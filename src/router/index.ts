@@ -14,6 +14,14 @@ export const router = createBrowserRouter([
         path: '/',
         Component: lazy(async () => import('@/pages/top.tsx')),
       },
+      {
+        path: '/c-time-keepers',
+        Component: lazy(async () => import('@/pages/c-time-keepers.tsx')),
+      },
+      {
+        path: '/sample',
+        Component: lazy(async () => import('@/pages/sample.tsx')),
+      },
     ],
   },
   {

@@ -8,9 +8,7 @@
     "preview": "vite preview",
     "format": "xo --fix --version ./src",
     "check-format": "xo --check --version ./src",
-    "type-check": "tsc --noEmit",
-    "test": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "type-check": "tsc --noEmit"
   },
   "xo": {
     "space": true,
