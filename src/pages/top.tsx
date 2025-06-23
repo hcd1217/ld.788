@@ -1,10 +1,10 @@
-import { 
-  Container, 
-  Stack, 
-  Title, 
-  Text, 
-  Button, 
-  Group, 
+import {
+  Container,
+  Stack,
+  Title,
+  Text,
+  Button,
+  Group,
   Box,
   BackgroundImage,
   Overlay,
@@ -13,11 +13,10 @@ import {
   SimpleGrid,
   Card,
   Badge,
-  Space
 } from '@mantine/core';
-import { 
-  IconRocket, 
-  IconSparkles, 
+import {
+  IconRocket,
+  IconSparkles,
   IconTrendingUp,
   IconShieldCheck,
   IconBolt,
@@ -49,10 +48,10 @@ export default function Top() {
                 >
                   Welcome to the Future
                 </Badge>
-                
-                <Title 
-                  order={1} 
-                  size={{ base: 42, sm: 58, md: 72 }}
+
+                <Title
+                  order={1}
+                  size={72}
                   fw={900}
                   c="white"
                   style={{ lineHeight: 1.1 }}
@@ -67,20 +66,20 @@ export default function Top() {
                     {' '}With Innovation
                   </Text>
                 </Title>
-                
-                <Text 
-                  size="xl" 
+
+                <Text
+                  size="xl"
                   c="dimmed"
                   maw={600}
                   style={{ color: 'rgba(255, 255, 255, 0.9)' }}
                 >
-                  Unlock the power of cutting-edge technology to accelerate growth, 
+                  Unlock the power of cutting-edge technology to accelerate growth,
                   streamline operations, and stay ahead of the competition.
                 </Text>
-                
+
                 <Group mt="xl">
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
                     radius="md"
                     variant="gradient"
                     gradient={{ from: 'blue', to: 'cyan' }}
@@ -88,8 +87,8 @@ export default function Top() {
                   >
                     Get Started Free
                   </Button>
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
                     radius="md"
                     variant="white"
                     color="dark"
@@ -131,7 +130,7 @@ export default function Top() {
                 Lightning Fast
               </Text>
               <Text size="sm" c="dimmed">
-                Optimized performance that delivers results in milliseconds, 
+                Optimized performance that delivers results in milliseconds,
                 ensuring your users never wait.
               </Text>
             </Card>
@@ -150,7 +149,7 @@ export default function Top() {
                 Enterprise Security
               </Text>
               <Text size="sm" c="dimmed">
-                Bank-level encryption and security measures to keep your 
+                Bank-level encryption and security measures to keep your
                 data safe and compliant.
               </Text>
             </Card>
@@ -169,7 +168,7 @@ export default function Top() {
                 Scalable Growth
               </Text>
               <Text size="sm" c="dimmed">
-                Built to grow with your business, from startup to enterprise, 
+                Built to grow with your business, from startup to enterprise,
                 without missing a beat.
               </Text>
             </Card>
@@ -188,7 +187,7 @@ export default function Top() {
                 Team Collaboration
               </Text>
               <Text size="sm" c="dimmed">
-                Seamless collaboration tools that bring your team together, 
+                Seamless collaboration tools that bring your team together,
                 no matter where they are.
               </Text>
             </Card>
@@ -207,7 +206,7 @@ export default function Top() {
                 AI-Powered
               </Text>
               <Text size="sm" c="dimmed">
-                Leverage artificial intelligence to automate tasks and 
+                Leverage artificial intelligence to automate tasks and
                 gain valuable insights.
               </Text>
             </Card>
@@ -226,7 +225,7 @@ export default function Top() {
                 Quick Setup
               </Text>
               <Text size="sm" c="dimmed">
-                Get up and running in minutes with our intuitive setup 
+                Get up and running in minutes with our intuitive setup
                 process and documentation.
               </Text>
             </Card>
@@ -242,12 +241,12 @@ export default function Top() {
               Ready to Get Started?
             </Title>
             <Text size="lg" c="dimmed" maw={500}>
-              Join thousands of companies already transforming their business 
+              Join thousands of companies already transforming their business
               with our platform.
             </Text>
             <Group>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 radius="md"
                 variant="gradient"
                 gradient={{ from: 'blue', to: 'cyan' }}
@@ -255,8 +254,8 @@ export default function Top() {
               >
                 Start Free Trial
               </Button>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 radius="md"
                 variant="default"
               >
