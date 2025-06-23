@@ -1,0 +1,51 @@
+{
+  "name": "c-landing-page",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "format": "xo --fix --version ./src",
+    "check-format": "xo --check --version ./src",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "xo": {
+    "space": true,
+    "prettier": true,
+    "print-config": true,
+    "semicolon": true,
+    "react": true,
+    "rules": {
+      "react/react-in-jsx-scope": "off"
+    }
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@mantine/core": "^8.0.2",
+    "@mantine/form": "^8.1.0",
+    "@mantine/hooks": "^8.0.2",
+    "@mantine/notifications": "^8.1.0",
+    "@tabler/icons-react": "3.17.0",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "@vite-pwa/assets-generator": "^0.2.6",
+    "@vitejs/plugin-react": "^4.2.1",
+    "axios": "^1.9.0",
+    "jsdom": "^26.1.0",
+    "react-router": "^7.6.2",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vite-plugin-pwa": "^1.0.0",
+    "vitest": "^3.2.3",
+    "xo": "^1.1.0",
+    "zod": "^3.25.63",
+    "zustand": "^5.0.5"
+  }
+}
