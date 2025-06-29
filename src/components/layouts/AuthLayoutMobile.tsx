@@ -34,7 +34,7 @@ import {VersionInformation} from '@/components/common/VersionInformation';
 export function AuthLayoutMobile() {
   const navigate = useNavigate();
   const location = useLocation();
-  const {user, logout, clientCode} = useAppStore();
+  const {user, logout} = useAppStore();
   const {t} = useTranslation();
   const {setColorScheme} = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light', {
@@ -43,11 +43,7 @@ export function AuthLayoutMobile() {
 
   const handleLogout = () => {
     logout();
-    if (clientCode) {
-      navigate(`/${clientCode}/login`);
-    } else {
-      navigate('/login');
-    }
+    navigate('/login');
   };
 
   const navigationItems = [

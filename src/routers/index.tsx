@@ -105,6 +105,6 @@ export const router = createBrowserRouter([
   {
     path: '/',
     Component: ServiceLayout,
-    children: [...routeObjects],
+    children: routeObjects,
   },
 ]);

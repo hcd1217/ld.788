@@ -13,7 +13,6 @@ type AppState = {
   isAuthenticated: boolean;
   isLoading: boolean;
   theme: 'light' | 'dark';
-  setClientCode: (clientCode: string) => void;
   setUser: (user: User | undefined) => void;
   setTheme: (theme: 'light' | 'dark') => void;
   login: (params: {
@@ -34,13 +33,6 @@ export const useAppStore = create<AppState>()(
         isAuthenticated: false,
         isLoading: false,
         theme: 'light',
-        setClientCode(clientCode) {
-          localStorage.setItem('clientCode', clientCode);
-          set({clientCode});
-          setTimeout(() => {
-            globalThis.location.reload();
-          }, 400);
-        },
         setUser: (user) => set({user, isAuthenticated: Boolean(user)}),
         setTheme: (theme) => set({theme}),
         async login(params) {
@@ -53,6 +45,7 @@ export const useAppStore = create<AppState>()(
             });
             set({
               user,
+              clientCode: params.clientCode,
               isAuthenticated: true,
               isLoading: false,
             });

@@ -33,18 +33,14 @@ import {VersionInformation} from '@/components/common/VersionInformation';
 export function AuthLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const {user, logout, clientCode} = useAppStore();
+  const {user, logout} = useAppStore();
   const {t} = useTranslation();
   const [mobileOpened, {toggle: toggleMobile}] = useDisclosure();
   const {colorScheme} = useMantineColorScheme();
 
   const handleLogout = () => {
     logout();
-    if (clientCode) {
-      navigate(`/${clientCode}/login`);
-    } else {
-      navigate('/login');
-    }
+    navigate('/login');
   };
 
   const navigationItems = [

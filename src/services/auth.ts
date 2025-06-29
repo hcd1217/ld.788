@@ -19,6 +19,7 @@ export const authService = {
     credentials: LoginRequest,
   ): Promise<{response: LoginResponse; user: User}> {
     try {
+      saveClientCode(credentials.clientCode);
       const response = await authApi.login(credentials);
       saveTokens({
         accessToken: response.accessToken,
@@ -53,6 +54,10 @@ export const authService = {
 
   getRefreshToken() {
     return localStorage.getItem('refreshToken') ?? undefined;
+  },
+
+  getClientCode() {
+    return localStorage.getItem('clientCode') ?? undefined;
   },
 
   async isAuthenticated() {
@@ -127,6 +132,10 @@ export const authService = {
     }
   },
 };
+
+function saveClientCode(clientCode: string) {
+  localStorage.setItem('clientCode', clientCode);
+}
 
 function saveTokens({
   accessToken,

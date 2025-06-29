@@ -43,20 +43,14 @@ export function LoginPage() {
   const [showAlert, setShowAlert] = useState(false);
   const [mounted, setMounted] = useState(false);
   const {t} = useTranslation();
-  const {clientCode, setClientCode} = useAppStore();
+  const {clientCode} = useAppStore();
   const params = useParams();
-
-  useEffect(() => {
-    if (params.clientCode && params.clientCode !== clientCode) {
-      setClientCode(params.clientCode);
-    }
-  }, [params.clientCode, setClientCode, clientCode]);
 
   const form = useForm<LoginFormValues>({
     initialValues: {
       identifier: localStorage.getItem('rememberedIdentifier') ?? '',
       password: '',
-      clientCode,
+      clientCode: params.clientCode ?? clientCode,
       rememberMe: Boolean(localStorage.getItem('rememberedIdentifier')),
     },
     validate: getFormValidators(t, ['identifier', 'password', 'clientCode']),
@@ -95,7 +89,6 @@ export function LoginPage() {
         message: t('notifications.loginSuccessMessage'),
         color: 'green',
       });
-      setClientCode(values.clientCode);
       navigate('/dashboard');
     } catch (error) {
       const errorMessage =

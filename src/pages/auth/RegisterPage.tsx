@@ -28,7 +28,6 @@ import {
 } from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
-import {useAppStore} from '@/stores/useAppStore';
 import {getLocaleConfig} from '@/config/localeConfig';
 import i18n from '@/lib/i18n';
 import {clientService} from '@/services/client';
@@ -47,7 +46,6 @@ type RegisterFormValues = {
 export function RegisterPage() {
   const navigate = useNavigate();
   const {t} = useTranslation();
-  const {setClientCode} = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -112,13 +110,12 @@ export function RegisterPage() {
         code: values.clientCode,
         name: values.clientName,
       });
-      setClientCode(client.code);
       notifications.show({
         title: t('notifications.registrationSuccess'),
         message: t('notifications.registrationSuccessMessage'),
         color: 'green',
       });
-      navigate('/login');
+      navigate(`/${client.code}/login`);
     } catch (error) {
       const errorMessage =
         error instanceof Error

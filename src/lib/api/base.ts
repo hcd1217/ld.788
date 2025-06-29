@@ -1,6 +1,5 @@
 import type {z} from 'zod';
 import {addApiError} from '@/stores/error';
-import {useAppStore} from '@/stores/useAppStore';
 import {authService} from '@/services/auth';
 
 type ApiConfig = {
@@ -92,6 +91,10 @@ export class BaseApiClient {
     return authService.getAccessToken() ?? undefined;
   }
 
+  private getClientCode(): string | undefined {
+    return authService.getClientCode() ?? undefined;
+  }
+
   private async request<T>(
     endpoint: string,
     config: RequestConfig<T> = {},
@@ -128,8 +131,10 @@ export class BaseApiClient {
       headers.set('Content-Type', 'application/json');
     }
 
-    const {clientCode} = useAppStore.getState();
-    headers.set('X-CLIENT-CODE', clientCode);
+    const clientCode = this.getClientCode();
+    if (clientCode) {
+      headers.set('X-CLIENT-CODE', clientCode);
+    }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
