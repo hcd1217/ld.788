@@ -10,7 +10,7 @@ import {
   useMantineTheme,
   useMantineColorScheme,
 } from '@mantine/core';
-import {Navigate, useParams} from 'react-router';
+import {Navigate} from 'react-router';
 import {LanguageSwitcher} from '@/components/common/LanguageSwitcher';
 import {ColorSchemeToggle} from '@/components/common/ColorSchemeToggle';
 import {useTranslation} from '@/hooks/useTranslation';
@@ -31,15 +31,9 @@ export function GuestLayout({
   const theme = useMantineTheme();
   const {colorScheme} = useMantineColorScheme();
   const {isAuthenticated} = useAppStore();
-  const {clientCode} = useParams();
 
   if (isAuthenticated) {
-    return (
-      <Navigate
-        replace
-        to={clientCode ? `/${clientCode}/profile` : '/profile'}
-      />
-    );
+    return <Navigate replace to="/profile" />;
   }
 
   return (

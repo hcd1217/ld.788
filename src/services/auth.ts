@@ -48,7 +48,7 @@ export const authService = {
   },
 
   getAccessToken() {
-    return sessionStorage.getItem('accessToken') ?? undefined;
+    return localStorage.getItem('accessToken') ?? undefined;
   },
 
   getRefreshToken() {
@@ -135,11 +135,11 @@ function saveTokens({
   accessToken: string;
   refreshToken: string;
 }) {
-  sessionStorage.setItem('accessToken', accessToken);
+  localStorage.setItem('accessToken', accessToken);
   localStorage.setItem('refreshToken', refreshToken);
 }
 
 function clearTokens() {
-  sessionStorage.removeItem('accessToken');
+  localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
 }

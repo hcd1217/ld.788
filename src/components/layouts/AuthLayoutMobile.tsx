@@ -13,7 +13,7 @@ import {
   useMantineColorScheme,
   useComputedColorScheme,
 } from '@mantine/core';
-import {Outlet, useNavigate, useLocation, useParams} from 'react-router';
+import {Outlet, useNavigate, useLocation} from 'react-router';
 import {
   IconUser,
   IconSettings,
@@ -34,9 +34,8 @@ import {VersionInformation} from '@/components/common/VersionInformation';
 export function AuthLayoutMobile() {
   const navigate = useNavigate();
   const location = useLocation();
-  const {user, logout} = useAppStore();
+  const {user, logout, clientCode} = useAppStore();
   const {t} = useTranslation();
-  const {clientCode} = useParams();
   const {setColorScheme} = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light', {
     getInitialValueInEffect: true,
@@ -55,22 +54,22 @@ export function AuthLayoutMobile() {
     {
       label: t('common.dashboard'),
       icon: IconDashboard,
-      path: clientCode ? `/${clientCode}/dashboard` : '/dashboard',
+      path: '/dashboard',
     },
     {
       label: t('common.explore'),
       icon: IconLayoutGrid,
-      path: clientCode ? `/${clientCode}/explore` : '/explore',
+      path: '/explore',
     },
     {
       label: t('common.notifications'),
       icon: IconBell,
-      path: clientCode ? `/${clientCode}/notifications` : '/notifications',
+      path: '/notifications',
     },
     {
       label: t('common.profile'),
       icon: IconUserCircle,
-      path: clientCode ? `/${clientCode}/profile` : '/profile',
+      path: '/profile',
     },
   ];
 

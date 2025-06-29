@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router';
+import {useNavigate, useParams} from 'react-router';
 import {
   TextInput,
   PasswordInput,
@@ -44,6 +44,13 @@ export function LoginPage() {
   const [mounted, setMounted] = useState(false);
   const {t} = useTranslation();
   const {clientCode, setClientCode} = useAppStore();
+  const params = useParams();
+
+  useEffect(() => {
+    if (params.clientCode && params.clientCode !== clientCode) {
+      setClientCode(params.clientCode);
+    }
+  }, [params.clientCode, setClientCode, clientCode]);
 
   const form = useForm<LoginFormValues>({
     initialValues: {
@@ -89,7 +96,7 @@ export function LoginPage() {
         color: 'green',
       });
       setClientCode(values.clientCode);
-      navigate(clientCode ? `/${clientCode}/dashboard` : '/dashboard');
+      navigate('/dashboard');
     } catch (error) {
       const errorMessage =
         error instanceof Error

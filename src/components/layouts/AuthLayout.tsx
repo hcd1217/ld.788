@@ -13,7 +13,7 @@ import {
   Divider,
   useMantineColorScheme,
 } from '@mantine/core';
-import {Outlet, useNavigate, useLocation, useParams} from 'react-router';
+import {Outlet, useNavigate, useLocation} from 'react-router';
 import {useDisclosure} from '@mantine/hooks';
 import {
   IconUser,
@@ -33,11 +33,10 @@ import {VersionInformation} from '@/components/common/VersionInformation';
 export function AuthLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const {user, logout} = useAppStore();
+  const {user, logout, clientCode} = useAppStore();
   const {t} = useTranslation();
   const [mobileOpened, {toggle: toggleMobile}] = useDisclosure();
   const {colorScheme} = useMantineColorScheme();
-  const {clientCode} = useParams();
 
   const handleLogout = () => {
     logout();
@@ -52,12 +51,12 @@ export function AuthLayout() {
     {
       label: t('common.dashboard'),
       icon: IconDashboard,
-      path: clientCode ? `/${clientCode}/dashboard` : '/dashboard',
+      path: '/dashboard',
     },
     {
       label: t('common.profile'),
       icon: IconUserCircle,
-      path: clientCode ? `/${clientCode}/profile` : '/profile',
+      path: '/profile',
     },
   ];
 

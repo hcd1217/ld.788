@@ -37,6 +37,9 @@ export const useAppStore = create<AppState>()(
         setClientCode(clientCode) {
           localStorage.setItem('clientCode', clientCode);
           set({clientCode});
+          setTimeout(() => {
+            globalThis.location.reload();
+          }, 400);
         },
         setUser: (user) => set({user, isAuthenticated: Boolean(user)}),
         setTheme: (theme) => set({theme}),

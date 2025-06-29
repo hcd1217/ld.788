@@ -5,7 +5,7 @@ import {useAppStore} from '@/stores/useAppStore';
 import {useTranslation} from '@/hooks/useTranslation';
 
 export function HomePage() {
-  const {user, isAuthenticated, clientCode} = useAppStore();
+  const {user, isAuthenticated} = useAppStore();
   const navigate = useNavigate();
   const {t} = useTranslation();
 
@@ -20,7 +20,7 @@ export function HomePage() {
       {isAuthenticated && user ? (
         <>
           <Text mt="md">Hello, {user.email}!</Text>
-          <Button onClick={() => navigate(`/${clientCode}/dashboard`)}>
+          <Button onClick={() => navigate('/dashboard')}>
             {t('common.dashboard')}
           </Button>
         </>

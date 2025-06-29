@@ -69,6 +69,10 @@ const routeObjects: RouteObject[] = [
         Component: LoginPage,
       },
       {
+        path: '/:clientCode/login',
+        Component: LoginPage,
+      },
+      {
         path: 'forgot-password',
         Component: ForgotPasswordPage,
       },
@@ -100,11 +104,6 @@ const routeObjects: RouteObject[] = [
 export const router = createBrowserRouter([
   {
     path: '/',
-    Component: ServiceLayout,
-    children: [...routeObjects],
-  },
-  {
-    path: '/:clientCode/*',
     Component: ServiceLayout,
     children: [...routeObjects],
   },
