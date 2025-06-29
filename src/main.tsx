@@ -6,7 +6,7 @@ import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import './index.css';
 import i18n from './lib/i18n';
-import App from './App.tsx';
+import App from './Application.tsx';
 import {theme} from '@/theme';
 import registerGlobalErrorCatcher from '@/utils/errorCatcher';
 import {ErrorModal} from '@/components/common/ErrorModal.tsx';
