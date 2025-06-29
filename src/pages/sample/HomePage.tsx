@@ -1,8 +1,14 @@
-import {Title, Text, Container} from '@mantine/core';
+import {Title, Text, Container, Button, Group} from '@mantine/core';
+import {useNavigate} from 'react-router';
+import {IconLogin} from '@tabler/icons-react';
 import {useAppStore} from '@/stores/useAppStore';
+import {useTranslation} from '@/hooks/useTranslation';
 
 export function HomePage() {
-  const {user} = useAppStore();
+  const {user, isAuthenticated} = useAppStore();
+  const navigate = useNavigate();
+  const {t} = useTranslation();
+
   return (
     <Container size="md" mt="xl">
       <Title order={1}>Welcome to Credo App</Title>
@@ -10,7 +16,20 @@ export function HomePage() {
         A Progressive Web App built with Vite, Mantine, Zustand, and React
         Router
       </Text>
-      {user ? <Text mt="md">Hello, {user.email}!</Text> : null}
+
+      {isAuthenticated && user ? (
+        <Text mt="md">Hello, {user.email}!</Text>
+      ) : (
+        <Group mt="xl">
+          <Button
+            size="lg"
+            leftSection={<IconLogin size={20} />}
+            onClick={() => navigate('/login')}
+          >
+            {t('common.login')}
+          </Button>
+        </Group>
+      )}
     </Container>
   );
 }
