@@ -1,0 +1,145 @@
+import {
+  authApi,
+  type LoginRequest,
+  type LoginResponse,
+  type ForgotPasswordRequest,
+  type ForgotPasswordResponse,
+  type ResetPasswordRequest,
+  type ResetPasswordResponse,
+} from '@/lib/api';
+import {decodeJWT, isTokenExpired} from '@/utils/jwt';
+
+export type User = {
+  id: string;
+  email: string;
+};
+
+export const authService = {
+  async login(
+    credentials: LoginRequest,
+  ): Promise<{response: LoginResponse; user: User}> {
+    try {
+      const response = await authApi.login(credentials);
+      saveTokens({
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      });
+
+      // Extract user info from JWT
+      const payload = decodeJWT(response.accessToken);
+      if (!payload) {
+        throw new Error('Invalid token received');
+      }
+
+      const user: User = {
+        id: payload.sub,
+        email: payload.email,
+      };
+
+      return {response, user};
+    } catch (error) {
+      console.error('Login failed', error);
+      throw error;
+    }
+  },
+
+  logout() {
+    clearTokens();
+  },
+
+  getAccessToken() {
+    return sessionStorage.getItem('accessToken') ?? undefined;
+  },
+
+  getRefreshToken() {
+    return localStorage.getItem('refreshToken') ?? undefined;
+  },
+
+  async isAuthenticated() {
+    const token = this.getAccessToken();
+    if (!token) {
+      return false;
+    }
+
+    // Renew token if it is expired
+    if (isTokenExpired(token)) {
+      const refreshToken = this.getRefreshToken();
+      if (!refreshToken) {
+        return false;
+      }
+
+      try {
+        const response = await authApi.renewToken({
+          refreshToken,
+        });
+        saveTokens({
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+        });
+      } catch (error) {
+        console.error('Failed to renew token', error);
+        clearTokens();
+        return false;
+      }
+    }
+
+    return true;
+  },
+
+  getCurrentUser(): User | undefined {
+    const token = this.getAccessToken();
+    if (!token) {
+      return undefined;
+    }
+
+    const payload = decodeJWT(token);
+    if (!payload) {
+      return undefined;
+    }
+
+    return {
+      id: payload.sub,
+      email: payload.email,
+    };
+  },
+
+  async forgotPassword(
+    data: ForgotPasswordRequest,
+  ): Promise<ForgotPasswordResponse> {
+    try {
+      const response = await authApi.forgotPassword(data);
+      return response;
+    } catch (error) {
+      console.error('Failed to send password reset email', error);
+      throw error;
+    }
+  },
+
+  async resetPassword(
+    data: ResetPasswordRequest,
+  ): Promise<ResetPasswordResponse> {
+    try {
+      const response = await authApi.resetPassword(data);
+      return response;
+    } catch (error) {
+      console.error('Failed to reset password', error);
+      throw error;
+    }
+  },
+};
+
+function saveTokens({
+  accessToken,
+  refreshToken,
+}: {
+  accessToken: string;
+  refreshToken: string;
+}) {
+  sessionStorage.setItem('accessToken', accessToken);
+  localStorage.setItem('refreshToken', refreshToken);
+}
+
+function clearTokens() {
+  sessionStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+}

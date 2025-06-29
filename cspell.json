@@ -1,0 +1,24 @@
+{
+  "ignorePaths": [
+    ".gitignore",
+    "package.json",
+    "node_modules",
+    "src/locales/vi.json",
+    "dist"
+  ],
+  "words": [
+    "Tiếng",
+    "Việt",
+    "webfonts",
+    "gstatic",
+    "beforeinstallprompt",
+    "Cantarell",
+    "Fira",
+    "languagedetector",
+    "Neue",
+    "Segoe",
+    "tabler",
+    "unhandledrejection",
+    "zustand"
+  ]
+}

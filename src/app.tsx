@@ -1,14 +1,16 @@
-import { RouterProvider } from 'react-router';
-import { MantineProvider } from '@mantine/core';
-import { router } from './router/index.ts';
-import { theme } from './theme/index.ts';
-import { Notifications } from '@mantine/notifications';
+import {RouterProvider} from 'react-router';
+import {router} from '@/routers';
+import {usePWA} from '@/hooks/usePWA';
+import {ErrorBoundary} from '@/components/common/ErrorBoundary';
 
-export default function App() {
+function App() {
+  usePWA();
+
   return (
-    <MantineProvider theme={theme}>
-      <Notifications />
+    <ErrorBoundary>
       <RouterProvider router={router} />
-    </MantineProvider>
+    </ErrorBoundary>
   );
 }
+
+export default App;

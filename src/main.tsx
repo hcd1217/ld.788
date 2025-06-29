@@ -1,21 +1,39 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import {StrictMode, Suspense} from 'react';
+import {createRoot} from 'react-dom/client';
+import {MantineProvider} from '@mantine/core';
+import {Notifications} from '@mantine/notifications';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
-import App from './app.tsx';
-import registerGlobalErrorCatcher from '@/services/global-error-catcher.ts';
-import { registerLogger } from '@/services/logger.ts';
+import './index.css';
+import i18n from './lib/i18n';
+import App from './App.tsx';
+import {theme} from '@/theme';
+import registerGlobalErrorCatcher from '@/utils/errorCatcher';
+import {ErrorModal} from '@/components/common/ErrorModal.tsx';
+import {registerLogger} from '@/utils/logger';
+import {AppLoader} from '@/components/common/AppLoader.tsx';
 
-const root = document.querySelector('#root');
-if (!root) {
-  throw new Error('Root element not found');
-}
+// Initialize i18n
+void i18n;
+
+// Register global error catcher
+const unregisterErrorCatcher = registerGlobalErrorCatcher();
+
+// Cleanup on unload (optional)
+window.addEventListener('unload', () => {
+  unregisterErrorCatcher();
+});
 
 registerLogger();
-registerGlobalErrorCatcher();
 
-createRoot(root).render(
+createRoot(document.querySelector('#root')!).render(
   <StrictMode>
-    <App />
+    <MantineProvider theme={theme} defaultColorScheme="auto">
+      <Suspense fallback={<AppLoader />}>
+        <Notifications />
+        <ErrorModal />
+        <App />
+      </Suspense>
+    </MantineProvider>
   </StrictMode>,
 );
