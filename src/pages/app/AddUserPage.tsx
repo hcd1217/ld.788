@@ -23,7 +23,6 @@ import {
   IconArrowLeft,
   IconAlertCircle,
   IconMail,
-  IconUser,
   IconAt,
   IconUserPlus,
   IconLock,
@@ -35,6 +34,7 @@ import {
   validateEmail,
 } from '@/utils/validation';
 import {clientService} from '@/services/client';
+import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
 
 type AddUserFormValues = {
   email?: string;
@@ -211,33 +211,12 @@ export function AddUserPage() {
               />
               <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap="md">
-                  <Group grow>
-                    <TextInput
-                      required
-                      label={t('auth.firstName')}
-                      placeholder={t('auth.firstNamePlaceholder')}
-                      error={form.errors.firstName}
-                      disabled={isLoading}
-                      leftSection={<IconUser size={16} />}
-                      {...form.getInputProps('firstName')}
-                      onFocus={() => {
-                        setShowAlert(false);
-                      }}
-                    />
-
-                    <TextInput
-                      required
-                      label={t('auth.lastName')}
-                      placeholder={t('auth.lastNamePlaceholder')}
-                      error={form.errors.lastName}
-                      disabled={isLoading}
-                      leftSection={<IconUser size={16} />}
-                      {...form.getInputProps('lastName')}
-                      onFocus={() => {
-                        setShowAlert(false);
-                      }}
-                    />
-                  </Group>
+                  <FirstNameAndLastNameInForm
+                    form={form}
+                    isLoading={isLoading}
+                    setMounted={setMounted}
+                    setShowAlert={setShowAlert}
+                  />
 
                   <TextInput
                     autoComplete="email"

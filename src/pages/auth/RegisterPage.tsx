@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import {useNavigate} from 'react-router';
 import {
   TextInput,
@@ -13,25 +13,22 @@ import {
   Alert,
   Transition,
   LoadingOverlay,
-  Grid,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
 import {
-  IconArrowLeft,
   IconAlertCircle,
-  IconMail,
-  IconLock,
-  IconUser,
+  IconArrowLeft,
   IconBuilding,
   IconId,
+  IconLock,
+  IconMail,
 } from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
-import {getLocaleConfig} from '@/config/localeConfig';
-import i18n from '@/lib/i18n';
 import {clientService} from '@/services/client';
 import {getFormValidators} from '@/utils/validation';
+import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
 
 type RegisterFormValues = {
   clientCode: string;
@@ -79,24 +76,6 @@ export function RegisterPage() {
       'confirmPassword',
     ]),
   });
-
-  // Focus first name field (based on locale order) on mount and trigger mount animation
-  useEffect(() => {
-    setMounted(true);
-    const timer = setTimeout(() => {
-      const localeConfig = getLocaleConfig(i18n.language);
-      const fieldToFocus =
-        localeConfig.nameOrder === 'family-first'
-          ? 'input[name="lastName"]'
-          : 'input[name="firstName"]';
-      const inputElement =
-        document.querySelector<HTMLInputElement>(fieldToFocus);
-      inputElement?.focus();
-    }, 300);
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
 
   const handleSubmit = async (values: RegisterFormValues) => {
     try {
@@ -193,51 +172,12 @@ export function RegisterPage() {
                   }}
                 />
                 <Stack gap="md">
-                  <Grid>
-                    {(() => {
-                      const localeConfig = getLocaleConfig(i18n.language);
-                      const firstNameField = (
-                        <Grid.Col key="firstName" span={{base: 12, sm: 6}}>
-                          <TextInput
-                            required
-                            autoComplete="given-name"
-                            label={t('auth.firstName')}
-                            placeholder={t('auth.firstNamePlaceholder')}
-                            error={form.errors.firstName}
-                            disabled={isLoading}
-                            leftSection={<IconUser size={16} />}
-                            {...form.getInputProps('firstName')}
-                            onFocus={() => {
-                              setShowAlert(false);
-                            }}
-                          />
-                        </Grid.Col>
-                      );
-
-                      const lastNameField = (
-                        <Grid.Col key="lastName" span={{base: 12, sm: 6}}>
-                          <TextInput
-                            required
-                            autoComplete="family-name"
-                            label={t('auth.lastName')}
-                            placeholder={t('auth.lastNamePlaceholder')}
-                            error={form.errors.lastName}
-                            disabled={isLoading}
-                            leftSection={<IconUser size={16} />}
-                            {...form.getInputProps('lastName')}
-                            onFocus={() => {
-                              setShowAlert(false);
-                            }}
-                          />
-                        </Grid.Col>
-                      );
-
-                      // Return fields in order based on locale configuration
-                      return localeConfig.nameOrder === 'family-first'
-                        ? [lastNameField, firstNameField]
-                        : [firstNameField, lastNameField];
-                    })()}
-                  </Grid>
+                  <FirstNameAndLastNameInForm
+                    form={form}
+                    isLoading={isLoading}
+                    setMounted={setMounted}
+                    setShowAlert={setShowAlert}
+                  />
 
                   <TextInput
                     required
