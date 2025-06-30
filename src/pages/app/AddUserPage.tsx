@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {Navigate, useNavigate} from 'react-router';
 import {
   TextInput,
@@ -52,7 +52,6 @@ export function AddUserPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const {t} = useTranslation();
   const {user} = useAppStore();
   const {colorScheme} = useMantineColorScheme();
@@ -102,20 +101,6 @@ export function AddUserPage() {
       },
     },
   });
-
-  // Focus email input on mount and trigger mount animation
-  useEffect(() => {
-    setMounted(true);
-    const timer = setTimeout(() => {
-      const emailInput = document.querySelector<HTMLInputElement>(
-        'input[name="email"]',
-      );
-      emailInput?.focus();
-    }, 300);
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
 
   const handleSubmit = async (values: AddUserFormValues) => {
     try {
@@ -209,7 +194,7 @@ export function AddUserPage() {
         </Title>
 
         <Transition
-          mounted={mounted}
+          mounted={true}
           transition="slide-up"
           duration={400}
           timingFunction="ease"
@@ -235,7 +220,6 @@ export function AddUserPage() {
                   <FirstNameAndLastNameInForm
                     form={form}
                     isLoading={isLoading}
-                    setMounted={setMounted}
                     setShowAlert={setShowAlert}
                   />
 
@@ -321,7 +305,6 @@ export function AddUserPage() {
                     loading={isLoading}
                     type="submit"
                     size="md"
-                    disabled={!form.isValid() && form.isTouched()}
                     leftSection={<IconUserPlus size={16} />}
                     styles={{
                       root: {

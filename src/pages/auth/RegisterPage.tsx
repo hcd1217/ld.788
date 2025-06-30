@@ -45,7 +45,7 @@ export function RegisterPage() {
   const {t} = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [mounted, setMounted] = useState(false);
+
   const form = useForm<RegisterFormValues>({
     initialValues: import.meta.env.PROD
       ? {
@@ -123,7 +123,7 @@ export function RegisterPage() {
     <GuestLayout hasRegisterLink={false} title={t('auth.registerTitle')}>
       <Stack gap="xl">
         <Transition
-          mounted={mounted}
+          mounted={true}
           transition="slide-up"
           duration={400}
           timingFunction="ease"
@@ -175,7 +175,6 @@ export function RegisterPage() {
                   <FirstNameAndLastNameInForm
                     form={form}
                     isLoading={isLoading}
-                    setMounted={setMounted}
                     setShowAlert={setShowAlert}
                   />
 

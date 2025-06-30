@@ -11,18 +11,15 @@ export function FirstNameAndLastNameInForm<
 >({
   form,
   isLoading,
-  setMounted,
   setShowAlert,
 }: {
   readonly isLoading: boolean;
   readonly form: UseFormReturnType<T>;
-  readonly setMounted: (mounted: boolean) => void;
   readonly setShowAlert: (show: boolean) => void;
 }) {
   const {t} = useTranslation();
   // Focus first name field (based on locale order) on mount and trigger mount animation
   useEffect(() => {
-    setMounted(true);
     const timer = setTimeout(() => {
       const localeConfig = getLocaleConfig(i18n.language);
       const fieldToFocus =
@@ -36,7 +33,7 @@ export function FirstNameAndLastNameInForm<
     return () => {
       clearTimeout(timer);
     };
-  }, [setMounted]);
+  }, []);
 
   return (
     <Grid>
