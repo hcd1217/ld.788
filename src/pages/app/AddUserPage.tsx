@@ -29,12 +29,16 @@ import {
   IconLock,
 } from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
-import {getFormValidators} from '@/utils/validation';
+import {
+  getFormValidators,
+  validateIdentifier,
+  validateEmail,
+} from '@/utils/validation';
 import {clientService} from '@/services/client';
 
 type AddUserFormValues = {
-  email: string;
-  username: string;
+  email?: string;
+  userName?: string;
   firstName: string;
   lastName: string;
   password: string;
@@ -52,7 +56,7 @@ export function AddUserPage() {
     initialValues: import.meta.env.DEV
       ? {
           email: 'test@test.com',
-          username: 'test-user',
+          userName: 'test-user',
           firstName: 'Test',
           lastName: 'Test',
           password: 'Secret@123',
@@ -60,20 +64,38 @@ export function AddUserPage() {
         }
       : {
           email: '',
-          username: '',
+          userName: '',
           firstName: '',
           lastName: '',
           password: '',
           confirmPassword: '',
         },
-    validate: getFormValidators(t, [
-      'firstName',
-      'lastName',
-      'email',
-      'username',
-      'password',
-      'confirmPassword',
-    ]),
+    validate: {
+      ...getFormValidators(t, [
+        'firstName',
+        'lastName',
+        'password',
+        'confirmPassword',
+      ]),
+      email(value?: string) {
+        if (!value) {
+          return undefined;
+        }
+
+        return validateEmail(value, t);
+      },
+      userName(value?: string) {
+        if (!value) {
+          if (form.values.email) {
+            return undefined;
+          }
+
+          return t('validation.emailOrUserNameRequired');
+        }
+
+        return validateIdentifier(value, t);
+      },
+    },
   });
 
   // Focus email input on mount and trigger mount animation
@@ -101,10 +123,10 @@ export function AddUserPage() {
 
       await clientService.registerUserByRootUser({
         email: values.email,
+        userName: values.userName,
         password: values.password,
         firstName: values.firstName,
         lastName: values.lastName,
-        username: values.username,
       });
 
       notifications.show({
@@ -122,7 +144,7 @@ export function AddUserPage() {
 
       form.setErrors({
         email: '',
-        username: '',
+        userName: '',
         role: '',
         firstName: '',
         lastName: '',
@@ -218,7 +240,6 @@ export function AddUserPage() {
                   </Group>
 
                   <TextInput
-                    required
                     autoComplete="email"
                     label={t('auth.email')}
                     placeholder="user@example.com"
@@ -232,13 +253,12 @@ export function AddUserPage() {
                   />
 
                   <TextInput
-                    required
-                    label={t('auth.username')}
-                    placeholder="username"
-                    error={form.errors.username}
+                    label={t('auth.userName')}
+                    placeholder="userName"
+                    error={form.errors.userName}
                     disabled={isLoading}
                     leftSection={<IconAt size={16} />}
-                    {...form.getInputProps('username')}
+                    {...form.getInputProps('userName')}
                     onFocus={() => {
                       setShowAlert(false);
                     }}

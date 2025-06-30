@@ -30,11 +30,11 @@ export const RegisterClientResponseSchema = z.object({
 });
 
 export const RegisterUserByRootUserRequestSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
-  username: z.string(),
+  email: emailSchema.optional(),
+  userName: z.string().optional(),
   firstName: z.string(),
   lastName: z.string(),
+  password: passwordSchema,
 });
 
 export const RegisterUserByRootUserResponseSchema = z.object({

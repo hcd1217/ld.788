@@ -15,7 +15,7 @@ export class TestApiClient extends BaseApiClient {
     const schema = z.object({
       id: z.number(),
       name: z.string(),
-      username: z.string(),
+      userName: z.string(),
       email: z.string(),
     });
 

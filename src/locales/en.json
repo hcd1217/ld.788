@@ -32,7 +32,7 @@
     "resetPasswordTitle": "Reset Password",
     "addUserTitle": "Add User",
     "email": "Email",
-    "username": "Username",
+    "userName": "Username",
     "identifier": "Username",
     "password": "Password",
     "newPassword": "New password",
@@ -84,6 +84,7 @@
   "validation": {
     "fieldRequired": "This field is required",
     "emailRequired": "Email is required",
+    "emailOrUserNameRequired": "Email or username is required",
     "emailInvalid": "Invalid email format",
     "usernameRequired": "Username is required",
     "usernameTooShort": "Username must be at least 3 characters",
