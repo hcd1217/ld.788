@@ -20,9 +20,7 @@ export function HomePage() {
       {isAuthenticated && user ? (
         <>
           <Text mt="md">Hello, {user.email}!</Text>
-          <Button onClick={() => navigate('/dashboard')}>
-            {t('common.dashboard')}
-          </Button>
+          <Button onClick={() => navigate('/home')}>{t('common.home')}</Button>
         </>
       ) : (
         <Group mt="xl">

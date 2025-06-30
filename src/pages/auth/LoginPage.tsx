@@ -89,7 +89,7 @@ export function LoginPage() {
         message: t('notifications.loginSuccessMessage'),
         color: 'green',
       });
-      navigate('/dashboard');
+      navigate('/home');
     } catch (error) {
       const errorMessage =
         error instanceof Error

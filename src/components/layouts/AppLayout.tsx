@@ -1,7 +1,8 @@
-import {AppShell, Group, Title} from '@mantine/core';
+import {AppShell, Group} from '@mantine/core';
 import {Outlet} from 'react-router';
 import {ColorSchemeToggle} from '@/components/common/ColorSchemeToggle';
 import {LanguageSwitcher} from '@/components/common/LanguageSwitcher';
+import {AppLogo} from '@/components/common/AppLogo';
 
 /*
  * @deprecated
@@ -14,7 +15,7 @@ export function AppLayout() {
     <AppShell header={{height: 60}} padding="md">
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between">
-          <Title order={3}>Credo</Title>
+          <AppLogo />
           <Group>
             <LanguageSwitcher />
             <ColorSchemeToggle />

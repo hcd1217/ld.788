@@ -1,13 +1,11 @@
 import {
   AppShell,
   Group,
-  Title,
   Menu,
   Avatar,
   Text,
   rem,
   UnstyledButton,
-  Box,
   Burger,
   Stack,
   Divider,
@@ -29,6 +27,7 @@ import {LanguageSwitcher} from '@/components/common/LanguageSwitcher';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {VersionInformation} from '@/components/common/VersionInformation';
+import {AppLogo} from '@/components/common/AppLogo';
 
 export function AuthLayout() {
   const navigate = useNavigate();
@@ -45,9 +44,9 @@ export function AuthLayout() {
 
   const navigationItems = [
     {
-      label: t('common.dashboard'),
+      label: t('common.home'),
       icon: IconDashboard,
-      path: '/dashboard',
+      path: '/home',
     },
     {
       label: t('common.profile'),
@@ -136,18 +135,7 @@ export function AuthLayout() {
               size="sm"
               onClick={toggleMobile}
             />
-            <Group gap="xs">
-              <Box
-                component="img"
-                src="/logo.svg"
-                alt="Logo"
-                style={{
-                  width: 30,
-                  height: 30,
-                }}
-              />
-              <Title order={3}>Credo</Title>
-            </Group>
+            <AppLogo />
           </Group>
 
           <Group>

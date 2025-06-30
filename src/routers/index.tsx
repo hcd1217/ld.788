@@ -19,9 +19,9 @@ const NotFound = lazy(async () => {
   return {default: module.NotFound};
 });
 
-const HomePage = lazy(async () => {
-  const module = await import('@/pages/sample/HomePage');
-  return {default: module.HomePage};
+const TopPage = lazy(async () => {
+  const module = await import('@/pages/TopPage');
+  return {default: module.TopPage};
 });
 
 const ProfilePage = lazy(async () => {
@@ -29,9 +29,9 @@ const ProfilePage = lazy(async () => {
   return {default: module.ProfilePage};
 });
 
-const DashboardPage = lazy(async () => {
-  const module = await import('@/pages/app/DashboardPage');
-  return {default: module.DashboardPage};
+const HomePage = lazy(async () => {
+  const module = await import('@/pages/app/HomePage');
+  return {default: module.HomePage};
 });
 
 const ExplorePage = lazy(async () => {
@@ -42,6 +42,11 @@ const ExplorePage = lazy(async () => {
 const NotificationsPage = lazy(async () => {
   const module = await import('@/pages/app/NotificationPage');
   return {default: module.NotificationsPage};
+});
+
+const MorePage = lazy(async () => {
+  const module = await import('@/pages/app/MorePage');
+  return {default: module.MorePage};
 });
 
 const LoginPage = lazy(async () => {
@@ -69,7 +74,7 @@ const routeObjects: RouteObject[] = [
     path: '',
     Component: AppLayout,
     children: [
-      {index: true, Component: HomePage},
+      {index: true, Component: TopPage},
       {
         path: 'sample',
         children: [{path: 'errors', Component: ErrorsPage}],
@@ -110,9 +115,10 @@ const routeObjects: RouteObject[] = [
     ),
     children: [
       {path: 'profile', Component: ProfilePage},
-      {path: 'dashboard', Component: DashboardPage},
+      {path: 'home', Component: HomePage},
       {path: 'explore', Component: ExplorePage},
       {path: 'notifications', Component: NotificationsPage},
+      {path: 'more', Component: MorePage},
     ],
   },
 ];

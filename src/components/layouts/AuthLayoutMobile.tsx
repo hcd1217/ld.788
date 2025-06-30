@@ -1,13 +1,11 @@
 import {
   AppShell,
   Group,
-  Title,
   Menu,
   Avatar,
   Text,
   rem,
   UnstyledButton,
-  Box,
   Stack,
   Switch,
   useMantineColorScheme,
@@ -18,18 +16,19 @@ import {
   IconUser,
   IconSettings,
   IconLogout,
-  IconUserCircle,
   IconLayoutGrid,
   IconBell,
   IconSun,
   IconMoon,
-  IconDashboard,
+  IconHome,
+  IconDots,
 } from '@tabler/icons-react';
 import classes from './AuthLayoutMobile.module.css';
 import {PWAInstallPrompt} from '@/components/common/PWAInstallPrompt';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {VersionInformation} from '@/components/common/VersionInformation';
+import {AppLogo} from '@/components/common/AppLogo';
 
 export function AuthLayoutMobile() {
   const navigate = useNavigate();
@@ -48,9 +47,9 @@ export function AuthLayoutMobile() {
 
   const navigationItems = [
     {
-      label: t('common.dashboard'),
-      icon: IconDashboard,
-      path: '/dashboard',
+      label: t('common.home'),
+      icon: IconHome,
+      path: '/home',
     },
     {
       label: t('common.explore'),
@@ -63,9 +62,9 @@ export function AuthLayoutMobile() {
       path: '/notifications',
     },
     {
-      label: t('common.profile'),
-      icon: IconUserCircle,
-      path: '/profile',
+      label: t('common.more'),
+      icon: IconDots,
+      path: '/more',
     },
   ];
 
@@ -155,18 +154,7 @@ export function AuthLayoutMobile() {
     >
       <AppShell.Header className={classes.header}>
         <Group h="100%" px="md" justify="space-between">
-          <Group gap="xs">
-            <Box
-              component="img"
-              src="/logo.svg"
-              alt="Logo"
-              style={{
-                width: 30,
-                height: 30,
-              }}
-            />
-            <Title order={3}>Credo</Title>
-          </Group>
+          <AppLogo />
 
           <UserMenu />
         </Group>
