@@ -100,6 +100,7 @@ export function createAuthValidation(t: TranslationFunction) {
     identifier: (value: string) => validateIdentifier(value, t),
     clientCode: (value: string) => validateRequired(value, t),
     clientName: (value: string) => validateRequired(value, t),
+    username: (value: string) => validateIdentifier(value, t),
   };
 }
 

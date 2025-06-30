@@ -1,6 +1,7 @@
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 import {authService} from '@/services/auth';
+import {delay} from '@/utils/time';
 
 type User = {
   id: string;
@@ -30,7 +31,7 @@ export const useAppStore = create<AppState>()(
       return {
         clientCode: localStorage.getItem('clientCode') ?? '',
         user: authService.getCurrentUser() ?? undefined,
-        isAuthenticated: false,
+        isAuthenticated: true,
         isLoading: false,
         theme: 'light',
         setUser: (user) => set({user, isAuthenticated: Boolean(user)}),
@@ -60,8 +61,14 @@ export const useAppStore = create<AppState>()(
         },
         async checkAuth() {
           const isAuthenticated = await authService.isAuthenticated();
-          const user = authService.getCurrentUser();
-          set({isAuthenticated, user: user ?? undefined});
+          if (isAuthenticated) {
+            await delay(100);
+            const user = authService.getCurrentUser();
+            set({isAuthenticated, user: user ?? undefined});
+          } else {
+            set({user: undefined, isAuthenticated: false});
+          }
+
           return isAuthenticated;
         },
       };

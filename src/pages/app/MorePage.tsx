@@ -19,6 +19,7 @@ import {
   IconExternalLink,
   IconInfoCircle,
   IconLogout,
+  IconUserPlus,
 } from '@tabler/icons-react';
 import {Navigate, useNavigate} from 'react-router';
 import {useTranslation} from '@/hooks/useTranslation';
@@ -67,6 +68,13 @@ export function MorePage() {
   ];
 
   const utilityItems = [
+    {
+      title: t('common.addUser'),
+      description: 'Add new users to the system',
+      icon: IconUserPlus,
+      onClick: () => navigate('/add-user'),
+      color: 'blue',
+    },
     {
       title: 'Error Testing',
       description: 'Test error handling (Dev only)',

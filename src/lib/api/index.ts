@@ -15,23 +15,9 @@ export const clientApi = new ClientApi({
 });
 
 // Export types and schemas
+export * from './auth';
+export * from './client';
 
-export type {RegisterClientRequest, RegisterClientResponse} from './client';
-
-export {
-  RegisterClientRequestSchema,
-  RegisterClientResponseSchema,
-} from './client';
-
-export type {
-  LoginRequest,
-  LoginResponse,
-  JWTPayload,
-  ForgotPasswordRequest,
-  ForgotPasswordResponse,
-  ResetPasswordRequest,
-  ResetPasswordResponse,
-} from './auth';
 export {
   LoginRequestSchema,
   LoginResponseSchema,

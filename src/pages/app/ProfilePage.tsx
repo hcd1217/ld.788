@@ -4,14 +4,14 @@ import {useAppStore} from '@/stores/useAppStore';
 
 export function ProfilePage() {
   const navigate = useNavigate();
-  const {user, logout} = useAppStore();
+  const {isAuthenticated, user, logout} = useAppStore();
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
-  if (!user) {
+  if (!isAuthenticated) {
     return (
       <Container size="sm" mt="xl">
         <Card shadow="sm" padding="lg">
@@ -30,9 +30,9 @@ export function ProfilePage() {
       <Card shadow="sm" padding="lg">
         <Title order={1}>Profile</Title>
         <Text mt="md" size="lg">
-          Email: {user.email}
+          Email: {user?.email}
         </Text>
-        <Text size="lg">Email: {user.email}</Text>
+        <Text size="lg">Email: {user?.email}</Text>
         <Group mt="xl">
           <Button color="red" onClick={handleLogout}>
             Logout

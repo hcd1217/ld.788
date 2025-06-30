@@ -49,6 +49,11 @@ const MorePage = lazy(async () => {
   return {default: module.MorePage};
 });
 
+const AddUserPage = lazy(async () => {
+  const module = await import('@/pages/app/AddUserPage');
+  return {default: module.AddUserPage};
+});
+
 const LoginPage = lazy(async () => {
   const module = await import('@/pages/auth/LoginPage');
   return {default: module.LoginPage};
@@ -116,6 +121,7 @@ const routeObjects: RouteObject[] = [
     children: [
       {path: 'profile', Component: ProfilePage},
       {path: 'home', Component: HomePage},
+      {path: 'add-user', Component: AddUserPage},
       {path: 'explore', Component: ExplorePage},
       {path: 'notifications', Component: NotificationsPage},
       {path: 'more', Component: MorePage},

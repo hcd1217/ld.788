@@ -106,7 +106,7 @@ export class BaseApiClient {
     if (import.meta.env.DEV) {
       const delayMs = Number(import.meta.env.VITE_DEV_API_DELAY) || 0;
       if (delayMs > 0) {
-        console.log(
+        console.ignore(
           `[API] Delaying request for ${delayMs}ms: ${init.method ?? 'GET'} ${endpoint}`,
         );
         await new Promise((resolve) => {

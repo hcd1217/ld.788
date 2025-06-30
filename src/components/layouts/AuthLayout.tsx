@@ -20,6 +20,7 @@ import {
   IconChevronDown,
   IconDashboard,
   IconUserCircle,
+  IconUserPlus,
 } from '@tabler/icons-react';
 import {PWAInstallPrompt} from '@/components/common/PWAInstallPrompt';
 import {ColorSchemeToggle} from '@/components/common/ColorSchemeToggle';
@@ -47,6 +48,11 @@ export function AuthLayout() {
       label: t('common.home'),
       icon: IconDashboard,
       path: '/home',
+    },
+    {
+      label: t('common.addUser'),
+      icon: IconUserPlus,
+      path: '/add-user',
     },
     {
       label: t('common.profile'),

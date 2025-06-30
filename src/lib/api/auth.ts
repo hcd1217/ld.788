@@ -4,7 +4,7 @@ import {BaseApiClient} from './base';
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&()^])[A-Za-z\d@#$!%*?&()^]{8,}$/;
 
-const jwtTokenRegex = /^(?:[\w-]{10,}\.){2}[\w-]{10,}$/
+const jwtTokenRegex = /^(?:[\w-]{10,}\.){2}[\w-]{10,}$/;
 
 const passwordSchema = z.string().regex(passwordRegex);
 const jwtTokenSchema = z.string().regex(jwtTokenRegex);
@@ -32,15 +32,9 @@ export const RenewTokenResponseSchema = z.object({
 
 export const JWTPayloadSchema = z.object({
   email: z.email(),
-  id: z.string().optional(),
-  sub: z.string().optional(),
+  sub: z.string(),
   iat: z.number(),
   exp: z.number(),
-}).transform((data) => {
-  return {
-    ...data,
-    id: data.id ?? data.sub,
-  };
 });
 
 export const ForgotPasswordRequestSchema = z.object({

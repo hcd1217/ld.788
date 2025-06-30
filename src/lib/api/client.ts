@@ -1,6 +1,11 @@
 import z from 'zod';
 import {BaseApiClient} from './base';
 
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&()^])[A-Za-z\d@#$!%*?&()^]{8,}$/;
+const passwordSchema = z.string().regex(passwordRegex);
+const emailSchema = z.email();
+
 export const RegisterClientRequestSchema = z.object({
   name: z.string(),
   code: z.string(),
@@ -24,9 +29,28 @@ export const RegisterClientResponseSchema = z.object({
   }),
 });
 
+export const RegisterUserByRootUserRequestSchema = z.object({
+  email: emailSchema,
+  password: passwordSchema,
+  username: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+});
+
+export const RegisterUserByRootUserResponseSchema = z.object({
+  id: z.string(),
+});
+
 export type RegisterClientRequest = z.infer<typeof RegisterClientRequestSchema>;
 export type RegisterClientResponse = z.infer<
   typeof RegisterClientResponseSchema
+>;
+
+export type RegisterUserByRootUserRequest = z.infer<
+  typeof RegisterUserByRootUserRequestSchema
+>;
+export type RegisterUserByRootUserResponse = z.infer<
+  typeof RegisterUserByRootUserResponseSchema
 >;
 
 export class ClientApi extends BaseApiClient {
@@ -36,6 +60,20 @@ export class ClientApi extends BaseApiClient {
       data,
       RegisterClientResponseSchema,
       RegisterClientRequestSchema,
+    );
+  }
+
+  async registerUserByRootUser(
+    data: RegisterUserByRootUserRequest,
+  ): Promise<RegisterUserByRootUserResponse> {
+    return this.post<
+      RegisterUserByRootUserResponse,
+      RegisterUserByRootUserRequest
+    >(
+      '/clients/user/register',
+      data,
+      RegisterUserByRootUserResponseSchema,
+      RegisterUserByRootUserRequestSchema,
     );
   }
 }

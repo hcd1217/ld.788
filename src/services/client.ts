@@ -2,6 +2,8 @@ import {
   clientApi,
   type RegisterClientRequest,
   type RegisterClientResponse,
+  type RegisterUserByRootUserRequest,
+  type RegisterUserByRootUserResponse,
 } from '@/lib/api';
 
 export type Client = {
@@ -15,5 +17,11 @@ export const clientService = {
     data: RegisterClientRequest,
   ): Promise<RegisterClientResponse> {
     return clientApi.register(data);
+  },
+
+  async registerUserByRootUser(
+    data: RegisterUserByRootUserRequest,
+  ): Promise<RegisterUserByRootUserResponse> {
+    return clientApi.registerUserByRootUser(data);
   },
 };
