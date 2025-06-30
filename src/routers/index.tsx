@@ -14,6 +14,11 @@ const ErrorsPage = lazy(async () => {
   return {default: module.ErrorsPage};
 });
 
+const NotFound = lazy(async () => {
+  const module = await import('@/pages/errors/NotFound');
+  return {default: module.NotFound};
+});
+
 const HomePage = lazy(async () => {
   const module = await import('@/pages/sample/HomePage');
   return {default: module.HomePage};
@@ -27,6 +32,16 @@ const ProfilePage = lazy(async () => {
 const DashboardPage = lazy(async () => {
   const module = await import('@/pages/app/DashboardPage');
   return {default: module.DashboardPage};
+});
+
+const ExplorePage = lazy(async () => {
+  const module = await import('@/pages/app/ExplorePage');
+  return {default: module.ExplorePage};
+});
+
+const NotificationsPage = lazy(async () => {
+  const module = await import('@/pages/app/NotificationPage');
+  return {default: module.NotificationsPage};
 });
 
 const LoginPage = lazy(async () => {
@@ -96,7 +111,8 @@ const routeObjects: RouteObject[] = [
     children: [
       {path: 'profile', Component: ProfilePage},
       {path: 'dashboard', Component: DashboardPage},
-      {path: '*', Component: DashboardPage},
+      {path: 'explore', Component: ExplorePage},
+      {path: 'notifications', Component: NotificationsPage},
     ],
   },
 ];
@@ -106,5 +122,9 @@ export const router = createBrowserRouter([
     path: '/',
     Component: ServiceLayout,
     children: routeObjects,
+  },
+  {
+    path: '*',
+    Component: NotFound,
   },
 ]);

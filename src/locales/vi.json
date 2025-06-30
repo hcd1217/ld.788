@@ -98,6 +98,9 @@
     "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối.",
     "serverError": "Lỗi máy chủ. Vui lòng thử lại sau.",
     "unauthorized": "Bạn không có quyền thực hiện hành động này.",
-    "notFound": "Không tìm thấy tài nguyên yêu cầu."
+    "notFound": "Không tìm thấy tài nguyên yêu cầu.",
+    "notFoundDescription": "Trang bạn đang tìm kiếm không tồn tại.",
+    "backToPreviousPage": "Quay lại trang trước",
+    "backToHomePage": "Quay lại trang chủ"
   }
 }

@@ -39,47 +39,11 @@ src/
   "common": {
     "login": "Login",
     "logout": "Logout",
-    "submit": "Submit",
-    "cancel": "Cancel",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit",
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success"
+    "submit": "Submit"
   },
   "auth": {
     "welcomeBack": "Welcome back!",
-    "email": "Email",
-    "password": "Password",
-    "rememberMe": "Remember me",
-    "forgotPassword": "Forgot password?",
-    "signIn": "Sign in",
-    "signUp": "Sign up",
-    "noAccount": "Do not have an account yet?",
-    "haveAccount": "Already have an account?",
-    "createAccount": "Create account",
-    "backToHome": "Back to homepage"
-  },
-  "validation": {
-    "emailRequired": "Email is required",
-    "emailInvalid": "Invalid email format",
-    "passwordRequired": "Password is required",
-    "passwordWeak": "Password must be at least 8 characters with uppercase, lowercase, number and special character",
-    "fieldRequired": "This field is required"
-  },
-  "notifications": {
-    "loginSuccess": "Welcome back!",
-    "loginSuccessMessage": "You have successfully logged in",
-    "loginFailed": "Login failed",
-    "invalidCredentials": "Invalid email or password. Please try again.",
-    "somethingWentWrong": "Something went wrong. Please try again."
-  },
-  "errors": {
-    "networkError": "Network error. Please check your connection.",
-    "serverError": "Server error. Please try again later.",
-    "unauthorized": "You are not authorized to perform this action.",
-    "notFound": "The requested resource was not found."
+    "email": "Email"
   }
 }
 ```
@@ -90,47 +54,11 @@ src/
   "common": {
     "login": "Đăng nhập",
     "logout": "Đăng xuất",
-    "submit": "Gửi",
-    "cancel": "Hủy",
-    "save": "Lưu",
-    "delete": "Xóa",
-    "edit": "Sửa",
-    "loading": "Đang tải...",
-    "error": "Lỗi",
-    "success": "Thành công"
+    "submit": "Gửi"
   },
   "auth": {
     "welcomeBack": "Chào mừng trở lại!",
-    "email": "Email",
-    "password": "Mật khẩu",
-    "rememberMe": "Ghi nhớ đăng nhập",
-    "forgotPassword": "Quên mật khẩu?",
-    "signIn": "Đăng nhập",
-    "signUp": "Đăng ký",
-    "noAccount": "Chưa có tài khoản?",
-    "haveAccount": "Đã có tài khoản?",
-    "createAccount": "Tạo tài khoản",
-    "backToHome": "Về trang chủ"
-  },
-  "validation": {
-    "emailRequired": "Email là bắt buộc",
-    "emailInvalid": "Email không hợp lệ",
-    "passwordRequired": "Mật khẩu là bắt buộc",
-    "passwordWeak": "Mật khẩu phải có ít nhất 8 ký tự bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt",
-    "fieldRequired": "Trường này là bắt buộc"
-  },
-  "notifications": {
-    "loginSuccess": "Chào mừng trở lại!",
-    "loginSuccessMessage": "Bạn đã đăng nhập thành công",
-    "loginFailed": "Đăng nhập thất bại",
-    "invalidCredentials": "Email hoặc mật khẩu không đúng. Vui lòng thử lại.",
-    "somethingWentWrong": "Có lỗi xảy ra. Vui lòng thử lại."
-  },
-  "errors": {
-    "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối.",
-    "serverError": "Lỗi máy chủ. Vui lòng thử lại sau.",
-    "unauthorized": "Bạn không có quyền thực hiện hành động này.",
-    "notFound": "Không tìm thấy tài nguyên yêu cầu."
+    "email": "Email"
   }
 }
 ```
@@ -249,11 +177,11 @@ import { useTranslation } from './hooks/useTranslation';
 
 function LoginPage() {
   const { t } = useTranslation();
-  
+
   return (
     <>
       <Title>{t('auth.welcomeBack')}</Title>
-      <TextInput 
+      <TextInput
         label={t('auth.email')}
         placeholder="you@example.com"
         error={form.errors.email && t('validation.emailRequired')}
