@@ -8,6 +8,7 @@ import {
   Button,
   Divider,
   rem,
+  useMantineColorScheme,
 } from '@mantine/core';
 import {
   IconHome,
@@ -19,7 +20,7 @@ import {
   IconInfoCircle,
   IconLogout,
 } from '@tabler/icons-react';
-import {useNavigate} from 'react-router';
+import {Navigate, useNavigate} from 'react-router';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 
@@ -27,6 +28,7 @@ export function MorePage() {
   const navigate = useNavigate();
   const {t} = useTranslation();
   const {user, logout} = useAppStore();
+  const {colorScheme} = useMantineColorScheme();
 
   const handleLogout = () => {
     logout();
@@ -82,6 +84,10 @@ export function MorePage() {
     },
   ];
 
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
   return (
     <Container size="sm" mt="xl">
       <Card shadow="sm" padding="lg" radius="md">
@@ -89,19 +95,22 @@ export function MorePage() {
           {t('common.more')}
         </Title>
 
-        {user ? (
-          <Card withBorder p="md" mb="lg" bg="gray.0">
-            <Group>
-              <IconUser size={20} />
-              <div>
-                <Text fw={500}>{user.email}</Text>
-                <Text size="sm" c="dimmed">
-                  {t('common.account')}
-                </Text>
-              </div>
-            </Group>
-          </Card>
-        ) : null}
+        <Card
+          withBorder
+          p="md"
+          mb="lg"
+          bg={colorScheme === 'dark' ? 'dark.6' : 'gray.0'}
+        >
+          <Group>
+            <IconUser size={20} />
+            <div>
+              <Text fw={500}>{user.email}</Text>
+              <Text size="sm" c="dimmed">
+                {t('common.account')}
+              </Text>
+            </div>
+          </Group>
+        </Card>
 
         <Stack gap="md">
           <div>

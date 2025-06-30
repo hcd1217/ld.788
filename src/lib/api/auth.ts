@@ -4,7 +4,11 @@ import {BaseApiClient} from './base';
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&()^])[A-Za-z\d@#$!%*?&()^]{8,}$/;
 
+const jwtTokenRegex = /^(?:[\w-]{10,}\.){2}[\w-]{10,}$/
+
 const passwordSchema = z.string().regex(passwordRegex);
+const jwtTokenSchema = z.string().regex(jwtTokenRegex);
+
 // Schemas
 export const LoginRequestSchema = z.object({
   identifier: z.string(),
@@ -13,24 +17,30 @@ export const LoginRequestSchema = z.object({
 });
 
 export const LoginResponseSchema = z.object({
-  accessToken: z.string(),
-  refreshToken: z.string(),
+  accessToken: jwtTokenSchema,
+  refreshToken: jwtTokenSchema,
 });
 
 export const RenewTokenRequestSchema = z.object({
-  refreshToken: z.string(),
+  refreshToken: jwtTokenSchema,
 });
 
 export const RenewTokenResponseSchema = z.object({
-  accessToken: z.string(),
-  refreshToken: z.string(),
+  accessToken: jwtTokenSchema,
+  refreshToken: jwtTokenSchema,
 });
 
 export const JWTPayloadSchema = z.object({
   email: z.email(),
-  sub: z.string(),
+  id: z.string().optional(),
+  sub: z.string().optional(),
   iat: z.number(),
   exp: z.number(),
+}).transform((data) => {
+  return {
+    ...data,
+    id: data.id ?? data.sub,
+  };
 });
 
 export const ForgotPasswordRequestSchema = z.object({
@@ -82,27 +92,21 @@ export type RegisterResponse = z.infer<typeof RegisterResponseSchema>;
 
 export class AuthApi extends BaseApiClient {
   async login(data: LoginRequest): Promise<LoginResponse> {
-    // Validate request data
-    const validatedData = LoginRequestSchema.parse(data);
-
     // Make request with response validation
-    return this.post<LoginResponse>(
+    return this.post<LoginResponse, LoginRequest>(
       '/auth/login',
-      validatedData,
+      data,
       LoginResponseSchema,
+      LoginRequestSchema,
     );
   }
 
   async forgotPassword(
     data: ForgotPasswordRequest,
   ): Promise<ForgotPasswordResponse> {
-    // Validate request data
-    const validatedData = ForgotPasswordRequestSchema.parse(data);
-
-    // Make request with response validation
-    return this.post<ForgotPasswordResponse>(
+    return this.post<ForgotPasswordResponse, ForgotPasswordRequest>(
       '/auth/forgot-password',
-      validatedData,
+      data,
       ForgotPasswordResponseSchema,
     );
   }
@@ -110,38 +114,28 @@ export class AuthApi extends BaseApiClient {
   async resetPassword(
     data: ResetPasswordRequest,
   ): Promise<ResetPasswordResponse> {
-    // Validate request data
-    const validatedData = ResetPasswordRequestSchema.parse(data);
-
-    // Make request with response validation
-    return this.post<ResetPasswordResponse>(
+    return this.post<ResetPasswordResponse, ResetPasswordRequest>(
       '/auth/reset-password',
-      validatedData,
+      data,
       ResetPasswordResponseSchema,
     );
   }
 
   async register(data: RegisterRequest): Promise<RegisterResponse> {
-    // Validate request data
-    const validatedData = RegisterRequestSchema.parse(data);
-
-    // Make request with response validation
-    return this.post<RegisterResponse>(
+    return this.post<RegisterResponse, RegisterRequest>(
       '/auth/register',
-      validatedData,
+      data,
       RegisterResponseSchema,
+      RegisterRequestSchema,
     );
   }
 
   async renewToken(data: RenewTokenRequest): Promise<RenewTokenResponse> {
-    // Validate request data
-    const validatedData = RenewTokenRequestSchema.parse(data);
-
-    // Make request with response validation
-    return this.post<RenewTokenResponse>(
+    return this.post<RenewTokenResponse, RenewTokenRequest>(
       '/auth/renew-token',
-      validatedData,
+      data,
       RenewTokenResponseSchema,
+      RenewTokenRequestSchema,
     );
   }
 }

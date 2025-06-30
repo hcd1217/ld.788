@@ -31,11 +31,11 @@ export type RegisterClientResponse = z.infer<
 
 export class ClientApi extends BaseApiClient {
   async register(data: RegisterClientRequest): Promise<RegisterClientResponse> {
-    const validatedData = RegisterClientRequestSchema.parse(data);
-    return this.post<RegisterClientResponse>(
+    return this.post<RegisterClientResponse, RegisterClientRequest>(
       '/clients/register',
-      validatedData,
+      data,
       RegisterClientResponseSchema,
+      RegisterClientRequestSchema,
     );
   }
 }

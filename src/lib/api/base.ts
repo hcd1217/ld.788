@@ -44,11 +44,13 @@ export class BaseApiClient {
     });
   }
 
-  async post<T>(
+  async post<T, R = unknown>(
     endpoint: string,
     data?: unknown,
     schema?: z.ZodSchema<T>,
+    dataSchema?: z.ZodSchema<R>,
   ): Promise<T> {
+    data = dataSchema?.parse(data) ?? data;
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
