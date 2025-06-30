@@ -33,7 +33,7 @@ export const authService = {
       }
 
       const user: User = {
-        id: payload.id,
+        id: payload.id ?? '',
         email: payload.email,
       };
 
@@ -103,7 +103,7 @@ export const authService = {
     }
 
     return {
-      id: payload.id,
+      id: payload.id ?? '',
       email: payload.email,
     };
   },
