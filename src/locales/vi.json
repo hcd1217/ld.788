@@ -20,6 +20,7 @@
     "settings": "Cài đặt",
     "preferences": "Tùy chọn",
     "addUser": "Thêm người dùng",
+    "importUsers": "Nhập người dùng",
     "darkMode": "Chế độ tối",
     "language": "Ngôn ngữ",
     "backToPreviousPage": "Quay lại trang trước"
@@ -79,7 +80,25 @@
     "passwordResetFailedDescription": "Không thể đặt lại mật khẩu. Liên kết có thể đã hết hạn hoặc không hợp lệ.",
     "redirectingToLogin": "Đang chuyển hướng đến trang đăng nhập...",
     "userAdded": "Người dùng đã được thêm thành công",
-    "addUserFailed": "Không thể thêm người dùng"
+    "addUserFailed": "Không thể thêm người dùng",
+    "importUsersTitle": "Nhập Người Dùng từ Excel",
+    "importUsers": "Nhập Người Dùng",
+    "downloadSample": "Tải Mẫu Excel",
+    "selectExcelFile": "Chọn File Excel",
+    "uploadFile": "Tải File Lên",
+    "importSuccess": "Nhập người dùng thành công",
+    "importFailed": "Không thể nhập người dùng",
+    "importSummary": "Tóm Tắt Nhập",
+    "totalUsers": "Tổng Người Dùng",
+    "successfulImports": "Nhập Thành Công",
+    "failedImports": "Nhập Thất Bại",
+    "noFileSelected": "Vui lòng chọn file Excel",
+    "invalidFileType": "Vui lòng chọn file Excel hợp lệ (.xlsx, .xls)",
+    "downloadingSample": "Đang tải file mẫu...",
+    "sampleExcelTemplate": "Mẫu File Excel",
+    "sampleExcelDescription": "Tải xuống file Excel mẫu với định dạng đúng",
+    "uploadExcelDescription": "Tải lên file Excel để nhập người dùng hàng loạt",
+    "dragDropText": "Nhấp để duyệt hoặc kéo thả file vào đây"
   },
   "validation": {
     "fieldRequired": "Trường này là bắt buộc",
@@ -117,5 +136,9 @@
     "notFoundDescription": "Trang bạn đang tìm kiếm không tồn tại.",
     "backToPreviousPage": "Quay lại trang trước",
     "backToHomePage": "Quay lại trang chủ"
+  },
+  "pcOnly": {
+    "title": "Tính Năng Máy Tính",
+    "description": "Tính năng này yêu cầu máy tính để bàn hoặc laptop để hoạt động tốt. Quản lý file và các tính năng nâng cao hoạt động tốt nhất trên màn hình lớn."
   }
 }

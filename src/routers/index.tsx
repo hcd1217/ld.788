@@ -9,6 +9,11 @@ const ServiceLayout = lazy(async () => {
   return {default: module.ServiceLayout};
 });
 
+const PCOnlyLayout = lazy(async () => {
+  const module = await import('@/components/layouts/PCOnlyLayout');
+  return {default: module.PCOnlyLayout};
+});
+
 const ErrorsPage = lazy(async () => {
   const module = await import('@/pages/sample/Errors');
   return {default: module.ErrorsPage};
@@ -52,6 +57,11 @@ const MorePage = lazy(async () => {
 const AddUserPage = lazy(async () => {
   const module = await import('@/pages/app/AddUserPage');
   return {default: module.AddUserPage};
+});
+
+const ImportUsersPage = lazy(async () => {
+  const module = await import('@/pages/app/ImportUsersPage');
+  return {default: module.ImportUsersPage};
 });
 
 const LoginPage = lazy(async () => {
@@ -125,6 +135,11 @@ const routeObjects: RouteObject[] = [
       {path: 'explore', Component: ExplorePage},
       {path: 'notifications', Component: NotificationsPage},
       {path: 'more', Component: MorePage},
+      {
+        path: '',
+        Component: PCOnlyLayout,
+        children: [{path: 'import-users', Component: ImportUsersPage}],
+      },
     ],
   },
 ];

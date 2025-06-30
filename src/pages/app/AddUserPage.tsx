@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router';
+import {Navigate, useNavigate} from 'react-router';
 import {
   TextInput,
   Button,
@@ -16,6 +16,7 @@ import {
   Container,
   Title,
   PasswordInput,
+  useMantineColorScheme,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
@@ -26,6 +27,7 @@ import {
   IconAt,
   IconUserPlus,
   IconLock,
+  IconFileSpreadsheet,
 } from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
@@ -35,6 +37,7 @@ import {
 } from '@/utils/validation';
 import {clientService} from '@/services/client';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
+import {useAppStore} from '@/stores/useAppStore';
 
 type AddUserFormValues = {
   email?: string;
@@ -51,6 +54,8 @@ export function AddUserPage() {
   const [showAlert, setShowAlert] = useState(false);
   const [mounted, setMounted] = useState(false);
   const {t} = useTranslation();
+  const {user} = useAppStore();
+  const {colorScheme} = useMantineColorScheme();
 
   const form = useForm<AddUserFormValues>({
     initialValues: import.meta.env.DEV
@@ -132,7 +137,7 @@ export function AddUserPage() {
       notifications.show({
         title: t('auth.userAdded'),
         message: `User ${values.email} added successfully`,
-        color: 'green',
+        color: colorScheme === 'dark' ? 'green.7' : 'green.9',
         icon: <IconUserPlus size={16} />,
       });
 
@@ -163,15 +168,19 @@ export function AddUserPage() {
     }
   };
 
+  if (!user?.isRoot) {
+    return <Navigate to="/home" />;
+  }
+
   return (
     <Container size="sm" mt="xl">
       <Stack gap="xl">
-        <Group>
+        <Group justify="space-between">
           <Anchor
             component="button"
             type="button"
             size="sm"
-            onClick={() => navigate('/more')}
+            onClick={() => navigate(-1)}
           >
             <Center inline>
               <IconArrowLeft
@@ -181,6 +190,18 @@ export function AddUserPage() {
               <Box ml={5}>{t('common.backToPreviousPage')}</Box>
             </Center>
           </Anchor>
+
+          {/* Import Users Button - Hidden on mobile */}
+          <Button
+            variant="light"
+            size="sm"
+            color="green"
+            leftSection={<IconFileSpreadsheet size={16} />}
+            visibleFrom="sm"
+            onClick={() => navigate('/import-users')}
+          >
+            {t('common.importUsers')}
+          </Button>
         </Group>
 
         <Title order={1} ta="center">

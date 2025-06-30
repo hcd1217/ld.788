@@ -33,6 +33,7 @@ export const RenewTokenResponseSchema = z.object({
 export const JWTPayloadSchema = z.object({
   email: z.email(),
   sub: z.string(),
+  isRoot: z.boolean().optional(),
   iat: z.number(),
   exp: z.number(),
 });

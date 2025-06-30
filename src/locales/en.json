@@ -20,6 +20,7 @@
     "settings": "Settings",
     "preferences": "Preferences",
     "addUser": "Add User",
+    "importUsers": "Import Users",
     "darkMode": "Dark Mode",
     "language": "Language",
     "backToPreviousPage": "Back to previous page"
@@ -79,7 +80,25 @@
     "passwordResetFailedDescription": "Failed to reset password. The link may have expired or is invalid.",
     "redirectingToLogin": "Redirecting to login page...",
     "userAdded": "User added successfully",
-    "addUserFailed": "Failed to add user"
+    "addUserFailed": "Failed to add user",
+    "importUsersTitle": "Import Users from Excel",
+    "importUsers": "Import Users",
+    "downloadSample": "Download Sample Excel",
+    "selectExcelFile": "Select Excel File",
+    "uploadFile": "Upload File",
+    "importSuccess": "Users imported successfully",
+    "importFailed": "Failed to import users",
+    "importSummary": "Import Summary",
+    "totalUsers": "Total Users",
+    "successfulImports": "Successful Imports",
+    "failedImports": "Failed Imports",
+    "noFileSelected": "Please select an Excel file",
+    "invalidFileType": "Please select a valid Excel file (.xlsx, .xls)",
+    "downloadingSample": "Downloading sample file...",
+    "sampleExcelTemplate": "Sample Excel Template",
+    "sampleExcelDescription": "Download a sample Excel file with the correct format",
+    "uploadExcelDescription": "Upload your Excel file to import users in bulk",
+    "dragDropText": "Click to browse or drag and drop your file here"
   },
   "validation": {
     "fieldRequired": "This field is required",
@@ -118,5 +137,9 @@
     "notFoundDescription": "The page you are looking for does not exist.",
     "backToPreviousPage": "Back to previous page",
     "backToHomePage": "Back to home"
+  },
+  "pcOnly": {
+    "title": "Desktop Feature",
+    "description": "This feature requires a desktop or laptop computer to work properly. File management and advanced features work best on larger screens."
   }
 }

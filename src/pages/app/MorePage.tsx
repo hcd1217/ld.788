@@ -74,6 +74,7 @@ export function MorePage() {
       icon: IconUserPlus,
       onClick: () => navigate('/add-user'),
       color: 'blue',
+      hidden: !user?.isRoot,
     },
     {
       title: 'Error Testing',
@@ -90,7 +91,7 @@ export function MorePage() {
       onClick: () => navigate('/'),
       color: 'cyan',
     },
-  ];
+  ].filter((item) => !item.hidden);
 
   if (!user) {
     return <Navigate to="/login" />;

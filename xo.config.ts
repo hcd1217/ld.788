@@ -4,6 +4,7 @@ export default {
   react: true,
   rules: {
     'unicorn/prefer-export-from': 'off',
+    'unicorn/prefer-blob-reading-methods': 'off',
     '@typescript-eslint/consistent-type-definitions': 'off',
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/no-floating-promises': 'off',

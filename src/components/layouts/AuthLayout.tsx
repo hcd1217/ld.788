@@ -53,13 +53,14 @@ export function AuthLayout() {
       label: t('common.addUser'),
       icon: IconUserPlus,
       path: '/add-user',
+      hidden: !user?.isRoot,
     },
     {
       label: t('common.profile'),
       icon: IconUserCircle,
       path: '/profile',
     },
-  ];
+  ].filter((item) => !item.hidden);
 
   const userInitials = user ? `${user.email.charAt(0).toUpperCase()}` : 'U';
 

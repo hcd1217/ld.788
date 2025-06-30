@@ -6,6 +6,7 @@ import {delay} from '@/utils/time';
 type User = {
   id: string;
   email: string;
+  isRoot?: boolean;
 };
 
 type AppState = {

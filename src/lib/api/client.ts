@@ -41,6 +41,34 @@ export const RegisterUserByRootUserResponseSchema = z.object({
   id: z.string(),
 });
 
+export const RegisterBulkUsersByRootUserRequestSchema = z.array(
+  RegisterUserByRootUserRequestSchema,
+);
+
+export const RegisterBulkUsersByRootUserResponseSchema = z.object({
+  summary: z.object({
+    total: z.number(),
+    success: z.number(),
+    failed: z.number(),
+  }),
+  success: z.array(
+    z.object({
+      id: z.string(),
+      email: z.string().optional(),
+      userName: z.string().optional(),
+      firstName: z.string(),
+      lastName: z.string(),
+      password: z.string().optional(),
+    }),
+  ),
+  failed: z.array(
+    z.object({
+      user: RegisterUserByRootUserRequestSchema,
+      error: z.string(),
+    }),
+  ),
+});
+
 export type RegisterClientRequest = z.infer<typeof RegisterClientRequestSchema>;
 export type RegisterClientResponse = z.infer<
   typeof RegisterClientResponseSchema
@@ -51,6 +79,13 @@ export type RegisterUserByRootUserRequest = z.infer<
 >;
 export type RegisterUserByRootUserResponse = z.infer<
   typeof RegisterUserByRootUserResponseSchema
+>;
+
+export type RegisterBulkUsersByRootUserRequest = z.infer<
+  typeof RegisterBulkUsersByRootUserRequestSchema
+>;
+export type RegisterBulkUsersByRootUserResponse = z.infer<
+  typeof RegisterBulkUsersByRootUserResponseSchema
 >;
 
 export class ClientApi extends BaseApiClient {
@@ -74,6 +109,20 @@ export class ClientApi extends BaseApiClient {
       data,
       RegisterUserByRootUserResponseSchema,
       RegisterUserByRootUserRequestSchema,
+    );
+  }
+
+  async registerBulkUsersByRootUser(
+    data: RegisterBulkUsersByRootUserRequest,
+  ): Promise<RegisterBulkUsersByRootUserResponse> {
+    return this.post<
+      RegisterBulkUsersByRootUserResponse,
+      RegisterBulkUsersByRootUserRequest
+    >(
+      '/clients/user/register/bulk',
+      data,
+      RegisterBulkUsersByRootUserResponseSchema,
+      RegisterBulkUsersByRootUserRequestSchema,
     );
   }
 }

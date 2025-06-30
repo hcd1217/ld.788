@@ -12,6 +12,7 @@ import {decodeJWT, isTokenExpired} from '@/utils/jwt';
 export type User = {
   id: string;
   email: string;
+  isRoot?: boolean;
 };
 
 export const authService = {
@@ -35,6 +36,7 @@ export const authService = {
       const user: User = {
         id: payload.sub,
         email: payload.email,
+        isRoot: payload.isRoot,
       };
 
       return {response, user};
@@ -105,6 +107,7 @@ export const authService = {
     return {
       id: payload.sub,
       email: payload.email,
+      isRoot: payload.isRoot,
     };
   },
 
