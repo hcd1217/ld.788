@@ -232,7 +232,6 @@ export function ResetPasswordPage() {
             />
 
             <FormButton
-              loading={isLoading}
               type="submit"
               disabled={!form.isValid() && form.isTouched()}
             >

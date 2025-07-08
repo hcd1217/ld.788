@@ -283,7 +283,7 @@ export function AddUserPage() {
                     )}
                   </Transition>
 
-                  <FormButton loading={isLoading} type="submit">
+                  <FormButton type="submit">
                     {t('auth.addUser')}
                   </FormButton>
                 </Stack>

@@ -9,7 +9,7 @@ export const VALIDATION_PATTERNS = {
 
 // Validation constraints
 export const VALIDATION_CONSTRAINTS = {
-  minNameLength: 3,
+  minNameLength: 2,
   minIdentifierLength: 5,
   minPasswordLength: 8,
 } as const;

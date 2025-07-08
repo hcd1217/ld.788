@@ -23,7 +23,7 @@ type DataTableProps<T> = {
   readonly renderActions?: (item: T) => React.ReactNode;
 };
 
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T extends Record<string, unknown> & {id: string}>({
   data,
   columns,
   isLoading = false,
@@ -56,8 +56,8 @@ export function DataTable<T extends Record<string, unknown>>({
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {data.map((item, index) => (
-                <Table.Tr key={index}>
+              {data.map((item) => (
+                <Table.Tr key={item.id}>
                   {columns.map((column) => (
                     <Table.Td key={column.key}>
                       {renderCellContent(item, column)}

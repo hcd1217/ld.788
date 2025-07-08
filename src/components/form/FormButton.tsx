@@ -10,7 +10,6 @@ type FormButtonProps = {
 
 export function FormButton({
   children,
-  loading = false,
   type = 'submit',
   fw = '400',
   fz = 'h4',
@@ -19,7 +18,6 @@ export function FormButton({
   return (
     <Button
       fullWidth
-      loading={loading}
       type={type}
       size="md"
       fw={fw}

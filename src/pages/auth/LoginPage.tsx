@@ -180,7 +180,7 @@ export function LoginPage() {
               </Anchor>
             </Group>
 
-            <FormButton loading={isLoading} type="submit">
+            <FormButton type="submit">
               {t('auth.signIn')}
             </FormButton>
           </Stack>

@@ -144,7 +144,6 @@ export function ForgotPasswordPage() {
             />
 
             <FormButton
-              loading={isLoading}
               type="submit"
               disabled={!form.isValid() && form.isTouched()}
             >
