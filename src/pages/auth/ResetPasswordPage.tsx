@@ -39,7 +39,6 @@ export function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isValidToken, setIsValidToken] = useState(true);
-  const [mounted, setMounted] = useState(true);
 
   const email = searchParams.get('email') ?? '';
   const token = searchParams.get('token') ?? '';
@@ -138,7 +137,7 @@ export function ResetPasswordPage() {
 
     return (
       <GuestLayout>
-        <AuthFormContainer isLoading={false} mounted={mounted}>
+        <AuthFormContainer isLoading={false} mounted={true}>
           {invalidTokenContent}
         </AuthFormContainer>
       </GuestLayout>
@@ -174,7 +173,7 @@ export function ResetPasswordPage() {
 
     return (
       <GuestLayout>
-        <AuthFormContainer isLoading={false} mounted={mounted}>
+        <AuthFormContainer isLoading={false} mounted={true}>
           {successContent}
         </AuthFormContainer>
       </GuestLayout>
@@ -194,7 +193,7 @@ export function ResetPasswordPage() {
           {t('auth.resetPasswordTitle')}
         </Title>
       </Group>
-      
+
       <Text size="sm" c="dimmed" ta="center" mb="lg">
         {t('auth.resetPasswordDescription')}
       </Text>
@@ -267,7 +266,7 @@ export function ResetPasswordPage() {
 
   return (
     <GuestLayout>
-      <AuthFormContainer isLoading={isLoading} mounted={mounted}>
+      <AuthFormContainer isLoading={isLoading} mounted={true}>
         {content}
       </AuthFormContainer>
     </GuestLayout>
