@@ -224,9 +224,7 @@ export function RegisterPage() {
               )}
             </Transition>
 
-            <FormButton type="submit">
-              {t('auth.createAccount')}
-            </FormButton>
+            <FormButton type="submit">{t('auth.createAccount')}</FormButton>
           </Stack>
         </form>
 

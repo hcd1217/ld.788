@@ -4,10 +4,8 @@ import {
   Button,
   Paper,
   Group,
-  Anchor,
   Center,
   Box,
-  rem,
   Stack,
   Container,
   Title,
@@ -15,8 +13,6 @@ import {
   Text,
   Badge,
   Modal,
-  TextInput,
-  PasswordInput,
   LoadingOverlay,
   Alert,
   Transition,
@@ -27,15 +23,11 @@ import {useDisclosure} from '@mantine/hooks';
 import {modals} from '@mantine/modals';
 import {notifications} from '@mantine/notifications';
 import {
-  IconArrowLeft,
   IconUserPlus,
   IconEye,
   IconEdit,
   IconTrash,
   IconAlertCircle,
-  IconMail,
-  IconAt,
-  IconLock,
   IconUser,
   IconFileSpreadsheet,
 } from '@tabler/icons-react';
@@ -52,6 +44,8 @@ import i18n from '@/lib/i18n';
 import {getLocaleConfig} from '@/config/localeConfig';
 import {userService, type User} from '@/services/user';
 import {DataTable} from '@/components/common/DataTable';
+import {FormInput} from '@/components/form/FormInput';
+import {GoBack} from '@/components/common/GoBack';
 
 type EditUserFormValues = {
   email: string;
@@ -79,7 +73,6 @@ export function UserManagementPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
   const [showAlert, setShowAlert] = useState(false);
-
   const [editOpened, {open: openEdit, close: closeEdit}] = useDisclosure(false);
 
   const form = useForm<EditUserFormValues>({
@@ -225,7 +218,6 @@ export function UserManagementPage() {
         color: 'green',
         icon: <IconUser size={16} />,
       });
-
       closeEdit();
       form.reset();
     } catch {
@@ -253,20 +245,7 @@ export function UserManagementPage() {
     <Container size="xl" mt="xl">
       <Stack gap="xl">
         <Group justify="space-between">
-          <Anchor
-            component="button"
-            type="button"
-            size="sm"
-            onClick={() => navigate(-1)}
-          >
-            <Center inline>
-              <IconArrowLeft
-                style={{width: rem(12), height: rem(12)}}
-                stroke={1.5}
-              />
-              <Box ml={5}>{t('common.backToPreviousPage')}</Box>
-            </Center>
-          </Anchor>
+          <GoBack />
 
           <Group gap="sm">
             <Button
@@ -296,7 +275,7 @@ export function UserManagementPage() {
           <Stack gap="md">
             <Box style={{position: 'relative'}}>
               <LoadingOverlay
-                visible={isLoading}
+                visible={isLoading ? !editOpened : false}
                 overlayProps={{blur: 2}}
                 transitionProps={{duration: 300}}
               />
@@ -485,50 +464,48 @@ export function UserManagementPage() {
                 setShowAlert={setShowAlert}
               />
 
-              <TextInput
+              <FormInput
                 required
                 label={t('auth.email')}
                 placeholder="user@example.com"
                 error={form.errors.email}
                 disabled={isLoading}
-                leftSection={<IconMail size={16} />}
                 {...form.getInputProps('email')}
                 onFocus={() => {
                   setShowAlert(false);
                 }}
               />
 
-              <TextInput
+              <FormInput
                 required
                 label={t('auth.userName')}
                 placeholder="userName"
                 error={form.errors.userName}
                 disabled={isLoading}
-                leftSection={<IconAt size={16} />}
                 {...form.getInputProps('userName')}
                 onFocus={() => {
                   setShowAlert(false);
                 }}
               />
 
-              <PasswordInput
+              <FormInput
+                type="password"
                 label={t('auth.newPassword')}
                 placeholder={t('auth.leaveEmptyToKeepCurrent')}
                 error={form.errors.password}
                 disabled={isLoading}
-                leftSection={<IconLock size={16} />}
                 {...form.getInputProps('password')}
                 onFocus={() => {
                   setShowAlert(false);
                 }}
               />
 
-              <PasswordInput
+              <FormInput
+                type="password"
                 label={t('auth.confirmNewPassword')}
                 placeholder={t('auth.confirmYourPassword')}
                 error={form.errors.confirmPassword}
                 disabled={isLoading}
-                leftSection={<IconLock size={16} />}
                 {...form.getInputProps('confirmPassword')}
                 onFocus={() => {
                   setShowAlert(false);
@@ -567,9 +544,7 @@ export function UserManagementPage() {
                 >
                   {t('common.cancel')}
                 </Button>
-                <Button type="submit" loading={isLoading}>
-                  {t('common.save')}
-                </Button>
+                <Button type="submit">{t('common.save')}</Button>
               </Group>
             </Stack>
           </form>

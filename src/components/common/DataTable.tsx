@@ -32,7 +32,7 @@ export function DataTable<T extends Record<string, unknown> & {id: string}>({
 }: DataTableProps<T>) {
   const {t} = useTranslation();
 
-  const defaultEmptyMessage = emptyMessage || 'No data found';
+  const defaultEmptyMessage = emptyMessage || t('common.noDataFound');
 
   return (
     <Box style={{position: 'relative'}}>

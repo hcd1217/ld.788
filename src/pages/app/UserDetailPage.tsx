@@ -1,22 +1,10 @@
-import {Navigate, useNavigate, useParams} from 'react-router';
-import {
-  Container,
-  Stack,
-  Group,
-  Anchor,
-  Center,
-  Box,
-  rem,
-  Title,
-  Paper,
-  Text,
-} from '@mantine/core';
-import {IconArrowLeft} from '@tabler/icons-react';
+import {Navigate, useParams} from 'react-router';
+import {Container, Stack, Group, Title, Paper, Text} from '@mantine/core';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
+import {GoBack} from '@/components/common/GoBack';
 
 export function UserDetailPage() {
-  const navigate = useNavigate();
   const {userId} = useParams<{userId: string}>();
   const {t} = useTranslation();
   const {user} = useAppStore();
@@ -29,20 +17,7 @@ export function UserDetailPage() {
     <Container size="md" mt="xl">
       <Stack gap="xl">
         <Group justify="space-between">
-          <Anchor
-            component="button"
-            type="button"
-            size="sm"
-            onClick={() => navigate(-1)}
-          >
-            <Center inline>
-              <IconArrowLeft
-                style={{width: rem(12), height: rem(12)}}
-                stroke={1.5}
-              />
-              <Box ml={5}>{t('common.backToPreviousPage')}</Box>
-            </Center>
-          </Anchor>
+          <GoBack />
         </Group>
 
         <Title order={1} ta="center">

@@ -1,13 +1,11 @@
 import {useState, useEffect, useCallback} from 'react';
-import {Navigate, useNavigate} from 'react-router';
+import {Navigate} from 'react-router';
 import {
   Button,
   Paper,
   Group,
-  Anchor,
   Center,
   Box,
-  rem,
   Stack,
   Container,
   Title,
@@ -33,7 +31,6 @@ import {useDisclosure} from '@mantine/hooks';
 import {modals} from '@mantine/modals';
 import {notifications} from '@mantine/notifications';
 import {
-  IconArrowLeft,
   IconPlus,
   IconEdit,
   IconTrash,
@@ -48,6 +45,7 @@ import {
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {clientService} from '@/services/client';
+import {GoBack} from '@/components/common/GoBack';
 
 type Role = {
   id: string;
@@ -68,7 +66,6 @@ type RoleFormValues = {
 const ROLES_PER_PAGE = 10;
 
 export function RoleManagementPage() {
-  const navigate = useNavigate();
   const {t} = useTranslation();
   const {user} = useAppStore();
 
@@ -302,20 +299,7 @@ export function RoleManagementPage() {
     <Container size="xl" mt="xl">
       <Stack gap="xl">
         <Group justify="space-between">
-          <Anchor
-            component="button"
-            type="button"
-            size="sm"
-            onClick={() => navigate(-1)}
-          >
-            <Center inline>
-              <IconArrowLeft
-                style={{width: rem(12), height: rem(12)}}
-                stroke={1.5}
-              />
-              <Box ml={5}>{t('common.backToPreviousPage')}</Box>
-            </Center>
-          </Anchor>
+          <GoBack />
 
           <Button leftSection={<IconPlus size={16} />} onClick={handleAddRole}>
             {t('common.addRole')}

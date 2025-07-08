@@ -44,6 +44,7 @@
     "viewDetails": "View Details",
     "refresh": "Refresh",
     "noUsersFound": "No users found",
+    "noDataFound": "No data found",
     "editUser": "Edit User",
     "confirmDelete": "Confirm Delete",
     "confirmDeleteMessage": "Are you sure you want to delete {{name}}? This action cannot be undone.",

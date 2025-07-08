@@ -1,14 +1,11 @@
 import {useState, useRef} from 'react';
 import * as XLSX from 'xlsx';
-import {Navigate, useNavigate} from 'react-router';
+import {Navigate} from 'react-router';
 import {
   Button,
   Paper,
   Group,
-  Anchor,
-  Center,
   Box,
-  rem,
   Stack,
   Transition,
   LoadingOverlay,
@@ -22,7 +19,6 @@ import {
 } from '@mantine/core';
 import {notifications} from '@mantine/notifications';
 import {
-  IconArrowLeft,
   IconAlertCircle,
   IconFileSpreadsheet,
   IconDownload,
@@ -31,6 +27,7 @@ import {
   IconX,
   IconUsers,
 } from '@tabler/icons-react';
+import {GoBack} from '@/components/common/GoBack';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {clientService} from '@/services/client';
@@ -49,7 +46,6 @@ type ImportResult = {
 };
 
 export function ImportUsersPage() {
-  const navigate = useNavigate();
   const {user} = useAppStore();
   const {t, i18n} = useTranslation();
 
@@ -369,20 +365,7 @@ export function ImportUsersPage() {
     <Container size="sm" mt="xl">
       <Stack gap="xl">
         <Group>
-          <Anchor
-            component="button"
-            type="button"
-            size="sm"
-            onClick={() => navigate(-1)}
-          >
-            <Center inline>
-              <IconArrowLeft
-                style={{width: rem(12), height: rem(12)}}
-                stroke={1.5}
-              />
-              <Box ml={5}>{t('common.backToPreviousPage')}</Box>
-            </Center>
-          </Anchor>
+          <GoBack />
         </Group>
 
         <Title order={1} ta="center">

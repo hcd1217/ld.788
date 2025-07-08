@@ -180,9 +180,7 @@ export function LoginPage() {
               </Anchor>
             </Group>
 
-            <FormButton type="submit">
-              {t('auth.signIn')}
-            </FormButton>
+            <FormButton type="submit">{t('auth.signIn')}</FormButton>
           </Stack>
         </form>
 

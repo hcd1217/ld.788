@@ -3,10 +3,6 @@ import {Navigate, useNavigate} from 'react-router';
 import {
   Button,
   Group,
-  Anchor,
-  Center,
-  Box,
-  rem,
   Stack,
   Alert,
   Transition,
@@ -17,7 +13,6 @@ import {
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
 import {
-  IconArrowLeft,
   IconAlertCircle,
   IconUserPlus,
   IconFileSpreadsheet,
@@ -35,6 +30,7 @@ import {useAppStore} from '@/stores/useAppStore';
 import {FormInput} from '@/components/form/FormInput';
 import {FormButton} from '@/components/form/FormButton';
 import {FormContainer} from '@/components/form/FormContainer';
+import {GoBack} from '@/components/common/GoBack';
 
 type AddUserFormValues = {
   email?: string;
@@ -103,11 +99,6 @@ export function AddUserPage() {
     try {
       setIsLoading(true);
 
-      // Simulate API call delay
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1000);
-      });
-
       await clientService.registerUserByRootUser({
         email: values.email,
         userName: values.userName,
@@ -158,20 +149,7 @@ export function AddUserPage() {
     <Container size="sm" mt="xl">
       <Stack gap="xl">
         <Group justify="space-between">
-          <Anchor
-            component="button"
-            type="button"
-            size="sm"
-            onClick={() => navigate(-1)}
-          >
-            <Center inline>
-              <IconArrowLeft
-                style={{width: rem(12), height: rem(12)}}
-                stroke={1.5}
-              />
-              <Box ml={5}>{t('common.backToPreviousPage')}</Box>
-            </Center>
-          </Anchor>
+          <GoBack />
 
           {/* Import Users Button - Hidden on mobile */}
           <Button
@@ -283,9 +261,7 @@ export function AddUserPage() {
                     )}
                   </Transition>
 
-                  <FormButton type="submit">
-                    {t('auth.addUser')}
-                  </FormButton>
+                  <FormButton type="submit">{t('auth.addUser')}</FormButton>
                 </Stack>
               </form>
             </FormContainer>
