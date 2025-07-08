@@ -8,6 +8,7 @@ import {
   Transition,
   Title,
   Text,
+  Space,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
@@ -29,11 +30,10 @@ type LoginFormValues = {
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const {login, isLoading} = useAppStore();
+  const {login, clientCode, isLoading} = useAppStore();
   const [showAlert, setShowAlert] = useState(false);
   const [mounted, setMounted] = useState(false);
   const {t} = useTranslation();
-  const {clientCode} = useAppStore();
   const params = useParams();
 
   const form = useForm<LoginFormValues>({
@@ -111,6 +111,7 @@ export function LoginPage() {
           {t('auth.title')}
         </Title>
       </Group>
+      <Space h="lg" />
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="lg">
           <AuthFormInput

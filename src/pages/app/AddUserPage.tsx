@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {Navigate, useNavigate} from 'react-router';
 import {
-  TextInput,
   Button,
   Paper,
   Group,
@@ -15,20 +14,16 @@ import {
   LoadingOverlay,
   Container,
   Title,
-  PasswordInput,
-  useMantineColorScheme,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
 import {
   IconArrowLeft,
   IconAlertCircle,
-  IconMail,
-  IconAt,
   IconUserPlus,
-  IconLock,
   IconFileSpreadsheet,
 } from '@tabler/icons-react';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
   getFormValidators,
@@ -38,6 +33,8 @@ import {
 import {clientService} from '@/services/client';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
 import {useAppStore} from '@/stores/useAppStore';
+import {AuthFormInput} from '@/components/auth/AuthFormInput';
+import {AuthFormButton} from '@/components/auth/AuthFormButton';
 
 type AddUserFormValues = {
   email?: string;
@@ -54,7 +51,7 @@ export function AddUserPage() {
   const [showAlert, setShowAlert] = useState(false);
   const {t} = useTranslation();
   const {user} = useAppStore();
-  const {colorScheme} = useMantineColorScheme();
+  const isDarkMode = useIsDarkMode();
 
   const form = useForm<AddUserFormValues>({
     initialValues: import.meta.env.DEV
@@ -122,7 +119,7 @@ export function AddUserPage() {
       notifications.show({
         title: t('auth.userAdded'),
         message: `User ${values.email} added successfully`,
-        color: colorScheme === 'dark' ? 'green.7' : 'green.9',
+        color: isDarkMode ? 'green.7' : 'green.9',
         icon: <IconUserPlus size={16} />,
       });
 
@@ -216,60 +213,55 @@ export function AddUserPage() {
                 transitionProps={{duration: 300}}
               />
               <form onSubmit={form.onSubmit(handleSubmit)}>
-                <Stack gap="md">
+                <Stack gap="lg">
                   <FirstNameAndLastNameInForm
                     form={form}
                     isLoading={isLoading}
                     setShowAlert={setShowAlert}
                   />
 
-                  <TextInput
+                  <AuthFormInput
+                    type="email"
                     autoComplete="email"
-                    label={t('auth.email')}
-                    placeholder="user@example.com"
+                    placeholder={t('auth.email')}
                     error={form.errors.email}
                     disabled={isLoading}
-                    leftSection={<IconMail size={16} />}
                     {...form.getInputProps('email')}
                     onFocus={() => {
                       setShowAlert(false);
                     }}
                   />
 
-                  <TextInput
-                    label={t('auth.userName')}
-                    placeholder="userName"
+                  <AuthFormInput
+                    placeholder={t('auth.userName')}
                     error={form.errors.userName}
                     disabled={isLoading}
-                    leftSection={<IconAt size={16} />}
                     {...form.getInputProps('userName')}
                     onFocus={() => {
                       setShowAlert(false);
                     }}
                   />
 
-                  <PasswordInput
+                  <AuthFormInput
                     required
+                    type="password"
                     autoComplete="new-password"
-                    label={t('auth.password')}
-                    placeholder={t('auth.password').toLowerCase()}
+                    placeholder={t('auth.password')}
                     error={form.errors.password}
                     disabled={isLoading}
-                    leftSection={<IconLock size={16} />}
                     {...form.getInputProps('password')}
                     onFocus={() => {
                       setShowAlert(false);
                     }}
                   />
 
-                  <PasswordInput
+                  <AuthFormInput
                     required
+                    type="password"
                     autoComplete="new-password"
-                    label={t('auth.confirmPassword')}
-                    placeholder={t('auth.confirmYourPassword')}
+                    placeholder={t('auth.confirmPassword')}
                     error={form.errors.confirmPassword}
                     disabled={isLoading}
-                    leftSection={<IconLock size={16} />}
                     {...form.getInputProps('confirmPassword')}
                     onFocus={() => {
                       setShowAlert(false);
@@ -300,22 +292,9 @@ export function AddUserPage() {
                     )}
                   </Transition>
 
-                  <Button
-                    fullWidth
-                    loading={isLoading}
-                    type="submit"
-                    size="md"
-                    leftSection={<IconUserPlus size={16} />}
-                    styles={{
-                      root: {
-                        transition: 'all 0.2s ease',
-                        height: rem(42),
-                      },
-                    }}
-                    mt="xs"
-                  >
+                  <AuthFormButton loading={isLoading} type="submit">
                     {t('auth.addUser')}
-                  </Button>
+                  </AuthFormButton>
                 </Stack>
               </form>
             </Paper>

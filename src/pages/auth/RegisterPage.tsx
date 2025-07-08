@@ -10,6 +10,7 @@ import {
   Transition,
   Group,
   Title,
+  Space,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
@@ -126,6 +127,7 @@ export function RegisterPage() {
           {t('auth.registerTitle')}
         </Title>
       </Group>
+      <Space h="lg" />
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="lg">
           <AuthFormInput

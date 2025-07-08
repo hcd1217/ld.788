@@ -9,7 +9,6 @@ import {
   Burger,
   Stack,
   Divider,
-  useMantineColorScheme,
 } from '@mantine/core';
 import {Outlet, useNavigate, useLocation} from 'react-router';
 import {useDisclosure} from '@mantine/hooks';
@@ -24,6 +23,7 @@ import {
   IconShield,
   IconLock,
 } from '@tabler/icons-react';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {PWAInstallPrompt} from '@/components/common/PWAInstallPrompt';
 import {ColorSchemeToggle} from '@/components/common/ColorSchemeToggle';
 import {LanguageSwitcher} from '@/components/common/LanguageSwitcher';
@@ -38,7 +38,7 @@ export function AuthLayout() {
   const {user, logout} = useAppStore();
   const {t} = useTranslation();
   const [mobileOpened, {toggle: toggleMobile}] = useDisclosure();
-  const {colorScheme} = useMantineColorScheme();
+  const isDarkMode = useIsDarkMode();
 
   const handleLogout = () => {
     logout();
@@ -183,19 +183,17 @@ export function AuthLayout() {
                   width: '100%',
                   padding: theme.spacing.xs,
                   borderRadius: theme.radius.sm,
-                  color:
-                    colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
+                  color: isDarkMode ? theme.colors.dark[0] : theme.black,
                   backgroundColor: isActive
-                    ? colorScheme === 'dark'
+                    ? isDarkMode
                       ? theme.colors.dark[6]
                       : theme.colors.gray[1]
                     : 'transparent',
 
                   '&:hover': {
-                    backgroundColor:
-                      colorScheme === 'dark'
-                        ? theme.colors.dark[6]
-                        : theme.colors.gray[0],
+                    backgroundColor: isDarkMode
+                      ? theme.colors.dark[6]
+                      : theme.colors.gray[0],
                   },
                 })}
                 onClick={() => navigate(item.path)}

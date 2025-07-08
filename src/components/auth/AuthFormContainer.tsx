@@ -1,6 +1,6 @@
 import {type ReactNode} from 'react';
 import {Paper, LoadingOverlay, Transition, Stack} from '@mantine/core';
-import {useMediaQuery} from '@mantine/hooks';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 
 type AuthFormContainerProps = {
   readonly children: ReactNode;
@@ -13,7 +13,7 @@ export function AuthFormContainer({
   isLoading,
   mounted,
 }: AuthFormContainerProps) {
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const isDesktop = useIsDesktop();
 
   return (
     <Stack gap="xl">
@@ -27,11 +27,13 @@ export function AuthFormContainer({
           <Paper
             withBorder={isDesktop}
             shadow={isDesktop ? 'xl' : 'none'}
-            p="lg"
+            p={isDesktop ? 'xl' : 'none'}
             radius={isDesktop ? 'md' : 'none'}
             style={{
               ...styles,
               position: 'relative',
+              width: isDesktop ? '120%' : '110%',
+              maxWidth: isDesktop ? '504px' : '100%',
             }}
           >
             <LoadingOverlay

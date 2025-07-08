@@ -9,6 +9,7 @@ import {
   Text,
   Title,
   Group,
+  Space,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
@@ -117,6 +118,8 @@ export function ForgotPasswordPage() {
           {t('auth.forgotPasswordTitle')}
         </Title>
       </Group>
+
+      <Space h="lg" />
 
       <Text size="sm" c="dimmed" ta="center" mb="lg">
         {t('auth.forgotPasswordDescription')}

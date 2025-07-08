@@ -2,10 +2,10 @@ import {forwardRef} from 'react';
 import {
   TextInput,
   PasswordInput,
-  useMantineColorScheme,
   type TextInputProps,
   type PasswordInputProps,
 } from '@mantine/core';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 type BaseAuthFormInputProps = {
   readonly type?: 'text' | 'email' | 'password';
@@ -15,9 +15,9 @@ type BaseAuthFormInputProps = {
 type AuthFormInputProps = BaseAuthFormInputProps &
   Omit<TextInputProps, 'variant' | 'styles' | 'type'>;
 
-const getInputStyles = (colorScheme: string) => ({
+const getInputStyles = (isDarkMode: boolean) => ({
   input: {
-    borderBottom: `1px solid ${colorScheme === 'dark' ? '#c5c5c5' : '#dee2e6'}`,
+    borderBottom: `1px solid ${isDarkMode ? '#c5c5c5' : '#dee2e6'}`,
     borderRadius: 0,
     padding: '12px 0',
   },
@@ -25,8 +25,8 @@ const getInputStyles = (colorScheme: string) => ({
 
 export const AuthFormInput = forwardRef<HTMLInputElement, AuthFormInputProps>(
   ({type = 'text', onFocus = undefined, ...props}, ref) => {
-    const {colorScheme} = useMantineColorScheme();
-    const inputStyles = getInputStyles(colorScheme);
+    const isDarkMode = useIsDarkMode();
+    const inputStyles = getInputStyles(isDarkMode);
 
     if (type === 'password') {
       return (

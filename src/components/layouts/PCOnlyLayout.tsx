@@ -9,20 +9,20 @@ import {
   Paper,
   Title,
   Text,
-  useMantineColorScheme,
 } from '@mantine/core';
-import {useMediaQuery} from '@mantine/hooks';
 import {IconArrowLeft, IconDeviceDesktop} from '@tabler/icons-react';
 import {Outlet, useNavigate} from 'react-router';
 import {useTranslation} from '@/hooks/useTranslation';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export function PCOnlyLayout() {
   const navigate = useNavigate();
   const {t} = useTranslation();
-  const {colorScheme} = useMantineColorScheme();
-  const isMobile = useMediaQuery('(max-width: 600px)');
+  const isDarkMode = useIsDarkMode();
+  const isDesktop = useIsDesktop();
 
-  if (isMobile) {
+  if (!isDesktop) {
     return (
       <Container size="sm" mt="xl">
         <Stack gap="xl">
@@ -50,10 +50,9 @@ export function PCOnlyLayout() {
             radius="md"
             style={{
               textAlign: 'center',
-              backgroundColor:
-                colorScheme === 'dark'
-                  ? 'var(--mantine-color-dark-6)'
-                  : 'var(--mantine-color-gray-0)',
+              backgroundColor: isDarkMode
+                ? 'var(--mantine-color-dark-6)'
+                : 'var(--mantine-color-gray-0)',
             }}
           >
             <Stack gap="lg" align="center">

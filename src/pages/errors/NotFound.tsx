@@ -6,15 +6,15 @@ import {
   Title,
   Stack,
   Paper,
-  useMantineColorScheme,
 } from '@mantine/core';
 import {useNavigate} from 'react-router';
 import {IconError404, IconArrowLeft, IconHome} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export function NotFound() {
   const {t} = useTranslation();
-  const {colorScheme} = useMantineColorScheme();
+  const isDarkMode = useIsDarkMode();
   const navigate = useNavigate();
 
   return (
@@ -34,10 +34,9 @@ export function NotFound() {
         radius="md"
         style={{
           textAlign: 'center',
-          backgroundColor:
-            colorScheme === 'dark'
-              ? 'var(--mantine-color-dark-6)'
-              : 'var(--mantine-color-gray-0)',
+          backgroundColor: isDarkMode
+            ? 'var(--mantine-color-dark-6)'
+            : 'var(--mantine-color-gray-0)',
           width: '100%',
         }}
       >

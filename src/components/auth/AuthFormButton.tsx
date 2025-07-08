@@ -12,7 +12,8 @@ export function AuthFormButton({
   children,
   loading = false,
   type = 'submit',
-  fw = '500',
+  fw = '400',
+  fz = 'h4',
   ...props
 }: AuthFormButtonProps) {
   return (
@@ -22,6 +23,7 @@ export function AuthFormButton({
       type={type}
       size="md"
       fw={fw}
+      fz={fz}
       styles={{
         root: {
           transition: 'all 0.2s ease',

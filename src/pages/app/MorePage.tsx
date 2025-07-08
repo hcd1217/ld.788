@@ -8,7 +8,6 @@ import {
   Button,
   Divider,
   rem,
-  useMantineColorScheme,
 } from '@mantine/core';
 import {
   IconHome,
@@ -24,12 +23,13 @@ import {
 import {Navigate, useNavigate} from 'react-router';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export function MorePage() {
   const navigate = useNavigate();
   const {t} = useTranslation();
   const {user, logout} = useAppStore();
-  const {colorScheme} = useMantineColorScheme();
+  const isDarkMode = useIsDarkMode();
 
   const handleLogout = () => {
     logout();
@@ -104,12 +104,7 @@ export function MorePage() {
           {t('common.more')}
         </Title>
 
-        <Card
-          withBorder
-          p="md"
-          mb="lg"
-          bg={colorScheme === 'dark' ? 'dark.6' : 'gray.0'}
-        >
+        <Card withBorder p="md" mb="lg" bg={isDarkMode ? 'dark.6' : 'gray.0'}>
           <Group>
             <IconUser size={20} />
             <div>
