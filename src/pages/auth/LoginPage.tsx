@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {useNavigate, useParams} from 'react-router';
+import {useNavigate} from 'react-router';
 import {
   Group,
   Anchor,
@@ -18,9 +18,10 @@ import {useTranslation} from '@/hooks/useTranslation';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {getFormValidators} from '@/utils/validation';
 import {Logo} from '@/components/common/Logo';
-import {AuthFormContainer} from '@/components/auth/AuthFormContainer';
-import {AuthFormInput} from '@/components/auth/AuthFormInput';
-import {AuthFormButton} from '@/components/auth/AuthFormButton';
+import {FormContainer} from '@/components/form/FormContainer';
+import {FormInput} from '@/components/form/FormInput';
+import {FormButton} from '@/components/form/FormButton';
+import {useClientCode} from '@/hooks/useClientCode';
 
 type LoginFormValues = {
   identifier: string;
@@ -30,17 +31,17 @@ type LoginFormValues = {
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const {login, clientCode, isLoading} = useAppStore();
+  const {login, isLoading} = useAppStore();
   const [showAlert, setShowAlert] = useState(false);
   const [mounted, setMounted] = useState(false);
   const {t} = useTranslation();
-  const params = useParams();
+  const clientCode = useClientCode();
 
   const form = useForm<LoginFormValues>({
     initialValues: {
       identifier: localStorage.getItem('rememberedIdentifier') ?? '',
       password: '',
-      clientCode: params.clientCode ?? clientCode,
+      clientCode,
     },
     validate: getFormValidators(t, ['identifier', 'password', 'clientCode']),
   });
@@ -98,106 +99,100 @@ export function LoginPage() {
     }
   };
 
-  const content = (
-    <>
-      <Group justify="center" gap="md" mb="lg">
-        <Logo />
-        <Title
-          style={{
-            fontWeight: 900,
-          }}
-          size="h2"
-        >
-          {t('auth.title')}
-        </Title>
-      </Group>
-      <Space h="lg" />
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack gap="lg">
-          <AuthFormInput
-            required
-            type="email"
-            autoComplete="identifier"
-            placeholder={t('auth.identifier')}
-            error={form.errors.identifier}
-            disabled={isLoading}
-            {...form.getInputProps('identifier')}
-            onFocus={() => {
-              setShowAlert(false);
-            }}
-          />
-
-          <AuthFormInput
-            required
-            type="password"
-            autoComplete="current-password"
-            placeholder={t('auth.password')}
-            error={form.errors.password}
-            disabled={isLoading}
-            {...form.getInputProps('password')}
-            onFocus={() => {
-              setShowAlert(false);
-            }}
-          />
-
-          <Transition
-            mounted={
-              showAlert
-                ? Boolean(form.errors.identifier && form.errors.password)
-                : false
-            }
-            transition="fade"
-            duration={300}
-            timingFunction="ease"
-          >
-            {(styles) => (
-              <Alert
-                withCloseButton
-                style={styles}
-                icon={<IconAlertCircle size={16} />}
-                color="red"
-                variant="light"
-                onClose={() => {
-                  setShowAlert(false);
-                }}
-              >
-                {t('notifications.invalidCredentials')}
-              </Alert>
-            )}
-          </Transition>
-
-          <Group justify="flex-end">
-            <Anchor
-              component="button"
-              type="button"
-              size="sm"
-              disabled={isLoading}
-              onClick={() => navigate('/forgot-password')}
-            >
-              {t('auth.forgotPassword')}
-            </Anchor>
-          </Group>
-
-          <AuthFormButton loading={isLoading} type="submit">
-            {t('auth.signIn')}
-          </AuthFormButton>
-        </Stack>
-      </form>
-
-      <Text size="sm" ta="center" mt="lg" c="dimmed">
-        {t('auth.noAccount')}{' '}
-        <Anchor href="/register" size="sm" fw="600">
-          {t('auth.createAccount')}
-        </Anchor>
-      </Text>
-    </>
-  );
-
   return (
     <GuestLayout>
-      <AuthFormContainer isLoading={isLoading} mounted={mounted}>
-        {content}
-      </AuthFormContainer>
+      <FormContainer isLoading={isLoading} mounted={mounted}>
+        <Group justify="center" gap="md" mb="lg">
+          <Logo />
+          <Title
+            style={{
+              fontWeight: 900,
+            }}
+            size="h2"
+          >
+            {t('auth.title')}
+          </Title>
+        </Group>
+        <Space h="lg" />
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Stack gap="lg">
+            <FormInput
+              required
+              type="text"
+              autoComplete="identifier"
+              placeholder={t('auth.identifier')}
+              error={form.errors.identifier}
+              disabled={isLoading}
+              {...form.getInputProps('identifier')}
+              onFocus={() => {
+                setShowAlert(false);
+              }}
+            />
+
+            <FormInput
+              required
+              type="password"
+              autoComplete="current-password"
+              placeholder={t('auth.password')}
+              error={form.errors.password}
+              disabled={isLoading}
+              {...form.getInputProps('password')}
+              onFocus={() => {
+                setShowAlert(false);
+              }}
+            />
+
+            <Transition
+              mounted={
+                showAlert
+                  ? Boolean(form.errors.identifier && form.errors.password)
+                  : false
+              }
+              transition="fade"
+              duration={300}
+              timingFunction="ease"
+            >
+              {(styles) => (
+                <Alert
+                  withCloseButton
+                  style={styles}
+                  icon={<IconAlertCircle size={16} />}
+                  color="red"
+                  variant="light"
+                  onClose={() => {
+                    setShowAlert(false);
+                  }}
+                >
+                  {t('notifications.invalidCredentials')}
+                </Alert>
+              )}
+            </Transition>
+
+            <Group justify="flex-end">
+              <Anchor
+                component="button"
+                type="button"
+                size="sm"
+                disabled={isLoading}
+                onClick={() => navigate('/forgot-password')}
+              >
+                {t('auth.forgotPassword')}
+              </Anchor>
+            </Group>
+
+            <FormButton loading={isLoading} type="submit">
+              {t('auth.signIn')}
+            </FormButton>
+          </Stack>
+        </form>
+
+        <Text size="sm" ta="center" mt="lg" c="dimmed">
+          {t('auth.noAccount')}{' '}
+          <Anchor href="/register" size="sm" fw="600">
+            {t('auth.createAccount')}
+          </Anchor>
+        </Text>
+      </FormContainer>
     </GuestLayout>
   );
 }

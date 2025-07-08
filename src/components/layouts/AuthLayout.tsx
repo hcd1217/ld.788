@@ -9,6 +9,7 @@ import {
   Burger,
   Stack,
   Divider,
+  Tooltip,
 } from '@mantine/core';
 import {Outlet, useNavigate, useLocation} from 'react-router';
 import {useDisclosure} from '@mantine/hooks';
@@ -17,12 +18,13 @@ import {
   IconSettings,
   IconLogout,
   IconChevronDown,
-  IconDashboard,
   IconUserCircle,
   IconUsers,
   IconShield,
   IconLock,
+  IconHome,
 } from '@tabler/icons-react';
+import type {TFunction} from 'i18next';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {PWAInstallPrompt} from '@/components/common/PWAInstallPrompt';
 import {ColorSchemeToggle} from '@/components/common/ColorSchemeToggle';
@@ -31,51 +33,24 @@ import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {VersionInformation} from '@/components/common/VersionInformation';
 import {AppLogo} from '@/components/common/AppLogo';
+import type {User} from '@/services/auth';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 
 export function AuthLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const {user, logout} = useAppStore();
   const {t} = useTranslation();
-  const [mobileOpened, {toggle: toggleMobile}] = useDisclosure();
+  const [desktopOpened, {toggle: toggleDesktop}] = useDisclosure(true);
   const isDarkMode = useIsDarkMode();
+  const isDesktop = useIsDesktop();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const navigationItems = [
-    {
-      label: t('common.home'),
-      icon: IconDashboard,
-      path: '/home',
-    },
-    {
-      label: t('common.userManagement'),
-      icon: IconUsers,
-      path: '/user-management',
-      hidden: !user?.isRoot,
-    },
-    {
-      label: t('common.roleManagement'),
-      icon: IconShield,
-      path: '/role-management',
-      hidden: !user?.isRoot,
-    },
-    {
-      label: t('permission.management'),
-      icon: IconLock,
-      path: '/permission-management',
-      hidden: !user?.isRoot,
-    },
-    {
-      label: t('common.profile'),
-      icon: IconUserCircle,
-      path: '/profile',
-    },
-  ].filter((item) => !item.hidden);
-
+  const navigationItems = buildNavigationItems(t, user);
   const userInitials = user ? `${user.email.charAt(0).toUpperCase()}` : 'U';
 
   function UserMenu() {
@@ -137,13 +112,16 @@ export function AuthLayout() {
     );
   }
 
+  if (!isDesktop) {
+    return null;
+  }
+
   return (
     <AppShell
       header={{height: 60}}
       navbar={{
-        width: 300,
+        width: desktopOpened ? 300 : 80,
         breakpoint: 'sm',
-        collapsed: {mobile: !mobileOpened},
       }}
       padding="md"
     >
@@ -151,10 +129,10 @@ export function AuthLayout() {
         <Group h="100%" px="md" justify="space-between">
           <Group>
             <Burger
-              opened={mobileOpened}
-              hiddenFrom="sm"
+              opened={desktopOpened}
+              visibleFrom="sm"
               size="sm"
-              onClick={toggleMobile}
+              onClick={toggleDesktop}
             />
             <AppLogo />
           </Group>
@@ -175,7 +153,7 @@ export function AuthLayout() {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
 
-            return (
+            const buttonContent = (
               <UnstyledButton
                 key={item.path}
                 style={(theme) => ({
@@ -198,11 +176,27 @@ export function AuthLayout() {
                 })}
                 onClick={() => navigate(item.path)}
               >
-                <Group>
+                <Group justify={desktopOpened ? 'flex-start' : 'center'}>
                   <Icon size={20} />
-                  <Text size="sm">{item.label}</Text>
+                  {desktopOpened ? <Text size="sm">{item.label}</Text> : null}
                 </Group>
               </UnstyledButton>
+            );
+
+            return desktopOpened ? (
+              buttonContent
+            ) : (
+              <Tooltip
+                key={item.path}
+                withArrow
+                label={item.label}
+                position="right"
+                c={isDarkMode ? 'white' : undefined}
+                bg={isDarkMode ? 'brand.8' : 'brand.4'}
+                openDelay={300}
+              >
+                {buttonContent}
+              </Tooltip>
             );
           })}
 
@@ -222,4 +216,43 @@ export function AuthLayout() {
       <PWAInstallPrompt />
     </AppShell>
   );
+}
+
+function buildNavigationItems(t: TFunction, user?: User) {
+  const isRoot = user?.isRoot ?? false;
+  const isAdminRoutesEnabled =
+    isRoot && localStorage.getItem('displayAdminRoutes') === 'true';
+
+  const adminItems = [
+    {
+      label: t('common.roleManagement'),
+      icon: IconShield,
+      path: '/role-management',
+    },
+    {
+      label: t('permission.management'),
+      icon: IconLock,
+      path: '/permission-management',
+    },
+  ];
+
+  return [
+    {
+      label: t('common.home'),
+      icon: IconHome,
+      path: '/home',
+    },
+    {
+      label: t('common.userManagement'),
+      icon: IconUsers,
+      path: '/user-management',
+      hidden: !isRoot,
+    },
+    ...(isAdminRoutesEnabled ? adminItems : []),
+    {
+      label: t('common.profile'),
+      icon: IconUserCircle,
+      path: '/profile',
+    },
+  ].filter((item) => ('hidden' in item ? !item.hidden : true));
 }

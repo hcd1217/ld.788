@@ -20,9 +20,9 @@ import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {clientService} from '@/services/client';
 import {getFormValidators} from '@/utils/validation';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
-import {AuthFormContainer} from '@/components/auth/AuthFormContainer';
-import {AuthFormInput} from '@/components/auth/AuthFormInput';
-import {AuthFormButton} from '@/components/auth/AuthFormButton';
+import {FormContainer} from '@/components/form/FormContainer';
+import {FormInput} from '@/components/form/FormInput';
+import {FormButton} from '@/components/form/FormButton';
 import {Logo} from '@/components/common/Logo';
 
 type RegisterFormValues = {
@@ -114,159 +114,153 @@ export function RegisterPage() {
     }
   };
 
-  const content = (
-    <>
-      <Group justify="center" gap="md" mb="lg">
-        <Logo />
-        <Title
-          style={{
-            fontWeight: 900,
-          }}
-          size="h2"
-        >
-          {t('auth.registerTitle')}
-        </Title>
-      </Group>
-      <Space h="lg" />
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack gap="lg">
-          <AuthFormInput
-            required
-            autoComplete="off"
-            placeholder={t('auth.clientCode')}
-            error={form.errors.clientCode}
-            disabled={isLoading}
-            {...form.getInputProps('clientCode')}
-            onFocus={() => {
-              setShowAlert(false);
-            }}
-          />
-          <AuthFormInput
-            required
-            autoComplete="off"
-            placeholder={t('auth.clientName')}
-            error={form.errors.clientName}
-            disabled={isLoading}
-            {...form.getInputProps('clientName')}
-            onFocus={() => {
-              setShowAlert(false);
-            }}
-          />
-          <FirstNameAndLastNameInForm
-            form={form}
-            isLoading={isLoading}
-            setShowAlert={setShowAlert}
-          />
-
-          <AuthFormInput
-            required
-            type="email"
-            autoComplete="email"
-            placeholder={t('auth.email')}
-            error={form.errors.email}
-            disabled={isLoading}
-            {...form.getInputProps('email')}
-            onFocus={() => {
-              setShowAlert(false);
-            }}
-          />
-
-          <AuthFormInput
-            required
-            type="password"
-            autoComplete="new-password"
-            placeholder={t('auth.password')}
-            error={form.errors.password}
-            disabled={isLoading}
-            {...form.getInputProps('password')}
-            onFocus={() => {
-              setShowAlert(false);
-            }}
-          />
-
-          <AuthFormInput
-            required
-            type="password"
-            autoComplete="new-password"
-            placeholder={t('auth.confirmPassword')}
-            error={form.errors.confirmPassword}
-            disabled={isLoading}
-            {...form.getInputProps('confirmPassword')}
-            onFocus={() => {
-              setShowAlert(false);
-            }}
-          />
-
-          <Transition
-            mounted={
-              showAlert
-                ? Boolean(form.errors.email && form.errors.password)
-                : false
-            }
-            transition="fade"
-            duration={300}
-            timingFunction="ease"
-          >
-            {(styles) => (
-              <Alert
-                withCloseButton
-                style={styles}
-                icon={<IconAlertCircle size={16} />}
-                color="red"
-                variant="light"
-                onClose={() => {
-                  setShowAlert(false);
-                }}
-              >
-                {t('notifications.registrationFailed')}
-              </Alert>
-            )}
-          </Transition>
-
-          <AuthFormButton loading={isLoading} type="submit">
-            {t('auth.createAccount')}
-          </AuthFormButton>
-        </Stack>
-      </form>
-
-      <Center mt="lg">
-        <Stack gap="xs" align="center">
-          <Anchor
-            component="button"
-            type="button"
-            size="sm"
-            disabled={isLoading}
-            onClick={() => navigate('/login')}
-          >
-            {t('auth.haveAccount')} {t('auth.signIn')}
-          </Anchor>
-
-          <Anchor
-            c="dimmed"
-            component="button"
-            size="xs"
-            type="button"
-            disabled={isLoading}
-            onClick={() => navigate('/')}
-          >
-            <Center inline>
-              <IconArrowLeft
-                style={{width: rem(12), height: rem(12)}}
-                stroke={1.5}
-              />
-              <Box ml={5}>{t('auth.backToHome')}</Box>
-            </Center>
-          </Anchor>
-        </Stack>
-      </Center>
-    </>
-  );
-
   return (
     <GuestLayout>
-      <AuthFormContainer mounted isLoading={isLoading}>
-        {content}
-      </AuthFormContainer>
+      <FormContainer mounted isLoading={isLoading}>
+        <Group justify="center" gap="md" mb="lg">
+          <Logo />
+          <Title
+            style={{
+              fontWeight: 900,
+            }}
+            size="h2"
+          >
+            {t('auth.registerTitle')}
+          </Title>
+        </Group>
+        <Space h="lg" />
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Stack gap="lg">
+            <FormInput
+              required
+              autoComplete="off"
+              placeholder={t('auth.clientCode')}
+              error={form.errors.clientCode}
+              disabled={isLoading}
+              {...form.getInputProps('clientCode')}
+              onFocus={() => {
+                setShowAlert(false);
+              }}
+            />
+            <FormInput
+              required
+              autoComplete="off"
+              placeholder={t('auth.clientName')}
+              error={form.errors.clientName}
+              disabled={isLoading}
+              {...form.getInputProps('clientName')}
+              onFocus={() => {
+                setShowAlert(false);
+              }}
+            />
+            <FirstNameAndLastNameInForm
+              form={form}
+              isLoading={isLoading}
+              setShowAlert={setShowAlert}
+            />
+
+            <FormInput
+              required
+              type="email"
+              autoComplete="email"
+              placeholder={t('auth.email')}
+              error={form.errors.email}
+              disabled={isLoading}
+              {...form.getInputProps('email')}
+              onFocus={() => {
+                setShowAlert(false);
+              }}
+            />
+
+            <FormInput
+              required
+              type="password"
+              autoComplete="new-password"
+              placeholder={t('auth.password')}
+              error={form.errors.password}
+              disabled={isLoading}
+              {...form.getInputProps('password')}
+              onFocus={() => {
+                setShowAlert(false);
+              }}
+            />
+
+            <FormInput
+              required
+              type="password"
+              autoComplete="new-password"
+              placeholder={t('auth.confirmPassword')}
+              error={form.errors.confirmPassword}
+              disabled={isLoading}
+              {...form.getInputProps('confirmPassword')}
+              onFocus={() => {
+                setShowAlert(false);
+              }}
+            />
+
+            <Transition
+              mounted={
+                showAlert
+                  ? Boolean(form.errors.email && form.errors.password)
+                  : false
+              }
+              transition="fade"
+              duration={300}
+              timingFunction="ease"
+            >
+              {(styles) => (
+                <Alert
+                  withCloseButton
+                  style={styles}
+                  icon={<IconAlertCircle size={16} />}
+                  color="red"
+                  variant="light"
+                  onClose={() => {
+                    setShowAlert(false);
+                  }}
+                >
+                  {t('notifications.registrationFailed')}
+                </Alert>
+              )}
+            </Transition>
+
+            <FormButton loading={isLoading} type="submit">
+              {t('auth.createAccount')}
+            </FormButton>
+          </Stack>
+        </form>
+
+        <Center mt="lg">
+          <Stack gap="xs" align="center">
+            <Anchor
+              component="button"
+              type="button"
+              size="sm"
+              disabled={isLoading}
+              onClick={() => navigate('/login')}
+            >
+              {t('auth.haveAccount')} {t('auth.signIn')}
+            </Anchor>
+
+            <Anchor
+              c="dimmed"
+              component="button"
+              size="xs"
+              type="button"
+              disabled={isLoading}
+              onClick={() => navigate('/')}
+            >
+              <Center inline>
+                <IconArrowLeft
+                  style={{width: rem(12), height: rem(12)}}
+                  stroke={1.5}
+                />
+                <Box ml={5}>{t('auth.backToHome')}</Box>
+              </Center>
+            </Anchor>
+          </Stack>
+        </Center>
+      </FormContainer>
     </GuestLayout>
   );
 }

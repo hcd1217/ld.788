@@ -2,17 +2,17 @@ import {type ReactNode} from 'react';
 import {Paper, LoadingOverlay, Transition, Stack} from '@mantine/core';
 import {useIsDesktop} from '@/hooks/useIsDesktop';
 
-type AuthFormContainerProps = {
+type FormContainerProps = {
   readonly children: ReactNode;
-  readonly isLoading: boolean;
-  readonly mounted: boolean;
+  readonly isLoading?: boolean;
+  readonly mounted?: boolean;
 };
 
-export function AuthFormContainer({
+export function FormContainer({
   children,
-  isLoading,
-  mounted,
-}: AuthFormContainerProps) {
+  isLoading = false,
+  mounted = true,
+}: FormContainerProps) {
   const isDesktop = useIsDesktop();
 
   return (

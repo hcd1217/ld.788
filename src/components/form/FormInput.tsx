@@ -7,12 +7,12 @@ import {
 } from '@mantine/core';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
-type BaseAuthFormInputProps = {
+type BaseFormInputProps = {
   readonly type?: 'text' | 'email' | 'password';
   readonly onFocus?: () => void;
 };
 
-type AuthFormInputProps = BaseAuthFormInputProps &
+type FormInputProps = BaseFormInputProps &
   Omit<TextInputProps, 'variant' | 'styles' | 'type'>;
 
 const getInputStyles = (isDarkMode: boolean) => ({
@@ -23,7 +23,7 @@ const getInputStyles = (isDarkMode: boolean) => ({
   },
 });
 
-export const AuthFormInput = forwardRef<HTMLInputElement, AuthFormInputProps>(
+export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   ({type = 'text', onFocus = undefined, ...props}, ref) => {
     const isDarkMode = useIsDarkMode();
     const inputStyles = getInputStyles(isDarkMode);
@@ -53,4 +53,4 @@ export const AuthFormInput = forwardRef<HTMLInputElement, AuthFormInputProps>(
   },
 );
 
-AuthFormInput.displayName = 'AuthFormInput';
+FormInput.displayName = 'FormInput';

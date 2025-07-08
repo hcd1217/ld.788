@@ -1,21 +1,21 @@
 import {type ReactNode} from 'react';
 import {Button, rem, type ButtonProps} from '@mantine/core';
 
-type AuthFormButtonProps = {
+type FormButtonProps = {
   readonly children: ReactNode;
   readonly loading?: boolean;
   readonly type?: 'submit' | 'button';
   readonly onClick?: () => void;
 } & Omit<ButtonProps, 'fullWidth' | 'size' | 'styles'>;
 
-export function AuthFormButton({
+export function FormButton({
   children,
   loading = false,
   type = 'submit',
   fw = '400',
   fz = 'h4',
   ...props
-}: AuthFormButtonProps) {
+}: FormButtonProps) {
   return (
     <Button
       fullWidth

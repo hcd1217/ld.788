@@ -2,7 +2,6 @@ import {useState} from 'react';
 import {Navigate, useNavigate} from 'react-router';
 import {
   Button,
-  Paper,
   Group,
   Anchor,
   Center,
@@ -33,8 +32,9 @@ import {
 import {clientService} from '@/services/client';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
 import {useAppStore} from '@/stores/useAppStore';
-import {AuthFormInput} from '@/components/auth/AuthFormInput';
-import {AuthFormButton} from '@/components/auth/AuthFormButton';
+import {FormInput} from '@/components/form/FormInput';
+import {FormButton} from '@/components/form/FormButton';
+import {FormContainer} from '@/components/form/FormContainer';
 
 type AddUserFormValues = {
   email?: string;
@@ -196,17 +196,8 @@ export function AddUserPage() {
           duration={400}
           timingFunction="ease"
         >
-          {(styles) => (
-            <Paper
-              withBorder
-              shadow="xl"
-              p={{base: 'xl', sm: 30}}
-              radius="md"
-              style={{
-                ...styles,
-                position: 'relative',
-              }}
-            >
+          {() => (
+            <FormContainer>
               <LoadingOverlay
                 visible={isLoading}
                 overlayProps={{blur: 2}}
@@ -220,7 +211,7 @@ export function AddUserPage() {
                     setShowAlert={setShowAlert}
                   />
 
-                  <AuthFormInput
+                  <FormInput
                     type="email"
                     autoComplete="email"
                     placeholder={t('auth.email')}
@@ -232,7 +223,7 @@ export function AddUserPage() {
                     }}
                   />
 
-                  <AuthFormInput
+                  <FormInput
                     placeholder={t('auth.userName')}
                     error={form.errors.userName}
                     disabled={isLoading}
@@ -242,7 +233,7 @@ export function AddUserPage() {
                     }}
                   />
 
-                  <AuthFormInput
+                  <FormInput
                     required
                     type="password"
                     autoComplete="new-password"
@@ -255,7 +246,7 @@ export function AddUserPage() {
                     }}
                   />
 
-                  <AuthFormInput
+                  <FormInput
                     required
                     type="password"
                     autoComplete="new-password"
@@ -292,12 +283,12 @@ export function AddUserPage() {
                     )}
                   </Transition>
 
-                  <AuthFormButton loading={isLoading} type="submit">
+                  <FormButton loading={isLoading} type="submit">
                     {t('auth.addUser')}
-                  </AuthFormButton>
+                  </FormButton>
                 </Stack>
               </form>
-            </Paper>
+            </FormContainer>
           )}
         </Transition>
       </Stack>

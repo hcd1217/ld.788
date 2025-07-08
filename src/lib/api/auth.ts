@@ -13,7 +13,7 @@ const jwtTokenSchema = z.string().regex(jwtTokenRegex);
 export const LoginRequestSchema = z.object({
   identifier: z.string(),
   password: passwordSchema,
-  clientCode: z.string(),
+  clientCode: z.string().min(2),
 });
 
 export const LoginResponseSchema = z.object({
@@ -40,6 +40,7 @@ export const JWTPayloadSchema = z.object({
 
 export const ForgotPasswordRequestSchema = z.object({
   email: z.email(),
+  clientCode: z.string().min(2),
 });
 
 export const ForgotPasswordResponseSchema = z.object({

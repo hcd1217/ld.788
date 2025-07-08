@@ -19,9 +19,9 @@ import {useTranslation} from '@/hooks/useTranslation';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {authService} from '@/services/auth';
 import {getFormValidators} from '@/utils/validation';
-import {AuthFormContainer} from '@/components/auth/AuthFormContainer';
-import {AuthFormInput} from '@/components/auth/AuthFormInput';
-import {AuthFormButton} from '@/components/auth/AuthFormButton';
+import {FormContainer} from '@/components/form/FormContainer';
+import {FormInput} from '@/components/form/FormInput';
+import {FormButton} from '@/components/form/FormButton';
 import {Logo} from '@/components/common/Logo';
 
 type ResetPasswordFormValues = {
@@ -121,22 +121,22 @@ export function ResetPasswordPage() {
           <Text size="sm" c="dimmed">
             {t('auth.invalidResetLinkDescription')}
           </Text>
-          <AuthFormButton
+          <FormButton
             variant="light"
             type="button"
             onClick={() => navigate('/forgot-password')}
           >
             {t('auth.requestNewLink')}
-          </AuthFormButton>
+          </FormButton>
         </Stack>
       </>
     );
 
     return (
       <GuestLayout>
-        <AuthFormContainer mounted isLoading={false}>
+        <FormContainer mounted isLoading={false}>
           {invalidTokenContent}
-        </AuthFormContainer>
+        </FormContainer>
       </GuestLayout>
     );
   }
@@ -170,102 +170,96 @@ export function ResetPasswordPage() {
 
     return (
       <GuestLayout>
-        <AuthFormContainer mounted isLoading={false}>
+        <FormContainer mounted isLoading={false}>
           {successContent}
-        </AuthFormContainer>
+        </FormContainer>
       </GuestLayout>
     );
   }
 
-  const content = (
-    <>
-      <Group justify="center" gap="md" mb="lg">
-        <Logo />
-        <Title
-          style={{
-            fontWeight: 900,
-          }}
-          size="h2"
-        >
-          {t('auth.resetPasswordTitle')}
-        </Title>
-      </Group>
-
-      <Space h="lg" />
-
-      <Text size="sm" c="dimmed" ta="center" mb="lg">
-        {t('auth.resetPasswordDescription')}
-      </Text>
-
-      {email ? (
-        <Alert
-          variant="light"
-          color="blue"
-          icon={<IconAlertCircle size={16} />}
-          mb="lg"
-        >
-          <Text size="sm">{t('auth.resettingPasswordFor', {email})}</Text>
-        </Alert>
-      ) : null}
-
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack gap="lg">
-          <AuthFormInput
-            required
-            type="password"
-            autoComplete="new-password"
-            placeholder={t('auth.enterNewPassword')}
-            error={form.errors.password}
-            disabled={isLoading}
-            {...form.getInputProps('password')}
-          />
-
-          <AuthFormInput
-            required
-            type="password"
-            autoComplete="new-password"
-            placeholder={t('auth.confirmYourPassword')}
-            error={form.errors.confirmPassword}
-            disabled={isLoading}
-            {...form.getInputProps('confirmPassword')}
-          />
-
-          <AuthFormButton
-            loading={isLoading}
-            type="submit"
-            disabled={!form.isValid() && form.isTouched()}
-          >
-            {t('auth.resetPassword')}
-          </AuthFormButton>
-        </Stack>
-      </form>
-
-      <Center mt="lg">
-        <Anchor
-          c="dimmed"
-          component="button"
-          size="sm"
-          type="button"
-          disabled={isLoading}
-          onClick={() => navigate('/login')}
-        >
-          <Center inline>
-            <IconArrowLeft
-              style={{width: rem(14), height: rem(14)}}
-              stroke={1.5}
-            />
-            <Box ml={5}>{t('auth.backToLogin')}</Box>
-          </Center>
-        </Anchor>
-      </Center>
-    </>
-  );
-
   return (
     <GuestLayout>
-      <AuthFormContainer mounted isLoading={isLoading}>
-        {content}
-      </AuthFormContainer>
+      <FormContainer mounted isLoading={isLoading}>
+        <Group justify="center" gap="md" mb="lg">
+          <Logo />
+          <Title
+            style={{
+              fontWeight: 900,
+            }}
+            size="h2"
+          >
+            {t('auth.resetPasswordTitle')}
+          </Title>
+        </Group>
+
+        <Space h="lg" />
+
+        <Text size="sm" c="dimmed" ta="center" mb="lg">
+          {t('auth.resetPasswordDescription')}
+        </Text>
+
+        {email ? (
+          <Alert
+            variant="light"
+            color="blue"
+            icon={<IconAlertCircle size={16} />}
+            mb="lg"
+          >
+            <Text size="sm">{t('auth.resettingPasswordFor', {email})}</Text>
+          </Alert>
+        ) : null}
+
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Stack gap="lg">
+            <FormInput
+              required
+              type="password"
+              autoComplete="new-password"
+              placeholder={t('auth.enterNewPassword')}
+              error={form.errors.password}
+              disabled={isLoading}
+              {...form.getInputProps('password')}
+            />
+
+            <FormInput
+              required
+              type="password"
+              autoComplete="new-password"
+              placeholder={t('auth.confirmYourPassword')}
+              error={form.errors.confirmPassword}
+              disabled={isLoading}
+              {...form.getInputProps('confirmPassword')}
+            />
+
+            <FormButton
+              loading={isLoading}
+              type="submit"
+              disabled={!form.isValid() && form.isTouched()}
+            >
+              {t('auth.resetPassword')}
+            </FormButton>
+          </Stack>
+        </form>
+
+        <Center mt="lg">
+          <Anchor
+            c="dimmed"
+            component="button"
+            size="sm"
+            type="button"
+            disabled={isLoading}
+            onClick={() => navigate('/login')}
+          >
+            <Center inline>
+              <IconArrowLeft
+                style={{width: rem(14), height: rem(14)}}
+                stroke={1.5}
+              />
+              <Box ml={5}>{t('auth.backToLogin')}</Box>
+            </Center>
+          </Anchor>
+        </Center>
+      </FormContainer>
     </GuestLayout>
   );
 }
