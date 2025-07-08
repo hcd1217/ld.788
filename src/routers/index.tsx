@@ -162,14 +162,15 @@ const routeObjects: RouteObject[] = [
       {path: 'more', Component: MorePage},
       {
         path: '',
-        Component: PCOnlyLayout,
+        Component: RootUserLayout,
         children: [
+          {path: 'user-management', Component: UserManagementPage},
+          {path: 'user/:userId', Component: UserDetailPage},
           {
             path: '',
-            Component: RootUserLayout,
+            Component: PCOnlyLayout,
             children: [
-              {path: 'user-management', Component: UserManagementPage},
-              {path: 'user/:userId', Component: UserDetailPage},
+              {path: 'import-users', Component: ImportUsersPage},
               {path: 'role-management', Component: RoleManagementPage},
               {
                 path: 'permission-management',
@@ -177,7 +178,6 @@ const routeObjects: RouteObject[] = [
               },
             ],
           },
-          {path: 'import-users', Component: ImportUsersPage},
         ],
       },
     ],

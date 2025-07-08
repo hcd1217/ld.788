@@ -11,21 +11,16 @@ import {
   Stack,
   Container,
   Title,
-  Table,
   ActionIcon,
   Text,
   Badge,
-  Menu,
   Modal,
   TextInput,
   PasswordInput,
   LoadingOverlay,
-  Pagination,
-  Tooltip,
   Alert,
   Transition,
   Card,
-  ScrollArea,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {useDisclosure} from '@mantine/hooks';
@@ -37,9 +32,6 @@ import {
   IconEye,
   IconEdit,
   IconTrash,
-  IconDots,
-  IconSearch,
-  IconRefresh,
   IconAlertCircle,
   IconMail,
   IconAt,
@@ -59,6 +51,7 @@ import {delay} from '@/utils/time';
 import i18n from '@/lib/i18n';
 import {getLocaleConfig} from '@/config/localeConfig';
 import {userService, type User} from '@/services/user';
+import {DataTable} from '@/components/common/DataTable';
 
 type EditUserFormValues = {
   email: string;
@@ -82,12 +75,8 @@ export function UserManagementPage() {
   const navigate = useNavigate();
   const {t} = useTranslation();
   const {user} = useAppStore();
-
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
   const [showAlert, setShowAlert] = useState(false);
 
@@ -133,7 +122,6 @@ export function UserManagementPage() {
       setIsLoading(true);
 
       const users = await userService.getUsers({
-        search: searchQuery || undefined,
         limit: USERS_PER_PAGE,
       });
 
@@ -148,12 +136,7 @@ export function UserManagementPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, t]);
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
-  };
+  }, [t]);
 
   const handleViewUser = (userId: string) => {
     navigate(`/user/${userId}`);
@@ -262,18 +245,6 @@ export function UserManagementPage() {
     loadUsers();
   }, [loadUsers]);
 
-  useEffect(() => {
-    // Since we're using API search, just use the users directly
-    setFilteredUsers(users);
-  }, [users]);
-
-  const paginatedUsers = filteredUsers.slice(
-    (currentPage - 1) * USERS_PER_PAGE,
-    currentPage * USERS_PER_PAGE,
-  );
-
-  const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
-
   if (!user?.isRoot) {
     return <Navigate to="/home" />;
   }
@@ -323,46 +294,6 @@ export function UserManagementPage() {
 
         <Paper withBorder shadow="md" p="md" radius="md">
           <Stack gap="md">
-            <Group justify="space-between" align="flex-start">
-              <Stack gap="md" style={{flex: 1}}>
-                {/* Mobile: Stack filters vertically */}
-                <Box hiddenFrom="sm">
-                  <TextInput
-                    placeholder={t('common.searchUsers')}
-                    leftSection={<IconSearch size={16} />}
-                    value={searchQuery}
-                    onChange={(event) => {
-                      handleSearch(event.currentTarget.value);
-                    }}
-                  />
-                </Box>
-
-                {/* Desktop: Horizontal layout */}
-                <Box visibleFrom="sm">
-                  <TextInput
-                    placeholder={t('common.searchUsers')}
-                    leftSection={<IconSearch size={16} />}
-                    value={searchQuery}
-                    style={{minWidth: 250}}
-                    onChange={(event) => {
-                      handleSearch(event.currentTarget.value);
-                    }}
-                  />
-                </Box>
-              </Stack>
-
-              <Tooltip label={t('common.refresh')}>
-                <ActionIcon
-                  variant="light"
-                  size="lg"
-                  loading={isLoading}
-                  onClick={loadUsers}
-                >
-                  <IconRefresh size={16} />
-                </ActionIcon>
-              </Tooltip>
-            </Group>
-
             <Box style={{position: 'relative'}}>
               <LoadingOverlay
                 visible={isLoading}
@@ -374,7 +305,7 @@ export function UserManagementPage() {
               <Box hiddenFrom="md">
                 {/* Mobile Card View */}
                 <Stack gap="sm">
-                  {paginatedUsers.map((user) => (
+                  {users.map((user) => (
                     <Card key={user.id} withBorder padding="md" radius="md">
                       <Stack gap="xs">
                         <Group justify="space-between" align="flex-start">
@@ -396,41 +327,38 @@ export function UserManagementPage() {
                               </Text>
                             ) : null}
                           </Box>
-                          <Menu shadow="md" width={200}>
-                            <Menu.Target>
-                              <ActionIcon variant="subtle" color="gray">
-                                <IconDots size={16} />
-                              </ActionIcon>
-                            </Menu.Target>
-                            <Menu.Dropdown>
-                              <Menu.Item
-                                leftSection={<IconEye size={14} />}
-                                onClick={() => {
-                                  handleViewUser(user.id);
-                                }}
-                              >
-                                {t('common.viewDetails')}
-                              </Menu.Item>
-                              <Menu.Item
-                                leftSection={<IconEdit size={14} />}
-                                onClick={() => {
-                                  handleEditUser(user);
-                                }}
-                              >
-                                {t('common.edit')}
-                              </Menu.Item>
-                              <Menu.Divider />
-                              <Menu.Item
-                                leftSection={<IconTrash size={14} />}
-                                color="red"
-                                onClick={() => {
-                                  handleDeleteUser(user);
-                                }}
-                              >
-                                {t('common.delete')}
-                              </Menu.Item>
-                            </Menu.Dropdown>
-                          </Menu>
+                          <Group gap={4}>
+                            <ActionIcon
+                              variant="subtle"
+                              color="blue"
+                              size="sm"
+                              onClick={() => {
+                                handleViewUser(user.id);
+                              }}
+                            >
+                              <IconEye size={16} />
+                            </ActionIcon>
+                            <ActionIcon
+                              variant="subtle"
+                              color="gray"
+                              size="sm"
+                              onClick={() => {
+                                handleEditUser(user);
+                              }}
+                            >
+                              <IconEdit size={16} />
+                            </ActionIcon>
+                            <ActionIcon
+                              variant="subtle"
+                              color="red"
+                              size="sm"
+                              onClick={() => {
+                                handleDeleteUser(user);
+                              }}
+                            >
+                              <IconTrash size={16} />
+                            </ActionIcon>
+                          </Group>
                         </Group>
 
                         {user.isRoot ? (
@@ -446,106 +374,91 @@ export function UserManagementPage() {
 
               <Box visibleFrom="md">
                 {/* Desktop Table View */}
-                <ScrollArea>
-                  <Table striped highlightOnHover>
-                    <Table.Thead>
-                      <Table.Tr>
-                        <Table.Th>{t('common.name')}</Table.Th>
-                        <Table.Th>{t('auth.email')}</Table.Th>
-                        <Table.Th>{t('auth.userName')}</Table.Th>
-                        <Table.Th>{t('common.actions')}</Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>
-                      {paginatedUsers.map((user) => (
-                        <Table.Tr key={user.id}>
-                          <Table.Td>
-                            <Text fw={500}>
-                              {getDisplayName(
-                                user.firstName || '',
-                                user.lastName || '',
-                              )}
-                              {user.isRoot ? (
-                                <Badge
-                                  color="blue"
-                                  variant="light"
-                                  size="xs"
-                                  ml="xs"
-                                >
-                                  Root
-                                </Badge>
-                              ) : null}
-                            </Text>
-                          </Table.Td>
-                          <Table.Td>
-                            <Text size="sm">{user.email || '-'}</Text>
-                          </Table.Td>
-                          <Table.Td>
-                            <Text size="sm">{user.userName || '-'}</Text>
-                          </Table.Td>
-                          <Table.Td>
-                            <Group gap={0} justify="flex-end">
-                              <Menu shadow="md" width={200}>
-                                <Menu.Target>
-                                  <ActionIcon variant="subtle" color="gray">
-                                    <IconDots size={16} />
-                                  </ActionIcon>
-                                </Menu.Target>
-                                <Menu.Dropdown>
-                                  <Menu.Item
-                                    leftSection={<IconEye size={14} />}
-                                    onClick={() => {
-                                      handleViewUser(user.id);
-                                    }}
-                                  >
-                                    {t('common.viewDetails')}
-                                  </Menu.Item>
-                                  <Menu.Item
-                                    leftSection={<IconEdit size={14} />}
-                                    onClick={() => {
-                                      handleEditUser(user);
-                                    }}
-                                  >
-                                    {t('common.edit')}
-                                  </Menu.Item>
-                                  <Menu.Divider />
-                                  <Menu.Item
-                                    leftSection={<IconTrash size={14} />}
-                                    color="red"
-                                    onClick={() => {
-                                      handleDeleteUser(user);
-                                    }}
-                                  >
-                                    {t('common.delete')}
-                                  </Menu.Item>
-                                </Menu.Dropdown>
-                              </Menu>
-                            </Group>
-                          </Table.Td>
-                        </Table.Tr>
-                      ))}
-                    </Table.Tbody>
-                  </Table>
-                </ScrollArea>
+                <DataTable
+                  data={users}
+                  isLoading={false}
+                  emptyMessage={t('common.noUsersFound')}
+                  renderActions={(user: User) => (
+                    <Group gap={4} justify="flex-end">
+                      <ActionIcon
+                        variant="subtle"
+                        color="blue"
+                        size="sm"
+                        onClick={() => {
+                          handleViewUser(user.id);
+                        }}
+                      >
+                        <IconEye size={16} />
+                      </ActionIcon>
+                      <ActionIcon
+                        variant="subtle"
+                        color="gray"
+                        size="sm"
+                        onClick={() => {
+                          handleEditUser(user);
+                        }}
+                      >
+                        <IconEdit size={16} />
+                      </ActionIcon>
+                      <ActionIcon
+                        variant="subtle"
+                        color="red"
+                        size="sm"
+                        onClick={() => {
+                          handleDeleteUser(user);
+                        }}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Group>
+                  )}
+                  columns={[
+                    {
+                      key: 'name',
+                      header: t('common.name'),
+                      render: (user: User) => (
+                        <Text fw={500}>
+                          {getDisplayName(
+                            user.firstName || '',
+                            user.lastName || '',
+                          )}
+                          {user.isRoot ? (
+                            <Badge
+                              color="blue"
+                              variant="light"
+                              size="xs"
+                              ml="xs"
+                            >
+                              Root
+                            </Badge>
+                          ) : null}
+                        </Text>
+                      ),
+                    },
+                    {
+                      key: 'email',
+                      header: t('auth.email'),
+                      render: (user: User) => (
+                        <Text size="sm">{user.email || '-'}</Text>
+                      ),
+                    },
+                    {
+                      key: 'userName',
+                      header: t('auth.userName'),
+                      render: (user: User) => (
+                        <Text size="sm">{user.userName || '-'}</Text>
+                      ),
+                    },
+                  ]}
+                />
               </Box>
 
-              {filteredUsers.length === 0 && !isLoading && (
+              {users.length === 0 && !isLoading && (
                 <Center py="xl">
                   <Text c="dimmed">{t('common.noUsersFound')}</Text>
                 </Center>
               )}
             </Box>
-
-            {totalPages > 1 && (
-              <Center>
-                <Pagination
-                  value={currentPage}
-                  total={totalPages}
-                  size="sm"
-                  onChange={setCurrentPage}
-                />
-              </Center>
-            )}
           </Stack>
         </Paper>
       </Stack>
