@@ -112,7 +112,7 @@ export function LoginPage() {
         </Title>
       </Group>
       <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack gap="md">
+        <Stack gap="lg">
           <AuthFormInput
             required
             type="email"
@@ -185,7 +185,7 @@ export function LoginPage() {
 
       <Text size="sm" ta="center" mt="lg" c="dimmed">
         {t('auth.noAccount')}{' '}
-        <Anchor href="/register" size="sm">
+        <Anchor href="/register" size="sm" fw="600">
           {t('auth.createAccount')}
         </Anchor>
       </Text>

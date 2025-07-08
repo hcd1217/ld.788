@@ -13,10 +13,7 @@ import {
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
-import {
-  IconAlertCircle,
-  IconArrowLeft,
-} from '@tabler/icons-react';
+import {IconAlertCircle, IconArrowLeft} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {clientService} from '@/services/client';
@@ -130,7 +127,7 @@ export function RegisterPage() {
         </Title>
       </Group>
       <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack gap="md">
+        <Stack gap="lg">
           <AuthFormInput
             required
             autoComplete="off"
@@ -265,7 +262,7 @@ export function RegisterPage() {
 
   return (
     <GuestLayout>
-      <AuthFormContainer isLoading={isLoading} mounted={true}>
+      <AuthFormContainer mounted isLoading={isLoading}>
         {content}
       </AuthFormContainer>
     </GuestLayout>

@@ -86,7 +86,7 @@ export function ForgotPasswordPage() {
             variant="light"
             type="button"
             onClick={() => {
-              navigate('/login')
+              navigate('/login');
             }}
           >
             {t('auth.backToLogin')}
@@ -97,7 +97,7 @@ export function ForgotPasswordPage() {
 
     return (
       <GuestLayout>
-        <AuthFormContainer isLoading={false} mounted={true}>
+        <AuthFormContainer mounted isLoading={false}>
           {successContent}
         </AuthFormContainer>
       </GuestLayout>
@@ -123,7 +123,7 @@ export function ForgotPasswordPage() {
       </Text>
 
       <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack gap="md">
+        <Stack gap="lg">
           <AuthFormInput
             required
             type="email"
@@ -167,7 +167,7 @@ export function ForgotPasswordPage() {
 
   return (
     <GuestLayout>
-      <AuthFormContainer isLoading={isLoading} mounted={true}>
+      <AuthFormContainer mounted isLoading={isLoading}>
         {content}
       </AuthFormContainer>
     </GuestLayout>

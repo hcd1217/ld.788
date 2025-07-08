@@ -14,6 +14,39 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Core React libraries
+          react: ['react', 'react-dom'],
+          // Router
+          router: ['react-router'],
+          // Mantine UI components
+          mantine: [
+            '@mantine/core',
+            '@mantine/hooks',
+            '@mantine/notifications',
+            '@mantine/modals',
+            '@mantine/form',
+            '@mantine/dates',
+          ],
+          // Icons (large dependency)
+          icons: ['@tabler/icons-react'],
+          // I18n
+          i18n: [
+            'i18next',
+            'react-i18next',
+            'i18next-browser-languagedetector',
+          ],
+          // State management & utilities
+          utils: ['zustand', 'zod', 'dayjs'],
+          // Large utilities
+          xlsx: ['xlsx'],
+        },
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({

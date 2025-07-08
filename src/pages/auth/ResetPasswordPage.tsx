@@ -13,11 +13,7 @@ import {
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
-import {
-  IconArrowLeft,
-  IconAlertCircle,
-  IconCheck,
-} from '@tabler/icons-react';
+import {IconArrowLeft, IconAlertCircle, IconCheck} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {authService} from '@/services/auth';
@@ -137,7 +133,7 @@ export function ResetPasswordPage() {
 
     return (
       <GuestLayout>
-        <AuthFormContainer isLoading={false} mounted={true}>
+        <AuthFormContainer mounted isLoading={false}>
           {invalidTokenContent}
         </AuthFormContainer>
       </GuestLayout>
@@ -173,7 +169,7 @@ export function ResetPasswordPage() {
 
     return (
       <GuestLayout>
-        <AuthFormContainer isLoading={false} mounted={true}>
+        <AuthFormContainer mounted isLoading={false}>
           {successContent}
         </AuthFormContainer>
       </GuestLayout>
@@ -205,14 +201,12 @@ export function ResetPasswordPage() {
           icon={<IconAlertCircle size={16} />}
           mb="lg"
         >
-          <Text size="sm">
-            {t('auth.resettingPasswordFor', {email})}
-          </Text>
+          <Text size="sm">{t('auth.resettingPasswordFor', {email})}</Text>
         </Alert>
       ) : null}
 
       <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack gap="md">
+        <Stack gap="lg">
           <AuthFormInput
             required
             type="password"
@@ -266,7 +260,7 @@ export function ResetPasswordPage() {
 
   return (
     <GuestLayout>
-      <AuthFormContainer isLoading={isLoading} mounted={true}>
+      <AuthFormContainer mounted isLoading={isLoading}>
         {content}
       </AuthFormContainer>
     </GuestLayout>

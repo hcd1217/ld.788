@@ -22,7 +22,7 @@ export function GuestLayout({children}: GuestLayoutProps) {
         minHeight: '100vh',
         width: '100%',
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'auto',
       }}
     >
       <Group

@@ -2,6 +2,7 @@ import {forwardRef} from 'react';
 import {
   TextInput,
   PasswordInput,
+  useMantineColorScheme,
   type TextInputProps,
   type PasswordInputProps,
 } from '@mantine/core';
@@ -14,16 +15,19 @@ type BaseAuthFormInputProps = {
 type AuthFormInputProps = BaseAuthFormInputProps &
   Omit<TextInputProps, 'variant' | 'styles' | 'type'>;
 
-const inputStyles = {
+const getInputStyles = (colorScheme: string) => ({
   input: {
-    borderBottom: '1px solid #dee2e6',
+    borderBottom: `1px solid ${colorScheme === 'dark' ? '#c5c5c5' : '#dee2e6'}`,
     borderRadius: 0,
     padding: '12px 0',
   },
-};
+});
 
 export const AuthFormInput = forwardRef<HTMLInputElement, AuthFormInputProps>(
-  ({type = 'text', onFocus, ...props}, ref) => {
+  ({type = 'text', onFocus = undefined, ...props}, ref) => {
+    const {colorScheme} = useMantineColorScheme();
+    const inputStyles = getInputStyles(colorScheme);
+
     if (type === 'password') {
       return (
         <PasswordInput

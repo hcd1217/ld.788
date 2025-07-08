@@ -1,10 +1,5 @@
 import {type ReactNode} from 'react';
-import {
-  Paper,
-  LoadingOverlay,
-  Transition,
-  Stack,
-} from '@mantine/core';
+import {Paper, LoadingOverlay, Transition, Stack} from '@mantine/core';
 import {useMediaQuery} from '@mantine/hooks';
 
 type AuthFormContainerProps = {
