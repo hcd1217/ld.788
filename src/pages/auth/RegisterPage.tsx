@@ -123,7 +123,7 @@ export function RegisterPage() {
     <GuestLayout hasRegisterLink={false} title={t('auth.registerTitle')}>
       <Stack gap="xl">
         <Transition
-          mounted={true}
+          mounted
           transition="slide-up"
           duration={400}
           timingFunction="ease"

@@ -194,7 +194,7 @@ export function AddUserPage() {
         </Title>
 
         <Transition
-          mounted={true}
+          mounted
           transition="slide-up"
           duration={400}
           timingFunction="ease"

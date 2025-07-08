@@ -23,7 +23,7 @@ export default defineConfig({
         name: 'Credo App',
         short_name: 'Credo',
         description: 'Credo Progressive Web Application',
-        theme_color: '#1969c8',
+        theme_color: '#3F60A0',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
