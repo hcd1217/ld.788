@@ -1,4 +1,4 @@
-import {z} from 'zod';
+import * as z from 'zod/v4';
 import {BaseApiClient} from './base';
 
 // Test API client for demonstrating error handling

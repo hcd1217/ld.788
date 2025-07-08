@@ -10,13 +10,16 @@
     "lint:fix": "xo --fix",
     "type-check": "tsc --noEmit",
     "preview": "vite preview",
-    "generate-pwa-assets": "node scripts/generate-pwa-assets.js"
+    "generate-pwa-assets": "node scripts/generate-pwa-assets.js",
+    "sync:translation": "node scripts/sync-translation.cjs",
+    "detect:hardcoded-strings": "node scripts/detect-hardcoded-strings.cjs"
   },
   "dependencies": {
     "@mantine/core": "^8.1.2",
     "@mantine/dates": "^8.1.2",
     "@mantine/form": "^8.1.2",
     "@mantine/hooks": "^8.1.2",
+    "@mantine/modals": "^8.1.2",
     "@mantine/notifications": "^8.1.2",
     "@tabler/icons-react": "3.17.0",
     "dayjs": "^1.11.13",
@@ -27,7 +30,7 @@
     "react-i18next": "^15.5.3",
     "react-router": "^7.6.3",
     "xlsx": "^0.18.5",
-    "zod": "^4.0.0-beta.1",
+    "zod": "^3.25.73",
     "zustand": "^5.0.6"
   },
   "devDependencies": {

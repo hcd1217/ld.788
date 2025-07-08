@@ -1,10 +1,19 @@
-import type {z} from 'zod';
+import type * as z from 'zod/v4';
 import {addApiError} from '@/stores/error';
 import {authService} from '@/services/auth';
+import {cleanObject} from '@/utils/object';
 
 type ApiConfig = {
   baseURL: string;
   timeout?: number;
+  cacheEnabled?: boolean;
+  cacheTTL?: number;
+};
+
+type CacheEntry<T> = {
+  data: T;
+  timestamp: number;
+  ttl: number;
 };
 
 type RequestConfig<T = unknown> = {
@@ -26,22 +35,58 @@ export class ApiError extends Error {
 export class BaseApiClient {
   private readonly baseURL: string;
   private readonly timeout: number;
+  private readonly cacheEnabled: boolean;
+  private readonly cacheTTL: number;
+  private readonly cache = new Map<string, CacheEntry<unknown>>();
 
   constructor(config: ApiConfig) {
     this.baseURL = config.baseURL;
     this.timeout = config.timeout ?? 30_000;
+    this.cacheEnabled = config.cacheEnabled ?? true;
+    this.cacheTTL = config.cacheTTL ?? 30_000; // 30 seconds default
   }
 
-  async get<T>(
+  public clearCache(): void {
+    this.cache.clear();
+  }
+
+  public clearExpiredCache(): void {
+    const now = Date.now();
+    for (const [key, entry] of this.cache.entries()) {
+      if (now - entry.timestamp > entry.ttl) {
+        this.cache.delete(key);
+      }
+    }
+  }
+
+  async get<T, R = unknown>(
     endpoint: string,
-    params?: Record<string, string>,
+    params?: R,
     schema?: z.ZodSchema<T>,
+    paramsSchema?: z.ZodSchema<R>,
   ): Promise<T> {
-    return this.request<T>(endpoint, {
+    const cleanParams = params
+      ? cleanObject(paramsSchema?.parse(params) ?? params, true)
+      : undefined;
+
+    // Check cache first
+    const cacheKey = this.generateCacheKey(endpoint, cleanParams);
+    const cachedData = this.getCachedData<T>(cacheKey);
+    if (cachedData !== undefined) {
+      return cachedData;
+    }
+
+    // Make request and cache result
+    const result = await this.request<T>(endpoint, {
       method: 'GET',
-      params,
+      params: cleanParams,
       schema,
     });
+
+    // Cache the result
+    this.setCachedData(cacheKey, result);
+
+    return result;
   }
 
   async post<T, R = unknown>(
@@ -51,23 +96,35 @@ export class BaseApiClient {
     dataSchema?: z.ZodSchema<R>,
   ): Promise<T> {
     data = dataSchema?.parse(data) ?? data;
-    return this.request<T>(endpoint, {
+    const result = await this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
       schema,
     });
+
+    // Invalidate related cache entries
+    this.invalidateRelatedCache(endpoint);
+
+    return result;
   }
 
-  async put<T>(
+  async put<T, R = unknown>(
     endpoint: string,
     data?: unknown,
     schema?: z.ZodSchema<T>,
+    dataSchema?: z.ZodSchema<R>,
   ): Promise<T> {
-    return this.request<T>(endpoint, {
+    data = dataSchema?.parse(data) ?? data;
+    const result = await this.request<T>(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
       schema,
     });
+
+    // Invalidate related cache entries
+    this.invalidateRelatedCache(endpoint);
+
+    return result;
   }
 
   async patch<T>(
@@ -75,18 +132,28 @@ export class BaseApiClient {
     data?: unknown,
     schema?: z.ZodSchema<T>,
   ): Promise<T> {
-    return this.request<T>(endpoint, {
+    const result = await this.request<T>(endpoint, {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
       schema,
     });
+
+    // Invalidate related cache entries
+    this.invalidateRelatedCache(endpoint);
+
+    return result;
   }
 
   async delete<T>(endpoint: string, schema?: z.ZodSchema<T>): Promise<T> {
-    return this.request<T>(endpoint, {
+    const result = await this.request<T>(endpoint, {
       method: 'DELETE',
       schema,
     });
+
+    // Invalidate related cache entries
+    this.invalidateRelatedCache(endpoint);
+
+    return result;
   }
 
   private getAuthToken(): string | undefined {
@@ -95,6 +162,48 @@ export class BaseApiClient {
 
   private getClientCode(): string | undefined {
     return authService.getClientCode() ?? undefined;
+  }
+
+  private invalidateRelatedCache(endpoint: string): void {
+    if (!this.cacheEnabled) return;
+
+    // Extract the resource path from endpoint (e.g., '/users/123' -> '/users')
+    const resourcePath = endpoint.split('/').slice(0, 2).join('/');
+
+    for (const key of this.cache.keys()) {
+      if (key.includes(resourcePath)) {
+        this.cache.delete(key);
+      }
+    }
+  }
+
+  private generateCacheKey(
+    endpoint: string,
+    params?: Record<string, string | number | boolean>,
+  ): string {
+    const url = new URL(`${this.baseURL}${endpoint}`);
+    if (params) {
+      for (const [key, value] of Object.entries(params)) {
+        url.searchParams.append(key, value.toString());
+      }
+    }
+
+    return url.toString();
+  }
+
+  private getCachedData<T>(cacheKey: string): T | undefined {
+    if (!this.cacheEnabled) return undefined;
+
+    const entry = this.cache.get(cacheKey) as CacheEntry<T> | undefined;
+    if (!entry) return undefined;
+
+    const now = Date.now();
+    if (now - entry.timestamp > entry.ttl) {
+      this.cache.delete(cacheKey);
+      return undefined;
+    }
+
+    return entry.data;
   }
 
   private async request<T>(
@@ -152,7 +261,29 @@ export class BaseApiClient {
 
       clearTimeout(timeoutId);
 
-      const data = (await response.json()) as unknown;
+      // Check if response has content before parsing JSON
+      let data: unknown;
+      const contentType = response.headers.get('content-type');
+      const contentLength = response.headers.get('content-length');
+
+      // Check if response likely has JSON content
+      const hasJsonContent =
+        contentType?.includes('application/json') &&
+        contentLength !== '0' &&
+        response.status !== 204;
+
+      if (hasJsonContent) {
+        try {
+          data = await response.json();
+        } catch (error: unknown) {
+          console.error('JSON parsing error:', error);
+          // If JSON parsing fails, return undefined for successful responses
+          data = response.ok ? undefined : {};
+        }
+      } else {
+        // No content or non-JSON content
+        data = undefined;
+      }
 
       if (!response.ok) {
         const apiError = new ApiError(
@@ -243,5 +374,15 @@ export class BaseApiClient {
 
       throw unknownError;
     }
+  }
+
+  private setCachedData<T>(cacheKey: string, data: T, ttl?: number): void {
+    if (!this.cacheEnabled) return;
+
+    this.cache.set(cacheKey, {
+      data,
+      timestamp: Date.now(),
+      ttl: ttl ?? this.cacheTTL,
+    });
   }
 }

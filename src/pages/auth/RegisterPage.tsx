@@ -1,10 +1,6 @@
 import {useState} from 'react';
 import {useNavigate} from 'react-router';
 import {
-  TextInput,
-  PasswordInput,
-  Button,
-  Paper,
   Anchor,
   Center,
   Box,
@@ -12,23 +8,24 @@ import {
   Stack,
   Alert,
   Transition,
-  LoadingOverlay,
+  Group,
+  Title,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
 import {
   IconAlertCircle,
   IconArrowLeft,
-  IconBuilding,
-  IconId,
-  IconLock,
-  IconMail,
 } from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {clientService} from '@/services/client';
 import {getFormValidators} from '@/utils/validation';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
+import {AuthFormContainer} from '@/components/auth/AuthFormContainer';
+import {AuthFormInput} from '@/components/auth/AuthFormInput';
+import {AuthFormButton} from '@/components/auth/AuthFormButton';
+import {Logo} from '@/components/common/Logo';
 
 type RegisterFormValues = {
   clientCode: string;
@@ -119,186 +116,158 @@ export function RegisterPage() {
     }
   };
 
-  return (
-    <GuestLayout hasRegisterLink={false} title={t('auth.registerTitle')}>
-      <Stack gap="xl">
-        <Transition
-          mounted
-          transition="slide-up"
-          duration={400}
-          timingFunction="ease"
+  const content = (
+    <>
+      <Group justify="center" gap="md" mb="lg">
+        <Logo />
+        <Title
+          style={{
+            fontWeight: 900,
+          }}
+          size="h2"
         >
-          {(styles) => (
-            <Paper
-              withBorder
-              shadow="xl"
-              p={{base: 'xl', sm: 30}}
-              radius="md"
-              style={{
-                ...styles,
-                position: 'relative',
-              }}
-            >
-              <LoadingOverlay
-                visible={isLoading}
-                overlayProps={{blur: 2}}
-                transitionProps={{duration: 300}}
+          {t('auth.registerTitle')}
+        </Title>
+      </Group>
+      <form onSubmit={form.onSubmit(handleSubmit)}>
+        <Stack gap="md">
+          <AuthFormInput
+            required
+            autoComplete="off"
+            placeholder={t('auth.clientCode')}
+            error={form.errors.clientCode}
+            disabled={isLoading}
+            {...form.getInputProps('clientCode')}
+            onFocus={() => {
+              setShowAlert(false);
+            }}
+          />
+          <AuthFormInput
+            required
+            autoComplete="off"
+            placeholder={t('auth.clientName')}
+            error={form.errors.clientName}
+            disabled={isLoading}
+            {...form.getInputProps('clientName')}
+            onFocus={() => {
+              setShowAlert(false);
+            }}
+          />
+          <FirstNameAndLastNameInForm
+            form={form}
+            isLoading={isLoading}
+            setShowAlert={setShowAlert}
+          />
+
+          <AuthFormInput
+            required
+            type="email"
+            autoComplete="email"
+            placeholder={t('auth.email')}
+            error={form.errors.email}
+            disabled={isLoading}
+            {...form.getInputProps('email')}
+            onFocus={() => {
+              setShowAlert(false);
+            }}
+          />
+
+          <AuthFormInput
+            required
+            type="password"
+            autoComplete="new-password"
+            placeholder={t('auth.password')}
+            error={form.errors.password}
+            disabled={isLoading}
+            {...form.getInputProps('password')}
+            onFocus={() => {
+              setShowAlert(false);
+            }}
+          />
+
+          <AuthFormInput
+            required
+            type="password"
+            autoComplete="new-password"
+            placeholder={t('auth.confirmPassword')}
+            error={form.errors.confirmPassword}
+            disabled={isLoading}
+            {...form.getInputProps('confirmPassword')}
+            onFocus={() => {
+              setShowAlert(false);
+            }}
+          />
+
+          <Transition
+            mounted={
+              showAlert
+                ? Boolean(form.errors.email && form.errors.password)
+                : false
+            }
+            transition="fade"
+            duration={300}
+            timingFunction="ease"
+          >
+            {(styles) => (
+              <Alert
+                withCloseButton
+                style={styles}
+                icon={<IconAlertCircle size={16} />}
+                color="red"
+                variant="light"
+                onClose={() => {
+                  setShowAlert(false);
+                }}
+              >
+                {t('notifications.registrationFailed')}
+              </Alert>
+            )}
+          </Transition>
+
+          <AuthFormButton loading={isLoading} type="submit">
+            {t('auth.createAccount')}
+          </AuthFormButton>
+        </Stack>
+      </form>
+
+      <Center mt="lg">
+        <Stack gap="xs" align="center">
+          <Anchor
+            component="button"
+            type="button"
+            size="sm"
+            disabled={isLoading}
+            onClick={() => navigate('/login')}
+          >
+            {t('auth.haveAccount')} {t('auth.signIn')}
+          </Anchor>
+
+          <Anchor
+            c="dimmed"
+            component="button"
+            size="xs"
+            type="button"
+            disabled={isLoading}
+            onClick={() => navigate('/')}
+          >
+            <Center inline>
+              <IconArrowLeft
+                style={{width: rem(12), height: rem(12)}}
+                stroke={1.5}
               />
-              <form onSubmit={form.onSubmit(handleSubmit)}>
-                <TextInput
-                  required
-                  autoComplete="off"
-                  label={t('auth.clientCode')}
-                  placeholder={t('auth.clientCode')}
-                  error={form.errors.clientCode}
-                  disabled={isLoading}
-                  leftSection={<IconBuilding size={16} />}
-                  {...form.getInputProps('clientCode')}
-                  onFocus={() => {
-                    setShowAlert(false);
-                  }}
-                />
-                <TextInput
-                  required
-                  autoComplete="off"
-                  label={t('auth.clientName')}
-                  placeholder={t('auth.clientName')}
-                  error={form.errors.clientName}
-                  disabled={isLoading}
-                  leftSection={<IconId size={16} />}
-                  {...form.getInputProps('clientName')}
-                  onFocus={() => {
-                    setShowAlert(false);
-                  }}
-                />
-                <Stack gap="md">
-                  <FirstNameAndLastNameInForm
-                    form={form}
-                    isLoading={isLoading}
-                    setShowAlert={setShowAlert}
-                  />
+              <Box ml={5}>{t('auth.backToHome')}</Box>
+            </Center>
+          </Anchor>
+        </Stack>
+      </Center>
+    </>
+  );
 
-                  <TextInput
-                    required
-                    autoComplete="email"
-                    label={t('auth.email')}
-                    placeholder="you@example.com"
-                    error={form.errors.email}
-                    disabled={isLoading}
-                    leftSection={<IconMail size={16} />}
-                    {...form.getInputProps('email')}
-                    onFocus={() => {
-                      setShowAlert(false);
-                    }}
-                  />
-
-                  <PasswordInput
-                    required
-                    autoComplete="new-password"
-                    label={t('auth.password')}
-                    placeholder={t('auth.password').toLowerCase()}
-                    error={form.errors.password}
-                    disabled={isLoading}
-                    leftSection={<IconLock size={16} />}
-                    {...form.getInputProps('password')}
-                    onFocus={() => {
-                      setShowAlert(false);
-                    }}
-                  />
-
-                  <PasswordInput
-                    required
-                    autoComplete="new-password"
-                    label={t('auth.confirmPassword')}
-                    placeholder={t('auth.confirmYourPassword')}
-                    error={form.errors.confirmPassword}
-                    disabled={isLoading}
-                    leftSection={<IconLock size={16} />}
-                    {...form.getInputProps('confirmPassword')}
-                    onFocus={() => {
-                      setShowAlert(false);
-                    }}
-                  />
-
-                  <Transition
-                    mounted={
-                      showAlert
-                        ? Boolean(form.errors.email && form.errors.password)
-                        : false
-                    }
-                    transition="fade"
-                    duration={300}
-                    timingFunction="ease"
-                  >
-                    {(styles) => (
-                      <Alert
-                        withCloseButton
-                        style={styles}
-                        icon={<IconAlertCircle size={16} />}
-                        color="red"
-                        variant="light"
-                        onClose={() => {
-                          setShowAlert(false);
-                        }}
-                      >
-                        {t('notifications.registrationFailed')}
-                      </Alert>
-                    )}
-                  </Transition>
-
-                  <Button
-                    fullWidth
-                    loading={isLoading}
-                    type="submit"
-                    size="md"
-                    disabled={!form.isValid() && form.isTouched()}
-                    styles={{
-                      root: {
-                        transition: 'all 0.2s ease',
-                        height: rem(42),
-                      },
-                    }}
-                    mt="xs"
-                  >
-                    {t('auth.createAccount')}
-                  </Button>
-                </Stack>
-              </form>
-
-              <Center mt="md">
-                <Stack gap="xs" align="center">
-                  <Anchor
-                    component="button"
-                    type="button"
-                    size="sm"
-                    disabled={isLoading}
-                    onClick={() => navigate('/login')}
-                  >
-                    {t('auth.haveAccount')} {t('auth.signIn')}
-                  </Anchor>
-
-                  <Anchor
-                    c="dimmed"
-                    component="button"
-                    size="xs"
-                    type="button"
-                    disabled={isLoading}
-                    onClick={() => navigate('/')}
-                  >
-                    <Center inline>
-                      <IconArrowLeft
-                        style={{width: rem(12), height: rem(12)}}
-                        stroke={1.5}
-                      />
-                      <Box ml={5}>{t('auth.backToHome')}</Box>
-                    </Center>
-                  </Anchor>
-                </Stack>
-              </Center>
-            </Paper>
-          )}
-        </Transition>
-      </Stack>
+  return (
+    <GuestLayout>
+      <AuthFormContainer isLoading={isLoading} mounted={true}>
+        {content}
+      </AuthFormContainer>
     </GuestLayout>
   );
 }

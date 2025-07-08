@@ -20,7 +20,9 @@ import {
   IconChevronDown,
   IconDashboard,
   IconUserCircle,
-  IconUserPlus,
+  IconUsers,
+  IconShield,
+  IconLock,
 } from '@tabler/icons-react';
 import {PWAInstallPrompt} from '@/components/common/PWAInstallPrompt';
 import {ColorSchemeToggle} from '@/components/common/ColorSchemeToggle';
@@ -50,9 +52,21 @@ export function AuthLayout() {
       path: '/home',
     },
     {
-      label: t('common.addUser'),
-      icon: IconUserPlus,
-      path: '/add-user',
+      label: t('common.userManagement'),
+      icon: IconUsers,
+      path: '/user-management',
+      hidden: !user?.isRoot,
+    },
+    {
+      label: t('common.roleManagement'),
+      icon: IconShield,
+      path: '/role-management',
+      hidden: !user?.isRoot,
+    },
+    {
+      label: t('permission.management'),
+      icon: IconLock,
+      path: '/permission-management',
       hidden: !user?.isRoot,
     },
     {

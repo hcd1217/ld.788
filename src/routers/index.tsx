@@ -1,12 +1,17 @@
 import {lazy} from 'react';
 import {createBrowserRouter, type RouteObject} from 'react-router';
 import {AppLayout} from '@/components/layouts/AppLayout';
-import {ProtectedRoute} from '@/components/layouts/ProtectedRoute';
 import {ResponsiveAuthLayout} from '@/components/layouts/ResponsiveAuthLayout';
+import {ProtectedRoute} from '@/components/layouts/ProtectedRoute';
 
 const ServiceLayout = lazy(async () => {
   const module = await import('@/components/layouts/ServiceLayout');
   return {default: module.ServiceLayout};
+});
+
+const RootUserLayout = lazy(async () => {
+  const module = await import('@/components/layouts/RootUserLayout');
+  return {default: module.RootUserLayout};
 });
 
 const PCOnlyLayout = lazy(async () => {
@@ -54,6 +59,11 @@ const MorePage = lazy(async () => {
   return {default: module.MorePage};
 });
 
+const UserManagementPage = lazy(async () => {
+  const module = await import('@/pages/app/UserManagementPage');
+  return {default: module.UserManagementPage};
+});
+
 const AddUserPage = lazy(async () => {
   const module = await import('@/pages/app/AddUserPage');
   return {default: module.AddUserPage};
@@ -62,6 +72,21 @@ const AddUserPage = lazy(async () => {
 const ImportUsersPage = lazy(async () => {
   const module = await import('@/pages/app/ImportUsersPage');
   return {default: module.ImportUsersPage};
+});
+
+const UserDetailPage = lazy(async () => {
+  const module = await import('@/pages/app/UserDetailPage');
+  return {default: module.UserDetailPage};
+});
+
+const RoleManagementPage = lazy(async () => {
+  const module = await import('@/pages/app/RoleManagementPage');
+  return {default: module.RoleManagementPage};
+});
+
+const PermissionManagementPage = lazy(async () => {
+  const module = await import('@/pages/app/PermissionManagementPage');
+  return {default: module.PermissionManagementPage};
 });
 
 const LoginPage = lazy(async () => {
@@ -138,7 +163,22 @@ const routeObjects: RouteObject[] = [
       {
         path: '',
         Component: PCOnlyLayout,
-        children: [{path: 'import-users', Component: ImportUsersPage}],
+        children: [
+          {
+            path: '',
+            Component: RootUserLayout,
+            children: [
+              {path: 'user-management', Component: UserManagementPage},
+              {path: 'user/:userId', Component: UserDetailPage},
+              {path: 'role-management', Component: RoleManagementPage},
+              {
+                path: 'permission-management',
+                Component: PermissionManagementPage,
+              },
+            ],
+          },
+          {path: 'import-users', Component: ImportUsersPage},
+        ],
       },
     ],
   },

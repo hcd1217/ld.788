@@ -583,31 +583,31 @@ export function ImportUsersPage() {
                     </Card>
 
                     {importResult.summary.failed > 0 &&
-                    importResult.details?.failed ? (
+                    importResult.details?.errors ? (
                       <Card withBorder>
                         <Text fw={500} mb="sm" c="red">
                           Failed Imports:
                         </Text>
                         <Stack gap="xs">
-                          {importResult.details.failed
+                          {importResult.details.errors
                             .slice(0, 5)
-                            .map((failure, index) => (
+                            .map((error, index) => (
                               <Text
-                                key={`failure-${
-                                  failure.user.email ||
-                                  failure.user.userName ||
+                                key={`error-${
+                                  error.user.email ||
+                                  error.user.userName ||
                                   index
                                 }`}
                                 size="sm"
                                 c="dimmed"
                               >
-                                {failure.user.firstName} {failure.user.lastName}
-                                : {failure.error}
+                                {error.user.firstName} {error.user.lastName}:{' '}
+                                {error.error}
                               </Text>
                             ))}
-                          {importResult.details.failed.length > 5 && (
+                          {importResult.details.errors.length > 5 && (
                             <Text size="sm" c="dimmed">
-                              ... and {importResult.details.failed.length - 5}{' '}
+                              ... and {importResult.details.errors.length - 5}{' '}
                               more
                             </Text>
                           )}

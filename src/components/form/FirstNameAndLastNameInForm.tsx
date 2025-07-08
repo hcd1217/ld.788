@@ -1,10 +1,10 @@
-import {Grid, TextInput} from '@mantine/core';
-import {IconUser} from '@tabler/icons-react';
+import {Grid} from '@mantine/core';
 import type {UseFormReturnType} from '@mantine/form';
 import {useEffect} from 'react';
 import {useTranslation} from '@/hooks/useTranslation';
 import i18n from '@/lib/i18n';
 import {getLocaleConfig} from '@/config/localeConfig';
+import {AuthFormInput} from '@/components/auth/AuthFormInput';
 
 export function FirstNameAndLastNameInForm<
   T extends {firstName: string; lastName: string},
@@ -41,14 +41,12 @@ export function FirstNameAndLastNameInForm<
         const localeConfig = getLocaleConfig(i18n.language);
         const firstNameField = (
           <Grid.Col key="firstName" span={{base: 12, sm: 6}}>
-            <TextInput
+            <AuthFormInput
               required
               autoComplete="given-name"
-              label={t('auth.firstName')}
               placeholder={t('auth.firstNamePlaceholder')}
               error={form.errors.firstName}
               disabled={isLoading}
-              leftSection={<IconUser size={16} />}
               {...form.getInputProps('firstName')}
               onFocus={() => {
                 setShowAlert(false);
@@ -59,14 +57,12 @@ export function FirstNameAndLastNameInForm<
 
         const lastNameField = (
           <Grid.Col key="lastName" span={{base: 12, sm: 6}}>
-            <TextInput
+            <AuthFormInput
               required
               autoComplete="family-name"
-              label={t('auth.lastName')}
               placeholder={t('auth.lastNamePlaceholder')}
               error={form.errors.lastName}
               disabled={isLoading}
-              leftSection={<IconUser size={16} />}
               {...form.getInputProps('lastName')}
               onFocus={() => {
                 setShowAlert(false);

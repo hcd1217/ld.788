@@ -1,5 +1,6 @@
 import {AuthApi} from './auth';
 import {ClientApi} from './client';
+import {UserApi} from './user';
 
 const API_BASE_URL =
   (import.meta.env.VITE_API_URL as string | undefined) ??
@@ -14,18 +15,13 @@ export const clientApi = new ClientApi({
   baseURL: API_BASE_URL,
 });
 
+export const userApi = new UserApi({
+  baseURL: API_BASE_URL,
+});
+
 // Export types and schemas
 export * from './auth';
 export * from './client';
-
-export {
-  LoginRequestSchema,
-  LoginResponseSchema,
-  JWTPayloadSchema,
-  ForgotPasswordRequestSchema,
-  ForgotPasswordResponseSchema,
-  ResetPasswordRequestSchema,
-  ResetPasswordResponseSchema,
-} from './auth';
+export * from './user';
 
 export {ApiError} from './base';
