@@ -30,7 +30,7 @@ export const useAppStore = create<AppState>()(
   devtools(
     (set, get) => {
       return {
-        clientCode: localStorage.getItem('clientCode') ?? '',
+        clientCode: localStorage.getItem('clientCode') ?? 'ACME',
         user: authService.getCurrentUser() ?? undefined,
         isAuthenticated: true,
         isLoading: false,
