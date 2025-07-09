@@ -1,8 +1,15 @@
+import {useMemo} from 'react';
 import {useParams} from 'react-router';
-import {useAppStore} from '@/stores/useAppStore';
+import {useAppConfigStore} from '@/stores/useAppStore';
 
 export function useClientCode() {
-  const {clientCode} = useAppStore();
+  const storeClientCode = useAppConfigStore((state) => state.clientCode);
   const params = useParams();
-  return params.clientCode ?? clientCode ?? 'ACME';
+
+  // Memoize clientCode derivation to prevent unnecessary re-renders
+  const clientCode = useMemo(() => {
+    return params.clientCode ?? storeClientCode ?? 'ACME';
+  }, [params.clientCode, storeClientCode]);
+
+  return clientCode;
 }

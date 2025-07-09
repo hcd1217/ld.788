@@ -19,8 +19,6 @@ export function GuestLayout({children}: GuestLayoutProps) {
   return (
     <Box
       style={{
-        height: '100vh',
-        // @ts-expect-error - this is a workaround to fix the issue with the keyboard
         height: '100dvh',
         width: '100%',
         position: 'fixed',

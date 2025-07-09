@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useMemo, useCallback} from 'react';
 import {useNavigate} from 'react-router';
 import {
   Group,
@@ -11,16 +11,21 @@ import {
   Space,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
-import {notifications} from '@mantine/notifications';
-import {IconAlertCircle} from '@tabler/icons-react';
-import {useAppStore} from '@/stores/useAppStore';
+import {showAuthNotifications} from '@/utils/notifications';
+import {
+  useAuthStore,
+  useFormStore,
+  useAppConfigStore,
+} from '@/stores/useAppStore';
 import {useTranslation} from '@/hooks/useTranslation';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {getFormValidators} from '@/utils/validation';
+import {useFocusManagement} from '@/hooks/useFocusManagement';
 import {Logo} from '@/components/common/Logo';
 import {FormContainer} from '@/components/form/FormContainer';
 import {FormInput} from '@/components/form/FormInput';
 import {FormButton} from '@/components/form/FormButton';
+import {LazyIcon} from '@/components/lazy/LazyIcon';
 import {useClientCode} from '@/hooks/useClientCode';
 
 type LoginFormValues = {
@@ -31,11 +36,40 @@ type LoginFormValues = {
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const {login, isLoading} = useAppStore();
+  const login = useAuthStore((state) => state.login);
+  const isLoading = useFormStore((state) => state.isLoading);
+  const setLoading = useFormStore((state) => state.setLoading);
+  const setClientCode = useAppConfigStore((state) => state.setClientCode);
   const [showAlert, setShowAlert] = useState(false);
   const [mounted, setMounted] = useState(false);
   const {t} = useTranslation();
   const clientCode = useClientCode();
+
+  // Memoized translation strings to prevent re-computation
+  const translationStrings = useMemo(
+    () => ({
+      title: t('auth.title'),
+      identifier: t('auth.identifier'),
+      password: t('auth.password'),
+      signIn: t('auth.signIn'),
+      forgotPassword: t('auth.forgotPassword'),
+      noAccount: t('auth.noAccount'),
+      createAccount: t('auth.createAccount'),
+      loginSuccess: t('notifications.loginSuccess'),
+      loginSuccessMessage: t('notifications.loginSuccessMessage'),
+      loginFailed: t('notifications.loginFailed'),
+      invalidCredentials: t('notifications.invalidCredentials'),
+    }),
+    [t],
+  );
+
+  // Memoized form validators
+  const validators = useMemo(() => {
+    return getFormValidators(t, ['identifier', 'password', 'clientCode']);
+  }, [t]);
+
+  // Optimized focus management
+  useFocusManagement('input[name="identifier"]', 300);
 
   const form = useForm<LoginFormValues>({
     initialValues: {
@@ -43,61 +77,75 @@ export function LoginPage() {
       password: '',
       clientCode,
     },
-    validate: getFormValidators(t, ['identifier', 'password', 'clientCode']),
+    validate: validators,
   });
 
-  // Focus identifier input on mount and trigger mount animation
+  // Mount animation trigger
   useEffect(() => {
     setMounted(true);
-    const timer = setTimeout(() => {
-      const emailInput = document.querySelector<HTMLInputElement>(
-        'input[name="identifier"]',
-      );
-      emailInput?.focus();
-    }, 300);
-    return () => {
-      clearTimeout(timer);
-    };
   }, []);
 
-  const handleSubmit = async (values: LoginFormValues) => {
-    try {
-      // Always remember the identifier
-      localStorage.setItem('rememberedIdentifier', values.identifier);
+  // Memoized event handlers to prevent unnecessary re-renders
+  const handleSubmit = useCallback(
+    async (values: LoginFormValues) => {
+      setLoading(true);
+      try {
+        // Always remember the identifier
+        localStorage.setItem('rememberedIdentifier', values.identifier);
 
-      await login({
-        identifier: values.identifier,
-        password: values.password,
-        clientCode: values.clientCode,
-      });
-      notifications.show({
-        title: t('notifications.loginSuccess'),
-        message: t('notifications.loginSuccessMessage'),
-        color: 'green',
-      });
-      navigate('/home');
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t('notifications.invalidCredentials');
+        await login({
+          identifier: values.identifier,
+          password: values.password,
+          clientCode: values.clientCode,
+        });
+        setClientCode(values.clientCode);
+        showAuthNotifications.loginSuccess(
+          translationStrings.loginSuccess,
+          translationStrings.loginSuccessMessage,
+        );
+        navigate('/home');
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : translationStrings.invalidCredentials;
 
-      form.setErrors({
-        identifier: '',
-        password: '',
-        clientCode: '',
-      });
+        form.setErrors({
+          identifier: '',
+          password: '',
+          clientCode: '',
+        });
 
-      setShowAlert(true);
+        setShowAlert(true);
 
-      notifications.show({
-        title: t('notifications.loginFailed'),
-        message: errorMessage,
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
-    }
-  };
+        showAuthNotifications.loginFailed(
+          translationStrings.loginFailed,
+          errorMessage,
+          <LazyIcon name="IconAlertCircle" size={16} />,
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [login, navigate, form, translationStrings, setLoading, setClientCode],
+  );
+
+  const handleFocus = useCallback(() => {
+    setShowAlert(false);
+  }, []);
+
+  const handleForgotPassword = useCallback(() => {
+    navigate('/forgot-password');
+  }, [navigate]);
+
+  const handleAlertClose = useCallback(() => {
+    setShowAlert(false);
+  }, []);
+
+  // Memoized alert condition
+  const shouldShowAlert = useMemo(() => {
+    return showAlert && Boolean(form.errors.identifier && form.errors.password);
+  }, [showAlert, form.errors.identifier, form.errors.password]);
 
   return (
     <GuestLayout>
@@ -110,7 +158,7 @@ export function LoginPage() {
             }}
             size="h2"
           >
-            {t('auth.title')}
+            {translationStrings.title}
           </Title>
         </Group>
         <Space h="lg" />
@@ -119,35 +167,28 @@ export function LoginPage() {
             <FormInput
               required
               type="text"
+              name="identifier"
               autoComplete="identifier"
-              placeholder={t('auth.identifier')}
+              placeholder={translationStrings.identifier}
               error={form.errors.identifier}
               disabled={isLoading}
               {...form.getInputProps('identifier')}
-              onFocus={() => {
-                setShowAlert(false);
-              }}
+              onFocus={handleFocus}
             />
 
             <FormInput
               required
               type="password"
               autoComplete="current-password"
-              placeholder={t('auth.password')}
+              placeholder={translationStrings.password}
               error={form.errors.password}
               disabled={isLoading}
               {...form.getInputProps('password')}
-              onFocus={() => {
-                setShowAlert(false);
-              }}
+              onFocus={handleFocus}
             />
 
             <Transition
-              mounted={
-                showAlert
-                  ? Boolean(form.errors.identifier && form.errors.password)
-                  : false
-              }
+              mounted={shouldShowAlert}
               transition="fade"
               duration={300}
               timingFunction="ease"
@@ -156,14 +197,12 @@ export function LoginPage() {
                 <Alert
                   withCloseButton
                   style={styles}
-                  icon={<IconAlertCircle size={16} />}
+                  icon={<LazyIcon name="IconAlertCircle" size={16} />}
                   color="red"
                   variant="light"
-                  onClose={() => {
-                    setShowAlert(false);
-                  }}
+                  onClose={handleAlertClose}
                 >
-                  {t('notifications.invalidCredentials')}
+                  {translationStrings.invalidCredentials}
                 </Alert>
               )}
             </Transition>
@@ -174,20 +213,20 @@ export function LoginPage() {
                 type="button"
                 size="sm"
                 disabled={isLoading}
-                onClick={() => navigate('/forgot-password')}
+                onClick={handleForgotPassword}
               >
-                {t('auth.forgotPassword')}
+                {translationStrings.forgotPassword}
               </Anchor>
             </Group>
 
-            <FormButton type="submit">{t('auth.signIn')}</FormButton>
+            <FormButton type="submit">{translationStrings.signIn}</FormButton>
           </Stack>
         </form>
 
         <Text size="sm" ta="center" mt="lg" c="dimmed">
-          {t('auth.noAccount')}{' '}
+          {translationStrings.noAccount}{' '}
           <Anchor href="/register" size="sm" fw="600">
-            {t('auth.createAccount')}
+            {translationStrings.createAccount}
           </Anchor>
         </Text>
       </FormContainer>

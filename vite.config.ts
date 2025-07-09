@@ -22,15 +22,18 @@ export default defineConfig({
           react: ['react', 'react-dom'],
           // Router
           router: ['react-router'],
-          // Mantine UI components
-          mantine: [
-            '@mantine/core',
-            '@mantine/hooks',
-            '@mantine/notifications',
-            '@mantine/modals',
-            '@mantine/form',
-            '@mantine/dates',
-          ],
+          // Mantine Core (most commonly used)
+          'mantine-core': ['@mantine/core'],
+          // Mantine Hooks (lightweight, commonly used)
+          'mantine-hooks': ['@mantine/hooks'],
+          // Mantine Form (auth-specific)
+          'mantine-form': ['@mantine/form'],
+          // Mantine Notifications (smaller, auth-specific)
+          'mantine-notifications': ['@mantine/notifications'],
+          // Mantine Modals (less commonly used)
+          'mantine-modals': ['@mantine/modals'],
+          // Mantine Dates (heavy, less commonly used)
+          'mantine-dates': ['@mantine/dates'],
           // Icons (large dependency)
           icons: ['@tabler/icons-react'],
           // I18n
@@ -39,8 +42,12 @@ export default defineConfig({
             'react-i18next',
             'i18next-browser-languagedetector',
           ],
-          // State management & utilities
-          utils: ['zustand', 'zod', 'dayjs'],
+          // State management
+          zustand: ['zustand'],
+          // Validation
+          zod: ['zod'],
+          // Date utilities
+          dayjs: ['dayjs'],
           // Large utilities
           xlsx: ['xlsx'],
         },
@@ -90,7 +97,40 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         navigateFallback: null,
+        // Exclude large lazy-loaded chunks from precaching
+        globIgnores: ['**/icons-*.js', '**/xlsx-*.js'],
+        // Increase cache size limit to handle remaining assets
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4MB
         runtimeCaching: [
+          // Cache lazy-loaded icons and large chunks on demand
+          {
+            urlPattern: /\/assets\/icons-.*\.js$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'lazy-icons',
+              expiration: {
+                maxEntries: 5,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
+            urlPattern: /\/assets\/xlsx-.*\.js$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'lazy-libs',
+              expiration: {
+                maxEntries: 5,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
           {
             urlPattern: ({request}) => request.mode === 'navigate',
             handler: 'NetworkFirst',

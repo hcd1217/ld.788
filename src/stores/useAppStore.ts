@@ -1,81 +1,50 @@
-import {create} from 'zustand';
-import {devtools} from 'zustand/middleware';
-import {authService} from '@/services/auth';
-import {delay} from '@/utils/time';
+// Re-export individual stores for optimized access
+// Backward compatibility - legacy combined hook
+import {useAuthStore} from './useAuthStore';
+import {useFormStore} from './useFormStore';
+import {useAppConfigStore} from './useAppConfigStore';
 
-type User = {
-  id: string;
-  email: string;
-  isRoot?: boolean;
+export {useAuthStore, authStoreSelectors} from './useAuthStore';
+export {useFormStore, formStoreSelectors} from './useFormStore';
+export {useAppConfigStore, appConfigStoreSelectors} from './useAppConfigStore';
+
+// Combined hook for backward compatibility (deprecated)
+export const useAppStore = () => {
+  const authStore = useAuthStore();
+  const formStore = useFormStore();
+  const configStore = useAppConfigStore();
+
+  return {
+    // Auth state
+    user: authStore.user,
+    isAuthenticated: authStore.isAuthenticated,
+    login: authStore.login,
+    logout: authStore.logout,
+    checkAuth: authStore.checkAuth,
+    setUser: authStore.setUser,
+
+    // Form state
+    isLoading: formStore.isLoading,
+
+    // Config state
+    clientCode: configStore.clientCode,
+    theme: configStore.theme,
+    setTheme: configStore.setTheme,
+  };
 };
 
-type AppState = {
-  clientCode: string;
-  user: User | undefined;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  theme: 'light' | 'dark';
-  setUser: (user: User | undefined) => void;
-  setTheme: (theme: 'light' | 'dark') => void;
-  login: (params: {
-    identifier: string;
-    password: string;
-    clientCode: string;
-  }) => Promise<void>;
-  logout: () => void;
-  checkAuth: () => Promise<boolean>;
+// Legacy selectors for backward compatibility
+export const appStoreSelectors = {
+  auth: (state: any) => ({
+    user: state.user,
+    isAuthenticated: state.isAuthenticated,
+  }),
+  loading: (state: any) => state.isLoading,
+  theme: (state: any) => state.theme,
+  clientCode: (state: any) => state.clientCode,
+  loginState: (state: any) => ({
+    isLoading: state.isLoading,
+    isAuthenticated: state.isAuthenticated,
+    login: state.login,
+  }),
 };
-
-export const useAppStore = create<AppState>()(
-  devtools(
-    (set, get) => {
-      return {
-        clientCode: localStorage.getItem('clientCode') ?? 'ACME',
-        user: authService.getCurrentUser() ?? undefined,
-        isAuthenticated: true,
-        isLoading: false,
-        theme: 'light',
-        setUser: (user) => set({user, isAuthenticated: Boolean(user)}),
-        setTheme: (theme) => set({theme}),
-        async login(params) {
-          set({isLoading: true, clientCode: params.clientCode});
-          try {
-            const {user} = await authService.login({
-              identifier: params.identifier,
-              password: params.password,
-              clientCode: params.clientCode ?? get().clientCode,
-            });
-            set({
-              user,
-              clientCode: params.clientCode,
-              isAuthenticated: true,
-              isLoading: false,
-            });
-          } catch (error) {
-            set({isLoading: false});
-            throw error;
-          }
-        },
-        logout() {
-          authService.logout();
-          set({user: undefined, isAuthenticated: false});
-        },
-        async checkAuth() {
-          const isAuthenticated = await authService.isAuthenticated();
-          if (isAuthenticated) {
-            await delay(100);
-            const user = authService.getCurrentUser();
-            set({isAuthenticated, user: user ?? undefined});
-          } else {
-            set({user: undefined, isAuthenticated: false});
-          }
-
-          return isAuthenticated;
-        },
-      };
-    },
-    {
-      name: 'app-store',
-    },
-  ),
-);
