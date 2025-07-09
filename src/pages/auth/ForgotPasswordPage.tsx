@@ -3,8 +3,6 @@ import {useNavigate} from 'react-router';
 import {
   Anchor,
   Center,
-  Box,
-  rem,
   Stack,
   Text,
   Title,
@@ -13,7 +11,7 @@ import {
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
-import {IconArrowLeft, IconInfoCircle} from '@tabler/icons-react';
+import {IconInfoCircle} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {authService} from '@/services/auth';
@@ -79,7 +77,7 @@ export function ForgotPasswordPage() {
             }}
             size="h2"
           >
-            {t('auth.forgotPasswordTitle')}
+            Credo
           </Title>
         </Group>
         <Stack gap="md" align="center" ta="center">
@@ -121,7 +119,7 @@ export function ForgotPasswordPage() {
             }}
             size="h2"
           >
-            {t('auth.forgotPasswordTitle')}
+            Credo
           </Title>
         </Group>
 
@@ -153,22 +151,11 @@ export function ForgotPasswordPage() {
         </form>
 
         <Center mt="lg">
-          <Anchor
-            c="dimmed"
-            component="button"
-            size="sm"
-            type="button"
-            disabled={isLoading}
-            onClick={() => navigate('/login')}
-          >
-            <Center inline>
-              <IconArrowLeft
-                style={{width: rem(14), height: rem(14)}}
-                stroke={1.5}
-              />
-              <Box ml={5}>{t('auth.backToLogin')}</Box>
-            </Center>
-          </Anchor>
+          <Text size="sm" ta="center" mt="lg" c="dimmed">
+            <Anchor href="/login" size="sm" fw="600">
+              {t('auth.backToLogin')}
+            </Anchor>
+          </Text>
         </Center>
       </FormContainer>
     </GuestLayout>

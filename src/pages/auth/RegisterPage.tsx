@@ -3,18 +3,16 @@ import {useNavigate} from 'react-router';
 import {
   Anchor,
   Center,
-  Box,
-  rem,
+  Text,
   Stack,
   Alert,
   Transition,
-  Group,
   Title,
   Space,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
-import {IconAlertCircle, IconArrowLeft} from '@tabler/icons-react';
+import {IconAlertCircle} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {clientService} from '@/services/client';
@@ -116,21 +114,20 @@ export function RegisterPage() {
 
   return (
     <GuestLayout>
+      <Space h="lg" />
       <FormContainer mounted isLoading={isLoading}>
-        <Group justify="center" gap="md" mb="lg">
-          <Logo />
-          <Title
-            style={{
-              fontWeight: 900,
-            }}
-            size="h2"
-          >
-            {t('auth.registerTitle')}
-          </Title>
-        </Group>
+        <Logo />
+        <Title
+          style={{
+            fontWeight: 900,
+          }}
+          size="h2"
+        >
+          {t('auth.registerTitle')}
+        </Title>
         <Space h="lg" />
         <form onSubmit={form.onSubmit(handleSubmit)}>
-          <Stack gap="lg">
+          <Stack gap="md">
             <FormInput
               required
               autoComplete="off"
@@ -224,39 +221,17 @@ export function RegisterPage() {
               )}
             </Transition>
 
-            <FormButton type="submit">{t('auth.createAccount')}</FormButton>
+            <FormButton type="submit">{t('auth.start')}</FormButton>
           </Stack>
         </form>
 
         <Center mt="lg">
-          <Stack gap="xs" align="center">
-            <Anchor
-              component="button"
-              type="button"
-              size="sm"
-              disabled={isLoading}
-              onClick={() => navigate('/login')}
-            >
-              {t('auth.haveAccount')} {t('auth.signIn')}
+          <Text size="sm" ta="center" mt="lg" c="dimmed">
+            {t('auth.haveAccount')}{' '}
+            <Anchor href="/login" size="sm" fw="600">
+              {t('auth.backToLogin')}
             </Anchor>
-
-            <Anchor
-              c="dimmed"
-              component="button"
-              size="xs"
-              type="button"
-              disabled={isLoading}
-              onClick={() => navigate('/')}
-            >
-              <Center inline>
-                <IconArrowLeft
-                  style={{width: rem(12), height: rem(12)}}
-                  stroke={1.5}
-                />
-                <Box ml={5}>{t('auth.backToHome')}</Box>
-              </Center>
-            </Anchor>
-          </Stack>
+          </Text>
         </Center>
       </FormContainer>
     </GuestLayout>

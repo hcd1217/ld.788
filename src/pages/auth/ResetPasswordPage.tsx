@@ -3,18 +3,15 @@ import {useNavigate, useSearchParams} from 'react-router';
 import {
   Anchor,
   Center,
-  Box,
-  rem,
   Stack,
   Text,
   Title,
-  Alert,
   Group,
   Space,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
-import {IconArrowLeft, IconAlertCircle, IconCheck} from '@tabler/icons-react';
+import {IconAlertCircle, IconCheck} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {authService} from '@/services/auth';
@@ -112,7 +109,7 @@ export function ResetPasswordPage() {
             }}
             size="h2"
           >
-            {t('auth.resetPasswordTitle')}
+            Credo
           </Title>
         </Group>
         <Stack gap="md" align="center" ta="center">
@@ -152,7 +149,7 @@ export function ResetPasswordPage() {
             }}
             size="h2"
           >
-            {t('auth.resetPasswordTitle')}
+            Credo
           </Title>
         </Group>
         <Stack gap="md" align="center" ta="center">
@@ -188,7 +185,7 @@ export function ResetPasswordPage() {
             }}
             size="h2"
           >
-            {t('auth.resetPasswordTitle')}
+            Credo
           </Title>
         </Group>
 
@@ -197,17 +194,6 @@ export function ResetPasswordPage() {
         <Text size="sm" c="dimmed" ta="center" mb="lg">
           {t('auth.resetPasswordDescription')}
         </Text>
-
-        {email ? (
-          <Alert
-            variant="light"
-            color="blue"
-            icon={<IconAlertCircle size={16} />}
-            mb="lg"
-          >
-            <Text size="sm">{t('auth.resettingPasswordFor', {email})}</Text>
-          </Alert>
-        ) : null}
 
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="lg">
@@ -241,22 +227,11 @@ export function ResetPasswordPage() {
         </form>
 
         <Center mt="lg">
-          <Anchor
-            c="dimmed"
-            component="button"
-            size="sm"
-            type="button"
-            disabled={isLoading}
-            onClick={() => navigate('/login')}
-          >
-            <Center inline>
-              <IconArrowLeft
-                style={{width: rem(14), height: rem(14)}}
-                stroke={1.5}
-              />
-              <Box ml={5}>{t('auth.backToLogin')}</Box>
-            </Center>
-          </Anchor>
+          <Text size="sm" ta="center" mt="lg" c="dimmed">
+            <Anchor href="/forgot-password" size="sm" fw="600">
+              {t('auth.backToForgotPassword')}
+            </Anchor>
+          </Text>
         </Center>
       </FormContainer>
     </GuestLayout>

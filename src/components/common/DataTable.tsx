@@ -7,6 +7,7 @@ import {
   ScrollArea,
 } from '@mantine/core';
 import {useTranslation} from '@/hooks/useTranslation';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 
 type DataTableColumn<T> = {
   key: string;
@@ -31,8 +32,13 @@ export function DataTable<T extends Record<string, unknown> & {id: string}>({
   renderActions,
 }: DataTableProps<T>) {
   const {t} = useTranslation();
+  const isDesktop = useIsDesktop();
 
   const defaultEmptyMessage = emptyMessage || t('common.noDataFound');
+
+  if (!isDesktop) {
+    return null;
+  }
 
   return (
     <Box style={{position: 'relative'}}>
@@ -74,7 +80,7 @@ export function DataTable<T extends Record<string, unknown> & {id: string}>({
       </Box>
 
       {data.length === 0 && !isLoading && (
-        <Center py="xl">
+        <Center py="xl" mih="30vh">
           <Text c="dimmed">{defaultEmptyMessage}</Text>
         </Center>
       )}

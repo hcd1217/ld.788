@@ -19,10 +19,11 @@ export function GuestLayout({children}: GuestLayoutProps) {
   return (
     <Box
       style={{
-        minHeight: '100vh',
+        // height: '100vh',
+        height: '100dvh',
         width: '100%',
         position: 'relative',
-        overflow: 'auto',
+        overflow: 'hidden',
       }}
     >
       <Group
@@ -39,7 +40,7 @@ export function GuestLayout({children}: GuestLayoutProps) {
       </Group>
       <Center
         style={{
-          minHeight: '100vh',
+          height: '100%',
           width: '100%',
           padding: '1rem',
           position: 'relative',
