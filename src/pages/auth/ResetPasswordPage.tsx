@@ -1,14 +1,6 @@
 import {useState, useEffect} from 'react';
 import {useNavigate, useSearchParams} from 'react-router';
-import {
-  Anchor,
-  Center,
-  Stack,
-  Text,
-  Title,
-  Group,
-  Space,
-} from '@mantine/core';
+import {Anchor, Center, Stack, Text, Title, Group, Space} from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
 import {IconAlertCircle, IconCheck} from '@tabler/icons-react';

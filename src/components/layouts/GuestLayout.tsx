@@ -19,11 +19,16 @@ export function GuestLayout({children}: GuestLayoutProps) {
   return (
     <Box
       style={{
-        // height: '100vh',
+        height: '100vh',
+        // @ts-expect-error - this is a workaround to fix the issue with the keyboard
         height: '100dvh',
         width: '100%',
-        position: 'relative',
+        position: 'fixed',
+        top: 0,
+        left: 0,
         overflow: 'hidden',
+        WebkitOverflowScrolling: 'auto',
+        touchAction: 'none',
       }}
     >
       <Group

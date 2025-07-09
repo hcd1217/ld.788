@@ -42,7 +42,7 @@ export function RegisterPage() {
   const form = useForm<RegisterFormValues>({
     initialValues: import.meta.env.PROD
       ? {
-          clientCode: '',
+          clientCode: Math.random().toString(36).slice(2, 10).toUpperCase(),
           clientName: '',
           firstName: '',
           lastName: '',
@@ -128,17 +128,6 @@ export function RegisterPage() {
         <Space h="lg" />
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="md">
-            <FormInput
-              required
-              autoComplete="off"
-              placeholder={t('auth.clientCode')}
-              error={form.errors.clientCode}
-              disabled={isLoading}
-              {...form.getInputProps('clientCode')}
-              onFocus={() => {
-                setShowAlert(false);
-              }}
-            />
             <FormInput
               required
               autoComplete="off"
