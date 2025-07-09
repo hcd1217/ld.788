@@ -1,11 +1,8 @@
 import {lazy} from 'react';
 import {type RouteObject} from 'react-router';
+import {LoginPage} from '@/pages/auth/LoginPage';
 
-// Auth page lazy loading with prefetch hints
-const LoginPage = lazy(async () => {
-  const module = await import('@/pages/auth/LoginPage');
-  return {default: module.LoginPage};
-});
+// Auth page lazy loading with prefetch hints (except LoginPage for better UX)
 
 const ForgotPasswordPage = lazy(async () => {
   const module = await import('@/pages/auth/ForgotPasswordPage');
