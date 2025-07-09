@@ -133,7 +133,6 @@ export function ForgotPasswordPage() {
           <Stack gap="lg">
             <TextInput
               required
-              variant="auth-form"
               type="email"
               autoComplete="email"
               placeholder={t('auth.email')}
@@ -144,7 +143,6 @@ export function ForgotPasswordPage() {
 
             <Button
               type="submit"
-              variant="auth-form"
               disabled={!form.isValid() && form.isTouched()}
             >
               {t('auth.sendResetEmail')}

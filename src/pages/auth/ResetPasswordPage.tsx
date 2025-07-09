@@ -199,7 +199,6 @@ export function ResetPasswordPage() {
           <Stack gap="lg">
             <PasswordInput
               required
-              variant="auth-form"
               autoComplete="new-password"
               placeholder={t('auth.enterNewPassword')}
               error={form.errors.password}
@@ -209,7 +208,6 @@ export function ResetPasswordPage() {
 
             <PasswordInput
               required
-              variant="auth-form"
               autoComplete="new-password"
               placeholder={t('auth.confirmYourPassword')}
               error={form.errors.confirmPassword}
@@ -219,7 +217,6 @@ export function ResetPasswordPage() {
 
             <Button
               type="submit"
-              variant="auth-form"
               disabled={!form.isValid() && form.isTouched()}
             >
               {t('auth.resetPassword')}

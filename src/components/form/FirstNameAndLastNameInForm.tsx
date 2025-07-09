@@ -42,7 +42,6 @@ export function FirstNameAndLastNameInForm<
           <Grid.Col key="firstName" span={{base: 12, sm: 6}}>
             <TextInput
               required
-              variant="auth-form"
               autoComplete="given-name"
               placeholder={t('auth.firstNamePlaceholder')}
               error={form.errors.firstName}
@@ -59,7 +58,6 @@ export function FirstNameAndLastNameInForm<
           <Grid.Col key="lastName" span={{base: 12, sm: 6}}>
             <TextInput
               required
-              variant="auth-form"
               autoComplete="family-name"
               placeholder={t('auth.lastNamePlaceholder')}
               error={form.errors.lastName}

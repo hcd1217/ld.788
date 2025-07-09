@@ -119,7 +119,6 @@ export function LoginPage() {
           <Stack gap="lg">
             <TextInput
               required
-              variant="auth-form"
               type="text"
               autoComplete="identifier"
               placeholder={t('auth.identifier')}
@@ -133,7 +132,6 @@ export function LoginPage() {
 
             <PasswordInput
               required
-              variant="auth-form"
               autoComplete="current-password"
               placeholder={t('auth.password')}
               error={form.errors.password}

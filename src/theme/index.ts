@@ -33,20 +33,7 @@ export const theme = createTheme({
   cursorType: 'pointer',
   components: {
     PasswordInput: PasswordInput.extend({
-      styles(_theme, props) {
-        if (props.variant === 'auth-form') {
-          return {
-            input: {
-              borderBottom: '1px solid var(--input-border-color)',
-              borderRadius: 0,
-              padding: '12px 0',
-            },
-            innerInput: {
-              padding: 0,
-            },
-          };
-        }
-
+      styles() {
         return {
           input: {
             border: 'none',
@@ -61,17 +48,7 @@ export const theme = createTheme({
       },
     }),
     TextInput: TextInput.extend({
-      styles(_theme, props) {
-        if (props.variant === 'auth-form') {
-          return {
-            input: {
-              borderBottom: '1px solid var(--input-border-color)',
-              borderRadius: 0,
-              padding: '12px 0',
-            },
-          };
-        }
-
+      styles() {
         return {
           input: {
             border: 'none',

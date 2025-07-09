@@ -131,7 +131,6 @@ export function RegisterPage() {
           <Stack gap="md">
             <TextInput
               required
-              variant="auth-form"
               autoComplete="off"
               placeholder={t('auth.clientName')}
               error={form.errors.clientName}
@@ -150,7 +149,6 @@ export function RegisterPage() {
             <TextInput
               required
               type="email"
-              variant="auth-form"
               autoComplete="email"
               placeholder={t('auth.email')}
               error={form.errors.email}
@@ -163,7 +161,6 @@ export function RegisterPage() {
 
             <PasswordInput
               required
-              variant="auth-form"
               autoComplete="new-password"
               placeholder={t('auth.password')}
               error={form.errors.password}
@@ -176,7 +173,6 @@ export function RegisterPage() {
 
             <PasswordInput
               required
-              variant="auth-form"
               autoComplete="new-password"
               placeholder={t('auth.confirmPassword')}
               error={form.errors.confirmPassword}
