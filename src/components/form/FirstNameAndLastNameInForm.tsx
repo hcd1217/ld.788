@@ -1,10 +1,9 @@
-import {Grid} from '@mantine/core';
+import {Grid, TextInput} from '@mantine/core';
 import type {UseFormReturnType} from '@mantine/form';
 import {useEffect} from 'react';
 import {useTranslation} from '@/hooks/useTranslation';
 import i18n from '@/lib/i18n';
 import {getLocaleConfig} from '@/config/localeConfig';
-import {FormInput} from '@/components/form/FormInput';
 
 export function FirstNameAndLastNameInForm<
   T extends {firstName: string; lastName: string},
@@ -41,8 +40,9 @@ export function FirstNameAndLastNameInForm<
         const localeConfig = getLocaleConfig(i18n.language);
         const firstNameField = (
           <Grid.Col key="firstName" span={{base: 12, sm: 6}}>
-            <FormInput
+            <TextInput
               required
+              variant="auth-form"
               autoComplete="given-name"
               placeholder={t('auth.firstNamePlaceholder')}
               error={form.errors.firstName}
@@ -57,8 +57,9 @@ export function FirstNameAndLastNameInForm<
 
         const lastNameField = (
           <Grid.Col key="lastName" span={{base: 12, sm: 6}}>
-            <FormInput
+            <TextInput
               required
+              variant="auth-form"
               autoComplete="family-name"
               placeholder={t('auth.lastNamePlaceholder')}
               error={form.errors.lastName}

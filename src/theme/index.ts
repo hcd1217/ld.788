@@ -1,4 +1,11 @@
-import {createTheme} from '@mantine/core';
+import {
+  Button,
+  createTheme,
+  PasswordInput,
+  rem,
+  TextInput,
+  type CSSVariablesResolver,
+} from '@mantine/core';
 
 export const theme = createTheme({
   primaryColor: 'brand',
@@ -24,4 +31,84 @@ export const theme = createTheme({
   },
   defaultRadius: 'md',
   cursorType: 'pointer',
+  components: {
+    PasswordInput: PasswordInput.extend({
+      styles(_theme, props) {
+        if (props.variant === 'auth-form') {
+          return {
+            input: {
+              borderBottom: '1px solid var(--input-border-color)',
+              borderRadius: 0,
+              padding: '12px 0',
+            },
+            innerInput: {
+              padding: 0,
+            },
+          };
+        }
+
+        return {
+          input: {
+            border: 'none',
+            borderBottom: '1px solid var(--input-border-color)',
+            borderRadius: 0,
+            padding: 0,
+          },
+          innerInput: {
+            padding: 0,
+          },
+        };
+      },
+    }),
+    TextInput: TextInput.extend({
+      styles(_theme, props) {
+        if (props.variant === 'auth-form') {
+          return {
+            input: {
+              borderBottom: '1px solid var(--input-border-color)',
+              borderRadius: 0,
+              padding: '12px 0',
+            },
+          };
+        }
+
+        return {
+          input: {
+            border: 'none',
+            borderBottom: '1px solid var(--input-border-color)',
+            borderRadius: 0,
+            padding: '12px 0',
+          },
+        };
+      },
+    }),
+    Button: Button.extend({
+      styles(_theme, props) {
+        if (props.variant === 'auth-form') {
+          return {
+            root: {
+              transition: 'all 0.2s ease',
+              height: rem(55),
+              fontSize: 'h4',
+              fontWeight: '400',
+            },
+          };
+        }
+
+        return {};
+      },
+    }),
+  },
+});
+
+export const resolver: CSSVariablesResolver = () => ({
+  variables: {
+    '--input-border-color': '#dee2e6',
+  },
+  light: {
+    '--input-border-color': '#dee2e6',
+  },
+  dark: {
+    '--input-border-color': '#c5c5c5',
+  },
 });

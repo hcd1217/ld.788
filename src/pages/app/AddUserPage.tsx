@@ -9,6 +9,8 @@ import {
   LoadingOverlay,
   Container,
   Title,
+  TextInput,
+  PasswordInput,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
@@ -27,8 +29,6 @@ import {
 import {clientService} from '@/services/client';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
 import {useAppStore} from '@/stores/useAppStore';
-import {FormInput} from '@/components/form/FormInput';
-import {FormButton} from '@/components/form/FormButton';
 import {FormContainer} from '@/components/form/FormContainer';
 import {GoBack} from '@/components/common/GoBack';
 
@@ -189,7 +189,7 @@ export function AddUserPage() {
                     setShowAlert={setShowAlert}
                   />
 
-                  <FormInput
+                  <TextInput
                     type="email"
                     autoComplete="email"
                     placeholder={t('auth.email')}
@@ -201,7 +201,7 @@ export function AddUserPage() {
                     }}
                   />
 
-                  <FormInput
+                  <TextInput
                     placeholder={t('auth.userName')}
                     error={form.errors.userName}
                     disabled={isLoading}
@@ -211,9 +211,8 @@ export function AddUserPage() {
                     }}
                   />
 
-                  <FormInput
+                  <PasswordInput
                     required
-                    type="password"
                     autoComplete="new-password"
                     placeholder={t('auth.password')}
                     error={form.errors.password}
@@ -224,9 +223,8 @@ export function AddUserPage() {
                     }}
                   />
 
-                  <FormInput
+                  <PasswordInput
                     required
-                    type="password"
                     autoComplete="new-password"
                     placeholder={t('auth.confirmPassword')}
                     error={form.errors.confirmPassword}
@@ -261,7 +259,9 @@ export function AddUserPage() {
                     )}
                   </Transition>
 
-                  <FormButton type="submit">{t('auth.addUser')}</FormButton>
+                  <Button variant="auth-form" type="submit">
+                    {t('auth.addUser')}
+                  </Button>
                 </Stack>
               </form>
             </FormContainer>

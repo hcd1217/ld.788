@@ -17,6 +17,8 @@ import {
   Alert,
   Transition,
   Card,
+  TextInput,
+  PasswordInput,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {useDisclosure} from '@mantine/hooks';
@@ -44,7 +46,6 @@ import i18n from '@/lib/i18n';
 import {getLocaleConfig} from '@/config/localeConfig';
 import {userService, type User} from '@/services/user';
 import {DataTable} from '@/components/common/DataTable';
-import {FormInput} from '@/components/form/FormInput';
 import {GoBack} from '@/components/common/GoBack';
 
 type EditUserFormValues = {
@@ -464,7 +465,7 @@ export function UserManagementPage() {
                 setShowAlert={setShowAlert}
               />
 
-              <FormInput
+              <TextInput
                 required
                 label={t('auth.email')}
                 placeholder="user@example.com"
@@ -476,7 +477,7 @@ export function UserManagementPage() {
                 }}
               />
 
-              <FormInput
+              <TextInput
                 required
                 label={t('auth.userName')}
                 placeholder="userName"
@@ -488,8 +489,7 @@ export function UserManagementPage() {
                 }}
               />
 
-              <FormInput
-                type="password"
+              <PasswordInput
                 label={t('auth.newPassword')}
                 placeholder={t('auth.leaveEmptyToKeepCurrent')}
                 error={form.errors.password}
@@ -500,8 +500,7 @@ export function UserManagementPage() {
                 }}
               />
 
-              <FormInput
-                type="password"
+              <PasswordInput
                 label={t('auth.confirmNewPassword')}
                 placeholder={t('auth.confirmYourPassword')}
                 error={form.errors.confirmPassword}

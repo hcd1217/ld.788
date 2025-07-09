@@ -1,11 +1,8 @@
 import {lazy} from 'react';
 import {createBrowserRouter, type RouteObject} from 'react-router';
-import {authRoutes} from './authRoutes';
 import {AppLayout} from '@/components/layouts/AppLayout';
 import {ResponsiveAuthLayout} from '@/components/layouts/ResponsiveAuthLayout';
 import {ProtectedRoute} from '@/components/layouts/ProtectedRoute';
-
-// Import auth routes from separate module
 
 const ServiceLayout = lazy(async () => {
   const module = await import('@/components/layouts/ServiceLayout');
@@ -92,6 +89,26 @@ const PermissionManagementPage = lazy(async () => {
   return {default: module.PermissionManagementPage};
 });
 
+const LoginPage = lazy(async () => {
+  const module = await import('@/pages/auth/LoginPage');
+  return {default: module.LoginPage};
+});
+
+const ForgotPasswordPage = lazy(async () => {
+  const module = await import('@/pages/auth/ForgotPasswordPage');
+  return {default: module.ForgotPasswordPage};
+});
+
+const ResetPasswordPage = lazy(async () => {
+  const module = await import('@/pages/auth/ResetPasswordPage');
+  return {default: module.ResetPasswordPage};
+});
+
+const RegisterPage = lazy(async () => {
+  const module = await import('@/pages/auth/RegisterPage');
+  return {default: module.RegisterPage};
+});
+
 const routeObjects: RouteObject[] = [
   {
     path: '',
@@ -106,7 +123,28 @@ const routeObjects: RouteObject[] = [
   },
   {
     path: '',
-    children: authRoutes,
+    children: [
+      {
+        path: 'login',
+        Component: LoginPage,
+      },
+      {
+        path: '/:clientCode/login',
+        Component: LoginPage,
+      },
+      {
+        path: 'forgot-password',
+        Component: ForgotPasswordPage,
+      },
+      {
+        path: 'reset-password',
+        Component: ResetPasswordPage,
+      },
+      {
+        path: 'register',
+        Component: RegisterPage,
+      },
+    ],
   },
   {
     path: '',

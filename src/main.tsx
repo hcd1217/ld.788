@@ -8,7 +8,7 @@ import '@mantine/notifications/styles.css';
 import './index.css';
 import i18n from './lib/i18n';
 import App from './App.tsx';
-import {theme} from '@/theme';
+import {resolver, theme} from '@/theme';
 import registerGlobalErrorCatcher from '@/utils/errorCatcher';
 import {ErrorModal} from '@/components/common/ErrorModal.tsx';
 import {registerLogger} from '@/utils/logger';
@@ -29,7 +29,11 @@ registerLogger();
 
 createRoot(document.querySelector('#root')!).render(
   <StrictMode>
-    <MantineProvider theme={theme} defaultColorScheme="auto">
+    <MantineProvider
+      theme={theme}
+      defaultColorScheme="auto"
+      cssVariablesResolver={resolver}
+    >
       <Suspense fallback={<AppLoader />}>
         <Notifications />
         <ModalsProvider>

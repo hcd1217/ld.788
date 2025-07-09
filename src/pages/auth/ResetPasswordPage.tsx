@@ -1,6 +1,16 @@
 import {useState, useEffect} from 'react';
 import {useNavigate, useSearchParams} from 'react-router';
-import {Anchor, Center, Stack, Text, Title, Group, Space} from '@mantine/core';
+import {
+  Anchor,
+  Center,
+  Stack,
+  Text,
+  Title,
+  Group,
+  Space,
+  Button,
+  PasswordInput,
+} from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
 import {IconAlertCircle, IconCheck} from '@tabler/icons-react';
@@ -9,8 +19,6 @@ import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {authService} from '@/services/auth';
 import {getFormValidators} from '@/utils/validation';
 import {FormContainer} from '@/components/form/FormContainer';
-import {FormInput} from '@/components/form/FormInput';
-import {FormButton} from '@/components/form/FormButton';
 import {Logo} from '@/components/common/Logo';
 
 type ResetPasswordFormValues = {
@@ -110,13 +118,13 @@ export function ResetPasswordPage() {
           <Text size="sm" c="dimmed">
             {t('auth.invalidResetLinkDescription')}
           </Text>
-          <FormButton
+          <Button
             variant="light"
             type="button"
             onClick={() => navigate('/forgot-password')}
           >
             {t('auth.requestNewLink')}
-          </FormButton>
+          </Button>
         </Stack>
       </>
     );
@@ -189,9 +197,9 @@ export function ResetPasswordPage() {
 
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="lg">
-            <FormInput
+            <PasswordInput
               required
-              type="password"
+              variant="auth-form"
               autoComplete="new-password"
               placeholder={t('auth.enterNewPassword')}
               error={form.errors.password}
@@ -199,9 +207,9 @@ export function ResetPasswordPage() {
               {...form.getInputProps('password')}
             />
 
-            <FormInput
+            <PasswordInput
               required
-              type="password"
+              variant="auth-form"
               autoComplete="new-password"
               placeholder={t('auth.confirmYourPassword')}
               error={form.errors.confirmPassword}
@@ -209,12 +217,13 @@ export function ResetPasswordPage() {
               {...form.getInputProps('confirmPassword')}
             />
 
-            <FormButton
+            <Button
               type="submit"
+              variant="auth-form"
               disabled={!form.isValid() && form.isTouched()}
             >
               {t('auth.resetPassword')}
-            </FormButton>
+            </Button>
           </Stack>
         </form>
 

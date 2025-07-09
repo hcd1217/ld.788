@@ -1,6 +1,16 @@
 import {useState} from 'react';
 import {useNavigate} from 'react-router';
-import {Anchor, Center, Stack, Text, Title, Group, Space} from '@mantine/core';
+import {
+  Anchor,
+  Center,
+  Stack,
+  Text,
+  Title,
+  Group,
+  Space,
+  Button,
+  TextInput,
+} from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
 import {IconInfoCircle} from '@tabler/icons-react';
@@ -9,8 +19,6 @@ import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {authService} from '@/services/auth';
 import {getFormValidators} from '@/utils/validation';
 import {FormContainer} from '@/components/form/FormContainer';
-import {FormInput} from '@/components/form/FormInput';
-import {FormButton} from '@/components/form/FormButton';
 import {Logo} from '@/components/common/Logo';
 import {useClientCode} from '@/hooks/useClientCode';
 
@@ -78,7 +86,7 @@ export function ForgotPasswordPage() {
           <Text size="sm" c="dimmed">
             {t('auth.passwordResetEmailSentDescription')}
           </Text>
-          <FormButton
+          <Button
             variant="light"
             type="button"
             onClick={() => {
@@ -86,7 +94,7 @@ export function ForgotPasswordPage() {
             }}
           >
             {t('auth.backToLogin')}
-          </FormButton>
+          </Button>
         </Stack>
       </>
     );
@@ -123,8 +131,9 @@ export function ForgotPasswordPage() {
 
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="lg">
-            <FormInput
+            <TextInput
               required
+              variant="auth-form"
               type="email"
               autoComplete="email"
               placeholder={t('auth.email')}
@@ -133,12 +142,13 @@ export function ForgotPasswordPage() {
               {...form.getInputProps('email')}
             />
 
-            <FormButton
+            <Button
               type="submit"
+              variant="auth-form"
               disabled={!form.isValid() && form.isTouched()}
             >
               {t('auth.sendResetEmail')}
-            </FormButton>
+            </Button>
           </Stack>
         </form>
 

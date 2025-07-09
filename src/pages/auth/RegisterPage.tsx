@@ -9,6 +9,9 @@ import {
   Transition,
   Title,
   Space,
+  Button,
+  TextInput,
+  PasswordInput,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
@@ -19,8 +22,6 @@ import {clientService} from '@/services/client';
 import {getFormValidators} from '@/utils/validation';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
 import {FormContainer} from '@/components/form/FormContainer';
-import {FormInput} from '@/components/form/FormInput';
-import {FormButton} from '@/components/form/FormButton';
 import {Logo} from '@/components/common/Logo';
 
 type RegisterFormValues = {
@@ -128,8 +129,9 @@ export function RegisterPage() {
         <Space h="lg" />
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="md">
-            <FormInput
+            <TextInput
               required
+              variant="auth-form"
               autoComplete="off"
               placeholder={t('auth.clientName')}
               error={form.errors.clientName}
@@ -145,9 +147,10 @@ export function RegisterPage() {
               setShowAlert={setShowAlert}
             />
 
-            <FormInput
+            <TextInput
               required
               type="email"
+              variant="auth-form"
               autoComplete="email"
               placeholder={t('auth.email')}
               error={form.errors.email}
@@ -158,9 +161,9 @@ export function RegisterPage() {
               }}
             />
 
-            <FormInput
+            <PasswordInput
               required
-              type="password"
+              variant="auth-form"
               autoComplete="new-password"
               placeholder={t('auth.password')}
               error={form.errors.password}
@@ -171,9 +174,9 @@ export function RegisterPage() {
               }}
             />
 
-            <FormInput
+            <PasswordInput
               required
-              type="password"
+              variant="auth-form"
               autoComplete="new-password"
               placeholder={t('auth.confirmPassword')}
               error={form.errors.confirmPassword}
@@ -210,7 +213,9 @@ export function RegisterPage() {
               )}
             </Transition>
 
-            <FormButton type="submit">{t('auth.start')}</FormButton>
+            <Button variant="auth-form" type="submit">
+              {t('auth.start')}
+            </Button>
           </Stack>
         </form>
 
