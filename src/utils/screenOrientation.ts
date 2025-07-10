@@ -3,6 +3,8 @@
  * Handles portrait-only orientation lock for PWA
  */
 
+type OrientationLockType = 'portrait' | 'landscape';
+
 type ScreenOrientationAPI = {
   lock: (orientation: OrientationLockType) => Promise<void>;
   unlock: () => void;
@@ -15,17 +17,20 @@ type ScreenOrientationAPI = {
 export async function lockToPortrait(): Promise<boolean> {
   try {
     // Check if the Screen Orientation API is available
-    const screen = window.screen as Screen & {orientation?: ScreenOrientationAPI};
-    
+    const screen = window.screen as Screen & {
+      orientation?: ScreenOrientationAPI;
+    };
+
     if (!screen.orientation?.lock) {
       console.warn('Screen Orientation API not supported');
       return false;
     }
 
     // Check if we're in a PWA context (standalone or fullscreen)
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-      || window.matchMedia('(display-mode: fullscreen)').matches
-      || (window.navigator as any).standalone === true; // iOS specific
+    const isStandalone =
+      globalThis.matchMedia('(display-mode: standalone)').matches ||
+      globalThis.matchMedia('(display-mode: fullscreen)').matches ||
+      (globalThis.navigator as {standalone?: boolean}).standalone === true; // IOS specific
 
     if (!isStandalone) {
       console.info('Orientation lock only works in PWA standalone mode');
@@ -51,8 +56,10 @@ export async function lockToPortrait(): Promise<boolean> {
  */
 export function unlockOrientation(): void {
   try {
-    const screen = window.screen as Screen & {orientation?: ScreenOrientationAPI};
-    
+    const screen = window.screen as Screen & {
+      orientation?: ScreenOrientationAPI;
+    };
+
     if (screen.orientation?.unlock) {
       screen.orientation.unlock();
       console.info('Screen orientation unlocked');
@@ -94,7 +101,7 @@ export function initializeOrientationLock(): void {
   });
 
   // Try again if orientation changes (user might have rotated before lock)
-  window.addEventListener('orientationchange', () => {
+  globalThis.addEventListener('orientationchange', () => {
     void lockToPortrait();
   });
 }
