@@ -1,6 +1,7 @@
 import {type ReactNode} from 'react';
-import {Box, Center, Container, Group} from '@mantine/core';
+import {Affix, Box, Center, Container, Group} from '@mantine/core';
 import {Navigate} from 'react-router';
+import {VersionInformation} from '../common/VersionInformation';
 import {LanguageSwitcher} from '@/components/common/LanguageSwitcher';
 import {ColorSchemeToggle} from '@/components/common/ColorSchemeToggle';
 import {useAppStore} from '@/stores/useAppStore';
@@ -54,6 +55,9 @@ export function GuestLayout({children}: GuestLayoutProps) {
           {children}
         </Container>
       </Center>
+      <Affix position={{bottom: 0, right: 0}} p="sm">
+        <VersionInformation />
+      </Affix>
     </Box>
   );
 }

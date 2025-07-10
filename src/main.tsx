@@ -13,6 +13,7 @@ import registerGlobalErrorCatcher from '@/utils/errorCatcher';
 import {ErrorModal} from '@/components/common/ErrorModal.tsx';
 import {registerLogger} from '@/utils/logger';
 import {AppLoader} from '@/components/common/AppLoader.tsx';
+import {initializeOrientationLock} from '@/utils/screenOrientation';
 
 // Initialize i18n
 void i18n;
@@ -26,6 +27,9 @@ window.addEventListener('unload', () => {
 });
 
 registerLogger();
+
+// Initialize screen orientation lock for PWA
+initializeOrientationLock();
 
 createRoot(document.querySelector('#root')!).render(
   <StrictMode>

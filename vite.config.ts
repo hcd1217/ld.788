@@ -7,7 +7,7 @@ import {VitePWA} from 'vite-plugin-pwa';
 process.env.VITE_APP_VERSION = process.env.npm_package_version;
 process.env.VITE_APP_BUILD = new Date()
   .toISOString()
-  .replace(/[-:]/g, '')
+  .replaceAll(/[-:]/g, '')
   .replace('T', '_')
   .slice(0, -7);
 
