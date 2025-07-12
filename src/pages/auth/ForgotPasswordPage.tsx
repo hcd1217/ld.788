@@ -1,25 +1,15 @@
 import {useState} from 'react';
 import {useNavigate} from 'react-router';
-import {
-  Anchor,
-  Center,
-  Stack,
-  Text,
-  Title,
-  Group,
-  Space,
-  Button,
-  TextInput,
-} from '@mantine/core';
+import {Stack, Text, Space, Button, TextInput} from '@mantine/core';
 import {useForm} from '@mantine/form';
-import {notifications} from '@mantine/notifications';
 import {IconInfoCircle} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
+import {useAuthForm} from '@/hooks/useAuthForm';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {authService} from '@/services/auth';
 import {getFormValidators} from '@/utils/validation';
 import {FormContainer} from '@/components/form/FormContainer';
-import {Logo} from '@/components/common/Logo';
+import {AuthHeader, AuthFormLink, AuthSuccessState} from '@/components/auth';
 import {useClientCode} from '@/hooks/useClientCode';
 
 type ForgotPasswordFormValues = {
@@ -30,7 +20,6 @@ type ForgotPasswordFormValues = {
 export function ForgotPasswordPage() {
   const navigate = useNavigate();
   const {t} = useTranslation();
-  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const clientCode = useClientCode();
 
@@ -42,67 +31,34 @@ export function ForgotPasswordPage() {
     validate: getFormValidators(t, ['email']),
   });
 
-  const handleSubmit = async (values: ForgotPasswordFormValues) => {
-    try {
-      setIsLoading(true);
-
-      await authService.forgotPassword({
-        email: values.email,
-        clientCode: values.clientCode,
-      });
-
+  const {isLoading, handleSubmit} = useAuthForm(form, {
+    successTitle: t('auth.passwordResetRequested'),
+    successMessage: t('auth.passwordResetEmailSent'),
+    onSuccess() {
       setIsSubmitted(true);
+    },
+  });
 
-      notifications.show({
-        title: t('auth.passwordResetRequested'),
-        message: t('auth.passwordResetEmailSent'),
-        color: 'green',
-      });
-    } catch (error) {
-      // Error notification is already handled by authService
-      console.error('Forgot password error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const onSubmit = handleSubmit(async (values: ForgotPasswordFormValues) => {
+    await authService.forgotPassword({
+      email: values.email,
+      clientCode: values.clientCode,
+    });
+  });
 
   if (isSubmitted) {
-    const successContent = (
-      <>
-        <Group justify="center" gap="md" mb="lg">
-          <Logo />
-          <Title
-            style={{
-              fontWeight: 900,
-            }}
-            size="h2"
-          >
-            Credo
-          </Title>
-        </Group>
-        <Stack gap="md" align="center" ta="center">
-          <IconInfoCircle size={48} color="var(--mantine-color-green-6)" />
-          <Title order={3}>{t('auth.checkYourEmail')}</Title>
-          <Text size="sm" c="dimmed">
-            {t('auth.passwordResetEmailSentDescription')}
-          </Text>
-          <Button
-            variant="light"
-            type="button"
-            onClick={() => {
-              navigate('/login');
-            }}
-          >
-            {t('auth.backToLogin')}
-          </Button>
-        </Stack>
-      </>
-    );
-
     return (
       <GuestLayout>
         <FormContainer mounted isLoading={false}>
-          {successContent}
+          <AuthSuccessState
+            icon={
+              <IconInfoCircle size={48} color="var(--mantine-color-green-6)" />
+            }
+            title={t('auth.checkYourEmail')}
+            description={t('auth.passwordResetEmailSentDescription')}
+            buttonText={t('auth.backToLogin')}
+            onButtonClick={() => navigate('/login')}
+          />
         </FormContainer>
       </GuestLayout>
     );
@@ -111,25 +67,13 @@ export function ForgotPasswordPage() {
   return (
     <GuestLayout>
       <FormContainer mounted isLoading={isLoading}>
-        <Group justify="center" gap="md" mb="lg">
-          <Logo />
-          <Title
-            style={{
-              fontWeight: 900,
-            }}
-            size="h2"
-          >
-            Credo
-          </Title>
-        </Group>
-
+        <AuthHeader />
         <Space h="lg" />
-
         <Text size="sm" c="dimmed" ta="center" mb="lg">
           {t('auth.forgotPasswordDescription')}
         </Text>
 
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap="lg">
             <TextInput
               required
@@ -143,6 +87,7 @@ export function ForgotPasswordPage() {
 
             <Button
               type="submit"
+              variant="auth-form"
               disabled={!form.isValid() && form.isTouched()}
             >
               {t('auth.sendResetEmail')}
@@ -150,13 +95,7 @@ export function ForgotPasswordPage() {
           </Stack>
         </form>
 
-        <Center mt="lg">
-          <Text size="sm" ta="center" mt="lg" c="dimmed">
-            <Anchor href="/login" size="sm" fw="600">
-              {t('auth.backToLogin')}
-            </Anchor>
-          </Text>
-        </Center>
+        <AuthFormLink text="" linkText={t('auth.backToLogin')} href="/login" />
       </FormContainer>
     </GuestLayout>
   );

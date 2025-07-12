@@ -259,9 +259,7 @@ export function AddUserPage() {
                     )}
                   </Transition>
 
-                  <Button variant="auth-form" type="submit">
-                    {t('auth.addUser')}
-                  </Button>
+                  <Button type="submit">{t('auth.addUser')}</Button>
                 </Stack>
               </form>
             </FormContainer>

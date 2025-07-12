@@ -4,24 +4,19 @@ import {
   Group,
   Anchor,
   Stack,
-  Alert,
-  Transition,
-  Title,
-  Text,
   Space,
   Button,
   TextInput,
   PasswordInput,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
-import {notifications} from '@mantine/notifications';
-import {IconAlertCircle} from '@tabler/icons-react';
 import {useAppStore} from '@/stores/useAppStore';
 import {useTranslation} from '@/hooks/useTranslation';
+import {useAuthForm} from '@/hooks/useAuthForm';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {getFormValidators} from '@/utils/validation';
-import {Logo} from '@/components/common/Logo';
 import {FormContainer} from '@/components/form/FormContainer';
+import {AuthHeader, AuthAlert, AuthFormLink} from '@/components/auth';
 import {useClientCode} from '@/hooks/useClientCode';
 
 type LoginFormValues = {
@@ -32,8 +27,7 @@ type LoginFormValues = {
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const {login, isLoading} = useAppStore();
-  const [showAlert, setShowAlert] = useState(false);
+  const {login} = useAppStore();
   const [mounted, setMounted] = useState(false);
   const {t} = useTranslation();
   const clientCode = useClientCode();
@@ -45,6 +39,13 @@ export function LoginPage() {
       clientCode,
     },
     validate: getFormValidators(t, ['identifier', 'password', 'clientCode']),
+  });
+
+  const {isLoading, showAlert, clearErrors, handleSubmit} = useAuthForm(form, {
+    successTitle: t('notifications.loginSuccess'),
+    successMessage: t('notifications.loginSuccessMessage'),
+    errorTitle: t('notifications.loginFailed'),
+    onSuccess: () => navigate('/home'),
   });
 
   // Focus identifier input on mount and trigger mount animation
@@ -61,61 +62,21 @@ export function LoginPage() {
     };
   }, []);
 
-  const handleSubmit = async (values: LoginFormValues) => {
-    try {
-      // Always remember the identifier
-      localStorage.setItem('rememberedIdentifier', values.identifier);
-
-      await login({
-        identifier: values.identifier,
-        password: values.password,
-        clientCode: values.clientCode,
-      });
-      notifications.show({
-        title: t('notifications.loginSuccess'),
-        message: t('notifications.loginSuccessMessage'),
-        color: 'green',
-      });
-      navigate('/home');
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t('notifications.invalidCredentials');
-
-      form.setErrors({
-        identifier: '',
-        password: '',
-        clientCode: '',
-      });
-
-      setShowAlert(true);
-
-      notifications.show({
-        title: t('notifications.loginFailed'),
-        message: errorMessage,
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
-    }
-  };
+  const onSubmit = handleSubmit(async (values: LoginFormValues) => {
+    localStorage.setItem('rememberedIdentifier', values.identifier);
+    await login({
+      identifier: values.identifier,
+      password: values.password,
+      clientCode: values.clientCode,
+    });
+  });
 
   return (
     <GuestLayout>
       <FormContainer isLoading={isLoading} mounted={mounted}>
-        <Group justify="center" gap="md" mb="lg">
-          <Logo />
-          <Title
-            style={{
-              fontWeight: 900,
-            }}
-            size="h2"
-          >
-            {t('auth.title')}
-          </Title>
-        </Group>
+        <AuthHeader title={t('auth.title')} />
         <Space h="lg" />
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap="lg">
             <TextInput
               required
@@ -125,9 +86,7 @@ export function LoginPage() {
               error={form.errors.identifier}
               disabled={isLoading}
               {...form.getInputProps('identifier')}
-              onFocus={() => {
-                setShowAlert(false);
-              }}
+              onFocus={clearErrors}
             />
 
             <PasswordInput
@@ -137,36 +96,18 @@ export function LoginPage() {
               error={form.errors.password}
               disabled={isLoading}
               {...form.getInputProps('password')}
-              onFocus={() => {
-                setShowAlert(false);
-              }}
+              onFocus={clearErrors}
             />
 
-            <Transition
-              mounted={
+            <AuthAlert
+              show={
                 showAlert
                   ? Boolean(form.errors.identifier && form.errors.password)
                   : false
               }
-              transition="fade"
-              duration={300}
-              timingFunction="ease"
-            >
-              {(styles) => (
-                <Alert
-                  withCloseButton
-                  style={styles}
-                  icon={<IconAlertCircle size={16} />}
-                  color="red"
-                  variant="light"
-                  onClose={() => {
-                    setShowAlert(false);
-                  }}
-                >
-                  {t('notifications.invalidCredentials')}
-                </Alert>
-              )}
-            </Transition>
+              message={t('notifications.invalidCredentials')}
+              onClose={clearErrors}
+            />
 
             <Group justify="flex-end">
               <Anchor
@@ -186,12 +127,11 @@ export function LoginPage() {
           </Stack>
         </form>
 
-        <Text size="sm" ta="center" mt="lg" c="dimmed">
-          {t('auth.noAccount')}{' '}
-          <Anchor href="/register" size="sm" fw="600">
-            {t('auth.createAccount')}
-          </Anchor>
-        </Text>
+        <AuthFormLink
+          text={t('auth.noAccount')}
+          linkText={t('auth.createAccount')}
+          href="/register"
+        />
       </FormContainer>
     </GuestLayout>
   );
