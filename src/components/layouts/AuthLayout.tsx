@@ -23,6 +23,8 @@ import {
   IconShield,
   IconLock,
   IconHome,
+  IconBuildingStore,
+  IconUsersGroup,
 } from '@tabler/icons-react';
 import type {TFunction} from 'i18next';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
@@ -241,6 +243,16 @@ function buildNavigationItems(t: TFunction, user?: User) {
       label: t('common.home'),
       icon: IconHome,
       path: '/home',
+    },
+    {
+      label: 'Store Management',
+      icon: IconBuildingStore,
+      path: '/stores',
+    },
+    {
+      label: 'Staff Management',
+      icon: IconUsersGroup,
+      path: '/staff',
     },
     {
       label: t('common.userManagement'),

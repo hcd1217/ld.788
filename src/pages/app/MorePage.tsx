@@ -19,6 +19,8 @@ import {
   IconInfoCircle,
   IconLogout,
   IconUserPlus,
+  IconBuildingStore,
+  IconUsersGroup,
 } from '@tabler/icons-react';
 import {Navigate, useNavigate} from 'react-router';
 import {useTranslation} from '@/hooks/useTranslation';
@@ -43,6 +45,20 @@ export function MorePage() {
       icon: IconHome,
       onClick: () => navigate('/home'),
       color: 'blue',
+    },
+    {
+      title: 'Store Management',
+      description: 'Manage your stores and locations',
+      icon: IconBuildingStore,
+      onClick: () => navigate('/stores'),
+      color: 'indigo',
+    },
+    {
+      title: 'Staff Management',
+      description: 'Manage staff members and permissions',
+      icon: IconUsersGroup,
+      onClick: () => navigate('/staff'),
+      color: 'violet',
     },
     {
       title: t('common.explore'),

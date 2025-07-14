@@ -89,6 +89,31 @@ const PermissionManagementPage = lazy(async () => {
   return {default: module.PermissionManagementPage};
 });
 
+const StoreListPage = lazy(async () => {
+  const module = await import('@/pages/app/StoreListPage');
+  return {default: module.StoreListPage};
+});
+
+const StoreConfigPage = lazy(async () => {
+  const module = await import('@/pages/app/StoreConfigPage');
+  return {default: module.StoreConfigPage};
+});
+
+const StaffListPage = lazy(async () => {
+  const module = await import('@/pages/app/StaffListPage');
+  return {default: module.StaffListPage};
+});
+
+const AddStaffPage = lazy(async () => {
+  const module = await import('@/pages/app/AddStaffPage');
+  return {default: module.AddStaffPage};
+});
+
+const EditStaffPage = lazy(async () => {
+  const module = await import('@/pages/app/EditStaffPage');
+  return {default: module.EditStaffPage};
+});
+
 const LoginPage = lazy(async () => {
   const module = await import('@/pages/auth/LoginPage');
   return {default: module.LoginPage};
@@ -166,6 +191,11 @@ const routeObjects: RouteObject[] = [
         children: [
           {path: 'user-management', Component: UserManagementPage},
           {path: 'user/:userId', Component: UserDetailPage},
+          {path: 'stores', Component: StoreListPage},
+          {path: 'store-config', Component: StoreConfigPage},
+          {path: 'staff', Component: StaffListPage},
+          {path: 'staff/add', Component: AddStaffPage},
+          {path: 'staff/edit/:staffId', Component: EditStaffPage},
           {
             path: '',
             Component: PCOnlyLayout,
