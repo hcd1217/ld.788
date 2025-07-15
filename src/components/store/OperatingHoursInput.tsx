@@ -2,10 +2,12 @@ import {Stack, Group, Text, Switch, Paper} from '@mantine/core';
 import {TimeInput} from '@mantine/dates';
 import {IconClock} from '@tabler/icons-react';
 
-export type DaySchedule = {
-  open: string;
-  close: string;
-} | {closed: true};
+export type DaySchedule =
+  | {
+      open: string;
+      close: string;
+    }
+  | {closed: true};
 
 type OperatingHours = Record<string, DaySchedule>;
 
@@ -58,9 +60,8 @@ export function OperatingHoursInput({
     const currentDay = value[day] || {open: '09:00', close: '17:00'};
 
     // If it's a closed day, we need to convert it to an open day first
-    const daySchedule = 'closed' in currentDay
-      ? {open: '09:00', close: '17:00'}
-      : currentDay;
+    const daySchedule =
+      'closed' in currentDay ? {open: '09:00', close: '17:00'} : currentDay;
 
     const updatedHours = {
       ...value,
@@ -92,7 +93,7 @@ export function OperatingHoursInput({
     <Stack gap="md">
       {daysOfWeek.map(({key, label}) => {
         const daySchedule = value[key] || {open: '09:00', close: '17:00'};
-        const isClosed = 'closed' in daySchedule && daySchedule.closed === true;
+        const isClosed = 'closed' in daySchedule && daySchedule.closed;
 
         return (
           <Paper key={key} withBorder p="md">

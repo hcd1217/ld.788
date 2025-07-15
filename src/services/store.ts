@@ -10,10 +10,11 @@ export interface Store {
   };
   operatingHours: Record<
     string,
-    {
-      open: string; // "09:00"
-      close: string; // "17:00"
-    } | { closed: boolean }
+    | {
+        open: string; // "09:00"
+        close: string; // "17:00"
+      }
+    | {closed: boolean}
   >;
   createdAt: string;
   updatedAt: string;

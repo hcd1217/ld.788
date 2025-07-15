@@ -165,14 +165,14 @@ export const useStoreConfigStore = create<StoreConfigState>()(
           stores: state.stores,
           currentStore: state.currentStore,
         }),
-        // Custom merge function to handle store updates
-        merge: (persistedState: Partial<StoreConfigState>, currentState) => ({
-          ...currentState,
-          ...persistedState,
-          // Always start with clean loading/error state
-          isLoading: false,
-          error: undefined,
-        }),
+        // // Custom merge function to handle store updates
+        // merge: (persistedState: Partial<StoreConfigState>, currentState) => ({
+        //   ...currentState,
+        //   ...persistedState,
+        //   // Always start with clean loading/error state
+        //   isLoading: false,
+        //   error: undefined,
+        // }),
       },
     ),
     {

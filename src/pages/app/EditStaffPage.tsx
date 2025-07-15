@@ -379,13 +379,29 @@ export function EditStaffPage() {
                   transitionProps={{duration: 300}}
                 />
 
-                {activeStep === 0 && <BasicInfoSection form={form as UseFormReturnType<CreateStaffRequest>} />}
+                {activeStep === 0 && (
+                  <BasicInfoSection
+                    form={form as UseFormReturnType<CreateStaffRequest>}
+                  />
+                )}
 
-                {activeStep === 1 && <WorkingPatternSection form={form as UseFormReturnType<CreateStaffRequest>} />}
+                {activeStep === 1 && (
+                  <WorkingPatternSection
+                    form={form as UseFormReturnType<CreateStaffRequest>}
+                  />
+                )}
 
-                {activeStep === 2 && <LeaveManagementSection form={form as UseFormReturnType<CreateStaffRequest>} />}
+                {activeStep === 2 && (
+                  <LeaveManagementSection
+                    form={form as UseFormReturnType<CreateStaffRequest>}
+                  />
+                )}
 
-                {activeStep === 3 && <AccessPermissionSection form={form as UseFormReturnType<CreateStaffRequest>} />}
+                {activeStep === 3 && (
+                  <AccessPermissionSection
+                    form={form as UseFormReturnType<CreateStaffRequest>}
+                  />
+                )}
               </div>
 
               <Group justify="space-between" pt="md">

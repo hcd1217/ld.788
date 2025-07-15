@@ -19,10 +19,7 @@ import {
   IconInfoCircle,
 } from '@tabler/icons-react';
 import type {UseFormReturnType} from '@mantine/form';
-import {
-  permissionMatrix,
-  type CreateStaffRequest,
-} from '@/services/staff';
+import {permissionMatrix, type CreateStaffRequest} from '@/services/staff';
 
 export interface AccessPermissionSectionProps {
   readonly form: UseFormReturnType<CreateStaffRequest>;

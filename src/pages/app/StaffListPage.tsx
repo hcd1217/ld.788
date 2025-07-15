@@ -45,7 +45,9 @@ export function StaffListPage() {
   const navigate = useNavigate();
   const [deleteModalOpened, {open: openDeleteModal, close: closeDeleteModal}] =
     useDisclosure(false);
-  const [staffToDelete, setStaffToDelete] = useState<Staff | undefined>(undefined);
+  const [staffToDelete, setStaffToDelete] = useState<Staff | undefined>(
+    undefined,
+  );
   const [searchValue, setSearchValue] = useState('');
   const [debouncedSearch] = useDebouncedValue(searchValue, 300);
   const isDarkMode = useIsDarkMode();
@@ -269,10 +271,12 @@ export function StaffListPage() {
               ]}
               w={120}
               onChange={(value) => {
-                if (!value) {
-                  handleFiltersChange({status: 'all'});
+                if (value) {
+                  handleFiltersChange({
+                    status: value as 'active' | 'inactive' | 'all',
+                  });
                 } else {
-                  handleFiltersChange({status: value as 'active' | 'inactive' | 'all'});
+                  handleFiltersChange({status: 'all'});
                 }
               }}
             />
@@ -288,10 +292,12 @@ export function StaffListPage() {
               ]}
               w={120}
               onChange={(value) => {
-                if (!value) {
-                  handleFiltersChange({role: 'all'});
+                if (value) {
+                  handleFiltersChange({
+                    role: value as 'admin' | 'manager' | 'member' | 'all',
+                  });
                 } else {
-                  handleFiltersChange({role: value as 'admin' | 'manager' | 'member' | 'all'});
+                  handleFiltersChange({role: 'all'});
                 }
               }}
             />
@@ -307,10 +313,12 @@ export function StaffListPage() {
               ]}
               w={120}
               onChange={(value) => {
-                if (!value) {
-                  handleFiltersChange({sortBy: 'createdAt'});
+                if (value) {
+                  handleFiltersChange({
+                    sortBy: value as 'name' | 'email' | 'role' | 'createdAt',
+                  });
                 } else {
-                  handleFiltersChange({sortBy: value as 'name' | 'email' | 'role' | 'createdAt'});
+                  handleFiltersChange({sortBy: 'createdAt'});
                 }
               }}
             />

@@ -11,7 +11,6 @@ const mapContainerStyle = {
   borderRadius: '8px',
 };
 
-
 const mapOptions: google.maps.MapOptions = {
   disableDefaultUI: false,
   zoomControl: true,
@@ -34,13 +33,12 @@ export function GoogleMapDisplay({
   address,
   zoom = 15,
 }: GoogleMapDisplayProps) {
-  const [mapError] = useState<string | undefined>();
+  const [mapError] = useState<string | undefined>(undefined);
 
   const {isLoaded, loadError} = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
     libraries,
   });
-
 
   if (loadError) {
     return (

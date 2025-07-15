@@ -12,10 +12,7 @@ type StoreConfigFormProps = {
       lat: number;
       lng: number;
     };
-    operatingHours: Record<
-      string,
-      DaySchedule
-    >;
+    operatingHours: Record<string, DaySchedule>;
   }>;
   readonly isLoading: boolean;
   readonly onLocationChange: (
@@ -23,7 +20,9 @@ type StoreConfigFormProps = {
     address: string,
   ) => void;
   readonly onAddressChange: (address: string) => void;
-  readonly onOperatingHoursChange: (operatingHours: Record<string, DaySchedule>) => void;
+  readonly onOperatingHoursChange: (
+    operatingHours: Record<string, DaySchedule>,
+  ) => void;
   readonly onFocus?: () => void;
 };
 

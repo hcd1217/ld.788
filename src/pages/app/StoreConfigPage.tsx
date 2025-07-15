@@ -19,7 +19,7 @@ import {
   IconCheck,
 } from '@tabler/icons-react';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-// import {useTranslation} from '@/hooks/useTranslation';
+// Import {useTranslation} from '@/hooks/useTranslation';
 import {
   useStoreActions,
   useCurrentStore,
@@ -39,10 +39,7 @@ type StoreConfigFormValues = {
     lat: number;
     lng: number;
   };
-  operatingHours: Record<
-    string,
-    DaySchedule
-  >;
+  operatingHours: Record<string, DaySchedule>;
 };
 
 const defaultOperatingHours: StoreConfigFormValues['operatingHours'] = {
@@ -58,7 +55,7 @@ const defaultOperatingHours: StoreConfigFormValues['operatingHours'] = {
 export function StoreConfigPage() {
   const navigate = useNavigate();
   const [showAlert, setShowAlert] = useState(false);
-  // const {t} = useTranslation();
+  // Const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
 
   const currentStore = useCurrentStore();
