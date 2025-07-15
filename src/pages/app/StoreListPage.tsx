@@ -294,7 +294,7 @@ export function StoreListPage() {
       <Modal
         centered
         opened={deleteModalOpened}
-        title={t('store.confirmDeleteTitle')}
+        title={<Title order={3}>{t('store.confirmDeleteTitle')}</Title>}
         onClose={closeDeleteModal}
       >
         <Stack gap="md">

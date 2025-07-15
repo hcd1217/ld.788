@@ -93,61 +93,69 @@ export function OperatingHoursInput({
   // };
 
   return (
-    <Stack gap="md">
+    <Stack gap="xs">
       {daysOfWeekKeys.map((key) => {
         const daySchedule = value[key] || {open: '09:00', close: '17:00'};
         const isClosed = 'closed' in daySchedule && daySchedule.closed;
 
         return (
-          <Paper key={key} withBorder p="md">
-            <Group justify="space-between" wrap="nowrap">
-              <Group gap="md" style={{flex: 1}}>
+          <Paper key={key} withBorder p="xs">
+            <Group justify="space-between" wrap="nowrap" p={0}>
+              <Group gap="sm" style={{flex: 1}} p={0}>
                 <Text w={100} fw={500}>
                   {t(`store.${key}` as const)}
                 </Text>
-
                 <Switch
                   checked={!isClosed}
                   disabled={disabled}
                   label={isClosed ? t('store.closed') : t('store.open')}
                   size="sm"
+                  w="10rem"
                   onChange={() => {
                     handleDayToggle(key);
                   }}
                 />
               </Group>
 
-              {!isClosed && 'open' in daySchedule && (
-                <Group gap="xs" wrap="nowrap">
-                  <TimeInput
-                    value={daySchedule.open}
-                    disabled={disabled}
-                    size="sm"
-                    w={100}
-                    leftSection={<IconClock size={14} />}
-                    aria-label={`${t(`store.${key}` as const)} opening time`}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      handleTimeChange(key, 'open', event.target.value);
-                    }}
-                  />
+              <Group gap="xs" wrap="nowrap">
+                <TimeInput
+                  value={'open' in daySchedule ? daySchedule.open : '09:00'}
+                  disabled={disabled || isClosed}
+                  size="sm"
+                  w={120}
+                  leftSection={<IconClock size={14} />}
+                  aria-label={`${t(`store.${key}` as const)} opening time`}
+                  styles={{
+                    input: {
+                      opacity: isClosed ? 0.5 : 1,
+                    },
+                  }}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    handleTimeChange(key, 'open', event.target.value);
+                  }}
+                />
 
-                  <Text size="sm" c="dimmed">
-                    {t('store.to')}
-                  </Text>
+                <Text size="sm" c="dimmed">
+                  {t('store.to')}
+                </Text>
 
-                  <TimeInput
-                    value={daySchedule.close}
-                    disabled={disabled}
-                    size="sm"
-                    w={100}
-                    leftSection={<IconClock size={14} />}
-                    aria-label={`${t(`store.${key}` as const)} closing time`}
-                    onChange={(event) => {
-                      handleTimeChange(key, 'close', event.target.value);
-                    }}
-                  />
-                </Group>
-              )}
+                <TimeInput
+                  value={'close' in daySchedule ? daySchedule.close : '17:00'}
+                  disabled={disabled || isClosed}
+                  size="sm"
+                  w={120}
+                  leftSection={<IconClock size={14} />}
+                  aria-label={`${t(`store.${key}` as const)} closing time`}
+                  styles={{
+                    input: {
+                      opacity: isClosed ? 0.5 : 1,
+                    },
+                  }}
+                  onChange={(event) => {
+                    handleTimeChange(key, 'close', event.target.value);
+                  }}
+                />
+              </Group>
             </Group>
           </Paper>
         );

@@ -1,5 +1,15 @@
-import {Stack, TextInput, Fieldset} from '@mantine/core';
+import {
+  Grid,
+  Stack,
+  TextInput,
+  Fieldset,
+  Group,
+  Button,
+  Box,
+} from '@mantine/core';
 import {type UseFormReturnType} from '@mantine/form';
+import {IconBuildingStore} from '@tabler/icons-react';
+import {useNavigate} from 'react-router';
 import {LocationInput} from './LocationInput';
 import {OperatingHoursInput, type DaySchedule} from './OperatingHoursInput';
 import {GoogleMapDisplay} from './GoogleMapDisplay';
@@ -35,52 +45,86 @@ export function StoreConfigForm({
   onOperatingHoursChange,
   onFocus,
 }: StoreConfigFormProps) {
+  const navigate = useNavigate();
   const {t} = useTranslation();
 
+  const buttonGroups = (
+    <Group justify="flex-end" mt="xl">
+      <Button
+        variant="light"
+        disabled={isLoading}
+        onClick={() => {
+          form.reset();
+          navigate('/home');
+        }}
+      >
+        {t('common.cancel')}
+      </Button>
+
+      <Button
+        type="submit"
+        leftSection={<IconBuildingStore size={16} />}
+        disabled={isLoading}
+      >
+        {t('store.createStore')}
+      </Button>
+    </Group>
+  );
+
   return (
-    <Stack gap="lg">
+    <Grid gutter="xl">
       {/* Basic Store Information */}
-      <Fieldset legend={t('store.storeInformation')}>
-        <Stack gap="md">
-          <TextInput
-            required
-            label={t('store.storeName')}
-            placeholder={t('store.enterStoreName')}
-            error={form.errors.name}
-            disabled={isLoading}
-            {...form.getInputProps('name')}
-            onFocus={onFocus}
-          />
-
-          <LocationInput
-            label={t('store.storeAddress')}
-            placeholder={t('store.searchForStoreAddress')}
-            value={form.values.address}
-            error={form.errors.address ?? undefined}
-            disabled={isLoading}
-            onLocationSelect={onLocationChange}
-            onAddressChange={onAddressChange}
-            onFocus={onFocus}
-          />
-
-          {/* Map Display */}
-          {form.values.location.lat && form.values.location.lng ? (
-            <GoogleMapDisplay
-              location={form.values.location}
-              address={form.values.address}
+      <Grid.Col span={{base: 12, sm: 12, md: 12, lg: 6}}>
+        <Fieldset legend={t('store.storeInformation')}>
+          <Stack gap="md">
+            <TextInput
+              required
+              label={t('store.storeName')}
+              placeholder={t('store.enterStoreName')}
+              error={form.errors.name}
+              disabled={isLoading}
+              {...form.getInputProps('name')}
+              onFocus={onFocus}
             />
-          ) : null}
-        </Stack>
-      </Fieldset>
+
+            <LocationInput
+              label={t('store.storeAddress')}
+              placeholder={t('store.searchForStoreAddress')}
+              value={form.values.address}
+              error={form.errors.address ?? undefined}
+              disabled={isLoading}
+              onLocationSelect={onLocationChange}
+              onAddressChange={onAddressChange}
+              onFocus={onFocus}
+            />
+
+            {/* Map Display */}
+            {form.values.location.lat && form.values.location.lng ? (
+              <GoogleMapDisplay
+                location={form.values.location}
+                address={form.values.address}
+              />
+            ) : null}
+          </Stack>
+        </Fieldset>
+        <Box visibleFrom="lg" mt="xl">
+          {buttonGroups}
+        </Box>
+      </Grid.Col>
 
       {/* Operating Hours */}
-      <Fieldset legend={t('store.operatingHours')}>
-        <OperatingHoursInput
-          value={form.values.operatingHours}
-          disabled={isLoading}
-          onChange={onOperatingHoursChange}
-        />
-      </Fieldset>
-    </Stack>
+      <Grid.Col span={{base: 12, sm: 12, md: 12, lg: 6}}>
+        <Fieldset legend={t('store.operatingHours')}>
+          <OperatingHoursInput
+            value={form.values.operatingHours}
+            disabled={isLoading}
+            onChange={onOperatingHoursChange}
+          />
+        </Fieldset>
+      </Grid.Col>
+      <Grid.Col span={12} hiddenFrom="lg">
+        {buttonGroups}
+      </Grid.Col>
+    </Grid>
   );
 }

@@ -25,6 +25,7 @@ import {
   IconHome,
   IconBuildingStore,
   IconUsersGroup,
+  IconCircle,
 } from '@tabler/icons-react';
 import type {TFunction} from 'i18next';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
@@ -154,6 +155,7 @@ export function AuthLayout() {
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
+            const isDummy = item.dummy ?? false;
 
             const buttonContent = (
               <UnstyledButton
@@ -178,9 +180,20 @@ export function AuthLayout() {
                 })}
                 onClick={() => navigate(item.path)}
               >
-                <Group justify={desktopOpened ? 'flex-start' : 'center'}>
+                <Group
+                  justify={desktopOpened ? 'flex-start' : 'center'}
+                  style={{position: 'relative'}}
+                >
                   <Icon size={20} />
                   {desktopOpened ? <Text size="sm">{item.label}</Text> : null}
+                  {isDummy ? (
+                    <IconCircle
+                      style={{position: 'absolute', left: 15, top: 15}}
+                      color="red"
+                      fill="red"
+                      size={10}
+                    />
+                  ) : null}
                 </Group>
               </UnstyledButton>
             );
@@ -248,11 +261,13 @@ function buildNavigationItems(t: TFunction, user?: User) {
       label: t('common.storeManagement'),
       icon: IconBuildingStore,
       path: '/stores',
+      dummy: true,
     },
     {
       label: t('common.staffManagement'),
       icon: IconUsersGroup,
       path: '/staff',
+      dummy: true,
     },
     {
       label: t('common.userManagement'),

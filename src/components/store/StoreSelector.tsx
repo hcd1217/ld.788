@@ -110,7 +110,9 @@ export function StoreSelector({
           ? `${t('store.selected')}: ${currentStore.address}`
           : undefined
       }
-      onChange={handleStoreChange}
+      onChange={(value) => {
+        handleStoreChange(value ?? undefined);
+      }}
     />
   );
 }

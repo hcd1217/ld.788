@@ -446,7 +446,7 @@ export function UserManagementPage() {
       {/* Edit User Modal */}
       <Modal
         opened={editOpened}
-        title={t('common.editUser')}
+        title={<Title order={3}>{t('common.editUser')}</Title>}
         size="md"
         onClose={closeEdit}
       >

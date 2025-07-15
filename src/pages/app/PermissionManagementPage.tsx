@@ -362,7 +362,11 @@ export function PermissionManagementPage() {
 
       <Modal
         opened={formOpened}
-        title={isAddMode ? t('permission.add') : t('permission.edit')}
+        title={
+          <Title order={3}>
+            {isAddMode ? t('permission.add') : t('permission.edit')}
+          </Title>
+        }
         size="md"
         onClose={closeForm}
       >

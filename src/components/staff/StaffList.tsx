@@ -17,6 +17,7 @@ import {
   Modal,
   SimpleGrid,
   ScrollArea,
+  Title,
 } from '@mantine/core';
 import {useDisclosure, useMediaQuery} from '@mantine/hooks';
 import {
@@ -303,7 +304,11 @@ export function StaffList({
         <Modal
           centered
           opened={qrModalOpened}
-          title={t('staff.qrCodeTitle', {name: selectedStaff?.fullName})}
+          title={
+            <Title order={3}>
+              {t('staff.qrCodeTitle', {name: selectedStaff?.fullName})}
+            </Title>
+          }
           onClose={closeQrModal}
         >
           {selectedStaff ? (
@@ -390,168 +395,142 @@ export function StaffList({
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {staff.map((staffMember) => {
-                let label = '';
-                switch (staffMember.status) {
-                  case 'active': {
-                    label = t('staff.active');
-                    break;
-                  }
+              {staff.map((staffMember) => (
+                <Table.Tr key={staffMember.id}>
+                  <Table.Td>
+                    <Group gap="sm">
+                      <Avatar size={32} radius="xl" color="blue">
+                        {staffMember.fullName.charAt(0).toUpperCase()}
+                      </Avatar>
+                      <div>
+                        <Text fw={600} size="sm">
+                          {staffMember.fullName}
+                        </Text>
+                        <Text size="xs" c="dimmed">
+                          {t('staff.joined')}{' '}
+                          {new Date(staffMember.createdAt).toLocaleDateString()}
+                        </Text>
+                      </div>
+                    </Group>
+                  </Table.Td>
 
-                  case 'inactive': {
-                    label = t('staff.inactive');
-                    break;
-                  }
-
-                  case 'deleted': {
-                    label = t('staff.deleted');
-                    break;
-                  }
-
-                  default: {
-                    break;
-                  }
-                }
-
-                return (
-                  <Table.Tr key={staffMember.id}>
-                    <Table.Td>
-                      <Group gap="sm">
-                        <Avatar size={32} radius="xl" color="blue">
-                          {staffMember.fullName.charAt(0).toUpperCase()}
-                        </Avatar>
-                        <div>
-                          <Text fw={600} size="sm">
-                            {staffMember.fullName}
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            {t('staff.joined')}{' '}
-                            {new Date(
-                              staffMember.createdAt,
-                            ).toLocaleDateString()}
-                          </Text>
-                        </div>
+                  <Table.Td>
+                    <Stack gap={2}>
+                      <Group gap="xs">
+                        <IconMail size={12} />
+                        <Text size="xs">{staffMember.email}</Text>
                       </Group>
-                    </Table.Td>
+                      <Group gap="xs">
+                        <IconPhone size={12} />
+                        <Text size="xs">{staffMember.phoneNumber}</Text>
+                      </Group>
+                    </Stack>
+                  </Table.Td>
 
-                    <Table.Td>
-                      <Stack gap={2}>
-                        <Group gap="xs">
-                          <IconMail size={12} />
-                          <Text size="xs">{staffMember.email}</Text>
-                        </Group>
-                        <Group gap="xs">
-                          <IconPhone size={12} />
-                          <Text size="xs">{staffMember.phoneNumber}</Text>
-                        </Group>
-                      </Stack>
-                    </Table.Td>
+                  <Table.Td>
+                    <Stack gap="xs">
+                      <Badge
+                        size="sm"
+                        color={getRoleBadgeColor(staffMember.role)}
+                        variant="light"
+                      >
+                        {t(`staff.${staffMember.role}`)}
+                      </Badge>
+                      <Switch
+                        size="sm"
+                        checked={staffMember.status === 'active'}
+                        color={
+                          staffMember.status === 'active' ? 'green' : 'orange'
+                        }
+                        label={t(`staff.${staffMember.status}` as const)}
+                        onChange={() => {
+                          onToggleStatus(staffMember);
+                        }}
+                      />
+                    </Stack>
+                  </Table.Td>
 
-                    <Table.Td>
-                      <Stack gap="xs">
-                        <Badge
-                          size="sm"
-                          color={getRoleBadgeColor(staffMember.role)}
+                  <Table.Td>
+                    <Text size="sm">{formatWorkingPattern(staffMember)}</Text>
+                  </Table.Td>
+
+                  <Table.Td>
+                    <Text size="sm" fw={600}>
+                      {formatCurrency(staffMember.hourlyRate)}
+                    </Text>
+                  </Table.Td>
+
+                  <Table.Td>
+                    <Group gap="xs">
+                      <Tooltip label={t('staff.viewQrCode')}>
+                        <ActionIcon
                           variant="light"
-                        >
-                          {t(`staff.${staffMember.role}`)}
-                        </Badge>
-                        <Switch
+                          color="blue"
                           size="sm"
-                          checked={staffMember.status === 'active'}
-                          color={
-                            staffMember.status === 'active' ? 'green' : 'orange'
-                          }
-                          label={label}
-                          onChange={() => {
-                            onToggleStatus(staffMember);
+                          onClick={() => {
+                            handleShowQrCode(staffMember);
                           }}
-                        />
-                      </Stack>
-                    </Table.Td>
+                        >
+                          <IconQrcode size={14} />
+                        </ActionIcon>
+                      </Tooltip>
 
-                    <Table.Td>
-                      <Text size="sm">{formatWorkingPattern(staffMember)}</Text>
-                    </Table.Td>
-
-                    <Table.Td>
-                      <Text size="sm" fw={600}>
-                        {formatCurrency(staffMember.hourlyRate)}
-                      </Text>
-                    </Table.Td>
-
-                    <Table.Td>
-                      <Group gap="xs">
-                        <Tooltip label={t('staff.viewQrCode')}>
-                          <ActionIcon
-                            variant="light"
-                            color="blue"
-                            size="sm"
-                            onClick={() => {
-                              handleShowQrCode(staffMember);
-                            }}
+                      <CopyButton value={staffMember.clockInUrl}>
+                        {({copied, copy}) => (
+                          <Tooltip
+                            label={
+                              copied ? t('staff.copied') : t('staff.copyUrl')
+                            }
                           >
-                            <IconQrcode size={14} />
-                          </ActionIcon>
-                        </Tooltip>
-
-                        <CopyButton value={staffMember.clockInUrl}>
-                          {({copied, copy}) => (
-                            <Tooltip
-                              label={
-                                copied ? t('staff.copied') : t('staff.copyUrl')
-                              }
+                            <ActionIcon
+                              variant="light"
+                              color={copied ? 'green' : 'gray'}
+                              size="sm"
+                              onClick={copy}
                             >
-                              <ActionIcon
-                                variant="light"
-                                color={copied ? 'green' : 'gray'}
-                                size="sm"
-                                onClick={copy}
-                              >
-                                {copied ? (
-                                  <IconCheck size={14} />
-                                ) : (
-                                  <IconCopy size={14} />
-                                )}
-                              </ActionIcon>
-                            </Tooltip>
-                          )}
-                        </CopyButton>
-                      </Group>
-                    </Table.Td>
+                              {copied ? (
+                                <IconCheck size={14} />
+                              ) : (
+                                <IconCopy size={14} />
+                              )}
+                            </ActionIcon>
+                          </Tooltip>
+                        )}
+                      </CopyButton>
+                    </Group>
+                  </Table.Td>
 
-                    <Table.Td>
-                      <Group gap="xs">
-                        <Tooltip label={t('staff.editStaff')}>
-                          <ActionIcon
-                            variant="light"
-                            color="blue"
-                            size="sm"
-                            onClick={() => {
-                              onEdit(staffMember);
-                            }}
-                          >
-                            <IconEdit size={14} />
-                          </ActionIcon>
-                        </Tooltip>
+                  <Table.Td>
+                    <Group gap="xs">
+                      <Tooltip label={t('staff.editStaff')}>
+                        <ActionIcon
+                          variant="light"
+                          color="blue"
+                          size="sm"
+                          onClick={() => {
+                            onEdit(staffMember);
+                          }}
+                        >
+                          <IconEdit size={14} />
+                        </ActionIcon>
+                      </Tooltip>
 
-                        <Tooltip label={t('staff.deleteStaffTooltip')}>
-                          <ActionIcon
-                            variant="light"
-                            color="red"
-                            size="sm"
-                            onClick={() => {
-                              onDelete(staffMember);
-                            }}
-                          >
-                            <IconTrash size={14} />
-                          </ActionIcon>
-                        </Tooltip>
-                      </Group>
-                    </Table.Td>
-                  </Table.Tr>
-                );
-              })}
+                      <Tooltip label={t('staff.deleteStaffTooltip')}>
+                        <ActionIcon
+                          variant="light"
+                          color="red"
+                          size="sm"
+                          onClick={() => {
+                            onDelete(staffMember);
+                          }}
+                        >
+                          <IconTrash size={14} />
+                        </ActionIcon>
+                      </Tooltip>
+                    </Group>
+                  </Table.Td>
+                </Table.Tr>
+              ))}
             </Table.Tbody>
           </Table>
         </ScrollArea>
@@ -561,7 +540,11 @@ export function StaffList({
       <Modal
         centered
         opened={qrModalOpened}
-        title={t('staff.qrCodeTitle', {name: selectedStaff?.fullName})}
+        title={
+          <Title order={3}>
+            {t('staff.qrCodeTitle', {name: selectedStaff?.fullName})}
+          </Title>
+        }
         onClose={closeQrModal}
       >
         {selectedStaff ? (

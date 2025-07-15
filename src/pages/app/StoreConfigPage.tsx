@@ -14,11 +14,7 @@ import {
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
-import {
-  IconAlertCircle,
-  IconBuildingStore,
-  IconCheck,
-} from '@tabler/icons-react';
+import {IconAlertCircle, IconCheck} from '@tabler/icons-react';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
@@ -168,11 +164,9 @@ export function StoreConfigPage() {
 
   return (
     <Container fluid mt="xl">
-      <Stack gap="xl">
-        <Container size="xl" px="md">
+      <Stack gap="xs">
+        <Container fluid w="100%" px="md">
           <Group justify="space-between">
-            <GoBack />
-
             {currentStore ? (
               <Button
                 variant="light"
@@ -181,7 +175,9 @@ export function StoreConfigPage() {
               >
                 {t('store.viewAllStores')}
               </Button>
-            ) : null}
+            ) : (
+              <GoBack />
+            )}
           </Group>
         </Container>
 
@@ -194,10 +190,9 @@ export function StoreConfigPage() {
             display: 'flex',
             justifyContent: 'center',
             width: '100%',
-            padding: '0 16px',
           }}
         >
-          <Box style={{maxWidth: '600px', width: '100%'}}>
+          <Box style={{width: '100%'}}>
             <Transition
               mounted
               transition="slide-up"
@@ -211,6 +206,32 @@ export function StoreConfigPage() {
                     overlayProps={{blur: 2}}
                     transitionProps={{duration: 300}}
                   />
+                  <Transition
+                    mounted={Boolean(
+                      showAlert &&
+                        (error || Object.keys(form.errors).length > 0),
+                    )}
+                    transition="fade"
+                    duration={300}
+                    timingFunction="ease"
+                  >
+                    {(styles) => (
+                      <Alert
+                        withCloseButton
+                        style={styles}
+                        icon={<IconAlertCircle size={16} />}
+                        color="red"
+                        variant="light"
+                        my="md"
+                        onClose={() => {
+                          setShowAlert(false);
+                          clearError();
+                        }}
+                      >
+                        {error || t('common.checkFormErrors')}
+                      </Alert>
+                    )}
+                  </Transition>
 
                   <form onSubmit={form.onSubmit(handleSubmit)}>
                     <Stack gap="lg">
@@ -224,53 +245,6 @@ export function StoreConfigPage() {
                           setShowAlert(false);
                         }}
                       />
-
-                      <Transition
-                        mounted={Boolean(
-                          showAlert &&
-                            (error || Object.keys(form.errors).length > 0),
-                        )}
-                        transition="fade"
-                        duration={300}
-                        timingFunction="ease"
-                      >
-                        {(styles) => (
-                          <Alert
-                            withCloseButton
-                            style={styles}
-                            icon={<IconAlertCircle size={16} />}
-                            color="red"
-                            variant="light"
-                            onClose={() => {
-                              setShowAlert(false);
-                              clearError();
-                            }}
-                          >
-                            {error || t('common.checkFormErrors')}
-                          </Alert>
-                        )}
-                      </Transition>
-
-                      <Group justify="flex-end" mt="xl">
-                        <Button
-                          variant="light"
-                          disabled={isLoading}
-                          onClick={() => {
-                            form.reset();
-                            navigate('/home');
-                          }}
-                        >
-                          {t('common.cancel')}
-                        </Button>
-
-                        <Button
-                          type="submit"
-                          leftSection={<IconBuildingStore size={16} />}
-                          disabled={isLoading}
-                        >
-                          {t('store.createStore')}
-                        </Button>
-                      </Group>
                     </Stack>
                   </form>
                 </Card>

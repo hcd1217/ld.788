@@ -189,6 +189,8 @@ const routeObjects: RouteObject[] = [
         path: '',
         Component: RootUserLayout,
         children: [
+          {path: 'stores', Component: StoreListPage},
+          {path: 'staff', Component: StaffListPage},
           {path: 'user-management', Component: UserManagementPage},
           {path: 'user/:userId', Component: UserDetailPage},
           {
@@ -197,9 +199,7 @@ const routeObjects: RouteObject[] = [
             children: [
               {path: 'import-users', Component: ImportUsersPage},
               {path: 'role-management', Component: RoleManagementPage},
-              {path: 'stores', Component: StoreListPage},
               {path: 'store-config', Component: StoreConfigPage},
-              {path: 'staff', Component: StaffListPage},
               {path: 'staff/add', Component: AddStaffPage},
               {path: 'staff/edit/:staffId', Component: EditStaffPage},
               {
