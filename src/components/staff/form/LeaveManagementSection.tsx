@@ -17,6 +17,7 @@ import {
   IconCalculator,
 } from '@tabler/icons-react';
 import type {UseFormReturnType} from '@mantine/form';
+import {useTranslation} from '@/hooks/useTranslation';
 import {VALIDATION_RULES, type CreateStaffRequest} from '@/services/staff';
 
 export interface LeaveManagementSectionProps {
@@ -24,6 +25,7 @@ export interface LeaveManagementSectionProps {
 }
 
 export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
+  const {t} = useTranslation();
   const isShiftWorker = form.values.workingPattern === 'shift';
 
   const calculateTotalLeaveBalance = () => {
@@ -55,11 +57,10 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
     <Stack gap="lg">
       <div>
         <Text size="lg" fw={600} mb="md">
-          Leave Management
+          {t('staff.leaveManagement.title')}
         </Text>
         <Text size="sm" c="dimmed">
-          Configure leave entitlements, balances, and calculation rules for the
-          staff member.
+          {t('staff.leaveManagement.description')}
         </Text>
       </div>
 
@@ -68,28 +69,30 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
           <Group gap="xs">
             <IconCalendarStats size={16} />
             <Text size="sm" fw={500}>
-              Annual Leave Entitlement
+              {t('staff.leaveManagement.annualEntitlement')}
             </Text>
           </Group>
 
           <NumberInput
             required
-            label="Bookable Leave Days per Year"
+            label={t('staff.leaveManagement.bookableLeaveDays')}
             placeholder="20"
             min={VALIDATION_RULES.leave.daysPerYear.min}
             max={VALIDATION_RULES.leave.daysPerYear.max}
-            description="Total number of leave days the staff member is entitled to annually"
+            description={t(
+              'staff.leaveManagement.bookableLeaveDaysDescription',
+            )}
             {...form.getInputProps('bookableLeaveDays')}
           />
 
           {isShiftWorker ? (
             <>
               <NumberInput
-                label="Hours per Leave Day"
+                label={t('staff.leaveManagement.hoursPerDay')}
                 placeholder="8"
                 min={VALIDATION_RULES.leave.hoursPerDay.min}
                 max={VALIDATION_RULES.leave.hoursPerDay.max}
-                description="Number of working hours equivalent to one leave day"
+                description={t('staff.leaveManagement.hoursPerDayDescription')}
                 {...form.getInputProps('leaveHoursEquivalent')}
               />
 
@@ -98,18 +101,19 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
                 color="blue"
                 variant="light"
               >
-                For shift workers, leave is calculated in hours. Each leave day
-                equals {form.values.leaveHoursEquivalent || 8} working hours.
+                {t('staff.leaveManagement.shiftWorkerAlert', {
+                  hours: form.values.leaveHoursEquivalent || 8,
+                })}
               </Alert>
             </>
           ) : null}
 
           <NumberInput
-            label="Carry-over Days"
+            label={t('staff.leaveManagement.carryOverDays')}
             placeholder="0"
             min={0}
             max={form.values.bookableLeaveDays}
-            description="Maximum days that can be carried over to the next year"
+            description={t('staff.leaveManagement.carryOverDaysDescription')}
             {...form.getInputProps('carryOverDays')}
           />
         </Stack>
@@ -121,7 +125,7 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
             <Group gap="xs">
               <IconCalendar size={16} />
               <Text size="sm" fw={500}>
-                Current Leave Balances
+                {t('staff.leaveManagement.currentBalances')}
               </Text>
             </Group>
 
@@ -133,20 +137,19 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
             >
               <Group gap={4}>
                 <IconCalculator size={12} />
-                Set defaults
+                {t('staff.leaveManagement.setDefaults')}
               </Group>
             </Text>
           </Group>
 
           <Text size="xs" c="dimmed">
-            Enter the current leave balances for this staff member. These will
-            be updated as leave is taken.
+            {t('staff.leaveManagement.balancesDescription')}
           </Text>
 
           <SimpleGrid cols={3} spacing="md">
             <div>
               <NumberInput
-                label="Vacation Days"
+                label={t('staff.leaveManagement.vacationDays')}
                 placeholder="0"
                 min={0}
                 max={form.values.bookableLeaveDays}
@@ -157,7 +160,7 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
 
             <div>
               <NumberInput
-                label="Sick Days"
+                label={t('staff.leaveManagement.sickDays')}
                 placeholder="0"
                 min={0}
                 max={form.values.bookableLeaveDays}
@@ -168,7 +171,7 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
 
             <div>
               <NumberInput
-                label="Other Leave"
+                label={t('staff.leaveManagement.otherLeave')}
                 placeholder="0"
                 min={0}
                 max={form.values.bookableLeaveDays}
@@ -181,15 +184,19 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
           <Divider />
 
           <Group justify="space-between">
-            <Text size="sm">Total Leave Balance:</Text>
+            <Text size="sm">{t('staff.leaveManagement.totalBalance')}</Text>
             <Text size="sm" fw={600}>
-              {calculateTotalLeaveBalance()} days
-              {isShiftWorker ? ` (${calculateLeaveHours()} hours)` : null}
+              {calculateTotalLeaveBalance()} {t('staff.leaveManagement.days')}
+              {isShiftWorker
+                ? ` (${calculateLeaveHours()} ${t('staff.leaveManagement.hours')})`
+                : null}
             </Text>
           </Group>
 
           <Group justify="space-between">
-            <Text size="sm">Remaining Allocation:</Text>
+            <Text size="sm">
+              {t('staff.leaveManagement.remainingAllocation')}
+            </Text>
             <Text
               size="sm"
               fw={600}
@@ -201,7 +208,7 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
               }
             >
               {form.values.bookableLeaveDays - calculateTotalLeaveBalance()}{' '}
-              days
+              {t('staff.leaveManagement.days')}
             </Text>
           </Group>
 
@@ -211,8 +218,7 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
               color="orange"
               variant="light"
             >
-              Warning: Total leave balance exceeds annual entitlement. Please
-              adjust the balances.
+              {t('staff.leaveManagement.balanceExceedsWarning')}
             </Alert>
           )}
         </Stack>
@@ -227,36 +233,40 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
       >
         <Stack gap="xs">
           <Text size="sm" fw={500}>
-            Leave Summary
+            {t('staff.leaveManagement.leaveSummary')}
           </Text>
 
           <Group justify="space-between">
-            <Text size="sm">Annual Entitlement:</Text>
+            <Text size="sm">
+              {t('staff.leaveManagement.annualEntitlementLabel')}
+            </Text>
             <Text size="sm" fw={600}>
-              {form.values.bookableLeaveDays} days
+              {form.values.bookableLeaveDays} {t('staff.leaveManagement.days')}
             </Text>
           </Group>
 
           <Group justify="space-between">
-            <Text size="sm">Current Balance:</Text>
+            <Text size="sm">
+              {t('staff.leaveManagement.currentBalanceLabel')}
+            </Text>
             <Text size="sm" fw={600}>
-              {calculateTotalLeaveBalance()} days
+              {calculateTotalLeaveBalance()} {t('staff.leaveManagement.days')}
             </Text>
           </Group>
 
           {isShiftWorker ? (
             <Group justify="space-between">
-              <Text size="sm">Balance in Hours:</Text>
+              <Text size="sm">{t('staff.leaveManagement.balanceInHours')}</Text>
               <Text size="sm" fw={600}>
-                {calculateLeaveHours()} hours
+                {calculateLeaveHours()} {t('staff.leaveManagement.hours')}
               </Text>
             </Group>
           ) : null}
 
           <Group justify="space-between">
-            <Text size="sm">Carry-over Limit:</Text>
+            <Text size="sm">{t('staff.leaveManagement.carryOverLimit')}</Text>
             <Text size="sm" fw={600}>
-              {form.values.carryOverDays} days
+              {form.values.carryOverDays} {t('staff.leaveManagement.days')}
             </Text>
           </Group>
 
@@ -265,9 +275,10 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
             pt="xs"
             style={{borderTop: '1px solid var(--mantine-color-green-2)'}}
           >
-            <Text size="sm">Available to Take:</Text>
+            <Text size="sm">{t('staff.leaveManagement.availableToTake')}</Text>
             <Text size="sm" fw={600}>
-              {Math.max(0, calculateTotalLeaveBalance())} days
+              {Math.max(0, calculateTotalLeaveBalance())}{' '}
+              {t('staff.leaveManagement.days')}
             </Text>
           </Group>
         </Stack>

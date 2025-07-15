@@ -3,6 +3,7 @@ import {type UseFormReturnType} from '@mantine/form';
 import {LocationInput} from './LocationInput';
 import {OperatingHoursInput, type DaySchedule} from './OperatingHoursInput';
 import {GoogleMapDisplay} from './GoogleMapDisplay';
+import {useTranslation} from '@/hooks/useTranslation';
 
 type StoreConfigFormProps = {
   readonly form: UseFormReturnType<{
@@ -34,15 +35,17 @@ export function StoreConfigForm({
   onOperatingHoursChange,
   onFocus,
 }: StoreConfigFormProps) {
+  const {t} = useTranslation();
+
   return (
     <Stack gap="lg">
       {/* Basic Store Information */}
-      <Fieldset legend="Store Information">
+      <Fieldset legend={t('store.storeInformation')}>
         <Stack gap="md">
           <TextInput
             required
-            label="Store Name"
-            placeholder="Enter store name"
+            label={t('store.storeName')}
+            placeholder={t('store.enterStoreName')}
             error={form.errors.name}
             disabled={isLoading}
             {...form.getInputProps('name')}
@@ -50,8 +53,8 @@ export function StoreConfigForm({
           />
 
           <LocationInput
-            label="Store Address"
-            placeholder="Search for store address"
+            label={t('store.storeAddress')}
+            placeholder={t('store.searchForStoreAddress')}
             value={form.values.address}
             error={form.errors.address ?? undefined}
             disabled={isLoading}
@@ -71,7 +74,7 @@ export function StoreConfigForm({
       </Fieldset>
 
       {/* Operating Hours */}
-      <Fieldset legend="Operating Hours">
+      <Fieldset legend={t('store.operatingHours')}>
         <OperatingHoursInput
           value={form.values.operatingHours}
           disabled={isLoading}

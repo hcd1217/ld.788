@@ -1,5 +1,6 @@
 import {Select, Text, Group, Box} from '@mantine/core';
 import {IconBuildingStore, IconChevronDown} from '@tabler/icons-react';
+import {useTranslation} from '@/hooks/useTranslation';
 import {
   useCurrentStore,
   useStores,
@@ -15,21 +16,24 @@ type StoreSelectorProps = {
 };
 
 export function StoreSelector({
-  placeholder = 'Select a store',
+  placeholder,
   disabled = false,
   size = 'sm',
   variant = 'default',
 }: StoreSelectorProps) {
+  const {t} = useTranslation();
   const currentStore = useCurrentStore();
   const stores = useStores();
   const {setCurrentStore} = useStoreActions();
+
+  const defaultPlaceholder = placeholder || t('store.selectAStore');
 
   const storeOptions = stores.map((store) => ({
     value: store.id,
     label: store.name,
   }));
 
-  const handleStoreChange = (storeId: string | null) => {
+  const handleStoreChange = (storeId: string | undefined) => {
     if (storeId) {
       const selectedStore = stores.find((store) => store.id === storeId);
       setCurrentStore(selectedStore);
@@ -56,7 +60,7 @@ export function StoreSelector({
     return (
       <Select
         disabled
-        placeholder="No stores available"
+        placeholder={t('store.noStoresAvailable')}
         data={[]}
         size={size}
         variant={variant}
@@ -88,7 +92,7 @@ export function StoreSelector({
     <Select
       searchable
       clearable
-      placeholder={placeholder}
+      placeholder={defaultPlaceholder}
       value={currentStore?.id || null}
       data={storeOptions}
       disabled={disabled}
@@ -102,7 +106,9 @@ export function StoreSelector({
         return store ? renderSelectOption(store) : option.label;
       }}
       description={
-        currentStore ? `Selected: ${currentStore.address}` : undefined
+        currentStore
+          ? `${t('store.selected')}: ${currentStore.address}`
+          : undefined
       }
       onChange={handleStoreChange}
     />

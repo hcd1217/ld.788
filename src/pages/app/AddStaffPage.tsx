@@ -21,6 +21,7 @@ import {
   IconCalendar,
   IconShield,
 } from '@tabler/icons-react';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useStaffActions} from '@/stores/useStaffStore';
 import {useCurrentStore} from '@/stores/useStoreConfigStore';
@@ -35,6 +36,7 @@ import {VALIDATION_RULES, type CreateStaffRequest} from '@/services/staff';
 
 export function AddStaffPage() {
   const navigate = useNavigate();
+  const {t} = useTranslation();
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isDarkMode = useIsDarkMode();
@@ -69,21 +71,21 @@ export function AddStaffPage() {
 
       // Basic Info validation
       if (!values.fullName.trim()) {
-        errors.fullName = 'Full name is required';
+        errors.fullName = t('validation.fullNameRequired');
       } else if (values.fullName.trim().length < 2) {
-        errors.fullName = 'Full name must be at least 2 characters';
+        errors.fullName = t('validation.fullNameTooShort');
       }
 
       if (!values.email.trim()) {
-        errors.email = 'Email is required';
+        errors.email = t('validation.emailRequired');
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-        errors.email = 'Invalid email format';
+        errors.email = t('validation.emailInvalid');
       }
 
       if (!values.phoneNumber.trim()) {
-        errors.phoneNumber = 'Phone number is required';
+        errors.phoneNumber = t('validation.phoneRequired');
       } else if (values.phoneNumber.length < 10) {
-        errors.phoneNumber = 'Phone number must be at least 10 digits';
+        errors.phoneNumber = t('validation.phoneTooShort');
       }
 
       // Working Pattern validation
@@ -91,7 +93,10 @@ export function AddStaffPage() {
         values.hourlyRate < VALIDATION_RULES.hourlyRate.min ||
         values.hourlyRate > VALIDATION_RULES.hourlyRate.max
       ) {
-        errors.hourlyRate = `Hourly rate must be between $${VALIDATION_RULES.hourlyRate.min} and $${VALIDATION_RULES.hourlyRate.max}`;
+        errors.hourlyRate = t('validation.hourlyRateRange', {
+          min: VALIDATION_RULES.hourlyRate.min,
+          max: VALIDATION_RULES.hourlyRate.max,
+        });
       }
 
       const maxHours =
@@ -103,7 +108,10 @@ export function AddStaffPage() {
         values.weeklyContractedHours < 0 ||
         values.weeklyContractedHours > maxHours
       ) {
-        errors.weeklyContractedHours = `Weekly hours must be between 0 and ${maxHours}`;
+        errors.weeklyContractedHours = t('validation.weeklyHoursRange', {
+          min: 0,
+          max: maxHours,
+        });
       }
 
       if (
@@ -114,7 +122,10 @@ export function AddStaffPage() {
           values.defaultWeeklyHours >
             VALIDATION_RULES.workingHours.fulltime.max)
       ) {
-        errors.defaultWeeklyHours = `Default weekly hours must be between ${VALIDATION_RULES.workingHours.fulltime.min} and ${VALIDATION_RULES.workingHours.fulltime.max}`;
+        errors.defaultWeeklyHours = t('validation.defaultWeeklyHoursRange', {
+          min: VALIDATION_RULES.workingHours.fulltime.min,
+          max: VALIDATION_RULES.workingHours.fulltime.max,
+        });
       }
 
       // Leave Management validation
@@ -122,7 +133,10 @@ export function AddStaffPage() {
         values.bookableLeaveDays < 0 ||
         values.bookableLeaveDays > VALIDATION_RULES.leave.daysPerYear.max
       ) {
-        errors.bookableLeaveDays = `Leave days must be between 0 and ${VALIDATION_RULES.leave.daysPerYear.max}`;
+        errors.bookableLeaveDays = t('validation.leaveDaysRange', {
+          min: 0,
+          max: VALIDATION_RULES.leave.daysPerYear.max,
+        });
       }
 
       if (
@@ -131,7 +145,10 @@ export function AddStaffPage() {
         (values.leaveHoursEquivalent < VALIDATION_RULES.leave.hoursPerDay.min ||
           values.leaveHoursEquivalent > VALIDATION_RULES.leave.hoursPerDay.max)
       ) {
-        errors.leaveHoursEquivalent = `Hours per day must be between ${VALIDATION_RULES.leave.hoursPerDay.min} and ${VALIDATION_RULES.leave.hoursPerDay.max}`;
+        errors.leaveHoursEquivalent = t('validation.hoursPerDayRange', {
+          min: VALIDATION_RULES.leave.hoursPerDay.min,
+          max: VALIDATION_RULES.leave.hoursPerDay.max,
+        });
       }
 
       return errors;
@@ -140,23 +157,23 @@ export function AddStaffPage() {
 
   const steps = [
     {
-      label: 'Basic Information',
-      description: 'Name, email, and contact details',
+      label: t('staff.steps.basicInfo.label'),
+      description: t('staff.steps.basicInfo.description'),
       icon: IconUser,
     },
     {
-      label: 'Working Pattern',
-      description: 'Hours, rates, and schedule type',
+      label: t('staff.steps.workingPattern.label'),
+      description: t('staff.steps.workingPattern.description'),
       icon: IconBriefcase,
     },
     {
-      label: 'Leave Management',
-      description: 'Leave entitlements and balances',
+      label: t('staff.steps.leaveManagement.label'),
+      description: t('staff.steps.leaveManagement.description'),
       icon: IconCalendar,
     },
     {
-      label: 'Access & Permissions',
-      description: 'Role and system permissions',
+      label: t('staff.steps.accessPermissions.label'),
+      description: t('staff.steps.accessPermissions.description'),
       icon: IconShield,
     },
   ];
@@ -212,8 +229,8 @@ export function AddStaffPage() {
   const handleSubmit = async (values: CreateStaffRequest) => {
     if (!currentStore) {
       notifications.show({
-        title: 'Error',
-        message: 'No store selected. Please select a store first.',
+        title: t('common.error'),
+        message: t('staff.noStoreSelectedError'),
         color: 'red',
         icon: <IconAlertTriangle size={16} />,
       });
@@ -234,8 +251,8 @@ export function AddStaffPage() {
       const newStaff = await createStaff(finalValues);
 
       notifications.show({
-        title: 'Staff Created',
-        message: `${newStaff.fullName} has been added successfully`,
+        title: t('staff.createSuccess'),
+        message: t('staff.createSuccessMessage', {name: newStaff.fullName}),
         color: isDarkMode ? 'green.7' : 'green.9',
         icon: <IconCheck size={16} />,
       });
@@ -243,12 +260,10 @@ export function AddStaffPage() {
       navigate('/staff');
     } catch (error) {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Failed to create staff member';
+        error instanceof Error ? error.message : t('staff.createFailedDefault');
 
       notifications.show({
-        title: 'Creation Failed',
+        title: t('staff.createFailed'),
         message: errorMessage,
         color: 'red',
         icon: <IconAlertTriangle size={16} />,
@@ -264,7 +279,7 @@ export function AddStaffPage() {
         <Stack gap="xl">
           <GoBack />
           <Title order={1} ta="center">
-            Add Staff Member
+            {t('staff.addTitle')}
           </Title>
 
           <Alert
@@ -272,7 +287,7 @@ export function AddStaffPage() {
             color="orange"
             variant="light"
           >
-            No store selected. Please select a store first to add staff members.
+            {t('staff.noStoreSelectedAddError')}
           </Alert>
         </Stack>
       </Container>
@@ -287,7 +302,7 @@ export function AddStaffPage() {
         </Group>
 
         <Title order={1} ta="center">
-          Add Staff Member - {currentStore.name}
+          {t('staff.addTitleWithStore', {storeName: currentStore.name})}
         </Title>
 
         <Paper shadow="sm" p="xl" radius="md">
@@ -326,19 +341,19 @@ export function AddStaffPage() {
                   disabled={activeStep === 0}
                   onClick={handleBack}
                 >
-                  Back
+                  {t('common.back')}
                 </Button>
 
                 <Group gap="sm">
                   {activeStep < 3 ? (
-                    <Button onClick={handleNext}>Next</Button>
+                    <Button onClick={handleNext}>{t('common.next')}</Button>
                   ) : (
                     <Button
                       type="submit"
                       loading={isSubmitting}
                       leftSection={<IconCheck size={16} />}
                     >
-                      Create Staff Member
+                      {t('staff.createButton')}
                     </Button>
                   )}
                 </Group>

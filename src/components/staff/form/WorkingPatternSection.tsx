@@ -15,6 +15,7 @@ import {
   IconCalculator,
 } from '@tabler/icons-react';
 import type {UseFormReturnType} from '@mantine/form';
+import {useTranslation} from '@/hooks/useTranslation';
 import {VALIDATION_RULES, type CreateStaffRequest} from '@/services/staff';
 
 export interface WorkingPatternSectionProps {
@@ -22,6 +23,7 @@ export interface WorkingPatternSectionProps {
 }
 
 export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
+  const {t} = useTranslation();
   const isFulltime = form.values.workingPattern === 'fulltime';
 
   const formatCurrency = (amount: number) => {
@@ -64,28 +66,27 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
     <Stack gap="lg">
       <div>
         <Text size="lg" fw={600} mb="md">
-          Working Pattern & Rates
+          {t('staff.workingPattern.title')}
         </Text>
         <Text size="sm" c="dimmed">
-          Configure the staff member&apos;s working hours, schedule type, and
-          compensation rates.
+          {t('staff.workingPattern.description')}
         </Text>
       </div>
 
       <div>
         <Text size="sm" fw={500} mb="xs">
-          Working Pattern
+          {t('staff.workingPattern.patternLabel')}
         </Text>
         <SegmentedControl
           fullWidth
           value={form.values.workingPattern}
           data={[
             {
-              label: 'Full-time',
+              label: t('staff.workingPattern.fulltime'),
               value: 'fulltime',
             },
             {
-              label: 'Shift Worker',
+              label: t('staff.workingPattern.shiftWorker'),
               value: 'shift',
             },
           ]}
@@ -98,7 +99,7 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
           <Group gap="xs">
             <IconClock size={16} />
             <Text size="sm" fw={500}>
-              Working Hours
+              {t('staff.workingPattern.workingHours')}
             </Text>
           </Group>
 
@@ -109,14 +110,13 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
                 color="blue"
                 variant="light"
               >
-                Full-time staff typically work a consistent schedule with
-                standard weekly hours.
+                {t('staff.workingPattern.fulltimeDescription')}
               </Alert>
 
               <Group grow>
                 <NumberInput
                   required
-                  label="Weekly Contracted Hours"
+                  label={t('staff.workingPattern.weeklyContractedHours')}
                   placeholder="40"
                   min={VALIDATION_RULES.workingHours.fulltime.min}
                   max={VALIDATION_RULES.workingHours.fulltime.max}
@@ -124,11 +124,13 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
                 />
 
                 <NumberInput
-                  label="Default Weekly Hours"
+                  label={t('staff.workingPattern.defaultWeeklyHours')}
                   placeholder="40"
                   min={VALIDATION_RULES.workingHours.fulltime.min}
                   max={VALIDATION_RULES.workingHours.fulltime.max}
-                  description="Standard hours for scheduling"
+                  description={t(
+                    'staff.workingPattern.standardHoursDescription',
+                  )}
                   {...form.getInputProps('defaultWeeklyHours')}
                 />
               </Group>
@@ -140,17 +142,18 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
                 color="green"
                 variant="light"
               >
-                Shift workers have flexible schedules with variable weekly
-                hours.
+                {t('staff.workingPattern.shiftDescription')}
               </Alert>
 
               <NumberInput
                 required
-                label="Weekly Contracted Hours"
+                label={t('staff.workingPattern.weeklyContractedHours')}
                 placeholder="32"
                 min={VALIDATION_RULES.workingHours.shift.min}
                 max={VALIDATION_RULES.workingHours.shift.max}
-                description="Maximum contracted hours per week"
+                description={t(
+                  'staff.workingPattern.maxContractedHoursDescription',
+                )}
                 {...form.getInputProps('weeklyContractedHours')}
               />
             </>
@@ -163,20 +166,23 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
           <Group gap="xs">
             <IconCurrencyDollar size={16} />
             <Text size="sm" fw={500}>
-              Hourly Rates
+              {t('staff.workingPattern.hourlyRates')}
             </Text>
           </Group>
 
           <NumberInput
             fixedDecimalScale
             required
-            label="Base Hourly Rate"
+            label={t('staff.workingPattern.baseHourlyRate')}
             placeholder="15.00"
             min={VALIDATION_RULES.hourlyRate.min}
             max={VALIDATION_RULES.hourlyRate.max}
             decimalScale={2}
             leftSection="$"
-            description={`Minimum: ${formatCurrency(VALIDATION_RULES.hourlyRate.min)} | Maximum: ${formatCurrency(VALIDATION_RULES.hourlyRate.max)}`}
+            description={t('staff.workingPattern.rateRange', {
+              min: formatCurrency(VALIDATION_RULES.hourlyRate.min),
+              max: formatCurrency(VALIDATION_RULES.hourlyRate.max),
+            })}
             {...form.getInputProps('hourlyRate')}
           />
 
@@ -184,24 +190,23 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
 
           <div>
             <Text size="sm" fw={500} mb="sm">
-              Additional Rates (Optional)
+              {t('staff.workingPattern.additionalRates')}
             </Text>
             <Text size="xs" c="dimmed" mb="md">
-              These rates will be calculated automatically if left empty. You
-              can override them with custom values.
+              {t('staff.workingPattern.additionalRatesDescription')}
             </Text>
 
             <Group grow>
               <div>
                 <NumberInput
                   fixedDecimalScale
-                  label="Overtime Rate"
-                  placeholder="Auto-calculated"
+                  label={t('staff.workingPattern.overtimeRate')}
+                  placeholder={t('staff.workingPattern.autoCalculated')}
                   min={0}
                   max={VALIDATION_RULES.hourlyRate.max * 3}
                   decimalScale={2}
                   leftSection="$"
-                  description="1.5x base rate"
+                  description={t('staff.workingPattern.overtimeDescription')}
                   {...form.getInputProps('overtimeRate')}
                 />
                 <Group gap="xs" mt="xs">
@@ -212,7 +217,7 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
                     style={{cursor: 'pointer'}}
                     onClick={calculateOvertimeRate}
                   >
-                    Auto-calculate (1.5x base)
+                    {t('staff.workingPattern.autoCalculateOvertime')}
                   </Text>
                 </Group>
               </div>
@@ -220,13 +225,13 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
               <div>
                 <NumberInput
                   fixedDecimalScale
-                  label="Holiday Rate"
-                  placeholder="Auto-calculated"
+                  label={t('staff.workingPattern.holidayRate')}
+                  placeholder={t('staff.workingPattern.autoCalculated')}
                   min={0}
                   max={VALIDATION_RULES.hourlyRate.max * 3}
                   decimalScale={2}
                   leftSection="$"
-                  description="2.0x base rate"
+                  description={t('staff.workingPattern.holidayDescription')}
                   {...form.getInputProps('holidayRate')}
                 />
                 <Group gap="xs" mt="xs">
@@ -237,7 +242,7 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
                     style={{cursor: 'pointer'}}
                     onClick={calculateHolidayRate}
                   >
-                    Auto-calculate (2.0x base)
+                    {t('staff.workingPattern.autoCalculateHoliday')}
                   </Text>
                 </Group>
               </div>
@@ -256,30 +261,35 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
         >
           <Stack gap="xs">
             <Text size="sm" fw={500}>
-              Rate Summary
+              {t('staff.workingPattern.rateSummary')}
             </Text>
             <Group justify="space-between">
-              <Text size="sm">Base Rate:</Text>
+              <Text size="sm">{t('staff.workingPattern.baseRateLabel')}</Text>
               <Text size="sm" fw={600}>
-                {formatCurrency(form.values.hourlyRate)}/hour
+                {formatCurrency(form.values.hourlyRate)}
+                {t('staff.workingPattern.perHour')}
               </Text>
             </Group>
             <Group justify="space-between">
-              <Text size="sm">Overtime Rate:</Text>
+              <Text size="sm">
+                {t('staff.workingPattern.overtimeRateLabel')}
+              </Text>
               <Text size="sm" fw={600}>
                 {formatCurrency(
                   form.values.overtimeRate || form.values.hourlyRate * 1.5,
                 )}
-                /hour
+                {t('staff.workingPattern.perHour')}
               </Text>
             </Group>
             <Group justify="space-between">
-              <Text size="sm">Holiday Rate:</Text>
+              <Text size="sm">
+                {t('staff.workingPattern.holidayRateLabel')}
+              </Text>
               <Text size="sm" fw={600}>
                 {formatCurrency(
                   form.values.holidayRate || form.values.hourlyRate * 2,
                 )}
-                /hour
+                {t('staff.workingPattern.perHour')}
               </Text>
             </Group>
 
@@ -289,12 +299,14 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
                 pt="xs"
                 style={{borderTop: '1px solid var(--mantine-color-blue-2)'}}
               >
-                <Text size="sm">Weekly Estimate:</Text>
+                <Text size="sm">
+                  {t('staff.workingPattern.weeklyEstimateLabel')}
+                </Text>
                 <Text size="sm" fw={600}>
                   {formatCurrency(
                     form.values.hourlyRate * form.values.defaultWeeklyHours,
                   )}
-                  /week
+                  {t('staff.workingPattern.perWeek')}
                 </Text>
               </Group>
             ) : null}

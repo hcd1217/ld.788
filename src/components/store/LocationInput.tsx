@@ -2,6 +2,7 @@ import {useState, useRef, useEffect} from 'react';
 import {TextInput, Loader, Text} from '@mantine/core';
 import {IconMapPin} from '@tabler/icons-react';
 import {useLoadScript} from '@react-google-maps/api';
+import {useTranslation} from '@/hooks/useTranslation';
 
 const libraries: Array<'places'> = ['places'];
 
@@ -20,8 +21,8 @@ type LocationInputProps = {
 };
 
 export function LocationInput({
-  label = 'Address',
-  placeholder = 'Search for an address',
+  label,
+  placeholder,
   value,
   error,
   disabled,
@@ -29,11 +30,15 @@ export function LocationInput({
   onAddressChange,
   onFocus,
 }: LocationInputProps) {
+  const {t} = useTranslation();
   const [inputValue, setInputValue] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | undefined>(
     null,
   );
+
+  const defaultLabel = label || t('store.address');
+  const defaultPlaceholder = placeholder || t('store.searchForAddress');
 
   // Load Google Maps API
   const {isLoaded, loadError} = useLoadScript({
@@ -96,12 +101,10 @@ export function LocationInput({
     return (
       <TextInput
         ref={inputRef}
-        label={label}
-        placeholder={placeholder}
+        label={defaultLabel}
+        placeholder={defaultPlaceholder}
         value={inputValue}
-        error={
-          error || 'Failed to load Google Maps. Please enter address manually.'
-        }
+        error={error || t('store.failedToLoadGoogleMaps')}
         disabled={disabled}
         leftSection={<IconMapPin size={16} />}
         onChange={handleInputChange}
@@ -114,8 +117,8 @@ export function LocationInput({
     return (
       <TextInput
         disabled
-        label={label}
-        placeholder="Loading Google Maps..."
+        label={defaultLabel}
+        placeholder={t('store.loadingGoogleMaps')}
         rightSection={<Loader size="xs" />}
         leftSection={<IconMapPin size={16} />}
       />
@@ -128,8 +131,8 @@ export function LocationInput({
       <div>
         <TextInput
           ref={inputRef}
-          label={label}
-          placeholder={placeholder}
+          label={defaultLabel}
+          placeholder={defaultPlaceholder}
           value={inputValue}
           error={error}
           disabled={disabled}
@@ -138,7 +141,7 @@ export function LocationInput({
           onFocus={handleFocus}
         />
         <Text size="xs" c="orange" mt={4}>
-          Google Maps API key not configured. Autocomplete is disabled.
+          {t('store.googleMapsApiKeyNotConfigured')}
         </Text>
       </div>
     );
@@ -147,13 +150,13 @@ export function LocationInput({
   return (
     <TextInput
       ref={inputRef}
-      label={label}
-      placeholder={placeholder}
+      label={defaultLabel}
+      placeholder={defaultPlaceholder}
       value={inputValue}
       error={error}
       disabled={disabled}
       leftSection={<IconMapPin size={16} />}
-      description="Start typing to see address suggestions"
+      description={t('store.startTypingForSuggestions')}
       onChange={handleInputChange}
       onFocus={handleFocus}
     />

@@ -19,7 +19,7 @@ import {
   IconCheck,
 } from '@tabler/icons-react';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-// Import {useTranslation} from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {
   useStoreActions,
   useCurrentStore,
@@ -55,7 +55,7 @@ const defaultOperatingHours: StoreConfigFormValues['operatingHours'] = {
 export function StoreConfigPage() {
   const navigate = useNavigate();
   const [showAlert, setShowAlert] = useState(false);
-  // Const {t} = useTranslation();
+  const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
 
   const currentStore = useCurrentStore();
@@ -76,21 +76,21 @@ export function StoreConfigPage() {
     validate: {
       name(value) {
         if (!value || value.trim().length < 2) {
-          return 'Store name must be at least 2 characters long';
+          return t('validation.storeNameRequired');
         }
 
         return undefined;
       },
       address(value) {
         if (!value || value.trim().length < 5) {
-          return 'Store address must be at least 5 characters long';
+          return t('validation.storeAddressRequired');
         }
 
         return undefined;
       },
       location(value) {
         if (!value?.lat || !value.lng) {
-          return 'Store location is required';
+          return t('validation.storeLocationRequired');
         }
 
         return undefined;
@@ -118,8 +118,8 @@ export function StoreConfigPage() {
       const newStore = await createStore(storeData);
 
       notifications.show({
-        title: 'Store Created',
-        message: `Store "${newStore.name}" has been created successfully`,
+        title: t('store.storeCreated'),
+        message: t('store.storeCreatedMessage', {name: newStore.name}),
         color: isDarkMode ? 'green.7' : 'green.9',
         icon: <IconCheck size={16} />,
       });
@@ -131,12 +131,14 @@ export function StoreConfigPage() {
       navigate('/stores');
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Failed to create store';
+        error instanceof Error
+          ? error.message
+          : t('errors.failedToCreateStore');
 
       setShowAlert(true);
 
       notifications.show({
-        title: 'Store Creation Failed',
+        title: t('store.storeCreationFailed'),
         message: errorMessage,
         color: 'red',
         icon: <IconAlertCircle size={16} />,
@@ -176,13 +178,13 @@ export function StoreConfigPage() {
               size="sm"
               onClick={() => navigate('/stores')}
             >
-              View All Stores
+              {t('store.viewAllStores')}
             </Button>
           ) : null}
         </Group>
 
         <Title order={1} ta="center">
-          Create New Store
+          {t('store.createNewStore')}
         </Title>
 
         <Transition
@@ -234,7 +236,7 @@ export function StoreConfigPage() {
                             clearError();
                           }}
                         >
-                          {error || 'Please check the form for errors'}
+                          {error || t('common.checkFormErrors')}
                         </Alert>
                       )}
                     </Transition>
@@ -248,7 +250,7 @@ export function StoreConfigPage() {
                           navigate('/home');
                         }}
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </Button>
 
                       <Button
@@ -256,7 +258,7 @@ export function StoreConfigPage() {
                         leftSection={<IconBuildingStore size={16} />}
                         disabled={isLoading}
                       >
-                        Create Store
+                        {t('store.createStore')}
                       </Button>
                     </Group>
                   </Stack>

@@ -1,6 +1,7 @@
 import {Stack, Group, Text, Switch, Paper} from '@mantine/core';
 import {TimeInput} from '@mantine/dates';
 import {IconClock} from '@tabler/icons-react';
+import {useTranslation} from '@/hooks/useTranslation';
 
 export type DaySchedule =
   | {
@@ -17,14 +18,14 @@ type OperatingHoursInputProps = {
   readonly disabled?: boolean;
 };
 
-const daysOfWeek = [
-  {key: 'monday', label: 'Monday'},
-  {key: 'tuesday', label: 'Tuesday'},
-  {key: 'wednesday', label: 'Wednesday'},
-  {key: 'thursday', label: 'Thursday'},
-  {key: 'friday', label: 'Friday'},
-  {key: 'saturday', label: 'Saturday'},
-  {key: 'sunday', label: 'Sunday'},
+const daysOfWeekKeys = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
 ];
 
 // Const timeOptions = Array.from({length: 24 * 4}, (_, i) => {
@@ -39,6 +40,8 @@ export function OperatingHoursInput({
   onChange,
   disabled = false,
 }: OperatingHoursInputProps) {
+  const {t} = useTranslation();
+
   const handleDayToggle = (day: string) => {
     const currentDay = value[day] || {open: '09:00', close: '17:00'};
     const isClosed = 'closed' in currentDay && currentDay.closed;
@@ -91,7 +94,7 @@ export function OperatingHoursInput({
 
   return (
     <Stack gap="md">
-      {daysOfWeek.map(({key, label}) => {
+      {daysOfWeekKeys.map((key) => {
         const daySchedule = value[key] || {open: '09:00', close: '17:00'};
         const isClosed = 'closed' in daySchedule && daySchedule.closed;
 
@@ -100,13 +103,13 @@ export function OperatingHoursInput({
             <Group justify="space-between" wrap="nowrap">
               <Group gap="md" style={{flex: 1}}>
                 <Text w={100} fw={500}>
-                  {label}
+                  {t(`store.${key}`)}
                 </Text>
 
                 <Switch
                   checked={!isClosed}
                   disabled={disabled}
-                  label={isClosed ? 'Closed' : 'Open'}
+                  label={isClosed ? t('store.closed') : t('store.open')}
                   size="sm"
                   onChange={() => {
                     handleDayToggle(key);
@@ -122,14 +125,14 @@ export function OperatingHoursInput({
                     size="sm"
                     w={100}
                     leftSection={<IconClock size={14} />}
-                    aria-label={`${label} opening time`}
+                    aria-label={`${t(`store.${key}`)} opening time`}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                       handleTimeChange(key, 'open', event.target.value);
                     }}
                   />
 
                   <Text size="sm" c="dimmed">
-                    to
+                    {t('store.to')}
                   </Text>
 
                   <TimeInput
@@ -138,7 +141,7 @@ export function OperatingHoursInput({
                     size="sm"
                     w={100}
                     leftSection={<IconClock size={14} />}
-                    aria-label={`${label} closing time`}
+                    aria-label={`${t(`store.${key}`)} closing time`}
                     onChange={(event) => {
                       handleTimeChange(key, 'close', event.target.value);
                     }}
@@ -151,8 +154,7 @@ export function OperatingHoursInput({
       })}
 
       <Text size="xs" c="dimmed" ta="center" mt="md">
-        💡 Tip: Toggle the switch to mark a day as closed, or set specific
-        opening hours for each day.
+        {t('store.operatingHoursTip')}
       </Text>
     </Stack>
   );

@@ -24,6 +24,7 @@ import {
 import CryptoJS from 'crypto-js';
 import QRCode from 'qrcode';
 import type {UseFormReturnType} from '@mantine/form';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useCurrentStore} from '@/stores/useStoreConfigStore';
 import type {CreateStaffRequest} from '@/services/staff';
 
@@ -32,6 +33,7 @@ export interface BasicInfoSectionProps {
 }
 
 export function BasicInfoSection({form}: BasicInfoSectionProps) {
+  const {t} = useTranslation();
   const [previewQrCode, setPreviewQrCode] = useState<string>('');
   const [isGeneratingQr, setIsGeneratingQr] = useState(false);
   const currentStore = useCurrentStore();
@@ -93,18 +95,18 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
     <Stack gap="lg">
       <div>
         <Text size="lg" fw={600} mb="md">
-          Basic Information
+          {t('staff.basicInfo.title')}
         </Text>
         <Text size="sm" c="dimmed">
-          Enter the staff member&apos;s personal and contact information.
+          {t('staff.basicInfo.description')}
         </Text>
       </div>
 
       <Stack gap="md">
         <TextInput
           required
-          label="Full Name"
-          placeholder="Enter full name"
+          label={t('staff.basicInfo.fullName')}
+          placeholder={t('staff.basicInfo.fullNamePlaceholder')}
           leftSection={<IconUser size={16} />}
           {...form.getInputProps('fullName')}
         />
@@ -112,8 +114,8 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
         <Group grow>
           <TextInput
             required
-            label="Email Address"
-            placeholder="Enter email address"
+            label={t('staff.basicInfo.email')}
+            placeholder={t('staff.basicInfo.emailPlaceholder')}
             leftSection={<IconMail size={16} />}
             type="email"
             {...form.getInputProps('email')}
@@ -121,8 +123,8 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
 
           <TextInput
             required
-            label="Phone Number"
-            placeholder="Enter phone number"
+            label={t('staff.basicInfo.phone')}
+            placeholder={t('staff.basicInfo.phonePlaceholder')}
             leftSection={<IconPhone size={16} />}
             {...form.getInputProps('phoneNumber')}
           />
@@ -135,11 +137,10 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
 
           <div>
             <Text size="md" fw={600} mb="sm">
-              Clock-in Access (Preview)
+              {t('staff.basicInfo.clockInPreview.title')}
             </Text>
             <Text size="sm" c="dimmed" mb="md">
-              This is a preview of what will be generated for the staff member.
-              The actual URL will be created when you save the staff member.
+              {t('staff.basicInfo.clockInPreview.description')}
             </Text>
           </div>
 
@@ -156,13 +157,12 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
                 color="blue"
                 variant="light"
               >
-                The clock-in URL and QR code will be automatically generated
-                when you create the staff member.
+                {t('staff.basicInfo.clockInPreview.autoGenerateMessage')}
               </Alert>
 
               <div>
                 <Text size="sm" fw={500} mb="xs">
-                  Clock-in URL Preview:
+                  {t('staff.basicInfo.clockInPreview.urlLabel')}
                 </Text>
                 <Code block>{previewUrl}</Code>
 
@@ -182,7 +182,9 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
                       mt="xs"
                       onClick={copy}
                     >
-                      {copied ? 'Copied!' : 'Copy Preview URL'}
+                      {copied
+                        ? t('staff.basicInfo.clockInPreview.copied')
+                        : t('staff.basicInfo.clockInPreview.copyButton')}
                     </Button>
                   )}
                 </CopyButton>
@@ -191,23 +193,22 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
               {previewQrCode ? (
                 <div>
                   <Text size="sm" fw={500} mb="xs">
-                    QR Code Preview:
+                    {t('staff.basicInfo.clockInPreview.qrLabel')}
                   </Text>
                   <Group align="center">
                     <Image
                       src={previewQrCode}
-                      alt="Preview QR Code"
+                      alt={t('staff.basicInfo.clockInPreview.qrAlt')}
                       width={120}
                       height={120}
                       style={{border: '1px solid var(--mantine-color-gray-3)'}}
                     />
                     <Stack gap="xs" style={{flex: 1}}>
                       <Text size="xs" c="dimmed">
-                        Staff members can scan this QR code to quickly access
-                        their clock-in page.
+                        {t('staff.basicInfo.clockInPreview.qrDescription1')}
                       </Text>
                       <Text size="xs" c="dimmed">
-                        The QR code can be printed or shared digitally.
+                        {t('staff.basicInfo.clockInPreview.qrDescription2')}
                       </Text>
                     </Stack>
                   </Group>
@@ -218,7 +219,7 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
                 <Group gap="xs">
                   <IconQrcode size={16} />
                   <Text size="xs" c="dimmed">
-                    Generating QR code preview...
+                    {t('staff.basicInfo.clockInPreview.generatingQr')}
                   </Text>
                 </Group>
               ) : null}

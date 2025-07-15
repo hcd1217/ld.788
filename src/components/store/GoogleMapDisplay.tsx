@@ -1,7 +1,7 @@
-import {useState} from 'react';
 import {Box, Text, Alert} from '@mantine/core';
 import {IconAlertCircle} from '@tabler/icons-react';
 import {GoogleMap, useLoadScript, Marker} from '@react-google-maps/api';
+import {useTranslation} from '@/hooks/useTranslation';
 
 const libraries: Array<'places'> = ['places'];
 
@@ -33,7 +33,8 @@ export function GoogleMapDisplay({
   address,
   zoom = 15,
 }: GoogleMapDisplayProps) {
-  const [mapError] = useState<string | undefined>(undefined);
+  const {t} = useTranslation();
+  // Const [mapError] = useState<string | undefined>(undefined);
 
   const {isLoaded, loadError} = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
@@ -43,7 +44,7 @@ export function GoogleMapDisplay({
   if (loadError) {
     return (
       <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
-        Failed to load Google Maps. Please check your API configuration.
+        {t('store.failedToLoadMapApi')}
       </Alert>
     );
   }
@@ -61,7 +62,7 @@ export function GoogleMapDisplay({
         }}
       >
         <Text size="sm" c="dimmed">
-          Loading map...
+          {t('store.loadingMap')}
         </Text>
       </Box>
     );
@@ -74,28 +75,28 @@ export function GoogleMapDisplay({
         color="orange"
         variant="light"
       >
-        Google Maps API key not configured. Map display is disabled.
+        {t('store.mapApiKeyNotConfigured')}
         {address ? (
           <Text size="sm" mt="xs">
-            Selected address: {address}
+            {t('store.selectedAddress')}: {address}
           </Text>
         ) : null}
       </Alert>
     );
   }
 
-  if (mapError) {
-    return (
-      <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
-        {mapError}
-        {address ? (
-          <Text size="sm" mt="xs">
-            Selected address: {address}
-          </Text>
-        ) : null}
-      </Alert>
-    );
-  }
+  // If (mapError) {
+  //   return (
+  //     <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
+  //       {/* {mapError} */}
+  //       {address ? (
+  //         <Text size="sm" mt="xs">
+  //           {t('store.selectedAddress')}: {address}
+  //         </Text>
+  //       ) : null}
+  //     </Alert>
+  //   );
+  // }
 
   return (
     <Box>
@@ -111,7 +112,10 @@ export function GoogleMapDisplay({
         zoom={zoom}
         options={mapOptions}
       >
-        <Marker position={location} title={address || 'Selected location'} />
+        <Marker
+          position={location}
+          title={address || t('store.selectedLocation')}
+        />
       </GoogleMap>
     </Box>
   );

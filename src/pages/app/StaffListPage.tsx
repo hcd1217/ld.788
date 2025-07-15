@@ -26,6 +26,7 @@ import {
   IconUserMinus,
   IconUserCheck,
 } from '@tabler/icons-react';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {
   useStaffList,
@@ -43,6 +44,7 @@ import type {Staff} from '@/services/staff';
 
 export function StaffListPage() {
   const navigate = useNavigate();
+  const {t} = useTranslation();
   const [deleteModalOpened, {open: openDeleteModal, close: closeDeleteModal}] =
     useDisclosure(false);
   const [staffToDelete, setStaffToDelete] = useState<Staff | undefined>(
@@ -103,8 +105,10 @@ export function StaffListPage() {
       await deleteStaff(staffToDelete.id);
 
       notifications.show({
-        title: 'Staff Deleted',
-        message: `${staffToDelete.fullName} has been deleted successfully`,
+        title: t('staff.deleteSuccess'),
+        message: t('staff.deleteSuccessMessage', {
+          name: staffToDelete.fullName,
+        }),
         color: isDarkMode ? 'green.7' : 'green.9',
         icon: <IconCheck size={16} />,
       });
@@ -113,12 +117,10 @@ export function StaffListPage() {
       setStaffToDelete(undefined);
     } catch (error) {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Failed to delete staff member';
+        error instanceof Error ? error.message : t('staff.deleteFailedDefault');
 
       notifications.show({
-        title: 'Delete Failed',
+        title: t('staff.deleteFailed'),
         message: errorMessage,
         color: 'red',
         icon: <IconAlertTriangle size={16} />,
@@ -131,16 +133,20 @@ export function StaffListPage() {
       if (staffMember.status === 'active') {
         await deactivateStaff(staffMember.id);
         notifications.show({
-          title: 'Staff Deactivated',
-          message: `${staffMember.fullName} has been deactivated`,
+          title: t('staff.deactivateSuccess'),
+          message: t('staff.deactivateSuccessMessage', {
+            name: staffMember.fullName,
+          }),
           color: 'orange',
           icon: <IconUserMinus size={16} />,
         });
       } else {
         await activateStaff(staffMember.id);
         notifications.show({
-          title: 'Staff Activated',
-          message: `${staffMember.fullName} has been activated`,
+          title: t('staff.activateSuccess'),
+          message: t('staff.activateSuccessMessage', {
+            name: staffMember.fullName,
+          }),
           color: isDarkMode ? 'green.7' : 'green.9',
           icon: <IconUserCheck size={16} />,
         });
@@ -149,10 +155,10 @@ export function StaffListPage() {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : 'Failed to update staff status';
+          : t('staff.updateStatusFailedDefault');
 
       notifications.show({
-        title: 'Update Failed',
+        title: t('staff.updateFailed'),
         message: errorMessage,
         color: 'red',
         icon: <IconAlertTriangle size={16} />,
@@ -171,8 +177,8 @@ export function StaffListPage() {
   const handleAddStaff = () => {
     if (!currentStore) {
       notifications.show({
-        title: 'No Store Selected',
-        message: 'Please select a store before adding staff members',
+        title: t('staff.noStoreSelected'),
+        message: t('staff.selectStoreBeforeAdding'),
         color: 'orange',
         icon: <IconAlertTriangle size={16} />,
       });
@@ -188,7 +194,7 @@ export function StaffListPage() {
         <Stack gap="xl">
           <GoBack />
           <Title order={1} ta="center">
-            Staff Management
+            {t('staff.title')}
           </Title>
 
           <Alert
@@ -197,7 +203,7 @@ export function StaffListPage() {
             variant="light"
           >
             <Stack gap="md">
-              <Text>Please select a store to manage staff members.</Text>
+              <Text>{t('staff.selectStoreToManage')}</Text>
               <StoreSelector />
             </Stack>
           </Alert>
@@ -212,7 +218,7 @@ export function StaffListPage() {
         <Stack gap="xl">
           <GoBack />
           <Title order={1} ta="center">
-            Staff Management
+            {t('staff.title')}
           </Title>
 
           <Alert
@@ -220,8 +226,7 @@ export function StaffListPage() {
             color="orange"
             variant="light"
           >
-            No stores found. Please create a store first to manage staff
-            members.
+            {t('staff.noStoresFound')}
           </Alert>
         </Stack>
       </Container>
@@ -240,19 +245,19 @@ export function StaffListPage() {
                 leftSection={<IconPlus size={16} />}
                 onClick={handleAddStaff}
               >
-                Add Staff
+                {t('staff.addStaff')}
               </Button>
             </Group>
           </Group>
 
           <Title order={1} ta="center">
-            Staff Management - {currentStore.name}
+            {t('staff.titleWithStore', {storeName: currentStore.name})}
           </Title>
 
           {/* Search and Filters */}
           <Group gap="md" align="flex-end">
             <TextInput
-              placeholder="Search by name, email, or phone..."
+              placeholder={t('staff.searchPlaceholder')}
               value={searchValue}
               leftSection={<IconSearch size={16} />}
               style={{flex: 1}}
@@ -262,12 +267,12 @@ export function StaffListPage() {
             />
 
             <Select
-              label="Status"
+              label={t('common.status')}
               value={filters.status}
               data={[
-                {value: 'all', label: 'All Status'},
-                {value: 'active', label: 'Active'},
-                {value: 'inactive', label: 'Inactive'},
+                {value: 'all', label: t('staff.allStatus')},
+                {value: 'active', label: t('common.active')},
+                {value: 'inactive', label: t('common.inactive')},
               ]}
               w={120}
               onChange={(value) => {
@@ -282,13 +287,13 @@ export function StaffListPage() {
             />
 
             <Select
-              label="Role"
+              label={t('common.role')}
               value={filters.role}
               data={[
-                {value: 'all', label: 'All Roles'},
-                {value: 'admin', label: 'Admin'},
-                {value: 'manager', label: 'Manager'},
-                {value: 'member', label: 'Member'},
+                {value: 'all', label: t('staff.allRoles')},
+                {value: 'admin', label: t('staff.admin')},
+                {value: 'manager', label: t('staff.manager')},
+                {value: 'member', label: t('staff.member')},
               ]}
               w={120}
               onChange={(value) => {
@@ -303,13 +308,13 @@ export function StaffListPage() {
             />
 
             <Select
-              label="Sort By"
+              label={t('staff.sortBy')}
               value={filters.sortBy}
               data={[
-                {value: 'name', label: 'Name'},
-                {value: 'email', label: 'Email'},
-                {value: 'role', label: 'Role'},
-                {value: 'createdAt', label: 'Created'},
+                {value: 'name', label: t('common.name')},
+                {value: 'email', label: t('auth.email')},
+                {value: 'role', label: t('common.role')},
+                {value: 'createdAt', label: t('common.created')},
               ]}
               w={120}
               onChange={(value) => {
@@ -326,7 +331,12 @@ export function StaffListPage() {
             <ActionIcon
               variant="light"
               size="lg"
-              title={`Sort ${filters.sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
+              title={t('staff.sortTooltip', {
+                order:
+                  filters.sortOrder === 'asc'
+                    ? t('staff.descending')
+                    : t('staff.ascending'),
+              })}
               onClick={() => {
                 handleFiltersChange({
                   sortOrder: filters.sortOrder === 'asc' ? 'desc' : 'asc',
@@ -337,7 +347,7 @@ export function StaffListPage() {
             </ActionIcon>
 
             <Button variant="light" onClick={resetFilters}>
-              Reset
+              {t('staff.reset')}
             </Button>
           </Group>
 
@@ -385,7 +395,10 @@ export function StaffListPage() {
           {/* Summary */}
           <Group justify="center">
             <Text size="sm" c="dimmed">
-              Showing {staff.length} of {pagination.total} staff members
+              {t('staff.showingCount', {
+                current: staff.length,
+                total: pagination.total,
+              })}
             </Text>
           </Group>
         </Stack>
@@ -395,13 +408,13 @@ export function StaffListPage() {
       <Modal
         centered
         opened={deleteModalOpened}
-        title="Delete Staff Member"
+        title={t('staff.deleteModalTitle')}
         onClose={closeDeleteModal}
       >
         <Stack gap="md">
           <Text>
-            Are you sure you want to delete {staffToDelete?.fullName}? This
-            action cannot be undone.
+            {t('staff.deleteConfirmation', {name: staffToDelete?.fullName})}{' '}
+            {t('common.cannotBeUndone')}
           </Text>
 
           <Alert
@@ -409,16 +422,15 @@ export function StaffListPage() {
             color="red"
             variant="light"
           >
-            Warning: This will permanently remove all staff data and clock-in
-            history.
+            {t('staff.deleteWarning')}
           </Alert>
 
           <Flex gap="sm" justify="flex-end">
             <Button variant="light" onClick={closeDeleteModal}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button color="red" onClick={confirmDeleteStaff}>
-              Delete Staff
+              {t('staff.deleteStaff')}
             </Button>
           </Flex>
         </Stack>

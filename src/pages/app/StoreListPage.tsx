@@ -28,7 +28,7 @@ import {
   IconCheck,
 } from '@tabler/icons-react';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-// Import {useTranslation} from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {
   useStores,
   useStoreLoading,
@@ -46,7 +46,7 @@ export function StoreListPage() {
   const [storeToDelete, setStoreToDelete] = useState<Store | undefined>(
     undefined,
   );
-  // Const {t} = useTranslation();
+  const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
 
   const stores = useStores();
@@ -80,8 +80,8 @@ export function StoreListPage() {
       await deleteStore(storeToDelete.id);
 
       notifications.show({
-        title: 'Store Deleted',
-        message: `Store "${storeToDelete.name}" has been deleted successfully`,
+        title: t('store.storeDeleted'),
+        message: t('store.storeDeletedMessage', {name: storeToDelete.name}),
         color: isDarkMode ? 'green.7' : 'green.9',
         icon: <IconCheck size={16} />,
       });
@@ -90,10 +90,12 @@ export function StoreListPage() {
       setStoreToDelete(undefined);
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Failed to delete store';
+        error instanceof Error
+          ? error.message
+          : t('errors.failedToDeleteStore');
 
       notifications.show({
-        title: 'Delete Failed',
+        title: t('store.storeDeleteFailed'),
         message: errorMessage,
         color: 'red',
         icon: <IconAlertTriangle size={16} />,
@@ -104,8 +106,8 @@ export function StoreListPage() {
   const handleSelectStore = (store: Store) => {
     setCurrentStore(store);
     notifications.show({
-      title: 'Store Selected',
-      message: `"${store.name}" is now your current store`,
+      title: t('store.storeSelected'),
+      message: t('store.storeSelectedMessage', {name: store.name}),
       color: isDarkMode ? 'blue.7' : 'blue.9',
       icon: <IconBuildingStore size={16} />,
     });
@@ -129,10 +131,10 @@ export function StoreListPage() {
       return true;
     });
 
-    if (openDays.length === 0) return 'Closed all week';
-    if (openDays.length === 7) return 'Open 7 days a week';
+    if (openDays.length === 0) return t('store.closedAllWeek');
+    if (openDays.length === 7) return t('store.open7Days');
 
-    return `Open ${openDays.length} days a week`;
+    return t('store.openDaysPerWeek', {count: openDays.length});
   };
 
   const renderStoreCard = (store: Store) => {
@@ -158,7 +160,7 @@ export function StoreListPage() {
                 </Text>
                 {isSelected ? (
                   <Badge size="sm" color="blue" variant="filled">
-                    Current
+                    {t('store.current')}
                   </Badge>
                 ) : null}
               </Group>
@@ -182,7 +184,7 @@ export function StoreListPage() {
               color="red"
               variant="light"
               size="sm"
-              title="Delete store"
+              title={t('store.deleteStoreTooltip')}
               onClick={() => {
                 handleDeleteStore(store);
               }}
@@ -197,7 +199,8 @@ export function StoreListPage() {
             style={{borderTop: '1px solid var(--mantine-color-gray-3)'}}
           >
             <Text size="xs" c="dimmed">
-              Created {new Date(store.createdAt).toLocaleDateString()}
+              {t('common.created')}{' '}
+              {new Date(store.createdAt).toLocaleDateString()}
             </Text>
 
             {!isSelected && (
@@ -208,7 +211,7 @@ export function StoreListPage() {
                   handleSelectStore(store);
                 }}
               >
-                Select Store
+                {t('store.selectStore')}
               </Button>
             )}
           </Group>
@@ -227,12 +230,12 @@ export function StoreListPage() {
               leftSection={<IconPlus size={16} />}
               onClick={() => navigate('/store-config')}
             >
-              Create New Store
+              {t('store.createNewStore')}
             </Button>
           </Group>
 
           <Title order={1} ta="center">
-            Store Management
+            {t('store.title')}
           </Title>
 
           {error ? (
@@ -263,10 +266,10 @@ export function StoreListPage() {
                   />
                   <div>
                     <Title order={3} c="dimmed">
-                      No stores found
+                      {t('store.noStoresFound')}
                     </Title>
                     <Text c="dimmed" mt="xs">
-                      Create your first store to get started
+                      {t('store.createFirstStoreDescription')}
                     </Text>
                   </div>
                   <Button
@@ -274,7 +277,7 @@ export function StoreListPage() {
                     mt="md"
                     onClick={() => navigate('/store-config')}
                   >
-                    Create Your First Store
+                    {t('store.createFirstStore')}
                   </Button>
                 </Stack>
               </Card>
@@ -291,13 +294,12 @@ export function StoreListPage() {
       <Modal
         centered
         opened={deleteModalOpened}
-        title="Delete Store"
+        title={t('store.confirmDeleteTitle')}
         onClose={closeDeleteModal}
       >
         <Stack gap="md">
           <Text>
-            Are you sure you want to delete &quot;{storeToDelete?.name}&quot;?
-            This action cannot be undone.
+            {t('store.confirmDeleteMessage', {name: storeToDelete?.name || ''})}
           </Text>
 
           <Alert
@@ -305,16 +307,15 @@ export function StoreListPage() {
             color="red"
             variant="light"
           >
-            Warning: All staff members associated with this store will also be
-            affected.
+            {t('store.deleteWarning')}
           </Alert>
 
           <Flex gap="sm" justify="flex-end">
             <Button variant="light" onClick={closeDeleteModal}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button color="red" onClick={confirmDeleteStore}>
-              Delete Store
+              {t('store.deleteStore')}
             </Button>
           </Flex>
         </Stack>

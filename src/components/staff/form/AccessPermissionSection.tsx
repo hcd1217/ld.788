@@ -19,6 +19,7 @@ import {
   IconInfoCircle,
 } from '@tabler/icons-react';
 import type {UseFormReturnType} from '@mantine/form';
+import {useTranslation} from '@/hooks/useTranslation';
 import {permissionMatrix, type CreateStaffRequest} from '@/services/staff';
 
 export interface AccessPermissionSectionProps {
@@ -26,26 +27,27 @@ export interface AccessPermissionSectionProps {
 }
 
 export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
+  const {t} = useTranslation();
+
   const roleData = [
     {
       value: 'member',
-      label: 'Member',
-      description: 'Basic staff access - can view own profile and clock in',
+      label: t('staff.accessPermissions.memberRole'),
+      description: t('staff.accessPermissions.memberDescription'),
       icon: IconUser,
       color: 'green',
     },
     {
       value: 'manager',
-      label: 'Manager',
-      description: 'Supervisor access - can manage staff and view reports',
+      label: t('staff.accessPermissions.managerRole'),
+      description: t('staff.accessPermissions.managerDescription'),
       icon: IconUsers,
       color: 'blue',
     },
     {
       value: 'admin',
-      label: 'Administrator',
-      description:
-        'Full access - can manage everything including store settings',
+      label: t('staff.accessPermissions.adminRole'),
+      description: t('staff.accessPermissions.adminDescription'),
       icon: IconShieldCheck,
       color: 'red',
     },
@@ -64,31 +66,40 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
 
   const getPermissionDescription = (permission: string) => {
     const descriptions: Record<string, string> = {
-      manage_store: 'Configure store settings, operating hours, and location',
-      manage_staff: 'Add, edit, and remove staff members',
-      view_all_reports: 'Access all business reports and analytics',
-      manage_permissions: 'Modify user roles and permissions',
-      manage_schedule: 'Create and edit staff schedules',
-      view_all_profiles: 'View detailed information of all staff members',
-      clock_in: 'Access to clock in and out of shifts',
-      view_reports: 'View reports relevant to managed teams',
-      view_own_profile: 'View and edit personal profile information',
-      view_schedule: 'View assigned shifts and schedule',
+      manage_store: t('staff.accessPermissions.permissions.manage_store'),
+      manage_staff: t('staff.accessPermissions.permissions.manage_staff'),
+      view_all_reports: t(
+        'staff.accessPermissions.permissions.view_all_reports',
+      ),
+      manage_permissions: t(
+        'staff.accessPermissions.permissions.manage_permissions',
+      ),
+      manage_schedule: t('staff.accessPermissions.permissions.manage_schedule'),
+      view_all_profiles: t(
+        'staff.accessPermissions.permissions.view_all_profiles',
+      ),
+      clock_in: t('staff.accessPermissions.permissions.clock_in'),
+      view_reports: t('staff.accessPermissions.permissions.view_reports'),
+      view_own_profile: t(
+        'staff.accessPermissions.permissions.view_own_profile',
+      ),
+      view_schedule: t('staff.accessPermissions.permissions.view_schedule'),
     };
 
-    return descriptions[permission] || 'Standard system access';
+    return (
+      descriptions[permission] ||
+      t('staff.accessPermissions.permissions.default')
+    );
   };
 
   return (
     <Stack gap="lg">
       <div>
         <Text size="lg" fw={600} mb="md">
-          Access & Permissions
+          {t('staff.accessPermissions.title')}
         </Text>
         <Text size="sm" c="dimmed">
-          Choose the appropriate role for this staff member. Each role has
-          predefined permissions that control what the user can access and do in
-          the system.
+          {t('staff.accessPermissions.description')}
         </Text>
       </div>
 
@@ -97,14 +108,14 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
           <Group gap="xs">
             <IconShield size={16} />
             <Text size="sm" fw={500}>
-              Role Selection
+              {t('staff.accessPermissions.roleSelection')}
             </Text>
           </Group>
 
           <Select
             required
-            label="Staff Role"
-            placeholder="Select a role"
+            label={t('staff.accessPermissions.staffRole')}
+            placeholder={t('staff.accessPermissions.selectRole')}
             data={roleData.map((role) => ({
               value: role.value,
               label: role.label,
@@ -130,7 +141,9 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
           <Group gap="xs">
             <IconUserCheck size={16} />
             <Text size="sm" fw={500}>
-              Role Permissions ({permissions.length})
+              {t('staff.accessPermissions.rolePermissions', {
+                count: permissions.length,
+              })}
             </Text>
           </Group>
 
@@ -172,7 +185,7 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
               color="orange"
               variant="light"
             >
-              No permissions defined for the selected role.
+              {t('staff.accessPermissions.noPermissionsDefined')}
             </Alert>
           )}
         </Stack>
@@ -187,7 +200,7 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
       >
         <Stack gap="md">
           <Text size="sm" fw={500}>
-            Role Comparison
+            {t('staff.accessPermissions.roleComparison')}
           </Text>
 
           <SimpleGrid cols={{base: 1, sm: 3}} spacing="md">
@@ -219,7 +232,7 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
                     {permissionMatrix[
                       role.value as keyof typeof permissionMatrix
                     ]?.length || 0}{' '}
-                    permissions
+                    {t('staff.accessPermissions.permissionsCount')}
                   </Text>
                 </Stack>
               </Paper>
@@ -233,9 +246,8 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
             style={{fontSize: '0.8rem'}}
           >
             <Text size="xs">
-              <strong>Note:</strong> Permissions are automatically assigned
-              based on the selected role. Custom permission management will be
-              available in future updates.
+              <strong>{t('staff.accessPermissions.noteTitle')}</strong>{' '}
+              {t('staff.accessPermissions.noteText')}
             </Text>
           </Alert>
         </Stack>
