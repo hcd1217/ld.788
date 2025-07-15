@@ -55,7 +55,7 @@ export function StoreConfigForm({
         disabled={isLoading}
         onClick={() => {
           form.reset();
-          navigate('/home');
+          navigate(-1);
         }}
       >
         {t('common.cancel')}
