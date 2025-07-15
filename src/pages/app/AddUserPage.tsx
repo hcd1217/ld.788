@@ -11,6 +11,8 @@ import {
   Title,
   TextInput,
   PasswordInput,
+  Box,
+  Card,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
@@ -29,7 +31,6 @@ import {
 import {clientService} from '@/services/client';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
 import {useAppStore} from '@/stores/useAppStore';
-import {FormContainer} from '@/components/form/FormContainer';
 import {GoBack} from '@/components/common/GoBack';
 
 type AddUserFormValues = {
@@ -146,125 +147,138 @@ export function AddUserPage() {
   }
 
   return (
-    <Container size="sm" mt="xl">
+    <Container fluid mt="xl">
       <Stack gap="xl">
-        <Group justify="space-between">
-          <GoBack />
+        <Container size="xl" px="md">
+          <Group justify="space-between">
+            <GoBack />
 
-          {/* Import Users Button - Hidden on mobile */}
-          <Button
-            variant="light"
-            size="sm"
-            color="green"
-            leftSection={<IconFileSpreadsheet size={16} />}
-            visibleFrom="sm"
-            onClick={() => navigate('/import-users')}
-          >
-            {t('common.importUsers')}
-          </Button>
-        </Group>
+            {/* Import Users Button - Hidden on mobile */}
+            <Button
+              variant="light"
+              size="sm"
+              color="green"
+              leftSection={<IconFileSpreadsheet size={16} />}
+              visibleFrom="sm"
+              onClick={() => navigate('/import-users')}
+            >
+              {t('common.importUsers')}
+            </Button>
+          </Group>
+        </Container>
 
         <Title order={1} ta="center">
           {t('auth.addUserTitle')}
         </Title>
 
-        <Transition
-          mounted
-          transition="slide-up"
-          duration={400}
-          timingFunction="ease"
+        <Box
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            width: '100%',
+            padding: '0 16px',
+          }}
         >
-          {() => (
-            <FormContainer>
-              <LoadingOverlay
-                visible={isLoading}
-                overlayProps={{blur: 2}}
-                transitionProps={{duration: 300}}
-              />
-              <form onSubmit={form.onSubmit(handleSubmit)}>
-                <Stack gap="lg">
-                  <FirstNameAndLastNameInForm
-                    form={form}
-                    isLoading={isLoading}
-                    setShowAlert={setShowAlert}
+          <Box style={{maxWidth: '600px', width: '100%'}}>
+            <Transition
+              mounted
+              transition="slide-up"
+              duration={400}
+              timingFunction="ease"
+            >
+              {() => (
+                <Card shadow="sm" padding="xl" radius="md">
+                  <LoadingOverlay
+                    visible={isLoading}
+                    overlayProps={{blur: 2}}
+                    transitionProps={{duration: 300}}
                   />
+                  <form onSubmit={form.onSubmit(handleSubmit)}>
+                    <Stack gap="lg">
+                      <FirstNameAndLastNameInForm
+                        form={form}
+                        isLoading={isLoading}
+                        setShowAlert={setShowAlert}
+                      />
 
-                  <TextInput
-                    type="email"
-                    autoComplete="email"
-                    placeholder={t('auth.email')}
-                    error={form.errors.email}
-                    disabled={isLoading}
-                    {...form.getInputProps('email')}
-                    onFocus={() => {
-                      setShowAlert(false);
-                    }}
-                  />
-
-                  <TextInput
-                    placeholder={t('auth.userName')}
-                    error={form.errors.userName}
-                    disabled={isLoading}
-                    {...form.getInputProps('userName')}
-                    onFocus={() => {
-                      setShowAlert(false);
-                    }}
-                  />
-
-                  <PasswordInput
-                    required
-                    autoComplete="new-password"
-                    placeholder={t('auth.password')}
-                    error={form.errors.password}
-                    disabled={isLoading}
-                    {...form.getInputProps('password')}
-                    onFocus={() => {
-                      setShowAlert(false);
-                    }}
-                  />
-
-                  <PasswordInput
-                    required
-                    autoComplete="new-password"
-                    placeholder={t('auth.confirmPassword')}
-                    error={form.errors.confirmPassword}
-                    disabled={isLoading}
-                    {...form.getInputProps('confirmPassword')}
-                    onFocus={() => {
-                      setShowAlert(false);
-                    }}
-                  />
-
-                  <Transition
-                    mounted={Boolean(
-                      showAlert && Object.keys(form.errors).length > 0,
-                    )}
-                    transition="fade"
-                    duration={300}
-                    timingFunction="ease"
-                  >
-                    {(styles) => (
-                      <Alert
-                        withCloseButton
-                        style={styles}
-                        icon={<IconAlertCircle size={16} />}
-                        color="red"
-                        variant="light"
-                        onClose={() => {
+                      <TextInput
+                        type="email"
+                        autoComplete="email"
+                        placeholder={t('auth.email')}
+                        error={form.errors.email}
+                        disabled={isLoading}
+                        {...form.getInputProps('email')}
+                        onFocus={() => {
                           setShowAlert(false);
                         }}
-                      >
-                        Please check the form for errors
-                      </Alert>
-                    )}
-                  </Transition>
+                      />
 
-                  <Button type="submit">{t('auth.addUser')}</Button>
-                </Stack>
-              </form>
-            </FormContainer>
-          )}
-        </Transition>
+                      <TextInput
+                        placeholder={t('auth.userName')}
+                        error={form.errors.userName}
+                        disabled={isLoading}
+                        {...form.getInputProps('userName')}
+                        onFocus={() => {
+                          setShowAlert(false);
+                        }}
+                      />
+
+                      <PasswordInput
+                        required
+                        autoComplete="new-password"
+                        placeholder={t('auth.password')}
+                        error={form.errors.password}
+                        disabled={isLoading}
+                        {...form.getInputProps('password')}
+                        onFocus={() => {
+                          setShowAlert(false);
+                        }}
+                      />
+
+                      <PasswordInput
+                        required
+                        autoComplete="new-password"
+                        placeholder={t('auth.confirmPassword')}
+                        error={form.errors.confirmPassword}
+                        disabled={isLoading}
+                        {...form.getInputProps('confirmPassword')}
+                        onFocus={() => {
+                          setShowAlert(false);
+                        }}
+                      />
+
+                      <Transition
+                        mounted={Boolean(
+                          showAlert && Object.keys(form.errors).length > 0,
+                        )}
+                        transition="fade"
+                        duration={300}
+                        timingFunction="ease"
+                      >
+                        {(styles) => (
+                          <Alert
+                            withCloseButton
+                            style={styles}
+                            icon={<IconAlertCircle size={16} />}
+                            color="red"
+                            variant="light"
+                            onClose={() => {
+                              setShowAlert(false);
+                            }}
+                          >
+                            Please check the form for errors
+                          </Alert>
+                        )}
+                      </Transition>
+
+                      <Button type="submit">{t('auth.addUser')}</Button>
+                    </Stack>
+                  </form>
+                </Card>
+              )}
+            </Transition>
+          </Box>
+        </Box>
       </Stack>
     </Container>
   );

@@ -8,6 +8,7 @@ import {
   Button,
   Divider,
   rem,
+  Box,
 } from '@mantine/core';
 import {
   IconHome,
@@ -114,112 +115,135 @@ export function MorePage() {
   }
 
   return (
-    <Container size="sm" mt="xl">
-      <Card shadow="sm" padding="lg" radius="md">
-        <Title order={1} mb="lg">
-          {t('common.more')}
-        </Title>
+    <Container fluid mt="xl">
+      <Stack gap="xl">
+        <Box
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            width: '100%',
+            padding: '0 16px',
+          }}
+        >
+          <Box style={{maxWidth: '600px', width: '100%'}}>
+            <Card shadow="sm" padding="lg" radius="md">
+              <Title order={1} mb="lg">
+                {t('common.more')}
+              </Title>
 
-        <Card withBorder p="md" mb="lg" bg={isDarkMode ? 'dark.6' : 'gray.0'}>
-          <Group>
-            <IconUser size={20} />
-            <div>
-              <Text fw={500}>{user.email}</Text>
-              <Text size="sm" c="dimmed">
-                {t('common.account')}
-              </Text>
-            </div>
-          </Group>
-        </Card>
+              <Card
+                withBorder
+                p="md"
+                mb="lg"
+                bg={isDarkMode ? 'dark.6' : 'gray.0'}
+              >
+                <Group>
+                  <IconUser size={20} />
+                  <div>
+                    <Text fw={500}>{user.email}</Text>
+                    <Text size="sm" c="dimmed">
+                      {t('common.account')}
+                    </Text>
+                  </div>
+                </Group>
+              </Card>
 
-        <Stack gap="md">
-          <div>
-            <Text fw={600} mb="sm">
-              Navigation
-            </Text>
-            <Stack gap="xs">
-              {menuItems.map((item) => (
-                <Card
-                  key={item.title}
-                  withBorder
-                  p="md"
-                  style={{cursor: 'pointer'}}
-                  onClick={item.onClick}
+              <Stack gap="md">
+                <div>
+                  <Text fw={600} mb="sm">
+                    Navigation
+                  </Text>
+                  <Stack gap="xs">
+                    {menuItems.map((item) => (
+                      <Card
+                        key={item.title}
+                        withBorder
+                        p="md"
+                        style={{cursor: 'pointer'}}
+                        onClick={item.onClick}
+                      >
+                        <Group justify="space-between">
+                          <Group gap="sm">
+                            <item.icon
+                              size={20}
+                              style={{
+                                color: `var(--mantine-color-${item.color}-6)`,
+                              }}
+                            />
+                            <div>
+                              <Text fw={500}>{item.title}</Text>
+                              <Text size="sm" c="dimmed">
+                                {item.description}
+                              </Text>
+                            </div>
+                          </Group>
+                          <IconExternalLink
+                            size={16}
+                            style={{color: 'var(--mantine-color-gray-5)'}}
+                          />
+                        </Group>
+                      </Card>
+                    ))}
+                  </Stack>
+                </div>
+
+                <Divider />
+
+                <div>
+                  <Text fw={600} mb="sm">
+                    Utilities
+                  </Text>
+                  <Stack gap="xs">
+                    {utilityItems
+                      .filter((item) => !item.devOnly || import.meta.env.DEV)
+                      .map((item) => (
+                        <Card
+                          key={item.title}
+                          withBorder
+                          p="md"
+                          style={{cursor: 'pointer'}}
+                          onClick={item.onClick}
+                        >
+                          <Group justify="space-between">
+                            <Group gap="sm">
+                              <item.icon
+                                size={20}
+                                style={{
+                                  color: `var(--mantine-color-${item.color}-6)`,
+                                }}
+                              />
+                              <div>
+                                <Text fw={500}>{item.title}</Text>
+                                <Text size="sm" c="dimmed">
+                                  {item.description}
+                                </Text>
+                              </div>
+                            </Group>
+                            <IconExternalLink
+                              size={16}
+                              style={{color: 'var(--mantine-color-gray-5)'}}
+                            />
+                          </Group>
+                        </Card>
+                      ))}
+                  </Stack>
+                </div>
+
+                <Divider />
+                <Button
+                  fullWidth
+                  color="red"
+                  variant="light"
+                  onClick={handleLogout}
                 >
-                  <Group justify="space-between">
-                    <Group gap="sm">
-                      <item.icon
-                        size={20}
-                        style={{
-                          color: `var(--mantine-color-${item.color}-6)`,
-                        }}
-                      />
-                      <div>
-                        <Text fw={500}>{item.title}</Text>
-                        <Text size="sm" c="dimmed">
-                          {item.description}
-                        </Text>
-                      </div>
-                    </Group>
-                    <IconExternalLink
-                      size={16}
-                      style={{color: 'var(--mantine-color-gray-5)'}}
-                    />
-                  </Group>
-                </Card>
-              ))}
-            </Stack>
-          </div>
-
-          <Divider />
-
-          <div>
-            <Text fw={600} mb="sm">
-              Utilities
-            </Text>
-            <Stack gap="xs">
-              {utilityItems
-                .filter((item) => !item.devOnly || import.meta.env.DEV)
-                .map((item) => (
-                  <Card
-                    key={item.title}
-                    withBorder
-                    p="md"
-                    style={{cursor: 'pointer'}}
-                    onClick={item.onClick}
-                  >
-                    <Group justify="space-between">
-                      <Group gap="sm">
-                        <item.icon
-                          size={20}
-                          style={{
-                            color: `var(--mantine-color-${item.color}-6)`,
-                          }}
-                        />
-                        <div>
-                          <Text fw={500}>{item.title}</Text>
-                          <Text size="sm" c="dimmed">
-                            {item.description}
-                          </Text>
-                        </div>
-                      </Group>
-                      <IconExternalLink
-                        size={16}
-                        style={{color: 'var(--mantine-color-gray-5)'}}
-                      />
-                    </Group>
-                  </Card>
-                ))}
-            </Stack>
-          </div>
-
-          <Divider />
-          <Button fullWidth color="red" variant="light" onClick={handleLogout}>
-            <IconLogout size={rem(16)} />
-            <Text ml="xs">{t('common.logout')}</Text>
-          </Button>
-        </Stack>
-      </Card>
+                  <IconLogout size={rem(16)} />
+                  <Text ml="xs">{t('common.logout')}</Text>
+                </Button>
+              </Stack>
+            </Card>
+          </Box>
+        </Box>
+      </Stack>
     </Container>
   );
 }

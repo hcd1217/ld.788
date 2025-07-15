@@ -191,17 +191,17 @@ const routeObjects: RouteObject[] = [
         children: [
           {path: 'user-management', Component: UserManagementPage},
           {path: 'user/:userId', Component: UserDetailPage},
-          {path: 'stores', Component: StoreListPage},
-          {path: 'store-config', Component: StoreConfigPage},
-          {path: 'staff', Component: StaffListPage},
-          {path: 'staff/add', Component: AddStaffPage},
-          {path: 'staff/edit/:staffId', Component: EditStaffPage},
           {
             path: '',
             Component: PCOnlyLayout,
             children: [
               {path: 'import-users', Component: ImportUsersPage},
               {path: 'role-management', Component: RoleManagementPage},
+              {path: 'stores', Component: StoreListPage},
+              {path: 'store-config', Component: StoreConfigPage},
+              {path: 'staff', Component: StaffListPage},
+              {path: 'staff/add', Component: AddStaffPage},
+              {path: 'staff/edit/:staffId', Component: EditStaffPage},
               {
                 path: 'permission-management',
                 Component: PermissionManagementPage,

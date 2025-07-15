@@ -10,6 +10,7 @@ import {
   LoadingOverlay,
   Alert,
   Transition,
+  Box,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
@@ -27,7 +28,6 @@ import {
   useStoreError,
 } from '@/stores/useStoreConfigStore';
 import {GoBack} from '@/components/common/GoBack';
-import {FormContainer} from '@/components/form/FormContainer';
 import {StoreConfigForm} from '@/components/store/StoreConfigForm';
 import type {DaySchedule} from '@/components/store/OperatingHoursInput';
 import type {CreateStoreRequest} from '@/services/store';
@@ -167,106 +167,117 @@ export function StoreConfigPage() {
   };
 
   return (
-    <Container size="md" mt="xl">
+    <Container fluid mt="xl">
       <Stack gap="xl">
-        <Group justify="space-between">
-          <GoBack />
+        <Container size="xl" px="md">
+          <Group justify="space-between">
+            <GoBack />
 
-          {currentStore ? (
-            <Button
-              variant="light"
-              size="sm"
-              onClick={() => navigate('/stores')}
-            >
-              {t('store.viewAllStores')}
-            </Button>
-          ) : null}
-        </Group>
+            {currentStore ? (
+              <Button
+                variant="light"
+                size="sm"
+                onClick={() => navigate('/stores')}
+              >
+                {t('store.viewAllStores')}
+              </Button>
+            ) : null}
+          </Group>
+        </Container>
 
         <Title order={1} ta="center">
           {t('store.createNewStore')}
         </Title>
 
-        <Transition
-          mounted
-          transition="slide-up"
-          duration={400}
-          timingFunction="ease"
+        <Box
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            width: '100%',
+            padding: '0 16px',
+          }}
         >
-          {() => (
-            <Card shadow="sm" padding="xl" radius="md">
-              <FormContainer>
-                <LoadingOverlay
-                  visible={isLoading}
-                  overlayProps={{blur: 2}}
-                  transitionProps={{duration: 300}}
-                />
+          <Box style={{maxWidth: '600px', width: '100%'}}>
+            <Transition
+              mounted
+              transition="slide-up"
+              duration={400}
+              timingFunction="ease"
+            >
+              {() => (
+                <Card shadow="sm" padding="xl" radius="md">
+                  <LoadingOverlay
+                    visible={isLoading}
+                    overlayProps={{blur: 2}}
+                    transitionProps={{duration: 300}}
+                  />
 
-                <form onSubmit={form.onSubmit(handleSubmit)}>
-                  <Stack gap="lg">
-                    <StoreConfigForm
-                      form={form}
-                      isLoading={isLoading}
-                      onLocationChange={handleLocationChange}
-                      onAddressChange={handleAddressChange}
-                      onOperatingHoursChange={handleOperatingHoursChange}
-                      onFocus={() => {
-                        setShowAlert(false);
-                      }}
-                    />
+                  <form onSubmit={form.onSubmit(handleSubmit)}>
+                    <Stack gap="lg">
+                      <StoreConfigForm
+                        form={form}
+                        isLoading={isLoading}
+                        onLocationChange={handleLocationChange}
+                        onAddressChange={handleAddressChange}
+                        onOperatingHoursChange={handleOperatingHoursChange}
+                        onFocus={() => {
+                          setShowAlert(false);
+                        }}
+                      />
 
-                    <Transition
-                      mounted={Boolean(
-                        showAlert &&
-                          (error || Object.keys(form.errors).length > 0),
-                      )}
-                      transition="fade"
-                      duration={300}
-                      timingFunction="ease"
-                    >
-                      {(styles) => (
-                        <Alert
-                          withCloseButton
-                          style={styles}
-                          icon={<IconAlertCircle size={16} />}
-                          color="red"
+                      <Transition
+                        mounted={Boolean(
+                          showAlert &&
+                            (error || Object.keys(form.errors).length > 0),
+                        )}
+                        transition="fade"
+                        duration={300}
+                        timingFunction="ease"
+                      >
+                        {(styles) => (
+                          <Alert
+                            withCloseButton
+                            style={styles}
+                            icon={<IconAlertCircle size={16} />}
+                            color="red"
+                            variant="light"
+                            onClose={() => {
+                              setShowAlert(false);
+                              clearError();
+                            }}
+                          >
+                            {error || t('common.checkFormErrors')}
+                          </Alert>
+                        )}
+                      </Transition>
+
+                      <Group justify="flex-end" mt="xl">
+                        <Button
                           variant="light"
-                          onClose={() => {
-                            setShowAlert(false);
-                            clearError();
+                          disabled={isLoading}
+                          onClick={() => {
+                            form.reset();
+                            navigate('/home');
                           }}
                         >
-                          {error || t('common.checkFormErrors')}
-                        </Alert>
-                      )}
-                    </Transition>
+                          {t('common.cancel')}
+                        </Button>
 
-                    <Group justify="flex-end" mt="xl">
-                      <Button
-                        variant="light"
-                        disabled={isLoading}
-                        onClick={() => {
-                          form.reset();
-                          navigate('/home');
-                        }}
-                      >
-                        {t('common.cancel')}
-                      </Button>
-
-                      <Button
-                        type="submit"
-                        leftSection={<IconBuildingStore size={16} />}
-                        disabled={isLoading}
-                      >
-                        {t('store.createStore')}
-                      </Button>
-                    </Group>
-                  </Stack>
-                </form>
-              </FormContainer>
-            </Card>
-          )}
-        </Transition>
+                        <Button
+                          type="submit"
+                          leftSection={<IconBuildingStore size={16} />}
+                          disabled={isLoading}
+                        >
+                          {t('store.createStore')}
+                        </Button>
+                      </Group>
+                    </Stack>
+                  </form>
+                </Card>
+              )}
+            </Transition>
+          </Box>
+        </Box>
       </Stack>
     </Container>
   );

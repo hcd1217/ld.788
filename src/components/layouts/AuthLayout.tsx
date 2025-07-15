@@ -245,12 +245,12 @@ function buildNavigationItems(t: TFunction, user?: User) {
       path: '/home',
     },
     {
-      label: 'Store Management',
+      label: t('common.storeManagement'),
       icon: IconBuildingStore,
       path: '/stores',
     },
     {
-      label: 'Staff Management',
+      label: t('common.staffManagement'),
       icon: IconUsersGroup,
       path: '/staff',
     },

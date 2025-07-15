@@ -31,6 +31,7 @@ import {
   IconBriefcase,
 } from '@tabler/icons-react';
 import type {Staff} from '@/services/staff';
+import {useTranslation} from '@/hooks/useTranslation';
 
 export interface StaffListProps {
   readonly staff: readonly Staff[];
@@ -45,6 +46,7 @@ export function StaffList({
   onDelete,
   onToggleStatus,
 }: StaffListProps) {
+  const {t} = useTranslation();
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
   const [qrModalOpened, {open: openQrModal, close: closeQrModal}] =
     useDisclosure(false);
@@ -102,12 +104,15 @@ export function StaffList({
   };
 
   const formatWorkingPattern = (staff: Staff) => {
-    const pattern = staff.workingPattern === 'fulltime' ? 'Full-time' : 'Shift';
+    const pattern =
+      staff.workingPattern === 'fulltime'
+        ? t('staff.fulltime')
+        : t('staff.shift');
     const hours =
       staff.workingPattern === 'fulltime'
-        ? `${staff.defaultWeeklyHours || staff.weeklyContractedHours}h/week`
-        : `${staff.weeklyContractedHours}h/week`;
-    return `${pattern} (${hours})`;
+        ? staff.defaultWeeklyHours || staff.weeklyContractedHours
+        : staff.weeklyContractedHours;
+    return `${pattern} (${t('staff.hoursPerWeek', {hours})})`;
   };
 
   if (staff.length === 0) {
@@ -117,10 +122,10 @@ export function StaffList({
           <IconUser size={48} color="var(--mantine-color-gray-5)" />
           <div>
             <Text size="lg" fw={600} c="dimmed">
-              No staff members found
+              {t('staff.noStaffFound')}
             </Text>
             <Text c="dimmed" mt="xs">
-              Add your first staff member to get started
+              {t('staff.addFirstStaff')}
             </Text>
           </div>
         </Stack>
@@ -135,7 +140,10 @@ export function StaffList({
         <Stack gap="md">
           <Group justify="space-between">
             <Text size="sm" c="dimmed">
-              {staff.length} staff member{staff.length === 1 ? '' : 's'}
+              {staff.length}{' '}
+              {staff.length === 1
+                ? t('staff.staffMember')
+                : t('staff.staffMembers')}
             </Text>
             {!isMobile && (
               <Button
@@ -145,7 +153,9 @@ export function StaffList({
                   setViewMode(viewMode === 'table' ? 'cards' : 'table');
                 }}
               >
-                {viewMode === 'table' ? 'Card View' : 'Table View'}
+                {viewMode === 'table'
+                  ? t('staff.cardView')
+                  : t('staff.tableView')}
               </Button>
             )}
           </Group>
@@ -174,7 +184,7 @@ export function StaffList({
                           color={getRoleBadgeColor(staffMember.role)}
                           variant="light"
                         >
-                          {staffMember.role}
+                          {t(`staff.${staffMember.role}`)}
                         </Badge>
                       </div>
                     </Group>
@@ -210,7 +220,8 @@ export function StaffList({
                       <IconBriefcase size={14} />
                       <Text size="xs">
                         {formatWorkingPattern(staffMember)} •{' '}
-                        {formatCurrency(staffMember.hourlyRate)}/hr
+                        {formatCurrency(staffMember.hourlyRate)}
+                        {t('staff.perHour')}
                       </Text>
                     </Group>
                   </Stack>
@@ -221,7 +232,7 @@ export function StaffList({
                     style={{borderTop: '1px solid var(--mantine-color-gray-3)'}}
                   >
                     <Group gap="xs">
-                      <Tooltip label="View QR Code">
+                      <Tooltip label={t('staff.viewQrCode')}>
                         <ActionIcon
                           variant="light"
                           color="blue"
@@ -237,7 +248,11 @@ export function StaffList({
                       <CopyButton value={staffMember.clockInUrl}>
                         {({copied, copy}) => (
                           <Tooltip
-                            label={copied ? 'Copied!' : 'Copy clock-in URL'}
+                            label={
+                              copied
+                                ? t('staff.copied')
+                                : t('staff.copyClockInUrl')
+                            }
                           >
                             <ActionIcon
                               variant="light"
@@ -264,7 +279,7 @@ export function StaffList({
                           onEdit(staffMember);
                         }}
                       >
-                        Edit
+                        {t('staff.edit')}
                       </Button>
                       <ActionIcon
                         color="red"
@@ -288,7 +303,7 @@ export function StaffList({
         <Modal
           centered
           opened={qrModalOpened}
-          title={`QR Code - ${selectedStaff?.fullName}`}
+          title={t('staff.qrCodeTitle', {name: selectedStaff?.fullName})}
           onClose={closeQrModal}
         >
           {selectedStaff ? (
@@ -345,7 +360,10 @@ export function StaffList({
       <Stack gap="md">
         <Group justify="space-between">
           <Text size="sm" c="dimmed">
-            {staff.length} staff member{staff.length === 1 ? '' : 's'}
+            {staff.length}{' '}
+            {staff.length === 1
+              ? t('staff.staffMember')
+              : t('staff.staffMembers')}
           </Text>
           <Button
             variant="light"
@@ -354,7 +372,7 @@ export function StaffList({
               setViewMode('cards');
             }}
           >
-            Card View
+            {t('staff.cardView')}
           </Button>
         </Group>
 
@@ -362,148 +380,178 @@ export function StaffList({
           <Table highlightOnHover>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Staff Member</Table.Th>
-                <Table.Th>Contact</Table.Th>
-                <Table.Th>Role & Status</Table.Th>
-                <Table.Th>Working Pattern</Table.Th>
-                <Table.Th>Hourly Rate</Table.Th>
-                <Table.Th>Clock-in</Table.Th>
-                <Table.Th>Actions</Table.Th>
+                <Table.Th>{t('staff.staffMemberHeader')}</Table.Th>
+                <Table.Th>{t('staff.contact')}</Table.Th>
+                <Table.Th>{t('staff.roleStatus')}</Table.Th>
+                <Table.Th>{t('staff.workingPatternLabel')}</Table.Th>
+                <Table.Th>{t('staff.hourlyRate')}</Table.Th>
+                <Table.Th>{t('staff.clockIn')}</Table.Th>
+                <Table.Th>{t('staff.actions')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {staff.map((staffMember) => (
-                <Table.Tr key={staffMember.id}>
-                  <Table.Td>
-                    <Group gap="sm">
-                      <Avatar size={32} radius="xl" color="blue">
-                        {staffMember.fullName.charAt(0).toUpperCase()}
-                      </Avatar>
-                      <div>
-                        <Text fw={600} size="sm">
-                          {staffMember.fullName}
-                        </Text>
-                        <Text size="xs" c="dimmed">
-                          Joined{' '}
-                          {new Date(staffMember.createdAt).toLocaleDateString()}
-                        </Text>
-                      </div>
-                    </Group>
-                  </Table.Td>
+              {staff.map((staffMember) => {
+                let label = '';
+                switch (staffMember.status) {
+                  case 'active': {
+                    label = t('staff.active');
+                    break;
+                  }
 
-                  <Table.Td>
-                    <Stack gap={2}>
-                      <Group gap="xs">
-                        <IconMail size={12} />
-                        <Text size="xs">{staffMember.email}</Text>
+                  case 'inactive': {
+                    label = t('staff.inactive');
+                    break;
+                  }
+
+                  case 'deleted': {
+                    label = t('staff.deleted');
+                    break;
+                  }
+
+                  default: {
+                    break;
+                  }
+                }
+
+                return (
+                  <Table.Tr key={staffMember.id}>
+                    <Table.Td>
+                      <Group gap="sm">
+                        <Avatar size={32} radius="xl" color="blue">
+                          {staffMember.fullName.charAt(0).toUpperCase()}
+                        </Avatar>
+                        <div>
+                          <Text fw={600} size="sm">
+                            {staffMember.fullName}
+                          </Text>
+                          <Text size="xs" c="dimmed">
+                            {t('staff.joined')}{' '}
+                            {new Date(
+                              staffMember.createdAt,
+                            ).toLocaleDateString()}
+                          </Text>
+                        </div>
                       </Group>
-                      <Group gap="xs">
-                        <IconPhone size={12} />
-                        <Text size="xs">{staffMember.phoneNumber}</Text>
-                      </Group>
-                    </Stack>
-                  </Table.Td>
+                    </Table.Td>
 
-                  <Table.Td>
-                    <Stack gap="xs">
-                      <Badge
-                        size="sm"
-                        color={getRoleBadgeColor(staffMember.role)}
-                        variant="light"
-                      >
-                        {staffMember.role}
-                      </Badge>
-                      <Switch
-                        size="sm"
-                        checked={staffMember.status === 'active'}
-                        color={
-                          staffMember.status === 'active' ? 'green' : 'orange'
-                        }
-                        label={staffMember.status}
-                        onChange={() => {
-                          onToggleStatus(staffMember);
-                        }}
-                      />
-                    </Stack>
-                  </Table.Td>
+                    <Table.Td>
+                      <Stack gap={2}>
+                        <Group gap="xs">
+                          <IconMail size={12} />
+                          <Text size="xs">{staffMember.email}</Text>
+                        </Group>
+                        <Group gap="xs">
+                          <IconPhone size={12} />
+                          <Text size="xs">{staffMember.phoneNumber}</Text>
+                        </Group>
+                      </Stack>
+                    </Table.Td>
 
-                  <Table.Td>
-                    <Text size="sm">{formatWorkingPattern(staffMember)}</Text>
-                  </Table.Td>
-
-                  <Table.Td>
-                    <Text size="sm" fw={600}>
-                      {formatCurrency(staffMember.hourlyRate)}
-                    </Text>
-                  </Table.Td>
-
-                  <Table.Td>
-                    <Group gap="xs">
-                      <Tooltip label="View QR Code">
-                        <ActionIcon
-                          variant="light"
-                          color="blue"
+                    <Table.Td>
+                      <Stack gap="xs">
+                        <Badge
                           size="sm"
-                          onClick={() => {
-                            handleShowQrCode(staffMember);
-                          }}
+                          color={getRoleBadgeColor(staffMember.role)}
+                          variant="light"
                         >
-                          <IconQrcode size={14} />
-                        </ActionIcon>
-                      </Tooltip>
+                          {t(`staff.${staffMember.role}`)}
+                        </Badge>
+                        <Switch
+                          size="sm"
+                          checked={staffMember.status === 'active'}
+                          color={
+                            staffMember.status === 'active' ? 'green' : 'orange'
+                          }
+                          label={label}
+                          onChange={() => {
+                            onToggleStatus(staffMember);
+                          }}
+                        />
+                      </Stack>
+                    </Table.Td>
 
-                      <CopyButton value={staffMember.clockInUrl}>
-                        {({copied, copy}) => (
-                          <Tooltip label={copied ? 'Copied!' : 'Copy URL'}>
-                            <ActionIcon
-                              variant="light"
-                              color={copied ? 'green' : 'gray'}
-                              size="sm"
-                              onClick={copy}
+                    <Table.Td>
+                      <Text size="sm">{formatWorkingPattern(staffMember)}</Text>
+                    </Table.Td>
+
+                    <Table.Td>
+                      <Text size="sm" fw={600}>
+                        {formatCurrency(staffMember.hourlyRate)}
+                      </Text>
+                    </Table.Td>
+
+                    <Table.Td>
+                      <Group gap="xs">
+                        <Tooltip label={t('staff.viewQrCode')}>
+                          <ActionIcon
+                            variant="light"
+                            color="blue"
+                            size="sm"
+                            onClick={() => {
+                              handleShowQrCode(staffMember);
+                            }}
+                          >
+                            <IconQrcode size={14} />
+                          </ActionIcon>
+                        </Tooltip>
+
+                        <CopyButton value={staffMember.clockInUrl}>
+                          {({copied, copy}) => (
+                            <Tooltip
+                              label={
+                                copied ? t('staff.copied') : t('staff.copyUrl')
+                              }
                             >
-                              {copied ? (
-                                <IconCheck size={14} />
-                              ) : (
-                                <IconCopy size={14} />
-                              )}
-                            </ActionIcon>
-                          </Tooltip>
-                        )}
-                      </CopyButton>
-                    </Group>
-                  </Table.Td>
+                              <ActionIcon
+                                variant="light"
+                                color={copied ? 'green' : 'gray'}
+                                size="sm"
+                                onClick={copy}
+                              >
+                                {copied ? (
+                                  <IconCheck size={14} />
+                                ) : (
+                                  <IconCopy size={14} />
+                                )}
+                              </ActionIcon>
+                            </Tooltip>
+                          )}
+                        </CopyButton>
+                      </Group>
+                    </Table.Td>
 
-                  <Table.Td>
-                    <Group gap="xs">
-                      <Tooltip label="Edit staff">
-                        <ActionIcon
-                          variant="light"
-                          color="blue"
-                          size="sm"
-                          onClick={() => {
-                            onEdit(staffMember);
-                          }}
-                        >
-                          <IconEdit size={14} />
-                        </ActionIcon>
-                      </Tooltip>
+                    <Table.Td>
+                      <Group gap="xs">
+                        <Tooltip label={t('staff.editStaff')}>
+                          <ActionIcon
+                            variant="light"
+                            color="blue"
+                            size="sm"
+                            onClick={() => {
+                              onEdit(staffMember);
+                            }}
+                          >
+                            <IconEdit size={14} />
+                          </ActionIcon>
+                        </Tooltip>
 
-                      <Tooltip label="Delete staff">
-                        <ActionIcon
-                          variant="light"
-                          color="red"
-                          size="sm"
-                          onClick={() => {
-                            onDelete(staffMember);
-                          }}
-                        >
-                          <IconTrash size={14} />
-                        </ActionIcon>
-                      </Tooltip>
-                    </Group>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
+                        <Tooltip label={t('staff.deleteStaffTooltip')}>
+                          <ActionIcon
+                            variant="light"
+                            color="red"
+                            size="sm"
+                            onClick={() => {
+                              onDelete(staffMember);
+                            }}
+                          >
+                            <IconTrash size={14} />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Group>
+                    </Table.Td>
+                  </Table.Tr>
+                );
+              })}
             </Table.Tbody>
           </Table>
         </ScrollArea>
@@ -513,7 +561,7 @@ export function StaffList({
       <Modal
         centered
         opened={qrModalOpened}
-        title={`QR Code - ${selectedStaff?.fullName}`}
+        title={t('staff.qrCodeTitle', {name: selectedStaff?.fullName})}
         onClose={closeQrModal}
       >
         {selectedStaff ? (

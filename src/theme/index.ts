@@ -33,30 +33,40 @@ export const theme = createTheme({
   cursorType: 'pointer',
   components: {
     PasswordInput: PasswordInput.extend({
-      styles() {
-        return {
+      styles(_theme, props) {
+        const styles = {
           input: {
             border: 'none',
             borderBottom: '1px solid var(--input-border-color)',
             borderRadius: 0,
-            padding: 0,
+            padding: '0',
           },
           innerInput: {
             padding: 0,
           },
         };
+        if (props.leftSection) {
+          styles.input.padding = '.5rem 2rem';
+        }
+
+        return styles;
       },
     }),
     TextInput: TextInput.extend({
-      styles() {
-        return {
+      styles(_theme, props) {
+        const styles = {
           input: {
             border: 'none',
             borderBottom: '1px solid var(--input-border-color)',
             borderRadius: 0,
-            padding: '12px 0',
+            padding: '0',
           },
         };
+        if (props.leftSection) {
+          styles.input.padding = '.5rem 2rem';
+        }
+
+        return styles;
       },
     }),
     Button: Button.extend({

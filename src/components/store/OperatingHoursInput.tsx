@@ -26,7 +26,7 @@ const daysOfWeekKeys = [
   'friday',
   'saturday',
   'sunday',
-];
+] as const;
 
 // Const timeOptions = Array.from({length: 24 * 4}, (_, i) => {
 //   const hour = Math.floor(i / 4);
@@ -103,7 +103,7 @@ export function OperatingHoursInput({
             <Group justify="space-between" wrap="nowrap">
               <Group gap="md" style={{flex: 1}}>
                 <Text w={100} fw={500}>
-                  {t(`store.${key}`)}
+                  {t(`store.${key}` as const)}
                 </Text>
 
                 <Switch
@@ -125,7 +125,7 @@ export function OperatingHoursInput({
                     size="sm"
                     w={100}
                     leftSection={<IconClock size={14} />}
-                    aria-label={`${t(`store.${key}`)} opening time`}
+                    aria-label={`${t(`store.${key}` as const)} opening time`}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                       handleTimeChange(key, 'open', event.target.value);
                     }}
@@ -141,7 +141,7 @@ export function OperatingHoursInput({
                     size="sm"
                     w={100}
                     leftSection={<IconClock size={14} />}
-                    aria-label={`${t(`store.${key}`)} closing time`}
+                    aria-label={`${t(`store.${key}` as const)} closing time`}
                     onChange={(event) => {
                       handleTimeChange(key, 'close', event.target.value);
                     }}
