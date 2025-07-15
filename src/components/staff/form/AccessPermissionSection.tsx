@@ -6,7 +6,6 @@ import {
   Alert,
   Paper,
   Badge,
-  List,
   ThemeIcon,
   SimpleGrid,
 } from '@mantine/core';
@@ -23,7 +22,6 @@ import type {UseFormReturnType} from '@mantine/form';
 import {
   permissionMatrix,
   type CreateStaffRequest,
-  type Staff,
 } from '@/services/staff';
 
 export interface AccessPermissionSectionProps {
@@ -141,7 +139,7 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
 
           {permissions.length > 0 ? (
             <SimpleGrid cols={{base: 1, sm: 2}} spacing="md">
-              {permissions.map((permission, index) => (
+              {permissions.map((permission) => (
                 <Paper
                   key={permission}
                   withBorder

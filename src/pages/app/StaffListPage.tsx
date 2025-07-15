@@ -14,26 +14,19 @@ import {
   Text,
   Flex,
   Pagination,
-  Badge,
-  Switch,
   ActionIcon,
-  Tooltip,
 } from '@mantine/core';
 import {useDisclosure, useDebouncedValue} from '@mantine/hooks';
 import {notifications} from '@mantine/notifications';
 import {
   IconPlus,
-  IconUsers,
   IconSearch,
   IconAlertTriangle,
   IconCheck,
-  IconTrash,
   IconUserMinus,
   IconUserCheck,
-  IconUserPlus,
 } from '@tabler/icons-react';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-import {useTranslation} from '@/hooks/useTranslation';
 import {
   useStaffList,
   useStaffLoading,
@@ -52,10 +45,9 @@ export function StaffListPage() {
   const navigate = useNavigate();
   const [deleteModalOpened, {open: openDeleteModal, close: closeDeleteModal}] =
     useDisclosure(false);
-  const [staffToDelete, setStaffToDelete] = useState<Staff | undefined>(null);
+  const [staffToDelete, setStaffToDelete] = useState<Staff | undefined>(undefined);
   const [searchValue, setSearchValue] = useState('');
   const [debouncedSearch] = useDebouncedValue(searchValue, 300);
-  const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
 
   const staff = useStaffList();
@@ -116,7 +108,7 @@ export function StaffListPage() {
       });
 
       closeDeleteModal();
-      setStaffToDelete(null);
+      setStaffToDelete(undefined);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -277,7 +269,11 @@ export function StaffListPage() {
               ]}
               w={120}
               onChange={(value) => {
-                handleFiltersChange({status: value});
+                if (!value) {
+                  handleFiltersChange({status: 'all'});
+                } else {
+                  handleFiltersChange({status: value as 'active' | 'inactive' | 'all'});
+                }
               }}
             />
 
@@ -292,7 +288,11 @@ export function StaffListPage() {
               ]}
               w={120}
               onChange={(value) => {
-                handleFiltersChange({role: value});
+                if (!value) {
+                  handleFiltersChange({role: 'all'});
+                } else {
+                  handleFiltersChange({role: value as 'admin' | 'manager' | 'member' | 'all'});
+                }
               }}
             />
 
@@ -307,7 +307,11 @@ export function StaffListPage() {
               ]}
               w={120}
               onChange={(value) => {
-                handleFiltersChange({sortBy: value});
+                if (!value) {
+                  handleFiltersChange({sortBy: 'createdAt'});
+                } else {
+                  handleFiltersChange({sortBy: value as 'name' | 'email' | 'role' | 'createdAt'});
+                }
               }}
             />
 

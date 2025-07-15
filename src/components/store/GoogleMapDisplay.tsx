@@ -11,10 +11,6 @@ const mapContainerStyle = {
   borderRadius: '8px',
 };
 
-const defaultCenter = {
-  lat: 37.7749, // San Francisco
-  lng: -122.4194,
-};
 
 const mapOptions: google.maps.MapOptions = {
   disableDefaultUI: false,
@@ -38,16 +34,13 @@ export function GoogleMapDisplay({
   address,
   zoom = 15,
 }: GoogleMapDisplayProps) {
-  const [mapError, setMapError] = useState<string | undefined>(null);
+  const [mapError] = useState<string | undefined>();
 
   const {isLoaded, loadError} = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
     libraries,
   });
 
-  const handleMapError = () => {
-    setMapError('Failed to load map. Please check your internet connection.');
-  };
 
   if (loadError) {
     return (
@@ -119,7 +112,6 @@ export function GoogleMapDisplay({
         center={location}
         zoom={zoom}
         options={mapOptions}
-        onError={handleMapError}
       >
         <Marker position={location} title={address || 'Selected location'} />
       </GoogleMap>

@@ -28,7 +28,7 @@ import {
   IconCheck,
 } from '@tabler/icons-react';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-import {useTranslation} from '@/hooks/useTranslation';
+// import {useTranslation} from '@/hooks/useTranslation';
 import {
   useStores,
   useStoreLoading,
@@ -43,8 +43,8 @@ export function StoreListPage() {
   const navigate = useNavigate();
   const [deleteModalOpened, {open: openDeleteModal, close: closeDeleteModal}] =
     useDisclosure(false);
-  const [storeToDelete, setStoreToDelete] = useState<Store | undefined>(null);
-  const {t} = useTranslation();
+  const [storeToDelete, setStoreToDelete] = useState<Store | undefined>(undefined);
+  // const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
 
   const stores = useStores();
@@ -85,7 +85,7 @@ export function StoreListPage() {
       });
 
       closeDeleteModal();
-      setStoreToDelete(null);
+      setStoreToDelete(undefined);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to delete store';
@@ -119,7 +119,12 @@ export function StoreListPage() {
       'saturday',
       'sunday',
     ];
-    const openDays = days.filter((day) => !operatingHours[day]?.closed);
+    const openDays = days.filter((day) => {
+      if ('closed' in operatingHours[day]) {
+        return false
+      }
+      return true;
+    });
 
     if (openDays.length === 0) return 'Closed all week';
     if (openDays.length === 7) return 'Open 7 days a week';

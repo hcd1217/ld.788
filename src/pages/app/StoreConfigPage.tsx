@@ -19,7 +19,7 @@ import {
   IconCheck,
 } from '@tabler/icons-react';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-import {useTranslation} from '@/hooks/useTranslation';
+// import {useTranslation} from '@/hooks/useTranslation';
 import {
   useStoreActions,
   useCurrentStore,
@@ -29,6 +29,7 @@ import {
 import {GoBack} from '@/components/common/GoBack';
 import {FormContainer} from '@/components/form/FormContainer';
 import {StoreConfigForm} from '@/components/store/StoreConfigForm';
+import type {DaySchedule} from '@/components/store/OperatingHoursInput';
 import type {CreateStoreRequest} from '@/services/store';
 
 type StoreConfigFormValues = {
@@ -40,15 +41,11 @@ type StoreConfigFormValues = {
   };
   operatingHours: Record<
     string,
-    {
-      open: string;
-      close: string;
-      closed?: boolean;
-    }
+    DaySchedule
   >;
 };
 
-const defaultOperatingHours = {
+const defaultOperatingHours: StoreConfigFormValues['operatingHours'] = {
   monday: {open: '09:00', close: '17:00'},
   tuesday: {open: '09:00', close: '17:00'},
   wednesday: {open: '09:00', close: '17:00'},
@@ -61,7 +58,7 @@ const defaultOperatingHours = {
 export function StoreConfigPage() {
   const navigate = useNavigate();
   const [showAlert, setShowAlert] = useState(false);
-  const {t} = useTranslation();
+  // const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
 
   const currentStore = useCurrentStore();

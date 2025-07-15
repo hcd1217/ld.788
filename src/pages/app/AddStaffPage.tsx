@@ -22,7 +22,6 @@ import {
   IconShield,
 } from '@tabler/icons-react';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-import {useTranslation} from '@/hooks/useTranslation';
 import {useStaffActions} from '@/stores/useStaffStore';
 import {useCurrentStore} from '@/stores/useStoreConfigStore';
 import {GoBack} from '@/components/common/GoBack';
@@ -38,7 +37,6 @@ export function AddStaffPage() {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
 
   const currentStore = useCurrentStore();
@@ -296,7 +294,7 @@ export function AddStaffPage() {
           <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack gap="xl">
               <Stepper active={activeStep} onStepClick={setActiveStep}>
-                {steps.map((step, index) => (
+                {steps.map((step) => (
                   <Stepper.Step
                     key={step.label}
                     label={step.label}

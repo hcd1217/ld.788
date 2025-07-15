@@ -12,7 +12,7 @@ import {
   Paper,
   Text,
 } from '@mantine/core';
-import {useForm} from '@mantine/form';
+import {useForm, type UseFormReturnType} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
 import {
   IconCheck,
@@ -21,10 +21,8 @@ import {
   IconBriefcase,
   IconCalendar,
   IconShield,
-  IconArrowLeft,
 } from '@tabler/icons-react';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-import {useTranslation} from '@/hooks/useTranslation';
 import {useStaffActions} from '@/stores/useStaffStore';
 import {useCurrentStore} from '@/stores/useStoreConfigStore';
 import {GoBack} from '@/components/common/GoBack';
@@ -38,6 +36,7 @@ import {
   VALIDATION_RULES,
   staffService,
   type UpdateStaffRequest,
+  type CreateStaffRequest,
   type Staff,
 } from '@/services/staff';
 
@@ -47,8 +46,7 @@ export function EditStaffPage() {
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [staff, setStaff] = useState<Staff | undefined>(null);
-  const {t} = useTranslation();
+  const [staff, setStaff] = useState<Staff | undefined>(undefined);
   const isDarkMode = useIsDarkMode();
 
   const currentStore = useCurrentStore();
@@ -364,7 +362,7 @@ export function EditStaffPage() {
           <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack gap="xl">
               <Stepper active={activeStep} onStepClick={setActiveStep}>
-                {steps.map((step, index) => (
+                {steps.map((step) => (
                   <Stepper.Step
                     key={step.label}
                     label={step.label}
@@ -381,13 +379,13 @@ export function EditStaffPage() {
                   transitionProps={{duration: 300}}
                 />
 
-                {activeStep === 0 && <BasicInfoSection form={form} />}
+                {activeStep === 0 && <BasicInfoSection form={form as UseFormReturnType<CreateStaffRequest>} />}
 
-                {activeStep === 1 && <WorkingPatternSection form={form} />}
+                {activeStep === 1 && <WorkingPatternSection form={form as UseFormReturnType<CreateStaffRequest>} />}
 
-                {activeStep === 2 && <LeaveManagementSection form={form} />}
+                {activeStep === 2 && <LeaveManagementSection form={form as UseFormReturnType<CreateStaffRequest>} />}
 
-                {activeStep === 3 && <AccessPermissionSection form={form} />}
+                {activeStep === 3 && <AccessPermissionSection form={form as UseFormReturnType<CreateStaffRequest>} />}
               </div>
 
               <Group justify="space-between" pt="md">

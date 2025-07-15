@@ -9,7 +9,6 @@ import {
   Divider,
 } from '@mantine/core';
 import {
-  IconBriefcase,
   IconClock,
   IconCurrencyDollar,
   IconInfoCircle,

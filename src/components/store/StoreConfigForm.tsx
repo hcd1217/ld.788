@@ -1,7 +1,7 @@
 import {Stack, TextInput, Fieldset} from '@mantine/core';
 import {type UseFormReturnType} from '@mantine/form';
 import {LocationInput} from './LocationInput';
-import {OperatingHoursInput} from './OperatingHoursInput';
+import {OperatingHoursInput, type DaySchedule} from './OperatingHoursInput';
 import {GoogleMapDisplay} from './GoogleMapDisplay';
 
 type StoreConfigFormProps = {
@@ -14,11 +14,7 @@ type StoreConfigFormProps = {
     };
     operatingHours: Record<
       string,
-      {
-        open: string;
-        close: string;
-        closed?: boolean;
-      }
+      DaySchedule
     >;
   }>;
   readonly isLoading: boolean;
@@ -27,7 +23,7 @@ type StoreConfigFormProps = {
     address: string,
   ) => void;
   readonly onAddressChange: (address: string) => void;
-  readonly onOperatingHoursChange: (operatingHours: any) => void;
+  readonly onOperatingHoursChange: (operatingHours: Record<string, DaySchedule>) => void;
   readonly onFocus?: () => void;
 };
 
@@ -58,7 +54,7 @@ export function StoreConfigForm({
             label="Store Address"
             placeholder="Search for store address"
             value={form.values.address}
-            error={form.errors.address}
+            error={form.errors.address ?? undefined}
             disabled={isLoading}
             onLocationSelect={onLocationChange}
             onAddressChange={onAddressChange}

@@ -29,7 +29,7 @@ export function StoreSelector({
     label: store.name,
   }));
 
-  const handleStoreChange = (storeId: string | undefined) => {
+  const handleStoreChange = (storeId: string | null) => {
     if (storeId) {
       const selectedStore = stores.find((store) => store.id === storeId);
       setCurrentStore(selectedStore);

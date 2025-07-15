@@ -13,8 +13,7 @@ export interface Store {
     {
       open: string; // "09:00"
       close: string; // "17:00"
-      closed?: boolean;
-    }
+    } | { closed: boolean }
   >;
   createdAt: string;
   updatedAt: string;
@@ -117,7 +116,7 @@ export const storeService = {
     return newStore;
   },
 
-  async updateStore(id: string, data: UpdateStoreRequest): Promise<Store> {
+  async updateStore(id: string): Promise<Store> {
     await delay(600);
 
     const storeIndex = mockStores.findIndex((store) => store.id === id);

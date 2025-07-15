@@ -12,7 +12,6 @@ import {
   CopyButton,
 } from '@mantine/core';
 import {
-  IconEdit,
   IconTrash,
   IconMail,
   IconPhone,

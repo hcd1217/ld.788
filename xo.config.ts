@@ -22,6 +22,7 @@ export default {
     'new-cap': 'off',
     'no-await-in-loop': 'off',
     'no-new': 'off',
+    'no-unused-vars': 'error',
     'react/boolean-prop-naming': 'off',
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',

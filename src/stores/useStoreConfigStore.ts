@@ -166,7 +166,7 @@ export const useStoreConfigStore = create<StoreConfigState>()(
           currentStore: state.currentStore,
         }),
         // Custom merge function to handle store updates
-        merge: (persistedState, currentState) => ({
+        merge: (persistedState: Record<string, unknown>, currentState) => ({
           ...currentState,
           ...persistedState,
           // Always start with clean loading/error state

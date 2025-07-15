@@ -9,7 +9,7 @@ type LocationInputProps = {
   readonly label?: string;
   readonly placeholder?: string;
   readonly value: string;
-  readonly error?: string;
+  readonly error?: string | React.ReactNode;
   readonly disabled?: boolean;
   readonly onLocationSelect: (
     location: {lat: number; lng: number},

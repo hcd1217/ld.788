@@ -2,11 +2,10 @@ import {Stack, Group, Text, Switch, Paper} from '@mantine/core';
 import {TimeInput} from '@mantine/dates';
 import {IconClock} from '@tabler/icons-react';
 
-type DaySchedule = {
+export type DaySchedule = {
   open: string;
   close: string;
-  closed?: boolean;
-};
+} | {closed: true};
 
 type OperatingHours = Record<string, DaySchedule>;
 
@@ -40,14 +39,15 @@ export function OperatingHoursInput({
 }: OperatingHoursInputProps) {
   const handleDayToggle = (day: string) => {
     const currentDay = value[day] || {open: '09:00', close: '17:00'};
+    const isClosed = 'closed' in currentDay && currentDay.closed;
+
     const updatedHours = {
       ...value,
-      [day]: {
-        ...currentDay,
-        closed: !currentDay.closed,
-      },
+      [day]: isClosed
+        ? {open: '09:00', close: '17:00'}
+        : {closed: true as const},
     };
-    onChange(updatedHours);
+    onChange(updatedHours as OperatingHours);
   };
 
   const handleTimeChange = (
@@ -56,10 +56,16 @@ export function OperatingHoursInput({
     time: string,
   ) => {
     const currentDay = value[day] || {open: '09:00', close: '17:00'};
+
+    // If it's a closed day, we need to convert it to an open day first
+    const daySchedule = 'closed' in currentDay
+      ? {open: '09:00', close: '17:00'}
+      : currentDay;
+
     const updatedHours = {
       ...value,
       [day]: {
-        ...currentDay,
+        ...daySchedule,
         [field]: time,
       },
     };
@@ -86,7 +92,7 @@ export function OperatingHoursInput({
     <Stack gap="md">
       {daysOfWeek.map(({key, label}) => {
         const daySchedule = value[key] || {open: '09:00', close: '17:00'};
-        const isClosed = daySchedule.closed || false;
+        const isClosed = 'closed' in daySchedule && daySchedule.closed === true;
 
         return (
           <Paper key={key} withBorder p="md">
@@ -107,7 +113,7 @@ export function OperatingHoursInput({
                 />
               </Group>
 
-              {!isClosed && (
+              {!isClosed && 'open' in daySchedule && (
                 <Group gap="xs" wrap="nowrap">
                   <TimeInput
                     value={daySchedule.open}
