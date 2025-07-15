@@ -113,6 +113,7 @@
     "loadingGoogleMaps": "Đang tải Google Maps...",
     "googleMapsApiKeyNotConfigured": "API key Google Maps chưa được cấu hình. Tự động gợi ý bị vô hiệu hóa.",
     "startTypingForSuggestions": "Bắt đầu gõ để xem gợi ý địa chỉ",
+    "applyForAll": "Áp dụng cho tất cả",
     "monday": "Thứ hai",
     "tuesday": "Thứ ba",
     "wednesday": "Thứ tư",
@@ -499,5 +500,15 @@
       "notesPlaceholder": "Nhập bất kỳ ghi chú hoặc điều kiện đặc biệt...",
       "notesDescription": "Ghi chú bổ sung về quyền nghỉ phép hoặc điều kiện đặc biệt"
     }
+  },
+  "pwa": {
+    "installTitle": "Cài đặt Credo App",
+    "installDescription": "Cài đặt ứng dụng này trên thiết bị của bạn để có trải nghiệm tốt hơn",
+    "maybeLater": "Để sau",
+    "install": "Cài đặt"
+  },
+  "orientation": {
+    "title": "Xoay Thiết Bị",
+    "message": "Vui lòng xoay thiết bị về chế độ dọc để có trải nghiệm tốt nhất"
   }
 }

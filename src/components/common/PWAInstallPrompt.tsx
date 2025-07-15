@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import {Button, Paper, Text, Group, CloseButton} from '@mantine/core';
+import {useTranslation} from '@/hooks/useTranslation';
 
 type BeforeInstallPromptEvent = {
   prompt: () => Promise<void>;
@@ -7,6 +8,7 @@ type BeforeInstallPromptEvent = {
 } & Event;
 
 export function PWAInstallPrompt() {
+  const {t} = useTranslation();
   const [deferredPrompt, setDeferredPrompt] = useState<
     BeforeInstallPromptEvent | undefined
   >();
@@ -64,20 +66,20 @@ export function PWAInstallPrompt() {
       <Group align="start">
         <div style={{flex: 1}}>
           <Text size="sm" fw={500} mb={4}>
-            Install Credo App
+            {t('pwa.installTitle')}
           </Text>
           <Text size="xs" c="dimmed">
-            Install this app on your device for a better experience
+            {t('pwa.installDescription')}
           </Text>
         </div>
         <CloseButton size="sm" onClick={handleDismiss} />
       </Group>
       <Group mt="md">
         <Button size="xs" variant="light" onClick={handleDismiss}>
-          Maybe later
+          {t('pwa.maybeLater')}
         </Button>
         <Button size="xs" onClick={handleInstallClick}>
-          Install
+          {t('pwa.install')}
         </Button>
       </Group>
     </Paper>

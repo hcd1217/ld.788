@@ -1,6 +1,14 @@
-import {Stack, Group, Text, Switch, Paper} from '@mantine/core';
+import {
+  Stack,
+  Group,
+  Text,
+  Switch,
+  Paper,
+  ActionIcon,
+  Tooltip,
+} from '@mantine/core';
 import {TimeInput} from '@mantine/dates';
-import {IconClock} from '@tabler/icons-react';
+import {IconCopy} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 
 export type DaySchedule =
@@ -76,21 +84,16 @@ export function OperatingHoursInput({
     onChange(updatedHours);
   };
 
-  // Const copyToAllDays = (sourceDay: string) => {
-  //   const sourceSchedule = value[sourceDay];
-  //   if (!sourceSchedule) return;
+  const copyToAllDays = (sourceDay: string) => {
+    const sourceSchedule = value[sourceDay] || {open: '09:00', close: '17:00'};
 
-  //   const updatedHours: OperatingHours = {};
-  //   for (const {key} of daysOfWeek) {
-  //     updatedHours[key] = {
-  //       open: sourceSchedule.open,
-  //       close: sourceSchedule.close,
-  //       closed: sourceSchedule.closed,
-  //     };
-  //   }
+    const updatedHours: OperatingHours = {};
+    for (const dayKey of daysOfWeekKeys) {
+      updatedHours[dayKey] = sourceSchedule;
+    }
 
-  //   onChange(updatedHours);
-  // };
+    onChange(updatedHours);
+  };
 
   return (
     <Stack gap="xs">
@@ -122,8 +125,7 @@ export function OperatingHoursInput({
                   value={'open' in daySchedule ? daySchedule.open : '09:00'}
                   disabled={disabled || isClosed}
                   size="sm"
-                  w={120}
-                  leftSection={<IconClock size={14} />}
+                  w={100}
                   aria-label={`${t(`store.${key}` as const)} opening time`}
                   styles={{
                     input: {
@@ -143,8 +145,7 @@ export function OperatingHoursInput({
                   value={'close' in daySchedule ? daySchedule.close : '17:00'}
                   disabled={disabled || isClosed}
                   size="sm"
-                  w={120}
-                  leftSection={<IconClock size={14} />}
+                  w={100}
                   aria-label={`${t(`store.${key}` as const)} closing time`}
                   styles={{
                     input: {
@@ -155,6 +156,19 @@ export function OperatingHoursInput({
                     handleTimeChange(key, 'close', event.target.value);
                   }}
                 />
+                <Tooltip label={t('store.applyForAll')} position="top">
+                  <ActionIcon
+                    variant="subtle"
+                    size="sm"
+                    disabled={disabled}
+                    aria-label={t('store.applyForAll')}
+                    onClick={() => {
+                      copyToAllDays(key);
+                    }}
+                  >
+                    <IconCopy size={16} />
+                  </ActionIcon>
+                </Tooltip>
               </Group>
             </Group>
           </Paper>

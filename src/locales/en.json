@@ -116,6 +116,7 @@
     "loadingGoogleMaps": "Loading Google Maps...",
     "googleMapsApiKeyNotConfigured": "Google Maps API key not configured. Autocomplete is disabled.",
     "startTypingForSuggestions": "Start typing to see address suggestions",
+    "applyForAll": "Apply for all",
     "monday": "Monday",
     "tuesday": "Tuesday",
     "wednesday": "Wednesday",
@@ -499,5 +500,15 @@
       "carryOverLimit": "Carry-over Limit:",
       "availableToTake": "Available to Take:"
     }
+  },
+  "pwa": {
+    "installTitle": "Install Credo App",
+    "installDescription": "Install this app on your device for a better experience",
+    "maybeLater": "Maybe later",
+    "install": "Install"
+  },
+  "orientation": {
+    "title": "Rotate Your Device",
+    "message": "Please rotate your device to portrait mode for the best experience"
   }
 }
