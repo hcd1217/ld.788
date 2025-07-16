@@ -65,12 +65,12 @@ export function RegisterPage() {
 
   const onSubmit = handleSubmit(async (values: RegisterFormValues) => {
     const {client} = await clientService.registerNewClient({
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      password: values.password,
-      code: values.clientCode,
-      name: values.clientName,
+      clientCode: values.clientCode,
+      clientName: values.clientName,
+      rootUserEmail: values.email,
+      rootUserPassword: values.password,
+      rootUserFirstName: values.firstName,
+      rootUserLastName: values.lastName,
     });
     form.setFieldValue('clientCode', client.code);
   });

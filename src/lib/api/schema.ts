@@ -13,4 +13,6 @@ export const clientCodeSchema = z
   .max(10)
   .regex(/^[A-Z\d]+$/);
 export const emailSchema = z.email();
-export const timestampSchema = z.union([z.number(), z.string()]).transform((val) => new Date(val).toISOString());
+export const timestampSchema = z
+  .union([z.number(), z.string()])
+  .transform((val) => new Date(val).toISOString());

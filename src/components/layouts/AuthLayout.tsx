@@ -154,7 +154,9 @@ export function AuthLayout() {
         <Stack gap="xs">
           {navigationItems.map((item) => {
             const Icon = item.icon;
-            const isActive = item.activePaths?.includes(location.pathname) ?? location.pathname === item.path;
+            const isActive =
+              item.activePaths?.includes(location.pathname) ??
+              location.pathname === item.path;
             const isDummy = item.dummy ?? false;
 
             const buttonContent = (
@@ -233,7 +235,10 @@ export function AuthLayout() {
   );
 }
 
-function buildNavigationItems(t: TFunction, user?: User): Array<{
+function buildNavigationItems(
+  t: TFunction,
+  user?: User,
+): Array<{
   label: string;
   icon: React.ElementType;
   path: string;
@@ -268,10 +273,7 @@ function buildNavigationItems(t: TFunction, user?: User): Array<{
       icon: IconBuildingStore,
       path: '/stores',
       dummy: true,
-      activePaths: [
-        '/stores',
-        '/store-config',
-      ],
+      activePaths: ['/stores', '/store-config'],
     },
     {
       label: t('common.staffManagement'),

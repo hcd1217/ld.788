@@ -13,24 +13,26 @@ export const AdminLoginResponseSchema = z.object({
 });
 
 // Client Management Schemas
-export const ClientSchema = z.object({
-  id: z.string(),
-  clientCode: z.string(),
-  clientName: z.string(),
-  rootUser: z.object({
-    email: emailSchema,
-    firstName: z.string(),
-    lastName: z.string(),
-  }),
-  createdAt: timestampSchema,
-  isActive: z.boolean(),
-  status: z.enum(['active', 'suspended']).default('active'),
-}).transform(({isActive, ...data}) => {
-  data.status =  isActive ? 'active' : 'suspended'
-  return data
-})
+export const ClientSchema = z
+  .object({
+    id: z.string(),
+    clientCode: z.string(),
+    clientName: z.string(),
+    rootUser: z.object({
+      email: emailSchema,
+      firstName: z.string(),
+      lastName: z.string(),
+    }),
+    createdAt: timestampSchema,
+    isActive: z.boolean(),
+    status: z.enum(['active', 'suspended']).default('active'),
+  })
+  .transform(({isActive, ...data}) => {
+    data.status = isActive ? 'active' : 'suspended';
+    return data;
+  });
 
-export const RegisterClientRequestSchema = z.object({
+export const AdminRegisterClientRequestSchema = z.object({
   clientCode: clientCodeSchema,
   clientName: z.string().min(3).max(100),
   rootUserEmail: emailSchema,
@@ -39,7 +41,7 @@ export const RegisterClientRequestSchema = z.object({
   rootUserLastName: z.string().min(2).max(50),
 });
 
-export const RegisterClientResponseSchema = z.object({
+export const AdminRegisterClientResponseSchema = z.object({
   success: z.boolean(),
   clientId: z.string(),
 });
@@ -65,9 +67,11 @@ export const ClientListResponseSchema = z.object({
 export type AdminLoginRequest = z.infer<typeof AdminLoginRequestSchema>;
 export type AdminLoginResponse = z.infer<typeof AdminLoginResponseSchema>;
 export type Client = z.infer<typeof ClientSchema>;
-export type RegisterClientRequest = z.infer<typeof RegisterClientRequestSchema>;
-export type RegisterClientResponse = z.infer<
-  typeof RegisterClientResponseSchema
+export type AdminRegisterClientRequest = z.infer<
+  typeof AdminRegisterClientRequestSchema
+>;
+export type AdminRegisterClientResponse = z.infer<
+  typeof AdminRegisterClientResponseSchema
 >;
 export type UpdateClientRequest = z.infer<typeof UpdateClientRequestSchema>;
 export type ClientListResponse = z.infer<typeof ClientListResponseSchema>;
@@ -152,13 +156,13 @@ export class AdminApi extends BaseApiClient {
   }
 
   async registerClient(
-    data: RegisterClientRequest,
-  ): Promise<RegisterClientResponse> {
-    return this.post<RegisterClientResponse, RegisterClientRequest>(
+    data: AdminRegisterClientRequest,
+  ): Promise<AdminRegisterClientResponse> {
+    return this.post<AdminRegisterClientResponse, AdminRegisterClientRequest>(
       'admin/clients/register',
       data,
-      RegisterClientResponseSchema,
-      RegisterClientRequestSchema,
+      AdminRegisterClientResponseSchema,
+      AdminRegisterClientRequestSchema,
     );
   }
 

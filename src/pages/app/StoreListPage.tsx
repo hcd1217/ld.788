@@ -26,6 +26,7 @@ import {
   IconAlertTriangle,
   IconCheck,
 } from '@tabler/icons-react';
+import classes from './StoreListPage.module.css';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
@@ -36,7 +37,6 @@ import {
   useCurrentStore,
 } from '@/stores/useStoreConfigStore';
 import type {Store} from '@/services/store';
-import classes from './StoreListPage.module.css';
 
 export function StoreListPage() {
   const navigate = useNavigate();
@@ -106,6 +106,7 @@ export function StoreListPage() {
     if (currentStore?.id === store.id) {
       return;
     }
+
     setCurrentStore(store);
     notifications.show({
       title: t('store.storeSelected'),
