@@ -210,7 +210,6 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
           <Text size="sm" fw={500}>
             {t('staff.accessPermissions.roleComparison')}
           </Text>
-
           <SimpleGrid cols={{base: 1, sm: 3}} spacing="md">
             {roleData.map((role) => (
               <Paper

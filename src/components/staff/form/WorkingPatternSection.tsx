@@ -10,7 +10,7 @@ import {
 } from '@mantine/core';
 import {
   IconClock,
-  IconCurrencyDollar,
+  IconCash,
   IconInfoCircle,
   IconCalculator,
 } from '@tabler/icons-react';
@@ -166,7 +166,7 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
       <Paper withBorder p="md" radius="md">
         <Stack gap="md">
           <Group gap="xs">
-            <IconCurrencyDollar size={16} />
+            <IconCash size={16} />
             <Text size="sm" fw={500}>
               {t('staff.workingPattern.hourlyRates')}
             </Text>
@@ -180,7 +180,7 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
             min={VALIDATION_RULES.hourlyRate.min}
             max={VALIDATION_RULES.hourlyRate.max}
             decimalScale={2}
-            leftSection="$"
+            leftSection="đ"
             description={t('staff.workingPattern.rateRange', {
               min: formatCurrency(VALIDATION_RULES.hourlyRate.min),
               max: formatCurrency(VALIDATION_RULES.hourlyRate.max),
@@ -207,7 +207,7 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
                   min={0}
                   max={VALIDATION_RULES.hourlyRate.max * 3}
                   decimalScale={2}
-                  leftSection="$"
+                  leftSection="đ"
                   description={t('staff.workingPattern.overtimeDescription')}
                   {...form.getInputProps('overtimeRate')}
                 />
@@ -232,7 +232,7 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
                   min={0}
                   max={VALIDATION_RULES.hourlyRate.max * 3}
                   decimalScale={2}
-                  leftSection="$"
+                  leftSection="đ"
                   description={t('staff.workingPattern.holidayDescription')}
                   {...form.getInputProps('holidayRate')}
                 />
@@ -258,7 +258,6 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
           withBorder
           p="md"
           radius="md"
-          bg="blue.0"
           style={{
             backgroundColor: isDarkMode
               ? 'var(--mantine-color-dark-6)'

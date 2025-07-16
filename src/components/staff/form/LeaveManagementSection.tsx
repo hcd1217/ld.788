@@ -229,11 +229,10 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
         withBorder
         p="md"
         radius="md"
-        bg="green.0"
         style={{
           backgroundColor: isDarkMode
             ? 'var(--mantine-color-dark-6)'
-            : 'var(--mantine-color-red-0)',
+            : 'var(--mantine-color-green-0)',
         }}
       >
         <Stack gap="xs">
