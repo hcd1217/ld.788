@@ -241,7 +241,7 @@ export class BaseApiClient {
     }
 
     if (this.adminAccessKey) {
-      headers.set('X-ADMIN-ACCESS-KEY', this.adminAccessKey);
+      headers.set('X-ADMIN-KEY', this.adminAccessKey);
     } else {
       const clientCode = this.getClientCode();
       if (clientCode) {
