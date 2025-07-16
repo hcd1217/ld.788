@@ -19,6 +19,7 @@ import {
 import type {UseFormReturnType} from '@mantine/form';
 import {useTranslation} from '@/hooks/useTranslation';
 import {VALIDATION_RULES, type CreateStaffRequest} from '@/services/staff';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export interface LeaveManagementSectionProps {
   readonly form: UseFormReturnType<CreateStaffRequest>;
@@ -26,6 +27,7 @@ export interface LeaveManagementSectionProps {
 
 export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
   const {t} = useTranslation();
+  const isDarkMode = useIsDarkMode();
   const isShiftWorker = form.values.workingPattern === 'shift';
 
   const calculateTotalLeaveBalance = () => {
@@ -223,13 +225,16 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
           )}
         </Stack>
       </Paper>
-
       <Paper
         withBorder
         p="md"
         radius="md"
         bg="green.0"
-        style={{backgroundColor: 'var(--mantine-color-green-0)'}}
+        style={{
+          backgroundColor: isDarkMode
+            ? 'var(--mantine-color-dark-6)'
+            : 'var(--mantine-color-red-0)',
+        }}
       >
         <Stack gap="xs">
           <Text size="sm" fw={500}>

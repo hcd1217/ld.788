@@ -21,6 +21,7 @@ import {
 import type {UseFormReturnType} from '@mantine/form';
 import {useTranslation} from '@/hooks/useTranslation';
 import {permissionMatrix, type CreateStaffRequest} from '@/services/staff';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export interface AccessPermissionSectionProps {
   readonly form: UseFormReturnType<CreateStaffRequest>;
@@ -28,6 +29,7 @@ export interface AccessPermissionSectionProps {
 
 export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
   const {t} = useTranslation();
+  const isDarkMode = useIsDarkMode();
 
   const roleData = [
     {
@@ -155,8 +157,11 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
                   withBorder
                   p="sm"
                   radius="sm"
-                  bg="gray.0"
-                  style={{backgroundColor: 'var(--mantine-color-gray-0)'}}
+                  style={{
+                    backgroundColor: isDarkMode
+                      ? 'var(--mantine-color-dark-6)'
+                      : 'var(--mantine-color-gray-0)',
+                  }}
                 >
                   <Group gap="sm" align="flex-start">
                     <ThemeIcon
@@ -195,8 +200,11 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
         withBorder
         p="md"
         radius="md"
-        bg="blue.0"
-        style={{backgroundColor: 'var(--mantine-color-blue-0)'}}
+        style={{
+          backgroundColor: isDarkMode
+            ? 'var(--mantine-color-dark-6)'
+            : 'var(--mantine-color-blue-0)',
+        }}
       >
         <Stack gap="md">
           <Text size="sm" fw={500}>
@@ -213,8 +221,12 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
                 style={{
                   backgroundColor:
                     selectedRole === role.value
-                      ? `var(--mantine-color-${role.color}-0)`
-                      : 'white',
+                      ? isDarkMode
+                        ? 'var(--mantine-color-dark-5)'
+                        : `var(--mantine-color-${role.color}-0)`
+                      : isDarkMode
+                        ? 'var(--mantine-color-dark-6)'
+                        : 'white',
                 }}
               >
                 <Stack gap="xs" align="center">

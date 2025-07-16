@@ -3,6 +3,7 @@ import {createBrowserRouter, type RouteObject} from 'react-router';
 import {AppLayout} from '@/components/layouts/AppLayout';
 import {ResponsiveAuthLayout} from '@/components/layouts/ResponsiveAuthLayout';
 import {ProtectedRoute} from '@/components/layouts/ProtectedRoute';
+import {AdminProtectedRoute} from '@/components/layouts/AdminProtectedRoute';
 
 const ServiceLayout = lazy(async () => {
   const module = await import('@/components/layouts/ServiceLayout');
@@ -134,6 +135,16 @@ const RegisterPage = lazy(async () => {
   return {default: module.RegisterPage};
 });
 
+const AdminLoginPage = lazy(async () => {
+  const module = await import('@/pages/admin/AdminLoginPage');
+  return {default: module.AdminLoginPage};
+});
+
+const AdminDashboardPage = lazy(async () => {
+  const module = await import('@/pages/admin/AdminDashboardPage');
+  return {default: module.AdminDashboardPage};
+});
+
 const routeObjects: RouteObject[] = [
   {
     path: '',
@@ -209,6 +220,24 @@ const routeObjects: RouteObject[] = [
             ],
           },
         ],
+      },
+    ],
+  },
+  {
+    path: 'admin',
+    children: [
+      {
+        path: 'login',
+        Component: AdminLoginPage,
+      },
+      {
+        path: '',
+        element: (
+          <AdminProtectedRoute>
+            <AppLayout />
+          </AdminProtectedRoute>
+        ),
+        children: [{path: 'dashboard', Component: AdminDashboardPage}],
       },
     ],
   },

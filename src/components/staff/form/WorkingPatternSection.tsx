@@ -17,6 +17,7 @@ import {
 import type {UseFormReturnType} from '@mantine/form';
 import {useTranslation} from '@/hooks/useTranslation';
 import {VALIDATION_RULES, type CreateStaffRequest} from '@/services/staff';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export interface WorkingPatternSectionProps {
   readonly form: UseFormReturnType<CreateStaffRequest>;
@@ -24,6 +25,7 @@ export interface WorkingPatternSectionProps {
 
 export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
   const {t} = useTranslation();
+  const isDarkMode = useIsDarkMode();
   const isFulltime = form.values.workingPattern === 'fulltime';
 
   const formatCurrency = (amount: number) => {
@@ -257,7 +259,11 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
           p="md"
           radius="md"
           bg="blue.0"
-          style={{backgroundColor: 'var(--mantine-color-blue-0)'}}
+          style={{
+            backgroundColor: isDarkMode
+              ? 'var(--mantine-color-dark-6)'
+              : 'var(--mantine-color-blue-0)',
+          }}
         >
           <Stack gap="xs">
             <Text size="sm" fw={500}>

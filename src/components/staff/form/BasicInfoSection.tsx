@@ -27,6 +27,7 @@ import type {UseFormReturnType} from '@mantine/form';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useCurrentStore} from '@/stores/useStoreConfigStore';
 import type {CreateStaffRequest} from '@/services/staff';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export interface BasicInfoSectionProps {
   readonly form: UseFormReturnType<CreateStaffRequest>;
@@ -37,6 +38,7 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
   const [previewQrCode, setPreviewQrCode] = useState<string>('');
   const [isGeneratingQr, setIsGeneratingQr] = useState(false);
   const currentStore = useCurrentStore();
+  const isDarkMode = useIsDarkMode();
 
   // Generate MD5 hash
   const generateMD5 = (text: string): string => CryptoJS.MD5(text).toString();
@@ -113,7 +115,6 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
 
         <Group grow>
           <TextInput
-            required
             label={t('staff.basicInfo.email')}
             placeholder={t('staff.basicInfo.emailPlaceholder')}
             leftSection={<IconMail size={16} />}
@@ -148,8 +149,11 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
             withBorder
             p="md"
             radius="md"
-            bg="gray.0"
-            style={{backgroundColor: 'var(--mantine-color-gray-0)'}}
+            style={{
+              backgroundColor: isDarkMode
+                ? 'var(--mantine-color-dark-6)'
+                : 'var(--mantine-color-gray-0)',
+            }}
           >
             <Stack gap="md">
               <Alert

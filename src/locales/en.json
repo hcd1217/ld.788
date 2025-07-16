@@ -510,5 +510,28 @@
   "orientation": {
     "title": "Rotate Your Device",
     "message": "Please rotate your device to portrait mode for the best experience"
+  },
+  "admin": {
+    "title": "System Admin",
+    "subtitle": "Platform administration portal",
+    "dashboard": "Admin Dashboard",
+    "signIn": "Sign In",
+    "logout": "Logout",
+    "accessKeyPlaceholder": "Enter access key",
+    "invalidAccessKey": "Invalid access key. Please try again.",
+    "securityNotice": "This session will expire when you close this tab",
+    "loginSuccess": "Admin access granted",
+    "loginSuccessMessage": "You have successfully authenticated",
+    "loginFailed": "Authentication failed",
+    "systemStatus": "System Status",
+    "operational": "All Systems Operational",
+    "tenants": "Tenants",
+    "tenantsDescription": "Manage platform tenants",
+    "stores": "Stores",
+    "storesDescription": "View all stores across tenants",
+    "monitoring": "Monitoring",
+    "monitoringDescription": "System health and performance",
+    "settings": "Settings",
+    "settingsDescription": "Platform configuration"
   }
 }

@@ -33,6 +33,8 @@ export class ApiError extends Error {
 }
 
 export class BaseApiClient {
+  protected adminAccessKey = '';
+
   private readonly baseURL: string;
   private readonly timeout: number;
   private readonly cacheEnabled: boolean;
@@ -238,13 +240,17 @@ export class BaseApiClient {
       headers.set('Authorization', `Bearer ${token}`);
     }
 
-    if (!headers.has('Content-Type') && init.body) {
-      headers.set('Content-Type', 'application/json');
+    if (this.adminAccessKey) {
+      headers.set('X-ADMIN-ACCESS-KEY', this.adminAccessKey);
+    } else {
+      const clientCode = this.getClientCode();
+      if (clientCode) {
+        headers.set('X-CLIENT-CODE', clientCode);
+      }
     }
 
-    const clientCode = this.getClientCode();
-    if (clientCode) {
-      headers.set('X-CLIENT-CODE', clientCode);
+    if (!headers.has('Content-Type') && init.body) {
+      headers.set('Content-Type', 'application/json');
     }
 
     const controller = new AbortController();

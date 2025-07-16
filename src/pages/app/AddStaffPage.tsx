@@ -295,7 +295,7 @@ export function AddStaffPage() {
   }
 
   return (
-    <Container size="md" mt="xl">
+    <Container fluid mt="xl">
       <Stack gap="xl">
         <Group justify="space-between">
           <GoBack />
