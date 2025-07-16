@@ -105,11 +105,6 @@ export function StoreSelector({
         const store = stores.find((s) => s.id === option.value);
         return store ? renderSelectOption(store) : option.label;
       }}
-      description={
-        currentStore
-          ? `${t('store.selected')}: ${currentStore.address}`
-          : undefined
-      }
       onChange={(value) => {
         handleStoreChange(value ?? undefined);
       }}

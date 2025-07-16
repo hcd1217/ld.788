@@ -6,21 +6,17 @@ import {
   Stack,
   Group,
   Button,
-  TextInput,
-  Select,
   LoadingOverlay,
   Alert,
   Modal,
   Text,
   Flex,
   Pagination,
-  ActionIcon,
 } from '@mantine/core';
-import {useDisclosure, useDebouncedValue} from '@mantine/hooks';
+import {useDisclosure} from '@mantine/hooks';
 import {notifications} from '@mantine/notifications';
 import {
   IconPlus,
-  IconSearch,
   IconAlertTriangle,
   IconCheck,
   IconUserMinus,
@@ -33,16 +29,12 @@ import {
   useStaffLoading,
   useStaffError,
   useStaffPagination,
-  useStaffFilters,
   useStaffActions,
 } from '@/stores/useStaffStore';
 import {useCurrentStore, useStores} from '@/stores/useStoreConfigStore';
-import {GoBack} from '@/components/common/GoBack';
 import {StoreSelector} from '@/components/store';
 import {StaffList} from '@/components/staff';
 import type {Staff} from '@/services/staff';
-
-const disabledFilter = true;
 
 export function StaffListPage() {
   const navigate = useNavigate();
@@ -52,26 +44,21 @@ export function StaffListPage() {
   const [staffToDelete, setStaffToDelete] = useState<Staff | undefined>(
     undefined,
   );
-  const [searchValue, setSearchValue] = useState('');
-  const [debouncedSearch] = useDebouncedValue(searchValue, 300);
   const isDarkMode = useIsDarkMode();
 
   const staff = useStaffList();
   const isLoading = useStaffLoading();
   const error = useStaffError();
   const pagination = useStaffPagination();
-  const filters = useStaffFilters();
-  const currentStore = useCurrentStore();
   const stores = useStores();
+  const currentStore = useCurrentStore();
 
   const {
     loadStaff,
     deleteStaff,
     deactivateStaff,
     activateStaff,
-    setFilters,
     setPagination,
-    resetFilters,
     clearError,
   } = useStaffActions();
 
@@ -89,11 +76,6 @@ export function StaffListPage() {
 
     void load();
   }, [loadStaff, currentStore]);
-
-  // Update search filter when debounced value changes
-  useEffect(() => {
-    setFilters({search: debouncedSearch});
-  }, [debouncedSearch, setFilters]);
 
   const handleDeleteStaff = (staffMember: Staff) => {
     setStaffToDelete(staffMember);
@@ -172,10 +154,6 @@ export function StaffListPage() {
     setPagination({page});
   };
 
-  const handleFiltersChange = (newFilters: Partial<typeof filters>) => {
-    setFilters(newFilters);
-  };
-
   const handleAddStaff = () => {
     if (!currentStore) {
       notifications.show({
@@ -194,7 +172,6 @@ export function StaffListPage() {
     return (
       <Container size="lg" mt="xl">
         <Stack gap="xl">
-          <GoBack />
           <Title order={1} ta="center">
             {t('staff.title')}
           </Title>
@@ -218,7 +195,6 @@ export function StaffListPage() {
     return (
       <Container size="lg" mt="xl">
         <Stack gap="xl">
-          <GoBack />
           <Title order={1} ta="center">
             {t('staff.title')}
           </Title>
@@ -240,9 +216,10 @@ export function StaffListPage() {
       <Container size="xl" mt="xl">
         <Stack gap="xl">
           <Group justify="space-between">
-            <GoBack />
+            <Title order={1} ta="center">
+              {t('staff.titleWithStore', {storeName: currentStore.name})}
+            </Title>
             <Group gap="md">
-              <StoreSelector />
               <Button
                 visibleFrom="md"
                 leftSection={<IconPlus size={16} />}
@@ -252,109 +229,9 @@ export function StaffListPage() {
               </Button>
             </Group>
           </Group>
-
-          <Title order={1} ta="center">
-            {t('staff.titleWithStore', {storeName: currentStore.name})}
-          </Title>
-
-          {/* Search and Filters */}
-          {disabledFilter ? null : (
-            <Group gap="md" align="flex-end">
-              <TextInput
-                placeholder={t('staff.searchPlaceholder')}
-                value={searchValue}
-                leftSection={<IconSearch size={16} />}
-                style={{flex: 1}}
-                onChange={(event) => {
-                  setSearchValue(event.currentTarget.value);
-                }}
-              />
-
-              <Select
-                label={t('common.status')}
-                value={filters.status}
-                data={[
-                  {value: 'all', label: t('staff.allStatus')},
-                  {value: 'active', label: t('common.active')},
-                  {value: 'inactive', label: t('common.inactive')},
-                ]}
-                w={120}
-                onChange={(value) => {
-                  if (value) {
-                    handleFiltersChange({
-                      status: value as 'active' | 'inactive' | 'all',
-                    });
-                  } else {
-                    handleFiltersChange({status: 'all'});
-                  }
-                }}
-              />
-
-              <Select
-                label={t('common.role')}
-                value={filters.role}
-                data={[
-                  {value: 'all', label: t('staff.allRoles')},
-                  {value: 'admin', label: t('staff.admin')},
-                  {value: 'manager', label: t('staff.manager')},
-                  {value: 'member', label: t('staff.member')},
-                ]}
-                w={120}
-                onChange={(value) => {
-                  if (value) {
-                    handleFiltersChange({
-                      role: value as 'admin' | 'manager' | 'member' | 'all',
-                    });
-                  } else {
-                    handleFiltersChange({role: 'all'});
-                  }
-                }}
-              />
-
-              <Select
-                label={t('staff.sortBy')}
-                value={filters.sortBy}
-                data={[
-                  {value: 'name', label: t('common.name')},
-                  {value: 'email', label: t('auth.email')},
-                  {value: 'role', label: t('common.role')},
-                  {value: 'createdAt', label: t('common.created')},
-                ]}
-                w={120}
-                onChange={(value) => {
-                  if (value) {
-                    handleFiltersChange({
-                      sortBy: value as 'name' | 'email' | 'role' | 'createdAt',
-                    });
-                  } else {
-                    handleFiltersChange({sortBy: 'createdAt'});
-                  }
-                }}
-              />
-
-              <ActionIcon
-                variant="light"
-                size="lg"
-                title={t('staff.sortTooltip', {
-                  order:
-                    filters.sortOrder === 'asc'
-                      ? t('staff.descending')
-                      : t('staff.ascending'),
-                })}
-                onClick={() => {
-                  handleFiltersChange({
-                    sortOrder: filters.sortOrder === 'asc' ? 'desc' : 'asc',
-                  });
-                }}
-              >
-                {filters.sortOrder === 'asc' ? '↑' : '↓'}
-              </ActionIcon>
-
-              <Button variant="light" onClick={resetFilters}>
-                {t('staff.reset')}
-              </Button>
-            </Group>
-          )}
+          <Group justify="end">
+            <StoreSelector />
+          </Group>
 
           {error ? (
             <Alert

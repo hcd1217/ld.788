@@ -147,7 +147,7 @@ export function StoreListPage() {
       <Card
         key={store.id}
         withBorder
-        shadow="sm"
+        shadow={isSelected ? 'xl' : 'sm'}
         padding="lg"
         radius="md"
         className={`${classes.storeCard} ${isSelected ? classes.selected : ''}`}

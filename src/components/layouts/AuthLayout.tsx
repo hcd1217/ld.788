@@ -280,6 +280,7 @@ function buildNavigationItems(
       icon: IconUsersGroup,
       path: '/staff',
       dummy: true,
+      activePaths: ['/staff', '/staff/add'],
     },
     {
       label: t('common.userManagement'),

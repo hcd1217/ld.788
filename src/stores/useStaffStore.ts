@@ -66,7 +66,7 @@ const initialFilters: StaffState['filters'] = {
 
 const initialPagination: StaffState['pagination'] = {
   page: 1,
-  limit: 5,
+  limit: 20,
   total: 0,
   totalPages: 0,
 };

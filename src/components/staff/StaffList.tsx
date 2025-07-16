@@ -23,16 +23,18 @@ import {useDisclosure, useMediaQuery} from '@mantine/hooks';
 import {
   IconEdit,
   IconTrash,
-  IconMail,
   IconPhone,
   IconQrcode,
   IconCopy,
   IconCheck,
   IconUser,
   IconBriefcase,
+  IconUsers,
+  IconShieldCheck,
 } from '@tabler/icons-react';
 import type {Staff} from '@/services/staff';
 import {useTranslation} from '@/hooks/useTranslation';
+import {formatPhoneNumber} from '@/utils/string';
 
 export interface StaffListProps {
   readonly staff: readonly Staff[];
@@ -81,39 +83,37 @@ export function StaffList({
     }
   };
 
-  // Const getStatusBadgeColor = (status: Staff['status']) => {
-  //   switch (status) {
-  //     case 'active': {
-  //       return 'green';
-  //     }
+  const getRoleIcon = (staff: Staff) => {
+    const color = staff.status === 'active' ? '#29CA42' : '#8E8E8E';
+    switch (staff.role) {
+      case 'admin': {
+        return <IconShieldCheck color={color} size={22} />;
+      }
 
-  //     case 'inactive': {
-  //       return 'orange';
-  //     }
+      case 'manager': {
+        return <IconUsers color={color} size={22} />;
+      }
 
-  //     default: {
-  //       return 'gray';
-  //     }
-  //   }
-  // };
+      case 'member': {
+        return <IconUser color={color} size={22} />;
+      }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
+      default: {
+        return null;
+      }
+    }
   };
 
   const formatWorkingPattern = (staff: Staff) => {
-    const pattern =
-      staff.workingPattern === 'fulltime'
-        ? t('staff.fulltime')
-        : t('staff.shift');
-    const hours =
-      staff.workingPattern === 'fulltime'
-        ? staff.defaultWeeklyHours || staff.weeklyContractedHours
-        : staff.weeklyContractedHours;
-    return `${pattern} (${t('staff.hoursPerWeek', {hours})})`;
+    return staff.workingPattern === 'fulltime'
+      ? t('staff.fulltime')
+      : t('staff.shift');
+  };
+
+  const callPhone = (staff: Staff) => {
+    if (isMobile) {
+      window.open(`tel:${staff.phoneNumber}`);
+    }
   };
 
   if (staff.length === 0) {
@@ -173,9 +173,26 @@ export function StaffList({
                 <Stack gap="md">
                   <Group justify="space-between" align="flex-start">
                     <Group gap="sm">
-                      <Avatar size={40} radius="xl" color="blue">
-                        {staffMember.fullName.charAt(0).toUpperCase()}
-                      </Avatar>
+                      <div style={{position: 'relative'}}>
+                        <Avatar size={40} radius="xl" color="blue">
+                          {staffMember.fullName.charAt(0).toUpperCase()}
+                        </Avatar>
+                        <div
+                          style={{
+                            position: 'absolute',
+                            bottom: -2,
+                            right: -2,
+                            width: 10,
+                            height: 10,
+                            borderRadius: '50%',
+                            backgroundColor:
+                              staffMember.status === 'active'
+                                ? '#29CA42'
+                                : '#8E8E8E',
+                            border: '2px solid white',
+                          }}
+                        />
+                      </div>
                       <div>
                         <Text fw={600} size="sm">
                           {staffMember.fullName}
@@ -184,6 +201,7 @@ export function StaffList({
                           size="xs"
                           color={getRoleBadgeColor(staffMember.role)}
                           variant="light"
+                          leftSection={getRoleIcon(staffMember)}
                         >
                           {t(`staff.${staffMember.role}`)}
                         </Badge>
@@ -205,25 +223,27 @@ export function StaffList({
                   </Group>
 
                   <Stack gap="xs">
-                    <Group gap="xs" c="dimmed">
-                      <IconMail size={14} />
-                      <Text truncate size="xs">
-                        {staffMember.email}
-                      </Text>
-                    </Group>
-
-                    <Group gap="xs" c="dimmed">
-                      <IconPhone size={14} />
-                      <Text size="xs">{staffMember.phoneNumber}</Text>
-                    </Group>
-
-                    <Group gap="xs" c="dimmed">
-                      <IconBriefcase size={14} />
+                    <Group
+                      gap="xs"
+                      c="dimmed"
+                      component="a"
+                      style={{
+                        textDecoration: 'none',
+                        color: 'inherit',
+                      }}
+                      onClick={() => {
+                        callPhone(staffMember);
+                      }}
+                    >
+                      <IconPhone size={22} />
                       <Text size="xs">
-                        {formatWorkingPattern(staffMember)} •{' '}
-                        {formatCurrency(staffMember.hourlyRate)}
-                        {t('staff.perHour')}
+                        {formatPhoneNumber(staffMember.phoneNumber)}
                       </Text>
+                    </Group>
+
+                    <Group gap="xs" c="dimmed">
+                      <IconBriefcase size={22} />
+                      <Text size="xs">{formatWorkingPattern(staffMember)}</Text>
                     </Group>
                   </Stack>
 
@@ -242,7 +262,7 @@ export function StaffList({
                             handleShowQrCode(staffMember);
                           }}
                         >
-                          <IconQrcode size={14} />
+                          <IconQrcode size={22} />
                         </ActionIcon>
                       </Tooltip>
 
@@ -262,9 +282,9 @@ export function StaffList({
                               onClick={copy}
                             >
                               {copied ? (
-                                <IconCheck size={14} />
+                                <IconCheck size={22} />
                               ) : (
-                                <IconCopy size={14} />
+                                <IconCopy size={22} />
                               )}
                             </ActionIcon>
                           </Tooltip>
@@ -290,7 +310,7 @@ export function StaffList({
                           onDelete(staffMember);
                         }}
                       >
-                        <IconTrash size={14} />
+                        <IconTrash size={22} />
                       </ActionIcon>
                     </Group>
                   </Group>
@@ -314,7 +334,7 @@ export function StaffList({
           {selectedStaff ? (
             <Stack gap="md" align="center">
               <Text size="sm" c="dimmed" ta="center">
-                Staff can scan this QR code to access their clock-in page
+                {t('staff.qrCodeDescription')}
               </Text>
 
               {selectedStaff.clockInQrCode ? (
@@ -328,7 +348,7 @@ export function StaffList({
 
               <Stack gap="xs" w="100%">
                 <Text size="xs" c="dimmed">
-                  Clock-in URL:
+                  {t('staff.clockInUrl')}
                 </Text>
                 <Code block>{selectedStaff.clockInUrl}</Code>
 
@@ -347,7 +367,7 @@ export function StaffList({
                       variant="light"
                       onClick={copy}
                     >
-                      {copied ? 'Copied!' : 'Copy URL'}
+                      {copied ? t('staff.copied') : t('staff.copyUrl')}
                     </Button>
                   )}
                 </CopyButton>
@@ -387,150 +407,138 @@ export function StaffList({
               <Table.Tr>
                 <Table.Th>{t('staff.staffMemberHeader')}</Table.Th>
                 <Table.Th>{t('staff.contact')}</Table.Th>
-                <Table.Th>{t('staff.roleStatus')}</Table.Th>
+                <Table.Th>{t('staff.role')}</Table.Th>
                 <Table.Th>{t('staff.workingPatternLabel')}</Table.Th>
-                <Table.Th>{t('staff.hourlyRate')}</Table.Th>
                 <Table.Th>{t('staff.clockIn')}</Table.Th>
                 <Table.Th>{t('staff.actions')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {staff.map((staffMember) => (
-                <Table.Tr key={staffMember.id}>
-                  <Table.Td>
-                    <Group gap="sm">
-                      <Avatar size={32} radius="xl" color="blue">
-                        {staffMember.fullName.charAt(0).toUpperCase()}
-                      </Avatar>
-                      <div>
+              {[...staff]
+                .sort((a: Staff, b: Staff) => {
+                  const a1 = a.status === 'active' ? 1 : 0;
+                  const b1 = b.status === 'active' ? 1 : 0;
+                  return a1 - b1;
+                })
+                .map((staffMember) => (
+                  <Table.Tr key={staffMember.id}>
+                    <Table.Td>
+                      <Group gap="sm">
+                        {getRoleIcon(staffMember)}
                         <Text fw={600} size="sm">
                           {staffMember.fullName}
                         </Text>
-                        <Text size="xs" c="dimmed">
-                          {t('staff.joined')}{' '}
-                          {new Date(staffMember.createdAt).toLocaleDateString()}
-                        </Text>
-                      </div>
-                    </Group>
-                  </Table.Td>
-
-                  <Table.Td>
-                    <Stack gap={2}>
-                      <Group gap="xs">
-                        <IconMail size={12} />
-                        <Text size="xs">{staffMember.email}</Text>
                       </Group>
-                      <Group gap="xs">
-                        <IconPhone size={12} />
-                        <Text size="xs">{staffMember.phoneNumber}</Text>
-                      </Group>
-                    </Stack>
-                  </Table.Td>
+                    </Table.Td>
 
-                  <Table.Td>
-                    <Stack gap="xs">
-                      <Badge
-                        size="sm"
-                        color={getRoleBadgeColor(staffMember.role)}
-                        variant="light"
-                      >
-                        {t(`staff.${staffMember.role}`)}
-                      </Badge>
-                      <Switch
-                        size="sm"
-                        checked={staffMember.status === 'active'}
-                        color={
-                          staffMember.status === 'active' ? 'green' : 'orange'
-                        }
-                        label={t(`staff.${staffMember.status}` as const)}
-                        onChange={() => {
-                          onToggleStatus(staffMember);
-                        }}
-                      />
-                    </Stack>
-                  </Table.Td>
-
-                  <Table.Td>
-                    <Text size="sm">{formatWorkingPattern(staffMember)}</Text>
-                  </Table.Td>
-
-                  <Table.Td>
-                    <Text size="sm" fw={600}>
-                      {formatCurrency(staffMember.hourlyRate)}
-                    </Text>
-                  </Table.Td>
-
-                  <Table.Td>
-                    <Group gap="xs">
-                      <Tooltip label={t('staff.viewQrCode')}>
-                        <ActionIcon
-                          variant="light"
-                          color="blue"
-                          size="sm"
+                    <Table.Td>
+                      {staffMember.phoneNumber ? (
+                        <Group
+                          gap="xs"
+                          component="a"
+                          style={{
+                            textDecoration: 'none',
+                            color: 'inherit',
+                          }}
                           onClick={() => {
-                            handleShowQrCode(staffMember);
+                            callPhone(staffMember);
                           }}
                         >
-                          <IconQrcode size={14} />
-                        </ActionIcon>
-                      </Tooltip>
+                          <IconPhone size={12} />
+                          <Text size="xs">
+                            {formatPhoneNumber(staffMember.phoneNumber)}
+                          </Text>
+                        </Group>
+                      ) : null}
+                    </Table.Td>
 
-                      <CopyButton value={staffMember.clockInUrl}>
-                        {({copied, copy}) => (
-                          <Tooltip
-                            label={
-                              copied ? t('staff.copied') : t('staff.copyUrl')
-                            }
+                    <Table.Td>
+                      <Group gap="xs">
+                        <Badge
+                          size="sm"
+                          color={getRoleBadgeColor(staffMember.role)}
+                          variant="light"
+                        >
+                          {t(`staff.${staffMember.role}`)}
+                        </Badge>
+                      </Group>
+                    </Table.Td>
+
+                    <Table.Td>
+                      <Text size="sm">{formatWorkingPattern(staffMember)}</Text>
+                    </Table.Td>
+
+                    <Table.Td>
+                      <Group gap="xs">
+                        <Tooltip label={t('staff.viewQrCode')}>
+                          <ActionIcon
+                            variant="light"
+                            color="blue"
+                            size="sm"
+                            onClick={() => {
+                              handleShowQrCode(staffMember);
+                            }}
                           >
-                            <ActionIcon
-                              variant="light"
-                              color={copied ? 'green' : 'gray'}
-                              size="sm"
-                              onClick={copy}
+                            <IconQrcode size={22} />
+                          </ActionIcon>
+                        </Tooltip>
+
+                        <CopyButton value={staffMember.clockInUrl}>
+                          {({copied, copy}) => (
+                            <Tooltip
+                              label={
+                                copied ? t('staff.copied') : t('staff.copyUrl')
+                              }
                             >
-                              {copied ? (
-                                <IconCheck size={14} />
-                              ) : (
-                                <IconCopy size={14} />
-                              )}
-                            </ActionIcon>
-                          </Tooltip>
-                        )}
-                      </CopyButton>
-                    </Group>
-                  </Table.Td>
+                              <ActionIcon
+                                variant="light"
+                                color={copied ? 'green' : 'gray'}
+                                size="sm"
+                                onClick={copy}
+                              >
+                                {copied ? (
+                                  <IconCheck size={22} />
+                                ) : (
+                                  <IconCopy size={22} />
+                                )}
+                              </ActionIcon>
+                            </Tooltip>
+                          )}
+                        </CopyButton>
+                      </Group>
+                    </Table.Td>
 
-                  <Table.Td>
-                    <Group gap="xs">
-                      <Tooltip label={t('staff.editStaff')}>
-                        <ActionIcon
-                          variant="light"
-                          color="blue"
-                          size="sm"
-                          onClick={() => {
-                            onEdit(staffMember);
-                          }}
-                        >
-                          <IconEdit size={14} />
-                        </ActionIcon>
-                      </Tooltip>
+                    <Table.Td>
+                      <Group gap="xs">
+                        <Tooltip label={t('staff.editStaff')}>
+                          <ActionIcon
+                            variant="light"
+                            color="blue"
+                            size="sm"
+                            onClick={() => {
+                              onEdit(staffMember);
+                            }}
+                          >
+                            <IconEdit size={22} />
+                          </ActionIcon>
+                        </Tooltip>
 
-                      <Tooltip label={t('staff.deleteStaffTooltip')}>
-                        <ActionIcon
-                          variant="light"
-                          color="red"
-                          size="sm"
-                          onClick={() => {
-                            onDelete(staffMember);
-                          }}
-                        >
-                          <IconTrash size={14} />
-                        </ActionIcon>
-                      </Tooltip>
-                    </Group>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
+                        <Tooltip label={t('staff.deleteStaffTooltip')}>
+                          <ActionIcon
+                            variant="light"
+                            color="red"
+                            size="sm"
+                            onClick={() => {
+                              onDelete(staffMember);
+                            }}
+                          >
+                            <IconTrash size={22} />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Group>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
             </Table.Tbody>
           </Table>
         </ScrollArea>
@@ -550,7 +558,7 @@ export function StaffList({
         {selectedStaff ? (
           <Stack gap="md" align="center">
             <Text size="sm" c="dimmed" ta="center">
-              Staff can scan this QR code to access their clock-in page
+              {t('staff.qrCodeDescription')}
             </Text>
 
             {selectedStaff.clockInQrCode ? (
@@ -564,7 +572,7 @@ export function StaffList({
 
             <Stack gap="xs" w="100%">
               <Text size="xs" c="dimmed">
-                Clock-in URL:
+                {t('staff.clockInUrlLabel')}
               </Text>
               <Code block>{selectedStaff.clockInUrl}</Code>
 
@@ -579,7 +587,7 @@ export function StaffList({
                     variant="light"
                     onClick={copy}
                   >
-                    {copied ? 'Copied!' : 'Copy URL'}
+                    {copied ? t('staff.copied') : t('staff.copyUrl')}
                   </Button>
                 )}
               </CopyButton>

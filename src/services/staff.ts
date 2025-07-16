@@ -404,7 +404,7 @@ const generateQRCode = async (url: string): Promise<string> => {
 
 export const staffService = {
   async getAllStaff(params: StaffListRequest = {}): Promise<StaffListResponse> {
-    await delay(600);
+    await delay(300);
 
     const {
       storeId,
@@ -416,7 +416,6 @@ export const staffService = {
       sortBy = 'createdAt',
       sortOrder = 'desc',
     } = params;
-
     const filteredStaff = mockStaff.filter((staff) => {
       // Filter by store
       if (storeId && staff.storeId !== storeId) return false;
