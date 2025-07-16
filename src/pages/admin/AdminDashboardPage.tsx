@@ -35,29 +35,29 @@ export function AdminDashboardPage() {
   const dashboardCards = [
     {
       icon: IconUsers,
-      title: t('admin.tenants'),
-      description: t('admin.tenantsDescription'),
+      title: t('admin.dashboard.clients'),
+      description: t('admin.dashboard.clientsDescription'),
       color: 'blue',
-      onClick: () => navigate('/admin/tenants'),
+      onClick: () => navigate('/admin/clients'),
     },
     {
       icon: IconBuildingStore,
-      title: t('admin.stores'),
-      description: t('admin.storesDescription'),
+      title: t('admin.dashboard.stores'),
+      description: t('admin.dashboard.storesDescription'),
       color: 'grape',
       onClick: () => navigate('/admin/stores'),
     },
     {
       icon: IconActivity,
-      title: t('admin.monitoring'),
-      description: t('admin.monitoringDescription'),
+      title: t('admin.dashboard.monitoring'),
+      description: t('admin.dashboard.monitoringDescription'),
       color: 'green',
       onClick: () => navigate('/admin/monitoring'),
     },
     {
       icon: IconSettings,
-      title: t('admin.settings'),
-      description: t('admin.settingsDescription'),
+      title: t('admin.dashboard.settings'),
+      description: t('admin.dashboard.settingsDescription'),
       color: 'orange',
       onClick: () => navigate('/admin/settings'),
     },
@@ -71,7 +71,7 @@ export function AdminDashboardPage() {
           <Group justify="space-between" align="center">
             <Group>
               <IconShieldCheck size={32} stroke={1.5} />
-              <Title order={1}>{t('admin.dashboard')}</Title>
+              <Title order={1}>{t('admin.dashboard.label')}</Title>
             </Group>
             <Button
               variant="subtle"
@@ -109,6 +109,7 @@ export function AdminDashboardPage() {
                   padding="lg"
                   radius="md"
                   style={{cursor: 'pointer'}}
+                  h={160}
                   onClick={card.onClick}
                 >
                   <Stack gap="sm">

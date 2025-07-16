@@ -79,7 +79,7 @@ export function AddStaffPage() {
       if (!values.email.trim()) {
         errors.email = t('validation.emailRequired');
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-        errors.email = t('validation.emailInvalid');
+        errors.email = t('validation.invalidEmail');
       }
 
       if (!values.phoneNumber.trim()) {

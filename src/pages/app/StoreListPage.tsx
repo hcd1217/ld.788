@@ -8,7 +8,6 @@ import {
   Group,
   Button,
   Text,
-  Badge,
   SimpleGrid,
   LoadingOverlay,
   Alert,
@@ -36,8 +35,8 @@ import {
   useStoreActions,
   useCurrentStore,
 } from '@/stores/useStoreConfigStore';
-import {GoBack} from '@/components/common/GoBack';
 import type {Store} from '@/services/store';
+import classes from './StoreListPage.module.css';
 
 export function StoreListPage() {
   const navigate = useNavigate();
@@ -104,6 +103,9 @@ export function StoreListPage() {
   };
 
   const handleSelectStore = (store: Store) => {
+    if (currentStore?.id === store.id) {
+      return;
+    }
     setCurrentStore(store);
     notifications.show({
       title: t('store.storeSelected'),
@@ -147,9 +149,10 @@ export function StoreListPage() {
         shadow="sm"
         padding="lg"
         radius="md"
-        style={
-          isSelected ? {borderColor: 'var(--mantine-color-blue-6)'} : undefined
-        }
+        className={`${classes.storeCard} ${isSelected ? classes.selected : ''}`}
+        onClick={() => {
+          handleSelectStore(store);
+        }}
       >
         <Stack gap="md">
           <Group justify="space-between" align="flex-start">
@@ -158,16 +161,20 @@ export function StoreListPage() {
                 <Text fw={700} size="lg">
                   {store.name}
                 </Text>
-                {isSelected ? (
-                  <Badge size="sm" color="blue" variant="filled">
-                    {t('store.current')}
-                  </Badge>
-                ) : null}
               </Group>
 
               <Group gap="xs" c="dimmed">
                 <IconMapPin size={14} />
-                <Text size="sm" lineClamp={2}>
+                <Text
+                  size="sm"
+                  maw={250}
+                  lineClamp={2}
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   {store.address}
                 </Text>
               </Group>
@@ -185,7 +192,8 @@ export function StoreListPage() {
               variant="light"
               size="sm"
               title={t('store.deleteStoreTooltip')}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 handleDeleteStore(store);
               }}
             >
@@ -205,6 +213,7 @@ export function StoreListPage() {
 
             {!isSelected && (
               <Button
+                opacity={0}
                 size="xs"
                 variant="light"
                 onClick={() => {
@@ -225,7 +234,9 @@ export function StoreListPage() {
       <Container size="lg" mt="xl">
         <Stack gap="xl">
           <Group justify="space-between">
-            <GoBack />
+            <Title order={1} ta="center">
+              {t('store.title')}
+            </Title>
             <Button
               leftSection={<IconPlus size={16} />}
               onClick={() => navigate('/store-config')}
@@ -233,10 +244,6 @@ export function StoreListPage() {
               {t('store.createNewStore')}
             </Button>
           </Group>
-
-          <Title order={1} ta="center">
-            {t('store.title')}
-          </Title>
 
           {error ? (
             <Alert

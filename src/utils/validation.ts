@@ -21,7 +21,7 @@ export function validateEmail(
 ): string | undefined {
   if (!value) return t('validation.emailRequired');
   if (!VALIDATION_PATTERNS.email.test(value))
-    return t('validation.emailInvalid');
+    return t('validation.invalidEmail');
   return undefined;
 }
 

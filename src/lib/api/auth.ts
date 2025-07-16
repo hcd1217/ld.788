@@ -1,13 +1,6 @@
 import * as z from 'zod/v4';
 import {BaseApiClient} from './base';
-
-const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&()^])[A-Za-z\d@#$!%*?&()^]{8,}$/;
-
-const jwtTokenRegex = /^(?:[\w-]{10,}\.){2}[\w-]{10,}$/;
-
-const passwordSchema = z.string().regex(passwordRegex);
-const jwtTokenSchema = z.string().regex(jwtTokenRegex);
+import {passwordSchema, jwtTokenSchema, emailSchema} from './schema';
 
 // Schemas
 export const LoginRequestSchema = z.object({
@@ -31,7 +24,7 @@ export const RenewTokenResponseSchema = z.object({
 });
 
 export const JWTPayloadSchema = z.object({
-  email: z.email(),
+  email: emailSchema,
   sub: z.string(),
   isRoot: z.boolean().optional(),
   iat: z.number(),
@@ -39,7 +32,7 @@ export const JWTPayloadSchema = z.object({
 });
 
 export const ForgotPasswordRequestSchema = z.object({
-  email: z.email(),
+  email: emailSchema,
   clientCode: z.string().min(2),
 });
 
@@ -48,7 +41,7 @@ export const ForgotPasswordResponseSchema = z.object({
 });
 
 export const ResetPasswordRequestSchema = z.object({
-  email: z.email(),
+  email: emailSchema,
   token: z.string(),
   password: passwordSchema,
 });
@@ -58,7 +51,7 @@ export const ResetPasswordResponseSchema = z.object({
 });
 
 export const RegisterRequestSchema = z.object({
-  email: z.email(),
+  email: emailSchema,
   password: passwordSchema,
   firstName: z.string().min(1),
   lastName: z.string().min(1),

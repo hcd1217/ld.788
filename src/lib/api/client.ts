@@ -7,12 +7,12 @@ const passwordSchema = z.string().regex(passwordRegex);
 const emailSchema = z.email();
 
 export const RegisterClientRequestSchema = z.object({
-  name: z.string(),
-  code: z.string(),
-  email: z.email(),
-  password: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
+  clientCode: z.string(),
+  clientName: z.string(),
+  rootUserEmail: emailSchema,
+  rootUserPassword: z.string(),
+  rootUserFirstName: z.string(),
+  rootUserLastName: z.string(),
 });
 
 export const RegisterClientResponseSchema = z.object({
@@ -23,7 +23,7 @@ export const RegisterClientResponseSchema = z.object({
   }),
   rootUser: z.object({
     id: z.string(),
-    email: z.email(),
+    email: emailSchema,
     firstName: z.string(),
     lastName: z.string(),
   }),

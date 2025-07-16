@@ -145,6 +145,21 @@ const AdminDashboardPage = lazy(async () => {
   return {default: module.AdminDashboardPage};
 });
 
+const ClientListPage = lazy(async () => {
+  const module = await import('@/pages/admin/ClientListPage');
+  return {default: module.ClientListPage};
+});
+
+const ClientCreatePage = lazy(async () => {
+  const module = await import('@/pages/admin/ClientCreatePage');
+  return {default: module.ClientCreatePage};
+});
+
+const ClientDetailPage = lazy(async () => {
+  const module = await import('@/pages/admin/ClientDetailPage');
+  return {default: module.ClientDetailPage};
+});
+
 const routeObjects: RouteObject[] = [
   {
     path: '',
@@ -237,7 +252,12 @@ const routeObjects: RouteObject[] = [
             <AppLayout />
           </AdminProtectedRoute>
         ),
-        children: [{path: 'dashboard', Component: AdminDashboardPage}],
+        children: [
+          {path: 'dashboard', Component: AdminDashboardPage},
+          {path: 'clients', Component: ClientListPage},
+          {path: 'clients/new', Component: ClientCreatePage},
+          {path: 'clients/:id', Component: ClientDetailPage},
+        ],
       },
     ],
   },

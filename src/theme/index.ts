@@ -42,11 +42,11 @@ export const theme = createTheme({
             padding: '0',
           },
           innerInput: {
-            padding: 0,
+            padding: '0',
           },
         };
         if (props.leftSection) {
-          styles.input.padding = '.5rem 2rem';
+          styles.innerInput.padding = '0.5rem 2rem';
         }
 
         return styles;

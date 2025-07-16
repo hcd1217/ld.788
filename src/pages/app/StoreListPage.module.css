@@ -1,0 +1,35 @@
+.storeCard {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  will-change: transform, box-shadow;
+}
+
+.storeCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* For dark mode */
+[data-mantine-color-scheme="dark"] .storeCard:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Active state for better feedback */
+.storeCard:active {
+  transform: translate(20px);
+  transition-duration: 0.5s;
+}
+
+/* Ensure smooth transition for selected state */
+.storeCard.selected {
+  border-color: var(--mantine-color-blue-6);
+  border-width: 2px;
+  transform: scale(1.02);
+  background-color: light-dark(var(--mantine-color-blue-1), var(--mantine-color-brand-9));
+}
+
+/* Subtle scale effect on hover for enhanced visual feedback */
+.storeCard:hover {
+  transform: translate(-6px) scale(1.02);
+  transition-duration: 0.5s;
+}
