@@ -17,6 +17,7 @@ import {
   IconActivity,
   IconLogout,
   IconShieldCheck,
+  IconShieldLock,
 } from '@tabler/icons-react';
 import {useNavigate} from 'react-router';
 import {useAppStore} from '@/stores/useAppStore';
@@ -39,6 +40,13 @@ export function AdminDashboardPage() {
       description: t('admin.dashboard.clientsDescription'),
       color: 'blue',
       onClick: () => navigate('/admin/clients'),
+    },
+    {
+      icon: IconShieldLock,
+      title: t('admin.dashboard.permissions'),
+      description: t('admin.dashboard.permissionsDescription'),
+      color: 'red',
+      onClick: () => navigate('/admin/permissions'),
     },
     {
       icon: IconBuildingStore,

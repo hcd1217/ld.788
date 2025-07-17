@@ -1,15 +1,14 @@
 import {Group, Title, Box} from '@mantine/core';
 import {useNavigate} from 'react-router';
 
-export function AppLogo() {
+type AppLogoProps = {
+  readonly link?: string;
+};
+export function AppLogo({link = '/home'}: AppLogoProps) {
   const navigate = useNavigate();
 
   return (
-    <Group
-      gap="xs"
-      style={{cursor: 'pointer'}}
-      onClick={() => navigate('/home')}
-    >
+    <Group gap="xs" style={{cursor: 'pointer'}} onClick={() => navigate(link)}>
       <Box
         component="img"
         src="/logo.svg"

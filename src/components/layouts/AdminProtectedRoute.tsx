@@ -1,19 +1,33 @@
+import {AppShell, Group} from '@mantine/core';
+import {Outlet, Navigate} from 'react-router';
 import {type ReactNode} from 'react';
-import {Navigate} from 'react-router';
+import {ColorSchemeToggle} from '@/components/common/ColorSchemeToggle';
+import {LanguageSwitcher} from '@/components/common/LanguageSwitcher';
+import {AppLogo} from '@/components/common/AppLogo';
 import {useAppStore} from '@/stores/useAppStore';
 
-type AdminProtectedRouteProps = {
-  readonly children: ReactNode;
-};
-
-export function AdminProtectedRoute({
-  children,
-}: AdminProtectedRouteProps): ReactNode {
+export function AdminProtectedRoute(): ReactNode {
   const {adminAuthenticated} = useAppStore();
 
   if (!adminAuthenticated) {
     return <Navigate replace to="/admin/login" />;
   }
 
-  return children;
+  return (
+    <AppShell header={{height: 60}} padding="md">
+      <AppShell.Header>
+        <Group h="100%" px="md" justify="space-between">
+          <AppLogo link="/admin/dashboard" />
+          <Group>
+            <LanguageSwitcher />
+            <ColorSchemeToggle />
+          </Group>
+        </Group>
+      </AppShell.Header>
+
+      <AppShell.Main>
+        <Outlet />
+      </AppShell.Main>
+    </AppShell>
+  );
 }

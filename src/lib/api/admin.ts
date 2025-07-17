@@ -77,6 +77,52 @@ export const HardDeleteClientResponseSchema = z.object({
   message: z.string(),
 });
 
+// Admin Permission Management Schemas
+export const AdminPermissionSchema = z.object({
+  id: z.string(),
+  resource: z.string(),
+  action: z.string(),
+  scope: z.string(),
+  description: z.string(),
+  isSystem: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string().optional(),
+  deletedAt: z.string().nullable().optional(),
+});
+
+export const GetAllAdminPermissionsResponseSchema = z.object({
+  permissions: z.array(AdminPermissionSchema),
+  total: z.number(),
+  offset: z.number(),
+  limit: z.number(),
+  hasNext: z.boolean().optional(),
+  hasPrev: z.boolean().optional(),
+});
+
+export const CreateAdminPermissionRequestSchema = z.object({
+  resource: z.string(),
+  action: z.string(),
+  scope: z.string(),
+  description: z.string(),
+});
+
+export const CreateAdminPermissionResponseSchema = z.object({
+  permission: AdminPermissionSchema,
+});
+
+export const UpdateAdminPermissionRequestSchema = z.object({
+  description: z.string(),
+});
+
+export const UpdateAdminPermissionResponseSchema = z.object({
+  permission: AdminPermissionSchema,
+});
+
+export const DeleteAdminPermissionResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+
 // Type exports
 export type AdminLoginRequest = z.infer<typeof AdminLoginRequestSchema>;
 export type AdminLoginResponse = z.infer<typeof AdminLoginResponseSchema>;
@@ -101,6 +147,25 @@ export type HardDeleteClientRequest = z.infer<
 >;
 export type HardDeleteClientResponse = z.infer<
   typeof HardDeleteClientResponseSchema
+>;
+export type AdminPermission = z.infer<typeof AdminPermissionSchema>;
+export type GetAllAdminPermissionsResponse = z.infer<
+  typeof GetAllAdminPermissionsResponseSchema
+>;
+export type CreateAdminPermissionRequest = z.infer<
+  typeof CreateAdminPermissionRequestSchema
+>;
+export type CreateAdminPermissionResponse = z.infer<
+  typeof CreateAdminPermissionResponseSchema
+>;
+export type UpdateAdminPermissionRequest = z.infer<
+  typeof UpdateAdminPermissionRequestSchema
+>;
+export type UpdateAdminPermissionResponse = z.infer<
+  typeof UpdateAdminPermissionResponseSchema
+>;
+export type DeleteAdminPermissionResponse = z.infer<
+  typeof DeleteAdminPermissionResponseSchema
 >;
 
 export class AdminApi extends BaseApiClient {
@@ -177,6 +242,67 @@ export class AdminApi extends BaseApiClient {
       {},
       ReactivateClientResponseSchema,
       ReactivateClientRequestSchema,
+    );
+  }
+
+  // Admin Permission Management Methods
+  async getAllAdminPermissions(params?: {
+    search?: string;
+    offset?: number;
+    limit?: number;
+  }): Promise<GetAllAdminPermissionsResponse> {
+    const queryParams = new URLSearchParams();
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.offset !== undefined)
+      queryParams.append('offset', params.offset.toString());
+    if (params?.limit !== undefined)
+      queryParams.append('limit', params.limit.toString());
+
+    const url = `/admin/permissions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+
+    return this.get<GetAllAdminPermissionsResponse, void>(
+      url,
+      undefined,
+      GetAllAdminPermissionsResponseSchema,
+    );
+  }
+
+  async createAdminPermission(
+    data: CreateAdminPermissionRequest,
+  ): Promise<CreateAdminPermissionResponse> {
+    return this.post<
+      CreateAdminPermissionResponse,
+      CreateAdminPermissionRequest
+    >(
+      '/admin/permissions',
+      data,
+      CreateAdminPermissionResponseSchema,
+      CreateAdminPermissionRequestSchema,
+    );
+  }
+
+  async updateAdminPermission(
+    id: string,
+    data: UpdateAdminPermissionRequest,
+  ): Promise<UpdateAdminPermissionResponse> {
+    return this.put<
+      UpdateAdminPermissionResponse,
+      UpdateAdminPermissionRequest
+    >(
+      `/admin/permissions/${id}`,
+      data,
+      UpdateAdminPermissionResponseSchema,
+      UpdateAdminPermissionRequestSchema,
+    );
+  }
+
+  async deleteAdminPermission(
+    id: string,
+  ): Promise<DeleteAdminPermissionResponse> {
+    return this.delete<DeleteAdminPermissionResponse>(
+      `/admin/permissions/${id}`,
+      undefined,
+      DeleteAdminPermissionResponseSchema,
     );
   }
 }

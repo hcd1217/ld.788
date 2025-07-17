@@ -160,6 +160,11 @@ const ClientDetailPage = lazy(async () => {
   return {default: module.ClientDetailPage};
 });
 
+const AdminPermissionManagementPage = lazy(async () => {
+  const module = await import('@/pages/admin/PermissionManagementPage');
+  return {default: module.PermissionManagementPage};
+});
+
 const routeObjects: RouteObject[] = [
   {
     path: '',
@@ -247,16 +252,13 @@ const routeObjects: RouteObject[] = [
       },
       {
         path: '',
-        element: (
-          <AdminProtectedRoute>
-            <AppLayout />
-          </AdminProtectedRoute>
-        ),
+        Component: AdminProtectedRoute,
         children: [
           {path: 'dashboard', Component: AdminDashboardPage},
           {path: 'clients', Component: ClientListPage},
           {path: 'clients/new', Component: ClientCreatePage},
           {path: 'clients/:clientCode', Component: ClientDetailPage},
+          {path: 'permissions', Component: AdminPermissionManagementPage},
         ],
       },
     ],
