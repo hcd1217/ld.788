@@ -278,7 +278,6 @@ export class BaseApiClient {
       clearTimeout(timeoutId);
 
       // Check if response has content before parsing JSON
-      let data: unknown;
       const contentType = response.headers.get('content-type');
       const contentLength = response.headers.get('content-length');
 
@@ -288,18 +287,7 @@ export class BaseApiClient {
         contentLength !== '0' &&
         response.status !== 204;
 
-      if (hasJsonContent) {
-        try {
-          data = await response.json();
-        } catch (error: unknown) {
-          console.error('JSON parsing error:', error);
-          // If JSON parsing fails, return undefined for successful responses
-          data = response.ok ? undefined : {};
-        }
-      } else {
-        // No content or non-JSON content
-        data = undefined;
-      }
+      const data = hasJsonContent ? await response.json() : undefined;
 
       if (!response.ok) {
         const apiError = new ApiError(

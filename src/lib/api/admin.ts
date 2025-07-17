@@ -55,7 +55,17 @@ export const SuspendClientRequestSchema = z.object({
   reason: z.string().min(1).max(500),
 });
 
+export const SuspendClientResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+
 export const ReactivateClientRequestSchema = z.object({});
+
+export const ReactivateClientResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
 
 // Hard Delete Client Schemas
 export const HardDeleteClientRequestSchema = z.object({
@@ -79,8 +89,12 @@ export type AdminRegisterClientResponse = z.infer<
 >;
 export type ClientListResponse = z.infer<typeof ClientListResponseSchema>;
 export type SuspendClientRequest = z.infer<typeof SuspendClientRequestSchema>;
+export type SuspendClientResponse = z.infer<typeof SuspendClientResponseSchema>;
 export type ReactivateClientRequest = z.infer<
   typeof ReactivateClientRequestSchema
+>;
+export type ReactivateClientResponse = z.infer<
+  typeof ReactivateClientResponseSchema
 >;
 export type HardDeleteClientRequest = z.infer<
   typeof HardDeleteClientRequestSchema
@@ -146,20 +160,22 @@ export class AdminApi extends BaseApiClient {
   async suspendClient(
     clientCode: string,
     data: SuspendClientRequest,
-  ): Promise<Client> {
-    return this.patch<Client, SuspendClientRequest>(
+  ): Promise<SuspendClientResponse> {
+    return this.patch<SuspendClientResponse, SuspendClientRequest>(
       `/admin/clients/${clientCode}/suspend`,
       data,
-      ClientSchema,
+      SuspendClientResponseSchema,
       SuspendClientRequestSchema,
     );
   }
 
-  async reactivateClient(clientCode: string): Promise<Client> {
-    return this.patch<Client, ReactivateClientRequest>(
+  async reactivateClient(
+    clientCode: string,
+  ): Promise<ReactivateClientResponse> {
+    return this.patch<ReactivateClientResponse, ReactivateClientRequest>(
       `/admin/clients/${clientCode}/reactivate`,
       {},
-      ClientSchema,
+      ReactivateClientResponseSchema,
       ReactivateClientRequestSchema,
     );
   }
