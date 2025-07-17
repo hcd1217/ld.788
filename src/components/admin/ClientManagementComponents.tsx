@@ -9,6 +9,9 @@ import {
   Alert,
   TextInput,
   Button,
+  Card,
+  ActionIcon,
+  Menu,
   type BadgeProps,
 } from '@mantine/core';
 import {
@@ -17,6 +20,11 @@ import {
   IconMail,
   IconCalendar,
   IconAlertTriangle,
+  IconEdit,
+  IconDotsVertical,
+  IconCircleCheck,
+  IconBan,
+  IconTrash,
 } from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {formatDate} from '@/utils/string';
@@ -322,5 +330,163 @@ export function ClientActionModal({
         </Group>
       </Stack>
     </Modal>
+  );
+}
+
+// Client Card Component
+interface ClientCardProps {
+  readonly client: Client;
+  readonly onSuspend: (client: Client) => void;
+  readonly onReactivate: (client: Client) => void;
+  readonly onDelete: (client: Client) => void;
+  readonly onViewDetails: (clientCode: string) => void;
+}
+
+// Client Action Menu Component
+interface ClientActionMenuProps {
+  readonly client: Client;
+  readonly onSuspend: () => void;
+  readonly onReactivate: () => void;
+  readonly onDelete: () => void;
+  readonly size?: 'sm' | 'lg';
+}
+
+export function ClientActionMenu({
+  client,
+  onSuspend,
+  onReactivate,
+  onDelete,
+  size = 'sm',
+}: ClientActionMenuProps) {
+  const {t} = useTranslation();
+  const isSuspended = client.status === 'suspended';
+
+  return (
+    <Menu shadow="md" width={200}>
+      <Menu.Target>
+        <ActionIcon
+          variant="light"
+          size={size}
+          title={t('admin.clients.moreActions')}
+        >
+          <IconDotsVertical size={size === 'sm' ? 14 : 16} />
+        </ActionIcon>
+      </Menu.Target>
+
+      <Menu.Dropdown>
+        {isSuspended ? (
+          <Menu.Item
+            leftSection={<IconCircleCheck size={14} />}
+            color="green"
+            onClick={onReactivate}
+          >
+            {t('admin.clients.activateClient')}
+          </Menu.Item>
+        ) : (
+          <Menu.Item
+            leftSection={<IconBan size={14} />}
+            color="yellow"
+            onClick={onSuspend}
+          >
+            {t('admin.clients.suspendClient')}
+          </Menu.Item>
+        )}
+        <Menu.Divider />
+        <Menu.Item
+          leftSection={<IconTrash size={14} />}
+          color="red"
+          onClick={onDelete}
+        >
+          {t('admin.clients.deleteClient')}
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
+  );
+}
+
+export function ClientCard({
+  client,
+  onSuspend,
+  onReactivate,
+  onDelete,
+  onViewDetails,
+}: ClientCardProps) {
+  const {t} = useTranslation();
+  const isSuspended = client.status === 'suspended';
+
+  return (
+    <Card
+      withBorder
+      shadow="sm"
+      padding="lg"
+      radius="md"
+      style={isSuspended ? {opacity: 0.7} : undefined}
+    >
+      <Stack gap="md">
+        <Group justify="space-between" align="flex-start">
+          <Stack gap={4} style={{flex: 1}}>
+            <Group gap="xs" wrap="nowrap">
+              <Text truncate fw={700} size="lg">
+                {client.clientName}
+              </Text>
+              <ClientStatusBadge status={client.status} size="sm" />
+            </Group>
+
+            <Badge size="md" variant="light" color="blue">
+              {client.clientCode}
+            </Badge>
+
+            <Group gap="xs" c="dimmed" mt="xs">
+              <IconMail size={14} />
+              <Text size="sm">{client.rootUser.email}</Text>
+            </Group>
+
+            <Text size="sm" c="dimmed">
+              {client.rootUser.firstName} {client.rootUser.lastName}
+            </Text>
+          </Stack>
+
+          <Group gap="xs">
+            <ActionIcon
+              color="blue"
+              variant="light"
+              size="sm"
+              title={t('admin.clients.viewDetails')}
+              onClick={() => {
+                onViewDetails(client.clientCode);
+              }}
+            >
+              <IconEdit size={14} />
+            </ActionIcon>
+
+            <ClientActionMenu
+              client={client}
+              onSuspend={() => {
+                onSuspend(client);
+              }}
+              onReactivate={() => {
+                onReactivate(client);
+              }}
+              onDelete={() => {
+                onDelete(client);
+              }}
+            />
+          </Group>
+        </Group>
+
+        <Group
+          justify="space-between"
+          pt="md"
+          style={{borderTop: '1px solid var(--mantine-color-gray-3)'}}
+        >
+          <Group gap="xs" c="dimmed">
+            <IconCalendar size={14} />
+            <Text size="xs">
+              {t('common.created')} {formatDate(client.createdAt)}
+            </Text>
+          </Group>
+        </Group>
+      </Stack>
+    </Card>
   );
 }

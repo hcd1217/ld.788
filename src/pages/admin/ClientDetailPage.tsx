@@ -9,8 +9,6 @@ import {
   Box,
   Alert,
   LoadingOverlay,
-  ActionIcon,
-  Menu,
   Divider,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
@@ -18,10 +16,8 @@ import {notifications} from '@mantine/notifications';
 import {
   IconAlertCircle,
   IconBan,
-  IconCircleCheck,
   IconTrash,
   IconCheck,
-  IconDotsVertical,
   IconAlertTriangle,
 } from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
@@ -33,6 +29,7 @@ import {
   ClientBasicInfo,
   RootUserInfo,
   ClientActionModal,
+  ClientActionMenu,
 } from '@/components/admin/ClientManagementComponents';
 import type {Client} from '@/lib/api';
 
@@ -254,41 +251,13 @@ export function ClientDetailPage() {
           <Group justify="space-between">
             <GoBack />
             {client ? (
-              <Menu shadow="md" width={200}>
-                <Menu.Target>
-                  <ActionIcon variant="light" size="lg">
-                    <IconDotsVertical size={16} />
-                  </ActionIcon>
-                </Menu.Target>
-
-                <Menu.Dropdown>
-                  {client.status === 'active' ? (
-                    <Menu.Item
-                      leftSection={<IconBan size={14} />}
-                      color="yellow"
-                      onClick={handleSuspend}
-                    >
-                      {t('admin.clients.suspendClient')}
-                    </Menu.Item>
-                  ) : (
-                    <Menu.Item
-                      leftSection={<IconCircleCheck size={14} />}
-                      color="green"
-                      onClick={handleReactivate}
-                    >
-                      {t('admin.clients.activateClient')}
-                    </Menu.Item>
-                  )}
-                  <Menu.Divider />
-                  <Menu.Item
-                    leftSection={<IconTrash size={14} />}
-                    color="red"
-                    onClick={handleDelete}
-                  >
-                    {t('admin.clients.deleteClient')}
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
+              <ClientActionMenu
+                client={client}
+                size="lg"
+                onSuspend={handleSuspend}
+                onReactivate={handleReactivate}
+                onDelete={handleDelete}
+              />
             ) : null}
           </Group>
         </Container>

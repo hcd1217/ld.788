@@ -11,7 +11,6 @@ import {
   PasswordInput,
   Box,
   Alert,
-  Transition,
   Text,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
@@ -50,8 +49,6 @@ export function ClientCreatePage() {
   const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
   const [isLoading, setIsLoading] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
 
   const {createClient} = useClientActions();
 
@@ -133,31 +130,19 @@ export function ClientCreatePage() {
 
   const handleSubmit = async (values: RegisterClientRequest) => {
     setIsLoading(true);
-    setShowAlert(false);
 
-    try {
-      await createClient(values);
+    await createClient(values);
 
-      notifications.show({
-        title: t('admin.clients.clientCreated'),
-        message: t('admin.clients.clientCreatedMessage', {
-          name: values.clientName,
-        }),
-        color: isDarkMode ? 'green.7' : 'green.9',
-        icon: <IconCheck size={16} />,
-      });
+    notifications.show({
+      title: t('admin.clients.clientCreated'),
+      message: t('admin.clients.clientCreatedMessage', {
+        name: values.clientName,
+      }),
+      color: isDarkMode ? 'green.7' : 'green.9',
+      icon: <IconCheck size={16} />,
+    });
 
-      navigate('/admin/clients');
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t('errors.failedToCreateClient');
-      setAlertMessage(errorMessage);
-      setShowAlert(true);
-    } finally {
-      setIsLoading(false);
-    }
+    navigate('/admin/clients');
   };
 
   const handleClientCodeChange = (
@@ -259,23 +244,6 @@ export function ClientCreatePage() {
                     {...form.getInputProps('rootUserPassword')}
                     disabled={isLoading}
                   />
-
-                  <Transition mounted={showAlert} transition="fade">
-                    {(styles) => (
-                      <Alert
-                        withCloseButton
-                        style={styles}
-                        icon={<IconAlertCircle size={16} />}
-                        color="red"
-                        variant="light"
-                        onClose={() => {
-                          setShowAlert(false);
-                        }}
-                      >
-                        {alertMessage}
-                      </Alert>
-                    )}
-                  </Transition>
 
                   <Alert
                     icon={<IconAlertCircle size={16} />}
