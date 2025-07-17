@@ -13,8 +13,7 @@ import {
   LoadingOverlay,
   Alert,
   ActionIcon,
-  Modal,
-  Flex,
+  Menu,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
 import {notifications} from '@mantine/notifications';
@@ -28,6 +27,8 @@ import {
   IconAlertTriangle,
   IconCheck,
   IconEdit,
+  IconTrash,
+  IconDotsVertical,
 } from '@tabler/icons-react';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useTranslation} from '@/hooks/useTranslation';
@@ -38,9 +39,14 @@ import {
   useClientActions,
 } from '@/stores/useClientStore';
 import {GoBack} from '@/components/common/GoBack';
+import {
+  ClientStatusBadge,
+  ClientActionModal,
+} from '@/components/admin/ClientManagementComponents';
 import type {Client} from '@/lib/api';
+import {formatDate} from '@/utils/string';
 
-type Action = 'suspend' | 'activate';
+type Action = 'suspend' | 'reactivate' | 'delete';
 
 export function ClientListPage() {
   const navigate = useNavigate();
@@ -48,22 +54,26 @@ export function ClientListPage() {
     useDisclosure(false);
   const [selectedClient, setSelectedClient] = useState<Client>();
   const [actionType, setActionType] = useState<Action>('suspend');
+  const [deleteConfirmCode, setDeleteConfirmCode] = useState('');
+  const [deleteReason, setDeleteReason] = useState('');
+  const [suspendReason, setSuspendReason] = useState('');
   const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
 
   const clients = useClients();
   const isLoading = useClientLoading();
   const error = useClientError();
-  const {loadClients, suspendClient, activateClient, clearError} =
-    useClientActions();
+  const {
+    loadClients,
+    suspendClient,
+    reactivateClient,
+    hardDeleteClient,
+    clearError,
+  } = useClientActions();
 
   useEffect(() => {
     const load = async () => {
-      try {
-        await loadClients();
-      } catch (error) {
-        console.error(error);
-      }
+      await loadClients();
     };
 
     void load();
@@ -75,9 +85,17 @@ export function ClientListPage() {
     openModal();
   };
 
-  const handleActivateClient = (client: Client) => {
+  const handleReactivateClient = (client: Client) => {
     setSelectedClient(client);
-    setActionType('activate');
+    setActionType('reactivate');
+    openModal();
+  };
+
+  const handleDeleteClient = (client: Client) => {
+    setSelectedClient(client);
+    setActionType('delete');
+    setDeleteConfirmCode('');
+    setDeleteReason('');
     openModal();
   };
 
@@ -85,30 +103,88 @@ export function ClientListPage() {
     if (!selectedClient) return;
 
     try {
-      if (actionType === 'suspend') {
-        await suspendClient(selectedClient.id);
-        notifications.show({
-          title: t('admin.clients.clientSuspended'),
-          message: t('admin.clients.clientSuspendedMessage', {
-            name: selectedClient.clientName,
-          }),
-          color: isDarkMode ? 'yellow.7' : 'yellow.9',
-          icon: <IconBan size={16} />,
-        });
-      } else {
-        await activateClient(selectedClient.id);
-        notifications.show({
-          title: t('admin.clients.clientActivated'),
-          message: t('admin.clients.clientActivatedMessage', {
-            name: selectedClient.clientName,
-          }),
-          color: isDarkMode ? 'green.7' : 'green.9',
-          icon: <IconCheck size={16} />,
-        });
+      switch (actionType) {
+        case 'suspend': {
+          if (!suspendReason.trim()) {
+            notifications.show({
+              title: t('validation.error'),
+              message: t('admin.clients.validation.suspendReasonRequired'),
+              color: 'red',
+              icon: <IconAlertTriangle size={16} />,
+            });
+            return;
+          }
+
+          await suspendClient(selectedClient.clientCode, suspendReason);
+          notifications.show({
+            title: t('admin.clients.clientSuspended'),
+            message: t('admin.clients.clientSuspendedMessage', {
+              name: selectedClient.clientName,
+            }),
+            color: isDarkMode ? 'yellow.7' : 'yellow.9',
+            icon: <IconBan size={16} />,
+          });
+
+          break;
+        }
+
+        case 'reactivate': {
+          await reactivateClient(selectedClient.clientCode);
+          notifications.show({
+            title: t('admin.clients.clientActivated'),
+            message: t('admin.clients.clientActivatedMessage', {
+              name: selectedClient.clientName,
+            }),
+            color: isDarkMode ? 'green.7' : 'green.9',
+            icon: <IconCheck size={16} />,
+          });
+
+          break;
+        }
+
+        case 'delete': {
+          if (deleteConfirmCode !== selectedClient.clientCode) {
+            notifications.show({
+              title: t('validation.error'),
+              message: t('admin.clients.validation.confirmCodeMismatch'),
+              color: 'red',
+              icon: <IconAlertTriangle size={16} />,
+            });
+            return;
+          }
+
+          if (!deleteReason.trim()) {
+            notifications.show({
+              title: t('validation.error'),
+              message: t('admin.clients.validation.deleteReasonRequired'),
+              color: 'red',
+              icon: <IconAlertTriangle size={16} />,
+            });
+            return;
+          }
+
+          await hardDeleteClient(
+            selectedClient.clientCode,
+            deleteConfirmCode,
+            deleteReason,
+          );
+          notifications.show({
+            title: t('admin.clients.clientDeleted'),
+            message: t('admin.clients.clientDeletedMessage', {
+              name: selectedClient.clientName,
+            }),
+            color: 'red',
+            icon: <IconTrash size={16} />,
+          });
+
+          break;
+        }
+        // No default needed - switch is exhaustive
       }
 
       closeModal();
       setSelectedClient(undefined);
+      await loadClients();
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -122,10 +198,6 @@ export function ClientListPage() {
         icon: <IconAlertTriangle size={16} />,
       });
     }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
   };
 
   const renderClientCard = (client: Client) => {
@@ -147,15 +219,7 @@ export function ClientListPage() {
                 <Text truncate fw={700} size="lg">
                   {client.clientName}
                 </Text>
-                <Badge
-                  size="sm"
-                  color={isSuspended ? 'red' : 'green'}
-                  variant="filled"
-                >
-                  {isSuspended
-                    ? t('admin.clients.suspended')
-                    : t('admin.clients.active')}
-                </Badge>
+                <ClientStatusBadge status={client.status} size="sm" />
               </Group>
 
               <Badge size="md" variant="light" color="blue">
@@ -177,37 +241,57 @@ export function ClientListPage() {
                 color="blue"
                 variant="light"
                 size="sm"
-                title={t('admin.clients.editClient')}
-                onClick={() => navigate(`/admin/clients/${client.id}`)}
+                title={t('admin.clients.viewDetails')}
+                onClick={() => navigate(`/admin/clients/${client.clientCode}`)}
               >
                 <IconEdit size={14} />
               </ActionIcon>
 
-              {isSuspended ? (
-                <ActionIcon
-                  color="green"
-                  variant="light"
-                  size="sm"
-                  title={t('admin.clients.activateClient')}
-                  onClick={() => {
-                    handleActivateClient(client);
-                  }}
-                >
-                  <IconCircleCheck size={14} />
-                </ActionIcon>
-              ) : (
-                <ActionIcon
-                  color="red"
-                  variant="light"
-                  size="sm"
-                  title={t('admin.clients.suspendClient')}
-                  onClick={() => {
-                    handleSuspendClient(client);
-                  }}
-                >
-                  <IconBan size={14} />
-                </ActionIcon>
-              )}
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <ActionIcon
+                    variant="light"
+                    size="sm"
+                    title={t('admin.clients.moreActions')}
+                  >
+                    <IconDotsVertical size={14} />
+                  </ActionIcon>
+                </Menu.Target>
+
+                <Menu.Dropdown>
+                  {isSuspended ? (
+                    <Menu.Item
+                      leftSection={<IconCircleCheck size={14} />}
+                      color="green"
+                      onClick={() => {
+                        handleReactivateClient(client);
+                      }}
+                    >
+                      {t('admin.clients.activateClient')}
+                    </Menu.Item>
+                  ) : (
+                    <Menu.Item
+                      leftSection={<IconBan size={14} />}
+                      color="yellow"
+                      onClick={() => {
+                        handleSuspendClient(client);
+                      }}
+                    >
+                      {t('admin.clients.suspendClient')}
+                    </Menu.Item>
+                  )}
+                  <Menu.Divider />
+                  <Menu.Item
+                    leftSection={<IconTrash size={14} />}
+                    color="red"
+                    onClick={() => {
+                      handleDeleteClient(client);
+                    }}
+                  >
+                    {t('admin.clients.deleteClient')}
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
             </Group>
           </Group>
 
@@ -295,55 +379,23 @@ export function ClientListPage() {
         </Stack>
       </Container>
 
-      {/* Suspend/Activate Confirmation Modal */}
-      <Modal
-        centered
-        opened={modalOpened}
-        title={
-          <Title order={3}>
-            {actionType === 'suspend'
-              ? t('admin.clients.confirmSuspendTitle')
-              : t('admin.clients.confirmActivateTitle')}
-          </Title>
-        }
-        onClose={closeModal}
-      >
-        <Stack gap="md">
-          <Text>
-            {actionType === 'suspend'
-              ? t('admin.clients.confirmSuspendMessage', {
-                  name: selectedClient?.clientName || '',
-                })
-              : t('admin.clients.confirmActivateMessage', {
-                  name: selectedClient?.clientName || '',
-                })}
-          </Text>
-
-          {actionType === 'suspend' && (
-            <Alert
-              icon={<IconAlertTriangle size={16} />}
-              color="yellow"
-              variant="light"
-            >
-              {t('admin.clients.suspendWarning')}
-            </Alert>
-          )}
-
-          <Flex gap="sm" justify="flex-end">
-            <Button variant="light" onClick={closeModal}>
-              {t('common.cancel')}
-            </Button>
-            <Button
-              color={actionType === 'suspend' ? 'red' : 'green'}
-              onClick={confirmAction}
-            >
-              {actionType === 'suspend'
-                ? t('admin.clients.suspend')
-                : t('admin.clients.activate')}
-            </Button>
-          </Flex>
-        </Stack>
-      </Modal>
+      {/* Action Confirmation Modal */}
+      {selectedClient ? (
+        <ClientActionModal
+          opened={modalOpened}
+          actionType={actionType}
+          clientName={selectedClient.clientName}
+          clientCode={selectedClient.clientCode}
+          suspendReason={suspendReason}
+          deleteConfirmCode={deleteConfirmCode}
+          deleteReason={deleteReason}
+          onClose={closeModal}
+          onSuspendReasonChange={setSuspendReason}
+          onDeleteConfirmCodeChange={setDeleteConfirmCode}
+          onDeleteReasonChange={setDeleteReason}
+          onConfirm={confirmAction}
+        />
+      ) : null}
     </>
   );
 }

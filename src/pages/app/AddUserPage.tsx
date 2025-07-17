@@ -32,6 +32,7 @@ import {clientService} from '@/services/client';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
 import {useAppStore} from '@/stores/useAppStore';
 import {GoBack} from '@/components/common/GoBack';
+import {isDevelopment} from '@/utils/env';
 
 type AddUserFormValues = {
   email?: string;
@@ -51,7 +52,7 @@ export function AddUserPage() {
   const isDarkMode = useIsDarkMode();
 
   const form = useForm<AddUserFormValues>({
-    initialValues: import.meta.env.DEV
+    initialValues: isDevelopment
       ? {
           email: 'test@test.com',
           userName: 'test-user',

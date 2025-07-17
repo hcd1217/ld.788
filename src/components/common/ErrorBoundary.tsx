@@ -2,6 +2,7 @@ import {Component, type ReactNode, type ErrorInfo} from 'react';
 import {Alert, Button, Stack, Text, Title} from '@mantine/core';
 import {IconAlertTriangle} from '@tabler/icons-react';
 import {addComponentError} from '@/stores/error';
+import {isDevelopment} from '@/utils/env';
 
 type Props = {
   readonly children: ReactNode;
@@ -26,7 +27,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log to console in development
-    if (import.meta.env.DEV) {
+    if (isDevelopment) {
       console.error('ErrorBoundary caught error:', error, errorInfo);
     }
 
@@ -64,7 +65,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <Title order={4} c="white">
                 An error occurred in this component
               </Title>
-              {import.meta.env.DEV && this.state.error ? (
+              {isDevelopment && this.state.error ? (
                 <Text size="sm" c="red.1" mt="xs">
                   {this.state.error.message}
                 </Text>

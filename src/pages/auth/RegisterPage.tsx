@@ -10,6 +10,7 @@ import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastName
 import {FormContainer} from '@/components/form/FormContainer';
 import {AuthHeader, AuthAlert, AuthFormLink} from '@/components/auth';
 import {generateRandomString} from '@/utils/string';
+import {isProduction} from '@/utils/env';
 
 type RegisterFormValues = {
   clientCode: string;
@@ -26,7 +27,7 @@ export function RegisterPage() {
   const {t} = useTranslation();
 
   const form = useForm<RegisterFormValues>({
-    initialValues: import.meta.env.PROD
+    initialValues: isProduction
       ? {
           clientCode: generateRandomString(5).toUpperCase(),
           clientName: '',

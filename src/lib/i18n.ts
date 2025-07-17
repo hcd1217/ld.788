@@ -3,6 +3,7 @@ import {initReactI18next} from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import en from '@/locales/en.json';
 import vi from '@/locales/vi.json';
+import {isDevelopment} from '@/utils/env';
 
 const resources = {
   en: {
@@ -20,7 +21,7 @@ i18n
     resources,
     lng: localStorage.getItem('language') ?? 'vi',
     fallbackLng: 'en',
-    debug: import.meta.env.DEV,
+    debug: isDevelopment,
     interpolation: {
       escapeValue: false,
     },

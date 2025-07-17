@@ -9,3 +9,7 @@ export function formatPhoneNumber(phoneNumber: string) {
     .replace('+84', '0')
     .replace(/(\d{4})(\d{3})(\d+)/, '$1-$2-$3');
 }
+
+export function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString();
+}

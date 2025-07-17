@@ -1,3 +1,4 @@
+import {isDevelopment, isProduction} from './env';
 import {useErrorStore, type ErrorType} from '@/stores/error';
 
 type ErrorEventDetails = {
@@ -62,9 +63,6 @@ function createErrorSource(
 }
 
 export default function registerGlobalErrorCatcher(): () => void {
-  const isDevelopment = import.meta.env.DEV;
-  const isProduction = import.meta.env.PROD;
-
   // Global error handler
   const errorHandler = (event: ErrorEvent): void => {
     // Prevent default error handling

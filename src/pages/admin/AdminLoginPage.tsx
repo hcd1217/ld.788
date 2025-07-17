@@ -17,6 +17,7 @@ import {useAuthForm} from '@/hooks/useAuthForm';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {FormContainer} from '@/components/form/FormContainer';
 import {AuthAlert} from '@/components/auth';
+import {isDevelopment} from '@/utils/env';
 
 type AdminLoginFormValues = {
   accessKey: string;
@@ -29,9 +30,13 @@ export function AdminLoginPage() {
   const {t} = useTranslation();
 
   const form = useForm<AdminLoginFormValues>({
-    initialValues: {
-      accessKey: '',
-    },
+    initialValues: isDevelopment
+      ? {
+          accessKey: localStorage.getItem('__ACCESSKEY__') ?? '',
+        }
+      : {
+          accessKey: '',
+        },
     validate: {
       accessKey: (value) =>
         value.trim().length === 0 ? t('validation.fieldRequired') : null,

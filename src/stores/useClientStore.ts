@@ -1,10 +1,6 @@
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
-import {
-  type Client,
-  type RegisterClientRequest,
-  type UpdateClientRequest,
-} from '@/lib/api';
+import {type Client, type RegisterClientRequest} from '@/lib/api';
 import {clientManagementService} from '@/services/clientManagement';
 
 type ClientStoreState = {
@@ -18,9 +14,13 @@ type ClientStoreState = {
   setSelectedClient: (client: Client | undefined) => void;
   loadClients: () => Promise<void>;
   createClient: (data: RegisterClientRequest) => Promise<Client>;
-  updateClient: (id: string, data: UpdateClientRequest) => Promise<Client>;
-  suspendClient: (id: string) => Promise<void>;
-  activateClient: (id: string) => Promise<void>;
+  suspendClient: (clientCode: string, reason: string) => Promise<void>;
+  reactivateClient: (clientCode: string) => Promise<void>;
+  hardDeleteClient: (
+    clientCode: string,
+    confirmClientCode: string,
+    reason: string,
+  ) => Promise<void>;
   clearError: () => void;
 
   // Selectors
@@ -101,16 +101,17 @@ export const useClientStore = create<ClientStoreState>()(
         }
       },
 
-      async updateClient(id, data) {
+      async suspendClient(clientCode, reason) {
         set({isLoading: true, error: undefined});
         try {
-          const updatedClient = await clientManagementService.updateClient(
-            id,
-            data,
+          const updatedClient = await clientManagementService.suspendClient(
+            clientCode,
+            reason,
           );
 
+          // Update local state
           const {clients} = get();
-          const index = clients.findIndex((c) => c.id === id);
+          const index = clients.findIndex((c) => c.clientCode === clientCode);
 
           if (index !== -1) {
             const updatedClients = [...clients];
@@ -121,48 +122,9 @@ export const useClientStore = create<ClientStoreState>()(
               isLoading: false,
             });
 
-            // Update selected client if it was updated
-            if (get().selectedClient?.id === id) {
-              set({selectedClient: updatedClient});
-            }
-          }
-
-          return updatedClient;
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : 'Failed to update client';
-          set({
-            isLoading: false,
-            error: errorMessage,
-          });
-          throw error;
-        }
-      },
-
-      async suspendClient(id) {
-        set({isLoading: true, error: undefined});
-        try {
-          await clientManagementService.suspendClient(id);
-
-          // Update local state
-          const {clients} = get();
-          const index = clients.findIndex((c) => c.id === id);
-
-          if (index !== -1) {
-            const updatedClients = [...clients];
-            updatedClients[index] = {
-              ...updatedClients[index],
-              status: 'suspended',
-            };
-
-            set({
-              clients: updatedClients,
-              isLoading: false,
-            });
-
             // Update selected client if it was suspended
-            if (get().selectedClient?.id === id) {
-              set({selectedClient: updatedClients[index]});
+            if (get().selectedClient?.clientCode === clientCode) {
+              set({selectedClient: updatedClient});
             }
           }
         } catch (error) {
@@ -176,37 +138,70 @@ export const useClientStore = create<ClientStoreState>()(
         }
       },
 
-      async activateClient(id) {
+      async reactivateClient(clientCode) {
         set({isLoading: true, error: undefined});
         try {
-          await clientManagementService.activateClient(id);
+          const updatedClient =
+            await clientManagementService.reactivateClient(clientCode);
 
           // Update local state
           const {clients} = get();
-          const index = clients.findIndex((c) => c.id === id);
+          const index = clients.findIndex((c) => c.clientCode === clientCode);
 
           if (index !== -1) {
             const updatedClients = [...clients];
-            updatedClients[index] = {
-              ...updatedClients[index],
-              status: 'active',
-            };
+            updatedClients[index] = updatedClient;
 
             set({
               clients: updatedClients,
               isLoading: false,
             });
 
-            // Update selected client if it was activated
-            if (get().selectedClient?.id === id) {
-              set({selectedClient: updatedClients[index]});
+            // Update selected client if it was reactivated
+            if (get().selectedClient?.clientCode === clientCode) {
+              set({selectedClient: updatedClient});
             }
           }
         } catch (error) {
           const errorMessage =
             error instanceof Error
               ? error.message
-              : 'Failed to activate client';
+              : 'Failed to reactivate client';
+          set({
+            isLoading: false,
+            error: errorMessage,
+          });
+          throw error;
+        }
+      },
+
+      async hardDeleteClient(clientCode, confirmClientCode, reason) {
+        set({isLoading: true, error: undefined});
+        try {
+          await clientManagementService.hardDeleteClient(
+            clientCode,
+            confirmClientCode,
+            reason,
+          );
+
+          // Remove from local state
+          const {clients} = get();
+          const updatedClients = clients.filter(
+            (c) => c.clientCode !== clientCode,
+          );
+
+          set({
+            clients: updatedClients,
+            isLoading: false,
+          });
+
+          // Clear selected client if it was deleted
+          if (get().selectedClient?.clientCode === clientCode) {
+            set({selectedClient: undefined});
+          }
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : 'Failed to delete client';
           set({
             isLoading: false,
             error: errorMessage,
@@ -249,9 +244,9 @@ export const useClientActions = () => {
     setSelectedClient: store.setSelectedClient,
     loadClients: store.loadClients,
     createClient: store.createClient,
-    updateClient: store.updateClient,
     suspendClient: store.suspendClient,
-    activateClient: store.activateClient,
+    reactivateClient: store.reactivateClient,
+    hardDeleteClient: store.hardDeleteClient,
     clearError: store.clearError,
     getClientById: store.getClientById,
     getClientByCode: store.getClientByCode,

@@ -6,94 +6,77 @@ import {
   Stack,
   Card,
   Group,
-  Button,
-  TextInput,
   Box,
   Alert,
   LoadingOverlay,
-  Badge,
-  Text,
+  ActionIcon,
+  Menu,
   Divider,
 } from '@mantine/core';
-import {useForm} from '@mantine/form';
+import {useDisclosure} from '@mantine/hooks';
 import {notifications} from '@mantine/notifications';
 import {
   IconAlertCircle,
+  IconBan,
+  IconCircleCheck,
+  IconTrash,
   IconCheck,
-  IconBuilding,
-  IconMail,
-  IconUser,
-  IconEdit,
-  IconDeviceFloppy,
-  IconX,
-  IconCalendar,
+  IconDotsVertical,
+  IconAlertTriangle,
 } from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useClientActions} from '@/stores/useClientStore';
 import {clientManagementService} from '@/services/clientManagement';
 import {GoBack} from '@/components/common/GoBack';
-import type {Client, UpdateClientRequest} from '@/lib/api';
+import {
+  ClientBasicInfo,
+  RootUserInfo,
+  ClientActionModal,
+} from '@/components/admin/ClientManagementComponents';
+import type {Client} from '@/lib/api';
 
 export function ClientDetailPage() {
-  const {id} = useParams<{id: string}>();
+  const {clientCode} = useParams<{clientCode: string}>();
   const navigate = useNavigate();
   const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [client, setClient] = useState<Client | undefined>(undefined);
   const [error, setError] = useState<string | undefined>(undefined);
+  const [deleteConfirmCode, setDeleteConfirmCode] = useState('');
+  const [deleteReason, setDeleteReason] = useState('');
+  const [suspendReason, setSuspendReason] = useState('');
+  const [actionType, setActionType] = useState<
+    'suspend' | 'reactivate' | 'delete' | undefined
+  >();
 
-  const {updateClient} = useClientActions();
+  const [modalOpened, {open: openModal, close: closeModal}] =
+    useDisclosure(false);
+  const {suspendClient, reactivateClient, hardDeleteClient} =
+    useClientActions();
 
-  const form = useForm<UpdateClientRequest>({
-    initialValues: {
-      clientName: '',
-      rootUser: {
-        email: '',
-        firstName: '',
-        lastName: '',
-      },
-    },
-    validate: {
-      clientName(value) {
-        if (value && (value.length < 3 || value.length > 100)) {
-          return t('admin.clients.validation.clientNameLength');
-        }
+  const handleSuspend = () => {
+    setActionType('suspend');
+    setSuspendReason('');
+    openModal();
+  };
 
-        return null;
-      },
-      rootUser: {
-        email(value) {
-          if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-            return t('validation.invalidEmail');
-          }
+  const handleReactivate = () => {
+    setActionType('reactivate');
+    openModal();
+  };
 
-          return null;
-        },
-        firstName(value) {
-          if (value && (value.length < 2 || value.length > 50)) {
-            return t('admin.clients.validation.nameLength');
-          }
-
-          return null;
-        },
-        lastName(value) {
-          if (value && (value.length < 2 || value.length > 50)) {
-            return t('admin.clients.validation.nameLength');
-          }
-
-          return null;
-        },
-      },
-    },
-  });
+  const handleDelete = () => {
+    setActionType('delete');
+    setDeleteConfirmCode('');
+    setDeleteReason('');
+    openModal();
+  };
 
   useEffect(() => {
     const loadClient = async () => {
-      if (!id) {
+      if (!clientCode) {
         navigate('/admin/clients');
         return;
       }
@@ -102,18 +85,9 @@ export function ClientDetailPage() {
       setError(undefined);
 
       try {
-        const clientData = await clientManagementService.getClientById(id);
+        const clientData =
+          await clientManagementService.getClientByClientCode(clientCode);
         setClient(clientData);
-
-        // Set form values
-        form.setValues({
-          clientName: clientData.clientName,
-          rootUser: {
-            email: clientData.rootUser.email,
-            firstName: clientData.rootUser.firstName,
-            lastName: clientData.rootUser.lastName,
-          },
-        });
       } catch (error) {
         const errorMessage =
           error instanceof Error
@@ -127,46 +101,96 @@ export function ClientDetailPage() {
     };
 
     void loadClient();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, navigate, t]);
+  }, [clientCode, navigate, t]);
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleCancel = () => {
-    if (client) {
-      form.setValues({
-        clientName: client.clientName,
-        rootUser: {
-          email: client.rootUser.email,
-          firstName: client.rootUser.firstName,
-          lastName: client.rootUser.lastName,
-        },
-      });
-    }
-
-    setIsEditing(false);
-  };
-
-  const handleSubmit = async (values: UpdateClientRequest) => {
-    if (!client || !id) return;
-
-    setIsSaving(true);
+  const confirmAction = async () => {
+    if (!client || !clientCode || !actionType) return;
 
     try {
-      const updated = await updateClient(id, values);
-      setClient(updated);
-      setIsEditing(false);
+      switch (actionType) {
+        case 'suspend': {
+          if (!suspendReason.trim()) {
+            notifications.show({
+              title: t('validation.error'),
+              message: t('admin.clients.validation.suspendReasonRequired'),
+              color: 'red',
+              icon: <IconAlertCircle size={16} />,
+            });
+            return;
+          }
 
-      notifications.show({
-        title: t('admin.clients.clientUpdated'),
-        message: t('admin.clients.clientUpdatedMessage', {
-          name: updated.clientName,
-        }),
-        color: isDarkMode ? 'green.7' : 'green.9',
-        icon: <IconCheck size={16} />,
-      });
+          await suspendClient(clientCode, suspendReason);
+          await loadClient();
+
+          notifications.show({
+            title: t('admin.clients.clientSuspended'),
+            message: t('admin.clients.clientSuspendedMessage', {
+              name: client.clientName,
+            }),
+            color: isDarkMode ? 'yellow.7' : 'yellow.9',
+            icon: <IconBan size={16} />,
+          });
+
+          break;
+        }
+
+        case 'reactivate': {
+          await reactivateClient(clientCode);
+          await loadClient();
+
+          notifications.show({
+            title: t('admin.clients.clientActivated'),
+            message: t('admin.clients.clientActivatedMessage', {
+              name: client.clientName,
+            }),
+            color: isDarkMode ? 'green.7' : 'green.9',
+            icon: <IconCheck size={16} />,
+          });
+
+          break;
+        }
+
+        case 'delete': {
+          if (deleteConfirmCode !== clientCode) {
+            notifications.show({
+              title: t('validation.error'),
+              message: t('admin.clients.validation.confirmCodeMismatch'),
+              color: 'red',
+              icon: <IconAlertCircle size={16} />,
+            });
+            return;
+          }
+
+          if (!deleteReason.trim()) {
+            notifications.show({
+              title: t('validation.error'),
+              message: t('admin.clients.validation.deleteReasonRequired'),
+              color: 'red',
+              icon: <IconAlertCircle size={16} />,
+            });
+            return;
+          }
+
+          await hardDeleteClient(clientCode, deleteConfirmCode, deleteReason);
+
+          notifications.show({
+            title: t('admin.clients.clientDeleted'),
+            message: t('admin.clients.clientDeletedMessage', {
+              name: client.clientName,
+            }),
+            color: 'red',
+            icon: <IconTrash size={16} />,
+          });
+
+          navigate('/admin/clients');
+
+          break;
+        }
+
+        // No default needed - actionType is checked above
+      }
+
+      closeModal();
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -176,15 +200,21 @@ export function ClientDetailPage() {
         title: t('admin.clients.updateFailed'),
         message: errorMessage,
         color: 'red',
-        icon: <IconAlertCircle size={16} />,
+        icon: <IconAlertTriangle size={16} />,
       });
-    } finally {
-      setIsSaving(false);
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+  const loadClient = async () => {
+    if (!clientCode) return;
+
+    try {
+      const clientData =
+        await clientManagementService.getClientByClientCode(clientCode);
+      setClient(clientData);
+    } catch (error) {
+      console.error('Failed to reload client:', error);
+    }
   };
 
   if (error && !isLoading) {
@@ -220,17 +250,45 @@ export function ClientDetailPage() {
   return (
     <Container fluid mt="xl">
       <Stack gap="xl">
-        <Container fluid>
-          <Group w="80vw" justify="space-between">
+        <Container fluid px="md">
+          <Group justify="space-between">
             <GoBack />
-            {client && !isEditing ? (
-              <Button
-                leftSection={<IconEdit size={16} />}
-                disabled={isLoading}
-                onClick={handleEdit}
-              >
-                {t('admin.clients.editClient')}
-              </Button>
+            {client ? (
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <ActionIcon variant="light" size="lg">
+                    <IconDotsVertical size={16} />
+                  </ActionIcon>
+                </Menu.Target>
+
+                <Menu.Dropdown>
+                  {client.status === 'active' ? (
+                    <Menu.Item
+                      leftSection={<IconBan size={14} />}
+                      color="yellow"
+                      onClick={handleSuspend}
+                    >
+                      {t('admin.clients.suspendClient')}
+                    </Menu.Item>
+                  ) : (
+                    <Menu.Item
+                      leftSection={<IconCircleCheck size={14} />}
+                      color="green"
+                      onClick={handleReactivate}
+                    >
+                      {t('admin.clients.activateClient')}
+                    </Menu.Item>
+                  )}
+                  <Menu.Divider />
+                  <Menu.Item
+                    leftSection={<IconTrash size={14} />}
+                    color="red"
+                    onClick={handleDelete}
+                  >
+                    {t('admin.clients.deleteClient')}
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
             ) : null}
           </Group>
         </Container>
@@ -256,122 +314,34 @@ export function ClientDetailPage() {
 
             {client ? (
               <Card shadow="sm" padding="xl" radius="md">
-                <form onSubmit={form.onSubmit(handleSubmit)}>
-                  <Stack gap="lg">
-                    <Group justify="space-between" align="center">
-                      <Title order={3}>
-                        {t('admin.clients.clientInformation')}
-                      </Title>
-                      <Badge
-                        size="lg"
-                        color={client.status === 'active' ? 'green' : 'red'}
-                        variant="filled"
-                      >
-                        {client.status === 'active'
-                          ? t('admin.clients.active')
-                          : t('admin.clients.suspended')}
-                      </Badge>
-                    </Group>
-
-                    <Box>
-                      <Text size="sm" c="dimmed" mb={4}>
-                        {t('admin.clients.clientCode')}
-                      </Text>
-                      <Badge size="lg" variant="light" color="blue">
-                        {client.clientCode}
-                      </Badge>
-                    </Box>
-
-                    <TextInput
-                      label={t('admin.clients.clientName')}
-                      placeholder={t('admin.clients.clientNamePlaceholder')}
-                      leftSection={<IconBuilding size={16} />}
-                      {...form.getInputProps('clientName')}
-                      disabled={!isEditing || isSaving}
-                      readOnly={!isEditing}
-                    />
-
-                    <Group gap="xs" c="dimmed">
-                      <IconCalendar size={14} />
-                      <Text size="sm">
-                        {t('common.created')} {formatDate(client.createdAt)}
-                      </Text>
-                    </Group>
-
-                    <Divider />
-
-                    <Title order={3}>
-                      {t('admin.clients.rootUserInformation')}
-                    </Title>
-
-                    <Group grow>
-                      <TextInput
-                        label={t('admin.clients.firstName')}
-                        placeholder={t('admin.clients.firstNamePlaceholder')}
-                        leftSection={<IconUser size={16} />}
-                        {...form.getInputProps('rootUser.firstName')}
-                        disabled={!isEditing || isSaving}
-                        readOnly={!isEditing}
-                      />
-
-                      <TextInput
-                        label={t('admin.clients.lastName')}
-                        placeholder={t('admin.clients.lastNamePlaceholder')}
-                        leftSection={<IconUser size={16} />}
-                        {...form.getInputProps('rootUser.lastName')}
-                        disabled={!isEditing || isSaving}
-                        readOnly={!isEditing}
-                      />
-                    </Group>
-
-                    <TextInput
-                      label={t('admin.clients.email')}
-                      placeholder={t('admin.clients.emailPlaceholder')}
-                      leftSection={<IconMail size={16} />}
-                      {...form.getInputProps('rootUser.email')}
-                      disabled={!isEditing || isSaving}
-                      readOnly={!isEditing}
-                    />
-
-                    {isEditing ? (
-                      <>
-                        <Alert
-                          icon={<IconAlertCircle size={16} />}
-                          variant="light"
-                          color="blue"
-                        >
-                          <Text size="sm">
-                            {t('admin.clients.editClientNotice')}
-                          </Text>
-                        </Alert>
-
-                        <Group justify="flex-end" mt="xl">
-                          <Button
-                            variant="light"
-                            leftSection={<IconX size={16} />}
-                            disabled={isSaving}
-                            onClick={handleCancel}
-                          >
-                            {t('common.cancel')}
-                          </Button>
-                          <Button
-                            type="submit"
-                            leftSection={<IconDeviceFloppy size={16} />}
-                            loading={isSaving}
-                            disabled={isSaving}
-                          >
-                            {t('common.save')}
-                          </Button>
-                        </Group>
-                      </>
-                    ) : null}
-                  </Stack>
-                </form>
+                <Stack gap="lg">
+                  <ClientBasicInfo client={client} />
+                  <Divider />
+                  <RootUserInfo rootUser={client.rootUser} />
+                </Stack>
               </Card>
             ) : null}
           </Box>
         </Box>
       </Stack>
+
+      {/* Action Confirmation Modal */}
+      {actionType && client ? (
+        <ClientActionModal
+          opened={modalOpened}
+          actionType={actionType}
+          clientName={client.clientName}
+          clientCode={client.clientCode}
+          suspendReason={suspendReason}
+          deleteConfirmCode={deleteConfirmCode}
+          deleteReason={deleteReason}
+          onClose={closeModal}
+          onSuspendReasonChange={setSuspendReason}
+          onDeleteConfirmCodeChange={setDeleteConfirmCode}
+          onDeleteReasonChange={setDeleteReason}
+          onConfirm={confirmAction}
+        />
+      ) : null}
     </Container>
   );
 }

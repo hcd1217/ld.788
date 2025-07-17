@@ -30,6 +30,20 @@ import {useClientActions} from '@/stores/useClientStore';
 import {GoBack} from '@/components/common/GoBack';
 import {getFormValidators} from '@/utils/validation';
 import type {RegisterClientRequest} from '@/lib/api';
+import {isDevelopment} from '@/utils/env';
+
+function fakeClient() {
+  const clientCode = Math.random().toString(36).slice(2, 8);
+  const clientName = `${clientCode.toLocaleUpperCase()} Inc.`;
+  return {
+    clientCode: clientCode.toLocaleUpperCase(),
+    clientName,
+    rootUserEmail: `admin@${clientCode}.com`,
+    rootUserPassword: 's5cureP@s5w0rd123!!!',
+    rootUserFirstName: `U${clientCode}`,
+    rootUserLastName: 'Admin',
+  };
+}
 
 export function ClientCreatePage() {
   const navigate = useNavigate();
@@ -42,14 +56,16 @@ export function ClientCreatePage() {
   const {createClient} = useClientActions();
 
   const form = useForm<RegisterClientRequest>({
-    initialValues: {
-      clientCode: '',
-      clientName: '',
-      rootUserEmail: '',
-      rootUserPassword: '',
-      rootUserFirstName: '',
-      rootUserLastName: '',
-    },
+    initialValues: isDevelopment
+      ? fakeClient()
+      : {
+          clientCode: '',
+          clientName: '',
+          rootUserEmail: '',
+          rootUserPassword: '',
+          rootUserFirstName: '',
+          rootUserLastName: '',
+        },
     validate: {
       ...getFormValidators(t, ['clientCode', 'clientName']),
       // Override with custom client-specific validators

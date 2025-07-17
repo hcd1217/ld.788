@@ -1,3 +1,5 @@
+import {isDevelopment} from './env';
+
 declare global {
   interface Console {
     ignore: (message?: unknown, ...optionalParams: unknown[]) => void;
@@ -33,7 +35,7 @@ export function registerLogger() {
     message: unknown,
     ...args: unknown[]
   ) {
-    if (!import.meta.env.DEV) {
+    if (!isDevelopment) {
       return;
     }
 

@@ -256,7 +256,7 @@ const routeObjects: RouteObject[] = [
           {path: 'dashboard', Component: AdminDashboardPage},
           {path: 'clients', Component: ClientListPage},
           {path: 'clients/new', Component: ClientCreatePage},
-          {path: 'clients/:id', Component: ClientDetailPage},
+          {path: 'clients/:clientCode', Component: ClientDetailPage},
         ],
       },
     ],

@@ -217,6 +217,7 @@
     "confirmNewPassword": "Xác nhận mật khẩu mới"
   },
   "validation": {
+    "error": "Lỗi Xác Thực",
     "fieldRequired": "Trường này là bắt buộc",
     "invalidLevel": "Cấp độ không hợp lệ",
     "emailRequired": "Cần nhập email",
@@ -574,9 +575,12 @@
       "activateClient": "Kích Hoạt Khách Hàng",
       "confirmSuspendTitle": "Xác Nhận Tạm Ngưng Khách Hàng",
       "confirmActivateTitle": "Xác Nhận Kích Hoạt Khách Hàng",
+      "confirmDeleteTitle": "Xác Nhận Xóa Khách Hàng",
       "confirmSuspendMessage": "Bạn có chắc muốn tạm ngưng {{name}}? Tất cả người dùng sẽ mất quyền truy cập.",
       "confirmActivateMessage": "Bạn có chắc muốn kích hoạt {{name}}? Tất cả người dùng sẽ có lại quyền truy cập.",
+      "confirmDeleteMessage": "Bạn có chắc muốn xóa vĩnh viễn {{name}}? Hành động này không thể hoàn tác.",
       "suspendWarning": "Hành động này sẽ ngay lập tức ngăn tất cả người dùng truy cập hệ thống",
+      "deleteWarning": "CẢNH BÁO: Hành động này là vĩnh viễn và không thể hoàn tác. Tất cả dữ liệu sẽ bị mất.",
       "clientCreated": "Đã Tạo Khách Hàng",
       "clientCreatedMessage": "{{name}} đã được tạo thành công",
       "clientUpdated": "Đã Cập Nhật Khách Hàng",
@@ -585,12 +589,27 @@
       "clientSuspendedMessage": "{{name}} đã bị tạm ngưng",
       "clientActivated": "Đã Kích Hoạt Khách Hàng",
       "clientActivatedMessage": "{{name}} đã được kích hoạt",
+      "clientDeleted": "Đã Xóa Khách Hàng",
+      "clientDeletedMessage": "{{name}} đã bị xóa vĩnh viễn",
       "updateFailed": "Cập Nhật Thất Bại",
+      "delete": "Xóa",
+      "deleteClient": "Xóa Khách Hàng",
+      "viewDetails": "Xem Chi Tiết",
+      "moreActions": "Thêm Hành Động",
+      "suspendReason": "Lý Do Tạm Ngưng",
+      "suspendReasonPlaceholder": "Nhập lý do tạm ngưng khách hàng này",
+      "deleteReason": "Lý Do Xóa",
+      "deleteReasonPlaceholder": "Nhập lý do xóa khách hàng này",
+      "confirmClientCode": "Xác Nhận Mã Khách Hàng",
+      "confirmClientCodeDescription": "Nhập {{code}} để xác nhận xóa",
       "validation": {
         "clientCodeFormat": "Phải có 2-10 chữ cái in hoa và số",
         "clientNameLength": "Phải có từ 3 đến 100 ký tự",
         "passwordLength": "Phải có ít nhất 12 ký tự",
-        "nameLength": "Phải có từ 2 đến 50 ký tự"
+        "nameLength": "Phải có từ 2 đến 50 ký tự",
+        "suspendReasonRequired": "Vui lòng cung cấp lý do tạm ngưng",
+        "deleteReasonRequired": "Vui lòng cung cấp lý do xóa",
+        "confirmCodeMismatch": "Mã khách hàng không khớp. Vui lòng nhập chính xác mã để xác nhận"
       }
     }
   }

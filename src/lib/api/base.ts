@@ -2,6 +2,7 @@ import type * as z from 'zod/v4';
 import {addApiError} from '@/stores/error';
 import {authService} from '@/services/auth';
 import {cleanObject} from '@/utils/object';
+import {isDevelopment} from '@/utils/env';
 
 type ApiConfig = {
   baseURL: string;
@@ -129,11 +130,13 @@ export class BaseApiClient {
     return result;
   }
 
-  async patch<T>(
+  async patch<T, R = unknown>(
     endpoint: string,
     data?: unknown,
     schema?: z.ZodSchema<T>,
+    dataSchema?: z.ZodSchema<R>,
   ): Promise<T> {
+    data = dataSchema?.parse(data) ?? data;
     const result = await this.request<T>(endpoint, {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
@@ -146,9 +149,16 @@ export class BaseApiClient {
     return result;
   }
 
-  async delete<T>(endpoint: string, schema?: z.ZodSchema<T>): Promise<T> {
+  async delete<T, R = unknown>(
+    endpoint: string,
+    data?: unknown,
+    schema?: z.ZodSchema<T>,
+    dataSchema?: z.ZodSchema<R>,
+  ): Promise<T> {
+    data = dataSchema?.parse(data) ?? data;
     const result = await this.request<T>(endpoint, {
       method: 'DELETE',
+      body: data ? JSON.stringify(data) : undefined,
       schema,
     });
 
@@ -214,7 +224,7 @@ export class BaseApiClient {
   ): Promise<T> {
     const {params, schema, ...init} = config;
     // Add configurable delay in development mode
-    if (import.meta.env.DEV) {
+    if (isDevelopment) {
       const delayMs = Number(import.meta.env.VITE_DEV_API_DELAY) || 0;
       if (delayMs > 0) {
         console.ignore(
@@ -298,7 +308,7 @@ export class BaseApiClient {
           data,
         );
         // Log to error store in development
-        if (import.meta.env.DEV) {
+        if (isDevelopment) {
           addApiError(apiError.message, response.status, endpoint, {
             method: init.method ?? 'GET',
             url: url.toString(),
@@ -321,7 +331,7 @@ export class BaseApiClient {
             error: error instanceof Error ? error.message : 'Validation failed',
           });
           // Log validation errors to error store
-          if (import.meta.env.DEV) {
+          if (isDevelopment) {
             addApiError(validationError.message, 422, endpoint, {
               method: init.method ?? 'GET',
               url: url.toString(),
@@ -346,7 +356,7 @@ export class BaseApiClient {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           const timeoutError = new ApiError(408, 'Request Timeout');
-          if (import.meta.env.DEV) {
+          if (isDevelopment) {
             addApiError('Request Timeout', 408, endpoint, {
               method: init.method ?? 'GET',
               url: url.toString(),
@@ -358,7 +368,7 @@ export class BaseApiClient {
         }
 
         const networkError = new ApiError(0, error.message);
-        if (import.meta.env.DEV) {
+        if (isDevelopment) {
           addApiError(error.message, 0, endpoint, {
             method: init.method ?? 'GET',
             url: url.toString(),
@@ -371,7 +381,7 @@ export class BaseApiClient {
       }
 
       const unknownError = new ApiError(0, 'Unknown error occurred');
-      if (import.meta.env.DEV) {
+      if (isDevelopment) {
         addApiError('Unknown error occurred', 0, endpoint, {
           method: init.method ?? 'GET',
           url: url.toString(),

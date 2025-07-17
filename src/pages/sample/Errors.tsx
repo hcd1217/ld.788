@@ -7,13 +7,14 @@ import {
 } from '@/test-error';
 import {addApiError} from '@/stores/error';
 import {TestApiClient} from '@/lib/api/test';
+import { isDevelopment } from '@/utils/env';
 
 export function ErrorsPage() {
   return (
     <Container size="md" mt="xl">
       <Title order={1}>Welcome to Credo Errors Page</Title>
       {/* TEMPORARY: Error testing buttons - REMOVE AFTER TESTING */}
-      {import.meta.env.DEV ? (
+      {isDevelopment ? (
         <Paper withBorder p="md" mt="xl">
           <Title order={3} mb="md">
             Error Handling Test (Dev Only)

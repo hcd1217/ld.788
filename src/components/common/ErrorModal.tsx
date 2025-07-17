@@ -44,6 +44,7 @@ import {
   type ErrorSeverity,
   type ErrorType,
 } from '@/stores/error';
+import {isDevelopment, isProduction} from '@/utils/env';
 
 type ErrorModalProps = {
   readonly isAutoOpen?: boolean;
@@ -320,7 +321,7 @@ export function ErrorModal({
 
   // Auto-open modal when new errors arrive in development
   useEffect(() => {
-    if (import.meta.env.DEV && autoOpen && errors.length > 0) {
+    if (isDevelopment && autoOpen && errors.length > 0) {
       setOpened(true);
 
       // Auto-close after delay if specified
@@ -336,7 +337,7 @@ export function ErrorModal({
   }, [errors.length, autoOpen, autoCloseDelay]);
 
   // Don't render in production
-  if (import.meta.env.PROD) {
+  if (isProduction) {
     return null;
   }
 

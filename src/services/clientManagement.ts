@@ -1,8 +1,9 @@
 import {
   type Client,
   type RegisterClientRequest,
-  type UpdateClientRequest,
   type ClientListResponse,
+  type SuspendClientRequest,
+  type HardDeleteClientRequest,
   adminApi,
 } from '@/lib/api';
 
@@ -16,88 +17,64 @@ export const clientManagementService = {
     }
   },
 
-  async getClientById(id: string): Promise<Client> {
+  async getClientByClientCode(clientCode: string): Promise<Client> {
     try {
-      return await adminApi.getClient(id);
+      return await adminApi.getClient(clientCode);
     } catch (error) {
-      console.error(`Failed to fetch client ${id}:`, error);
+      console.error(`Failed to fetch client ${clientCode}:`, error);
       throw error;
     }
   },
 
   async registerClient(data: RegisterClientRequest): Promise<Client> {
+    const registerResult = await adminApi.registerClient(data);
+    if (!registerResult) {
+      throw new Error('Failed to register client');
+    }
+
+    return {
+      id: registerResult.clientId,
+      clientCode: data.clientCode,
+      clientName: data.clientName,
+      status: 'active',
+      rootUser: {
+        email: data.rootUserEmail,
+        firstName: data.rootUserFirstName,
+        lastName: data.rootUserLastName,
+      },
+      createdAt: new Date().toISOString(),
+    };
+  },
+
+  async suspendClient(clientCode: string, reason: string): Promise<Client> {
     try {
-      // Validate client code format
-      if (!/^[A-Z\d]{2,10}$/.test(data.clientCode)) {
-        throw new Error(
-          'Client code must be 2-10 uppercase alphanumeric characters',
-        );
-      }
-
-      // Validate password strength
-      if (data.rootUserPassword.length < 12) {
-        throw new Error('Password must be at least 12 characters long');
-      }
-
-      const registerResult = await adminApi.registerClient(data);
-      if (!registerResult) {
-        throw new Error('Failed to register client');
-      }
-
-      return {
-        id: registerResult.clientId,
-        clientCode: data.clientCode,
-        clientName: data.clientName,
-        status: 'active',
-        rootUser: {
-          email: data.rootUserEmail,
-          firstName: data.rootUserFirstName,
-          lastName: data.rootUserLastName,
-        },
-        createdAt: new Date().toISOString(),
-      };
+      const data: SuspendClientRequest = {reason};
+      return await adminApi.suspendClient(clientCode, data);
     } catch (error) {
-      if (error instanceof Error && error.message.includes('already exists')) {
-        throw new Error(`Client code "${data.clientCode}" is already in use`);
-      }
-
-      console.error('Failed to register client:', error);
+      console.error(`Failed to suspend client ${clientCode}:`, error);
       throw error;
     }
   },
 
-  async updateClient(id: string, data: UpdateClientRequest): Promise<Client> {
+  async reactivateClient(clientCode: string): Promise<Client> {
     try {
-      return await adminApi.updateClient(id, data);
+      return await adminApi.reactivateClient(clientCode);
     } catch (error) {
-      console.error(`Failed to update client ${id}:`, error);
+      console.error(`Failed to reactivate client ${clientCode}:`, error);
       throw error;
     }
   },
 
-  async suspendClient(id: string): Promise<void> {
+  async hardDeleteClient(
+    clientCode: string,
+    confirmClientCode: string,
+    reason: string,
+  ): Promise<void> {
     try {
-      await adminApi.updateClient(id, {status: 'suspended'});
+      const data: HardDeleteClientRequest = {confirmClientCode, reason};
+      await adminApi.hardDeleteClient(clientCode, data);
     } catch (error) {
-      console.error(`Failed to suspend client ${id}:`, error);
-      throw error;
-    }
-  },
-
-  async activateClient(id: string): Promise<void> {
-    try {
-      await adminApi.updateClient(id, {status: 'active'});
-    } catch (error) {
-      console.error(`Failed to activate client ${id}:`, error);
-      throw error;
-    }
-  },
-
-  async deleteClient(id: string): Promise<void> {
-    try {
-      await adminApi.deleteClient(id);
-    } catch (error) {
-      console.error(`Failed to delete client ${id}:`, error);
+      console.error(`Failed to delete client ${clientCode}:`, error);
       throw error;
     }
   },

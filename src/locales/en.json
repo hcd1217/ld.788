@@ -217,6 +217,7 @@
     "confirmNewPassword": "Confirm new password"
   },
   "validation": {
+    "error": "Validation Error",
     "fieldRequired": "This field is required",
     "invalidLevel": "Invalid level",
     "emailRequired": "Email is required",
@@ -574,9 +575,12 @@
       "activateClient": "Activate Client",
       "confirmSuspendTitle": "Confirm Suspend Client",
       "confirmActivateTitle": "Confirm Activate Client",
+      "confirmDeleteTitle": "Confirm Delete Client",
       "confirmSuspendMessage": "Are you sure you want to suspend {{name}}? All users will lose access.",
       "confirmActivateMessage": "Are you sure you want to activate {{name}}? All users will regain access.",
+      "confirmDeleteMessage": "Are you sure you want to permanently delete {{name}}? This action cannot be undone.",
       "suspendWarning": "This action will immediately prevent all users from accessing the system",
+      "deleteWarning": "WARNING: This action is permanent and cannot be undone. All data will be lost.",
       "clientCreated": "Client Created",
       "clientCreatedMessage": "{{name}} has been successfully created",
       "clientUpdated": "Client Updated",
@@ -585,12 +589,27 @@
       "clientSuspendedMessage": "{{name}} has been suspended",
       "clientActivated": "Client Activated",
       "clientActivatedMessage": "{{name}} has been activated",
+      "clientDeleted": "Client Deleted",
+      "clientDeletedMessage": "{{name}} has been permanently deleted",
       "updateFailed": "Update Failed",
+      "delete": "Delete",
+      "deleteClient": "Delete Client",
+      "viewDetails": "View Details",
+      "moreActions": "More Actions",
+      "suspendReason": "Reason for Suspension",
+      "suspendReasonPlaceholder": "Enter reason for suspending this client",
+      "deleteReason": "Reason for Deletion",
+      "deleteReasonPlaceholder": "Enter reason for deleting this client",
+      "confirmClientCode": "Confirm Client Code",
+      "confirmClientCodeDescription": "Type {{code}} to confirm deletion",
       "validation": {
         "clientCodeFormat": "Must be 2-10 uppercase letters and numbers",
         "clientNameLength": "Must be between 3 and 100 characters",
         "passwordLength": "Must be at least 12 characters",
-        "nameLength": "Must be between 2 and 50 characters"
+        "nameLength": "Must be between 2 and 50 characters",
+        "suspendReasonRequired": "Please provide a reason for suspension",
+        "deleteReasonRequired": "Please provide a reason for deletion",
+        "confirmCodeMismatch": "Client code does not match. Please type the exact code to confirm"
       }
     }
   }

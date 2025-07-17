@@ -27,6 +27,7 @@ import {Navigate, useNavigate} from 'react-router';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import {isDevelopment} from '@/utils/env';
 
 export function MorePage() {
   const navigate = useNavigate();
@@ -195,7 +196,7 @@ export function MorePage() {
                   </Text>
                   <Stack gap="xs">
                     {utilityItems
-                      .filter((item) => !item.devOnly || import.meta.env.DEV)
+                      .filter((item) => !item.devOnly || isDevelopment)
                       .map((item) => (
                         <Card
                           key={item.title}
