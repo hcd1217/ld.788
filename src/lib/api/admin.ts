@@ -120,8 +120,8 @@ export const UpdateAdminPermissionResponseSchema = z.object({
 });
 
 export const DeleteAdminPermissionResponseSchema = z.object({
-  success: z.boolean(),
   message: z.string(),
+  deletedPermissionId: z.string(),
 });
 
 // Type exports

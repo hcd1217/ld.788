@@ -76,7 +76,12 @@
     "created": "Created",
     "back": "Back",
     "next": "Next",
-    "cannotBeUndone": "This action cannot be undone."
+    "cannotBeUndone": "This action cannot be undone.",
+    "minutes": "minutes",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "notSet": "Not set",
+    "goToHome": "Go to Home"
   },
   "store": {
     "title": "Store Management",
@@ -294,6 +299,34 @@
     "addFailed": "Failed to add permission",
     "updateFailed": "Failed to update permission",
     "revokeFailed": "Failed to revoke permission"
+  },
+  "profile": {
+    "title": "My Profile",
+    "notLoggedIn": "Not Logged In",
+    "pleaseLogin": "Please log in to view your profile.",
+    "fetchError": "Failed to load profile data. Please try again.",
+    "basicInfo": "Basic Information",
+    "email": "Email",
+    "username": "Username",
+    "clientCode": "Client Code",
+    "rootUser": "Root User",
+    "roles": "Roles",
+    "level": "Level",
+    "featureFlags": "Feature Flags",
+    "features": {
+      "role-management": "Role Management",
+      "role-management.customRoles": "Custom Roles",
+      "role-management.roleHierarchy": "Role Hierarchy",
+      "user-management": "User Management",
+      "user-management.bulkImport": "Bulk Import",
+      "user-management.userInvitations": "User Invitations",
+      "user-management.createUserWithDepartment": "Create User with Department"
+    },
+    "clientConfig": "Client Configuration",
+    "sessionTimeout": "Session Timeout",
+    "maxSessions": "Max Concurrent Sessions",
+    "passwordReset": "Password Reset",
+    "selfRegistration": "Self Registration"
   },
   "staff": {
     "title": "Staff Management",

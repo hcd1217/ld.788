@@ -64,6 +64,51 @@ export const RegisterResponseSchema = z.object({
   refreshToken: z.string(),
 });
 
+// Schema for role object
+export const RoleSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  level: z.number(),
+});
+
+// Schema for dynamic feature flags
+export const DynamicFeatureFlagsSchema = z.object({
+  'role-management': z
+    .object({
+      customRoles: z.boolean(),
+      roleHierarchy: z.boolean(),
+    })
+    .optional(),
+  'user-management': z
+    .object({
+      bulkImport: z.boolean(),
+      userInvitations: z.boolean(),
+      createUserWithDepartment: z.boolean(),
+    })
+    .optional(),
+});
+
+// Schema for client config
+export const ClientConfigSchema = z.object({
+  sessionTimeoutMinutes: z.number(),
+  maxConcurrentSessions: z.number(),
+  allowPasswordReset: z.boolean(),
+  allowSelfRegistration: z.boolean(),
+});
+
+// Schema for GET /auth/me response
+export const GetMeResponseSchema = z.object({
+  id: z.string().uuid(),
+  email: emailSchema,
+  userName: z.string().nullable(),
+  clientId: z.string().uuid(),
+  clientCode: z.string(),
+  isRoot: z.boolean(),
+  roles: z.array(RoleSchema),
+  dynamicFeatureFlags: DynamicFeatureFlagsSchema,
+  clientConfig: ClientConfigSchema,
+});
+
 // Types derived from schemas
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 export type LoginResponse = z.infer<typeof LoginResponseSchema>;
@@ -78,6 +123,10 @@ export type ResetPasswordRequest = z.infer<typeof ResetPasswordRequestSchema>;
 export type ResetPasswordResponse = z.infer<typeof ResetPasswordResponseSchema>;
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 export type RegisterResponse = z.infer<typeof RegisterResponseSchema>;
+export type Role = z.infer<typeof RoleSchema>;
+export type DynamicFeatureFlags = z.infer<typeof DynamicFeatureFlagsSchema>;
+export type ClientConfig = z.infer<typeof ClientConfigSchema>;
+export type GetMeResponse = z.infer<typeof GetMeResponseSchema>;
 
 export class AuthApi extends BaseApiClient {
   async login(data: LoginRequest): Promise<LoginResponse> {
@@ -126,5 +175,9 @@ export class AuthApi extends BaseApiClient {
       RenewTokenResponseSchema,
       RenewTokenRequestSchema,
     );
+  }
+
+  async getMe(): Promise<GetMeResponse> {
+    return this.get<GetMeResponse>('/auth/me', GetMeResponseSchema);
   }
 }

@@ -90,14 +90,24 @@ export function AdminLoginPage() {
 
         <Space h="lg" />
 
-        <form onSubmit={form.onSubmit(onSubmit)}>
+        <form autoComplete="off" onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap="lg">
+            {/* Hidden username field to prevent Chrome password save */}
+            <input
+              type="text"
+              name="username"
+              autoComplete="username"
+              style={{display: 'none'}}
+              aria-hidden="true"
+              tabIndex={-1}
+            />
             <PasswordInput
               required
               name="accessKey"
               placeholder={t('admin.accessKeyPlaceholder')}
               error={form.errors.accessKey}
               disabled={isLoading}
+              autoComplete="one-time-code"
               {...form.getInputProps('accessKey')}
               onFocus={clearErrors}
             />

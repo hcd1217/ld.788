@@ -76,7 +76,12 @@
     "created": "Đã tạo",
     "back": "Quay lại",
     "next": "Tiếp theo",
-    "cannotBeUndone": "Hành động này không thể hoàn tác."
+    "cannotBeUndone": "Hành động này không thể hoàn tác.",
+    "minutes": "phút",
+    "enabled": "Đã Bật",
+    "disabled": "Đã Tắt",
+    "notSet": "Chưa thiết lập",
+    "goToHome": "Về Trang Chủ"
   },
   "store": {
     "title": "Quản Lý Cửa Hàng",
@@ -294,6 +299,34 @@
     "addFailed": "Thêm quyền thất bại",
     "updateFailed": "Cập nhật quyền thất bại",
     "revokeFailed": "Thu hồi quyền thất bại"
+  },
+  "profile": {
+    "title": "Hồ Sơ Của Tôi",
+    "notLoggedIn": "Chưa Đăng Nhập",
+    "pleaseLogin": "Vui lòng đăng nhập để xem hồ sơ của bạn.",
+    "fetchError": "Không thể tải dữ liệu hồ sơ. Vui lòng thử lại.",
+    "basicInfo": "Thông Tin Cơ Bản",
+    "email": "Email",
+    "username": "Tên Người Dùng",
+    "clientCode": "Mã Khách Hàng",
+    "rootUser": "Người Dùng Gốc",
+    "roles": "Vai Trò",
+    "level": "Cấp Độ",
+    "featureFlags": "Tính Năng",
+    "features": {
+      "role-management": "Quản Lý Vai Trò",
+      "role-management.customRoles": "Vai Trò Tùy Chỉnh",
+      "role-management.roleHierarchy": "Phân Cấp Vai Trò",
+      "user-management": "Quản Lý Người Dùng",
+      "user-management.bulkImport": "Nhập Hàng Loạt",
+      "user-management.userInvitations": "Lời Mời Người Dùng",
+      "user-management.createUserWithDepartment": "Tạo Người Dùng Với Phòng Ban"
+    },
+    "clientConfig": "Cấu Hình Khách Hàng",
+    "sessionTimeout": "Thời Gian Hết Phiên",
+    "maxSessions": "Số Phiên Đồng Thời Tối Đa",
+    "passwordReset": "Đặt Lại Mật Khẩu",
+    "selfRegistration": "Tự Đăng Ký"
   },
   "staff": {
     "title": "Quản Lý Nhân Viên",

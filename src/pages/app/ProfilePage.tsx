@@ -7,13 +7,50 @@ import {
   Group,
   Box,
   Stack,
+  Badge,
+  SimpleGrid,
+  Alert,
+  LoadingOverlay,
+  Transition,
 } from '@mantine/core';
 import {useNavigate} from 'react-router';
+import {useState, useEffect} from 'react';
+import {IconAlertCircle, IconCheck, IconX} from '@tabler/icons-react';
 import {useAppStore} from '@/stores/useAppStore';
+import {useTranslation} from '@/hooks/useTranslation';
+import {authApi} from '@/lib/api';
+import type {GetMeResponse} from '@/lib/api/auth';
+import {GoBack} from '@/components/common/GoBack';
 
 export function ProfilePage() {
   const navigate = useNavigate();
-  const {isAuthenticated, user, logout} = useAppStore();
+  const {t} = useTranslation();
+  const {isAuthenticated, logout} = useAppStore();
+  const [userData, setUserData] = useState<GetMeResponse | undefined>(
+    undefined,
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [showAlert, setShowAlert] = useState(false);
+
+  const fetchUserData = async () => {
+    try {
+      setIsLoading(true);
+      setError(undefined);
+      const response = await authApi.getMe();
+      setUserData(response);
+    } catch {
+      setError(t('profile.fetchError'));
+      setShowAlert(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -22,56 +59,206 @@ export function ProfilePage() {
 
   if (!isAuthenticated) {
     return (
-      <Container fluid mt="xl">
-        <Stack gap="xl">
-          <Box
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              width: '100%',
-              padding: '0 16px',
-            }}
-          >
-            <Box style={{maxWidth: '600px', width: '100%'}}>
-              <Card shadow="sm" padding="lg">
-                <Title order={2}>Not Logged In</Title>
-                <Text mt="md">Please log in to view your profile.</Text>
-                <Button mt="md" onClick={() => navigate('/')}>
-                  Go to Home
-                </Button>
-              </Card>
-            </Box>
-          </Box>
-        </Stack>
+      <Container size="md" mt="xl">
+        <Card shadow="sm" padding="lg">
+          <Title order={2}>{t('profile.notLoggedIn')}</Title>
+          <Text mt="md">{t('profile.pleaseLogin')}</Text>
+          <Button mt="md" onClick={() => navigate('/')}>
+            {t('common.goToHome')}
+          </Button>
+        </Card>
       </Container>
     );
   }
 
   return (
-    <Container fluid mt="xl">
+    <Container size="md" mt="xl">
       <Stack gap="xl">
-        <Box
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-            padding: '0 16px',
-          }}
-        >
-          <Box style={{maxWidth: '600px', width: '100%'}}>
-            <Card shadow="sm" padding="lg">
-              <Title order={1}>Profile</Title>
-              <Text mt="md" size="lg">
-                Email: {user?.email}
-              </Text>
-              <Text size="lg">Email: {user?.email}</Text>
-              <Group mt="xl">
-                <Button color="red" onClick={handleLogout}>
-                  Logout
-                </Button>
-              </Group>
-            </Card>
-          </Box>
+        <Group justify="space-between">
+          <GoBack />
+          <Button color="red" onClick={handleLogout}>
+            {t('common.logout')}
+          </Button>
+        </Group>
+
+        <Title order={1} ta="center">
+          {t('profile.title')}
+        </Title>
+
+        <Box pos="relative">
+          <LoadingOverlay
+            visible={isLoading}
+            overlayProps={{blur: 2}}
+            transitionProps={{duration: 300}}
+          />
+
+          <Transition
+            mounted={showAlert ? Boolean(error) : false}
+            transition="fade"
+          >
+            {(styles) => (
+              <Alert
+                withCloseButton
+                style={styles}
+                icon={<IconAlertCircle size={16} />}
+                color="red"
+                variant="light"
+                mb="md"
+                onClose={() => {
+                  setShowAlert(false);
+                }}
+              >
+                {error}
+              </Alert>
+            )}
+          </Transition>
+
+          {userData ? (
+            <Stack gap="lg">
+              {/* Basic Information */}
+              <Card shadow="sm" padding="xl" radius="md">
+                <Title order={3} mb="md">
+                  {t('profile.basicInfo')}
+                </Title>
+                <Stack gap="sm">
+                  <Group>
+                    <Text fw={500}>{t('profile.email')}:</Text>
+                    <Text>{userData.email}</Text>
+                  </Group>
+                  <Group>
+                    <Text fw={500}>{t('profile.username')}:</Text>
+                    <Text>{userData.userName || t('common.notSet')}</Text>
+                  </Group>
+                  <Group>
+                    <Text fw={500}>{t('profile.clientCode')}:</Text>
+                    <Badge variant="light">{userData.clientCode}</Badge>
+                  </Group>
+                  {userData.isRoot ? (
+                    <Badge color="red" variant="filled">
+                      {t('profile.rootUser')}
+                    </Badge>
+                  ) : null}
+                </Stack>
+              </Card>
+
+              {/* Roles Section */}
+              <Card shadow="sm" padding="xl" radius="md">
+                <Title order={3} mb="md">
+                  {t('profile.roles')}
+                </Title>
+                <Stack gap="sm">
+                  {userData.roles.map((role) => (
+                    <Group key={role.id} justify="space-between">
+                      <Badge size="lg" variant="light">
+                        {role.name}
+                      </Badge>
+                      <Text size="sm" c="dimmed">
+                        {t('profile.level')}: {role.level}
+                      </Text>
+                    </Group>
+                  ))}
+                </Stack>
+              </Card>
+
+              {/* Feature Flags */}
+              <Card shadow="sm" padding="xl" radius="md">
+                <Title order={3} mb="md">
+                  {t('profile.featureFlags')}
+                </Title>
+                <Stack gap="md">
+                  {Object.entries(userData.dynamicFeatureFlags).map(
+                    ([category, flags]) => (
+                      <Box key={category}>
+                        <Text fw={500} mb="xs">
+                          {t(`profile.features.${category}` as any)}
+                        </Text>
+                        <SimpleGrid cols={{base: 1, sm: 2}} spacing="xs">
+                          {flags
+                            ? Object.entries(flags).map(
+                                ([feature, enabled]) => (
+                                  <Group key={feature} gap="xs">
+                                    {enabled ? (
+                                      <IconCheck size={16} color="green" />
+                                    ) : (
+                                      <IconX size={16} color="red" />
+                                    )}
+                                    <Text size="sm">
+                                      {t(
+                                        `profile.features.${category}.${feature}` as any,
+                                      )}
+                                    </Text>
+                                  </Group>
+                                ),
+                              )
+                            : null}
+                        </SimpleGrid>
+                      </Box>
+                    ),
+                  )}
+                </Stack>
+              </Card>
+
+              {/* Client Configuration */}
+              <Card shadow="sm" padding="xl" radius="md">
+                <Title order={3} mb="md">
+                  {t('profile.clientConfig')}
+                </Title>
+                <SimpleGrid cols={{base: 1, sm: 2}} spacing="sm">
+                  <Box>
+                    <Text size="sm" c="dimmed">
+                      {t('profile.sessionTimeout')}
+                    </Text>
+                    <Text fw={500}>
+                      {userData.clientConfig.sessionTimeoutMinutes}{' '}
+                      {t('common.minutes')}
+                    </Text>
+                  </Box>
+                  <Box>
+                    <Text size="sm" c="dimmed">
+                      {t('profile.maxSessions')}
+                    </Text>
+                    <Text fw={500}>
+                      {userData.clientConfig.maxConcurrentSessions}
+                    </Text>
+                  </Box>
+                  <Box>
+                    <Text size="sm" c="dimmed">
+                      {t('profile.passwordReset')}
+                    </Text>
+                    <Badge
+                      color={
+                        userData.clientConfig.allowPasswordReset
+                          ? 'green'
+                          : 'red'
+                      }
+                      variant="light"
+                    >
+                      {userData.clientConfig.allowPasswordReset
+                        ? t('common.enabled')
+                        : t('common.disabled')}
+                    </Badge>
+                  </Box>
+                  <Box>
+                    <Text size="sm" c="dimmed">
+                      {t('profile.selfRegistration')}
+                    </Text>
+                    <Badge
+                      color={
+                        userData.clientConfig.allowSelfRegistration
+                          ? 'green'
+                          : 'red'
+                      }
+                      variant="light"
+                    >
+                      {userData.clientConfig.allowSelfRegistration
+                        ? t('common.enabled')
+                        : t('common.disabled')}
+                    </Badge>
+                  </Box>
+                </SimpleGrid>
+              </Card>
+            </Stack>
+          ) : null}
         </Box>
       </Stack>
     </Container>

@@ -419,6 +419,7 @@ export function DeletePermissionModal({
   onConfirm,
 }: DeletePermissionModalProps) {
   const {t} = useTranslation();
+  const isDarkMode = useIsDarkMode();
   const [confirmText, setConfirmText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -466,7 +467,7 @@ export function DeletePermissionModal({
               {t('admin.permissions.deleteWarning')}
             </Alert>
 
-            <Paper p="sm" bg="red.0" radius="sm">
+            <Paper p="sm" bg={isDarkMode ? 'dark.6' : 'gray.1'} radius="sm">
               <Stack gap="xs">
                 <Group gap="xs">
                   <IconCode size={16} color="var(--mantine-color-red-6)" />

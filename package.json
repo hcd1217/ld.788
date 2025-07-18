@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "xo",
     "lint:fix": "xo --fix",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc -p tsconfig.app.json --noEmit",
     "preview": "vite preview",
     "generate-pwa-assets": "node scripts/generate-pwa-assets.js",
     "sync:translation": "node scripts/sync-translation.cjs",
