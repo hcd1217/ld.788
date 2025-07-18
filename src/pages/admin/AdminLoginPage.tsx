@@ -121,7 +121,6 @@ export function AdminLoginPage() {
               variant="filled"
               type="submit"
               disabled={isLoading}
-              loading={isLoading}
             >
               {t('admin.signIn')}
             </Button>

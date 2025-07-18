@@ -7,7 +7,6 @@ import {
   Group,
   Button,
   Text,
-  LoadingOverlay,
   Alert,
   TextInput,
   Pagination,
@@ -28,7 +27,6 @@ import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
   usePermissions,
-  usePermissionLoading,
   usePermissionError,
   usePermissionActions,
 } from '@/stores/usePermissionStore';
@@ -57,7 +55,6 @@ export function PermissionManagementPage() {
   const isDarkMode = useIsDarkMode();
 
   const allPermissions = usePermissions();
-  const isLoading = usePermissionLoading();
   const error = usePermissionError();
   const {
     loadPermissions,
@@ -160,7 +157,7 @@ export function PermissionManagementPage() {
 
   return (
     <>
-      <Container size="xl" mt="xl">
+      <Container fluid px="xl" mt="xl">
         <Stack gap="xl">
           <Group justify="space-between">
             <GoBack />
@@ -201,53 +198,45 @@ export function PermissionManagementPage() {
               />
 
               {/* Permissions Table */}
-              <div style={{position: 'relative'}}>
-                <LoadingOverlay
-                  visible={isLoading}
-                  overlayProps={{blur: 2}}
-                  transitionProps={{duration: 300}}
+              {allPermissions.length === 0 ? (
+                <Paper p="xl" ta="center">
+                  <Stack gap="md">
+                    <IconShieldCheck
+                      size={48}
+                      color="var(--mantine-color-gray-5)"
+                    />
+                    <div>
+                      <Title order={3} c="dimmed">
+                        {searchQuery
+                          ? t('admin.permissions.noPermissionsFoundSearch')
+                          : t('admin.permissions.noPermissionsFound')}
+                      </Title>
+                      <Text c="dimmed" mt="xs">
+                        {searchQuery
+                          ? t('admin.permissions.tryDifferentSearch')
+                          : t(
+                              'admin.permissions.createFirstPermissionDescription',
+                            )}
+                      </Text>
+                    </div>
+                    {searchQuery ? null : (
+                      <Button
+                        leftSection={<IconPlus size={16} />}
+                        mt="md"
+                        onClick={openCreateModal}
+                      >
+                        {t('admin.permissions.createFirstPermission')}
+                      </Button>
+                    )}
+                  </Stack>
+                </Paper>
+              ) : (
+                <PermissionTable
+                  permissions={paginatedPermissions}
+                  onEdit={handleEditPermission}
+                  onDelete={handleDeletePermission}
                 />
-
-                {allPermissions.length === 0 && !isLoading ? (
-                  <Paper p="xl" ta="center">
-                    <Stack gap="md">
-                      <IconShieldCheck
-                        size={48}
-                        color="var(--mantine-color-gray-5)"
-                      />
-                      <div>
-                        <Title order={3} c="dimmed">
-                          {searchQuery
-                            ? t('admin.permissions.noPermissionsFoundSearch')
-                            : t('admin.permissions.noPermissionsFound')}
-                        </Title>
-                        <Text c="dimmed" mt="xs">
-                          {searchQuery
-                            ? t('admin.permissions.tryDifferentSearch')
-                            : t(
-                                'admin.permissions.createFirstPermissionDescription',
-                              )}
-                        </Text>
-                      </div>
-                      {searchQuery ? null : (
-                        <Button
-                          leftSection={<IconPlus size={16} />}
-                          mt="md"
-                          onClick={openCreateModal}
-                        >
-                          {t('admin.permissions.createFirstPermission')}
-                        </Button>
-                      )}
-                    </Stack>
-                  </Paper>
-                ) : (
-                  <PermissionTable
-                    permissions={paginatedPermissions}
-                    onEdit={handleEditPermission}
-                    onDelete={handleDeletePermission}
-                  />
-                )}
-              </div>
+              )}
 
               {/* Pagination */}
               {totalPages > 1 ? (

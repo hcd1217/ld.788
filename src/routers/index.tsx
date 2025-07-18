@@ -245,6 +245,7 @@ const routeObjects: RouteObject[] = [
   },
   {
     path: 'admin',
+    Component: PCOnlyLayout,
     children: [
       {
         path: 'login',

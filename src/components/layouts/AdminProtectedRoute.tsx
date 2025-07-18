@@ -5,6 +5,7 @@ import {ColorSchemeToggle} from '@/components/common/ColorSchemeToggle';
 import {LanguageSwitcher} from '@/components/common/LanguageSwitcher';
 import {AppLogo} from '@/components/common/AppLogo';
 import {useAppStore} from '@/stores/useAppStore';
+import {AdminLoadingOverlay} from '@/components/admin/AdminLoadingOverlay';
 
 export function AdminProtectedRoute(): ReactNode {
   const {adminAuthenticated} = useAppStore();
@@ -14,20 +15,23 @@ export function AdminProtectedRoute(): ReactNode {
   }
 
   return (
-    <AppShell header={{height: 60}} padding="md">
-      <AppShell.Header>
-        <Group h="100%" px="md" justify="space-between">
-          <AppLogo link="/admin/dashboard" />
-          <Group>
-            <LanguageSwitcher />
-            <ColorSchemeToggle />
+    <>
+      <AppShell header={{height: 60}} padding="md">
+        <AppShell.Header>
+          <Group h="100%" px="md" justify="space-between">
+            <AppLogo link="/admin/dashboard" />
+            <Group>
+              <LanguageSwitcher />
+              <ColorSchemeToggle />
+            </Group>
           </Group>
-        </Group>
-      </AppShell.Header>
+        </AppShell.Header>
 
-      <AppShell.Main>
-        <Outlet />
-      </AppShell.Main>
-    </AppShell>
+        <AppShell.Main>
+          <Outlet />
+        </AppShell.Main>
+      </AppShell>
+      <AdminLoadingOverlay />
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import * as z from 'zod/v4';
 import {BaseApiClient} from './base';
 import {clientCodeSchema, emailSchema, timestampSchema} from './schema';
+import {useAppStore} from '@/stores/useAppStore';
 
 // Login Schemas
 export const AdminLoginRequestSchema = z.object({
@@ -175,6 +176,87 @@ export class AdminApi extends BaseApiClient {
 
   clearAdminAccessKey() {
     this.adminAccessKey = '';
+  }
+
+  // Override base HTTP methods to add loading state tracking
+  async get<T, R = unknown>(
+    endpoint: string,
+    params?: R,
+    schema?: z.ZodSchema<T>,
+    paramsSchema?: z.ZodSchema<R>,
+  ): Promise<T> {
+    const {setAdminApiLoading} = useAppStore.getState();
+
+    try {
+      setAdminApiLoading(true);
+      return await super.get(endpoint, params, schema, paramsSchema);
+    } finally {
+      setAdminApiLoading(false);
+    }
+  }
+
+  async post<T, R = unknown>(
+    endpoint: string,
+    data?: unknown,
+    schema?: z.ZodSchema<T>,
+    dataSchema?: z.ZodSchema<R>,
+  ): Promise<T> {
+    const {setAdminApiLoading} = useAppStore.getState();
+
+    try {
+      setAdminApiLoading(true);
+      return await super.post(endpoint, data, schema, dataSchema);
+    } finally {
+      setAdminApiLoading(false);
+    }
+  }
+
+  async put<T, R = unknown>(
+    endpoint: string,
+    data?: unknown,
+    schema?: z.ZodSchema<T>,
+    dataSchema?: z.ZodSchema<R>,
+  ): Promise<T> {
+    const {setAdminApiLoading} = useAppStore.getState();
+
+    try {
+      setAdminApiLoading(true);
+      return await super.put(endpoint, data, schema, dataSchema);
+    } finally {
+      setAdminApiLoading(false);
+    }
+  }
+
+  async patch<T, R = unknown>(
+    endpoint: string,
+    data?: unknown,
+    schema?: z.ZodSchema<T>,
+    dataSchema?: z.ZodSchema<R>,
+  ): Promise<T> {
+    const {setAdminApiLoading} = useAppStore.getState();
+
+    try {
+      setAdminApiLoading(true);
+      return await super.patch(endpoint, data, schema, dataSchema);
+    } finally {
+      setAdminApiLoading(false);
+    }
+  }
+
+  async delete<T, R = unknown>(
+    endpoint: string,
+    data?: unknown,
+    schema?: z.ZodSchema<T>,
+    dataSchema?: z.ZodSchema<R>,
+  ): Promise<T> {
+    const {setAdminApiLoading} = useAppStore.getState();
+
+    try {
+      setAdminApiLoading(true);
+      return await super.delete(endpoint, data, schema, dataSchema);
+    } finally {
+      setAdminApiLoading(false);
+    }
   }
 
   async login(data: AdminLoginRequest): Promise<AdminLoginResponse> {

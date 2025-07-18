@@ -9,7 +9,6 @@ import {
   Button,
   Text,
   SimpleGrid,
-  LoadingOverlay,
   Alert,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
@@ -26,7 +25,6 @@ import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
   useClients,
-  useClientLoading,
   useClientError,
   useClientActions,
 } from '@/stores/useClientStore';
@@ -52,7 +50,6 @@ export function ClientListPage() {
   const isDarkMode = useIsDarkMode();
 
   const clients = useClients();
-  const isLoading = useClientLoading();
   const error = useClientError();
   const {
     loadClients,
@@ -179,7 +176,7 @@ export function ClientListPage() {
 
   return (
     <>
-      <Container size="lg" mt="xl">
+      <Container fluid px="xl" mt="xl">
         <Stack gap="xl">
           <Group justify="space-between">
             <GoBack />
@@ -207,51 +204,43 @@ export function ClientListPage() {
             </Alert>
           ) : null}
 
-          <div style={{position: 'relative'}}>
-            <LoadingOverlay
-              visible={isLoading}
-              overlayProps={{blur: 2}}
-              transitionProps={{duration: 300}}
-            />
-
-            {clients.length === 0 && !isLoading ? (
-              <Card shadow="sm" padding="xl" radius="md" ta="center">
-                <Stack gap="md">
-                  <IconUsers size={48} color="var(--mantine-color-gray-5)" />
-                  <div>
-                    <Title order={3} c="dimmed">
-                      {t('admin.clients.noClientsFound')}
-                    </Title>
-                    <Text c="dimmed" mt="xs">
-                      {t('admin.clients.createFirstClientDescription')}
-                    </Text>
-                  </div>
-                  <Button
-                    leftSection={<IconPlus size={16} />}
-                    mt="md"
-                    onClick={() => navigate('/admin/clients/new')}
-                  >
-                    {t('admin.clients.createFirstClient')}
-                  </Button>
-                </Stack>
-              </Card>
-            ) : (
-              <SimpleGrid cols={{base: 1, sm: 2, lg: 3}} spacing="lg">
-                {clients.map((client) => (
-                  <ClientCard
-                    key={client.id}
-                    client={client}
-                    onSuspend={handleSuspendClient}
-                    onReactivate={handleReactivateClient}
-                    onDelete={handleDeleteClient}
-                    onViewDetails={(clientCode) =>
-                      navigate(`/admin/clients/${clientCode}`)
-                    }
-                  />
-                ))}
-              </SimpleGrid>
-            )}
-          </div>
+          {clients.length === 0 ? (
+            <Card shadow="sm" padding="xl" radius="md" ta="center">
+              <Stack gap="md">
+                <IconUsers size={48} color="var(--mantine-color-gray-5)" />
+                <div>
+                  <Title order={3} c="dimmed">
+                    {t('admin.clients.noClientsFound')}
+                  </Title>
+                  <Text c="dimmed" mt="xs">
+                    {t('admin.clients.createFirstClientDescription')}
+                  </Text>
+                </div>
+                <Button
+                  leftSection={<IconPlus size={16} />}
+                  mt="md"
+                  onClick={() => navigate('/admin/clients/new')}
+                >
+                  {t('admin.clients.createFirstClient')}
+                </Button>
+              </Stack>
+            </Card>
+          ) : (
+            <SimpleGrid cols={{base: 1, sm: 2, lg: 3}} spacing="lg">
+              {clients.map((client) => (
+                <ClientCard
+                  key={client.id}
+                  client={client}
+                  onSuspend={handleSuspendClient}
+                  onReactivate={handleReactivateClient}
+                  onDelete={handleDeleteClient}
+                  onViewDetails={(clientCode) =>
+                    navigate(`/admin/clients/${clientCode}`)
+                  }
+                />
+              ))}
+            </SimpleGrid>
+          )}
         </Stack>
       </Container>
 

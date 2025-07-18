@@ -232,7 +232,7 @@ export function StoreListPage() {
 
   return (
     <>
-      <Container size="lg" mt="xl">
+      <Container fluid px="xl" mt="xl">
         <Stack gap="xl">
           <Group justify="space-between">
             <Title order={1} ta="center">

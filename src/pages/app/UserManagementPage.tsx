@@ -243,7 +243,7 @@ export function UserManagementPage() {
   }
 
   return (
-    <Container size="xl" mt="xl">
+    <Container fluid px="xl" mt="xl">
       <Stack gap="xl">
         <Group justify="space-between">
           <GoBack />

@@ -8,7 +8,6 @@ import {
   Group,
   Box,
   Alert,
-  LoadingOverlay,
   Divider,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
@@ -275,12 +274,6 @@ export function ClientDetailPage() {
           }}
         >
           <Box style={{maxWidth: '600px', width: '100%', position: 'relative'}}>
-            <LoadingOverlay
-              visible={isLoading}
-              overlayProps={{blur: 2}}
-              transitionProps={{duration: 300}}
-            />
-
             {client ? (
               <Card shadow="sm" padding="xl" radius="md">
                 <Stack gap="lg">

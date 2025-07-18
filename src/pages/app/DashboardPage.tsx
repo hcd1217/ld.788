@@ -1,26 +1,15 @@
-import {Title, Text, Container, Card, Box, Stack} from '@mantine/core';
+import {Title, Text, Container, Card, Stack} from '@mantine/core';
 
 export function DashboardPage() {
   return (
-    <Container fluid mt="xl">
+    <Container fluid px="xl" mt="xl">
       <Stack gap="xl">
-        <Box
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-            padding: '0 16px',
-          }}
-        >
-          <Box style={{maxWidth: '600px', width: '100%'}}>
-            <Card shadow="sm" padding="lg">
-              <Title order={1}>Home</Title>
-              <Text mt="md" size="lg">
-                Welcome to the home
-              </Text>
-            </Card>
-          </Box>
-        </Box>
+        <Card shadow="sm" padding="lg">
+          <Title order={1}>Home</Title>
+          <Text mt="md" size="lg">
+            Welcome to the home
+          </Text>
+        </Card>
       </Stack>
     </Container>
   );

@@ -1,4 +1,3 @@
-import {useState} from 'react';
 import {useNavigate} from 'react-router';
 import {
   Container,
@@ -48,7 +47,6 @@ export function ClientCreatePage() {
   const navigate = useNavigate();
   const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
-  const [isLoading, setIsLoading] = useState(false);
 
   const {createClient} = useClientActions();
 
@@ -129,8 +127,6 @@ export function ClientCreatePage() {
   });
 
   const handleSubmit = async (values: RegisterClientRequest) => {
-    setIsLoading(true);
-
     await createClient(values);
 
     notifications.show({
@@ -189,7 +185,6 @@ export function ClientCreatePage() {
                     description={t('admin.clients.clientCodeDescription')}
                     leftSection={<IconBuilding size={16} />}
                     {...form.getInputProps('clientCode')}
-                    disabled={isLoading}
                     onChange={handleClientCodeChange}
                   />
 
@@ -199,7 +194,6 @@ export function ClientCreatePage() {
                     placeholder={t('admin.clients.clientNamePlaceholder')}
                     leftSection={<IconBuilding size={16} />}
                     {...form.getInputProps('clientName')}
-                    disabled={isLoading}
                   />
 
                   <Title order={3} mt="md" mb="sm">
@@ -213,7 +207,6 @@ export function ClientCreatePage() {
                       placeholder={t('admin.clients.firstNamePlaceholder')}
                       leftSection={<IconUser size={16} />}
                       {...form.getInputProps('rootUserFirstName')}
-                      disabled={isLoading}
                     />
 
                     <TextInput
@@ -222,7 +215,6 @@ export function ClientCreatePage() {
                       placeholder={t('admin.clients.lastNamePlaceholder')}
                       leftSection={<IconUser size={16} />}
                       {...form.getInputProps('rootUserLastName')}
-                      disabled={isLoading}
                     />
                   </Group>
 
@@ -232,7 +224,6 @@ export function ClientCreatePage() {
                     placeholder={t('admin.clients.emailPlaceholder')}
                     leftSection={<IconMail size={16} />}
                     {...form.getInputProps('rootUserEmail')}
-                    disabled={isLoading}
                   />
 
                   <PasswordInput
@@ -242,7 +233,6 @@ export function ClientCreatePage() {
                     description={t('admin.clients.passwordDescription')}
                     leftSection={<IconLock size={16} />}
                     {...form.getInputProps('rootUserPassword')}
-                    disabled={isLoading}
                   />
 
                   <Alert
@@ -258,16 +248,11 @@ export function ClientCreatePage() {
                   <Group justify="flex-end" mt="xl">
                     <Button
                       variant="light"
-                      disabled={isLoading}
                       onClick={() => navigate('/admin/clients')}
                     >
                       {t('common.cancel')}
                     </Button>
-                    <Button
-                      type="submit"
-                      loading={isLoading}
-                      disabled={isLoading}
-                    >
+                    <Button type="submit">
                       {t('admin.clients.createClient')}
                     </Button>
                   </Group>

@@ -244,7 +244,7 @@ export function PermissionManagementPage() {
   }
 
   return (
-    <Container size="xl" mt="xl">
+    <Container fluid px="xl" mt="xl">
       <Stack gap="xl">
         <Group justify="space-between">
           <GoBack />
@@ -267,12 +267,7 @@ export function PermissionManagementPage() {
               <Box style={{flex: 1}} />
 
               <Tooltip label={t('common.refresh')}>
-                <ActionIcon
-                  variant="light"
-                  size="lg"
-                  loading={isLoading}
-                  onClick={loadPermissions}
-                >
+                <ActionIcon variant="light" size="lg" onClick={loadPermissions}>
                   <IconRefresh size={16} />
                 </ActionIcon>
               </Tooltip>

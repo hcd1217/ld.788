@@ -527,6 +527,9 @@
     "loginSuccess": "Quyền truy cập quản trị được cấp",
     "loginSuccessMessage": "Bạn đã xác thực thành công",
     "loginFailed": "Xác thực thất bại",
+    "common": {
+      "loading": "Đang xử lý yêu cầu..."
+    },
     "systemStatus": "Trạng Thái Hệ Thống",
     "operational": "Tất Cả Hệ Thống Hoạt Động",
     "dashboard": {

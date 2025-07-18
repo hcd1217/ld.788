@@ -22,10 +22,13 @@ type AppState = {
   isAuthenticated: boolean;
   adminAuthenticated: boolean;
   isLoading: boolean;
+  adminApiLoading: boolean;
+  adminApiLoadingMessage: string;
   theme: 'light' | 'dark';
   setUser: (user: User | undefined) => void;
   setTheme: (theme: 'light' | 'dark') => void;
   setAdminAuth: (authenticated: boolean) => void;
+  setAdminApiLoading: (loading: boolean, message?: string) => void;
   login: (params: {
     identifier: string;
     password: string;
@@ -49,11 +52,15 @@ export const useAppStore = create<AppState>()(
         isAuthenticated: true,
         adminAuthenticated: isAdminAuthenticated(),
         isLoading: false,
+        adminApiLoading: false,
+        adminApiLoadingMessage: '',
         theme: 'light',
         setUser: (user) => set({user, isAuthenticated: Boolean(user)}),
         setTheme: (theme) => set({theme}),
         setAdminAuth: (authenticated) =>
           set({adminAuthenticated: authenticated}),
+        setAdminApiLoading: (loading, message = '') =>
+          set({adminApiLoading: loading, adminApiLoadingMessage: message}),
         async login(params) {
           set({isLoading: true, clientCode: params.clientCode});
           try {

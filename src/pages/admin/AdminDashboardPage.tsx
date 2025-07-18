@@ -75,7 +75,7 @@ export function AdminDashboardPage() {
     <Container fluid mt="xl">
       <Stack gap="xl">
         {/* Header */}
-        <Container size="xl" px="md">
+        <Container fluid px="md">
           <Group justify="space-between" align="center">
             <Group>
               <IconShieldCheck size={32} stroke={1.5} />
@@ -93,7 +93,7 @@ export function AdminDashboardPage() {
         </Container>
 
         {/* Status Bar */}
-        <Container size="xl" px="md">
+        <Container fluid px="md">
           <Paper withBorder p="md">
             <Group justify="space-between">
               <Text size="sm" c="dimmed">
@@ -107,7 +107,7 @@ export function AdminDashboardPage() {
         </Container>
 
         {/* Dashboard Cards */}
-        <Container size="xl" px="md">
+        <Container fluid px="md">
           <Grid>
             {dashboardCards.map((card) => (
               <Grid.Col key={card.title} span={{base: 12, sm: 6, md: 3}}>

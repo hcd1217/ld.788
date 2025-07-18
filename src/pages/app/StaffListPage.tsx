@@ -170,7 +170,7 @@ export function StaffListPage() {
 
   if (!currentStore && stores.length > 0) {
     return (
-      <Container size="lg" mt="xl">
+      <Container fluid px="xl" mt="xl">
         <Stack gap="xl">
           <Title order={1} ta="center">
             {t('staff.title')}
@@ -193,7 +193,7 @@ export function StaffListPage() {
 
   if (!currentStore) {
     return (
-      <Container size="lg" mt="xl">
+      <Container fluid px="xl" mt="xl">
         <Stack gap="xl">
           <Title order={1} ta="center">
             {t('staff.title')}
@@ -213,7 +213,7 @@ export function StaffListPage() {
 
   return (
     <>
-      <Container size="xl" mt="xl">
+      <Container fluid px="xl" mt="xl">
         <Stack gap="xl">
           <Group justify="space-between">
             <Title order={1} ta="center">
