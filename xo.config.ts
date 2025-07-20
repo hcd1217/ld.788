@@ -21,6 +21,7 @@ export default {
     'n/prefer-global/buffer': 'off',
     'new-cap': 'off',
     'no-await-in-loop': 'off',
+    'no-control-regex': 'off',
     'no-new': 'off',
     'no-unused-vars': 'off',
     'react/boolean-prop-naming': 'off',

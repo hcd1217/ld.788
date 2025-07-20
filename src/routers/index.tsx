@@ -1,6 +1,5 @@
 import {lazy} from 'react';
-import {createBrowserRouter, type RouteObject} from 'react-router';
-import {AppLayout} from '@/components/layouts/AppLayout';
+import {createBrowserRouter, Navigate, type RouteObject} from 'react-router';
 import {ResponsiveAuthLayout} from '@/components/layouts/ResponsiveAuthLayout';
 import {ProtectedRoute} from '@/components/layouts/ProtectedRoute';
 import {AdminProtectedRoute} from '@/components/layouts/AdminProtectedRoute';
@@ -20,19 +19,9 @@ const PCOnlyLayout = lazy(async () => {
   return {default: module.PCOnlyLayout};
 });
 
-const ErrorsPage = lazy(async () => {
-  const module = await import('@/pages/sample/Errors');
-  return {default: module.ErrorsPage};
-});
-
 const NotFound = lazy(async () => {
   const module = await import('@/pages/errors/NotFound');
   return {default: module.NotFound};
-});
-
-const TopPage = lazy(async () => {
-  const module = await import('@/pages/TopPage');
-  return {default: module.TopPage};
 });
 
 const ProfilePage = lazy(async () => {
@@ -167,15 +156,8 @@ const AdminPermissionManagementPage = lazy(async () => {
 
 const routeObjects: RouteObject[] = [
   {
-    path: '',
-    Component: AppLayout,
-    children: [
-      {index: true, Component: TopPage},
-      {
-        path: 'sample',
-        children: [{path: 'errors', Component: ErrorsPage}],
-      },
-    ],
+    path: '/',
+    Component: () => <Navigate to="/login" />,
   },
   {
     path: '',

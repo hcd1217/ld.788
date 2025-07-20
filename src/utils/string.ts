@@ -13,3 +13,10 @@ export function formatPhoneNumber(phoneNumber: string) {
 export function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString();
 }
+
+export function convertCamelCaseToText(text: string) {
+  // RoleHierarchy → Role Hierarchy
+  return text.replaceAll(/([A-Z])/g, ' $1').replace(/^./, function (str) {
+    return str.toUpperCase();
+  });
+}

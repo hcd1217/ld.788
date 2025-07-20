@@ -34,7 +34,7 @@ import {clientService} from '@/services/client';
 import type {
   RegisterUserByRootUserRequest,
   RegisterBulkUsersByRootUserResponse,
-} from '@/lib/api/client';
+} from '@/lib/api';
 
 type ImportResult = {
   summary: {

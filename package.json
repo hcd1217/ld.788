@@ -23,6 +23,7 @@
     "@mantine/notifications": "^8.1.2",
     "@react-google-maps/api": "^2.20.7",
     "@tabler/icons-react": "3.17.0",
+    "@tanstack/react-virtual": "^3.13.12",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
     "i18next": "^25.2.1",

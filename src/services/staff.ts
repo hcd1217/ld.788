@@ -441,24 +441,24 @@ export const staffService = {
 
     // Sort
     filteredStaff.sort((a, b) => {
-      let aValue: any = a[sortBy as keyof Staff];
-      let bValue: any = b[sortBy as keyof Staff];
+      let aValue: unknown = a[sortBy as keyof Staff];
+      let bValue: unknown = b[sortBy as keyof Staff];
 
       if (sortBy === 'name') {
         aValue = a.fullName;
         bValue = b.fullName;
       }
 
-      if (typeof aValue === 'string') {
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
         aValue = aValue.toLowerCase();
         bValue = bValue.toLowerCase();
       }
 
       if (sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1;
+        return (aValue as any) > (bValue as any) ? 1 : -1;
       }
 
-      return aValue < bValue ? 1 : -1;
+      return (aValue as any) < (bValue as any) ? 1 : -1;
     });
 
     // Paginate

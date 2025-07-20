@@ -38,7 +38,7 @@ import {
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {clientService} from '@/services/client';
-import type {Permission} from '@/lib/api/client';
+import type {Permission} from '@/lib/api';
 import {GoBack} from '@/components/common/GoBack';
 
 type PermissionFormValues = {

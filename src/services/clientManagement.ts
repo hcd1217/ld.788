@@ -1,5 +1,6 @@
 import {
   type Client,
+  type ClientDetail,
   type RegisterClientRequest,
   type ClientListResponse,
   type HardDeleteClientRequest,
@@ -16,7 +17,7 @@ export const clientManagementService = {
     }
   },
 
-  async getClientByClientCode(clientCode: string): Promise<Client> {
+  async getClientByClientCode(clientCode: string): Promise<ClientDetail> {
     try {
       return await adminApi.getClient(clientCode);
     } catch (error) {
@@ -45,7 +46,10 @@ export const clientManagementService = {
     };
   },
 
-  async suspendClient(clientCode: string, reason: string): Promise<Client> {
+  async suspendClient(
+    clientCode: string,
+    reason: string,
+  ): Promise<ClientDetail> {
     const response = await adminApi.suspendClient(clientCode, {reason});
     if (!response.success) {
       throw new Error(response.message || 'Failed to suspend client');
@@ -55,7 +59,7 @@ export const clientManagementService = {
     return adminApi.getClient(clientCode);
   },
 
-  async reactivateClient(clientCode: string): Promise<Client> {
+  async reactivateClient(clientCode: string): Promise<ClientDetail> {
     const response = await adminApi.reactivateClient(clientCode);
     if (!response.success) {
       throw new Error(response.message || 'Failed to reactivate client');

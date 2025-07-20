@@ -1,7 +1,8 @@
-import {AuthApi} from './auth';
-import {ClientApi} from './client';
-import {UserApi} from './user';
-import {AdminApi} from './admin';
+import {AuthApi} from './services/auth.service';
+import {ClientApi} from './services/client.service';
+import {UserApi} from './services/user.service';
+import {AdminApi} from './services/admin.service';
+import {StoreApi} from './services/store.service';
 
 const API_BASE_URL =
   (import.meta.env.VITE_API_URL as string | undefined) ??
@@ -24,10 +25,18 @@ export const adminApi = new AdminApi({
   baseURL: API_BASE_URL,
 });
 
+export const storeApi = new StoreApi({
+  baseURL: API_BASE_URL,
+});
+
 // Export types and schemas
-export * from './auth';
-export * from './client';
-export * from './user';
-export * from './admin';
+export * from './schemas';
+
+// Export service classes
+export {AuthApi} from './services/auth.service';
+export {ClientApi} from './services/client.service';
+export {UserApi} from './services/user.service';
+export {AdminApi} from './services/admin.service';
+export {StoreApi} from './services/store.service';
 
 export {ApiError} from './base';

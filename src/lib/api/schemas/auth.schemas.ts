@@ -1,6 +1,5 @@
 import * as z from 'zod/v4';
-import {BaseApiClient} from './base';
-import {passwordSchema, jwtTokenSchema, emailSchema} from './schema';
+import {passwordSchema, jwtTokenSchema, emailSchema} from './common.schemas';
 
 // Schemas
 export const LoginRequestSchema = z.object({
@@ -100,7 +99,7 @@ export const ClientConfigSchema = z.object({
 export const GetMeResponseSchema = z.object({
   id: z.string().uuid(),
   email: emailSchema,
-  userName: z.string().nullable(),
+  userName: z.string().optional(),
   clientId: z.string().uuid(),
   clientCode: z.string(),
   isRoot: z.boolean(),
@@ -127,57 +126,3 @@ export type Role = z.infer<typeof RoleSchema>;
 export type DynamicFeatureFlags = z.infer<typeof DynamicFeatureFlagsSchema>;
 export type ClientConfig = z.infer<typeof ClientConfigSchema>;
 export type GetMeResponse = z.infer<typeof GetMeResponseSchema>;
-
-export class AuthApi extends BaseApiClient {
-  async login(data: LoginRequest): Promise<LoginResponse> {
-    // Make request with response validation
-    return this.post<LoginResponse, LoginRequest>(
-      '/auth/login',
-      data,
-      LoginResponseSchema,
-      LoginRequestSchema,
-    );
-  }
-
-  async forgotPassword(
-    data: ForgotPasswordRequest,
-  ): Promise<ForgotPasswordResponse> {
-    return this.post<ForgotPasswordResponse, ForgotPasswordRequest>(
-      '/auth/forgot-password',
-      data,
-      ForgotPasswordResponseSchema,
-    );
-  }
-
-  async resetPassword(
-    data: ResetPasswordRequest,
-  ): Promise<ResetPasswordResponse> {
-    return this.post<ResetPasswordResponse, ResetPasswordRequest>(
-      '/auth/reset-password',
-      data,
-      ResetPasswordResponseSchema,
-    );
-  }
-
-  async register(data: RegisterRequest): Promise<RegisterResponse> {
-    return this.post<RegisterResponse, RegisterRequest>(
-      '/auth/register',
-      data,
-      RegisterResponseSchema,
-      RegisterRequestSchema,
-    );
-  }
-
-  async renewToken(data: RenewTokenRequest): Promise<RenewTokenResponse> {
-    return this.post<RenewTokenResponse, RenewTokenRequest>(
-      '/auth/renew-token',
-      data,
-      RenewTokenResponseSchema,
-      RenewTokenRequestSchema,
-    );
-  }
-
-  async getMe(): Promise<GetMeResponse> {
-    return this.get<GetMeResponse>('/auth/me', GetMeResponseSchema);
-  }
-}

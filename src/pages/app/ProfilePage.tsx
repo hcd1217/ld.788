@@ -18,8 +18,7 @@ import {useState, useEffect} from 'react';
 import {IconAlertCircle, IconCheck, IconX} from '@tabler/icons-react';
 import {useAppStore} from '@/stores/useAppStore';
 import {useTranslation} from '@/hooks/useTranslation';
-import {authApi} from '@/lib/api';
-import type {GetMeResponse} from '@/lib/api/auth';
+import {authApi, type GetMeResponse} from '@/lib/api';
 import {GoBack} from '@/components/common/GoBack';
 
 export function ProfilePage() {

@@ -1,3 +1,4 @@
+import React, {useState} from 'react';
 import {
   Badge,
   Group,
@@ -12,6 +13,8 @@ import {
   Card,
   ActionIcon,
   Menu,
+  Table,
+  Switch,
   type BadgeProps,
 } from '@mantine/core';
 import {
@@ -25,10 +28,31 @@ import {
   IconCircleCheck,
   IconBan,
   IconTrash,
+  IconLock,
+  IconFlag,
+  IconUsers,
+  IconChevronDown,
+  IconChevronUp,
 } from '@tabler/icons-react';
+import {notifications} from '@mantine/notifications';
+import {AdminDataTable, type TableColumn} from './AdminDataTable';
+import {
+  FilterableAdminDataTable,
+  type FilterableColumn,
+} from './FilterableAdminDataTable';
+import {ExportButton} from './ExportButton';
+import {TruncatedText} from './TruncatedText';
 import {useTranslation} from '@/hooks/useTranslation';
-import {formatDate} from '@/utils/string';
-import type {Client} from '@/lib/api';
+import {type ExportColumn} from '@/utils/export';
+import {convertCamelCaseToText, formatDate} from '@/utils/string';
+import {
+  adminApi,
+  type Client,
+  type ClientDetail,
+  type RoleDetail,
+  type DynamicFeatureFlagDetail,
+  type ClientUser,
+} from '@/lib/api';
 
 // Client Status Badge Component
 interface ClientStatusBadgeProps extends BadgeProps {
@@ -344,7 +368,7 @@ interface ClientCardProps {
 
 // Client Action Menu Component
 interface ClientActionMenuProps {
-  readonly client: Client;
+  readonly client: Client | ClientDetail;
   readonly onSuspend: () => void;
   readonly onReactivate: () => void;
   readonly onDelete: () => void;
@@ -490,3 +514,507 @@ export function ClientCard({
     </Card>
   );
 }
+
+// Client Roles Section Component
+interface ClientRolesSectionProps {
+  readonly roles: RoleDetail[];
+}
+
+export const ClientRolesSection = React.memo(function ({
+  roles,
+}: ClientRolesSectionProps) {
+  const {t} = useTranslation();
+
+  const columns: Array<TableColumn<RoleDetail>> = [
+    {
+      key: 'name',
+      label: t('admin.clients.roleName'),
+      render: (role) => (
+        <Badge variant="light" color="blue">
+          {role.name}
+        </Badge>
+      ),
+    },
+    {
+      key: 'displayName',
+      label: t('admin.clients.roleDisplayName'),
+    },
+    {
+      key: 'description',
+      label: t('admin.clients.roleDescription'),
+      render: (role) => (
+        <TruncatedText
+          text={role.description}
+          size="sm"
+          c="dimmed"
+          maxWidth="300px"
+          lineClamp={2}
+        />
+      ),
+    },
+    {
+      key: 'level',
+      label: t('admin.clients.roleLevel'),
+      render: (role) => (
+        <Badge variant="filled" color="indigo">
+          {t('admin.clients.level')} {role.level}
+        </Badge>
+      ),
+    },
+    {
+      key: 'isSystem',
+      label: t('admin.clients.roleType'),
+      render: (role) =>
+        role.isSystem ? (
+          <Badge color="gray" variant="dot">
+            {t('admin.clients.systemRole')}
+          </Badge>
+        ) : (
+          <Badge color="green" variant="dot">
+            {t('admin.clients.customRole')}
+          </Badge>
+        ),
+    },
+    {
+      key: 'createdAt',
+      label: t('common.createdAt'),
+      render: (role) => (
+        <Text size="sm" c="dimmed">
+          {formatDate(role.createdAt)}
+        </Text>
+      ),
+    },
+  ];
+
+  return (
+    <AdminDataTable<RoleDetail>
+      data={roles}
+      columns={columns}
+      emptyState={{
+        icon: <IconLock size={48} color="gray" aria-hidden="true" />,
+        message: t('admin.clients.noRolesFound'),
+      }}
+      ariaLabel={t('admin.clients.rolesTableAriaLabel')}
+      getRowKey={(role) => role.id}
+      virtualScroll={{
+        enabled: false,
+        threshold: 50,
+        height: 600,
+        rowHeight: 60,
+      }}
+    />
+  );
+});
+
+// Client Feature Flags Section Component
+interface ClientFeatureFlagsSectionProps {
+  readonly featureFlags: DynamicFeatureFlagDetail[];
+  readonly clientId: string;
+  readonly onUpdate?: () => void;
+}
+
+export const ClientFeatureFlagsSection = React.memo(function ({
+  featureFlags,
+  clientId,
+  onUpdate,
+}: ClientFeatureFlagsSectionProps) {
+  const {t} = useTranslation();
+  const [expandedFlags, setExpandedFlags] = useState<Set<string>>(new Set());
+  const [updating, setUpdating] = useState<Set<string>>(new Set());
+
+  const toggleExpanded = (flagId: string) => {
+    setExpandedFlags((prev) => {
+      const next = new Set(prev);
+      if (next.has(flagId)) {
+        next.delete(flagId);
+      } else {
+        next.add(flagId);
+      }
+
+      return next;
+    });
+  };
+
+  const handleToggleFlag = async (flag: DynamicFeatureFlagDetail) => {
+    setUpdating((prev) => new Set(prev).add(flag.key));
+    console.log('handleToggleFlag', flag);
+    try {
+      if (flag.id) {
+        await adminApi.updateDynamicFeatureFlag(clientId, flag.key, {
+          enabled: !flag.enabled,
+          value: flag.value || {},
+        });
+      } else {
+        await adminApi.createDynamicFeatureFlag({
+          clientId,
+          key: flag.key,
+          enabled: !flag.enabled,
+          value: flag.value || {},
+          rolloutPercentage: flag.rolloutPercentage,
+          description: flag.description,
+        });
+        // @todo: Implement page reload after successful update
+      }
+
+      notifications.show({
+        title: t('common.success'),
+        message: t('admin.clients.featureFlagUpdated'),
+        color: 'green',
+      });
+      onUpdate?.();
+    } catch (error) {
+      console.log(error);
+      notifications.show({
+        title: t('common.error'),
+        message: t('admin.clients.featureFlagUpdateFailed'),
+        color: 'red',
+      });
+    } finally {
+      setUpdating((prev) => {
+        const next = new Set(prev);
+        next.delete(flag.key);
+        return next;
+      });
+    }
+  };
+
+  const handleToggleValue = async (
+    flag: DynamicFeatureFlagDetail,
+    valueKey: string,
+    currentValue: boolean,
+  ) => {
+    setUpdating((prev) => new Set(prev).add(`${flag.key}-${valueKey}`));
+
+    try {
+      const updatedValue = {
+        ...flag.value,
+        [valueKey]: !currentValue,
+      };
+      await adminApi.updateDynamicFeatureFlag(clientId, flag.key, {
+        enabled: flag.enabled,
+        value: updatedValue,
+        description: flag.description,
+        rolloutPercentage: flag.rolloutPercentage,
+      });
+      notifications.show({
+        title: t('common.success'),
+        message: t('admin.clients.featureFlagValueUpdated'),
+        color: 'green',
+      });
+      onUpdate?.();
+    } catch (error) {
+      console.log(error);
+      notifications.show({
+        title: t('common.error'),
+        message: t('admin.clients.featureFlagUpdateFailed'),
+        color: 'red',
+      });
+    } finally {
+      setUpdating((prev) => {
+        const next = new Set(prev);
+        next.delete(`${flag.key}-${valueKey}`);
+        return next;
+      });
+    }
+  };
+
+  const columns: Array<TableColumn<DynamicFeatureFlagDetail>> = [
+    {
+      key: 'expand',
+      label: '',
+      width: 40,
+      render(flag) {
+        const hasValues = flag.value && Object.keys(flag.value).length > 0;
+        const isExpanded = expandedFlags.has(flag.id ?? flag.key);
+        return hasValues ? (
+          <ActionIcon
+            variant="subtle"
+            size="sm"
+            onClick={() => {
+              toggleExpanded(flag.id ?? flag.key);
+            }}
+          >
+            {isExpanded ? (
+              <IconChevronUp size={16} />
+            ) : (
+              <IconChevronDown size={16} />
+            )}
+          </ActionIcon>
+        ) : null;
+      },
+    },
+    {
+      key: 'key',
+      label: t('admin.clients.featureFlagKey'),
+      render: (flag) => (
+        <Badge variant="filled" color="brand">
+          {flag.key}
+        </Badge>
+      ),
+    },
+    {
+      key: 'enabled',
+      label: t('admin.clients.featureFlagStatus'),
+      render: (flag) => (
+        <Badge color={flag.enabled ? 'green' : 'red'} variant="filled">
+          {flag.enabled
+            ? t('admin.clients.enabled')
+            : t('admin.clients.disabled')}
+        </Badge>
+      ),
+    },
+    {
+      key: 'description',
+      label: t('admin.clients.featureFlagDescription'),
+      render: (flag) => (
+        <TruncatedText
+          text={flag.description}
+          size="sm"
+          c="dimmed"
+          maxWidth="300px"
+          lineClamp={2}
+        />
+      ),
+    },
+    {
+      key: 'rolloutPercentage',
+      label: t('admin.clients.rolloutPercentage'),
+      render: (flag) => <Text size="sm">{flag.rolloutPercentage}%</Text>,
+    },
+    {
+      key: 'enabledAt',
+      label: t('admin.clients.enabledAt'),
+      render: (flag) => (
+        <Text size="sm" c="dimmed">
+          {flag.enabledAt ? formatDate(flag.enabledAt) : '-'}
+        </Text>
+      ),
+    },
+    {
+      key: 'actions',
+      label: t('common.actions'),
+      render: (flag) => (
+        <Switch
+          checked={flag.enabled}
+          disabled={updating.has(flag.key)}
+          onChange={async () => handleToggleFlag(flag)}
+        />
+      ),
+    },
+  ];
+
+  const renderRow = (
+    flag: DynamicFeatureFlagDetail,
+    _index: number,
+    rowContent: React.ReactNode,
+  ) => {
+    const isExpanded = expandedFlags.has(flag.id ?? flag.key);
+    const hasValues = flag.value && Object.keys(flag.value).length > 0;
+
+    return (
+      <>
+        {rowContent}
+        {isExpanded && hasValues ? (
+          <Table.Tr key={`${flag.id ?? flag.key}-expanded`}>
+            <Table.Td
+              colSpan={7}
+              style={{backgroundColor: 'var(--mantine-color-gray-0)'}}
+            >
+              <Box p="md">
+                <Stack gap="xs">
+                  {Object.entries(flag.value || {}).map(([key, value]) => (
+                    <Group key={key} ml="xl" justify="space-between" w="15rem">
+                      <Text ml="xl" size="sm" fw={600}>
+                        {convertCamelCaseToText(key)}
+                      </Text>
+                      <Switch
+                        size="sm"
+                        checked={value}
+                        disabled={
+                          !flag.enabled || updating.has(`${flag.key}-${key}`)
+                        }
+                        onChange={async () =>
+                          handleToggleValue(flag, key, value)
+                        }
+                      />
+                    </Group>
+                  ))}
+                </Stack>
+              </Box>
+            </Table.Td>
+          </Table.Tr>
+        ) : null}
+      </>
+    );
+  };
+
+  return (
+    <AdminDataTable<DynamicFeatureFlagDetail>
+      data={featureFlags}
+      columns={columns}
+      emptyState={{
+        icon: <IconFlag size={48} color="gray" aria-hidden="true" />,
+        message: t('admin.clients.noFeatureFlagsFound'),
+      }}
+      ariaLabel={t('admin.clients.featureFlagsTableAriaLabel')}
+      getRowKey={(flag) => flag.id ?? flag.key}
+      renderRow={renderRow}
+      // Virtual scrolling disabled for this table due to expandable rows
+      virtualScroll={false}
+    />
+  );
+});
+
+// Client Users Section Component
+interface ClientUsersSectionProps {
+  readonly users: ClientUser[];
+}
+
+export const ClientUsersSection = React.memo(function ({
+  users,
+}: ClientUsersSectionProps) {
+  const {t} = useTranslation();
+
+  const columns: Array<FilterableColumn<ClientUser>> = [
+    {
+      key: 'userName',
+      label: t('admin.clients.userName'),
+      render: (user) => (
+        <Text fw={500}>{user.userName || user.email.split('@')[0]}</Text>
+      ),
+    },
+    {
+      key: 'email',
+      label: t('admin.clients.email'),
+      render: (user) => (
+        <Group gap="xs">
+          <IconMail size={14} />
+          <Text size="sm">{user.email}</Text>
+        </Group>
+      ),
+    },
+    {
+      key: 'fullName',
+      label: t('admin.clients.fullName'),
+      render: (user) => (
+        <Group gap="xs">
+          <IconUser size={14} />
+          <Text size="sm">
+            {user.firstName} {user.lastName}
+          </Text>
+        </Group>
+      ),
+    },
+    {
+      key: 'roles',
+      label: t('admin.clients.roles'),
+      render: (user) => (
+        <Group gap={4}>
+          {user.roles.map((role) => (
+            <Badge key={role.id} size="sm" variant="light" color="violet">
+              {role.displayName}
+            </Badge>
+          ))}
+          {user.roles.length === 0 && (
+            <Text size="sm" c="dimmed">
+              {t('admin.clients.noRoles')}
+            </Text>
+          )}
+        </Group>
+      ),
+    },
+    {
+      key: 'isRoot',
+      label: t('admin.clients.userType'),
+      render: (user) =>
+        user.isRoot ? (
+          <Badge color="orange" variant="filled">
+            {t('admin.clients.rootUser')}
+          </Badge>
+        ) : (
+          <Badge color="blue" variant="light">
+            {t('admin.clients.regularUser')}
+          </Badge>
+        ),
+    },
+    {
+      key: 'createdAt',
+      label: t('common.createdAt'),
+      render: (user) => (
+        <Text size="sm" c="dimmed">
+          {formatDate(user.createdAt)}
+        </Text>
+      ),
+    },
+  ];
+
+  // Export columns with simplified data
+  const exportColumns: Array<ExportColumn<ClientUser>> = [
+    {
+      key: 'userName',
+      label: t('admin.clients.userName'),
+      getValue: (user) => user.userName || user.email.split('@')[0],
+    },
+    {
+      key: 'email',
+      label: t('admin.clients.email'),
+    },
+    {
+      key: 'firstName',
+      label: t('admin.clients.firstName'),
+    },
+    {
+      key: 'lastName',
+      label: t('admin.clients.lastName'),
+    },
+    {
+      key: 'roles',
+      label: t('admin.clients.roles'),
+      getValue: (user) =>
+        user.roles.map((role) => role.displayName).join('; ') ||
+        t('admin.clients.noRoles'),
+    },
+    {
+      key: 'isRoot',
+      label: t('admin.clients.userType'),
+      getValue: (user) =>
+        user.isRoot
+          ? t('admin.clients.rootUser')
+          : t('admin.clients.regularUser'),
+    },
+    {
+      key: 'createdAt',
+      label: t('common.createdAt'),
+      getValue: (user) => formatDate(user.createdAt),
+    },
+  ];
+
+  return (
+    <FilterableAdminDataTable<ClientUser>
+      data={users}
+      columns={columns}
+      emptyState={{
+        icon: <IconUsers size={48} color="gray" aria-hidden="true" />,
+        message: t('admin.clients.noUsersFound'),
+      }}
+      ariaLabel={t('admin.clients.usersTableAriaLabel')}
+      searchPlaceholder={t('admin.clients.searchUsers')}
+      searchFields={['userName', 'email', 'firstName', 'lastName']}
+      defaultSortBy="userName"
+      getRowKey={(user) => user.id}
+      virtualScroll={{
+        enabled: false,
+        threshold: 50,
+        height: 600,
+        rowHeight: 60,
+      }}
+      extraActions={
+        <ExportButton
+          data={users}
+          columns={exportColumns}
+          filename="client-users"
+        />
+      }
+    />
+  );
+});

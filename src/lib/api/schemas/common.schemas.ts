@@ -16,3 +16,4 @@ export const emailSchema = z.email();
 export const timestampSchema = z
   .union([z.number(), z.string()])
   .transform((val) => new Date(val).toISOString());
+export const optionalStringSchema = z.string().optional();
