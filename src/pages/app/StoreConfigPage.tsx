@@ -26,15 +26,33 @@ import {
 import {GoBack} from '@/components/common/GoBack';
 import {StoreConfigForm} from '@/components/store/StoreConfigForm';
 import type {DaySchedule} from '@/components/store/OperatingHoursInput';
-import type {CreateStoreRequest} from '@/services/store';
+import type {
+  CreateStoreRequest,
+  UpdateStoreOperatingHoursRequest,
+} from '@/lib/api/schemas/store.schemas';
+import {generateRandomString} from '@/utils/string';
 
 type StoreConfigFormValues = {
+  // Required fields
   name: string;
+  code: string;
   address: string;
+  city: string;
+  country: string;
+
+  // Optional fields
+  state?: string;
+  postalCode?: string;
+  phoneNumber?: string;
+  email?: string;
+
+  // Location (maps to latitude/longitude)
   location: {
     lat: number;
     lng: number;
   };
+
+  // Operating hours (handled separately)
   operatingHours: Record<string, DaySchedule>;
 };
 
@@ -57,12 +75,19 @@ export function StoreConfigPage() {
   const currentStore = useCurrentStore();
   const isLoading = useStoreLoading();
   const error = useStoreError();
-  const {createStore, clearError} = useStoreActions();
+  const {createStore, clearError, updateOperatingHours} = useStoreActions();
 
   const form = useForm<StoreConfigFormValues>({
     initialValues: {
-      name: '',
-      address: '',
+      name: `Sample@${Date.now()}`,
+      code: generateRandomString(6).toLocaleUpperCase(),
+      address: 'random address',
+      city: 'HCM',
+      country: 'VN',
+      state: '',
+      postalCode: '',
+      phoneNumber: '',
+      email: '',
       location: {
         lat: 37.7749, // Default to San Francisco
         lng: -122.4194,
@@ -77,9 +102,37 @@ export function StoreConfigPage() {
 
         return undefined;
       },
+      code(value) {
+        if (!value || value.trim().length === 0) {
+          return t('store.codeRequired');
+        }
+
+        return undefined;
+      },
       address(value) {
         if (!value || value.trim().length < 5) {
           return t('validation.storeAddressRequired');
+        }
+
+        return undefined;
+      },
+      city(value) {
+        if (!value || value.trim().length === 0) {
+          return t('store.cityRequired');
+        }
+
+        return undefined;
+      },
+      country(value) {
+        if (!value || value.trim().length === 0) {
+          return t('store.countryRequired');
+        }
+
+        return undefined;
+      },
+      email(value) {
+        if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          return t('validation.invalidEmail');
         }
 
         return undefined;
@@ -104,14 +157,26 @@ export function StoreConfigPage() {
     try {
       clearError();
 
+      // 1. Create store
       const storeData: CreateStoreRequest = {
         name: values.name.trim(),
+        code: values.code.trim(),
         address: values.address.trim(),
-        location: values.location,
-        operatingHours: values.operatingHours,
+        city: values.city.trim(),
+        country: values.country.trim(),
+        state: values.state?.trim() || undefined,
+        postalCode: values.postalCode?.trim() || undefined,
+        phoneNumber: values.phoneNumber?.trim() || undefined,
+        email: values.email?.trim() || undefined,
+        latitude: values.location.lat,
+        longitude: values.location.lng,
       };
 
       const newStore = await createStore(storeData);
+
+      // 2. Set operating hours
+      const operatingHours = convertToApiFormat(values.operatingHours);
+      await updateOperatingHours(newStore.id, operatingHours);
 
       notifications.show({
         title: t('store.storeCreated'),
@@ -140,6 +205,28 @@ export function StoreConfigPage() {
         icon: <IconAlertCircle size={16} />,
       });
     }
+  };
+
+  // Helper to convert UI format to API format
+  const convertToApiFormat = (
+    hours: Record<string, DaySchedule>,
+  ): UpdateStoreOperatingHoursRequest => {
+    const dayMap: Record<string, number> = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6,
+    };
+
+    return Object.entries(hours).map(([day, schedule]) => ({
+      dayOfWeek: dayMap[day],
+      openTime: 'closed' in schedule ? '00:00' : schedule.open,
+      closeTime: 'closed' in schedule ? '00:00' : schedule.close,
+      isClosed: 'closed' in schedule,
+    }));
   };
 
   const handleLocationChange = (

@@ -637,7 +637,6 @@ export const ClientFeatureFlagsSection = React.memo(function ({
 
   const handleToggleFlag = async (flag: DynamicFeatureFlagDetail) => {
     setUpdating((prev) => new Set(prev).add(flag.key));
-    console.log('handleToggleFlag', flag);
     try {
       if (flag.id) {
         await adminApi.updateDynamicFeatureFlag(clientId, flag.key, {
@@ -648,12 +647,11 @@ export const ClientFeatureFlagsSection = React.memo(function ({
         await adminApi.createDynamicFeatureFlag({
           clientId,
           key: flag.key,
-          enabled: !flag.enabled,
+          enabled: true,
           value: flag.value || {},
-          rolloutPercentage: flag.rolloutPercentage,
-          description: flag.description,
+          rolloutPercentage: 100,
+          description: flag.description ?? '',
         });
-        // @todo: Implement page reload after successful update
       }
 
       notifications.show({

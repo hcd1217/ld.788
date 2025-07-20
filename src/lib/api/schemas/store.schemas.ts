@@ -1,23 +1,28 @@
 import * as z from 'zod/v4';
-import {timestampSchema} from './common.schemas';
+import {
+  emailSchema,
+  idSchema,
+  optionalStringSchema,
+  timestampSchema,
+} from './common.schemas';
 
 // Store schemas
 export const StoreSchema = z.object({
-  id: z.string(),
-  clientId: z.string(),
+  id: idSchema,
+  clientId: idSchema,
   name: z.string(),
   code: z.string(),
   address: z.string(),
   city: z.string(),
-  state: z.string().nullable().optional(),
-  postalCode: z.string().nullable().optional(),
+  state: optionalStringSchema,
+  postalCode: optionalStringSchema,
   country: z.string(),
-  latitude: z.number().nullable().optional(),
-  longitude: z.number().nullable().optional(),
-  phoneNumber: z.string().nullable().optional(),
-  email: z.string().email().nullable().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  phoneNumber: optionalStringSchema,
+  email: emailSchema.optional(),
   isActive: z.boolean(),
-  metadata: z.record(z.string(), z.any()).nullable().optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
 });
@@ -33,13 +38,11 @@ export const CreateStoreRequestSchema = z.object({
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   phoneNumber: z.string().max(50).optional(),
-  email: z.string().email().optional(),
+  email: emailSchema.optional(),
   metadata: z.record(z.string(), z.any()).optional(),
 });
 
-export const CreateStoreResponseSchema = z.object({
-  store: StoreSchema,
-});
+export const CreateStoreResponseSchema = StoreSchema;
 
 export const UpdateStoreRequestSchema = z.object({
   isActive: z.boolean().optional(),
@@ -50,16 +53,16 @@ export const UpdateStoreResponseSchema = z.object({
 });
 
 export const GetStoresRequestSchema = z.object({
-  cursor: z.string().optional(),
+  cursor: optionalStringSchema,
   limit: z.number().min(1).max(100).default(20).optional(),
   sortBy: z
     .enum(['createdAt', 'name', 'code', 'city'])
     .default('createdAt')
     .optional(),
   sortOrder: z.enum(['asc', 'desc']).default('desc').optional(),
-  name: z.string().optional(),
-  code: z.string().optional(),
-  city: z.string().optional(),
+  name: optionalStringSchema,
+  code: optionalStringSchema,
+  city: optionalStringSchema,
   isActive: z.boolean().optional(),
 });
 
@@ -69,20 +72,15 @@ export const GetStoresResponseSchema = z.object({
     limit: z.number(),
     hasNext: z.boolean(),
     hasPrev: z.boolean(),
-    nextCursor: z.string().optional(),
-    prevCursor: z.string().optional(),
+    nextCursor: optionalStringSchema,
+    prevCursor: optionalStringSchema,
   }),
-});
-
-export const DeleteStoreResponseSchema = z.object({
-  statusCode: z.number(),
-  message: z.string(),
 });
 
 // Store Staff schemas
 export const StoreStaffSchema = z.object({
-  id: z.string(),
-  storeId: z.string(),
+  id: idSchema,
+  storeId: idSchema,
   fullName: z.string(),
   isActive: z.boolean(),
   createdAt: timestampSchema,
@@ -112,8 +110,8 @@ export const DeleteStoreStaffResponseSchema = z.object({
 
 // Store Operating Hours schemas
 export const StoreOperatingHoursSchema = z.object({
-  id: z.string(),
-  storeId: z.string(),
+  id: idSchema,
+  storeId: idSchema,
   dayOfWeek: z.number().min(0).max(6), // 0=Sunday, 6=Saturday
   openTime: z.string(),
   closeTime: z.string(),
@@ -149,7 +147,6 @@ export type UpdateStoreRequest = z.infer<typeof UpdateStoreRequestSchema>;
 export type UpdateStoreResponse = z.infer<typeof UpdateStoreResponseSchema>;
 export type GetStoresRequest = z.infer<typeof GetStoresRequestSchema>;
 export type GetStoresResponse = z.infer<typeof GetStoresResponseSchema>;
-export type DeleteStoreResponse = z.infer<typeof DeleteStoreResponseSchema>;
 
 export type StoreStaff = z.infer<typeof StoreStaffSchema>;
 export type CreateStoreStaffRequest = z.infer<

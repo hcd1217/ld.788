@@ -6,6 +6,7 @@ export default {
   rules: {
     '@typescript-eslint/consistent-type-definitions': 'off',
     '@typescript-eslint/naming-convention': 'off',
+    '@typescript-eslint/no-dynamic-delete': 'off',
     '@typescript-eslint/no-floating-promises': 'off',
     '@typescript-eslint/no-unsafe-argument': 'off',
     '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -24,6 +25,7 @@ export default {
     'no-control-regex': 'off',
     'no-new': 'off',
     'no-unused-vars': 'off',
+    'promise/prefer-await-to-then': 'off',
     'react/boolean-prop-naming': 'off',
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',

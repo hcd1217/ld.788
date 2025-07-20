@@ -1,5 +1,11 @@
 import * as z from 'zod/v4';
-import {timestampSchema, passwordSchema, emailSchema} from './common.schemas';
+import {
+  timestampSchema,
+  passwordSchema,
+  emailSchema,
+  optionalStringSchema,
+  idSchema,
+} from './common.schemas';
 
 export const RegisterClientRequestSchema = z.object({
   clientCode: z.string(),
@@ -12,12 +18,12 @@ export const RegisterClientRequestSchema = z.object({
 
 export const RegisterClientResponseSchema = z.object({
   client: z.object({
-    id: z.string(),
+    id: idSchema,
     name: z.string(),
     code: z.string(),
   }),
   rootUser: z.object({
-    id: z.string(),
+    id: idSchema,
     email: emailSchema,
     firstName: z.string(),
     lastName: z.string(),
@@ -26,14 +32,14 @@ export const RegisterClientResponseSchema = z.object({
 
 export const RegisterUserByRootUserRequestSchema = z.object({
   email: emailSchema.optional(),
-  userName: z.string().optional(),
+  userName: optionalStringSchema,
   firstName: z.string(),
   lastName: z.string(),
   password: passwordSchema,
 });
 
 export const RegisterUserByRootUserResponseSchema = z.object({
-  id: z.string(),
+  id: idSchema,
 });
 
 export const RegisterBulkUsersByRootUserRequestSchema = z.array(
@@ -48,12 +54,12 @@ export const RegisterBulkUsersByRootUserResponseSchema = z.object({
   }),
   success: z.array(
     z.object({
-      id: z.string(),
-      email: z.string().optional(),
-      userName: z.string().optional(),
+      id: idSchema,
+      email: optionalStringSchema,
+      userName: optionalStringSchema,
       firstName: z.string(),
       lastName: z.string(),
-      password: z.string().optional(),
+      password: optionalStringSchema,
     }),
   ),
   errors: z.array(
@@ -66,7 +72,7 @@ export const RegisterBulkUsersByRootUserResponseSchema = z.object({
 
 export const GetAllRolesResponseSchema = z.array(
   z.object({
-    id: z.string(),
+    id: idSchema,
     name: z.string(),
     displayName: z.string(),
     description: z.string(),
@@ -83,7 +89,7 @@ export const AddRoleRequestSchema = z.object({
 });
 
 export const AddRoleResponseSchema = z.object({
-  id: z.string(),
+  id: idSchema,
 });
 
 export const UpdateRoleRequestSchema = z.object({
@@ -94,12 +100,12 @@ export const UpdateRoleRequestSchema = z.object({
 });
 
 export const UpdateRoleResponseSchema = z.object({
-  id: z.string(),
+  id: idSchema,
 });
 
 // Permission Management Schemas
 export const PermissionSchema = z.object({
-  id: z.string(),
+  id: idSchema,
   resource: z.string(),
   action: z.string(),
   scope: z.string(),
@@ -116,7 +122,7 @@ export const AddPermissionRequestSchema = z.object({
 });
 
 export const AddPermissionResponseSchema = z.object({
-  id: z.string(),
+  id: idSchema,
 });
 
 export const UpdatePermissionRequestSchema = z.object({
@@ -127,7 +133,7 @@ export const UpdatePermissionRequestSchema = z.object({
 });
 
 export const UpdatePermissionResponseSchema = z.object({
-  id: z.string(),
+  id: idSchema,
 });
 
 export const PermissionCheckRequestSchema = z.object({
@@ -160,27 +166,27 @@ export const UserPermissionSchema = z.object({
   action: z.string(),
   scope: z.string(),
   source: z.string(),
-  roleId: z.string().optional(),
-  delegatedBy: z.string().optional(),
+  roleId: optionalStringSchema,
+  delegatedBy: optionalStringSchema,
   expiresAt: timestampSchema.optional(),
 });
 
 export const UserRoleSchema = z.object({
-  id: z.string(),
+  id: idSchema,
   name: z.string(),
   displayName: z.string(),
   level: z.number(),
   assignedAt: timestampSchema,
-  assignedBy: z.string().optional(),
+  assignedBy: optionalStringSchema,
   expiresAt: timestampSchema.optional(),
   isActive: z.boolean(),
 });
 
 export const GetMyPermissionsResponseSchema = z.object({
-  userId: z.string(),
+  userId: idSchema,
   roles: z.array(
     z.object({
-      id: z.string(),
+      id: idSchema,
       name: z.string(),
       level: z.number(),
     }),
@@ -197,7 +203,7 @@ export const GetMyPermissionsResponseSchema = z.object({
 });
 
 export const GetUserPermissionsResponseSchema = z.object({
-  userId: z.string(),
+  userId: idSchema,
   permissions: z.array(UserPermissionSchema),
   summary: z.object({
     total: z.number(),
@@ -212,7 +218,7 @@ export const GetMyRolesResponseSchema = z.array(UserRoleSchema);
 export const GetUserRolesResponseSchema = z.array(UserRoleSchema);
 
 export const GrantPermissionToRoleRequestSchema = z.object({
-  permissionId: z.string(),
+  permissionId: idSchema,
 });
 
 export type RegisterClientRequest = z.infer<typeof RegisterClientRequestSchema>;

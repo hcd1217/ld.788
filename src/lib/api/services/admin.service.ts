@@ -61,14 +61,9 @@ export class AdminApi extends BaseApiClient {
     schema?: z.ZodSchema<T>,
     paramsSchema?: z.ZodSchema<R>,
   ): Promise<T> {
-    const {setAdminApiLoading} = useAppStore.getState();
-
-    try {
-      setAdminApiLoading(true);
-      return await super.get(endpoint, params, schema, paramsSchema);
-    } finally {
-      setAdminApiLoading(false);
-    }
+    return this.requestWrapper(async () =>
+      super.get(endpoint, params, schema, paramsSchema),
+    );
   }
 
   async post<T, R = unknown>(
@@ -77,14 +72,9 @@ export class AdminApi extends BaseApiClient {
     schema?: z.ZodSchema<T>,
     dataSchema?: z.ZodSchema<R>,
   ): Promise<T> {
-    const {setAdminApiLoading} = useAppStore.getState();
-
-    try {
-      setAdminApiLoading(true);
-      return await super.post(endpoint, data, schema, dataSchema);
-    } finally {
-      setAdminApiLoading(false);
-    }
+    return this.requestWrapper(async () =>
+      super.post(endpoint, data, schema, dataSchema),
+    );
   }
 
   async put<T, R = unknown>(
@@ -93,14 +83,9 @@ export class AdminApi extends BaseApiClient {
     schema?: z.ZodSchema<T>,
     dataSchema?: z.ZodSchema<R>,
   ): Promise<T> {
-    const {setAdminApiLoading} = useAppStore.getState();
-
-    try {
-      setAdminApiLoading(true);
-      return await super.put(endpoint, data, schema, dataSchema);
-    } finally {
-      setAdminApiLoading(false);
-    }
+    return this.requestWrapper(async () =>
+      super.put(endpoint, data, schema, dataSchema),
+    );
   }
 
   async patch<T, R = unknown>(
@@ -109,14 +94,9 @@ export class AdminApi extends BaseApiClient {
     schema?: z.ZodSchema<T>,
     dataSchema?: z.ZodSchema<R>,
   ): Promise<T> {
-    const {setAdminApiLoading} = useAppStore.getState();
-
-    try {
-      setAdminApiLoading(true);
-      return await super.patch(endpoint, data, schema, dataSchema);
-    } finally {
-      setAdminApiLoading(false);
-    }
+    return this.requestWrapper(async () =>
+      super.patch(endpoint, data, schema, dataSchema),
+    );
   }
 
   async delete<T, R = unknown>(
@@ -297,5 +277,16 @@ export class AdminApi extends BaseApiClient {
       DynamicFeatureFlagResponseSchema,
       UpdateDynamicFeatureFlagRequestSchema,
     );
+  }
+
+  private async requestWrapper<R>(handler: () => Promise<R>): Promise<R> {
+    const {setAdminApiLoading} = useAppStore.getState();
+
+    try {
+      setAdminApiLoading(true);
+      return await handler();
+    } finally {
+      setAdminApiLoading(false);
+    }
   }
 }

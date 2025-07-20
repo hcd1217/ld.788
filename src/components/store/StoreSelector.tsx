@@ -6,7 +6,7 @@ import {
   useStores,
   useStoreActions,
 } from '@/stores/useStoreConfigStore';
-import type {Store} from '@/services/store';
+import type {Store} from '@/lib/api/schemas/store.schemas';
 
 type StoreSelectorProps = {
   readonly placeholder?: string;

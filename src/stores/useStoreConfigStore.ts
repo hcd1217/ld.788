@@ -1,29 +1,39 @@
 import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
-import {
-  storeService,
-  type Store,
-  type CreateStoreRequest,
-} from '@/services/store';
+import {storeApi, ApiError} from '@/lib/api';
+import type {
+  Store,
+  CreateStoreRequest,
+  GetStoresResponse,
+  StoreOperatingHours,
+  UpdateStoreOperatingHoursRequest,
+} from '@/lib/api/schemas/store.schemas';
 
 type StoreConfigState = {
   // Store data
   stores: Store[];
   currentStore: Store | undefined;
+  pagination: GetStoresResponse['pagination'] | undefined;
+  operatingHoursCache: Record<string, StoreOperatingHours[]>;
   isLoading: boolean;
   error: string | undefined;
 
   // Actions
   setCurrentStore: (store: Store | undefined) => void;
-  loadStores: () => Promise<void>;
+  loadStores: (cursor?: string) => Promise<void>;
   createStore: (data: CreateStoreRequest) => Promise<Store>;
   deleteStore: (id: string) => Promise<void>;
   refreshStores: () => Promise<void>;
   clearError: () => void;
+  loadOperatingHours: (storeId: string) => Promise<StoreOperatingHours[]>;
+  updateOperatingHours: (
+    storeId: string,
+    hours: UpdateStoreOperatingHoursRequest,
+  ) => Promise<void>;
 
   // Selectors
   getStoreById: (id: string) => Store | undefined;
-  isStoreNameUnique: (name: string, excludeId?: string) => Promise<boolean>;
+  isStoreCodeUnique: (code: string, excludeId?: string) => Promise<boolean>;
 };
 
 export const useStoreConfigStore = create<StoreConfigState>()(
@@ -33,6 +43,8 @@ export const useStoreConfigStore = create<StoreConfigState>()(
         // Initial state
         stores: [],
         currentStore: undefined,
+        pagination: undefined,
+        operatingHoursCache: {},
         isLoading: false,
         error: undefined,
 
@@ -41,15 +53,22 @@ export const useStoreConfigStore = create<StoreConfigState>()(
           set({currentStore: store, error: undefined});
         },
 
-        async loadStores() {
+        async loadStores(cursor) {
           set({isLoading: true, error: undefined});
           try {
-            const stores = await storeService.getAllStores();
+            const response = await storeApi.getStores({
+              cursor,
+              limit: 20,
+              sortBy: 'createdAt',
+              sortOrder: 'desc',
+            });
+
             set({
-              stores,
+              stores: response.stores,
+              pagination: response.pagination,
               isLoading: false,
               // Set first store as current if none selected
-              currentStore: get().currentStore ?? stores[0],
+              currentStore: get().currentStore ?? response.stores[0],
             });
           } catch (error) {
             const errorMessage =
@@ -65,62 +84,97 @@ export const useStoreConfigStore = create<StoreConfigState>()(
         async createStore(data) {
           set({isLoading: true, error: undefined});
           try {
-            // Validate store data first
-            const validation = storeService.validateStoreData(data);
-            if (!validation.isValid) {
-              throw new Error(validation.errors.join(', '));
-            }
+            const newStore = await storeApi.createStore(data);
 
-            // Check name uniqueness
-            const isUnique = await storeService.isStoreNameUnique(data.name);
-            if (!isUnique) {
-              throw new Error('A store with this name already exists');
-            }
-
-            const newStore = await storeService.createStore(data);
-            const updatedStores = [...get().stores, newStore];
+            // Optimistic update: add new store to the list immediately
+            const currentStores = get().stores;
+            const updatedStores = [newStore, ...currentStores];
 
             set({
               stores: updatedStores,
-              currentStore: newStore, // Set new store as current
+              currentStore: newStore,
               isLoading: false,
             });
 
+            // Refresh in background to sync with server state
+            get()
+              .loadStores()
+              .catch((error) => {
+                console.error('Background refresh failed:', error);
+              });
+
             return newStore;
           } catch (error) {
-            const errorMessage =
-              error instanceof Error ? error.message : 'Failed to create store';
+            let errorMessage = 'Failed to create store';
+
+            // Handle specific API errors
+            if (error instanceof ApiError && error.status === 409) {
+              errorMessage = 'A store with this code already exists';
+            } else if (error instanceof Error) {
+              errorMessage = error.message;
+            }
+
             set({
               isLoading: false,
               error: errorMessage,
             });
-            throw error;
+            throw new Error(errorMessage);
           }
         },
 
         async deleteStore(id) {
-          set({isLoading: true, error: undefined});
-          try {
-            await storeService.deleteStore(id);
-            const updatedStores = get().stores.filter(
-              (store) => store.id !== id,
-            );
-            const {currentStore} = get();
+          // Optimistic update: remove store immediately
+          const {stores, currentStore, operatingHoursCache} = get();
+          const storeToDelete = stores.find((s) => s.id === id);
 
-            set({
-              stores: updatedStores,
-              // Clear current store if it was deleted
-              currentStore:
-                currentStore?.id === id ? updatedStores[0] : currentStore,
-              isLoading: false,
-            });
+          if (!storeToDelete) {
+            throw new Error('Store not found');
+          }
+
+          // Save current state for rollback
+          const previousStores = stores;
+          const previousCurrentStore = currentStore;
+          const previousCache = operatingHoursCache;
+
+          // Optimistically update state
+          const updatedStores = stores.filter((s) => s.id !== id);
+          const newCache = {...operatingHoursCache};
+          delete newCache[id];
+
+          set({
+            stores: updatedStores,
+            currentStore:
+              currentStore?.id === id ? updatedStores[0] : currentStore,
+            operatingHoursCache: newCache,
+            isLoading: true,
+            error: undefined,
+          });
+
+          try {
+            // Actually delete on server
+            await storeApi.deleteStore(id);
+
+            set({isLoading: false});
+
+            // Refresh in background to sync with server state
+            get()
+              .loadStores()
+              .catch((error) => {
+                console.error('Background refresh failed:', error);
+              });
           } catch (error) {
+            // Rollback on error
             const errorMessage =
               error instanceof Error ? error.message : 'Failed to delete store';
+
             set({
+              stores: previousStores,
+              currentStore: previousCurrentStore,
+              operatingHoursCache: previousCache,
               isLoading: false,
               error: errorMessage,
             });
+
             throw error;
           }
         },
@@ -149,12 +203,83 @@ export const useStoreConfigStore = create<StoreConfigState>()(
           return get().stores.find((store) => store.id === id);
         },
 
-        async isStoreNameUnique(name, excludeId) {
+        async isStoreCodeUnique(code, excludeId) {
           try {
-            return await storeService.isStoreNameUnique(name, excludeId);
+            // First check local state for immediate feedback
+            const {stores} = get();
+            const existsLocally = stores.some(
+              (store) => store.code === code && store.id !== excludeId,
+            );
+
+            if (existsLocally) {
+              return false;
+            }
+
+            // Then check server to prevent race conditions
+            try {
+              const response = await storeApi.getStores({
+                code,
+                limit: 1,
+              });
+
+              // If we find any stores with this code that aren't the excluded one
+              const existsOnServer = response.stores.some(
+                (store) => store.id !== excludeId,
+              );
+
+              return !existsOnServer;
+            } catch (apiError) {
+              // If API check fails, fall back to local check only
+              console.error(
+                'API check failed, using local validation only:',
+                apiError,
+              );
+              return true; // Assume it's unique if we can't verify
+            }
           } catch (error) {
-            console.error('Error checking store name uniqueness:', error);
+            console.error('Error checking store code uniqueness:', error);
             return false;
+          }
+        },
+
+        async loadOperatingHours(storeId) {
+          const cached = get().operatingHoursCache[storeId];
+          if (cached) {
+            return cached;
+          }
+
+          try {
+            const hours = await storeApi.getStoreOperatingHours(storeId);
+
+            // Update cache
+            const newCache = {...get().operatingHoursCache};
+            newCache[storeId] = hours;
+            set({operatingHoursCache: newCache});
+
+            return hours;
+          } catch (error) {
+            console.error('Error loading operating hours:', error);
+            return [];
+          }
+        },
+
+        async updateOperatingHours(storeId, hours) {
+          try {
+            const updatedHours = await storeApi.updateStoreOperatingHours(
+              storeId,
+              hours,
+            );
+
+            // Update cache
+            const newCache = {...get().operatingHoursCache};
+            newCache[storeId] = updatedHours;
+            set({operatingHoursCache: newCache});
+          } catch (error) {
+            const errorMessage =
+              error instanceof Error
+                ? error.message
+                : 'Failed to update operating hours';
+            throw new Error(errorMessage);
           }
         },
       }),
@@ -164,6 +289,8 @@ export const useStoreConfigStore = create<StoreConfigState>()(
         partialize: (state) => ({
           stores: state.stores,
           currentStore: state.currentStore,
+          pagination: state.pagination,
+          operatingHoursCache: state.operatingHoursCache,
         }),
         // // Custom merge function to handle store updates
         // merge: (persistedState: Partial<StoreConfigState>, currentState) => ({
@@ -188,6 +315,8 @@ export const useStores = () => useStoreConfigStore((state) => state.stores);
 export const useStoreLoading = () =>
   useStoreConfigStore((state) => state.isLoading);
 export const useStoreError = () => useStoreConfigStore((state) => state.error);
+export const useStorePagination = () =>
+  useStoreConfigStore((state) => state.pagination);
 
 // Helper hooks for store operations
 export const useStoreActions = () => {
@@ -200,6 +329,8 @@ export const useStoreActions = () => {
     refreshStores: store.refreshStores,
     clearError: store.clearError,
     getStoreById: store.getStoreById,
-    isStoreNameUnique: store.isStoreNameUnique,
+    isStoreCodeUnique: store.isStoreCodeUnique,
+    loadOperatingHours: store.loadOperatingHours,
+    updateOperatingHours: store.updateOperatingHours,
   };
 };

@@ -25,6 +25,7 @@ import {
   IconTrash,
   IconAlertTriangle,
   IconCheck,
+  IconPhone,
 } from '@tabler/icons-react';
 import classes from './StoreListPage.module.css';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
@@ -35,8 +36,9 @@ import {
   useStoreError,
   useStoreActions,
   useCurrentStore,
+  useStorePagination,
 } from '@/stores/useStoreConfigStore';
-import type {Store} from '@/services/store';
+import type {Store} from '@/lib/api/schemas/store.schemas';
 
 export function StoreListPage() {
   const navigate = useNavigate();
@@ -52,6 +54,7 @@ export function StoreListPage() {
   const currentStore = useCurrentStore();
   const isLoading = useStoreLoading();
   const error = useStoreError();
+  const pagination = useStorePagination();
   const {loadStores, deleteStore, setCurrentStore, clearError} =
     useStoreActions();
 
@@ -116,28 +119,9 @@ export function StoreListPage() {
     });
   };
 
-  const formatOperatingHours = (operatingHours: Store['operatingHours']) => {
-    const days = [
-      'monday',
-      'tuesday',
-      'wednesday',
-      'thursday',
-      'friday',
-      'saturday',
-      'sunday',
-    ];
-    const openDays = days.filter((day) => {
-      if ('closed' in operatingHours[day]) {
-        return false;
-      }
-
-      return true;
-    });
-
-    if (openDays.length === 0) return t('store.closedAllWeek');
-    if (openDays.length === 7) return t('store.open7Days');
-
-    return t('store.openDaysPerWeek', {count: openDays.length});
+  // Since operating hours are fetched separately, we'll show a placeholder for now
+  const formatOperatingHours = () => {
+    return t('store.viewDetails');
   };
 
   const renderStoreCard = (store: Store) => {
@@ -162,6 +146,9 @@ export function StoreListPage() {
                 <Text fw={700} size="lg">
                   {store.name}
                 </Text>
+                <Text size="sm" c="dimmed">
+                  ({store.code})
+                </Text>
               </Group>
 
               <Group gap="xs" c="dimmed">
@@ -176,15 +163,21 @@ export function StoreListPage() {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {store.address}
+                  {store.address}, {store.city}
+                  {store.state ? `, ${store.state}` : ''}, {store.country}
                 </Text>
               </Group>
 
+              {store.phoneNumber ? (
+                <Group gap="xs" c="dimmed">
+                  <IconPhone size={14} />
+                  <Text size="sm">{store.phoneNumber}</Text>
+                </Group>
+              ) : null}
+
               <Group gap="xs" c="dimmed">
                 <IconClock size={14} />
-                <Text size="sm">
-                  {formatOperatingHours(store.operatingHours)}
-                </Text>
+                <Text size="sm">{formatOperatingHours()}</Text>
               </Group>
             </Stack>
 
@@ -295,6 +288,26 @@ export function StoreListPage() {
               </SimpleGrid>
             )}
           </div>
+
+          {/* Pagination */}
+          {pagination && stores.length > 0 ? (
+            <Group justify="center" mt="xl">
+              <Button
+                disabled={!pagination.hasPrev}
+                variant="light"
+                onClick={() => loadStores(pagination.prevCursor)}
+              >
+                {t('common.previous')}
+              </Button>
+              <Button
+                disabled={!pagination.hasNext}
+                variant="light"
+                onClick={() => loadStores(pagination.nextCursor)}
+              >
+                {t('common.next')}
+              </Button>
+            </Group>
+          ) : null}
         </Stack>
       </Container>
 

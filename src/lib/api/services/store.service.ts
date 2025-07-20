@@ -6,13 +6,11 @@ import {
   UpdateStoreRequestSchema,
   UpdateStoreResponseSchema,
   GetStoresResponseSchema,
-  DeleteStoreResponseSchema,
   CreateStoreStaffRequestSchema,
   CreateStoreStaffResponseSchema,
   GetStoreStaffResponseSchema,
   UpdateStoreStaffRequestSchema,
   UpdateStoreStaffResponseSchema,
-  DeleteStoreStaffResponseSchema,
   GetStoreOperatingHoursResponseSchema,
   UpdateStoreOperatingHoursRequestSchema,
   UpdateStoreOperatingHoursResponseSchema,
@@ -23,7 +21,6 @@ import {
   type UpdateStoreResponse,
   type GetStoresRequest,
   type GetStoresResponse,
-  type DeleteStoreResponse,
   type CreateStoreStaffRequest,
   type CreateStoreStaffResponse,
   type GetStoreStaffResponse,
@@ -83,12 +80,8 @@ export class StoreApi extends BaseApiClient {
     );
   }
 
-  async deleteStore(id: string): Promise<DeleteStoreResponse> {
-    return this.delete<DeleteStoreResponse, void>(
-      `/stores/${id}`,
-      undefined,
-      DeleteStoreResponseSchema,
-    );
+  async deleteStore(id: string): Promise<void> {
+    return this.delete(`/stores/${id}`);
   }
 
   // Store Staff methods
@@ -129,11 +122,7 @@ export class StoreApi extends BaseApiClient {
     storeId: string,
     staffId: string,
   ): Promise<DeleteStoreStaffResponse> {
-    return this.delete<DeleteStoreStaffResponse, void>(
-      `/stores/${storeId}/staff/${staffId}`,
-      undefined,
-      DeleteStoreStaffResponseSchema,
-    );
+    return this.delete(`/stores/${storeId}/staff/${staffId}`);
   }
 
   // Store Operating Hours methods

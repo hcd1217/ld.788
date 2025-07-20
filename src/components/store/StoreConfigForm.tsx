@@ -18,7 +18,14 @@ import {useTranslation} from '@/hooks/useTranslation';
 type StoreConfigFormProps = {
   readonly form: UseFormReturnType<{
     name: string;
+    code: string;
     address: string;
+    city: string;
+    country: string;
+    state?: string;
+    postalCode?: string;
+    phoneNumber?: string;
+    email?: string;
     location: {
       lat: number;
       lng: number;
@@ -36,6 +43,9 @@ type StoreConfigFormProps = {
   ) => void;
   readonly onFocus?: () => void;
 };
+const isGoogleMapsApiKeyConfigured = Boolean(
+  import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+);
 
 export function StoreConfigForm({
   form,
@@ -87,16 +97,101 @@ export function StoreConfigForm({
               onFocus={onFocus}
             />
 
-            <LocationInput
-              label={t('store.storeAddress')}
-              placeholder={t('store.searchForStoreAddress')}
-              value={form.values.address}
-              error={form.errors.address ?? undefined}
+            <TextInput
+              required
+              label={t('store.code')}
+              placeholder={t('store.code')}
+              error={form.errors.code}
               disabled={isLoading}
-              onLocationSelect={onLocationChange}
-              onAddressChange={onAddressChange}
+              {...form.getInputProps('code')}
               onFocus={onFocus}
             />
+
+            {isGoogleMapsApiKeyConfigured ? (
+              <LocationInput
+                label={t('store.storeAddress')}
+                placeholder={t('store.searchForStoreAddress')}
+                value={form.values.address}
+                error={form.errors.address ?? undefined}
+                disabled={isLoading}
+                onLocationSelect={onLocationChange}
+                onAddressChange={onAddressChange}
+                onFocus={onFocus}
+              />
+            ) : (
+              <TextInput
+                label={t('store.storeAddress')}
+                placeholder={t('store.addStoreAddress')}
+                value={form.values.address}
+                error={form.errors.address ?? undefined}
+                disabled={isLoading}
+                onFocus={onFocus}
+                {...form.getInputProps('storeAddress')}
+              />
+            )}
+
+            {/* <Grid gutter="md">
+              <Grid.Col span={6}>
+                <TextInput
+                  required
+                  label={t('store.city')}
+                  placeholder={t('store.city')}
+                  error={form.errors.city}
+                  disabled={isLoading}
+                  {...form.getInputProps('city')}
+                  onFocus={onFocus}
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <TextInput
+                  label={t('store.state')}
+                  placeholder={t('store.state')}
+                  error={form.errors.state}
+                  disabled={isLoading}
+                  {...form.getInputProps('state')}
+                  onFocus={onFocus}
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <TextInput
+                  label={t('store.postalCode')}
+                  placeholder={t('store.postalCode')}
+                  error={form.errors.postalCode}
+                  disabled={isLoading}
+                  {...form.getInputProps('postalCode')}
+                  onFocus={onFocus}
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <TextInput
+                  required
+                  label={t('store.country')}
+                  placeholder={t('store.country')}
+                  error={form.errors.country}
+                  disabled={isLoading}
+                  {...form.getInputProps('country')}
+                  onFocus={onFocus}
+                />
+              </Grid.Col>
+            </Grid> */}
+
+            <TextInput
+              label={t('store.phoneNumber')}
+              placeholder={t('store.phoneNumber')}
+              error={form.errors.phoneNumber}
+              disabled={isLoading}
+              {...form.getInputProps('phoneNumber')}
+              onFocus={onFocus}
+            />
+
+            {/* <TextInput
+              label={t('store.email')}
+              placeholder={t('store.email')}
+              error={form.errors.email}
+              disabled={isLoading}
+              {...form.getInputProps('email')}
+              onFocus={onFocus}
+            /> */}
 
             {/* Map Display */}
             {form.values.location.lat && form.values.location.lng ? (

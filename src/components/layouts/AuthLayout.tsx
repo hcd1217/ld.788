@@ -272,7 +272,6 @@ function buildNavigationItems(
       label: t('common.storeManagement'),
       icon: IconBuildingStore,
       path: '/stores',
-      dummy: true,
       activePaths: ['/stores', '/store-config'],
     },
     {

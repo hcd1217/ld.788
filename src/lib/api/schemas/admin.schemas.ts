@@ -2,6 +2,7 @@ import * as z from 'zod/v4';
 import {
   clientCodeSchema,
   emailSchema,
+  idSchema,
   optionalStringSchema,
   timestampSchema,
 } from './common.schemas';
@@ -17,7 +18,7 @@ export const AdminLoginResponseSchema = z.object({
 
 // Client Management Schemas
 const ClientBaseSchema = z.object({
-  id: z.string(),
+  id: idSchema,
   clientCode: z.string(),
   clientName: z.string(),
   rootUser: z.object({
@@ -48,7 +49,7 @@ export const AdminRegisterClientRequestSchema = z.object({
 
 export const AdminRegisterClientResponseSchema = z.object({
   success: z.boolean(),
-  clientId: z.string(),
+  clientId: idSchema,
 });
 
 export const ClientListResponseSchema = z.object({
@@ -58,7 +59,7 @@ export const ClientListResponseSchema = z.object({
 
 // Detailed Client Schemas for getClient response
 export const RoleDetailSchema = z.object({
-  id: z.string(),
+  id: idSchema,
   name: z.string(),
   displayName: z.string(),
   description: z.string(),
@@ -68,7 +69,7 @@ export const RoleDetailSchema = z.object({
 });
 
 export const DynamicFeatureFlagDetailSchema = z.object({
-  id: z.string().optional(),
+  id: optionalStringSchema,
   key: z.string(),
   enabled: z.boolean(),
   value: z.record(z.string(), z.boolean()).optional(),
@@ -80,16 +81,16 @@ export const DynamicFeatureFlagDetailSchema = z.object({
 });
 
 export const ClientUserSchema = z.object({
-  id: z.string(),
+  id: idSchema,
   email: z.string(),
-  userName: z.string().optional(),
+  userName: optionalStringSchema,
   firstName: z.string(),
   lastName: z.string(),
   isRoot: z.boolean(),
   createdAt: timestampSchema,
   roles: z.array(
     z.object({
-      id: z.string(),
+      id: idSchema,
       name: z.string(),
       displayName: z.string(),
       level: z.number(),
@@ -181,7 +182,7 @@ export const HardDeleteClientResponseSchema = z.object({
 
 // Admin Permission Management Schemas
 export const AdminPermissionSchema = z.object({
-  id: z.string(),
+  id: idSchema,
   resource: z.string(),
   action: z.string(),
   scope: z.string(),
@@ -222,12 +223,12 @@ export const UpdateAdminPermissionResponseSchema = z.object({
 
 export const DeleteAdminPermissionResponseSchema = z.object({
   message: z.string(),
-  deletedPermissionId: z.string(),
+  deletedPermissionId: idSchema,
 });
 
 // Dynamic Feature Flag Management Schemas
 export const CreateDynamicFeatureFlagRequestSchema = z.object({
-  clientId: z.string(),
+  clientId: idSchema,
   key: z.string(),
   enabled: z.boolean(),
   value: z.record(z.string(), z.boolean()),
@@ -238,7 +239,7 @@ export const CreateDynamicFeatureFlagRequestSchema = z.object({
       excludeUsers: z.array(z.string()).optional(),
     })
     .optional(),
-  expiresAt: z.string().optional(),
+  expiresAt: optionalStringSchema,
   description: z.string(),
 });
 
@@ -252,16 +253,16 @@ export const UpdateDynamicFeatureFlagRequestSchema = z.object({
       excludeUsers: z.array(z.string()).optional(),
     })
     .optional(),
-  expiresAt: z.string().optional(),
-  description: z.string().optional(),
-  reason: z.string().optional(),
+  expiresAt: optionalStringSchema,
+  description: optionalStringSchema,
+  reason: optionalStringSchema,
 });
 
 const DynamicFeatureFlagObjectSchema = z.object({
-  id: z.string(),
-  clientId: z.string(),
-  clientCode: z.string().optional(),
-  clientName: z.string().optional(),
+  id: idSchema,
+  clientId: idSchema,
+  clientCode: optionalStringSchema,
+  clientName: optionalStringSchema,
   key: z.string(),
   enabled: z.boolean(),
   value: z.record(z.string(), z.boolean()),
@@ -272,13 +273,13 @@ const DynamicFeatureFlagObjectSchema = z.object({
       excludeUsers: z.array(z.string()).optional(),
     })
     .optional(),
-  description: z.string().optional(),
+  description: optionalStringSchema,
   enabledAt: timestampSchema.optional(),
   expiresAt: timestampSchema.optional(),
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
-  createdBy: z.string().optional(),
-  updatedBy: z.string().optional(),
+  createdBy: optionalStringSchema,
+  updatedBy: optionalStringSchema,
 });
 
 export const DynamicFeatureFlagResponseSchema = z

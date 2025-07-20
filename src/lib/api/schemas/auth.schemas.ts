@@ -1,5 +1,11 @@
 import * as z from 'zod/v4';
-import {passwordSchema, jwtTokenSchema, emailSchema} from './common.schemas';
+import {
+  passwordSchema,
+  jwtTokenSchema,
+  emailSchema,
+  optionalStringSchema,
+  idSchema,
+} from './common.schemas';
 
 // Schemas
 export const LoginRequestSchema = z.object({
@@ -97,10 +103,10 @@ export const ClientConfigSchema = z.object({
 
 // Schema for GET /auth/me response
 export const GetMeResponseSchema = z.object({
-  id: z.string().uuid(),
+  id: idSchema,
   email: emailSchema,
-  userName: z.string().optional(),
-  clientId: z.string().uuid(),
+  userName: optionalStringSchema,
+  clientId: idSchema,
   clientCode: z.string(),
   isRoot: z.boolean(),
   roles: z.array(RoleSchema),
