@@ -6,11 +6,6 @@ import {
   UpdateStoreRequestSchema,
   UpdateStoreResponseSchema,
   GetStoresResponseSchema,
-  CreateStoreStaffRequestSchema,
-  CreateStoreStaffResponseSchema,
-  GetStoreStaffResponseSchema,
-  UpdateStoreStaffRequestSchema,
-  UpdateStoreStaffResponseSchema,
   GetStoreOperatingHoursResponseSchema,
   UpdateStoreOperatingHoursRequestSchema,
   UpdateStoreOperatingHoursResponseSchema,
@@ -21,16 +16,24 @@ import {
   type UpdateStoreResponse,
   type GetStoresRequest,
   type GetStoresResponse,
-  type CreateStoreStaffRequest,
-  type CreateStoreStaffResponse,
-  type GetStoreStaffResponse,
-  type UpdateStoreStaffRequest,
-  type UpdateStoreStaffResponse,
-  type DeleteStoreStaffResponse,
   type GetStoreOperatingHoursResponse,
   type UpdateStoreOperatingHoursRequest,
   type UpdateStoreOperatingHoursResponse,
 } from '../schemas/store.schemas';
+import {
+  CreateStaffRequestSchema,
+  CreateStaffResponseSchema,
+  GetStaffListResponseSchema,
+  UpdateStaffRequestSchema,
+  UpdateStaffResponseSchema,
+  DeleteStaffResponseSchema,
+  type CreateStaffRequest,
+  type CreateStaffResponse,
+  type GetStaffListResponse,
+  type UpdateStaffRequest,
+  type UpdateStaffResponse,
+  type DeleteStaffResponse,
+} from '../schemas/staff.schemas';
 
 export class StoreApi extends BaseApiClient {
   // Store methods
@@ -85,44 +88,48 @@ export class StoreApi extends BaseApiClient {
   }
 
   // Store Staff methods
-  async getStoreStaff(storeId: string): Promise<GetStoreStaffResponse> {
-    return this.get<GetStoreStaffResponse, void>(
+  async getStoreStaff(storeId: string): Promise<GetStaffListResponse> {
+    return this.get<GetStaffListResponse, void>(
       `/stores/${storeId}/staff`,
       undefined,
-      GetStoreStaffResponseSchema,
+      GetStaffListResponseSchema,
     );
   }
 
   async createStoreStaff(
     storeId: string,
-    data: CreateStoreStaffRequest,
-  ): Promise<CreateStoreStaffResponse> {
-    return this.post<CreateStoreStaffResponse, CreateStoreStaffRequest>(
+    data: CreateStaffRequest,
+  ): Promise<CreateStaffResponse> {
+    return this.post<CreateStaffResponse, CreateStaffRequest>(
       `/stores/${storeId}/staff`,
       data,
-      CreateStoreStaffResponseSchema,
-      CreateStoreStaffRequestSchema,
+      CreateStaffResponseSchema,
+      CreateStaffRequestSchema,
     );
   }
 
   async updateStoreStaff(
     storeId: string,
     staffId: string,
-    data: UpdateStoreStaffRequest,
-  ): Promise<UpdateStoreStaffResponse> {
-    return this.patch<UpdateStoreStaffResponse, UpdateStoreStaffRequest>(
+    data: UpdateStaffRequest,
+  ): Promise<UpdateStaffResponse> {
+    return this.patch<UpdateStaffResponse, UpdateStaffRequest>(
       `/stores/${storeId}/staff/${staffId}`,
       data,
-      UpdateStoreStaffResponseSchema,
-      UpdateStoreStaffRequestSchema,
+      UpdateStaffResponseSchema,
+      UpdateStaffRequestSchema,
     );
   }
 
   async deleteStoreStaff(
     storeId: string,
     staffId: string,
-  ): Promise<DeleteStoreStaffResponse> {
-    return this.delete(`/stores/${storeId}/staff/${staffId}`);
+  ): Promise<DeleteStaffResponse> {
+    return this.delete<DeleteStaffResponse, void>(
+      `/stores/${storeId}/staff/${staffId}`,
+      undefined,
+      DeleteStaffResponseSchema,
+    );
   }
 
   // Store Operating Hours methods

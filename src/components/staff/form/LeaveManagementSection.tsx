@@ -18,11 +18,12 @@ import {
 } from '@tabler/icons-react';
 import type {UseFormReturnType} from '@mantine/form';
 import {useTranslation} from '@/hooks/useTranslation';
-import {VALIDATION_RULES, type CreateStaffRequest} from '@/services/staff';
+import {VALIDATION_RULES} from '@/services/staff';
+import type {StaffFormData} from '@/lib/api/schemas/staff.schemas';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export interface LeaveManagementSectionProps {
-  readonly form: UseFormReturnType<CreateStaffRequest>;
+  readonly form: UseFormReturnType<StaffFormData>;
 }
 
 export function LeaveManagementSection({form}: LeaveManagementSectionProps) {

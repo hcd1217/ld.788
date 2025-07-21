@@ -5,6 +5,8 @@ import {
   optionalStringSchema,
   timestampSchema,
 } from './common.schemas';
+import {generateRandomString} from '@/utils/string';
+import {permissionMatrix} from '@/services/staff';
 
 // Store schemas
 export const StoreSchema = z.object({
@@ -78,14 +80,43 @@ export const GetStoresResponseSchema = z.object({
 });
 
 // Store Staff schemas
-export const StoreStaffSchema = z.object({
-  id: idSchema,
-  storeId: idSchema,
-  fullName: z.string(),
-  isActive: z.boolean(),
-  createdAt: timestampSchema,
-  updatedAt: timestampSchema,
-});
+export const StoreStaffSchema = z
+  .object({
+    id: idSchema,
+    storeId: idSchema,
+    fullName: z.string(),
+    isActive: z.boolean(),
+    createdAt: timestampSchema,
+    updatedAt: timestampSchema,
+  })
+  .transform((val) => {
+    const roles = Object.keys(permissionMatrix);
+    const role = roles[Math.floor(roles.length * Math.random())];
+    return {
+      ...val,
+      email: `${generateRandomString(4)}.${Date.now()}@example.com`,
+      phoneNumber: '+84938765432',
+      clockInUrl: 'https://app.credo.com/clock-in/',
+      clockInQrCode: '',
+      workingPattern: 'fulltime',
+      weeklyContractedHours: 40,
+      defaultWeeklyHours: 40,
+      hourlyRate: 28,
+      overtimeRate: 42,
+      holidayRate: 56,
+      bookableLeaveDays: 20,
+      leaveBalance: {
+        vacation: 18,
+        sick: 2,
+        other: 0,
+      },
+      carryOverDays: 5,
+      role,
+      accessPermissions:
+        permissionMatrix[role as keyof typeof permissionMatrix],
+      status: val.isActive ? 'active' : 'inactive',
+    };
+  });
 
 export const CreateStoreStaffRequestSchema = z.object({
   fullName: z.string().min(1).max(100),

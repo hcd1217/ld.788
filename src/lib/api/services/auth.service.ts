@@ -68,7 +68,11 @@ export class AuthApi extends BaseApiClient {
       data,
       RenewTokenResponseSchema,
       RenewTokenRequestSchema,
-    );
+    ).catch((error: unknown) => {
+      console.error(error);
+      // If the request fails, it means the token is expired, just reload the page
+      return {refreshToken: '', accessToken: ''};
+    });
   }
 
   async getMe(): Promise<GetMeResponse> {

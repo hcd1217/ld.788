@@ -32,7 +32,8 @@ import {
   LeaveManagementSection,
   AccessPermissionSection,
 } from '@/components/staff/form';
-import {VALIDATION_RULES, type CreateStaffRequest} from '@/services/staff';
+import {VALIDATION_RULES} from '@/services/staff';
+import type {StaffFormData} from '@/lib/api/schemas/staff.schemas';
 
 export function AddStaffPage() {
   const navigate = useNavigate();
@@ -44,12 +45,11 @@ export function AddStaffPage() {
   const currentStore = useCurrentStore();
   const {createStaff} = useStaffActions();
 
-  const form = useForm<CreateStaffRequest>({
+  const form = useForm<StaffFormData>({
     initialValues: {
-      storeId: currentStore?.id || '',
-      fullName: '',
-      email: '',
-      phoneNumber: '',
+      fullName: 'Nguyễn Văn An',
+      email: `an.${Date.now()}@example.com`,
+      phoneNumber: '0901-123-456',
       workingPattern: 'shift',
       weeklyContractedHours: 32,
       defaultWeeklyHours: 40,
@@ -65,6 +65,12 @@ export function AddStaffPage() {
       },
       carryOverDays: 0,
       role: 'member',
+      // Additional fields required by StaffFormData
+      status: 'active',
+      clockInUrl: '',
+      clockInQrCode: '',
+      accessPermissions: [],
+      isActive: true,
     },
     validate(values) {
       const errors: Record<string, string> = {};
@@ -226,7 +232,7 @@ export function AddStaffPage() {
     setActiveStep((current) => (current > 0 ? current - 1 : current));
   };
 
-  const handleSubmit = async (values: CreateStaffRequest) => {
+  const handleSubmit = async (values: StaffFormData) => {
     if (!currentStore) {
       notifications.show({
         title: t('common.error'),
@@ -240,15 +246,14 @@ export function AddStaffPage() {
     setIsSubmitting(true);
     try {
       // Calculate automatic values
-      const finalValues: CreateStaffRequest = {
+      const finalValues: StaffFormData = {
         ...values,
-        storeId: currentStore.id,
         // Calculate overtime and holiday rates if not set
         overtimeRate: values.overtimeRate || values.hourlyRate * 1.5,
         holidayRate: values.holidayRate || values.hourlyRate * 2,
       };
 
-      const newStaff = await createStaff(finalValues);
+      const newStaff = await createStaff(currentStore.id, finalValues);
 
       notifications.show({
         title: t('staff.createSuccess'),

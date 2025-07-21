@@ -11,7 +11,6 @@ import {
   Modal,
   Text,
   Flex,
-  Pagination,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
 import {notifications} from '@mantine/notifications';
@@ -53,21 +52,15 @@ export function StaffListPage() {
   const stores = useStores();
   const currentStore = useCurrentStore();
 
-  const {
-    loadStaff,
-    deleteStaff,
-    deactivateStaff,
-    activateStaff,
-    setPagination,
-    clearError,
-  } = useStaffActions();
+  const {loadStaff, deleteStaff, deactivateStaff, activateStaff, clearError} =
+    useStaffActions();
 
-  // Load staff when component mounts or filters change
+  // Load staff when component mounts or store changes
   useEffect(() => {
     const load = async () => {
       if (currentStore) {
         try {
-          await loadStaff({storeId: currentStore.id});
+          await loadStaff(currentStore.id);
         } catch (error) {
           console.error(error);
         }
@@ -86,7 +79,8 @@ export function StaffListPage() {
     if (!staffToDelete) return;
 
     try {
-      await deleteStaff(staffToDelete.id);
+      if (!currentStore) throw new Error('No store selected');
+      await deleteStaff(currentStore.id, staffToDelete.id);
 
       notifications.show({
         title: t('staff.deleteSuccess'),
@@ -150,8 +144,10 @@ export function StaffListPage() {
     }
   };
 
-  const handlePageChange = (page: number) => {
-    setPagination({page});
+  const handleLoadMore = async (cursor?: string) => {
+    if (currentStore) {
+      await loadStaff(currentStore.id, cursor);
+    }
   };
 
   const handleAddStaff = () => {
@@ -253,7 +249,7 @@ export function StaffListPage() {
             />
 
             <StaffList
-              staff={staff}
+              staffs={staff}
               onEdit={(staffMember) =>
                 navigate(`/staff/edit/${staffMember.id}`)
               }
@@ -263,23 +259,31 @@ export function StaffListPage() {
           </div>
 
           {/* Pagination */}
-          {pagination.totalPages > 1 && (
+          {pagination && (pagination.hasNext || pagination.hasPrev) ? (
             <Group justify="center">
-              <Pagination
-                total={pagination.totalPages}
-                value={pagination.page}
-                size="sm"
-                onChange={handlePageChange}
-              />
+              <Button
+                disabled={!pagination.hasPrev}
+                variant="light"
+                onClick={async () => handleLoadMore(pagination.prevCursor)}
+              >
+                {t('common.previous')}
+              </Button>
+              <Button
+                disabled={!pagination.hasNext}
+                variant="light"
+                onClick={async () => handleLoadMore(pagination.nextCursor)}
+              >
+                {t('common.next')}
+              </Button>
             </Group>
-          )}
+          ) : null}
 
           {/* Summary */}
           <Group justify="center">
             <Text size="sm" c="dimmed">
               {t('staff.showingCount', {
                 current: staff.length,
-                total: pagination.total,
+                total: staff.length, // API doesn't provide total count
               })}
             </Text>
           </Group>

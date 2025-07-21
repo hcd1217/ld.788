@@ -75,19 +75,17 @@ export const authService = {
         return false;
       }
 
-      try {
-        const response = await authApi.renewToken({
-          refreshToken,
-        });
+      const response = await authApi.renewToken({refreshToken});
+      if (!response.accessToken) {
         saveTokens({
           accessToken: response.accessToken,
           refreshToken: response.refreshToken,
         });
-      } catch (error) {
-        console.error('Failed to renew token', error);
-        clearTokens();
-        return false;
+        return true;
       }
+
+      clearTokens();
+      return false;
     }
 
     return true;

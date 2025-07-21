@@ -1,13 +1,12 @@
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
+import {storeApi, ApiError} from '@/lib/api';
 import {
-  staffService,
   type Staff,
   type CreateStaffRequest,
   type UpdateStaffRequest,
-  type StaffListRequest,
-  type StaffListResponse,
-} from '@/services/staff';
+  type StaffFormData,
+} from '@/lib/api/schemas/staff.schemas';
 
 type StaffState = {
   // Staff data
@@ -16,59 +15,36 @@ type StaffState = {
   isLoading: boolean;
   error: string | undefined;
 
-  // Pagination and filtering
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-  filters: {
-    storeId?: string;
-    search: string;
-    status: 'active' | 'inactive' | 'all';
-    role: 'admin' | 'manager' | 'member' | 'all';
-    sortBy: 'name' | 'email' | 'role' | 'createdAt';
-    sortOrder: 'asc' | 'desc';
-  };
+  // Pagination (cursor-based for API)
+  pagination:
+    | {
+        limit: number;
+        hasNext: boolean;
+        hasPrev: boolean;
+        nextCursor: string | undefined;
+        prevCursor: string | undefined;
+      }
+    | undefined;
+
+  // Current store context
+  currentStoreId: string | undefined;
 
   // Actions
   setCurrentStaff: (staff: Staff | undefined) => void;
-  loadStaff: (params?: Partial<StaffListRequest>) => Promise<void>;
-  createStaff: (data: CreateStaffRequest) => Promise<Staff>;
-  updateStaff: (id: string, data: UpdateStaffRequest) => Promise<Staff>;
-  deactivateStaff: (id: string) => Promise<void>;
-  activateStaff: (id: string) => Promise<void>;
-  deleteStaff: (id: string) => Promise<void>;
-  hardDeleteStaff: (id: string) => Promise<void>;
-  regenerateQRCode: (id: string) => Promise<string>;
-
-  // Filter and pagination actions
-  setFilters: (filters: Partial<StaffState['filters']>) => void;
-  setPagination: (pagination: Partial<StaffState['pagination']>) => void;
-  resetFilters: () => void;
+  loadStaff: (storeId: string, cursor?: string) => Promise<void>;
+  createStaff: (storeId: string, data: StaffFormData) => Promise<Staff>;
+  updateStaff: (
+    storeId: string,
+    staffId: string,
+    data: StaffFormData,
+  ) => Promise<Staff>;
+  deleteStaff: (storeId: string, staffId: string) => Promise<void>;
+  refreshStaff: (storeId: string) => Promise<void>;
   clearError: () => void;
+  setCurrentStoreId: (storeId: string | undefined) => void;
 
   // Selectors
   getStaffById: (id: string) => Staff | undefined;
-  getStaffByStore: (storeId: string) => Staff[];
-  isEmailUnique: (email: string, excludeId?: string) => Promise<boolean>;
-  isPhoneUnique: (phone: string, excludeId?: string) => Promise<boolean>;
-};
-
-const initialFilters: StaffState['filters'] = {
-  search: '',
-  status: 'all',
-  role: 'all',
-  sortBy: 'createdAt',
-  sortOrder: 'desc',
-};
-
-const initialPagination: StaffState['pagination'] = {
-  page: 1,
-  limit: 20,
-  total: 0,
-  totalPages: 0,
 };
 
 export const useStaffStore = create<StaffState>()(
@@ -79,43 +55,34 @@ export const useStaffStore = create<StaffState>()(
       currentStaff: undefined,
       isLoading: false,
       error: undefined,
-      pagination: initialPagination,
-      filters: initialFilters,
+      pagination: undefined,
+      currentStoreId: undefined,
 
       // Actions
       setCurrentStaff(staff) {
         set({currentStaff: staff, error: undefined});
       },
 
-      async loadStaff(params = {}) {
-        set({isLoading: true, error: undefined});
+      setCurrentStoreId(storeId) {
+        set({currentStoreId: storeId});
+      },
+
+      async loadStaff(storeId) {
+        set({isLoading: true, error: undefined, currentStoreId: storeId});
         try {
-          const currentFilters = get().filters;
-          const currentPagination = get().pagination;
-
-          const requestParams: StaffListRequest = {
-            ...currentFilters,
-            page: currentPagination.page,
-            limit: currentPagination.limit,
-            ...params, // Override with provided params
-          };
-
-          const response: StaffListResponse =
-            await staffService.getAllStaff(requestParams);
+          const staff = await storeApi.getStoreStaff(storeId);
 
           set({
-            staff: response.staff,
-            pagination: {
-              page: response.page,
-              limit: response.limit,
-              total: response.total,
-              totalPages: response.totalPages,
-            },
+            staff,
             isLoading: false,
           });
         } catch (error) {
           const errorMessage =
-            error instanceof Error ? error.message : 'Failed to load staff';
+            error instanceof ApiError
+              ? error.message
+              : error instanceof Error
+                ? error.message
+                : 'Failed to load staff';
           set({
             isLoading: false,
             error: errorMessage,
@@ -124,63 +91,30 @@ export const useStaffStore = create<StaffState>()(
         }
       },
 
-      async createStaff(data) {
+      async createStaff(storeId, data) {
         set({isLoading: true, error: undefined});
         try {
-          // Validate staff data first
-          const validation = staffService.validateStaffData(data);
-          if (!validation.isValid) {
-            throw new Error(validation.errors.join(', '));
-          }
+          // Extract only the field that API accepts
+          const apiRequest: CreateStaffRequest = {
+            fullName: data.fullName,
+          };
 
-          // Check email and phone uniqueness
-          const [emailUnique, phoneUnique] = await Promise.all([
-            staffService.isEmailUnique(data.email),
-            staffService.isPhoneUnique(data.phoneNumber),
-          ]);
+          const newStaff = await storeApi.createStoreStaff(storeId, apiRequest);
 
-          if (!emailUnique) {
-            throw new Error('Email address is already in use');
-          }
-
-          if (!phoneUnique) {
-            throw new Error('Phone number is already in use');
-          }
-
-          const newStaff = await staffService.createStaff(data);
-
-          // Add to current staff list if it matches current filters
-          const currentFilters = get().filters;
-          const shouldIncludeInList =
-            (!currentFilters.storeId ||
-              currentFilters.storeId === newStaff.storeId) &&
-            (currentFilters.status === 'all' ||
-              currentFilters.status === newStaff.status) &&
-            (currentFilters.role === 'all' ||
-              currentFilters.role === newStaff.role);
-
-          if (shouldIncludeInList) {
-            set((state) => ({
-              staff: [newStaff, ...state.staff],
-              pagination: {
-                ...state.pagination,
-                total: state.pagination.total + 1,
-                totalPages: Math.ceil(
-                  (state.pagination.total + 1) / state.pagination.limit,
-                ),
-              },
-              isLoading: false,
-            }));
-          } else {
-            set({isLoading: false});
-          }
+          // Add to current staff list
+          set((state) => ({
+            staff: [newStaff, ...state.staff],
+            isLoading: false,
+          }));
 
           return newStaff;
         } catch (error) {
           const errorMessage =
-            error instanceof Error
+            error instanceof ApiError
               ? error.message
-              : 'Failed to create staff member';
+              : error instanceof Error
+                ? error.message
+                : 'Failed to create staff member';
           set({
             isLoading: false,
             error: errorMessage,
@@ -189,53 +123,40 @@ export const useStaffStore = create<StaffState>()(
         }
       },
 
-      async updateStaff(id, data) {
+      async updateStaff(storeId, staffId, data) {
         set({isLoading: true, error: undefined});
         try {
-          // Validate staff data
-          const validation = staffService.validateStaffData(data);
-          if (!validation.isValid) {
-            throw new Error(validation.errors.join(', '));
-          }
+          // Extract only the field that API accepts
+          const apiRequest: UpdateStaffRequest = {
+            isActive: data.status === 'active',
+          };
 
-          // Check email and phone uniqueness if they're being updated
-          const promises: Array<Promise<boolean>> = [];
-          if (data.email) {
-            promises.push(staffService.isEmailUnique(data.email, id));
-          }
-
-          if (data.phoneNumber) {
-            promises.push(staffService.isPhoneUnique(data.phoneNumber, id));
-          }
-
-          if (promises.length > 0) {
-            const [emailUnique, phoneUnique] = await Promise.all(promises);
-            if (data.email && !emailUnique) {
-              throw new Error('Email address is already in use');
-            }
-
-            if (data.phoneNumber && !phoneUnique) {
-              throw new Error('Phone number is already in use');
-            }
-          }
-
-          const updatedStaff = await staffService.updateStaff(id, data);
+          const response = await storeApi.updateStoreStaff(
+            storeId,
+            staffId,
+            apiRequest,
+          );
+          const updatedStaff = response.staff;
 
           set((state) => ({
             staff: state.staff.map((staff) =>
-              staff.id === id ? updatedStaff : staff,
+              staff.id === staffId ? updatedStaff : staff,
             ),
             currentStaff:
-              state.currentStaff?.id === id ? updatedStaff : state.currentStaff,
+              state.currentStaff?.id === staffId
+                ? updatedStaff
+                : state.currentStaff,
             isLoading: false,
           }));
 
           return updatedStaff;
         } catch (error) {
           const errorMessage =
-            error instanceof Error
+            error instanceof ApiError
               ? error.message
-              : 'Failed to update staff member';
+              : error instanceof Error
+                ? error.message
+                : 'Failed to update staff member';
           set({
             isLoading: false,
             error: errorMessage,
@@ -244,106 +165,26 @@ export const useStaffStore = create<StaffState>()(
         }
       },
 
-      async deactivateStaff(id) {
-        await get().updateStaff(id, {status: 'inactive'});
-      },
-
-      async activateStaff(id) {
-        await get().updateStaff(id, {status: 'active'});
-      },
-
-      async deleteStaff(id) {
+      async deleteStaff(storeId, staffId) {
         set({isLoading: true, error: undefined});
         try {
-          await staffService.deleteStaff(id);
+          await storeApi.deleteStoreStaff(storeId, staffId);
 
           set((state) => ({
-            staff: state.staff
-              .map((staff) =>
-                staff.id === id
-                  ? {...staff, status: 'deleted' as const}
-                  : staff,
-              )
-              .filter((staff) => staff.status !== 'deleted'), // Remove from list
+            staff: state.staff.filter((staff) => staff.id !== staffId),
             currentStaff:
-              state.currentStaff?.id === id ? undefined : state.currentStaff,
-            pagination: {
-              ...state.pagination,
-              total: Math.max(0, state.pagination.total - 1),
-              totalPages: Math.ceil(
-                Math.max(0, state.pagination.total - 1) /
-                  state.pagination.limit,
-              ),
-            },
-            isLoading: false,
-          }));
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error
-              ? error.message
-              : 'Failed to delete staff member';
-          set({
-            isLoading: false,
-            error: errorMessage,
-          });
-          throw error;
-        }
-      },
-
-      async hardDeleteStaff(id) {
-        set({isLoading: true, error: undefined});
-        try {
-          await staffService.hardDeleteStaff(id);
-
-          set((state) => ({
-            staff: state.staff.filter((staff) => staff.id !== id),
-            currentStaff:
-              state.currentStaff?.id === id ? undefined : state.currentStaff,
-            pagination: {
-              ...state.pagination,
-              total: Math.max(0, state.pagination.total - 1),
-              totalPages: Math.ceil(
-                Math.max(0, state.pagination.total - 1) /
-                  state.pagination.limit,
-              ),
-            },
-            isLoading: false,
-          }));
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error
-              ? error.message
-              : 'Failed to permanently delete staff member';
-          set({
-            isLoading: false,
-            error: errorMessage,
-          });
-          throw error;
-        }
-      },
-
-      async regenerateQRCode(id) {
-        set({isLoading: true, error: undefined});
-        try {
-          const newQrCode = await staffService.regenerateQRCode(id);
-
-          set((state) => ({
-            staff: state.staff.map((staff) =>
-              staff.id === id ? {...staff, clockInQrCode: newQrCode} : staff,
-            ),
-            currentStaff:
-              state.currentStaff?.id === id
-                ? {...state.currentStaff, clockInQrCode: newQrCode}
+              state.currentStaff?.id === staffId
+                ? undefined
                 : state.currentStaff,
             isLoading: false,
           }));
-
-          return newQrCode;
         } catch (error) {
           const errorMessage =
-            error instanceof Error
+            error instanceof ApiError
               ? error.message
-              : 'Failed to regenerate QR code';
+              : error instanceof Error
+                ? error.message
+                : 'Failed to delete staff member';
           set({
             isLoading: false,
             error: errorMessage,
@@ -352,34 +193,8 @@ export const useStaffStore = create<StaffState>()(
         }
       },
 
-      // Filter and pagination actions
-      setFilters(newFilters) {
-        set((state) => ({
-          filters: {...state.filters, ...newFilters},
-          pagination: {...state.pagination, page: 1}, // Reset to first page when filters change
-        }));
-
-        // Reload data with new filters
-        get().loadStaff();
-      },
-
-      setPagination(newPagination) {
-        set((state) => ({
-          pagination: {...state.pagination, ...newPagination},
-        }));
-
-        // Reload data with new pagination
-        get().loadStaff();
-      },
-
-      resetFilters() {
-        set({
-          filters: initialFilters,
-          pagination: initialPagination,
-        });
-
-        // Reload data with reset filters
-        get().loadStaff();
+      async refreshStaff(storeId) {
+        return get().loadStaff(storeId);
       },
 
       clearError() {
@@ -389,28 +204,6 @@ export const useStaffStore = create<StaffState>()(
       // Selectors
       getStaffById(id) {
         return get().staff.find((staff) => staff.id === id);
-      },
-
-      getStaffByStore(storeId) {
-        return get().staff.filter((staff) => staff.storeId === storeId);
-      },
-
-      async isEmailUnique(email, excludeId) {
-        try {
-          return await staffService.isEmailUnique(email, excludeId);
-        } catch (error) {
-          console.error('Error checking email uniqueness:', error);
-          return false;
-        }
-      },
-
-      async isPhoneUnique(phone, excludeId) {
-        try {
-          return await staffService.isPhoneUnique(phone, excludeId);
-        } catch (error) {
-          console.error('Error checking phone uniqueness:', error);
-          return false;
-        }
       },
     }),
     {
@@ -427,7 +220,6 @@ export const useStaffLoading = () => useStaffStore((state) => state.isLoading);
 export const useStaffError = () => useStaffStore((state) => state.error);
 export const useStaffPagination = () =>
   useStaffStore((state) => state.pagination);
-export const useStaffFilters = () => useStaffStore((state) => state.filters);
 
 // Helper hooks for staff operations
 export const useStaffActions = () => {
@@ -437,18 +229,34 @@ export const useStaffActions = () => {
     loadStaff: store.loadStaff,
     createStaff: store.createStaff,
     updateStaff: store.updateStaff,
-    deactivateStaff: store.deactivateStaff,
-    activateStaff: store.activateStaff,
     deleteStaff: store.deleteStaff,
-    hardDeleteStaff: store.hardDeleteStaff,
-    regenerateQRCode: store.regenerateQRCode,
-    setFilters: store.setFilters,
-    setPagination: store.setPagination,
-    resetFilters: store.resetFilters,
+    refreshStaff: store.refreshStaff,
     clearError: store.clearError,
-    getStaffById: store.getStaffById,
-    getStaffByStore: store.getStaffByStore,
-    isEmailUnique: store.isEmailUnique,
-    isPhoneUnique: store.isPhoneUnique,
+    setCurrentStoreId: store.setCurrentStoreId,
+
+    // Legacy actions for compatibility
+    async deactivateStaff(id: string) {
+      const storeId = store.currentStoreId;
+      if (!storeId) throw new Error('No store selected');
+      const staff = store.getStaffById(id);
+      if (!staff) throw new Error('Staff not found');
+      return store.updateStaff(storeId, id, {
+        ...staff,
+        status: 'inactive',
+      } as StaffFormData);
+    },
+    async activateStaff(id: string) {
+      const storeId = store.currentStoreId;
+      if (!storeId) throw new Error('No store selected');
+      const staff = store.getStaffById(id);
+      if (!staff) throw new Error('Staff not found');
+      return store.updateStaff(storeId, id, {
+        ...staff,
+        status: 'active',
+      } as StaffFormData);
+    },
+    setPagination() {
+      // No-op for compatibility - API uses cursor-based pagination
+    },
   };
 };

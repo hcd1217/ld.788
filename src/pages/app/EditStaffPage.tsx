@@ -12,7 +12,7 @@ import {
   Paper,
   Text,
 } from '@mantine/core';
-import {useForm, type UseFormReturnType} from '@mantine/form';
+import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
 import {
   IconCheck,
@@ -23,7 +23,8 @@ import {
   IconShield,
 } from '@tabler/icons-react';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-import {useStaffActions} from '@/stores/useStaffStore';
+import {useTranslation} from '@/hooks/useTranslation';
+import {useStaffActions, useStaffStore} from '@/stores/useStaffStore';
 import {useCurrentStore} from '@/stores/useStoreConfigStore';
 import {GoBack} from '@/components/common/GoBack';
 import {
@@ -32,16 +33,12 @@ import {
   LeaveManagementSection,
   AccessPermissionSection,
 } from '@/components/staff/form';
-import {
-  VALIDATION_RULES,
-  staffService,
-  type UpdateStaffRequest,
-  type CreateStaffRequest,
-  type Staff,
-} from '@/services/staff';
+import {VALIDATION_RULES} from '@/services/staff';
+import type {Staff, StaffFormData} from '@/lib/api/schemas/staff.schemas';
 
 export function EditStaffPage() {
   const navigate = useNavigate();
+  const {t} = useTranslation();
   const {staffId} = useParams<{staffId: string}>();
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,9 +47,10 @@ export function EditStaffPage() {
   const isDarkMode = useIsDarkMode();
 
   const currentStore = useCurrentStore();
-  const {updateStaff} = useStaffActions();
+  const {updateStaff, loadStaff} = useStaffActions();
+  const staffList = useStaffStore((state) => state.staff);
 
-  const form = useForm<UpdateStaffRequest>({
+  const form = useForm<StaffFormData>({
     initialValues: {
       fullName: '',
       email: '',
@@ -72,23 +70,29 @@ export function EditStaffPage() {
       },
       carryOverDays: 0,
       role: 'member',
+      // Additional fields required by StaffFormData
+      status: 'active',
+      clockInUrl: '',
+      clockInQrCode: '',
+      accessPermissions: [],
+      isActive: true,
     },
     validate(values) {
       const errors: Record<string, string> = {};
 
       // Basic Info validation
       if (values.fullName && !values.fullName.trim()) {
-        errors.fullName = 'Full name is required';
+        errors.fullName = t('validation.fullNameRequired');
       } else if (values.fullName && values.fullName.trim().length < 2) {
-        errors.fullName = 'Full name must be at least 2 characters';
+        errors.fullName = t('validation.fullNameTooShort');
       }
 
       if (values.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-        errors.email = 'Invalid email format';
+        errors.email = t('validation.invalidEmail');
       }
 
       if (values.phoneNumber && values.phoneNumber.length < 10) {
-        errors.phoneNumber = 'Phone number must be at least 10 digits';
+        errors.phoneNumber = t('validation.phoneTooShort');
       }
 
       // Working Pattern validation
@@ -97,7 +101,10 @@ export function EditStaffPage() {
         (values.hourlyRate < VALIDATION_RULES.hourlyRate.min ||
           values.hourlyRate > VALIDATION_RULES.hourlyRate.max)
       ) {
-        errors.hourlyRate = `Hourly rate must be between $${VALIDATION_RULES.hourlyRate.min} and $${VALIDATION_RULES.hourlyRate.max}`;
+        errors.hourlyRate = t('validation.hourlyRateRange', {
+          min: VALIDATION_RULES.hourlyRate.min,
+          max: VALIDATION_RULES.hourlyRate.max,
+        });
       }
 
       if (values.weeklyContractedHours !== undefined) {
@@ -110,7 +117,10 @@ export function EditStaffPage() {
           values.weeklyContractedHours < 0 ||
           values.weeklyContractedHours > maxHours
         ) {
-          errors.weeklyContractedHours = `Weekly hours must be between 0 and ${maxHours}`;
+          errors.weeklyContractedHours = t('validation.weeklyHoursRange', {
+            min: 0,
+            max: maxHours,
+          });
         }
       }
 
@@ -122,7 +132,10 @@ export function EditStaffPage() {
           values.defaultWeeklyHours >
             VALIDATION_RULES.workingHours.fulltime.max)
       ) {
-        errors.defaultWeeklyHours = `Default weekly hours must be between ${VALIDATION_RULES.workingHours.fulltime.min} and ${VALIDATION_RULES.workingHours.fulltime.max}`;
+        errors.defaultWeeklyHours = t('validation.defaultWeeklyHoursRange', {
+          min: VALIDATION_RULES.workingHours.fulltime.min,
+          max: VALIDATION_RULES.workingHours.fulltime.max,
+        });
       }
 
       // Leave Management validation
@@ -131,7 +144,10 @@ export function EditStaffPage() {
         (values.bookableLeaveDays < 0 ||
           values.bookableLeaveDays > VALIDATION_RULES.leave.daysPerYear.max)
       ) {
-        errors.bookableLeaveDays = `Leave days must be between 0 and ${VALIDATION_RULES.leave.daysPerYear.max}`;
+        errors.bookableLeaveDays = t('validation.leaveDaysRange', {
+          min: 0,
+          max: VALIDATION_RULES.leave.daysPerYear.max,
+        });
       }
 
       if (
@@ -140,7 +156,10 @@ export function EditStaffPage() {
         (values.leaveHoursEquivalent < VALIDATION_RULES.leave.hoursPerDay.min ||
           values.leaveHoursEquivalent > VALIDATION_RULES.leave.hoursPerDay.max)
       ) {
-        errors.leaveHoursEquivalent = `Hours per day must be between ${VALIDATION_RULES.leave.hoursPerDay.min} and ${VALIDATION_RULES.leave.hoursPerDay.max}`;
+        errors.leaveHoursEquivalent = t('validation.hoursPerDayRange', {
+          min: VALIDATION_RULES.leave.hoursPerDay.min,
+          max: VALIDATION_RULES.leave.hoursPerDay.max,
+        });
       }
 
       return errors;
@@ -180,7 +199,12 @@ export function EditStaffPage() {
 
       try {
         setIsLoading(true);
-        const staffData = await staffService.getStaffById(staffId);
+        // Load staff if not already loaded
+        if (currentStore && staffList.length === 0) {
+          await loadStaff(currentStore.id);
+        }
+
+        const staffData = staffList.find((s) => s.id === staffId);
 
         if (!staffData) {
           notifications.show({
@@ -214,7 +238,7 @@ export function EditStaffPage() {
         });
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : 'Failed to load staff data';
+          error instanceof Error ? error.message : t('staff.loadFailed');
 
         notifications.show({
           title: 'Load Failed',
@@ -230,7 +254,7 @@ export function EditStaffPage() {
     };
 
     loadStaffData();
-  }, [staffId, navigate, form]);
+  }, [staffId, navigate, form, currentStore, staffList, loadStaff, t]);
 
   const validateCurrentStep = () => {
     const errors = form.validate();
@@ -280,14 +304,15 @@ export function EditStaffPage() {
     setActiveStep((current) => (current > 0 ? current - 1 : current));
   };
 
-  const handleSubmit = async (values: UpdateStaffRequest) => {
+  const handleSubmit = async (values: StaffFormData) => {
     if (!staffId || !staff) {
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const updatedStaff = await updateStaff(staffId, values);
+      if (!currentStore) throw new Error('No store selected');
+      const updatedStaff = await updateStaff(currentStore.id, staffId, values);
 
       notifications.show({
         title: 'Staff Updated',
@@ -328,7 +353,7 @@ export function EditStaffPage() {
         <Stack gap="xl">
           <GoBack />
           <Title order={1} ta="center">
-            Edit Staff Member
+            {t('staff.editTitle')}
           </Title>
 
           <Alert
@@ -336,7 +361,7 @@ export function EditStaffPage() {
             color="orange"
             variant="light"
           >
-            Staff member not found or no store selected.
+            {t('staff.notFoundOrNoStore')}
           </Alert>
         </Stack>
       </Container>
@@ -351,11 +376,11 @@ export function EditStaffPage() {
         </Group>
 
         <Title order={1} ta="center">
-          Edit Staff Member - {staff.fullName}
+          {t('staff.editTitleWithName', {name: staff.fullName})}
         </Title>
 
         <Text ta="center" c="dimmed">
-          Store: {currentStore.name}
+          {t('staff.storeName', {name: currentStore.name})}
         </Text>
 
         <Paper shadow="sm" p="xl" radius="md">
@@ -379,29 +404,13 @@ export function EditStaffPage() {
                   transitionProps={{duration: 300}}
                 />
 
-                {activeStep === 0 && (
-                  <BasicInfoSection
-                    form={form as UseFormReturnType<CreateStaffRequest>}
-                  />
-                )}
+                {activeStep === 0 && <BasicInfoSection form={form} />}
 
-                {activeStep === 1 && (
-                  <WorkingPatternSection
-                    form={form as UseFormReturnType<CreateStaffRequest>}
-                  />
-                )}
+                {activeStep === 1 && <WorkingPatternSection form={form} />}
 
-                {activeStep === 2 && (
-                  <LeaveManagementSection
-                    form={form as UseFormReturnType<CreateStaffRequest>}
-                  />
-                )}
+                {activeStep === 2 && <LeaveManagementSection form={form} />}
 
-                {activeStep === 3 && (
-                  <AccessPermissionSection
-                    form={form as UseFormReturnType<CreateStaffRequest>}
-                  />
-                )}
+                {activeStep === 3 && <AccessPermissionSection form={form} />}
               </div>
 
               <Group justify="space-between" pt="md">
@@ -410,19 +419,19 @@ export function EditStaffPage() {
                   disabled={activeStep === 0}
                   onClick={handleBack}
                 >
-                  Back
+                  {t('common.back')}
                 </Button>
 
                 <Group gap="sm">
                   {activeStep < 3 ? (
-                    <Button onClick={handleNext}>Next</Button>
+                    <Button onClick={handleNext}>{t('common.next')}</Button>
                   ) : (
                     <Button
                       type="submit"
                       loading={isSubmitting}
                       leftSection={<IconCheck size={16} />}
                     >
-                      Update Staff Member
+                      {t('staff.updateButton')}
                     </Button>
                   )}
                 </Group>

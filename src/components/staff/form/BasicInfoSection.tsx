@@ -26,11 +26,11 @@ import QRCode from 'qrcode';
 import type {UseFormReturnType} from '@mantine/form';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useCurrentStore} from '@/stores/useStoreConfigStore';
-import type {CreateStaffRequest} from '@/services/staff';
+import type {StaffFormData} from '@/lib/api/schemas/staff.schemas';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export interface BasicInfoSectionProps {
-  readonly form: UseFormReturnType<CreateStaffRequest>;
+  readonly form: UseFormReturnType<StaffFormData>;
 }
 
 export function BasicInfoSection({form}: BasicInfoSectionProps) {

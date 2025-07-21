@@ -20,11 +20,12 @@ import {
 } from '@tabler/icons-react';
 import type {UseFormReturnType} from '@mantine/form';
 import {useTranslation} from '@/hooks/useTranslation';
-import {permissionMatrix, type CreateStaffRequest} from '@/services/staff';
+import {permissionMatrix} from '@/services/staff';
+import type {StaffFormData} from '@/lib/api/schemas/staff.schemas';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export interface AccessPermissionSectionProps {
-  readonly form: UseFormReturnType<CreateStaffRequest>;
+  readonly form: UseFormReturnType<StaffFormData>;
 }
 
 export function AccessPermissionSection({form}: AccessPermissionSectionProps) {

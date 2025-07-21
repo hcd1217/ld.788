@@ -424,6 +424,12 @@
     "createFailed": "Creation Failed",
     "createFailedDefault": "Failed to create staff member",
     "createButton": "Create Staff Member",
+    "updateButton": "Update Staff Member",
+    "editTitle": "Edit Staff Member",
+    "editTitleWithName": "Edit Staff Member - {{name}}",
+    "storeName": "Store: {{name}}",
+    "notFoundOrNoStore": "Staff member not found or no store selected",
+    "loadFailed": "Failed to load staff data",
     "steps": {
       "basicInfo": {
         "label": "Basic Information",

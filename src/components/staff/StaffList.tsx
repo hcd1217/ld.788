@@ -37,14 +37,14 @@ import {useTranslation} from '@/hooks/useTranslation';
 import {formatPhoneNumber} from '@/utils/string';
 
 export interface StaffListProps {
-  readonly staff: readonly Staff[];
+  readonly staffs: readonly Staff[];
   readonly onEdit: (staff: Staff) => void;
   readonly onDelete: (staff: Staff) => void;
   readonly onToggleStatus: (staff: Staff) => void;
 }
 
 export function StaffList({
-  staff,
+  staffs,
   onEdit,
   onDelete,
   onToggleStatus,
@@ -116,7 +116,7 @@ export function StaffList({
     }
   };
 
-  if (staff.length === 0) {
+  if (staffs.length === 0) {
     return (
       <Card shadow="sm" padding="xl" radius="md" ta="center">
         <Stack gap="md">
@@ -141,8 +141,8 @@ export function StaffList({
         <Stack gap="md">
           <Group justify="space-between">
             <Text size="sm" c="dimmed">
-              {staff.length}{' '}
-              {staff.length === 1
+              {staffs.length}{' '}
+              {staffs.length === 1
                 ? t('staff.staffMember')
                 : t('staff.staffMembers')}
             </Text>
@@ -162,7 +162,7 @@ export function StaffList({
           </Group>
 
           <SimpleGrid cols={{base: 1, sm: 2, lg: 3}} spacing="md">
-            {staff.map((staffMember) => (
+            {staffs.map((staffMember) => (
               <Card
                 key={staffMember.id}
                 withBorder
@@ -385,8 +385,8 @@ export function StaffList({
       <Stack gap="md">
         <Group justify="space-between">
           <Text size="sm" c="dimmed">
-            {staff.length}{' '}
-            {staff.length === 1
+            {staffs.length}{' '}
+            {staffs.length === 1
               ? t('staff.staffMember')
               : t('staff.staffMembers')}
           </Text>
@@ -414,7 +414,7 @@ export function StaffList({
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {[...staff]
+              {[...staffs]
                 .sort((a: Staff, b: Staff) => {
                   const a1 = a.status === 'active' ? 1 : 0;
                   const b1 = b.status === 'active' ? 1 : 0;
