@@ -287,7 +287,12 @@ export class BaseApiClient {
         contentLength !== '0' &&
         response.status !== 204;
 
-      const data = hasJsonContent ? await response.json() : undefined;
+      let data = hasJsonContent ? await response.json() : undefined;
+
+      // @todo: refactor this later
+      if ('success' in data) {
+        data = data.data;
+      }
 
       if (!response.ok) {
         const apiError = new ApiError(

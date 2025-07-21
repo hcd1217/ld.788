@@ -10,7 +10,7 @@ import {
 
 type StaffState = {
   // Staff data
-  staff: Staff[];
+  staffs: Staff[];
   currentStaff: Staff | undefined;
   isLoading: boolean;
   error: string | undefined;
@@ -51,7 +51,7 @@ export const useStaffStore = create<StaffState>()(
   devtools(
     (set, get) => ({
       // Initial state
-      staff: [],
+      staffs: [],
       currentStaff: undefined,
       isLoading: false,
       error: undefined,
@@ -59,8 +59,8 @@ export const useStaffStore = create<StaffState>()(
       currentStoreId: undefined,
 
       // Actions
-      setCurrentStaff(staff) {
-        set({currentStaff: staff, error: undefined});
+      setCurrentStaff(staffs) {
+        set({currentStaff: staffs, error: undefined});
       },
 
       setCurrentStoreId(storeId) {
@@ -70,10 +70,10 @@ export const useStaffStore = create<StaffState>()(
       async loadStaff(storeId) {
         set({isLoading: true, error: undefined, currentStoreId: storeId});
         try {
-          const staff = await storeApi.getStoreStaff(storeId);
+          const {staffs} = await storeApi.getStoreStaff(storeId);
 
           set({
-            staff,
+            staffs,
             isLoading: false,
           });
         } catch (error) {
@@ -103,7 +103,7 @@ export const useStaffStore = create<StaffState>()(
 
           // Add to current staff list
           set((state) => ({
-            staff: [newStaff, ...state.staff],
+            staff: [newStaff, ...state.staffs],
             isLoading: false,
           }));
 
@@ -139,7 +139,7 @@ export const useStaffStore = create<StaffState>()(
           const updatedStaff = response.staff;
 
           set((state) => ({
-            staff: state.staff.map((staff) =>
+            staffs: state.staffs.map((staff) =>
               staff.id === staffId ? updatedStaff : staff,
             ),
             currentStaff:
@@ -171,7 +171,7 @@ export const useStaffStore = create<StaffState>()(
           await storeApi.deleteStoreStaff(storeId, staffId);
 
           set((state) => ({
-            staff: state.staff.filter((staff) => staff.id !== staffId),
+            staff: state.staffs.filter((staff) => staff.id !== staffId),
             currentStaff:
               state.currentStaff?.id === staffId
                 ? undefined
@@ -203,7 +203,7 @@ export const useStaffStore = create<StaffState>()(
 
       // Selectors
       getStaffById(id) {
-        return get().staff.find((staff) => staff.id === id);
+        return get().staffs.find((staff) => staff.id === id);
       },
     }),
     {
@@ -215,7 +215,7 @@ export const useStaffStore = create<StaffState>()(
 // Computed selectors for convenience
 export const useCurrentStaff = () =>
   useStaffStore((state) => state.currentStaff);
-export const useStaffList = () => useStaffStore((state) => state.staff);
+export const useStaffList = () => useStaffStore((state) => state.staffs);
 export const useStaffLoading = () => useStaffStore((state) => state.isLoading);
 export const useStaffError = () => useStaffStore((state) => state.error);
 export const useStaffPagination = () =>

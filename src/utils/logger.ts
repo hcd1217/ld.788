@@ -13,6 +13,11 @@ if (console.ignore === undefined) {
 }
 
 export function registerLogger() {
+  const debug = true;
+  if (debug) {
+    return;
+  }
+
   const originalConsoleLog = console.log;
   console.log = log.bind(null, 'info');
   console.warn = log.bind(null, 'warn');

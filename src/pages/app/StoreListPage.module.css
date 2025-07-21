@@ -22,9 +22,8 @@
 
 /* Ensure smooth transition for selected state */
 .storeCard.selected {
-  border-color: light-dark(#6980ad, #8ea4c9);
-  background-color: light-dark(#f1f4f9, #1e2533);
-  box-shadow: 5px 5px rgba(0, 0, 0, 0.05);
+  border-color: var(--card-border-color);
+  box-shadow: 5px 5px var(--box-shadow-color);
   border-width: 2px;
   transform: scale(1.02);
 }

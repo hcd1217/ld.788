@@ -68,7 +68,9 @@ export const UpdateStaffResponseSchema = z.object({
 });
 
 // Get staff list response
-export const GetStaffListResponseSchema = z.array(StaffSchema);
+export const GetStaffListResponseSchema = z.object({
+  staffs: z.array(StaffSchema),
+});
 
 // Delete staff response
 export const DeleteStaffResponseSchema = z.object({

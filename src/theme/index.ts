@@ -91,11 +91,17 @@ export const theme = createTheme({
 export const resolver: CSSVariablesResolver = () => ({
   variables: {
     '--input-border-color': '#dee2e6',
+    '--card-border-color': '#5173b8',
+    '--box-shadow-color': '#5173b8',
   },
   light: {
     '--input-border-color': '#dee2e6',
+    '--card-border-color': '#5173b8',
+    '--box-shadow-color': '#5173b8',
   },
   dark: {
     '--input-border-color': '#c5c5c5',
+    '--card-border-color': '#8ea4c9',
+    '--box-shadow-color': '#8ea4c9',
   },
 });

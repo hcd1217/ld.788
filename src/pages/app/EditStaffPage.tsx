@@ -48,7 +48,7 @@ export function EditStaffPage() {
 
   const currentStore = useCurrentStore();
   const {updateStaff, loadStaff} = useStaffActions();
-  const staffList = useStaffStore((state) => state.staff);
+  const staffList = useStaffStore((state) => state.staffs);
 
   const form = useForm<StaffFormData>({
     initialValues: {

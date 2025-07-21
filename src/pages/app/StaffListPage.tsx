@@ -45,7 +45,7 @@ export function StaffListPage() {
   );
   const isDarkMode = useIsDarkMode();
 
-  const staff = useStaffList();
+  const staffs = useStaffList();
   const isLoading = useStaffLoading();
   const error = useStaffError();
   const pagination = useStaffPagination();
@@ -249,7 +249,7 @@ export function StaffListPage() {
             />
 
             <StaffList
-              staffs={staff}
+              staffs={staffs}
               onEdit={(staffMember) =>
                 navigate(`/staff/edit/${staffMember.id}`)
               }
@@ -282,8 +282,8 @@ export function StaffListPage() {
           <Group justify="center">
             <Text size="sm" c="dimmed">
               {t('staff.showingCount', {
-                current: staff.length,
-                total: staff.length, // API doesn't provide total count
+                current: staffs.length,
+                total: staffs.length, // API doesn't provide total count
               })}
             </Text>
           </Group>
