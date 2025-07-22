@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router';
+import {useNavigate, useSearchParams} from 'react-router';
 import {
   Group,
   Anchor,
@@ -27,10 +27,27 @@ type LoginFormValues = {
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const {login} = useAppStore();
   const [mounted, setMounted] = useState(false);
   const {t} = useTranslation();
-  const clientCode = useClientCode();
+
+  // Extract client-code from URL query params
+  const clientCodeFromUrl = searchParams.get('client-code');
+
+  // Use client code from URL if available, otherwise use default
+  const defaultClientCode = useClientCode();
+  const clientCode = clientCodeFromUrl ?? defaultClientCode;
+
+  // Update localStorage if client-code is provided in URL
+  useEffect(() => {
+    if (clientCodeFromUrl && clientCodeFromUrl !== defaultClientCode) {
+      localStorage.setItem('clientCode', clientCodeFromUrl);
+      console.log('reload the page without search params', clientCodeFromUrl);
+      // Reload the page without search params
+      navigate(`/login`, {replace: true});
+    }
+  }, [navigate, defaultClientCode, clientCodeFromUrl]);
 
   const form = useForm<LoginFormValues>({
     initialValues: {

@@ -6,22 +6,12 @@ import {
   TextInput,
   type CSSVariablesResolver,
 } from '@mantine/core';
+import {defaultConfig} from './customTheme';
 
 export const theme = createTheme({
   primaryColor: 'brand',
   colors: {
-    brand: [
-      '#ecf4ff',
-      '#dce4f4',
-      '#b8c6e3',
-      '#91a7d2',
-      '#708cc4',
-      '#5b7bbb',
-      '#5073b8',
-      '#3f60a0',
-      '#365793',
-      '#294b83',
-    ],
+    brand: defaultConfig.brandColors,
   },
   fontFamily:
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
@@ -88,20 +78,23 @@ export const theme = createTheme({
   },
 });
 
+const defaultColors = defaultConfig.default;
+const lightColors = defaultConfig.light ?? defaultColors;
+const darkColors = defaultConfig.dark ?? defaultColors;
 export const resolver: CSSVariablesResolver = () => ({
   variables: {
-    '--input-border-color': '#dee2e6',
-    '--card-border-color': '#5173b8',
-    '--box-shadow-color': '#5173b8',
+    '--input-border-color': defaultColors.inputBorderColor,
+    '--card-border-color': defaultColors.borderColor,
+    '--box-shadow-color': defaultColors.borderColor,
   },
   light: {
-    '--input-border-color': '#dee2e6',
-    '--card-border-color': '#5173b8',
-    '--box-shadow-color': '#5173b8',
+    '--input-border-color': lightColors.inputBorderColor,
+    '--card-border-color': lightColors.borderColor,
+    '--box-shadow-color': lightColors.borderColor,
   },
   dark: {
-    '--input-border-color': '#c5c5c5',
-    '--card-border-color': '#8ea4c9',
-    '--box-shadow-color': '#8ea4c9',
+    '--input-border-color': darkColors.inputBorderColor,
+    '--card-border-color': darkColors.borderColor,
+    '--box-shadow-color': darkColors.borderColor,
   },
 });
