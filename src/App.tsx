@@ -1,8 +1,7 @@
 import {RouterProvider} from 'react-router';
 import {router} from '@/routers';
 import {usePWA} from '@/hooks/usePWA';
-import {ErrorBoundary} from '@/components/common/ErrorBoundary';
-import {OrientationNotice} from '@/components/common/OrientationNotice';
+import {ErrorBoundary, OrientationNotice} from '@/components/common';
 
 function App() {
   usePWA();

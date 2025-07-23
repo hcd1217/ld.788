@@ -89,6 +89,11 @@ const StoreConfigPage = lazy(async () => {
   return {default: module.StoreConfigPage};
 });
 
+const StoreEditPage = lazy(async () => {
+  const module = await import('@/pages/app/StoreEditPage');
+  return {default: module.StoreEditPage};
+});
+
 const StaffListPage = lazy(async () => {
   const module = await import('@/pages/app/StaffListPage');
   return {default: module.StaffListPage};
@@ -213,6 +218,7 @@ const routeObjects: RouteObject[] = [
               {path: 'import-users', Component: ImportUsersPage},
               {path: 'role-management', Component: RoleManagementPage},
               {path: 'store-config', Component: StoreConfigPage},
+              {path: 'stores/edit/:storeId', Component: StoreEditPage},
               {path: 'staff/add', Component: AddStaffPage},
               {path: 'staff/edit/:staffId', Component: EditStaffPage},
               {

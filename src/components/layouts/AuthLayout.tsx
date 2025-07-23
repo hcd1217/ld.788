@@ -29,13 +29,15 @@ import {
 } from '@tabler/icons-react';
 import type {TFunction} from 'i18next';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-import {PWAInstallPrompt} from '@/components/common/PWAInstallPrompt';
-import {ColorSchemeToggle} from '@/components/common/ColorSchemeToggle';
-import {LanguageSwitcher} from '@/components/common/LanguageSwitcher';
+import {
+  PWAInstallPrompt,
+  ColorSchemeToggle,
+  LanguageSwitcher,
+  VersionInformation,
+  AppLogo,
+} from '@/components/common';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
-import {VersionInformation} from '@/components/common/VersionInformation';
-import {AppLogo} from '@/components/common/AppLogo';
 import type {User} from '@/services/auth';
 import {useIsDesktop} from '@/hooks/useIsDesktop';
 

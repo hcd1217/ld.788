@@ -9,7 +9,6 @@ import {
   Button,
   Text,
   SimpleGrid,
-  Alert,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
 import {notifications} from '@mantine/notifications';
@@ -28,7 +27,7 @@ import {
   useClientError,
   useClientActions,
 } from '@/stores/useClientStore';
-import {GoBack} from '@/components/common/GoBack';
+import {ErrorAlert, GoBack} from '@/components/common';
 import {
   ClientCard,
   ClientActionModal,
@@ -192,17 +191,7 @@ export function ClientListPage() {
             {t('admin.clients.title')}
           </Title>
 
-          {error ? (
-            <Alert
-              withCloseButton
-              icon={<IconAlertTriangle size={16} />}
-              color="red"
-              variant="light"
-              onClose={clearError}
-            >
-              {error}
-            </Alert>
-          ) : null}
+          <ErrorAlert error={error} clearError={clearError} />
 
           {clients.length === 0 ? (
             <Card shadow="sm" padding="xl" radius="md" ta="center">

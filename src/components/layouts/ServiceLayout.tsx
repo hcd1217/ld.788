@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import {Outlet, useNavigate} from 'react-router';
 import {Center, Loader} from '@mantine/core';
 import {useAppStore} from '@/stores/useAppStore';
-import {PWAInstallPrompt} from '@/components/common/PWAInstallPrompt';
+import {PWAInstallPrompt} from '@/components/common';
 
 export function ServiceLayout() {
   const [ready, setReady] = useState(false);

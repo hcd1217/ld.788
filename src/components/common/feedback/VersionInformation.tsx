@@ -15,7 +15,7 @@ export function VersionInformation() {
   return (
     <Text
       c="dimmed"
-      fz="xs"
+      fz={10}
       fw={400}
       w="100%"
       ta="right"

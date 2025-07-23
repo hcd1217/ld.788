@@ -42,30 +42,38 @@ export const CreateStoreRequestSchema = z.object({
   phoneNumber: z.string().max(50).optional(),
   email: emailSchema.optional(),
   metadata: z.record(z.string(), z.any()).optional(),
+  operatingHours: z
+    .array(
+      z.object({
+        dayOfWeek: z.number().min(0).max(6),
+        openTime: z.string(),
+        closeTime: z.string(),
+        isClosed: z.boolean(),
+      }),
+    )
+    .optional(),
 });
 
 export const CreateStoreResponseSchema = StoreSchema;
 
 export const UpdateStoreRequestSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  code: z.string().min(1).max(20).optional(),
+  address: z.string().min(1).max(200).optional(),
+  city: z.string().min(1).max(100).optional(),
+  state: z.string().max(100).optional(),
+  postalCode: z.string().max(20).optional(),
+  country: z.string().min(1).max(100).optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  phoneNumber: z.string().max(50).optional(),
+  email: emailSchema.optional(),
   isActive: z.boolean().optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 });
 
 export const UpdateStoreResponseSchema = z.object({
   store: StoreSchema,
-});
-
-export const GetStoresRequestSchema = z.object({
-  cursor: optionalStringSchema,
-  limit: z.number().min(1).max(100).default(20).optional(),
-  sortBy: z
-    .enum(['createdAt', 'name', 'code', 'city'])
-    .default('createdAt')
-    .optional(),
-  sortOrder: z.enum(['asc', 'desc']).default('desc').optional(),
-  name: optionalStringSchema,
-  code: optionalStringSchema,
-  city: optionalStringSchema,
-  isActive: z.boolean().optional(),
 });
 
 export const GetStoresResponseSchema = z.object({
@@ -176,7 +184,6 @@ export type CreateStoreRequest = z.infer<typeof CreateStoreRequestSchema>;
 export type CreateStoreResponse = z.infer<typeof CreateStoreResponseSchema>;
 export type UpdateStoreRequest = z.infer<typeof UpdateStoreRequestSchema>;
 export type UpdateStoreResponse = z.infer<typeof UpdateStoreResponseSchema>;
-export type GetStoresRequest = z.infer<typeof GetStoresRequestSchema>;
 export type GetStoresResponse = z.infer<typeof GetStoresResponseSchema>;
 
 export type StoreStaff = z.infer<typeof StoreStaffSchema>;

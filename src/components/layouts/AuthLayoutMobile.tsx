@@ -24,11 +24,13 @@ import {
   IconDots,
 } from '@tabler/icons-react';
 import classes from './AuthLayoutMobile.module.css';
-import {PWAInstallPrompt} from '@/components/common/PWAInstallPrompt';
+import {
+  PWAInstallPrompt,
+  VersionInformation,
+  AppLogo,
+} from '@/components/common';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
-import {VersionInformation} from '@/components/common/VersionInformation';
-import {AppLogo} from '@/components/common/AppLogo';
 
 export function AuthLayoutMobile() {
   const navigate = useNavigate();

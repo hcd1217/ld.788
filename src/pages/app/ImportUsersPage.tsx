@@ -27,7 +27,7 @@ import {
   IconX,
   IconUsers,
 } from '@tabler/icons-react';
-import {GoBack} from '@/components/common/GoBack';
+import {GoBack} from '@/components/common';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {clientService} from '@/services/client';

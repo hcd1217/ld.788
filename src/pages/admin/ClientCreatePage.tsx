@@ -25,7 +25,7 @@ import {
 import {useTranslation} from '@/hooks/useTranslation';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useClientActions} from '@/stores/useClientStore';
-import {GoBack} from '@/components/common/GoBack';
+import {GoBack} from '@/components/common';
 import {getFormValidators} from '@/utils/validation';
 import type {RegisterClientRequest} from '@/lib/api';
 import {isDevelopment} from '@/utils/env';

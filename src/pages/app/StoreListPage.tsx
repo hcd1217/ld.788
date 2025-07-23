@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useMemo} from 'react';
 import {useNavigate} from 'react-router';
 import {
   Container,
@@ -11,23 +11,22 @@ import {
   SimpleGrid,
   LoadingOverlay,
   Alert,
-  ActionIcon,
   Modal,
   Flex,
+  TextInput,
+  Pagination,
+  Center,
+  Select,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
 import {notifications} from '@mantine/notifications';
 import {
   IconPlus,
   IconBuildingStore,
-  IconMapPin,
-  IconClock,
-  IconTrash,
   IconAlertTriangle,
   IconCheck,
-  IconPhone,
+  IconSearch,
 } from '@tabler/icons-react';
-import classes from './StoreListPage.module.css';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
@@ -36,9 +35,10 @@ import {
   useStoreError,
   useStoreActions,
   useCurrentStore,
-  useStorePagination,
 } from '@/stores/useStoreConfigStore';
+import {StoreCard} from '@/components/store/StoreCard';
 import type {Store} from '@/lib/api/schemas/store.schemas';
+import {ErrorAlert} from '@/components/common';
 
 export function StoreListPage() {
   const navigate = useNavigate();
@@ -47,6 +47,9 @@ export function StoreListPage() {
   const [storeToDelete, setStoreToDelete] = useState<Store | undefined>(
     undefined,
   );
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState('12');
   const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
 
@@ -54,21 +57,54 @@ export function StoreListPage() {
   const currentStore = useCurrentStore();
   const isLoading = useStoreLoading();
   const error = useStoreError();
-  const pagination = useStorePagination();
   const {loadStores, deleteStore, setCurrentStore, clearError} =
     useStoreActions();
 
   useEffect(() => {
     const load = async () => {
-      try {
-        await loadStores();
-      } catch (error) {
-        console.error(error);
-      }
+      await loadStores();
     };
 
     void load();
   }, [loadStores]);
+
+  // Client-side filtering
+  const filteredStores = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return stores;
+    }
+
+    const query = searchQuery.toLowerCase();
+    return stores.filter((store) => {
+      return (
+        store.name.toLowerCase().includes(query) ||
+        store.code.toLowerCase().includes(query) ||
+        store.address.toLowerCase().includes(query) ||
+        store.city.toLowerCase().includes(query) ||
+        (store.state?.toLowerCase().includes(query) ?? false) ||
+        store.country.toLowerCase().includes(query) ||
+        (store.phoneNumber?.toLowerCase().includes(query) ?? false)
+      );
+    });
+  }, [stores, searchQuery]);
+
+  // Client-side pagination
+  const paginatedStores = useMemo(() => {
+    const size = Number.parseInt(pageSize, 10);
+    const startIndex = (currentPage - 1) * size;
+    const endIndex = startIndex + size;
+    return filteredStores.slice(startIndex, endIndex);
+  }, [filteredStores, currentPage, pageSize]);
+
+  const totalPages = useMemo(() => {
+    const size = Number.parseInt(pageSize, 10);
+    return Math.ceil(filteredStores.length / size);
+  }, [filteredStores, pageSize]);
+
+  // Reset to first page when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const handleDeleteStore = (store: Store) => {
     setStoreToDelete(store);
@@ -124,103 +160,15 @@ export function StoreListPage() {
     return t('store.viewDetails');
   };
 
-  const renderStoreCard = (store: Store) => {
-    const isSelected = currentStore?.id === store.id;
+  const handleEditStore = (store: Store) => {
+    navigate(`/stores/edit/${store.id}`);
+  };
 
-    return (
-      <Card
-        key={store.id}
-        withBorder
-        shadow={isSelected ? 'xl' : 'sm'}
-        padding="lg"
-        radius="md"
-        className={`${classes.storeCard} ${isSelected ? classes.selected : ''}`}
-        onClick={() => {
-          handleSelectStore(store);
-        }}
-      >
-        <Stack gap="md">
-          <Group justify="space-between" align="flex-start">
-            <Stack gap={4} style={{flex: 1}}>
-              <Group gap="xs">
-                <Text fw={700} size="lg">
-                  {store.name}
-                </Text>
-                <Text size="sm" c="dimmed">
-                  ({store.code})
-                </Text>
-              </Group>
-
-              <Group gap="xs" c="dimmed">
-                <IconMapPin size={14} />
-                <Text
-                  size="sm"
-                  maw={250}
-                  lineClamp={2}
-                  style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {store.address}, {store.city}
-                  {store.state ? `, ${store.state}` : ''}, {store.country}
-                </Text>
-              </Group>
-
-              {store.phoneNumber ? (
-                <Group gap="xs" c="dimmed">
-                  <IconPhone size={14} />
-                  <Text size="sm">{store.phoneNumber}</Text>
-                </Group>
-              ) : null}
-
-              <Group gap="xs" c="dimmed">
-                <IconClock size={14} />
-                <Text size="sm">{formatOperatingHours()}</Text>
-              </Group>
-            </Stack>
-
-            <ActionIcon
-              color="red"
-              variant="light"
-              size="sm"
-              title={t('store.deleteStoreTooltip')}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteStore(store);
-              }}
-            >
-              <IconTrash size={14} />
-            </ActionIcon>
-          </Group>
-
-          <Group
-            justify="space-between"
-            pt="md"
-            style={{borderTop: '1px solid var(--mantine-color-gray-3)'}}
-          >
-            <Text size="xs" c="dimmed">
-              {t('common.created')}{' '}
-              {new Date(store.createdAt).toLocaleDateString()}
-            </Text>
-
-            {!isSelected && (
-              <Button
-                opacity={0}
-                size="xs"
-                variant="light"
-                onClick={() => {
-                  handleSelectStore(store);
-                }}
-              >
-                {t('store.selectStore')}
-              </Button>
-            )}
-          </Group>
-        </Stack>
-      </Card>
-    );
+  const handlePageSizeChange = (value: string | undefined) => {
+    if (value) {
+      setPageSize(value);
+      setCurrentPage(1); // Reset to first page when page size changes
+    }
   };
 
   return (
@@ -239,17 +187,19 @@ export function StoreListPage() {
             </Button>
           </Group>
 
-          {error ? (
-            <Alert
-              withCloseButton
-              icon={<IconAlertTriangle size={16} />}
-              color="red"
-              variant="light"
-              onClose={clearError}
-            >
-              {error}
-            </Alert>
-          ) : null}
+          {/* Search Bar - only show when stores > 10 */}
+          {stores.length > 10 && (
+            <TextInput
+              placeholder={t('store.searchPlaceholder')}
+              leftSection={<IconSearch size={16} />}
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+              }}
+            />
+          )}
+
+          <ErrorAlert error={error} clearError={clearError} />
 
           <div style={{position: 'relative'}}>
             <LoadingOverlay
@@ -258,7 +208,7 @@ export function StoreListPage() {
               transitionProps={{duration: 300}}
             />
 
-            {stores.length === 0 && !isLoading ? (
+            {filteredStores.length === 0 && !isLoading ? (
               <Card shadow="sm" padding="xl" radius="md" ta="center">
                 <Stack gap="md">
                   <IconBuildingStore
@@ -267,47 +217,75 @@ export function StoreListPage() {
                   />
                   <div>
                     <Title order={3} c="dimmed">
-                      {t('store.noStoresFound')}
+                      {searchQuery
+                        ? t('store.noStoresFoundSearch')
+                        : t('store.noStoresFound')}
                     </Title>
                     <Text c="dimmed" mt="xs">
-                      {t('store.createFirstStoreDescription')}
+                      {searchQuery
+                        ? t('store.tryDifferentSearch')
+                        : t('store.createFirstStoreDescription')}
                     </Text>
                   </div>
-                  <Button
-                    leftSection={<IconPlus size={16} />}
-                    mt="md"
-                    onClick={() => navigate('/store-config')}
-                  >
-                    {t('store.createFirstStore')}
-                  </Button>
+                  {!searchQuery && (
+                    <Button
+                      leftSection={<IconPlus size={16} />}
+                      mt="md"
+                      onClick={() => navigate('/store-config')}
+                    >
+                      {t('store.createFirstStore')}
+                    </Button>
+                  )}
                 </Stack>
               </Card>
             ) : (
               <SimpleGrid cols={{base: 1, sm: 2, lg: 3}} spacing="lg">
-                {stores.map((store) => renderStoreCard(store))}
+                {paginatedStores.map((store) => (
+                  <StoreCard
+                    key={store.id}
+                    store={store}
+                    isSelected={currentStore?.id === store.id}
+                    formatOperatingHours={formatOperatingHours}
+                    onSelect={handleSelectStore}
+                    onEdit={handleEditStore}
+                    onDelete={handleDeleteStore}
+                  />
+                ))}
               </SimpleGrid>
             )}
           </div>
 
           {/* Pagination */}
-          {pagination && stores.length > 0 ? (
-            <Group justify="center" mt="xl">
-              <Button
-                disabled={!pagination.hasPrev}
-                variant="light"
-                onClick={() => loadStores(pagination.prevCursor)}
-              >
-                {t('common.previous')}
-              </Button>
-              <Button
-                disabled={!pagination.hasNext}
-                variant="light"
-                onClick={() => loadStores(pagination.nextCursor)}
-              >
-                {t('common.next')}
-              </Button>
-            </Group>
-          ) : null}
+          {filteredStores.length > 0 && (
+            <Stack gap="md">
+              {totalPages > 1 && (
+                <Group justify="space-between">
+                  <Select
+                    value={pageSize}
+                    data={[
+                      {value: '6', label: '6'},
+                      {value: '12', label: '12'},
+                      {value: '24', label: '24'},
+                      {value: '48', label: '48'},
+                    ]}
+                    style={{width: 100}}
+                    onChange={(value) => {
+                      handlePageSizeChange(value ?? undefined);
+                    }}
+                  />
+                  <Center>
+                    <Pagination
+                      total={totalPages}
+                      value={currentPage}
+                      size="sm"
+                      onChange={setCurrentPage}
+                    />
+                  </Center>
+                  <div style={{width: 100}} /> {/* Spacer for balance */}
+                </Group>
+              )}
+            </Stack>
+          )}
         </Stack>
       </Container>
 

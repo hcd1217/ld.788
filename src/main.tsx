@@ -10,9 +10,8 @@ import i18n from './lib/i18n';
 import App from './App.tsx';
 import {resolver, theme} from '@/theme';
 import registerGlobalErrorCatcher from '@/utils/errorCatcher';
-import {ErrorModal} from '@/components/common/ErrorModal.tsx';
+import {ErrorModal, AppLoader} from '@/components/common';
 import {registerLogger} from '@/utils/logger';
-import {AppLoader} from '@/components/common/AppLoader.tsx';
 import {initializeOrientationLock} from '@/utils/screenOrientation';
 
 // Initialize i18n

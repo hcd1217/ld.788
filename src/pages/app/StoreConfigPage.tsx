@@ -23,7 +23,7 @@ import {
   useStoreLoading,
   useStoreError,
 } from '@/stores/useStoreConfigStore';
-import {GoBack} from '@/components/common/GoBack';
+import {GoBack} from '@/components/common';
 import {StoreConfigForm} from '@/components/store/StoreConfigForm';
 import type {DaySchedule} from '@/components/store/OperatingHoursInput';
 import type {
@@ -75,7 +75,7 @@ export function StoreConfigPage() {
   const currentStore = useCurrentStore();
   const isLoading = useStoreLoading();
   const error = useStoreError();
-  const {createStore, clearError, updateOperatingHours} = useStoreActions();
+  const {createStore, clearError} = useStoreActions();
 
   const form = useForm<StoreConfigFormValues>({
     initialValues: {
@@ -157,7 +157,8 @@ export function StoreConfigPage() {
     try {
       clearError();
 
-      // 1. Create store
+      // Create store with operating hours
+      const operatingHours = convertToApiFormat(values.operatingHours);
       const storeData: CreateStoreRequest = {
         name: values.name.trim(),
         code: values.code.trim(),
@@ -170,13 +171,10 @@ export function StoreConfigPage() {
         email: values.email?.trim() || undefined,
         latitude: values.location.lat,
         longitude: values.location.lng,
+        operatingHours,
       };
 
       const newStore = await createStore(storeData);
-
-      // 2. Set operating hours
-      const operatingHours = convertToApiFormat(values.operatingHours);
-      await updateOperatingHours(newStore.id, operatingHours);
 
       notifications.show({
         title: t('store.storeCreated'),

@@ -45,7 +45,7 @@ import {
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {clientService} from '@/services/client';
-import {GoBack} from '@/components/common/GoBack';
+import {GoBack} from '@/components/common';
 
 type Role = {
   id: string;

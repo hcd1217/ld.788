@@ -19,7 +19,7 @@ import {IconAlertCircle, IconCheck, IconX} from '@tabler/icons-react';
 import {useAppStore} from '@/stores/useAppStore';
 import {useTranslation} from '@/hooks/useTranslation';
 import {authApi, type GetMeResponse} from '@/lib/api';
-import {GoBack} from '@/components/common/GoBack';
+import {GoBack} from '@/components/common';
 
 export function ProfilePage() {
   const navigate = useNavigate();

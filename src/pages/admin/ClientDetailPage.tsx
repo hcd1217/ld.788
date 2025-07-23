@@ -28,7 +28,7 @@ import {useTranslation} from '@/hooks/useTranslation';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useClientDetail} from '@/hooks/useClientDetail';
 import {useClientActions} from '@/stores/useClientStore';
-import {GoBack} from '@/components/common/GoBack';
+import {GoBack} from '@/components/common';
 import {TabErrorBoundary} from '@/components/admin/TabErrorBoundary';
 import {
   ClientBasicInfo,

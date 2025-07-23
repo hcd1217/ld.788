@@ -1,9 +1,8 @@
 import {type ReactNode} from 'react';
 import {Affix, Box, Center, Container, Group} from '@mantine/core';
 import {Navigate} from 'react-router';
-import {VersionInformation} from '../common/VersionInformation';
-import {LanguageSwitcher} from '@/components/common/LanguageSwitcher';
-import {ColorSchemeToggle} from '@/components/common/ColorSchemeToggle';
+import {VersionInformation} from '../common';
+import {LanguageSwitcher, ColorSchemeToggle} from '@/components/common';
 import {useAppStore} from '@/stores/useAppStore';
 
 type GuestLayoutProps = {

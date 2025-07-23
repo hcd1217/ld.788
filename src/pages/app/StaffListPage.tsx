@@ -34,6 +34,7 @@ import {useCurrentStore, useStores} from '@/stores/useStoreConfigStore';
 import {StoreSelector} from '@/components/store';
 import {StaffList} from '@/components/staff';
 import type {Staff} from '@/services/staff';
+import {ErrorAlert} from '@/components/common';
 
 export function StaffListPage() {
   const navigate = useNavigate();
@@ -229,17 +230,7 @@ export function StaffListPage() {
             <StoreSelector />
           </Group>
 
-          {error ? (
-            <Alert
-              withCloseButton
-              icon={<IconAlertTriangle size={16} />}
-              color="red"
-              variant="light"
-              onClose={clearError}
-            >
-              {error}
-            </Alert>
-          ) : null}
+          <ErrorAlert error={error} clearError={clearError} />
 
           <div style={{position: 'relative'}}>
             <LoadingOverlay

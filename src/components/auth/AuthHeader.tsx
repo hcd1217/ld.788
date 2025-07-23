@@ -1,5 +1,5 @@
 import {Group, Title} from '@mantine/core';
-import {Logo} from '@/components/common/Logo';
+import {Logo} from '@/components/common';
 
 type AuthHeaderProps = {
   readonly title?: string;

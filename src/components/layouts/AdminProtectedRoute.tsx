@@ -1,9 +1,11 @@
 import {AppShell, Group} from '@mantine/core';
 import {Outlet, Navigate} from 'react-router';
 import {type ReactNode} from 'react';
-import {ColorSchemeToggle} from '@/components/common/ColorSchemeToggle';
-import {LanguageSwitcher} from '@/components/common/LanguageSwitcher';
-import {AppLogo} from '@/components/common/AppLogo';
+import {
+  ColorSchemeToggle,
+  LanguageSwitcher,
+  AppLogo,
+} from '@/components/common';
 import {useAppStore} from '@/stores/useAppStore';
 import {AdminLoadingOverlay} from '@/components/admin/AdminLoadingOverlay';
 

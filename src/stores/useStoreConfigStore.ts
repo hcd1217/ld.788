@@ -4,7 +4,7 @@ import {storeApi, ApiError} from '@/lib/api';
 import type {
   Store,
   CreateStoreRequest,
-  GetStoresResponse,
+  UpdateStoreRequest,
   StoreOperatingHours,
   UpdateStoreOperatingHoursRequest,
 } from '@/lib/api/schemas/store.schemas';
@@ -13,15 +13,15 @@ type StoreConfigState = {
   // Store data
   stores: Store[];
   currentStore: Store | undefined;
-  pagination: GetStoresResponse['pagination'] | undefined;
   operatingHoursCache: Record<string, StoreOperatingHours[]>;
   isLoading: boolean;
   error: string | undefined;
 
   // Actions
   setCurrentStore: (store: Store | undefined) => void;
-  loadStores: (cursor?: string) => Promise<void>;
+  loadStores: () => Promise<void>;
   createStore: (data: CreateStoreRequest) => Promise<Store>;
+  updateStore: (id: string, data: UpdateStoreRequest) => Promise<Store>;
   deleteStore: (id: string) => Promise<void>;
   refreshStores: () => Promise<void>;
   clearError: () => void;
@@ -43,7 +43,6 @@ export const useStoreConfigStore = create<StoreConfigState>()(
         // Initial state
         stores: [],
         currentStore: undefined,
-        pagination: undefined,
         operatingHoursCache: {},
         isLoading: false,
         error: undefined,
@@ -53,19 +52,13 @@ export const useStoreConfigStore = create<StoreConfigState>()(
           set({currentStore: store, error: undefined});
         },
 
-        async loadStores(cursor) {
+        async loadStores() {
           set({isLoading: true, error: undefined});
           try {
-            const response = await storeApi.getStores({
-              cursor,
-              limit: 20,
-              sortBy: 'createdAt',
-              sortOrder: 'desc',
-            });
+            const response = await storeApi.getStores();
 
             set({
               stores: response.stores,
-              pagination: response.pagination,
               isLoading: false,
               // Set first store as current if none selected
               currentStore: get().currentStore ?? response.stores[0],
@@ -114,6 +107,39 @@ export const useStoreConfigStore = create<StoreConfigState>()(
               errorMessage = error.message;
             }
 
+            set({
+              isLoading: false,
+              error: errorMessage,
+            });
+            throw new Error(errorMessage);
+          }
+        },
+
+        async updateStore(id, data) {
+          set({isLoading: true, error: undefined});
+          try {
+            const response = await storeApi.updateStore(id, data);
+            const updatedStore = response.store;
+
+            // Update the store in the list
+            const currentStores = get().stores;
+            const updatedStores = currentStores.map((s) =>
+              s.id === id ? updatedStore : s,
+            );
+
+            set({
+              stores: updatedStores,
+              currentStore:
+                get().currentStore?.id === id
+                  ? updatedStore
+                  : get().currentStore,
+              isLoading: false,
+            });
+
+            return updatedStore;
+          } catch (error) {
+            const errorMessage =
+              error instanceof Error ? error.message : 'Failed to update store';
             set({
               isLoading: false,
               error: errorMessage,
@@ -217,14 +243,11 @@ export const useStoreConfigStore = create<StoreConfigState>()(
 
             // Then check server to prevent race conditions
             try {
-              const response = await storeApi.getStores({
-                code,
-                limit: 1,
-              });
+              const response = await storeApi.getStores();
 
               // If we find any stores with this code that aren't the excluded one
               const existsOnServer = response.stores.some(
-                (store) => store.id !== excludeId,
+                (store) => store.code === code && store.id !== excludeId,
               );
 
               return !existsOnServer;
@@ -289,7 +312,6 @@ export const useStoreConfigStore = create<StoreConfigState>()(
         partialize: (state) => ({
           stores: state.stores,
           currentStore: state.currentStore,
-          pagination: state.pagination,
           operatingHoursCache: state.operatingHoursCache,
         }),
         // // Custom merge function to handle store updates
@@ -315,8 +337,6 @@ export const useStores = () => useStoreConfigStore((state) => state.stores);
 export const useStoreLoading = () =>
   useStoreConfigStore((state) => state.isLoading);
 export const useStoreError = () => useStoreConfigStore((state) => state.error);
-export const useStorePagination = () =>
-  useStoreConfigStore((state) => state.pagination);
 
 // Helper hooks for store operations
 export const useStoreActions = () => {
@@ -325,6 +345,7 @@ export const useStoreActions = () => {
     setCurrentStore: store.setCurrentStore,
     loadStores: store.loadStores,
     createStore: store.createStore,
+    updateStore: store.updateStore,
     deleteStore: store.deleteStore,
     refreshStores: store.refreshStores,
     clearError: store.clearError,

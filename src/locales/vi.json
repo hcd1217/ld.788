@@ -117,6 +117,14 @@
     "confirmDeleteTitle": "Xóa Cửa Hàng",
     "confirmDeleteMessage": "Bạn có chắc chắn muốn xóa \"{{name}}\"? Hành động này không thể hoàn tác.",
     "deleteWarning": "Cảnh báo: Tất cả nhân viên liên quan đến cửa hàng này cũng sẽ bị ảnh hưởng.",
+    "editStore": "Sửa Cửa Hàng",
+    "editStoreTooltip": "Sửa thông tin cửa hàng",
+    "storeUpdated": "Đã Cập Nhật Cửa Hàng",
+    "storeUpdatedMessage": "Cửa hàng \"{{name}}\" đã được cập nhật thành công",
+    "storeUpdateFailed": "Cập Nhật Thất Bại",
+    "storeNotFound": "Không Tìm Thấy Cửa Hàng",
+    "storeNotFoundMessage": "Không tìm thấy cửa hàng được yêu cầu.",
+    "loadFailed": "Tải Thất Bại",
     "storeInformation": "Thông Tin Cửa Hàng",
     "storeName": "Tên Cửa Hàng",
     "enterStoreName": "Nhập tên cửa hàng",
@@ -161,7 +169,10 @@
     "cityRequired": "Thành phố là bắt buộc",
     "countryRequired": "Quốc gia là bắt buộc",
     "duplicateCode": "Mã cửa hàng này đã tồn tại",
-    "viewDetails": "Xem chi tiết"
+    "viewDetails": "Xem chi tiết",
+    "searchPlaceholder": "Tìm kiếm cửa hàng theo tên, mã, địa chỉ hoặc vị trí...",
+    "noStoresFoundSearch": "Không tìm thấy cửa hàng phù hợp với tìm kiếm",
+    "tryDifferentSearch": "Thử một từ khóa tìm kiếm khác"
   },
   "auth": {
     "title": "Credo",
@@ -296,6 +307,8 @@
     "backToHomePage": "Quay lại trang chủ",
     "failedToCreateStore": "Không thể tạo cửa hàng",
     "failedToDeleteStore": "Không thể xóa cửa hàng",
+    "failedToUpdateStore": "Không thể cập nhật cửa hàng",
+    "failedToLoadStore": "Không thể tải cửa hàng",
     "failedToUpdateClient": "Không thể cập nhật khách hàng",
     "failedToCreateClient": "Không thể tạo khách hàng",
     "failedToLoadClient": "Không thể tải thông tin khách hàng"

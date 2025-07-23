@@ -14,7 +14,6 @@ import {
   type CreateStoreResponse,
   type UpdateStoreRequest,
   type UpdateStoreResponse,
-  type GetStoresRequest,
   type GetStoresResponse,
   type GetStoreOperatingHoursResponse,
   type UpdateStoreOperatingHoursRequest,
@@ -37,18 +36,9 @@ import {
 
 export class StoreApi extends BaseApiClient {
   // Store methods
-  async getStores(params?: GetStoresRequest): Promise<GetStoresResponse> {
+  async getStores(): Promise<GetStoresResponse> {
     const queryParams = new URLSearchParams();
-    if (params?.cursor) queryParams.append('cursor', params.cursor);
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-    if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
-    if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
-    if (params?.name) queryParams.append('name', params.name);
-    if (params?.code) queryParams.append('code', params.code);
-    if (params?.city) queryParams.append('city', params.city);
-    if (params?.isActive !== undefined)
-      queryParams.append('isActive', params.isActive.toString());
-
+    queryParams.append('limit', '100');
     const url = `/stores${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     return this.get<GetStoresResponse, void>(

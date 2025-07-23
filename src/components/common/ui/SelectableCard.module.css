@@ -1,27 +1,27 @@
-.storeCard {
+.selectableCard {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   will-change: transform, box-shadow;
 }
 
-.storeCard:hover {
+.selectableCard:hover {
   transform: translateY(-6px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 /* For dark mode */
-[data-mantine-color-scheme="dark"] .storeCard:hover {
+[data-mantine-color-scheme="dark"] .selectableCard:hover {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
 /* Active state for better feedback */
-.storeCard:active {
+.selectableCard:active {
   transform: translate(20px);
   transition-duration: 0.5s;
 }
 
 /* Ensure smooth transition for selected state */
-.storeCard.selected {
+.selectableCard.selected {
   border-color: var(--card-border-color);
   box-shadow: 5px 5px var(--box-shadow-color);
   border-width: 2px;
@@ -29,7 +29,7 @@
 }
 
 /* Subtle scale effect on hover for enhanced visual feedback */
-.storeCard:hover {
+.selectableCard:hover {
   transform: translate(-6px) scale(1.02);
   transition-duration: 0.5s;
 }

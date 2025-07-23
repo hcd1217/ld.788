@@ -7,7 +7,6 @@ import {
   Group,
   Button,
   Text,
-  Alert,
   TextInput,
   Pagination,
   Center,
@@ -17,7 +16,6 @@ import {useDisclosure} from '@mantine/hooks';
 import {notifications} from '@mantine/notifications';
 import {
   IconPlus,
-  IconAlertTriangle,
   IconCheck,
   IconTrash,
   IconSearch,
@@ -30,7 +28,7 @@ import {
   usePermissionError,
   usePermissionActions,
 } from '@/stores/usePermissionStore';
-import {GoBack} from '@/components/common/GoBack';
+import {ErrorAlert, GoBack} from '@/components/common';
 import {
   PermissionTable,
   CreatePermissionModal,
@@ -173,17 +171,7 @@ export function PermissionManagementPage() {
             {t('admin.permissions.title')}
           </Title>
 
-          {error ? (
-            <Alert
-              withCloseButton
-              icon={<IconAlertTriangle size={16} />}
-              color="red"
-              variant="light"
-              onClose={clearError}
-            >
-              {error}
-            </Alert>
-          ) : null}
+          <ErrorAlert error={error} clearError={clearError} />
 
           <Card shadow="sm" padding="md" radius="md">
             <Stack gap="md">

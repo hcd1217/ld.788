@@ -31,7 +31,7 @@ import {
 import {clientService} from '@/services/client';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
 import {useAppStore} from '@/stores/useAppStore';
-import {GoBack} from '@/components/common/GoBack';
+import {GoBack} from '@/components/common';
 import {isDevelopment} from '@/utils/env';
 
 type AddUserFormValues = {

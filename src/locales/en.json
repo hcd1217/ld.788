@@ -117,6 +117,14 @@
     "confirmDeleteTitle": "Delete Store",
     "confirmDeleteMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
     "deleteWarning": "Warning: All staff members associated with this store will also be affected.",
+    "editStore": "Edit Store",
+    "editStoreTooltip": "Edit store details",
+    "storeUpdated": "Store Updated",
+    "storeUpdatedMessage": "Store \"{{name}}\" has been updated successfully",
+    "storeUpdateFailed": "Update Failed",
+    "storeNotFound": "Store Not Found",
+    "storeNotFoundMessage": "The requested store could not be found.",
+    "loadFailed": "Load Failed",
     "storeInformation": "Store Information",
     "storeName": "Store Name",
     "enterStoreName": "Enter store name",
@@ -161,7 +169,10 @@
     "cityRequired": "City is required",
     "countryRequired": "Country is required",
     "duplicateCode": "A store with this code already exists",
-    "viewDetails": "View details"
+    "viewDetails": "View details",
+    "searchPlaceholder": "Search stores by name, code, address, or location...",
+    "noStoresFoundSearch": "No stores found matching your search",
+    "tryDifferentSearch": "Try a different search term"
   },
   "auth": {
     "title": "Credo",
@@ -296,6 +307,8 @@
     "backToHomePage": "Back to home",
     "failedToCreateStore": "Failed to create store",
     "failedToDeleteStore": "Failed to delete store",
+    "failedToUpdateStore": "Failed to update store",
+    "failedToLoadStore": "Failed to load store",
     "failedToUpdateClient": "Failed to update client",
     "failedToCreateClient": "Failed to create client",
     "failedToLoadClient": "Failed to load client details"

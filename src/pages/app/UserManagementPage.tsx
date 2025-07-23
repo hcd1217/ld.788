@@ -45,8 +45,7 @@ import {delay} from '@/utils/time';
 import i18n from '@/lib/i18n';
 import {getLocaleConfig} from '@/config/localeConfig';
 import {userService, type User} from '@/services/user';
-import {DataTable} from '@/components/common/DataTable';
-import {GoBack} from '@/components/common/GoBack';
+import {DataTable, GoBack} from '@/components/common';
 
 type EditUserFormValues = {
   email: string;
