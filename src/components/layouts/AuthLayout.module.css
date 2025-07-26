@@ -1,0 +1,156 @@
+.activeTag {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 10px 15px 10px 0;
+  border-color: transparent white transparent transparent;
+}
+
+.navButton {
+  display: block;
+  width: 100%;
+  font-weight: 400;
+  border-style: solid;
+  border-width: 0px 0px .5px 0px;
+  color: var(--menu-color);
+  border-color: var(--menu-border-color);
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.navButtonClosed {
+  padding-top: var(--mantine-spacing-lg);
+  padding-bottom: var(--mantine-spacing-lg);
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.navButtonOpen {
+  height: 50px;
+  /* padding-top: var(--mantine-spacing-lg);
+  padding-bottom: var(--mantine-spacing-lg); */
+  padding-left: var(--mantine-spacing-lg);
+  padding-right: 0;
+}
+
+.navButtonActive {
+  color: var(--menu-active-color);
+  background-color: var(--menu-active-background-color);
+}
+
+.navButtonInactive {
+  background-color: var(--menu-inactive-color);
+}
+
+.navButtonInactive:hover {
+  background-color: var(--menu-hover-color);
+}
+
+.navGroup {
+  padding: 0;
+  margin: 0;
+  color: var(--app-shell-color);
+  position: relative;
+}
+
+.navGroupCentered {
+  justify-content: center;
+}
+
+.navGroupSpaceBetween {
+  justify-content: space-between;
+}
+
+.navIcon {
+  flex-shrink: 0;
+}
+
+.navLabel {
+  font-weight: 500;
+  font-size: var(--mantine-font-size-sm);
+}
+
+.dummyIndicator {
+  position: absolute;
+  left: 15px;
+  top: 15px;
+}
+
+.chevron {
+  transition: transform 200ms ease;
+}
+
+.chevronExpanded {
+  transform: rotate(180deg);
+}
+
+.chevronCollapsed {
+  transform: rotate(0deg);
+}
+
+.subNavButton {
+  display: block;
+  width: 100%;
+  font-weight: 400;
+  height: 50px;
+  /* padding-top: var(--mantine-spacing-lg);
+  padding-bottom: var(--mantine-spacing-lg); */
+  padding-left: var(--mantine-spacing-lg);
+  padding-right: 0;
+  border-style: solid;
+  border-width: 0px 0px .5px 0px;
+  color: var(--menu-color);
+  border-color: var(--menu-border-color);
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.subNavButtonActive {
+  color: var(--menu-active-color);
+  background-color: var(--menu-active-background-color);
+}
+
+.subNavButtonInactive {
+  background-color: var(--menu-inactive-color);
+}
+
+.subNavButtonInactive:hover {
+  background-color: var(--menu-hover-color);
+}
+
+.subNavGroup {
+  color: var(--app-shell-color);
+  justify-content: flex-start;
+  position: relative;
+  margin-left: var(--mantine-spacing-xl);
+}
+
+.subNavLabel {
+  font-weight: 400;
+  font-size: var(--mantine-font-size-sm);
+}
+
+.userMenuButton {
+  cursor: pointer;
+}
+
+.userMenuIcon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.navbarStack {
+  gap: 0;
+}
+
+.navItemsContainer {
+  gap: 0;
+}
+
+.mobileControls {
+  gap: var(--mantine-spacing-xs);
+}

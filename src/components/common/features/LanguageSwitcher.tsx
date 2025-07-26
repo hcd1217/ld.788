@@ -1,6 +1,7 @@
 import {Select} from '@mantine/core';
 import {IconLanguage} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
+import {useAppStore} from '@/stores/useAppStore';
 
 const languages = [
   {value: 'en', label: 'English'},
@@ -9,6 +10,11 @@ const languages = [
 
 export function LanguageSwitcher() {
   const {currentLanguage, changeLanguage} = useTranslation();
+  const {publicClientConfig} = useAppStore();
+
+  if (!publicClientConfig?.features?.language) {
+    return null;
+  }
 
   return (
     <Select

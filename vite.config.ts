@@ -14,9 +14,7 @@ process.env.VITE_APP_BUILD = new Date()
 // https://vite.dev/config/
 export default defineConfig({
   server: {
-    allowedHosts: [
-      // '3991f73a93d3.ngrok-free.app',
-    ],
+    allowedHosts: ['f3c82d943be5.ngrok-free.app'],
   },
   resolve: {
     alias: {

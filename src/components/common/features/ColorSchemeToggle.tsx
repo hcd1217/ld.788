@@ -4,12 +4,18 @@ import {
   useComputedColorScheme,
 } from '@mantine/core';
 import {IconSun, IconMoon} from '@tabler/icons-react';
+import {useAppStore} from '@/stores/useAppStore';
 
 export function ColorSchemeToggle() {
+  const {publicClientConfig} = useAppStore();
   const {setColorScheme} = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light', {
     getInitialValueInEffect: true,
   });
+
+  if (!publicClientConfig?.features?.darkMode) {
+    return null;
+  }
 
   return (
     <ActionIcon

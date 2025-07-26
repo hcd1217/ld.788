@@ -18,7 +18,7 @@ import {
   IconAddressBook,
   IconBuildingStore,
   IconCash,
-  IconChevronDown,
+  IconCaretDownFilled,
   IconCircle,
   IconLayoutDashboard,
   IconLock,
@@ -33,6 +33,7 @@ import {
 } from '@tabler/icons-react';
 import type {TFunction} from 'i18next';
 import {useMemo, useState, useEffect} from 'react';
+import classes from './AuthLayout.module.css';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {
   PWAInstallPrompt,
@@ -46,28 +47,14 @@ import {useAppStore} from '@/stores/useAppStore';
 import type {User} from '@/services/auth';
 import {useIsDesktop} from '@/hooks/useIsDesktop';
 
-const activeTag = (
-  <div
-    style={{
-      position: 'absolute',
-      right: 0,
-      top: '50%',
-      transform: 'translateY(-50%)',
-      width: 0,
-      height: 0,
-      borderStyle: 'solid',
-      borderWidth: '.6rem .6rem .6rem 0',
-      borderColor: 'transparent white transparent transparent',
-    }}
-  />
-);
+const activeTag = <div className={classes.activeTag} />;
 
 export function AuthLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const {user} = useAppStore();
   const {t} = useTranslation();
-  const [desktopOpened, {toggle: toggleDesktop}] = useDisclosure(false);
+  const [desktopOpened, {toggle: toggleDesktop}] = useDisclosure(true);
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const isDarkMode = useIsDarkMode();
   const isDesktop = useIsDesktop();
@@ -99,19 +86,22 @@ export function AuthLayout() {
     <AppShell
       header={{height: 60}}
       navbar={{
-        width: desktopOpened ? 300 : 80,
+        width: desktopOpened ? 300 : 0,
         breakpoint: 'sm',
       }}
       padding="md"
     >
-      <AppShell.Header bg="var(--app-shell-background-color)">
-        <Group h="100%" px="md" justify="space-between">
+      <AppShell.Header
+        bg="var(--app-shell-background-color)"
+        withBorder={false}
+      >
+        <Group h="100%" px="sm" justify="space-between">
           <Group>
-            <AppLogo c="var(--app-shell-color)" />
+            <AppLogo c="var(--app-shell-color)" fw={400} />
             <Burger
               // Opened={desktopOpened}
               visibleFrom="sm"
-              size="sm"
+              size="xs"
               color="var(--app-shell-color)"
               onClick={toggleDesktop}
             />
@@ -125,187 +115,167 @@ export function AuthLayout() {
           </Group>
         </Group>
       </AppShell.Header>
-
-      <AppShell.Navbar
-        p="0"
-        bg="var(--menu-background-color)"
-        c="var(--app-shell-color)"
-      >
-        <Stack gap={0}>
-          {navigationItems.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              location.pathname === item.path ||
-              item.activePaths?.some((path) =>
-                location.pathname.startsWith(path),
-              ) ||
-              item.subs?.some(
-                (sub) =>
-                  location.pathname === sub.path ||
-                  sub.activePaths?.some((path) =>
-                    location.pathname.startsWith(path),
-                  ),
-              );
-            const isDummy = item.dummy ?? false;
-
-            const isExpanded = expandedMenus.includes(item.path);
-
-            const handleParentClick = () => {
-              if (item.subs) {
-                setExpandedMenus((prev) =>
-                  prev.includes(item.path)
-                    ? prev.filter((p) => p !== item.path)
-                    : [...prev, item.path],
+      {desktopOpened ? (
+        <AppShell.Navbar
+          p="0"
+          bg="var(--menu-background-color)"
+          c="var(--app-shell-color)"
+          withBorder={false}
+          w="250px"
+        >
+          <Stack className={classes.navbarStack}>
+            {navigationItems.map((item) => {
+              const Icon = item.icon;
+              const isActive =
+                location.pathname === item.path ||
+                item.activePaths?.some((path) =>
+                  location.pathname.startsWith(path),
+                ) ||
+                item.subs?.some(
+                  (sub) =>
+                    location.pathname === sub.path ||
+                    sub.activePaths?.some((path) =>
+                      location.pathname.startsWith(path),
+                    ),
                 );
-                if (!desktopOpened) {
-                  toggleDesktop();
-                }
-              } else {
-                navigate(item.path);
-              }
-            };
+              const isDummy = item.dummy ?? false;
 
-            const buttonContent = (
-              <UnstyledButton
-                key={item.path}
-                style={(theme) => ({
-                  display: 'block',
-                  width: '100%',
-                  paddingTop: theme.spacing.sm,
-                  paddingBottom: theme.spacing.sm,
-                  paddingLeft: desktopOpened ? theme.spacing.sm : 0,
-                  paddingRight: 0,
-                  borderStyle: 'solid',
-                  borderWidth: '.25px 0px',
-                  borderColor: 'var(--menu-border-color)',
-                  backgroundColor:
-                    isActive && !item.subs
-                      ? 'var(--menu-active-color)'
-                      : 'var(--menu-inactive-color)',
-                  position: 'relative',
-                })}
-                onClick={handleParentClick}
-              >
-                <Group
-                  p={0}
-                  m={0}
-                  c="var(--app-shell-color)"
-                  justify={desktopOpened ? 'space-between' : 'center'}
-                  style={{position: 'relative'}}
+              const isExpanded = expandedMenus.includes(item.path);
+
+              const handleParentClick = () => {
+                if (item.subs) {
+                  setExpandedMenus((prev) =>
+                    prev.includes(item.path)
+                      ? prev.filter((p) => p !== item.path)
+                      : [...prev, item.path],
+                  );
+                } else {
+                  navigate(item.path);
+                }
+              };
+
+              const buttonContent = (
+                <UnstyledButton
+                  key={item.path}
+                  className={`${classes.navButton} ${desktopOpened ? classes.navButtonOpen : classes.navButtonClosed} ${isActive && !item.subs ? classes.navButtonActive : classes.navButtonInactive}`}
+                  onClick={handleParentClick}
                 >
-                  <Group>
-                    {isActive && !item.subs && desktopOpened ? activeTag : null}
-                    <Icon size={20} />
-                    {desktopOpened ? (
-                      <Text fw={500} fz="sm">
-                        {item.label}
-                      </Text>
-                    ) : null}
-                    {isDummy ? (
-                      <IconCircle
-                        style={{position: 'absolute', left: 15, top: 15}}
-                        color="red"
-                        fill="red"
-                        size={10}
+                  <Group
+                    className={`${classes.navGroup} ${desktopOpened ? classes.navGroupSpaceBetween : classes.navGroupCentered}`}
+                  >
+                    <Group>
+                      {isActive && !item.subs && desktopOpened
+                        ? activeTag
+                        : null}
+                      <Icon
+                        color="var(--menu-color)"
+                        size={20}
+                        className={classes.navIcon}
+                      />
+                      {desktopOpened ? (
+                        <Text
+                          c={
+                            isActive
+                              ? 'var(--menu-active-color)'
+                              : 'var(--menu-color)'
+                          }
+                          className={classes.navLabel}
+                        >
+                          {item.label}
+                        </Text>
+                      ) : null}
+                      {isDummy ? (
+                        <IconCircle
+                          className={classes.dummyIndicator}
+                          color="red"
+                          fill="red"
+                          size={10}
+                        />
+                      ) : null}
+                    </Group>
+                    {desktopOpened && item.subs ? (
+                      <IconCaretDownFilled
+                        size={16}
+                        style={{
+                          marginRight: 'var(--mantine-spacing-lg)',
+                        }}
+                        className={`${classes.chevron} ${isExpanded ? classes.chevronExpanded : classes.chevronCollapsed}`}
                       />
                     ) : null}
                   </Group>
-                  {desktopOpened && item.subs ? (
-                    <IconChevronDown
-                      size={16}
-                      style={{
-                        transform: isExpanded
-                          ? 'rotate(180deg)'
-                          : 'rotate(0deg)',
-                        transition: 'transform 200ms ease',
-                      }}
-                    />
-                  ) : null}
-                </Group>
-              </UnstyledButton>
-            );
-
-            const menuItem = desktopOpened ? (
-              buttonContent
-            ) : (
-              <Tooltip
-                key={item.path}
-                withArrow
-                label={item.label}
-                position="right"
-                c={isDarkMode ? 'white' : undefined}
-                bg={isDarkMode ? 'brand.8' : 'brand.4'}
-                openDelay={300}
-              >
-                {buttonContent}
-              </Tooltip>
-            );
-
-            // If the item has submenus, render them
-            if (item.subs && desktopOpened) {
-              return (
-                <Stack key={item.path} gap={0}>
-                  {menuItem}
-                  <Collapse in={isExpanded}>
-                    <Stack gap={0}>
-                      {item.subs.map((subItem) => {
-                        const isSubActive =
-                          location.pathname === subItem.path ||
-                          subItem.activePaths?.some((path) =>
-                            location.pathname.startsWith(path),
-                          );
-
-                        return (
-                          <UnstyledButton
-                            key={subItem.path}
-                            style={(theme) => ({
-                              display: 'block',
-                              width: '100%',
-                              paddingTop: theme.spacing.sm,
-                              paddingBottom: theme.spacing.sm,
-                              paddingLeft: theme.spacing.sm,
-                              paddingRight: 0,
-                              borderStyle: 'solid',
-                              borderWidth: '.25px 0px',
-                              borderColor: 'var(--menu-border-color)',
-                              backgroundColor: isSubActive
-                                ? 'var(--menu-active-color)'
-                                : 'var(--menu-inactive-color)',
-                              position: 'relative',
-                            })}
-                            onClick={() => navigate(subItem.path)}
-                          >
-                            <Group
-                              c="var(--app-shell-color)"
-                              justify="flex-start"
-                              style={{position: 'relative'}}
-                              ml={rem(20)}
-                            >
-                              {isSubActive ? activeTag : null}
-                              <Text fw={400} fz="sm">
-                                {subItem.label}
-                              </Text>
-                            </Group>
-                          </UnstyledButton>
-                        );
-                      })}
-                    </Stack>
-                  </Collapse>
-                </Stack>
+                </UnstyledButton>
               );
-            }
 
-            return menuItem;
-          })}
+              const menuItem = desktopOpened ? (
+                buttonContent
+              ) : (
+                <Tooltip
+                  key={item.path}
+                  withArrow
+                  label={item.label}
+                  position="right"
+                  c={isDarkMode ? 'var(--app-shell-color)' : undefined}
+                  bg={isDarkMode ? 'brand.8' : 'brand.4'}
+                  openDelay={300}
+                >
+                  {buttonContent}
+                </Tooltip>
+              );
 
-          <Divider my="sm" hiddenFrom="sm" />
+              // If the item has submenus, render them
+              if (item.subs && desktopOpened) {
+                return (
+                  <Stack key={item.path} className={classes.navItemsContainer}>
+                    {menuItem}
+                    <Collapse in={isExpanded}>
+                      <Stack className={classes.navItemsContainer}>
+                        {item.subs.map((subItem) => {
+                          const isSubActive =
+                            location.pathname === subItem.path ||
+                            subItem.activePaths?.some((path) =>
+                              location.pathname.startsWith(path),
+                            );
 
-          <Stack gap="xs" hiddenFrom="sm">
-            <LanguageSwitcher />
-            <ColorSchemeToggle />
+                          return (
+                            <UnstyledButton
+                              key={subItem.path}
+                              className={`${classes.subNavButton} ${isSubActive ? classes.subNavButtonActive : classes.subNavButtonInactive}`}
+                              onClick={() => navigate(subItem.path)}
+                            >
+                              <Group className={classes.subNavGroup}>
+                                {isSubActive ? activeTag : null}
+                                <Text
+                                  c={
+                                    isSubActive
+                                      ? 'var(--menu-active-color)'
+                                      : 'var(--menu-color)'
+                                  }
+                                  className={classes.subNavLabel}
+                                >
+                                  {subItem.label}
+                                </Text>
+                              </Group>
+                            </UnstyledButton>
+                          );
+                        })}
+                      </Stack>
+                    </Collapse>
+                  </Stack>
+                );
+              }
+
+              return menuItem;
+            })}
+
+            <Divider my="sm" hiddenFrom="sm" />
+
+            <Stack className={classes.mobileControls} hiddenFrom="sm">
+              <LanguageSwitcher />
+              <ColorSchemeToggle />
+            </Stack>
           </Stack>
-        </Stack>
-      </AppShell.Navbar>
+        </AppShell.Navbar>
+      ) : null}
 
       <AppShell.Main>
         <Outlet />
@@ -429,7 +399,7 @@ function UserMenu({c}: {readonly c?: string}) {
       transitionProps={{transition: 'pop-top-right'}}
     >
       <Menu.Target>
-        <UnstyledButton>
+        <UnstyledButton className={classes.userMenuButton}>
           <Group gap={7}>
             <Avatar radius="xl" size="md" color="brand" c={c}>
               {userInitials}
@@ -437,9 +407,9 @@ function UserMenu({c}: {readonly c?: string}) {
             <Text fw={500} size="sm" lh={1} mr={3} c={c}>
               {user?.email}
             </Text>
-            <IconChevronDown
+            <IconCaretDownFilled
               color={c}
-              style={{width: rem(12), height: rem(12)}}
+              className={classes.userMenuIcon}
               stroke={1.5}
             />
           </Group>

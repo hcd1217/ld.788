@@ -94,7 +94,7 @@ export const resolver: CSSVariablesResolver = () => ({
 function _build(colors: CustomColors, defaultColors?: CustomColors) {
   return {
     '--app-active-color': colors.activeColor,
-    '--app-in-active-color': colors.inActiveColor,
+    '--app-inactive-color': colors.inActiveColor,
     '--app-shell-background-color':
       colors.appShell?.backgroundColor ??
       defaultColors?.appShell?.backgroundColor ??
@@ -107,12 +107,24 @@ function _build(colors: CustomColors, defaultColors?: CustomColors) {
       colors.borderColor ?? defaultColors?.borderColor ?? 'transparent',
     '--input-border-color': colors.inputBorderColor,
     '--menu-active-color':
-      colors.appShell?.menu?.active ??
-      defaultColors?.appShell?.menu?.active ??
+      colors.appShell?.menu?.active?.color ??
+      defaultColors?.appShell?.menu?.active?.color ??
+      '',
+    '--menu-active-background-color':
+      colors.appShell?.menu?.active?.background ??
+      defaultColors?.appShell?.menu?.active?.background ??
+      '',
+    '--menu-color':
+      colors.appShell?.menu?.color ??
+      defaultColors?.appShell?.menu?.color ??
       '',
     '--menu-background-color':
       colors.appShell?.menu?.background ??
       defaultColors?.appShell?.menu?.background ??
+      'transparent',
+    '--menu-hover-color':
+      colors.appShell?.menu?.hover ??
+      defaultColors?.appShell?.menu?.hover ??
       'transparent',
     '--menu-border-color':
       colors.appShell?.menu?.border ??

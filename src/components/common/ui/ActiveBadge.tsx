@@ -9,9 +9,7 @@ export function ActiveBadge({isActive}: ActiveBadgeProps) {
   const {t} = useTranslation();
   return (
     <Badge
-      color={
-        isActive ? 'var(--app-active-color)' : 'var(--app-in-active-color)'
-      }
+      color={isActive ? 'var(--app-active-color)' : 'var(--app-inactive-color)'}
       variant="light"
       size="sm"
     >

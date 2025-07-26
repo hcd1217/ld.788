@@ -1,12 +1,14 @@
 export type CustomColors = {
-  color?: {
-    appShell?: string;
-  };
   appShell?: {
     menu?: {
+      color?: string;
+      active?: {
+        color?: string;
+        background?: string;
+      };
       border?: string;
+      hover?: string;
       background?: string;
-      active?: string;
       inactive?: string;
     };
     backgroundColor?: string;
@@ -38,99 +40,105 @@ type CustomThemeConfig = {
 export const themeConfig: Record<string, CustomThemeConfig> = {
   orange: {
     brandColors: [
-      '#fff4e6',
-      '#f9e7d5',
-      '#efceac',
-      '#e5b47f',
-      '#dd9d59',
-      '#d98e40',
-      '#d78732',
-      '#c07525',
-      '#aa661d',
-      '#945712',
+      '#fff5e5',
+      '#f8e9d4',
+      '#edd1ad',
+      '#e2b781',
+      '#d9a25c',
+      '#d39444',
+      '#cd872f',
+      '#b97929',
+      '#a56b21',
+      '#905c15',
     ],
     default: {
       appShell: {
-        backgroundColor: '#1a2230',
-        color: '#c9c9c9',
+        backgroundColor: '#17233B',
+        color: '#ffffff',
         menu: {
-          border: '#2b3540',
-          background: '#1b1f26',
-          active: '#d78732',
-          inactive: '#2b3038',
+          color: '#D9D9D9',
+          active: {
+            color: '#ffffff',
+            background: '#CD872F',
+          },
+          border: '#3E4958',
+          background: '#232D40',
+          hover: '#17233B',
+          inactive: '#222D40',
         },
       },
-      color: {
-        appShell: 'white',
-      },
-      inputBorderColor: '#fac0a1',
-      borderColor: '#c07525',
-      activeColor: '#d78732',
+      inputBorderColor: '#e2b781',
+      borderColor: '#CD872F',
+      activeColor: '#CD872F',
       inActiveColor: 'gray',
     },
   },
-  tomato: {
+  blue: {
     brandColors: [
-      '#fff0e4',
-      '#ffe0cf',
-      '#fac0a1',
-      '#f69e6e',
-      '#f28043',
-      '#f06e27',
-      '#f06418',
-      '#d6530c',
-      '#bf4906',
-      '#a73c00',
+      '#eaf3fb', // [0] lightest
+      '#d6e6f7', // [1]
+      '#bcd6f0', // [2]
+      '#9bc1e7', // [3]
+      '#79aadb', // [4]
+      '#5f91c6', // [5]
+      '#4a76a9', // [6]
+      '#3e618c', // [7]
+      '#324e71', // [8]
+      '#273c59', // [9] darkest
+    ],
+    default: {
+      appShell: {
+        backgroundColor: '#17233B',
+        color: '#ffffff',
+        menu: {
+          color: '#D9D9D9',
+          active: {
+            color: '#ffffff',
+            background: '#324e71',
+          },
+          border: '#3E4958',
+          background: '#232D40',
+          hover: '#17233B',
+          inactive: '#222D40',
+        },
+      },
+      inputBorderColor: '#79aadb',
+      borderColor: '#324e71',
+      activeColor: '#324e71',
+      inActiveColor: 'gray',
+    },
+  },
+  elegant: {
+    brandColors: [
+      '#eaf3fb', // [0] lightest
+      '#d6e6f7', // [1]
+      '#bcd6f0', // [2]
+      '#9bc1e7', // [3]
+      '#79aadb', // [4]
+      '#5f91c6', // [5]
+      '#4a76a9', // [6]
+      '#3e618c', // [7]
+      '#324e71', // [8]
+      '#273c59', // [9] darkest
     ],
     default: {
       appShell: {
         backgroundColor: '#1a2230',
-        color: '#c9c9c9',
+        color: '#d6e6f7',
         menu: {
-          active: '#f28043',
-          inactive: '#1a2230',
+          border: '#2b3540',
+          background: '#1b1f26',
+          hover: '#1a2230',
+          active: {
+            color: '#d6e6f7',
+            background: '#1b1f26',
+          },
+          inactive: '#2b3038',
         },
       },
-      color: {
-        appShell: '#c9c9c9',
-      },
-      inputBorderColor: '#fac0a1',
-      borderColor: '#d6530c',
-      activeColor: '#f06e27',
-      inActiveColor: 'gray',
-    },
-    light: {
-      appShell: {
-        backgroundColor: '#1a2230',
-        color: '#c9c9c9',
-        menu: {
-          active: '#f28043',
-          inactive: '#1a2230',
-        },
-      },
-      color: {
-        appShell: 'white',
-      },
-      inputBorderColor: '#fac0a1',
-      borderColor: '#d6530c',
-      activeColor: '#f06e27',
-      inActiveColor: 'gray',
-    },
-    dark: {
-      appShell: {
-        backgroundColor: '#1a2230',
-        color: '#c9c9c9',
-        menu: {
-          active: '#f28043',
-          inactive: '#1a2230',
-        },
-      },
-      color: {
-        appShell: 'white',
-      },
-      inputBorderColor: '#fac0a1',
-      borderColor: '#d6530c',
-      activeColor: '#f06e27',
+      inputBorderColor: '#79aadb',
+      borderColor: '#5f91c6',
+      activeColor: '#79aadb',
       inActiveColor: 'gray',
     },
   },
@@ -162,38 +170,6 @@ export const themeConfig: Record<string, CustomThemeConfig> = {
     dark: {
       inputBorderColor: '#c5c5c5',
       borderColor: '#5173b8',
-      activeColor: 'green',
-      inActiveColor: 'gray',
-    },
-  },
-  elegant: {
-    brandColors: [
-      '#eaf3fb', // [0] lightest
-      '#d6e6f7', // [1]
-      '#bcd6f0', // [2]
-      '#9bc1e7', // [3]
-      '#79aadb', // [4]
-      '#5f91c6', // [5]
-      '#4a76a9', // [6]
-      '#3e618c', // [7]
-      '#324e71', // [8]
-      '#273c59', // [9] darkest
-    ],
-    default: {
-      inputBorderColor: '#dee2e6',
-      borderColor: '#4a76a9',
-      activeColor: 'green',
-      inActiveColor: 'gray',
-    },
-    light: {
-      inputBorderColor: '#dee2e6',
-      borderColor: '#4a76a9',
-      activeColor: 'green',
-      inActiveColor: 'gray',
-    },
-    dark: {
-      inputBorderColor: '#dee2e6',
-      borderColor: '#4a76a9',
       activeColor: 'green',
       inActiveColor: 'gray',
     },

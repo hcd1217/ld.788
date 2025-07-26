@@ -30,6 +30,16 @@ export const paginationSchema = z.object({
 });
 
 export const ClientPublicConfigSchema = z.object({
+  features: z
+    .object({
+      language: z.boolean(),
+      darkMode: z.boolean(),
+    })
+    .optional()
+    .default({
+      language: false,
+      darkMode: false,
+    }),
   clientCode: stringSchema,
   clientName: optionalStringSchema,
   logoUrl: optionalStringSchema,

@@ -53,6 +53,7 @@ import {
   type GetUserRolesResponse,
   type ClientPublicConfigResponse,
 } from '../schemas/client.schemas';
+import {ClientPublicConfigSchema} from '../schemas';
 import {delay} from '@/utils/time';
 
 export class ClientApi extends BaseApiClient {
@@ -255,12 +256,12 @@ export class ClientApi extends BaseApiClient {
     clientCode: string,
   ): Promise<ClientPublicConfigResponse> {
     await delay(100);
-    return {
+    return ClientPublicConfigSchema.parse({
       clientCode,
       // CLIENT PUBLIC INFORMATION
       // clientName: 'ACME',
       // logoUrl:
       //   'https://img.freepik.com/free-vector/butterfly-colorful-logo-template_361591-1587.jpg?semt=ais_hybrid&w=740',
-    };
+    });
   }
 }
