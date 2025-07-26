@@ -67,7 +67,7 @@ export function AuthLayout() {
   const location = useLocation();
   const {user} = useAppStore();
   const {t} = useTranslation();
-  const [desktopOpened, {toggle: toggleDesktop}] = useDisclosure(true);
+  const [desktopOpened, {toggle: toggleDesktop}] = useDisclosure(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const isDarkMode = useIsDarkMode();
   const isDesktop = useIsDesktop();
@@ -158,6 +158,9 @@ export function AuthLayout() {
                     ? prev.filter((p) => p !== item.path)
                     : [...prev, item.path],
                 );
+                if (!desktopOpened) {
+                  toggleDesktop();
+                }
               } else {
                 navigate(item.path);
               }
@@ -171,7 +174,7 @@ export function AuthLayout() {
                   width: '100%',
                   paddingTop: theme.spacing.sm,
                   paddingBottom: theme.spacing.sm,
-                  paddingLeft: theme.spacing.sm,
+                  paddingLeft: desktopOpened ? theme.spacing.sm : 0,
                   paddingRight: 0,
                   borderStyle: 'solid',
                   borderWidth: '.25px 0px',
@@ -247,7 +250,6 @@ export function AuthLayout() {
                   <Collapse in={isExpanded}>
                     <Stack gap={0}>
                       {item.subs.map((subItem) => {
-                        const SubIcon = subItem.icon;
                         const isSubActive =
                           location.pathname === subItem.path ||
                           subItem.activePaths?.some((path) =>
@@ -278,7 +280,6 @@ export function AuthLayout() {
                               ml={rem(20)}
                             >
                               {isSubActive ? activeTag : null}
-                              <SubIcon size={18} />
                               <Text fw={400} fz="sm">
                                 {subItem.label}
                               </Text>
