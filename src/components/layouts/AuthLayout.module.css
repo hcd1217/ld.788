@@ -14,6 +14,9 @@
   display: block;
   width: 100%;
   font-weight: 400;
+  height: 50px;
+  padding-left: var(--mantine-spacing-lg);
+  padding-right: 0;
   border-style: solid;
   border-width: 0px 0px .5px 0px;
   color: var(--menu-color);
@@ -22,31 +25,16 @@
   transition: background-color 0.2s ease;
 }
 
-.navButtonClosed {
-  padding-top: var(--mantine-spacing-lg);
-  padding-bottom: var(--mantine-spacing-lg);
-  padding-left: 0;
-  padding-right: 0;
-}
-
-.navButtonOpen {
-  height: 50px;
-  /* padding-top: var(--mantine-spacing-lg);
-  padding-bottom: var(--mantine-spacing-lg); */
-  padding-left: var(--mantine-spacing-lg);
-  padding-right: 0;
-}
-
-.navButtonActive {
+.navButton.active {
   color: var(--menu-active-color);
   background-color: var(--menu-active-background-color);
 }
 
-.navButtonInactive {
+.navButton:not(.active) {
   background-color: var(--menu-inactive-color);
 }
 
-.navButtonInactive:hover {
+.navButton:not(.active):hover {
   background-color: var(--menu-hover-color);
 }
 
@@ -55,13 +43,6 @@
   margin: 0;
   color: var(--app-shell-color);
   position: relative;
-}
-
-.navGroupCentered {
-  justify-content: center;
-}
-
-.navGroupSpaceBetween {
   justify-content: space-between;
 }
 
@@ -82,14 +63,12 @@
 
 .chevron {
   transition: transform 200ms ease;
-}
-
-.chevronExpanded {
-  transform: rotate(180deg);
-}
-
-.chevronCollapsed {
+  margin-right: var(--mantine-spacing-lg);
   transform: rotate(0deg);
+}
+
+.chevron.expanded {
+  transform: rotate(180deg);
 }
 
 .subNavButton {
@@ -97,8 +76,6 @@
   width: 100%;
   font-weight: 400;
   height: 50px;
-  /* padding-top: var(--mantine-spacing-lg);
-  padding-bottom: var(--mantine-spacing-lg); */
   padding-left: var(--mantine-spacing-lg);
   padding-right: 0;
   border-style: solid;
@@ -109,16 +86,16 @@
   transition: background-color 0.2s ease;
 }
 
-.subNavButtonActive {
+.subNavButton.active {
   color: var(--menu-active-color);
   background-color: var(--menu-active-background-color);
 }
 
-.subNavButtonInactive {
+.subNavButton:not(.active) {
   background-color: var(--menu-inactive-color);
 }
 
-.subNavButtonInactive:hover {
+.subNavButton:not(.active):hover {
   background-color: var(--menu-hover-color);
 }
 
@@ -149,8 +126,4 @@
 
 .navItemsContainer {
   gap: 0;
-}
-
-.mobileControls {
-  gap: var(--mantine-spacing-xs);
 }

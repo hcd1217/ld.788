@@ -8,8 +8,6 @@ import {
   UnstyledButton,
   Burger,
   Stack,
-  Divider,
-  Tooltip,
   Collapse,
 } from '@mantine/core';
 import {Outlet, useNavigate, useLocation} from 'react-router';
@@ -34,7 +32,6 @@ import {
 import type {TFunction} from 'i18next';
 import {useMemo, useState, useEffect} from 'react';
 import classes from './AuthLayout.module.css';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {
   PWAInstallPrompt,
   ColorSchemeToggle,
@@ -47,36 +44,19 @@ import {useAppStore} from '@/stores/useAppStore';
 import type {User} from '@/services/auth';
 import {useIsDesktop} from '@/hooks/useIsDesktop';
 
-const activeTag = <div className={classes.activeTag} />;
+interface NavigationItem {
+  label: string;
+  icon: React.ElementType;
+  path: string;
+  dummy?: boolean;
+  activePaths?: string[];
+  hidden?: boolean;
+  subs?: NavigationItem[];
+}
 
 export function AuthLayout() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const {user} = useAppStore();
-  const {t} = useTranslation();
-  const [desktopOpened, {toggle: toggleDesktop}] = useDisclosure(true);
-  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
-  const isDarkMode = useIsDarkMode();
+  const [isMenuOpen, {toggle: toggleMenu}] = useDisclosure(true);
   const isDesktop = useIsDesktop();
-
-  const navigationItems = useMemo(() => {
-    return buildNavigationItems(t, user);
-  }, [t, user]);
-
-  // Auto-expand menus that have active submenus
-  useEffect(() => {
-    const itemsWithActiveSubs = navigationItems.filter((item) =>
-      item.subs?.some(
-        (sub) =>
-          location.pathname === sub.path ||
-          sub.activePaths?.some((path) => location.pathname.startsWith(path)),
-      ),
-    );
-
-    if (itemsWithActiveSubs.length > 0) {
-      setExpandedMenus(itemsWithActiveSubs.map((item) => item.path));
-    }
-  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isDesktop) {
     return null;
@@ -86,7 +66,7 @@ export function AuthLayout() {
     <AppShell
       header={{height: 60}}
       navbar={{
-        width: desktopOpened ? 300 : 0,
+        width: isMenuOpen ? 300 : 0,
         breakpoint: 'sm',
       }}
       padding="md"
@@ -99,11 +79,10 @@ export function AuthLayout() {
           <Group>
             <AppLogo c="var(--app-shell-color)" fw={400} />
             <Burger
-              // Opened={desktopOpened}
               visibleFrom="sm"
               size="xs"
               color="var(--app-shell-color)"
-              onClick={toggleDesktop}
+              onClick={toggleMenu}
             />
           </Group>
           <Group>
@@ -115,168 +94,7 @@ export function AuthLayout() {
           </Group>
         </Group>
       </AppShell.Header>
-      {desktopOpened ? (
-        <AppShell.Navbar
-          p="0"
-          bg="var(--menu-background-color)"
-          c="var(--app-shell-color)"
-          withBorder={false}
-          w="250px"
-        >
-          <Stack className={classes.navbarStack}>
-            {navigationItems.map((item) => {
-              const Icon = item.icon;
-              const isActive =
-                location.pathname === item.path ||
-                item.activePaths?.some((path) =>
-                  location.pathname.startsWith(path),
-                ) ||
-                item.subs?.some(
-                  (sub) =>
-                    location.pathname === sub.path ||
-                    sub.activePaths?.some((path) =>
-                      location.pathname.startsWith(path),
-                    ),
-                );
-              const isDummy = item.dummy ?? false;
-
-              const isExpanded = expandedMenus.includes(item.path);
-
-              const handleParentClick = () => {
-                if (item.subs) {
-                  setExpandedMenus((prev) =>
-                    prev.includes(item.path)
-                      ? prev.filter((p) => p !== item.path)
-                      : [...prev, item.path],
-                  );
-                } else {
-                  navigate(item.path);
-                }
-              };
-
-              const buttonContent = (
-                <UnstyledButton
-                  key={item.path}
-                  className={`${classes.navButton} ${desktopOpened ? classes.navButtonOpen : classes.navButtonClosed} ${isActive && !item.subs ? classes.navButtonActive : classes.navButtonInactive}`}
-                  onClick={handleParentClick}
-                >
-                  <Group
-                    className={`${classes.navGroup} ${desktopOpened ? classes.navGroupSpaceBetween : classes.navGroupCentered}`}
-                  >
-                    <Group>
-                      {isActive && !item.subs && desktopOpened
-                        ? activeTag
-                        : null}
-                      <Icon
-                        color="var(--menu-color)"
-                        size={20}
-                        className={classes.navIcon}
-                      />
-                      {desktopOpened ? (
-                        <Text
-                          c={
-                            isActive
-                              ? 'var(--menu-active-color)'
-                              : 'var(--menu-color)'
-                          }
-                          className={classes.navLabel}
-                        >
-                          {item.label}
-                        </Text>
-                      ) : null}
-                      {isDummy ? (
-                        <IconCircle
-                          className={classes.dummyIndicator}
-                          color="red"
-                          fill="red"
-                          size={10}
-                        />
-                      ) : null}
-                    </Group>
-                    {desktopOpened && item.subs ? (
-                      <IconCaretDownFilled
-                        size={16}
-                        style={{
-                          marginRight: 'var(--mantine-spacing-lg)',
-                        }}
-                        className={`${classes.chevron} ${isExpanded ? classes.chevronExpanded : classes.chevronCollapsed}`}
-                      />
-                    ) : null}
-                  </Group>
-                </UnstyledButton>
-              );
-
-              const menuItem = desktopOpened ? (
-                buttonContent
-              ) : (
-                <Tooltip
-                  key={item.path}
-                  withArrow
-                  label={item.label}
-                  position="right"
-                  c={isDarkMode ? 'var(--app-shell-color)' : undefined}
-                  bg={isDarkMode ? 'brand.8' : 'brand.4'}
-                  openDelay={300}
-                >
-                  {buttonContent}
-                </Tooltip>
-              );
-
-              // If the item has submenus, render them
-              if (item.subs && desktopOpened) {
-                return (
-                  <Stack key={item.path} className={classes.navItemsContainer}>
-                    {menuItem}
-                    <Collapse in={isExpanded}>
-                      <Stack className={classes.navItemsContainer}>
-                        {item.subs.map((subItem) => {
-                          const isSubActive =
-                            location.pathname === subItem.path ||
-                            subItem.activePaths?.some((path) =>
-                              location.pathname.startsWith(path),
-                            );
-
-                          return (
-                            <UnstyledButton
-                              key={subItem.path}
-                              className={`${classes.subNavButton} ${isSubActive ? classes.subNavButtonActive : classes.subNavButtonInactive}`}
-                              onClick={() => navigate(subItem.path)}
-                            >
-                              <Group className={classes.subNavGroup}>
-                                {isSubActive ? activeTag : null}
-                                <Text
-                                  c={
-                                    isSubActive
-                                      ? 'var(--menu-active-color)'
-                                      : 'var(--menu-color)'
-                                  }
-                                  className={classes.subNavLabel}
-                                >
-                                  {subItem.label}
-                                </Text>
-                              </Group>
-                            </UnstyledButton>
-                          );
-                        })}
-                      </Stack>
-                    </Collapse>
-                  </Stack>
-                );
-              }
-
-              return menuItem;
-            })}
-
-            <Divider my="sm" hiddenFrom="sm" />
-
-            <Stack className={classes.mobileControls} hiddenFrom="sm">
-              <LanguageSwitcher />
-              <ColorSchemeToggle />
-            </Stack>
-          </Stack>
-        </AppShell.Navbar>
-      ) : null}
-
+      {isMenuOpen ? <NavBar /> : null}
       <AppShell.Main>
         <Outlet />
       </AppShell.Main>
@@ -286,18 +104,7 @@ export function AuthLayout() {
   );
 }
 
-interface NavigationItem {
-  label: string;
-  icon: React.ElementType;
-  path: string;
-  dummy?: boolean;
-  activePaths?: string[];
-  hidden?: boolean;
-  subs?: NavigationItem[];
-}
-
 function buildNavigationItems(t: TFunction, user?: User): NavigationItem[] {
-  console.log('buildNavigationItems...');
   const isRoot = user?.isRoot ?? false;
   const isAdminRoutesEnabled =
     isRoot && localStorage.getItem('displayAdminRoutes') === 'true';
@@ -368,7 +175,6 @@ function buildNavigationItems(t: TFunction, user?: User): NavigationItem[] {
       icon: IconUsers,
       path: '/user-management',
       hidden: true,
-      // Hidden: !isRoot,
     },
     ...(isAdminRoutesEnabled ? adminItems : []),
     {
@@ -445,5 +251,170 @@ function UserMenu({c}: {readonly c?: string}) {
         <VersionInformation />
       </Menu.Dropdown>
     </Menu>
+  );
+}
+
+function NavBar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const {user} = useAppStore();
+  const {t} = useTranslation();
+  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
+
+  const navigationItems = useMemo(() => {
+    return buildNavigationItems(t, user);
+  }, [t, user]);
+
+  // Auto-expand menus that have active submenus
+  useEffect(() => {
+    const itemsWithActiveSubs = navigationItems.filter((item) =>
+      item.subs?.some(
+        (sub) =>
+          location.pathname === sub.path ||
+          sub.activePaths?.some((path) => location.pathname.startsWith(path)),
+      ),
+    );
+
+    if (itemsWithActiveSubs.length > 0) {
+      setExpandedMenus(itemsWithActiveSubs.map((item) => item.path));
+    }
+  }, [location.pathname, navigationItems]);
+
+  return (
+    <AppShell.Navbar
+      p="0"
+      bg="var(--menu-background-color)"
+      c="var(--app-shell-color)"
+      withBorder={false}
+      w="250px"
+    >
+      <Stack className={classes.navbarStack}>
+        {navigationItems.map((item) => {
+          const Icon = item.icon;
+          const isActive =
+            location.pathname === item.path ||
+            item.activePaths?.some((path) =>
+              location.pathname.startsWith(path),
+            ) ||
+            item.subs?.some(
+              (sub) =>
+                location.pathname === sub.path ||
+                sub.activePaths?.some((path) =>
+                  location.pathname.startsWith(path),
+                ),
+            );
+          const isDummy = item.dummy ?? false;
+
+          const isExpanded = expandedMenus.includes(item.path);
+
+          const handleParentClick = () => {
+            if (item.subs) {
+              setExpandedMenus((prev) => {
+                if (prev.includes(item.path)) {
+                  return prev.filter((p) => p !== item.path);
+                }
+
+                return [...prev, item.path];
+              });
+            } else {
+              navigate(item.path);
+            }
+          };
+
+          const buttonContent = (
+            <UnstyledButton
+              key={item.path}
+              className={`${classes.navButton} ${isActive && !item.subs ? classes.active : ''}`}
+              onClick={handleParentClick}
+            >
+              <Group className={classes.navGroup}>
+                <Group>
+                  {isActive && !item.subs ? (
+                    <div className={classes.activeTag} />
+                  ) : null}
+                  <Icon
+                    color="var(--menu-color)"
+                    size={20}
+                    className={classes.navIcon}
+                  />
+                  <Text
+                    c={
+                      isActive
+                        ? 'var(--menu-active-color)'
+                        : 'var(--menu-color)'
+                    }
+                    className={classes.navLabel}
+                  >
+                    {item.label}
+                  </Text>
+                  {isDummy ? (
+                    <IconCircle
+                      className={classes.dummyIndicator}
+                      color="red"
+                      fill="red"
+                      size={10}
+                    />
+                  ) : null}
+                </Group>
+                {item.subs ? (
+                  <IconCaretDownFilled
+                    size={16}
+                    className={`${classes.chevron} ${isExpanded ? classes.expanded : ''}`}
+                  />
+                ) : null}
+              </Group>
+            </UnstyledButton>
+          );
+
+          // If the item has submenus, render them
+          if (item.subs) {
+            return (
+              <Stack key={item.path} className={classes.navItemsContainer}>
+                {buttonContent}
+                <Collapse in={isExpanded}>
+                  <Stack className={classes.navItemsContainer}>
+                    {item.subs.map((subItem) => {
+                      const isSubActive =
+                        location.pathname === subItem.path ||
+                        subItem.activePaths?.some((path) =>
+                          location.pathname.startsWith(path),
+                        );
+
+                      return (
+                        <UnstyledButton
+                          key={subItem.path}
+                          className={`${classes.subNavButton} ${isSubActive ? classes.active : ''}`}
+                          onClick={() => {
+                            navigate(subItem.path);
+                          }}
+                        >
+                          <Group className={classes.subNavGroup}>
+                            {isSubActive ? (
+                              <div className={classes.activeTag} />
+                            ) : null}
+                            <Text
+                              c={
+                                isSubActive
+                                  ? 'var(--menu-active-color)'
+                                  : 'var(--menu-color)'
+                              }
+                              className={classes.subNavLabel}
+                            >
+                              {subItem.label}
+                            </Text>
+                          </Group>
+                        </UnstyledButton>
+                      );
+                    })}
+                  </Stack>
+                </Collapse>
+              </Stack>
+            );
+          }
+
+          return buttonContent;
+        })}
+      </Stack>
+    </AppShell.Navbar>
   );
 }
