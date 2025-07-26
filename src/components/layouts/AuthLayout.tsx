@@ -128,7 +128,7 @@ export function AuthLayout() {
 
       <AppShell.Navbar
         p="0"
-        bg="var(--app-shell-background-color)"
+        bg="var(--menu-background-color)"
         c="var(--app-shell-color)"
       >
         <Stack gap={0}>
@@ -265,9 +265,12 @@ export function AuthLayout() {
                               paddingBottom: theme.spacing.sm,
                               paddingLeft: theme.spacing.sm,
                               paddingRight: 0,
+                              borderStyle: 'solid',
+                              borderWidth: '.25px 0px',
+                              borderColor: 'var(--menu-border-color)',
                               backgroundColor: isSubActive
                                 ? 'var(--menu-active-color)'
-                                : 'transparent',
+                                : 'var(--menu-inactive-color)',
                               position: 'relative',
                             })}
                             onClick={() => navigate(subItem.path)}

@@ -257,7 +257,8 @@ export class ClientApi extends BaseApiClient {
     await delay(100);
     return {
       clientCode,
-      // ClientName: 'ACME',
+      // CLIENT PUBLIC INFORMATION
+      // clientName: 'ACME',
       // logoUrl:
       //   'https://img.freepik.com/free-vector/butterfly-colorful-logo-template_361591-1587.jpg?semt=ais_hybrid&w=740',
     };

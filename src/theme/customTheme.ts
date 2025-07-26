@@ -1,14 +1,11 @@
 export type CustomColors = {
-  backgroundColor?: {
-    menu?: string;
-    appShell?: string;
-  };
   color?: {
     appShell?: string;
   };
   appShell?: {
     menu?: {
       border?: string;
+      background?: string;
       active?: string;
       inactive?: string;
     };
@@ -57,16 +54,11 @@ export const themeConfig: Record<string, CustomThemeConfig> = {
         backgroundColor: '#1a2230',
         color: '#c9c9c9',
         menu: {
-          border: '#1b1f30',
+          border: '#2b3540',
+          background: '#1b1f26',
           active: '#d78732',
-          inactive: '#1b1f26',
-          // Active?: string;
-          // inactive?: string;
+          inactive: '#2b3038',
         },
-      },
-      backgroundColor: {
-        menu: '#222',
-        appShell: '#1a2230',
       },
       color: {
         appShell: 'white',
@@ -99,10 +91,6 @@ export const themeConfig: Record<string, CustomThemeConfig> = {
           inactive: '#1a2230',
         },
       },
-      backgroundColor: {
-        menu: '#222',
-        appShell: '#1a2230',
-      },
       color: {
         appShell: '#c9c9c9',
       },
@@ -120,10 +108,6 @@ export const themeConfig: Record<string, CustomThemeConfig> = {
           inactive: '#1a2230',
         },
       },
-      backgroundColor: {
-        menu: '#222',
-        appShell: '#1a2230',
-      },
       color: {
         appShell: 'white',
       },
@@ -140,10 +124,6 @@ export const themeConfig: Record<string, CustomThemeConfig> = {
           active: '#f28043',
           inactive: '#1a2230',
         },
-      },
-      backgroundColor: {
-        menu: '#222',
-        appShell: '#1a2230',
       },
       color: {
         appShell: 'white',
