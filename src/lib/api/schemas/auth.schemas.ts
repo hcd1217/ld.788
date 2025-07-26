@@ -1,15 +1,18 @@
 import * as z from 'zod/v4';
 import {
-  passwordSchema,
-  jwtTokenSchema,
+  booleanSchema,
   emailSchema,
-  optionalStringSchema,
   idSchema,
+  jwtTokenSchema,
+  numberSchema,
+  optionalStringSchema,
+  passwordSchema,
+  stringSchema,
 } from './common.schemas';
 
 // Schemas
 export const LoginRequestSchema = z.object({
-  identifier: z.string(),
+  identifier: stringSchema,
   password: passwordSchema,
   clientCode: z.string().min(2),
 });
@@ -30,10 +33,10 @@ export const RenewTokenResponseSchema = z.object({
 
 export const JWTPayloadSchema = z.object({
   email: emailSchema,
-  sub: z.string(),
-  isRoot: z.boolean().optional(),
-  iat: z.number(),
-  exp: z.number(),
+  sub: stringSchema,
+  isRoot: booleanSchema.optional(),
+  iat: numberSchema,
+  exp: numberSchema,
 });
 
 export const ForgotPasswordRequestSchema = z.object({
@@ -42,63 +45,68 @@ export const ForgotPasswordRequestSchema = z.object({
 });
 
 export const ForgotPasswordResponseSchema = z.object({
-  success: z.boolean(),
+  success: booleanSchema,
 });
 
 export const ResetPasswordRequestSchema = z.object({
   email: emailSchema,
-  token: z.string(),
+  token: stringSchema,
   password: passwordSchema,
 });
 
 export const ResetPasswordResponseSchema = z.object({
-  success: z.boolean(),
+  success: booleanSchema,
 });
 
 export const RegisterRequestSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  clientCode: z.string().min(2),
-  clientName: z.string().min(5),
+  firstName: stringSchema.min(1),
+  lastName: stringSchema.min(1),
+  clientCode: stringSchema.min(2),
+  clientName: stringSchema.min(5),
 });
 
 export const RegisterResponseSchema = z.object({
-  accessToken: z.string(),
-  refreshToken: z.string(),
+  accessToken: stringSchema,
+  refreshToken: stringSchema,
 });
 
 // Schema for role object
 export const RoleSchema = z.object({
   id: z.string().uuid(),
-  name: z.string(),
-  level: z.number(),
+  name: stringSchema,
+  level: numberSchema,
 });
 
 // Schema for dynamic feature flags
 export const DynamicFeatureFlagsSchema = z.object({
   'role-management': z
     .object({
-      customRoles: z.boolean(),
-      roleHierarchy: z.boolean(),
+      customRoles: booleanSchema,
+      roleHierarchy: booleanSchema,
     })
     .optional(),
   'user-management': z
     .object({
-      bulkImport: z.boolean(),
-      userInvitations: z.boolean(),
-      createUserWithDepartment: z.boolean(),
+      bulkImport: booleanSchema,
+      userInvitations: booleanSchema,
+      createUserWithDepartment: booleanSchema,
     })
     .optional(),
 });
 
 // Schema for client config
 export const ClientConfigSchema = z.object({
-  sessionTimeoutMinutes: z.number(),
-  maxConcurrentSessions: z.number(),
-  allowPasswordReset: z.boolean(),
-  allowSelfRegistration: z.boolean(),
+  clientName: optionalStringSchema,
+  logoUrl: optionalStringSchema,
+  translations: z
+    .record(z.string(), z.record(z.string(), z.string()))
+    .optional(),
+  sessionTimeoutMinutes: numberSchema,
+  maxConcurrentSessions: numberSchema,
+  allowPasswordReset: booleanSchema,
+  allowSelfRegistration: booleanSchema,
 });
 
 // Schema for GET /auth/me response
@@ -107,8 +115,8 @@ export const GetMeResponseSchema = z.object({
   email: emailSchema,
   userName: optionalStringSchema,
   clientId: idSchema,
-  clientCode: z.string(),
-  isRoot: z.boolean(),
+  clientCode: stringSchema,
+  isRoot: booleanSchema,
   roles: z.array(RoleSchema),
   dynamicFeatureFlags: DynamicFeatureFlagsSchema,
   clientConfig: ClientConfigSchema,

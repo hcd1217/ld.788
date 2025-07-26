@@ -29,6 +29,26 @@ const ProfilePage = lazy(async () => {
   return {default: module.ProfilePage};
 });
 
+const BlankPage = lazy(async () => {
+  const module = await import('@/pages/app/BlankPage');
+  return {default: module.BlankPage};
+});
+
+const EmployeeListPage = lazy(async () => {
+  const module = await import('@/pages/app/EmployeeListPage');
+  return {default: module.EmployeeListPage};
+});
+
+const AddEmployeePage = lazy(async () => {
+  const module = await import('@/pages/app/AddEmployeePage.tsx');
+  return {default: module.AddEmployeePage};
+});
+
+const EditEmployeePage = lazy(async () => {
+  const module = await import('@/pages/app/EditEmployeePage.tsx');
+  return {default: module.EditEmployeePage};
+});
+
 const HomePage = lazy(async () => {
   const module = await import('@/pages/app/HomePage');
   return {default: module.HomePage};
@@ -207,6 +227,9 @@ const routeObjects: RouteObject[] = [
         path: '',
         Component: RootUserLayout,
         children: [
+          {path: 'employee-management', Component: EmployeeListPage},
+          {path: 'store-management', Component: BlankPage},
+          {path: 'salary-management', Component: BlankPage},
           {path: 'stores', Component: StoreListPage},
           {path: 'staff', Component: StaffListPage},
           {path: 'user-management', Component: UserManagementPage},
@@ -215,6 +238,8 @@ const routeObjects: RouteObject[] = [
             path: '',
             Component: PCOnlyLayout,
             children: [
+              {path: 'employees/add', Component: AddEmployeePage},
+              {path: 'employees/edit/:employeeId', Component: EditEmployeePage},
               {path: 'import-users', Component: ImportUsersPage},
               {path: 'role-management', Component: RoleManagementPage},
               {path: 'store-config', Component: StoreConfigPage},
@@ -249,6 +274,16 @@ const routeObjects: RouteObject[] = [
           {path: 'clients/:clientCode', Component: ClientDetailPage},
           {path: 'permissions', Component: AdminPermissionManagementPage},
         ],
+      },
+    ],
+  },
+  {
+    path: '/sample',
+    Component: PCOnlyLayout,
+    children: [
+      {
+        path: 'blank-page',
+        Component: BlankPage,
       },
     ],
   },

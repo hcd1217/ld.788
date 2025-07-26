@@ -3,6 +3,7 @@ import {ClientApi} from './services/client.service';
 import {UserApi} from './services/user.service';
 import {AdminApi} from './services/admin.service';
 import {StoreApi} from './services/store.service';
+import {HrApi} from './services/hr.service';
 
 const API_BASE_URL =
   (import.meta.env.VITE_API_URL as string | undefined) ??
@@ -29,6 +30,10 @@ export const storeApi = new StoreApi({
   baseURL: API_BASE_URL,
 });
 
+export const hrApi = new HrApi({
+  baseURL: API_BASE_URL,
+});
+
 // Export types and schemas
 export * from './schemas';
 
@@ -38,5 +43,6 @@ export {ClientApi} from './services/client.service';
 export {UserApi} from './services/user.service';
 export {AdminApi} from './services/admin.service';
 export {StoreApi} from './services/store.service';
+export {HrApi} from './services/hr.service';
 
 export {ApiError} from './base';

@@ -1,5 +1,8 @@
 # Local only
 swagger-*.json
+scripts/i18n-cleanup-report.json
+scripts/i18n-analysis-report.json
+scripts/i18n-analysis-safe-report.json
 # Sample data
 sample/
 

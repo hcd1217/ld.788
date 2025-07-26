@@ -1,6 +1,24 @@
 export type CustomColors = {
+  backgroundColor?: {
+    menu?: string;
+    appShell?: string;
+  };
+  color?: {
+    appShell?: string;
+  };
+  appShell?: {
+    menu?: {
+      border?: string;
+      active?: string;
+      inactive?: string;
+    };
+    backgroundColor?: string;
+    color?: string;
+  };
   inputBorderColor: string;
   borderColor: string;
+  activeColor: string;
+  inActiveColor: string;
 };
 type CustomThemeConfig = {
   brandColors: [
@@ -21,6 +39,80 @@ type CustomThemeConfig = {
 };
 
 export const themeConfig: Record<string, CustomThemeConfig> = {
+  orange: {
+    brandColors: [
+      '#fff4e6',
+      '#f9e7d5',
+      '#efceac',
+      '#e5b47f',
+      '#dd9d59',
+      '#d98e40',
+      '#d78732',
+      '#c07525',
+      '#aa661d',
+      '#945712',
+    ],
+    default: {
+      appShell: {
+        backgroundColor: '#1a2230',
+        color: 'white',
+        menu: {
+          border: '#1b1f30',
+          active: '#d78732',
+          inactive: '#1b1f26',
+          // Active?: string;
+          // inactive?: string;
+        },
+      },
+      backgroundColor: {
+        menu: '#222',
+        appShell: '#1a2230',
+      },
+      color: {
+        appShell: 'white',
+      },
+      inputBorderColor: '#fac0a1',
+      borderColor: '#c07525',
+      activeColor: '#d78732',
+      inActiveColor: 'gray',
+    },
+  },
+  tomato: {
+    brandColors: [
+      '#fff0e4',
+      '#ffe0cf',
+      '#fac0a1',
+      '#f69e6e',
+      '#f28043',
+      '#f06e27',
+      '#f06418',
+      '#d6530c',
+      '#bf4906',
+      '#a73c00',
+    ],
+    default: {
+      appShell: {
+        backgroundColor: '#1a2230',
+        color: 'white',
+        menu: {
+          active: '#f28043',
+          // Active?: string;
+          // inactive?: string;
+        },
+      },
+      backgroundColor: {
+        menu: '#222',
+        appShell: '#1a2230',
+      },
+      color: {
+        appShell: 'white',
+      },
+      inputBorderColor: '#fac0a1',
+      borderColor: '#d6530c',
+      activeColor: '#f06e27',
+      inActiveColor: 'gray',
+    },
+  },
   origin: {
     brandColors: [
       '#ecf4ff',
@@ -37,14 +129,20 @@ export const themeConfig: Record<string, CustomThemeConfig> = {
     default: {
       inputBorderColor: '#dee2e6',
       borderColor: '#5173b8',
+      activeColor: 'green',
+      inActiveColor: 'gray',
     },
     light: {
       inputBorderColor: '#dee2e6',
       borderColor: '#5173b8',
+      activeColor: 'green',
+      inActiveColor: 'gray',
     },
     dark: {
       inputBorderColor: '#c5c5c5',
       borderColor: '#5173b8',
+      activeColor: 'green',
+      inActiveColor: 'gray',
     },
   },
   elegant: {
@@ -63,17 +161,22 @@ export const themeConfig: Record<string, CustomThemeConfig> = {
     default: {
       inputBorderColor: '#dee2e6',
       borderColor: '#4a76a9',
+      activeColor: 'green',
+      inActiveColor: 'gray',
     },
     light: {
       inputBorderColor: '#dee2e6',
       borderColor: '#4a76a9',
+      activeColor: 'green',
+      inActiveColor: 'gray',
     },
     dark: {
       inputBorderColor: '#dee2e6',
       borderColor: '#4a76a9',
+      activeColor: 'green',
+      inActiveColor: 'gray',
     },
   },
 } as const;
 
-export const defaultConfig = themeConfig.origin;
-// Export const defaultConfig = themeConfig.elegant
+export const defaultConfig = themeConfig.orange;

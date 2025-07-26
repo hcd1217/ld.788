@@ -12,9 +12,19 @@ export const clientCodeSchema = z
   .min(3)
   .max(10)
   .regex(/^[A-Z\d]+$/);
+export const booleanSchema = z.boolean();
+export const numberSchema = z.number();
+export const stringSchema = z.string();
 export const idSchema = z.string();
 export const emailSchema = z.email();
 export const timestampSchema = z
   .union([z.number(), z.string()])
   .transform((val) => new Date(val).toISOString());
 export const optionalStringSchema = z.string().optional();
+export const paginationSchema = z.object({
+  limit: z.number(),
+  hasNext: z.boolean(),
+  hasPrev: z.boolean(),
+  nextCursor: optionalStringSchema,
+  prevCursor: optionalStringSchema,
+});

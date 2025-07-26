@@ -15,3 +15,6 @@ export * from './admin.schemas';
 
 // Store management schemas
 export * from './store.schemas';
+
+// HR management schemas
+export * from './hr.schemas';

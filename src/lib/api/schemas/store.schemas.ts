@@ -3,6 +3,7 @@ import {
   emailSchema,
   idSchema,
   optionalStringSchema,
+  paginationSchema,
   timestampSchema,
 } from './common.schemas';
 import {generateRandomString} from '@/utils/string';
@@ -78,13 +79,7 @@ export const UpdateStoreResponseSchema = z.object({
 
 export const GetStoresResponseSchema = z.object({
   stores: z.array(StoreSchema),
-  pagination: z.object({
-    limit: z.number(),
-    hasNext: z.boolean(),
-    hasPrev: z.boolean(),
-    nextCursor: optionalStringSchema,
-    prevCursor: optionalStringSchema,
-  }),
+  pagination: paginationSchema,
 });
 
 // Store Staff schemas

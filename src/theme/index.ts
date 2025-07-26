@@ -13,11 +13,12 @@ export const theme = createTheme({
   colors: {
     brand: defaultConfig.brandColors,
   },
+  // Cspell:words Noto Consolas
   fontFamily:
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+    '"Noto Sans", Consolas, Monaco, "Courier New", monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
   headings: {
     fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+      '"Noto Sans", Consolas, Monaco, "Courier New", monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
   },
   defaultRadius: 'md',
   cursorType: 'pointer',
@@ -84,17 +85,32 @@ const darkColors = defaultConfig.dark ?? defaultColors;
 export const resolver: CSSVariablesResolver = () => ({
   variables: {
     '--input-border-color': defaultColors.inputBorderColor,
+    '--menu-background-color': defaultColors.appShell?.color ?? 'white',
+    '--menu-active-color': defaultColors.appShell?.menu?.active ?? '',
+    '--menu-inactive-color':
+      defaultColors.appShell?.menu?.inactive ?? 'transparent',
+    '--menu-border-color':
+      defaultColors.appShell?.menu?.border ?? 'transparent',
+    '--app-shell-background-color':
+      defaultColors.appShell?.backgroundColor ?? 'white',
+    '--app-shell-color': defaultColors.appShell?.color ?? 'white',
     '--card-border-color': defaultColors.borderColor,
     '--box-shadow-color': defaultColors.borderColor,
+    '--app-active-color': defaultColors.activeColor,
+    '--app-in-active-color': defaultColors.inActiveColor,
   },
   light: {
     '--input-border-color': lightColors.inputBorderColor,
     '--card-border-color': lightColors.borderColor,
     '--box-shadow-color': lightColors.borderColor,
+    '--app-active-color': lightColors.activeColor,
+    '--app-in-active-color': lightColors.inActiveColor,
   },
   dark: {
     '--input-border-color': darkColors.inputBorderColor,
     '--card-border-color': darkColors.borderColor,
     '--box-shadow-color': darkColors.borderColor,
+    '--app-active-color': darkColors.activeColor,
+    '--app-in-active-color': darkColors.inActiveColor,
   },
 });

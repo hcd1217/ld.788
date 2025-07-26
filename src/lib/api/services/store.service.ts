@@ -41,11 +41,13 @@ export class StoreApi extends BaseApiClient {
     queryParams.append('limit', '100');
     const url = `/stores${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
-    return this.get<GetStoresResponse, void>(
+    const response = await this.get<GetStoresResponse, void>(
       url,
       undefined,
       GetStoresResponseSchema,
     );
+    // Response.stores = response.stores.slice(0, 1)
+    return response;
   }
 
   async createStore(data: CreateStoreRequest): Promise<CreateStoreResponse> {

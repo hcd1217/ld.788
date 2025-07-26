@@ -17,12 +17,6 @@ export function SelectableCard({
   shadow,
   ...cardProps
 }: SelectableCardProps) {
-  const handleClick = () => {
-    if (onClick) {
-      onClick();
-    }
-  };
-
   return (
     <Card
       withBorder
@@ -30,7 +24,7 @@ export function SelectableCard({
       padding="lg"
       radius="md"
       className={`${classes.selectableCard} ${isSelected ? classes.selected : ''} ${className ?? ''}`}
-      onClick={handleClick}
+      onClick={onClick}
       {...cardProps}
     >
       {children}

@@ -1,11 +1,5 @@
-import {Group, Text, Stack, ActionIcon, Button} from '@mantine/core';
-import {
-  IconMapPin,
-  IconClock,
-  IconPhone,
-  IconEdit,
-  IconTrash,
-} from '@tabler/icons-react';
+import {Group, Text, Stack, ActionIcon} from '@mantine/core';
+import {IconMapPin, IconPhone, IconEdit, IconTrash} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {SelectableCard} from '@/components/common';
 import type {Store} from '@/lib/api/schemas/store.schemas';
@@ -16,7 +10,6 @@ export interface StoreCardProps {
   readonly onSelect: (store: Store) => void;
   readonly onEdit: (store: Store) => void;
   readonly onDelete: (store: Store) => void;
-  readonly formatOperatingHours: () => string;
 }
 
 export function StoreCard({
@@ -25,7 +18,6 @@ export function StoreCard({
   onSelect,
   onEdit,
   onDelete,
-  formatOperatingHours,
 }: StoreCardProps) {
   const {t} = useTranslation();
 
@@ -80,20 +72,16 @@ export function StoreCard({
             <Text fw={700} size="lg">
               {store.name}
             </Text>
-            <Text size="sm" c="dimmed">
-              ({store.code})
-            </Text>
           </Group>
-          <Group gap="xs" c="dimmed">
-            <IconMapPin size={14} />
+          <Group gap="xs" c="dimmed" justify="left" wrap="nowrap">
+            <IconMapPin size={14} style={{flexShrink: 0}} />
             <Text
               size="sm"
-              maw={250}
-              lineClamp={2}
               style={{
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
+                flex: 1,
               }}
             >
               {store.address}, {store.city}
@@ -106,35 +94,7 @@ export function StoreCard({
               <Text size="sm">{store.phoneNumber}</Text>
             </Group>
           ) : null}
-          <Group gap="xs" c="dimmed">
-            <IconClock size={14} />
-            <Text size="sm">{formatOperatingHours()}</Text>
-          </Group>
         </Stack>
-
-        <Group
-          justify="space-between"
-          pt="md"
-          style={{borderTop: '1px solid var(--mantine-color-gray-3)'}}
-        >
-          <Text size="xs" c="dimmed">
-            {t('common.created')}{' '}
-            {new Date(store.createdAt).toLocaleDateString()}
-          </Text>
-
-          {!isSelected && (
-            <Button
-              opacity={0}
-              size="xs"
-              variant="light"
-              onClick={() => {
-                onSelect(store);
-              }}
-            >
-              {t('store.selectStore')}
-            </Button>
-          )}
-        </Group>
       </Stack>
     </SelectableCard>
   );

@@ -13,7 +13,7 @@ if (console.ignore === undefined) {
 }
 
 export function registerLogger() {
-  const debug = true;
+  const debug = false;
   if (debug) {
     return;
   }

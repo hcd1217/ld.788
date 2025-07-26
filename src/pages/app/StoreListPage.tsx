@@ -155,11 +155,6 @@ export function StoreListPage() {
     });
   };
 
-  // Since operating hours are fetched separately, we'll show a placeholder for now
-  const formatOperatingHours = () => {
-    return t('store.viewDetails');
-  };
-
   const handleEditStore = (store: Store) => {
     navigate(`/stores/edit/${store.id}`);
   };
@@ -245,7 +240,6 @@ export function StoreListPage() {
                     key={store.id}
                     store={store}
                     isSelected={currentStore?.id === store.id}
-                    formatOperatingHours={formatOperatingHours}
                     onSelect={handleSelectStore}
                     onEdit={handleEditStore}
                     onDelete={handleDeleteStore}

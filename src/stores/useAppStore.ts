@@ -9,6 +9,9 @@ import {
   isAdminAuthenticated,
   restoreAdminSession,
 } from '@/utils/adminSessionManager';
+import {authApi} from '@/lib/api';
+import {updateClientTranslations, clearClientTranslations} from '@/lib/i18n';
+import type {GetMeResponse} from '@/lib/api/schemas/auth.schemas';
 
 type User = {
   id: string;
@@ -16,16 +19,33 @@ type User = {
   isRoot?: boolean;
 };
 
+type UserProfile = GetMeResponse;
+
 type AppState = {
   clientCode: string;
   user: User | undefined;
+  userProfile: UserProfile | undefined;
   isAuthenticated: boolean;
   adminAuthenticated: boolean;
   isLoading: boolean;
   adminApiLoading: boolean;
   adminApiLoadingMessage: string;
   theme: 'light' | 'dark';
+  config: {
+    pagination: {
+      mobile: {
+        defaultPageSize: number;
+        pagingOptions: Array<{value: string; label: string}>;
+      };
+      desktop: {
+        defaultPageSize: number;
+        pagingOptions: Array<{value: string; label: string}>;
+      };
+    };
+  };
   setUser: (user: User | undefined) => void;
+  setUserProfile: (profile: UserProfile | undefined) => void;
+  fetchUserProfile: () => Promise<void>;
   setTheme: (theme: 'light' | 'dark') => void;
   setAdminAuth: (authenticated: boolean) => void;
   setAdminApiLoading: (loading: boolean, message?: string) => void;
@@ -49,13 +69,47 @@ export const useAppStore = create<AppState>()(
       return {
         clientCode: localStorage.getItem('clientCode') ?? 'ACME',
         user: authService.getCurrentUser() ?? undefined,
+        userProfile: undefined,
         isAuthenticated: true,
         adminAuthenticated: isAdminAuthenticated(),
         isLoading: false,
         adminApiLoading: false,
         adminApiLoadingMessage: '',
         theme: 'light',
+        config: {
+          pagination: {
+            mobile: {
+              defaultPageSize: 5,
+              pagingOptions: [{value: '5', label: '5'}],
+            },
+            desktop: {
+              defaultPageSize: 12,
+              pagingOptions: [
+                {value: '6', label: '6'},
+                {value: '12', label: '12'},
+                {value: '24', label: '24'},
+                {value: '48', label: '48'},
+              ],
+            },
+          },
+        },
         setUser: (user) => set({user, isAuthenticated: Boolean(user)}),
+        setUserProfile: (profile) => set({userProfile: profile}),
+        async fetchUserProfile() {
+          try {
+            const profile = await authApi.getMe();
+            set({userProfile: profile});
+
+            // Apply client-specific translations if available
+            if (profile.clientConfig?.translations) {
+              updateClientTranslations(profile.clientConfig.translations);
+            }
+          } catch (error) {
+            console.error('Failed to fetch user profile:', error);
+            // Don't throw the error, just log it
+            // The UI can handle the undefined userProfile state
+          }
+        },
         setTheme: (theme) => set({theme}),
         setAdminAuth: (authenticated) =>
           set({adminAuthenticated: authenticated}),
@@ -75,6 +129,8 @@ export const useAppStore = create<AppState>()(
               isAuthenticated: true,
               isLoading: false,
             });
+            // Fetch user profile after successful login
+            await get().fetchUserProfile();
           } catch (error) {
             set({isLoading: false});
             throw error;
@@ -82,7 +138,13 @@ export const useAppStore = create<AppState>()(
         },
         logout() {
           authService.logout();
-          set({user: undefined, isAuthenticated: false});
+          set({
+            user: undefined,
+            userProfile: undefined,
+            isAuthenticated: false,
+          });
+          // Clear client-specific translations on logout
+          clearClientTranslations();
         },
         async checkAuth() {
           const isAuthenticated = await authService.isAuthenticated();
@@ -90,8 +152,14 @@ export const useAppStore = create<AppState>()(
             await delay(100);
             const user = authService.getCurrentUser();
             set({isAuthenticated, user: user ?? undefined});
+            // Fetch user profile when checking auth
+            await get().fetchUserProfile();
           } else {
-            set({user: undefined, isAuthenticated: false});
+            set({
+              user: undefined,
+              userProfile: undefined,
+              isAuthenticated: false,
+            });
           }
 
           return isAuthenticated;
@@ -125,3 +193,7 @@ export const useAppStore = create<AppState>()(
     },
   ),
 );
+
+// Computed selectors for convenience
+export const useClientConfig = () =>
+  useAppStore((state) => state.userProfile?.clientConfig);

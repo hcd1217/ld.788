@@ -18,6 +18,7 @@ import {getFormValidators} from '@/utils/validation';
 import {FormContainer} from '@/components/form/FormContainer';
 import {AuthHeader, AuthAlert, AuthFormLink} from '@/components/auth';
 import {useClientCode} from '@/hooks/useClientCode';
+import {isDevelopment} from '@/utils/env';
 
 type LoginFormValues = {
   identifier: string;
@@ -51,8 +52,15 @@ export function LoginPage() {
 
   const form = useForm<LoginFormValues>({
     initialValues: {
-      identifier: localStorage.getItem('rememberedIdentifier') ?? '',
-      password: '',
+      identifier:
+        (isDevelopment
+          ? `admin@${clientCode?.toLocaleLowerCase() ?? 'example'}.com`
+          : '') ||
+        localStorage.getItem('rememberedIdentifier') ||
+        '',
+      password: isDevelopment
+        ? (localStorage.getItem('__PASSWORD__') ?? '')
+        : '',
       clientCode,
     },
     validate: getFormValidators(t, ['identifier', 'password', 'clientCode']),

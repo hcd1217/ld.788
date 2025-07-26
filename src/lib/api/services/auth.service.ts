@@ -76,6 +76,18 @@ export class AuthApi extends BaseApiClient {
   }
 
   async getMe(): Promise<GetMeResponse> {
-    return this.get<GetMeResponse>('/auth/me', GetMeResponseSchema);
+    const response = await this.get<GetMeResponse>(
+      '/auth/me',
+      GetMeResponseSchema,
+    );
+    response.clientConfig.translations = {
+      vi: {
+        'employee.unit': 'Cửa hàng',
+      },
+    };
+    response.clientConfig.clientName = 'ACME';
+    response.clientConfig.logoUrl =
+      'https://img.freepik.com/free-vector/butterfly-colorful-logo-template_361591-1587.jpg?semt=ais_hybrid&w=740';
+    return response;
   }
 }
