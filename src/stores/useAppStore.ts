@@ -9,7 +9,7 @@ import {
   isAdminAuthenticated,
   restoreAdminSession,
 } from '@/utils/adminSessionManager';
-import {authApi} from '@/lib/api';
+import {authApi, clientApi, type ClientPublicConfigResponse} from '@/lib/api';
 import {updateClientTranslations, clearClientTranslations} from '@/lib/i18n';
 import type {GetMeResponse} from '@/lib/api/schemas/auth.schemas';
 
@@ -19,9 +19,11 @@ type User = {
   isRoot?: boolean;
 };
 
+type ClientPublicConfig = ClientPublicConfigResponse;
 type UserProfile = GetMeResponse;
 
 type AppState = {
+  publicClientConfig?: ClientPublicConfig;
   clientCode: string;
   user: User | undefined;
   userProfile: UserProfile | undefined;
@@ -49,6 +51,8 @@ type AppState = {
   setTheme: (theme: 'light' | 'dark') => void;
   setAdminAuth: (authenticated: boolean) => void;
   setAdminApiLoading: (loading: boolean, message?: string) => void;
+  setPublicClientConfig: (config: ClientPublicConfig | undefined) => void;
+  fetchPublicClientConfig: (clientCode: string) => Promise<void>;
   login: (params: {
     identifier: string;
     password: string;
@@ -66,8 +70,19 @@ export const useAppStore = create<AppState>()(
       // Restore admin session on initialization
       restoreAdminSession();
 
+      // Load public client config on initialization
+      const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
+      clientApi
+        .getPubicClientConfig(clientCode)
+        .then((config) => {
+          set({publicClientConfig: config});
+        })
+        .catch((error) => {
+          console.error('Failed to fetch initial public client config:', error);
+        });
+
       return {
-        clientCode: localStorage.getItem('clientCode') ?? 'ACME',
+        clientCode,
         user: authService.getCurrentUser() ?? undefined,
         userProfile: undefined,
         isAuthenticated: true,
@@ -115,9 +130,26 @@ export const useAppStore = create<AppState>()(
           set({adminAuthenticated: authenticated}),
         setAdminApiLoading: (loading, message = '') =>
           set({adminApiLoading: loading, adminApiLoadingMessage: message}),
+        setPublicClientConfig: (config) => set({publicClientConfig: config}),
+        async fetchPublicClientConfig(clientCode: string) {
+          try {
+            const config = await clientApi.getPubicClientConfig(clientCode);
+            set({publicClientConfig: config});
+          } catch (error) {
+            console.error('Failed to fetch public client config:', error);
+            // Don't throw the error, just log it
+            // The UI can handle the undefined publicClientConfig state
+          }
+        },
         async login(params) {
           set({isLoading: true, clientCode: params.clientCode});
           try {
+            // Fetch public client config if clientCode has changed
+            const currentClientCode = get().clientCode;
+            if (params.clientCode !== currentClientCode) {
+              await get().fetchPublicClientConfig(params.clientCode);
+            }
+
             const {user} = await authService.login({
               identifier: params.identifier,
               password: params.password,
@@ -141,6 +173,7 @@ export const useAppStore = create<AppState>()(
           set({
             user: undefined,
             userProfile: undefined,
+            publicClientConfig: undefined,
             isAuthenticated: false,
           });
           // Clear client-specific translations on logout

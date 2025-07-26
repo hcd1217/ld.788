@@ -1,7 +1,7 @@
 import {Group, Title, Box} from '@mantine/core';
 import {useNavigate} from 'react-router';
 import {useState, useEffect} from 'react';
-import {useClientConfig} from '@/stores/useAppStore';
+import {useAppStore} from '@/stores/useAppStore';
 
 type AppLogoProps = {
   readonly c?: string;
@@ -9,25 +9,25 @@ type AppLogoProps = {
 };
 export function AppLogo({c, link = '/home'}: AppLogoProps) {
   const navigate = useNavigate();
-  const clientConfig = useClientConfig();
+  const {publicClientConfig} = useAppStore();
   const [title, setTitle] = useState('Credo');
-  const [logoUrl, setLogoUrl] = useState('/logo.svg');
+  const [logoUrl, setLogoUrl] = useState('/logo-black-and-white.svg');
 
   useEffect(() => {
-    if (clientConfig?.clientName) {
-      setTitle(clientConfig.clientName);
+    if (publicClientConfig?.clientName) {
+      setTitle(publicClientConfig.clientName);
     }
 
-    if (clientConfig?.logoUrl) {
-      setLogoUrl(clientConfig?.logoUrl);
+    if (publicClientConfig?.logoUrl) {
+      setLogoUrl(publicClientConfig?.logoUrl);
     }
-  }, [clientConfig]);
+  }, [publicClientConfig]);
 
   return (
     <Group gap="xs" style={{cursor: 'pointer'}} onClick={() => navigate(link)}>
       <Box
         component="img"
-        src={logoUrl || '/logo.svg'}
+        src={logoUrl || '/logo-black-and-white.svg'}
         alt="Logo"
         style={{
           width: 30,

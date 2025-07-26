@@ -82,9 +82,11 @@ export class AuthApi extends BaseApiClient {
     );
     response.clientConfig.translations = {
       vi: {
+        // Cspell:disable-next-line
         'employee.unit': 'Cửa hàng',
       },
     };
+    response.clientConfig.clientCode = 'ACME';
     response.clientConfig.clientName = 'ACME';
     response.clientConfig.logoUrl =
       'https://img.freepik.com/free-vector/butterfly-colorful-logo-template_361591-1587.jpg?semt=ais_hybrid&w=740';

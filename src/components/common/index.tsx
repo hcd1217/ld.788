@@ -13,7 +13,6 @@ export {Pagination} from './features/Pagination';
 export {PWAInstallPrompt} from './features/PWAInstallPrompt';
 export {AppLogo} from './navigation/AppLogo';
 export {GoBack} from './navigation/GoBack';
-export {Logo} from './navigation/Logo';
 export {AppLoader} from './feedback/AppLoader';
 export {ErrorAlert} from './feedback/ErrorAlert';
 export {ErrorBoundary} from './feedback/ErrorBoundary';

@@ -5,6 +5,7 @@ import {
   emailSchema,
   optionalStringSchema,
   idSchema,
+  type ClientPublicConfigSchema,
 } from './common.schemas';
 
 export const RegisterClientRequestSchema = z.object({
@@ -293,4 +294,8 @@ export type GetUserRolesResponse = z.infer<typeof GetUserRolesResponseSchema>;
 
 export type GrantPermissionToRoleRequest = z.infer<
   typeof GrantPermissionToRoleRequestSchema
+>;
+
+export type ClientPublicConfigResponse = z.infer<
+  typeof ClientPublicConfigSchema
 >;

@@ -51,7 +51,9 @@ import {
   type GetMyRolesResponse,
   type GetUserPermissionsResponse,
   type GetUserRolesResponse,
+  type ClientPublicConfigResponse,
 } from '../schemas/client.schemas';
+import {delay} from '@/utils/time';
 
 export class ClientApi extends BaseApiClient {
   async register(data: RegisterClientRequest): Promise<RegisterClientResponse> {
@@ -247,5 +249,17 @@ export class ClientApi extends BaseApiClient {
       undefined,
       GetUserRolesResponseSchema,
     );
+  }
+
+  async getPubicClientConfig(
+    clientCode: string,
+  ): Promise<ClientPublicConfigResponse> {
+    await delay(100);
+    return {
+      clientCode,
+      // ClientName: 'ACME',
+      // logoUrl:
+      //   'https://img.freepik.com/free-vector/butterfly-colorful-logo-template_361591-1587.jpg?semt=ais_hybrid&w=740',
+    };
   }
 }

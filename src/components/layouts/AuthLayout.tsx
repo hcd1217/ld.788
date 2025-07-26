@@ -107,16 +107,15 @@ export function AuthLayout() {
       <AppShell.Header bg="var(--app-shell-background-color)">
         <Group h="100%" px="md" justify="space-between">
           <Group>
+            <AppLogo c="var(--app-shell-color)" />
             <Burger
-              opened={desktopOpened}
+              // Opened={desktopOpened}
               visibleFrom="sm"
               size="sm"
               color="var(--app-shell-color)"
               onClick={toggleDesktop}
             />
-            <AppLogo c="var(--app-shell-color)" />
           </Group>
-
           <Group>
             <Group visibleFrom="sm">
               <LanguageSwitcher />

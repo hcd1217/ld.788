@@ -28,3 +28,12 @@ export const paginationSchema = z.object({
   nextCursor: optionalStringSchema,
   prevCursor: optionalStringSchema,
 });
+
+export const ClientPublicConfigSchema = z.object({
+  clientCode: stringSchema,
+  clientName: optionalStringSchema,
+  logoUrl: optionalStringSchema,
+  translations: z
+    .record(z.string(), z.record(z.string(), z.string()))
+    .optional(),
+});

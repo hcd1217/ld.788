@@ -1,6 +1,7 @@
 import * as z from 'zod/v4';
 import {
   booleanSchema,
+  ClientPublicConfigSchema,
   emailSchema,
   idSchema,
   jwtTokenSchema,
@@ -98,15 +99,11 @@ export const DynamicFeatureFlagsSchema = z.object({
 
 // Schema for client config
 export const ClientConfigSchema = z.object({
-  clientName: optionalStringSchema,
-  logoUrl: optionalStringSchema,
-  translations: z
-    .record(z.string(), z.record(z.string(), z.string()))
-    .optional(),
   sessionTimeoutMinutes: numberSchema,
   maxConcurrentSessions: numberSchema,
   allowPasswordReset: booleanSchema,
   allowSelfRegistration: booleanSchema,
+  ...ClientPublicConfigSchema.shape,
 });
 
 // Schema for GET /auth/me response
