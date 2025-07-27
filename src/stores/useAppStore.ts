@@ -94,7 +94,7 @@ export const useAppStore = create<AppState>()(
           pagination: {
             mobile: {
               defaultPageSize: 1000,
-              // PagingOptions: [{value: '1000', label: '1000'}],
+              PagingOptions: [{value: '1000', label: '1000'}],
             },
             desktop: {
               defaultPageSize: 12,

@@ -1,13 +1,6 @@
 import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router';
-import {
-  Container,
-  Stack,
-  Group,
-  LoadingOverlay,
-  Box,
-  SimpleGrid,
-} from '@mantine/core';
+import {Stack, Group, Box, SimpleGrid} from '@mantine/core';
 import {IconUser} from '@tabler/icons-react';
 import {useDisclosure} from '@mantine/hooks';
 import {notifications} from '@mantine/notifications';
@@ -21,12 +14,13 @@ import {
   useHrActions,
 } from '@/stores/useHrStore';
 import {
-  ErrorAlert,
   Pagination,
   AppPageTitle,
   SearchBar,
   SwitchView,
   BlankState,
+  AppMobileLayout,
+  AppDesktopLayout,
 } from '@/components/common';
 import {
   EmployeeCard,
@@ -36,14 +30,13 @@ import {
   EmployeeActivateModal,
 } from '@/components/app/employee';
 import useIsDesktop from '@/hooks/useIsDesktop';
-import {AppMobileLayout} from '@/components/common/layouts/AppMobileLayout';
 
 export function EmployeeListPage() {
   const navigate = useNavigate();
   const employees = useEmployeeList();
   const isLoading = useHrLoading();
   const error = useHrError();
-  const {loadEmployees, deactivateEmployee, activateEmployee, clearError} =
+  const {refreshEmployees, deactivateEmployee, activateEmployee, clearError} =
     useHrActions();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
@@ -75,7 +68,8 @@ export function EmployeeListPage() {
     });
 
   useEffect(() => {
-    void loadEmployees(true);
+    console.log('refreshEmployees');
+    void refreshEmployees();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -91,21 +85,26 @@ export function EmployeeListPage() {
 
   const confirmDeactivateEmployee = async () => {
     if (!employeeToDeactivate) return;
-    const {success} = await deactivateEmployee(employeeToDeactivate.id);
-    closeDeactivateModal();
-    if (success) {
+    try {
+      await deactivateEmployee(employeeToDeactivate.id);
       notifications.show({
         title: t('common.success'),
         message: t('employee.employeeDeactivated'),
         color: 'green',
       });
-    } else {
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : t('employee.deactivateEmployeeFailed');
       notifications.show({
         title: t('common.error'),
-        message: t('employee.deactivateEmployeeFailed'),
+        message: errorMessage,
         color: 'red',
       });
     }
+
+    closeDeactivateModal();
   };
 
   const confirmActivateEmployee = async () => {
@@ -113,7 +112,6 @@ export function EmployeeListPage() {
 
     try {
       await activateEmployee(employeeToActivate.id);
-      closeActivateModal();
       notifications.show({
         title: t('common.success'),
         message: t('employee.employeeActivated'),
@@ -130,13 +128,17 @@ export function EmployeeListPage() {
         color: 'red',
       });
     }
+
+    closeActivateModal();
   };
 
   if (!isDesktop) {
     return (
       <AppMobileLayout
-        withLogo
+        showLogo
         isLoading={isLoading}
+        error={error}
+        clearError={clearError}
         header={<AppPageTitle title={t('employee.title')} />}
       >
         <Group justify="space-between">
@@ -173,121 +175,114 @@ export function EmployeeListPage() {
   }
 
   return (
-    <Container fluid px="sm" mt="sm">
-      <Stack gap="xl">
-        <AppPageTitle
-          title={t('employee.title')}
-          button={{
-            label: t('employee.addEmployee'),
-            onClick() {
-              navigate('/employees/add');
-            },
-          }}
+    <AppDesktopLayout
+      isLoading={isLoading}
+      error={error}
+      clearError={clearError}
+    >
+      <AppPageTitle
+        title={t('employee.title')}
+        button={{
+          label: t('employee.addEmployee'),
+          onClick() {
+            navigate('/employees/add');
+          },
+        }}
+      />
+
+      {/* Search Bar and View Mode Selector */}
+      <Group justify="space-between" align="flex-end">
+        <SearchBar
+          hidden={employees.length < 11}
+          placeholder={t('employee.searchPlaceholder')}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
+        <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
+      </Group>
+
+      <div>
+        <BlankState
+          hidden={paginationState.totalItems > 0 || isLoading}
+          icon={<IconUser size={48} color="var(--mantine-color-gray-5)" />}
+          title={
+            searchQuery
+              ? t('employee.noEmployeesFoundSearch')
+              : t('employee.noEmployeesFound')
+          }
+          description={
+            searchQuery
+              ? t('employee.tryDifferentSearch')
+              : t('employee.createFirstEmployeeDescription')
+          }
+          button={
+            searchQuery
+              ? undefined
+              : {
+                  label: t('employee.createFirstEmployee'),
+                  onClick: () => navigate('/employees/add'),
+                }
+          }
         />
 
-        {/* Search Bar and View Mode Selector */}
-        <Group justify="space-between" align="flex-end">
-          <SearchBar
-            hidden={employees.length < 11}
-            placeholder={t('employee.searchPlaceholder')}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
-          <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
-        </Group>
-
-        <ErrorAlert error={error} clearError={clearError} />
-
-        <div>
-          <LoadingOverlay
-            visible={isLoading}
-            overlayProps={{blur: 2}}
-            transitionProps={{duration: 300}}
-          />
-          <BlankState
-            hidden={paginationState.totalItems > 0 || isLoading}
-            icon={<IconUser size={48} color="var(--mantine-color-gray-5)" />}
-            title={
-              searchQuery
-                ? t('employee.noEmployeesFoundSearch')
-                : t('employee.noEmployeesFound')
-            }
-            description={
-              searchQuery
-                ? t('employee.tryDifferentSearch')
-                : t('employee.createFirstEmployeeDescription')
-            }
-            button={
-              searchQuery
-                ? undefined
-                : {
-                    label: t('employee.createFirstEmployee'),
-                    onClick: () => navigate('/employees/add'),
-                  }
-            }
-          />
-
-          {paginationState.totalItems === 0 && !isLoading ? null : (
-            <>
-              {/* Desktop View - Table or Grid based on selection */}
-              <Box visibleFrom="md">
-                {viewMode === 'table' ? (
-                  <EmployeeDataTable
-                    employees={paginatedEmployees}
-                    onDeactivateEmployee={(employee) => {
+        {paginationState.totalItems === 0 && !isLoading ? null : (
+          <>
+            {/* Desktop View - Table or Grid based on selection */}
+            {viewMode === 'table' ? (
+              <EmployeeDataTable
+                employees={paginatedEmployees}
+                onDeactivateEmployee={(employee) => {
+                  handleDeactivateEmployee(employee);
+                }}
+                onActivateEmployee={(employee) => {
+                  handleActivateEmployee(employee);
+                }}
+              />
+            ) : (
+              <SimpleGrid cols={{base: 1, md: 2, lg: 3}} spacing="lg">
+                {paginatedEmployees.map((employee) => (
+                  <EmployeeGridCard
+                    key={employee.id}
+                    employee={employee}
+                    onDeactivate={() => {
                       handleDeactivateEmployee(employee);
                     }}
-                    onActivateEmployee={(employee) => {
+                    onActivate={() => {
                       handleActivateEmployee(employee);
                     }}
                   />
-                ) : (
-                  <SimpleGrid cols={{base: 1, md: 2, lg: 3}} spacing="lg">
-                    {paginatedEmployees.map((employee) => (
-                      <EmployeeGridCard
-                        key={employee.id}
-                        employee={employee}
-                        onDeactivate={() => {
-                          handleDeactivateEmployee(employee);
-                        }}
-                        onActivate={() => {
-                          handleActivateEmployee(employee);
-                        }}
-                      />
-                    ))}
-                  </SimpleGrid>
-                )}
-              </Box>
-            </>
-          )}
-        </div>
+                ))}
+              </SimpleGrid>
+            )}
+          </>
+        )}
+      </div>
 
-        <Pagination
-          hidden={paginationState.totalItems === 0}
-          totalPages={paginationState.totalPages}
-          pageSize={paginationState.pageSize}
-          currentPage={paginationState.currentPage}
-          onPageSizeChange={paginationHandlers.setPageSize}
-          onPageChange={paginationHandlers.setCurrentPage}
-        />
+      <Pagination
+        hidden={paginationState.totalItems === 0}
+        totalPages={paginationState.totalPages}
+        pageSize={paginationState.pageSize}
+        currentPage={paginationState.currentPage}
+        onPageSizeChange={paginationHandlers.setPageSize}
+        onPageChange={paginationHandlers.setCurrentPage}
+      />
 
-        {/* Deactivate Confirmation Modal */}
-        <EmployeeDeactivateModal
-          opened={deactivateModalOpened}
-          employee={employeeToDeactivate}
-          onClose={closeDeactivateModal}
-          onConfirm={confirmDeactivateEmployee}
-        />
+      {/* Deactivate Confirmation Modal */}
+      <EmployeeDeactivateModal
+        opened={deactivateModalOpened}
+        employee={employeeToDeactivate}
+        onClose={closeDeactivateModal}
+        onConfirm={confirmDeactivateEmployee}
+      />
 
-        {/* Activate Confirmation Modal */}
-        <EmployeeActivateModal
-          opened={activateModalOpened}
-          employee={employeeToActivate}
-          onClose={closeActivateModal}
-          onConfirm={confirmActivateEmployee}
-        />
-      </Stack>
-    </Container>
+      {/* Activate Confirmation Modal */}
+      <EmployeeActivateModal
+        opened={activateModalOpened}
+        employee={employeeToActivate}
+        onClose={closeActivateModal}
+        onConfirm={confirmActivateEmployee}
+      />
+    </AppDesktopLayout>
   );
 }
 

@@ -5,12 +5,9 @@ declare global {
     ignore: (message?: unknown, ...optionalParams: unknown[]) => void;
   }
 }
-
-if (console.ignore === undefined) {
-  console.ignore = () => {
-    // Do nothing
-  };
-}
+console.ignore = () => {
+  // Do nothing
+};
 
 export function registerLogger() {
   const debug = true;

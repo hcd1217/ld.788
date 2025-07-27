@@ -4,14 +4,20 @@ import {GoBack} from '@/components/common';
 
 type ResourceNotFoundProps = {
   readonly message: string;
+  readonly showGoBack?: boolean;
 };
-export function ResourceNotFound({message}: ResourceNotFoundProps) {
+export function ResourceNotFound({
+  message,
+  showGoBack = false,
+}: ResourceNotFoundProps) {
   return (
-    <Container fluid mt="xl">
+    <Container fluid w="100%" mt="xl">
       <Stack gap="xl">
-        <Group justify="left">
-          <GoBack />
-        </Group>
+        {showGoBack ? (
+          <Group justify="left">
+            <GoBack />
+          </Group>
+        ) : null}
 
         <Box
           style={{

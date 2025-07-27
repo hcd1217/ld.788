@@ -12,7 +12,7 @@ import {GoBack} from '@/components/common';
 
 interface DetailPageLayoutProps {
   readonly title: string;
-  readonly children: ReactNode;
+  readonly children?: ReactNode;
   readonly isLoading?: boolean;
   readonly containerFluid?: boolean;
   readonly containerSize?: MantineSize;

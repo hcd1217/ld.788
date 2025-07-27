@@ -13,10 +13,9 @@ export function useOrientation(): {
   const [orientation, setOrientation] = useState<Orientation>('portrait');
 
   useEffect(() => {
-    const isMobile = Math.min(window.innerWidth, window.innerHeight) < 769;
-    setIsMobile(isMobile);
-
     const handleOrientationChange = () => {
+      const isMobile = Math.min(window.innerWidth, window.innerHeight) < 769;
+      setIsMobile(isMobile);
       if (!isMobile) {
         return;
       }

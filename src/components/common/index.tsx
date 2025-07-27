@@ -25,4 +25,9 @@ export {
   ErrorModal,
   VersionInformation,
 } from './feedback';
-export {DetailPageLayout, ResourceNotFound} from './layouts';
+export {
+  AppDesktopLayout,
+  AppMobileLayout,
+  DetailPageLayout,
+  ResourceNotFound,
+} from './layouts';

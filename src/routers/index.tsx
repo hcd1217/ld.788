@@ -224,7 +224,10 @@ const routeObjects: RouteObject[] = [
         <AppLayout />
       </ProtectedRoute>
     ),
-    children: [{path: 'employee-management', Component: EmployeeListPage}],
+    children: [
+      {path: 'employee-management', Component: EmployeeListPage},
+      {path: 'employees/:employeeId', Component: EmployeeDetailPage},
+    ],
   },
   // Old APP routes
   {
@@ -246,7 +249,7 @@ const routeObjects: RouteObject[] = [
         Component: RootUserLayout,
         children: [
           // {path: 'employee-management', Component: EmployeeListPage},
-          {path: 'employees/:employeeId', Component: EmployeeDetailPage},
+          // {path: 'employees/:employeeId', Component: EmployeeDetailPage},
           {path: 'store-management', Component: BlankPage},
           {path: 'salary-management', Component: BlankPage},
           {path: 'stores', Component: StoreListPage},

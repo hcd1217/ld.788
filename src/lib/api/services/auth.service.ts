@@ -76,6 +76,13 @@ export class AuthApi extends BaseApiClient {
   }
 
   async getMe(): Promise<GetMeResponse> {
+    // Cache key is automatically generated and used by the get() method
+    // To manually manage cache for this endpoint:
+    // const cacheKey = this.getCacheKey('/auth/me');
+    // const isCached = this.hasCachedData(cacheKey);
+    // const ttlRemaining = this.getCacheTTL(cacheKey);
+    // this.clearCacheEntry(cacheKey); // To clear specific cache
+
     return this.get<GetMeResponse>('/auth/me', undefined, GetMeResponseSchema);
   }
 }

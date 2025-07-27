@@ -2,10 +2,16 @@ import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 import {useDisclosure} from '@mantine/hooks';
 import {notifications} from '@mantine/notifications';
+import {LoadingOverlay} from '@mantine/core';
 import useTranslation from '@/hooks/useTranslation';
 import useIsDesktop from '@/hooks/useIsDesktop';
 import {useEmployeeList, useHrActions, useHrLoading} from '@/stores/useHrStore';
-import {ResourceNotFound, DetailPageLayout} from '@/components/common';
+import {
+  ResourceNotFound,
+  DetailPageLayout,
+  AppPageTitle,
+  AppMobileLayout,
+} from '@/components/common';
 import {
   EmployeeDeactivateModal,
   EmployeeActivateModal,
@@ -13,6 +19,7 @@ import {
   EmployeeDetailAccordion,
 } from '@/components/app/employee';
 import type {Employee} from '@/lib/api/schemas/hr.schemas';
+import {renderFullName} from '@/utils/string';
 
 export function EmployeeDetailPage() {
   const {employeeId} = useParams<{employeeId: string}>();
@@ -119,8 +126,40 @@ export function EmployeeDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!employee && !isLoading) {
-    return <ResourceNotFound message={t('employee.notFound')} />;
+  if (!isDesktop) {
+    if (isLoading || !employee) {
+      return (
+        <AppMobileLayout
+          showLogo
+          isLoading={isLoading}
+          header={<AppPageTitle title={t('employee.employeeDetails')} />}
+        >
+          {isLoading ? (
+            <LoadingOverlay visible />
+          ) : (
+            <ResourceNotFound showGoBack message={t('employee.notFound')} />
+          )}
+          ;
+        </AppMobileLayout>
+      );
+    }
+
+    return (
+      <AppMobileLayout
+        showLogo
+        showGoBack
+        noFooter
+        isLoading={isLoading}
+        header={<AppPageTitle title={renderFullName(employee)} />}
+      >
+        <EmployeeDetailAccordion
+          employee={employee}
+          getDepartmentById={getDepartmentById}
+          onActivate={handleActivate}
+          onDeactivate={handleDeactivate}
+        />
+      </AppMobileLayout>
+    );
   }
 
   return (
@@ -130,41 +169,32 @@ export function EmployeeDetailPage() {
       isLoading={isLoading}
     >
       {employee ? (
-        <>
-          {isDesktop ? (
-            <EmployeeDetailTabs
-              employee={employee}
-              getDepartmentById={getDepartmentById}
-              onEdit={handleEdit}
-              onActivate={handleActivate}
-              onDeactivate={handleDeactivate}
-            />
-          ) : (
-            <EmployeeDetailAccordion
-              employee={employee}
-              getDepartmentById={getDepartmentById}
-              onActivate={handleActivate}
-              onDeactivate={handleDeactivate}
-            />
-          )}
+        <EmployeeDetailTabs
+          employee={employee}
+          getDepartmentById={getDepartmentById}
+          onEdit={handleEdit}
+          onActivate={handleActivate}
+          onDeactivate={handleDeactivate}
+        />
+      ) : (
+        <ResourceNotFound message={t('employee.notFound')} />
+      )}
 
-          {/* Deactivate Confirmation Modal */}
-          <EmployeeDeactivateModal
-            opened={deactivateModalOpened}
-            employee={employeeToDeactivate}
-            onClose={closeDeactivateModal}
-            onConfirm={confirmDeactivateEmployee}
-          />
+      {/* Deactivate Confirmation Modal */}
+      <EmployeeDeactivateModal
+        opened={deactivateModalOpened}
+        employee={employeeToDeactivate}
+        onClose={closeDeactivateModal}
+        onConfirm={confirmDeactivateEmployee}
+      />
 
-          {/* Activate Confirmation Modal */}
-          <EmployeeActivateModal
-            opened={activateModalOpened}
-            employee={employeeToActivate}
-            onClose={closeActivateModal}
-            onConfirm={confirmActivateEmployee}
-          />
-        </>
-      ) : null}
+      {/* Activate Confirmation Modal */}
+      <EmployeeActivateModal
+        opened={activateModalOpened}
+        employee={employeeToActivate}
+        onClose={closeActivateModal}
+        onConfirm={confirmActivateEmployee}
+      />
     </DetailPageLayout>
   );
 }

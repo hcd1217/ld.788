@@ -27,7 +27,7 @@ export function EmployeeDetailAccordion({
   const {t} = useTranslation();
 
   return (
-    <Accordion defaultValue={undefined} chevronPosition="right" p={0}>
+    <Accordion defaultValue="info" chevronPosition="right" p={0}>
       <Accordion.Item value="info">
         <Accordion.Control icon={<IconInfoCircle size={20} />}>
           <Text fw={600}>{t('employee.detailInformation')}</Text>

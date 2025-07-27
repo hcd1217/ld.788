@@ -1,4 +1,4 @@
-import {Modal, Stack, Title, Text, Alert, Flex, Button} from '@mantine/core';
+import {Modal, Stack, Text, Alert, Flex, Button} from '@mantine/core';
 import {IconAlertTriangle} from '@tabler/icons-react';
 import useTranslation from '@/hooks/useTranslation';
 import type {Employee} from '@/lib/api/schemas/hr.schemas';
@@ -23,7 +23,7 @@ export function EmployeeActivateModal({
     <Modal
       centered
       opened={opened}
-      title={<Title order={3}>{t('employee.confirmActivateTitle')}</Title>}
+      title={t('employee.confirmActivateTitle')}
       onClose={onClose}
     >
       <Stack gap="md">

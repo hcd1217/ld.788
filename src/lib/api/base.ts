@@ -3,6 +3,7 @@ import {addApiError} from '@/stores/error';
 import {authService} from '@/services/auth';
 import {cleanObject} from '@/utils/object';
 import {isDevelopment} from '@/utils/env';
+import {delay} from '@/utils/time';
 
 type ApiConfig = {
   baseURL: string;
@@ -41,6 +42,7 @@ export class BaseApiClient {
   private readonly cacheEnabled: boolean;
   private readonly cacheTTL: number;
   private readonly cache = new Map<string, CacheEntry<unknown>>();
+  private readonly locks = new Map<string, true>();
 
   constructor(config: ApiConfig) {
     this.baseURL = config.baseURL;
@@ -62,6 +64,54 @@ export class BaseApiClient {
     }
   }
 
+  /**
+   * Generates a cache key for a given endpoint and params
+   * This is exposed for manual cache management
+   */
+  public getCacheKey(
+    endpoint: string,
+    params?: Record<string, string | number | boolean>,
+  ): string {
+    return this.generateCacheKey(endpoint, params);
+  }
+
+  /**
+   * Checks if a cache entry exists and is valid
+   */
+  public hasCachedData(cacheKey: string): boolean {
+    if (!this.cacheEnabled) return false;
+
+    const entry = this.cache.get(cacheKey);
+    if (!entry) return false;
+
+    const now = Date.now();
+    if (now - entry.timestamp > entry.ttl) {
+      this.cache.delete(cacheKey);
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Clears a specific cache entry
+   */
+  public clearCacheEntry(cacheKey: string): void {
+    this.cache.delete(cacheKey);
+  }
+
+  /**
+   * Gets remaining TTL for a cache entry in milliseconds
+   */
+  public getCacheTTL(cacheKey: string): number {
+    const entry = this.cache.get(cacheKey);
+    if (!entry) return 0;
+
+    const elapsed = Date.now() - entry.timestamp;
+    const remaining = entry.ttl - elapsed;
+    return Math.max(0, remaining);
+  }
+
   async get<T, R = unknown>(
     endpoint: string,
     params?: R,
@@ -76,20 +126,36 @@ export class BaseApiClient {
     const cacheKey = this.generateCacheKey(endpoint, cleanParams);
     const cachedData = this.getCachedData<T>(cacheKey);
     if (cachedData !== undefined) {
+      console.ignore?.('get data from cache!!!', {endpoint});
       return cachedData;
     }
 
-    // Make request and cache result
-    const result = await this.request<T>(endpoint, {
-      method: 'GET',
-      params: cleanParams,
-      schema,
-    });
+    console.ignore?.('no cached data!!!', {endpoint});
 
-    // Cache the result
-    this.setCachedData(cacheKey, result);
+    if (this.locks.has(cacheKey)) {
+      console.ignore?.('race condition!!!');
+      await delay(200);
+      return this.get(endpoint, params, schema, paramsSchema);
+    }
 
-    return result;
+    this.locks.set(cacheKey, true);
+    try {
+      // Make request and cache result
+      const result = await this.request<T>(endpoint, {
+        method: 'GET',
+        params: cleanParams,
+        schema,
+      });
+
+      // Cache the result
+      this.setCachedData(cacheKey, result);
+      return result;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    } finally {
+      this.locks.delete(cacheKey);
+    }
   }
 
   async post<T, R = unknown>(
@@ -226,8 +292,8 @@ export class BaseApiClient {
     // Add configurable delay in development mode
     if (isDevelopment) {
       const delayMs = Number(import.meta.env.VITE_DEV_API_DELAY) || 0;
-      if (delayMs > 0 && console.ignore) {
-        console.ignore(
+      if (delayMs > 0) {
+        console.ignore?.(
           `[API] Delaying request for ${delayMs}ms: ${init.method ?? 'GET'} ${endpoint}`,
         );
         await new Promise((resolve) => {

@@ -17,7 +17,7 @@ type HrState = {
   loadEmployees: (force?: boolean) => Promise<void>;
   loadDepartments: () => Promise<void>;
   refreshEmployees: () => Promise<void>;
-  deactivateEmployee: (id: string) => Promise<{success: boolean}>;
+  deactivateEmployee: (id: string) => Promise<void>;
   activateEmployee: (id: string) => Promise<void>;
   clearError: () => void;
 
@@ -77,13 +77,16 @@ export const useHrStore = create<HrState>()(
 
         set({isLoading: true, error: undefined});
         try {
+          console.log('get data');
           // Load both employees and departments in parallel
           const [employeesResponse, departmentsResponse] = await Promise.all([
             hrApi.getEmployees(),
             hrApi.getDepartments(),
           ]);
+          console.log('get data done', employeesResponse, departmentsResponse);
           const now = Date.now();
           set({
+            isLoading: false,
             employees: employeesResponse.employees.sort((a, b) => {
               const x = (a.isActive ? 1 : -1) * now + a.createdAt.getTime();
               const y = (b.isActive ? 1 : -1) * now + b.createdAt.getTime();
@@ -95,7 +98,6 @@ export const useHrStore = create<HrState>()(
                 department,
               ]),
             ),
-            isLoading: false,
           });
         } catch (error) {
           const errorMessage =
@@ -109,11 +111,13 @@ export const useHrStore = create<HrState>()(
             error: errorMessage,
           });
           throw error;
+        } finally {
+          set({isLoading: false});
         }
       },
 
       async refreshEmployees() {
-        return get().loadEmployees();
+        return get().loadEmployees(true);
       },
 
       async deactivateEmployee(id: string) {
@@ -151,7 +155,6 @@ export const useHrStore = create<HrState>()(
             .catch((error) => {
               console.error('Background refresh failed:', error);
             });
-          return {success: true};
         } catch (error) {
           // Rollback on error
           const errorMessage =

@@ -3,7 +3,7 @@ import {IconAlertTriangle} from '@tabler/icons-react';
 
 type ErrorAlertProps = {
   readonly error?: string;
-  readonly clearError: () => void;
+  readonly clearError?: () => void;
 };
 export function ErrorAlert({error, clearError}: ErrorAlertProps) {
   if (!error) {
