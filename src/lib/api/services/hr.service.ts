@@ -5,13 +5,11 @@ import {
   CreateEmployeesResponseSchema,
   UpdateEmployeeRequestSchema,
   UpdateEmployeeResponseSchema,
-  DeleteEmployeeResponseSchema,
   type GetEmployeesResponse,
   type CreateEmployeesRequest,
   type CreateEmployeesResponse,
   type UpdateEmployeeRequest,
   type UpdateEmployeeResponse,
-  type DeleteEmployeeResponse,
   type GetDepartmentsResponse,
   GetDepartmentsResponseSchema,
   type Employee,
@@ -19,7 +17,7 @@ import {
 } from '../schemas/hr.schemas';
 import {nameAndGender} from '@/utils/fake';
 
-const fake = true;
+const fake = false;
 let id = Date.now();
 
 const departments: Department[] = fake
@@ -42,335 +40,342 @@ const departments: Department[] = fake
 
 const departmentIds = departments.map((el) => el.id);
 
-const employees: Employee[] = fake
+let employees: Employee[] = fake
   ? [
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: `employee-${id++}`,
         ...randomVietnameseName(),
         departmentId: randomDepartmentId(),
         isActive: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
-    ].slice(0, 20)
+    ]
+      .map((el) => {
+        return {
+          ...el,
+          employeeCode: `EMP_${el.id.slice(-4)}`.toLocaleUpperCase(),
+        };
+      })
+      .slice(0, 20)
   : [];
 export class HrApi extends BaseApiClient {
   async getEmployees(): Promise<GetEmployeesResponse> {
     const queryParams = new URLSearchParams();
     queryParams.append('limit', '1000');
-    const url = `/employees${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/api/hr/employees${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     if (fake) {
       return {
         employees,
@@ -394,14 +399,16 @@ export class HrApi extends BaseApiClient {
   ): Promise<CreateEmployeesResponse> {
     if (fake) {
       const newEmployees: Employee[] = data.map((el) => {
+        const employeeId = `employee-${id++}`;
         return {
-          id: `employee-${id++}`,
+          id: employeeId,
           firstName: el.firstName,
           lastName: el.lastName,
           departmentId: el.departmentId,
+          employeeCode: `EMP_${employeeId.slice(-4)}`.toLocaleUpperCase(),
           isActive: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         };
       });
       employees.push(...newEmployees);
@@ -412,7 +419,7 @@ export class HrApi extends BaseApiClient {
     }
 
     return this.post<CreateEmployeesResponse, CreateEmployeesRequest>(
-      '/employees',
+      '/api/hr/employees',
       data,
       CreateEmployeesResponseSchema,
       CreateEmployeesRequestSchema,
@@ -424,23 +431,54 @@ export class HrApi extends BaseApiClient {
     data: UpdateEmployeeRequest,
   ): Promise<UpdateEmployeeResponse> {
     return this.put<UpdateEmployeeResponse, UpdateEmployeeRequest>(
-      `/employees/${employeeId}`,
+      `/api/hr/employees/${employeeId}`,
       data,
       UpdateEmployeeResponseSchema,
       UpdateEmployeeRequestSchema,
     );
   }
 
-  async removeEmployee(employeeId: string): Promise<DeleteEmployeeResponse> {
+  async deactivateEmployee(employeeId: string): Promise<void> {
     if (fake) {
-      return {message: 'success'};
+      const employee = employees.find((e) => e.id === employeeId);
+      if (employee) {
+        employee.isActive = false;
+        employee.updatedAt = new Date();
+        return;
+      }
+
+      throw new Error('Employee not found');
     }
 
-    return this.delete<DeleteEmployeeResponse, void>(
-      `/employees/${employeeId}`,
-      undefined,
-      DeleteEmployeeResponseSchema,
-    );
+    const debug = true;
+    if (debug) {
+      throw new Error('Can not deactivate employee');
+    }
+
+    await this.patch(`/api/hr/employees/${employeeId}/deactivate`);
+  }
+
+  async activateEmployee(employeeId: string): Promise<void> {
+    if (fake) {
+      const employee = employees.find((e) => e.id === employeeId);
+      if (employee) {
+        employee.isActive = true;
+        employee.updatedAt = new Date();
+        return;
+      }
+
+      throw new Error('Employee not found');
+    }
+
+    await this.patch(`/api/hr/employees/${employeeId}/activate`);
+  }
+
+  async removeEmployee(employeeId: string): Promise<void> {
+    if (fake) {
+      employees = employees.filter((e) => e.id !== employeeId);
+    }
+
+    await this.delete(`/api/hr/employees/${employeeId}`);
   }
 
   async getDepartments(): Promise<GetDepartmentsResponse> {
@@ -457,7 +495,7 @@ export class HrApi extends BaseApiClient {
 
     const queryParams = new URLSearchParams();
     queryParams.append('limit', '1000');
-    const url = `/departments${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/api/hr/departments${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     return this.get<GetDepartmentsResponse, void>(
       url,

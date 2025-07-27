@@ -1,6 +1,6 @@
 import {type ReactNode} from 'react';
 import {Paper, LoadingOverlay, Transition, Stack} from '@mantine/core';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
+import useIsDesktop from '@/hooks/useIsDesktop';
 
 type FormContainerProps = {
   readonly children: ReactNode;

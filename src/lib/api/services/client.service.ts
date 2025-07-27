@@ -54,7 +54,6 @@ import {
   type ClientPublicConfigResponse,
 } from '../schemas/client.schemas';
 import {ClientPublicConfigSchema} from '../schemas';
-import {delay} from '@/utils/time';
 
 export class ClientApi extends BaseApiClient {
   async register(data: RegisterClientRequest): Promise<RegisterClientResponse> {
@@ -255,13 +254,10 @@ export class ClientApi extends BaseApiClient {
   async getPubicClientConfig(
     clientCode: string,
   ): Promise<ClientPublicConfigResponse> {
-    await delay(100);
-    return ClientPublicConfigSchema.parse({
-      clientCode,
-      // CLIENT PUBLIC INFORMATION
-      // clientName: 'ACME',
-      // logoUrl:
-      //   'https://img.freepik.com/free-vector/butterfly-colorful-logo-template_361591-1587.jpg?semt=ais_hybrid&w=740',
-    });
+    return this.get<ClientPublicConfigResponse, void>(
+      `/clients/${clientCode}/public-config`,
+      undefined,
+      ClientPublicConfigSchema,
+    );
   }
 }

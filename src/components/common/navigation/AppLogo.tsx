@@ -7,8 +7,14 @@ type AppLogoProps = {
   readonly c?: string;
   readonly fw?: MantineStyleProps['fw'];
   readonly link?: string;
+  readonly noTitle?: boolean;
 };
-export function AppLogo({c, fw, link = '/home'}: AppLogoProps) {
+export function AppLogo({
+  noTitle = false,
+  c,
+  fw,
+  link = '/home',
+}: AppLogoProps) {
   const navigate = useNavigate();
   const {publicClientConfig} = useAppStore();
   const [title, setTitle] = useState('Credo');
@@ -36,9 +42,11 @@ export function AppLogo({c, fw, link = '/home'}: AppLogoProps) {
           height: 30,
         }}
       />
-      <Title order={3} c={c}>
-        {title}
-      </Title>
+      {noTitle ? null : (
+        <Title order={3} c={c}>
+          {title}
+        </Title>
+      )}
     </Group>
   );
 }

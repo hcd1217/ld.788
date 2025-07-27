@@ -1,6 +1,9 @@
 import {Title, Text, Container, Card, Box, Stack} from '@mantine/core';
+import {useTranslation} from 'react-i18next';
+import {GoBack} from '@/components/common';
 
 export function BlankPage() {
+  const {t} = useTranslation();
   return (
     <Container fluid mt="xl">
       <Stack gap="xl">
@@ -13,12 +16,11 @@ export function BlankPage() {
           }}
         >
           <Box style={{maxWidth: '600px', width: '100%'}}>
-            <Card shadow="sm" padding="lg">
+            <GoBack />
+            <Card shadow="sm" padding="lg" mt="lg">
               <Title order={1}>Blank Page</Title>
               <Text mt="md" size="lg">
-                This page is blank place holder page, if you see this page, it
-                means that the route in under construction, please just ignore
-                this
+                {t('common.pages.blank')}
               </Text>
             </Card>
           </Box>

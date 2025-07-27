@@ -13,8 +13,12 @@ export function formatPhoneNumber(phoneNumber: string) {
     .replace(/(\d{4})(\d{3})(\d+)/, '$1-$2-$3');
 }
 
-export function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString();
+export function formatDate(date: string | Date) {
+  if (date instanceof Date) {
+    return date.toLocaleDateString();
+  }
+
+  return new Date(date).toLocaleDateString();
 }
 
 export function convertCamelCaseToText(text: string) {

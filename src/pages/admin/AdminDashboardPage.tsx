@@ -21,7 +21,7 @@ import {
 } from '@tabler/icons-react';
 import {useNavigate} from 'react-router';
 import {useAppStore} from '@/stores/useAppStore';
-import {useTranslation} from '@/hooks/useTranslation';
+import useTranslation from '@/hooks/useTranslation';
 
 export function AdminDashboardPage() {
   const navigate = useNavigate();

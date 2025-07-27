@@ -14,9 +14,11 @@ type HrState = {
 
   // Actions
   setCurrentEmployee: (employee: Employee | undefined) => void;
-  loadEmployees: () => Promise<void>;
+  loadEmployees: (force?: boolean) => Promise<void>;
   loadDepartments: () => Promise<void>;
   refreshEmployees: () => Promise<void>;
+  deactivateEmployee: (id: string) => Promise<{success: boolean}>;
+  activateEmployee: (id: string) => Promise<void>;
   clearError: () => void;
 
   // Selectors
@@ -68,7 +70,11 @@ export const useHrStore = create<HrState>()(
         }
       },
 
-      async loadEmployees() {
+      async loadEmployees(force = false) {
+        if (get().employees.length > 0 && !force) {
+          return;
+        }
+
         set({isLoading: true, error: undefined});
         try {
           // Load both employees and departments in parallel
@@ -76,9 +82,13 @@ export const useHrStore = create<HrState>()(
             hrApi.getEmployees(),
             hrApi.getDepartments(),
           ]);
-
+          const now = Date.now();
           set({
-            employees: employeesResponse.employees,
+            employees: employeesResponse.employees.sort((a, b) => {
+              const x = (a.isActive ? 1 : -1) * now + a.createdAt.getTime();
+              const y = (b.isActive ? 1 : -1) * now + b.createdAt.getTime();
+              return y - x;
+            }),
             departmentMap: new Map(
               departmentsResponse.departments.map((department) => [
                 department.id,
@@ -104,6 +114,109 @@ export const useHrStore = create<HrState>()(
 
       async refreshEmployees() {
         return get().loadEmployees();
+      },
+
+      async deactivateEmployee(id: string) {
+        // Optimistic update: mark employee as inactive immediately
+        const {employees} = get();
+        const employeeToDeactivate = employees.find((e) => e.id === id);
+
+        if (!employeeToDeactivate) {
+          throw new Error('Employee not found');
+        }
+
+        // Save current state for rollback
+        const previousEmployees = employees;
+
+        // Optimistically update state
+        const updatedEmployees = employees.map((e) =>
+          e.id === id ? {...e, isActive: false} : e,
+        );
+
+        set({
+          employees: updatedEmployees,
+          isLoading: true,
+          error: undefined,
+        });
+
+        try {
+          // Actually deactivate on server (soft delete)
+          await hrApi.deactivateEmployee(id);
+
+          set({isLoading: false});
+
+          // Refresh in background to sync with server state
+          get()
+            .loadEmployees()
+            .catch((error) => {
+              console.error('Background refresh failed:', error);
+            });
+          return {success: true};
+        } catch (error) {
+          // Rollback on error
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : 'Failed to deactivate employee';
+
+          set({
+            employees: previousEmployees,
+            isLoading: false,
+            error: errorMessage,
+          });
+          throw error;
+        }
+      },
+
+      async activateEmployee(id: string) {
+        // Optimistic update: mark employee as active immediately
+        const {employees} = get();
+        const employeeToActivate = employees.find((e) => e.id === id);
+
+        if (!employeeToActivate) {
+          throw new Error('Employee not found');
+        }
+
+        // Save current state for rollback
+        const previousEmployees = employees;
+
+        // Optimistically update state
+        const updatedEmployees = employees.map((e) =>
+          e.id === id ? {...e, isActive: true} : e,
+        );
+
+        set({
+          employees: updatedEmployees,
+          isLoading: true,
+          error: undefined,
+        });
+
+        try {
+          // Actually activate on server
+          await hrApi.activateEmployee(id);
+
+          set({isLoading: false});
+
+          // Refresh in background to sync with server state
+          get()
+            .loadEmployees()
+            .catch((error) => {
+              console.error('Background refresh failed:', error);
+            });
+        } catch (error) {
+          // Rollback on error
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : 'Failed to activate employee';
+
+          set({
+            employees: previousEmployees,
+            isLoading: false,
+            error: errorMessage,
+          });
+          throw error;
+        }
       },
 
       clearError() {
@@ -142,6 +255,8 @@ export const useHrActions = () => {
     loadEmployees: store.loadEmployees,
     loadDepartments: store.loadDepartments,
     refreshEmployees: store.refreshEmployees,
+    deactivateEmployee: store.deactivateEmployee,
+    activateEmployee: store.activateEmployee,
     clearError: store.clearError,
     getEmployeeById: store.getEmployeeById,
     getDepartmentById: store.getDepartmentById,

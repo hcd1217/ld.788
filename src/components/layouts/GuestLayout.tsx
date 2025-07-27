@@ -13,7 +13,7 @@ export function GuestLayout({children}: GuestLayoutProps) {
   const {isAuthenticated} = useAppStore();
 
   if (isAuthenticated) {
-    return <Navigate replace to="/profile" />;
+    return <Navigate replace to="/home" />;
   }
 
   return (

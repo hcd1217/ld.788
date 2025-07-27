@@ -1,21 +1,25 @@
 import {Table, ScrollArea, Badge} from '@mantine/core';
+import {useNavigate} from 'react-router';
 import {EmployeeActions} from './EmployeeActions';
-import {useTranslation} from '@/hooks/useTranslation';
+import useTranslation from '@/hooks/useTranslation';
 import type {Employee} from '@/lib/api/schemas/hr.schemas';
 import {renderFullName} from '@/utils/string';
 import {useHrActions} from '@/stores/useHrStore';
 
 type EmployeeDataTableProps = {
   readonly employees: readonly Employee[];
-  readonly onDeleteEmployee?: (id: string) => void;
+  readonly onDeactivateEmployee?: (employee: Employee) => void;
+  readonly onActivateEmployee?: (employee: Employee) => void;
 };
 
 export function EmployeeDataTable({
   employees,
-  onDeleteEmployee,
+  onDeactivateEmployee,
+  onActivateEmployee,
 }: EmployeeDataTableProps) {
   const {t} = useTranslation();
   const {getDepartmentById} = useHrActions();
+  const navigate = useNavigate();
 
   return (
     <ScrollArea>
@@ -30,7 +34,11 @@ export function EmployeeDataTable({
         </Table.Thead>
         <Table.Tbody>
           {employees.map((employee) => (
-            <Table.Tr key={employee.id}>
+            <Table.Tr
+              key={employee.id}
+              style={{cursor: 'pointer'}}
+              onClick={() => navigate(`/employees/${employee.id}`)}
+            >
               <Table.Td>{renderFullName(employee)}</Table.Td>
               <Table.Td>
                 {employee.departmentId
@@ -48,13 +56,21 @@ export function EmployeeDataTable({
                     : t('employee.inactive')}
                 </Badge>
               </Table.Td>
-              <Table.Td>
+              <Table.Td onClick={(e) => e.stopPropagation()}>
                 <EmployeeActions
                   employeeId={employee.id}
-                  onDelete={
-                    onDeleteEmployee
+                  isActive={employee.isActive}
+                  onDeactivate={
+                    onDeactivateEmployee
                       ? () => {
-                          onDeleteEmployee(employee.id);
+                          onDeactivateEmployee(employee);
+                        }
+                      : undefined
+                  }
+                  onActivate={
+                    onActivateEmployee
+                      ? () => {
+                          onActivateEmployee(employee);
                         }
                       : undefined
                   }

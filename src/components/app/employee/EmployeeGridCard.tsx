@@ -1,6 +1,7 @@
 import {Stack, Group, Text, Badge} from '@mantine/core';
+import {useNavigate} from 'react-router';
 import {EmployeeActions} from './EmployeeActions';
-import {useTranslation} from '@/hooks/useTranslation';
+import useTranslation from '@/hooks/useTranslation';
 import type {Employee} from '@/lib/api/schemas/hr.schemas';
 import {SelectableCard} from '@/components/common';
 import {renderFullName} from '@/utils/string';
@@ -8,12 +9,18 @@ import {useHrActions} from '@/stores/useHrStore';
 
 type EmployeeGridCardProps = {
   readonly employee: Employee;
-  readonly onDelete?: () => void;
+  readonly onDeactivate?: () => void;
+  readonly onActivate?: () => void;
 };
 
-export function EmployeeGridCard({employee, onDelete}: EmployeeGridCardProps) {
+export function EmployeeGridCard({
+  employee,
+  onDeactivate,
+  onActivate,
+}: EmployeeGridCardProps) {
   const {t} = useTranslation();
   const {getDepartmentById} = useHrActions();
+  const navigate = useNavigate();
 
   return (
     <SelectableCard
@@ -21,9 +28,11 @@ export function EmployeeGridCard({employee, onDelete}: EmployeeGridCardProps) {
       shadow="sm"
       padding="lg"
       radius="md"
+      style={{cursor: 'pointer'}}
       aria-label={t('employee.employeeCard', {
         name: `${employee.firstName} ${employee.lastName}`,
       })}
+      onClick={() => navigate(`/employees/${employee.id}`)}
     >
       <Stack gap="sm">
         <Group justify="space-between" align="flex-start">
@@ -44,7 +53,12 @@ export function EmployeeGridCard({employee, onDelete}: EmployeeGridCardProps) {
           </Badge>
         </Group>
         <Group justify="flex-end">
-          <EmployeeActions employeeId={employee.id} onDelete={onDelete} />
+          <EmployeeActions
+            employeeId={employee.id}
+            isActive={employee.isActive}
+            onDeactivate={onDeactivate}
+            onActivate={onActivate}
+          />
         </Group>
       </Stack>
     </SelectableCard>

@@ -15,9 +15,9 @@ import {
 } from '@mantine/core';
 import {useNavigate} from 'react-router';
 import {useState, useEffect} from 'react';
-import {IconAlertCircle, IconCheck, IconX} from '@tabler/icons-react';
+import {IconAlertCircle} from '@tabler/icons-react';
 import {useAppStore} from '@/stores/useAppStore';
-import {useTranslation} from '@/hooks/useTranslation';
+import useTranslation from '@/hooks/useTranslation';
 import {authApi, type GetMeResponse} from '@/lib/api';
 import {GoBack} from '@/components/common';
 
@@ -159,44 +159,6 @@ export function ProfilePage() {
                 </Stack>
               </Card>
 
-              {/* Feature Flags */}
-              <Card shadow="sm" padding="xl" radius="md">
-                <Title order={3} mb="md">
-                  {t('profile.featureFlags')}
-                </Title>
-                <Stack gap="md">
-                  {Object.entries(userData.dynamicFeatureFlags).map(
-                    ([category, flags]) => (
-                      <Box key={category}>
-                        <Text fw={500} mb="xs">
-                          {t(`profile.features.${category}` as any)}
-                        </Text>
-                        <SimpleGrid cols={{base: 1, sm: 2}} spacing="xs">
-                          {flags
-                            ? Object.entries(flags).map(
-                                ([feature, enabled]) => (
-                                  <Group key={feature} gap="xs">
-                                    {enabled ? (
-                                      <IconCheck size={16} color="green" />
-                                    ) : (
-                                      <IconX size={16} color="red" />
-                                    )}
-                                    <Text size="sm">
-                                      {t(
-                                        `profile.features.${category}.${feature}` as any,
-                                      )}
-                                    </Text>
-                                  </Group>
-                                ),
-                              )
-                            : null}
-                        </SimpleGrid>
-                      </Box>
-                    ),
-                  )}
-                </Stack>
-              </Card>
-
               {/* Client Configuration */}
               <Card shadow="sm" padding="xl" radius="md">
                 <Title order={3} mb="md">
@@ -208,7 +170,7 @@ export function ProfilePage() {
                       {t('profile.sessionTimeout')}
                     </Text>
                     <Text fw={500}>
-                      {userData.clientConfig.sessionTimeoutMinutes}{' '}
+                      {userData.clientConfig?.sessionTimeoutMinutes}{' '}
                       {t('common.minutes')}
                     </Text>
                   </Box>
@@ -217,7 +179,7 @@ export function ProfilePage() {
                       {t('profile.maxSessions')}
                     </Text>
                     <Text fw={500}>
-                      {userData.clientConfig.maxConcurrentSessions}
+                      {userData.clientConfig?.maxConcurrentSessions}
                     </Text>
                   </Box>
                   <Box>
@@ -226,13 +188,13 @@ export function ProfilePage() {
                     </Text>
                     <Badge
                       color={
-                        userData.clientConfig.allowPasswordReset
+                        userData.clientConfig?.allowPasswordReset
                           ? 'green'
                           : 'red'
                       }
                       variant="light"
                     >
-                      {userData.clientConfig.allowPasswordReset
+                      {userData.clientConfig?.allowPasswordReset
                         ? t('common.enabled')
                         : t('common.disabled')}
                     </Badge>
@@ -243,13 +205,13 @@ export function ProfilePage() {
                     </Text>
                     <Badge
                       color={
-                        userData.clientConfig.allowSelfRegistration
+                        userData.clientConfig?.allowSelfRegistration
                           ? 'green'
                           : 'red'
                       }
                       variant="light"
                     >
-                      {userData.clientConfig.allowSelfRegistration
+                      {userData.clientConfig?.allowSelfRegistration
                         ? t('common.enabled')
                         : t('common.disabled')}
                     </Badge>

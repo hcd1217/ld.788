@@ -1,7 +1,7 @@
 import {Button, type ButtonProps} from '@mantine/core';
 import {IconDownload} from '@tabler/icons-react';
 import {notifications} from '@mantine/notifications';
-import {useTranslation} from '@/hooks/useTranslation';
+import useTranslation from '@/hooks/useTranslation';
 import {exportToCSV, type ExportColumn} from '@/utils/export';
 
 interface ExportButtonProps<T> extends Omit<ButtonProps, 'onClick'> {
@@ -24,13 +24,11 @@ export function ExportButton<T extends Record<string, unknown>>({
   const handleExport = () => {
     try {
       exportToCSV(data, columns, filename);
-
       notifications.show({
         title: t('common.success'),
         message: t('common.exportSuccess', {count: data.length}),
         color: 'green',
       });
-
       onExport?.();
     } catch (error) {
       console.error('Export failed:', error);

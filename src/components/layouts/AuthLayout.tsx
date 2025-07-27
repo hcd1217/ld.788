@@ -39,10 +39,10 @@ import {
   VersionInformation,
   AppLogo,
 } from '@/components/common';
-import {useTranslation} from '@/hooks/useTranslation';
+import useTranslation from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import type {User} from '@/services/auth';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
+import useIsDesktop from '@/hooks/useIsDesktop';
 
 interface NavigationItem {
   label: string;

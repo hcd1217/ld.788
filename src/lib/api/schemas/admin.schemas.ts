@@ -131,17 +131,9 @@ export const ClientDetailSchema = ClientBaseSchema.extend({
       value: flag.value,
       rolloutPercentage: flag.rolloutPercentage ?? 0,
       description: flag.description ?? '',
-      enabledAt: flag.enabledAt
-        ? typeof flag.enabledAt === 'string'
-          ? flag.enabledAt
-          : flag.enabledAt
-        : undefined,
-      expiresAt: flag.expiresAt
-        ? typeof flag.expiresAt === 'string'
-          ? flag.expiresAt
-          : flag.expiresAt
-        : undefined,
-      createdAt: new Date().toISOString(), // Default as API doesn't provide this
+      enabledAt: new Date(flag.enabledAt ?? Date.now()),
+      expiresAt: new Date(flag.expiresAt ?? Date.now()),
+      createdAt: new Date(), // Default as API doesn't provide this
     }));
   }
 

@@ -7,13 +7,15 @@ export function OrientationNotice() {
   const {t} = useTranslation();
   const {isLandscape, isMobile} = useOrientation();
 
-  // Only show on mobile devices in landscape mode
-  const shouldShow = isMobile && isLandscape;
+  if (!isMobile) {
+    return null;
+  }
 
   return (
     <Modal
       fullScreen
-      opened={shouldShow}
+      // Only show on mobile devices in landscape mode
+      opened={isLandscape}
       withCloseButton={false}
       closeOnClickOutside={false}
       closeOnEscape={false}

@@ -1,5 +1,8 @@
 {
   "common": {
+    "pages": {
+      "blank": "This page is blank page, if you see this page, it means that the route in under construction, please just ignore this"
+    },
     "logout": "Logout",
     "cancel": "Cancel",
     "previous": "Previous",
@@ -72,13 +75,39 @@
     "add": "Add",
     "created": "Created",
     "createdAt": "Created At",
+    "updatedAt": "Updated At",
     "back": "Back",
+    "dangerZone": "Danger Zone",
     "cannotBeUndone": "This action cannot be undone.",
     "minutes": "minutes",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "notSet": "Not set",
     "goToHome": "Go to Home"
+  },
+  "pcOnly": {
+    "__check__": "Sun Jul 27 05:22:58 UTC 2025",
+    "title": "Desktop Feature",
+    "description": "This feature requires a desktop or laptop computer to work properly. File management and advanced features work best on larger screens."
+  },
+  "pwa": {
+    "__check__": "Sun Jul 27 06:18:01 UTC 2025",
+    "installTitle": "Install Credo App",
+    "installDescription": "Install this app on your device for a better experience",
+    "maybeLater": "Maybe later",
+    "install": "Install"
+  },
+  "errors": {
+    "backToHomePage": "Back to home",
+    "backToPreviousPage": "Back to previous page",
+    "failedToCreateStore": "Failed to create store",
+    "failedToDeleteStore": "Failed to delete store",
+    "failedToLoadClient": "Failed to load client details",
+    "failedToLoadStore": "Failed to load store",
+    "failedToUpdateClient": "Failed to update client",
+    "failedToUpdateStore": "Failed to update store",
+    "notFound": "The requested resource was not found.",
+    "notFoundDescription": "The page you are looking for does not exist."
   },
   "store": {
     "title": "Store Management",
@@ -173,7 +202,38 @@
     "name": "Name",
     "department": "Department",
     "unit": "Unit",
-    "status": "Status"
+    "status": "Status",
+    "confirmDeleteTitle": "Delete Employee",
+    "confirmDeleteMessage": "Are you sure you want to delete \"{{name}}\"? This will set the employee as inactive.",
+    "deleteWarning": "Warning: The employee will be marked as inactive and won't be able to access the system.",
+    "deleteEmployee": "Delete Employee",
+    "employeeDeleted": "Employee deleted successfully",
+    "deleteEmployeeFailed": "Failed to delete employee",
+    "confirmDeactivateTitle": "Deactivate Employee",
+    "confirmDeactivateMessage": "Are you sure you want to deactivate \"{{name}}\"? This will set the employee as inactive.",
+    "deactivateWarning": "Warning: The employee will be marked as inactive and won't be able to access the system.",
+    "deactivateEmployee": "Deactivate Employee",
+    "employeeDeactivated": "Employee deactivated successfully",
+    "deactivateEmployeeFailed": "Failed to deactivate employee",
+    "deactivate": "Deactivate",
+    "confirmActivateTitle": "Activate Employee",
+    "confirmActivateMessage": "Are you sure you want to activate \"{{name}}\"? This will restore the employee's access to the system.",
+    "activateInfo": "Info: The employee will be marked as active and will be able to access the system.",
+    "activateEmployee": "Activate Employee",
+    "employeeActivated": "Employee activated successfully",
+    "activateEmployeeFailed": "Failed to activate employee",
+    "activate": "Activate",
+    "employeeDetails": "Employee Details",
+    "detailInformation": "Detail Information",
+    "timesheet": "Time Sheet",
+    "salaryConfig": "Salary Config",
+    "purchasingOrder": "Purchasing Order",
+    "basicInformation": "Basic Information",
+    "employeeCode": "Employee ID",
+    "notFound": "Employee not found",
+    "deleteEmployeeDescription": "Permanently delete this employee from the system",
+    "deactivateEmployeeDescription": "Temporarily disable employee access to the system",
+    "activateEmployeeDescription": "Restore employee access to the system"
   },
   "auth": {
     "title": "Credo",
@@ -280,22 +340,6 @@
     "registrationSuccessMessage": "Your account has been created successfully",
     "registrationFailed": "Registration failed",
     "invalidCredentials": "Invalid email or password. Please try again."
-  },
-  "errors": {
-    "notFound": "The requested resource was not found.",
-    "notFoundDescription": "The page you are looking for does not exist.",
-    "backToPreviousPage": "Back to previous page",
-    "backToHomePage": "Back to home",
-    "failedToCreateStore": "Failed to create store",
-    "failedToDeleteStore": "Failed to delete store",
-    "failedToUpdateStore": "Failed to update store",
-    "failedToLoadStore": "Failed to load store",
-    "failedToUpdateClient": "Failed to update client",
-    "failedToLoadClient": "Failed to load client details"
-  },
-  "pcOnly": {
-    "title": "Desktop Feature",
-    "description": "This feature requires a desktop or laptop computer to work properly. File management and advanced features work best on larger screens."
   },
   "permission": {
     "management": "Permission Management",
@@ -544,12 +588,6 @@
       "carryOverLimit": "Carry-over Limit:",
       "availableToTake": "Available to Take:"
     }
-  },
-  "pwa": {
-    "installTitle": "Install Credo App",
-    "installDescription": "Install this app on your device for a better experience",
-    "maybeLater": "Maybe later",
-    "install": "Install"
   },
   "orientation": {
     "title": "Rotate Your Device",

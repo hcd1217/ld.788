@@ -93,6 +93,7 @@ export const resolver: CSSVariablesResolver = () => ({
 
 function _build(colors: CustomColors, defaultColors?: CustomColors) {
   return {
+    '--app-danger-color': colors.dangerColor,
     '--app-active-color': colors.activeColor,
     '--app-inactive-color': colors.inActiveColor,
     '--app-shell-background-color':

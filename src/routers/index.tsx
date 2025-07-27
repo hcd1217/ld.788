@@ -1,6 +1,7 @@
 import {lazy} from 'react';
 import {createBrowserRouter, Navigate, type RouteObject} from 'react-router';
 import {ResponsiveAuthLayout} from '@/components/layouts/ResponsiveAuthLayout';
+import {AppLayout} from '@/components/layouts/AppLayout';
 import {ProtectedRoute} from '@/components/layouts/ProtectedRoute';
 import {AdminProtectedRoute} from '@/components/layouts/AdminProtectedRoute';
 
@@ -47,6 +48,10 @@ const AddEmployeePage = lazy(async () => {
 const EditEmployeePage = lazy(async () => {
   const module = await import('@/pages/app/EditEmployeePage.tsx');
   return {default: module.EditEmployeePage};
+});
+const EmployeeDetailPage = lazy(async () => {
+  const module = await import('@/pages/app/EmployeeDetailPage');
+  return {default: module.EmployeeDetailPage};
 });
 
 const HomePage = lazy(async () => {
@@ -180,10 +185,12 @@ const AdminPermissionManagementPage = lazy(async () => {
 });
 
 const routeObjects: RouteObject[] = [
+  // Root route
   {
     path: '/',
     Component: () => <Navigate to="/login" />,
   },
+  // AUTH routes
   {
     path: '',
     children: [
@@ -209,6 +216,17 @@ const routeObjects: RouteObject[] = [
       },
     ],
   },
+  // APP routes
+  {
+    path: '',
+    element: (
+      <ProtectedRoute>
+        <AppLayout />
+      </ProtectedRoute>
+    ),
+    children: [{path: 'employee-management', Component: EmployeeListPage}],
+  },
+  // Old APP routes
   {
     path: '',
     element: (
@@ -217,8 +235,8 @@ const routeObjects: RouteObject[] = [
       </ProtectedRoute>
     ),
     children: [
-      {path: 'profile', Component: ProfilePage},
       {path: 'home', Component: HomePage},
+      {path: 'profile', Component: ProfilePage},
       {path: 'add-user', Component: AddUserPage},
       {path: 'explore', Component: ExplorePage},
       {path: 'notifications', Component: NotificationsPage},
@@ -227,7 +245,8 @@ const routeObjects: RouteObject[] = [
         path: '',
         Component: RootUserLayout,
         children: [
-          {path: 'employee-management', Component: EmployeeListPage},
+          // {path: 'employee-management', Component: EmployeeListPage},
+          {path: 'employees/:employeeId', Component: EmployeeDetailPage},
           {path: 'store-management', Component: BlankPage},
           {path: 'salary-management', Component: BlankPage},
           {path: 'stores', Component: StoreListPage},
@@ -256,6 +275,7 @@ const routeObjects: RouteObject[] = [
       },
     ],
   },
+  // ADMIN routes
   {
     path: 'admin',
     Component: PCOnlyLayout,

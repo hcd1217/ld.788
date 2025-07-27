@@ -1,4 +1,5 @@
 import z from 'zod/v4';
+import type {Dictionary} from '@/types/dictionary';
 
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&()^])[A-Za-z\d@#$!%*?&()^]{8,}$/;
@@ -19,8 +20,12 @@ export const idSchema = z.string();
 export const emailSchema = z.email();
 export const timestampSchema = z
   .union([z.number(), z.string()])
-  .transform((val) => new Date(val).toISOString());
+  .transform((val) => new Date(val));
 export const optionalStringSchema = z.string().optional();
+export const dictionarySchema: z.ZodType<Dictionary> = z.lazy(() =>
+  z.record(z.string(), z.union([z.string(), dictionarySchema])),
+);
+
 export const paginationSchema = z.object({
   limit: z.number(),
   hasNext: z.boolean(),
@@ -40,10 +45,7 @@ export const ClientPublicConfigSchema = z.object({
       language: false,
       darkMode: false,
     }),
-  clientCode: stringSchema,
+  clientCode: optionalStringSchema,
   clientName: optionalStringSchema,
   logoUrl: optionalStringSchema,
-  translations: z
-    .record(z.string(), z.record(z.string(), z.string()))
-    .optional(),
 });

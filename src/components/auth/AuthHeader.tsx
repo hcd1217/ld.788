@@ -9,7 +9,7 @@ type AuthHeaderProps = {
 export function AuthHeader({title: pageTitle = 'Credo'}: AuthHeaderProps) {
   const {publicClientConfig} = useAppStore();
   const [title, setTitle] = useState(pageTitle);
-  const [logoUrl, setLogoUrl] = useState('/icons/logo-orange.svg');
+  const [logoUrl, setLogoUrl] = useState('/logo.svg');
 
   useEffect(() => {
     setTitle(publicClientConfig?.clientName ?? title);

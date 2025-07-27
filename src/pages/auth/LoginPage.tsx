@@ -11,7 +11,7 @@ import {
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {useAppStore} from '@/stores/useAppStore';
-import {useTranslation} from '@/hooks/useTranslation';
+import useTranslation from '@/hooks/useTranslation';
 import {useAuthForm} from '@/hooks/useAuthForm';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {getFormValidators} from '@/utils/validation';
@@ -53,9 +53,7 @@ export function LoginPage() {
   const form = useForm<LoginFormValues>({
     initialValues: {
       identifier:
-        (isDevelopment
-          ? `admin@${clientCode?.toLocaleLowerCase() ?? 'example'}.com`
-          : '') ||
+        (isDevelopment ? 'admin' : '') ||
         localStorage.getItem('rememberedIdentifier') ||
         '',
       password: isDevelopment

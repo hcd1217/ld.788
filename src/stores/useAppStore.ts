@@ -51,7 +51,6 @@ type AppState = {
   setTheme: (theme: 'light' | 'dark') => void;
   setAdminAuth: (authenticated: boolean) => void;
   setAdminApiLoading: (loading: boolean, message?: string) => void;
-  setPublicClientConfig: (config: ClientPublicConfig | undefined) => void;
   fetchPublicClientConfig: (clientCode: string) => Promise<void>;
   login: (params: {
     identifier: string;
@@ -117,6 +116,8 @@ export const useAppStore = create<AppState>()(
 
             // Apply client-specific translations if available
             if (profile.clientConfig?.translations) {
+              // Clear old client translation before add new one
+              clearClientTranslations();
               updateClientTranslations(profile.clientConfig.translations);
             }
           } catch (error) {
@@ -130,7 +131,6 @@ export const useAppStore = create<AppState>()(
           set({adminAuthenticated: authenticated}),
         setAdminApiLoading: (loading, message = '') =>
           set({adminApiLoading: loading, adminApiLoadingMessage: message}),
-        setPublicClientConfig: (config) => set({publicClientConfig: config}),
         async fetchPublicClientConfig(clientCode: string) {
           try {
             const config = await clientApi.getPubicClientConfig(clientCode);
@@ -173,11 +173,12 @@ export const useAppStore = create<AppState>()(
           set({
             user: undefined,
             userProfile: undefined,
-            publicClientConfig: undefined,
+            // Don't clear client-specific public config on logout
+            // publicClientConfig: undefined,
             isAuthenticated: false,
           });
-          // Clear client-specific translations on logout
-          clearClientTranslations();
+          // Don't clear client-specific translations on logout
+          // clearClientTranslations();
         },
         async checkAuth() {
           const isAuthenticated = await authService.isAuthenticated();
@@ -230,3 +231,5 @@ export const useAppStore = create<AppState>()(
 // Computed selectors for convenience
 export const useClientConfig = () =>
   useAppStore((state) => state.userProfile?.clientConfig);
+export const usePublicClientConfig = () =>
+  useAppStore((state) => state.publicClientConfig);

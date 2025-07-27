@@ -2,6 +2,7 @@ import * as z from 'zod/v4';
 import {
   booleanSchema,
   ClientPublicConfigSchema,
+  dictionarySchema,
   emailSchema,
   idSchema,
   jwtTokenSchema,
@@ -75,34 +76,18 @@ export const RegisterResponseSchema = z.object({
 
 // Schema for role object
 export const RoleSchema = z.object({
-  id: z.string().uuid(),
+  id: idSchema,
   name: stringSchema,
   level: numberSchema,
 });
 
-// Schema for dynamic feature flags
-export const DynamicFeatureFlagsSchema = z.object({
-  'role-management': z
-    .object({
-      customRoles: booleanSchema,
-      roleHierarchy: booleanSchema,
-    })
-    .optional(),
-  'user-management': z
-    .object({
-      bulkImport: booleanSchema,
-      userInvitations: booleanSchema,
-      createUserWithDepartment: booleanSchema,
-    })
-    .optional(),
-});
-
 // Schema for client config
 export const ClientConfigSchema = z.object({
-  sessionTimeoutMinutes: numberSchema,
-  maxConcurrentSessions: numberSchema,
-  allowPasswordReset: booleanSchema,
-  allowSelfRegistration: booleanSchema,
+  sessionTimeoutMinutes: numberSchema.optional(),
+  maxConcurrentSessions: numberSchema.optional(),
+  allowPasswordReset: booleanSchema.optional(),
+  allowSelfRegistration: booleanSchema.optional(),
+  translations: dictionarySchema.optional(),
   ...ClientPublicConfigSchema.shape,
 });
 
@@ -115,8 +100,8 @@ export const GetMeResponseSchema = z.object({
   clientCode: stringSchema,
   isRoot: booleanSchema,
   roles: z.array(RoleSchema),
-  dynamicFeatureFlags: DynamicFeatureFlagsSchema,
-  clientConfig: ClientConfigSchema,
+  // DynamicFeatureFlags: DynamicFeatureFlagsSchema,
+  clientConfig: ClientConfigSchema.optional(),
 });
 
 // Types derived from schemas
@@ -134,6 +119,5 @@ export type ResetPasswordResponse = z.infer<typeof ResetPasswordResponseSchema>;
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 export type RegisterResponse = z.infer<typeof RegisterResponseSchema>;
 export type Role = z.infer<typeof RoleSchema>;
-export type DynamicFeatureFlags = z.infer<typeof DynamicFeatureFlagsSchema>;
 export type ClientConfig = z.infer<typeof ClientConfigSchema>;
 export type GetMeResponse = z.infer<typeof GetMeResponseSchema>;

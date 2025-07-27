@@ -36,8 +36,8 @@ export interface Staff {
   accessPermissions: string[]; // List of permission keys
 
   // Metadata
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   status: 'active' | 'inactive' | 'deleted';
 }
 
@@ -163,8 +163,8 @@ const mockStaff: Staff[] = [
     carryOverDays: 5,
     role: 'member',
     accessPermissions: permissionMatrix.member,
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z',
+    createdAt: new Date('2024-01-15T10:00:00Z'),
+    updatedAt: new Date('2024-01-15T10:00:00Z'),
     status: 'active',
   },
   {
@@ -191,8 +191,8 @@ const mockStaff: Staff[] = [
     carryOverDays: 3,
     role: 'manager',
     accessPermissions: permissionMatrix.manager,
-    createdAt: '2024-01-10T08:00:00Z',
-    updatedAt: '2024-01-10T08:00:00Z',
+    createdAt: new Date('2024-01-10T08:00:00Z'),
+    updatedAt: new Date('2024-01-10T08:00:00Z'),
     status: 'active',
   },
   {
@@ -219,8 +219,8 @@ const mockStaff: Staff[] = [
     carryOverDays: 3,
     role: 'member',
     accessPermissions: permissionMatrix.member,
-    createdAt: '2024-01-20T09:00:00Z',
-    updatedAt: '2024-01-20T09:00:00Z',
+    createdAt: new Date('2024-01-20T09:00:00Z'),
+    updatedAt: new Date('2024-01-20T09:00:00Z'),
     status: 'active',
   },
   {
@@ -247,8 +247,8 @@ const mockStaff: Staff[] = [
     carryOverDays: 5,
     role: 'manager',
     accessPermissions: permissionMatrix.manager,
-    createdAt: '2024-01-12T11:00:00Z',
-    updatedAt: '2024-01-12T11:00:00Z',
+    createdAt: new Date('2024-01-12T11:00:00Z'),
+    updatedAt: new Date('2024-01-12T11:00:00Z'),
     status: 'active',
   },
   {
@@ -275,8 +275,8 @@ const mockStaff: Staff[] = [
     carryOverDays: 4,
     role: 'member',
     accessPermissions: permissionMatrix.member,
-    createdAt: '2024-01-18T07:30:00Z',
-    updatedAt: '2024-01-18T07:30:00Z',
+    createdAt: new Date('2024-01-18T07:30:00Z'),
+    updatedAt: new Date('2024-01-18T07:30:00Z'),
     status: 'active',
   },
   {
@@ -303,8 +303,8 @@ const mockStaff: Staff[] = [
     carryOverDays: 5,
     role: 'admin',
     accessPermissions: permissionMatrix.admin,
-    createdAt: '2024-01-05T14:00:00Z',
-    updatedAt: '2024-01-05T14:00:00Z',
+    createdAt: new Date('2024-01-05T14:00:00Z'),
+    updatedAt: new Date('2024-01-05T14:00:00Z'),
     status: 'active',
   },
   {
@@ -331,8 +331,8 @@ const mockStaff: Staff[] = [
     carryOverDays: 3,
     role: 'member',
     accessPermissions: permissionMatrix.member,
-    createdAt: '2024-01-22T10:30:00Z',
-    updatedAt: '2024-01-22T10:30:00Z',
+    createdAt: new Date('2024-01-22T10:30:00Z'),
+    updatedAt: new Date('2024-01-22T10:30:00Z'),
     status: 'active',
   },
   {
@@ -359,8 +359,8 @@ const mockStaff: Staff[] = [
     carryOverDays: 4,
     role: 'manager',
     accessPermissions: permissionMatrix.manager,
-    createdAt: '2024-01-08T08:00:00Z',
-    updatedAt: '2024-01-08T08:00:00Z',
+    createdAt: new Date('2024-01-08T08:00:00Z'),
+    updatedAt: new Date('2024-01-08T08:00:00Z'),
     status: 'active',
   },
 ];
@@ -516,8 +516,8 @@ export const staffService = {
       clockInUrl,
       clockInQrCode,
       accessPermissions: permissionMatrix[data.role],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
       status: 'active',
     };
 
@@ -556,7 +556,7 @@ export const staffService = {
     const updatedStaff: Staff = {
       ...currentStaff,
       ...data,
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date(),
       // Update permissions if role changed
       accessPermissions: data.role
         ? permissionMatrix[data.role]
@@ -585,7 +585,7 @@ export const staffService = {
 
     // Soft delete - mark as deleted
     mockStaff[staffIndex].status = 'deleted';
-    mockStaff[staffIndex].updatedAt = new Date().toISOString();
+    mockStaff[staffIndex].updatedAt = new Date();
   },
 
   async hardDeleteStaff(id: string): Promise<void> {
@@ -711,7 +711,7 @@ export const staffService = {
     const staffIndex = mockStaff.findIndex((s) => s.id === staffId);
     if (staffIndex !== -1) {
       mockStaff[staffIndex].clockInQrCode = newQrCode;
-      mockStaff[staffIndex].updatedAt = new Date().toISOString();
+      mockStaff[staffIndex].updatedAt = new Date();
     }
 
     return newQrCode;

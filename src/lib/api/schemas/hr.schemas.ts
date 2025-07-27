@@ -17,6 +17,7 @@ export const EmployeeSchema = z.object({
   id: stringSchema,
   firstName: stringSchema,
   lastName: stringSchema,
+  employeeCode: stringSchema,
   departmentId: idSchema.optional(),
   isActive: z.boolean(),
   createdAt: timestampSchema,
@@ -57,10 +58,6 @@ export const CreateEmployeesResponseSchema = z.object({
 
 export const UpdateEmployeeResponseSchema = EmployeeSchema;
 
-export const DeleteEmployeeResponseSchema = z.object({
-  message: stringSchema,
-});
-
 // Type exports
 export type Employee = z.infer<typeof EmployeeSchema>;
 export type Department = z.infer<typeof DepartmentSchema>;
@@ -78,7 +75,4 @@ export type CreateEmployeesResponse = z.infer<
 >;
 export type UpdateEmployeeResponse = z.infer<
   typeof UpdateEmployeeResponseSchema
->;
-export type DeleteEmployeeResponse = z.infer<
-  typeof DeleteEmployeeResponseSchema
 >;

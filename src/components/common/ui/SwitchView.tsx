@@ -1,13 +1,24 @@
-import {Center, Box, SegmentedControl, Tooltip} from '@mantine/core';
+import {
+  Center,
+  Box,
+  SegmentedControl,
+  Tooltip,
+  type MantineBreakpoint,
+} from '@mantine/core';
 import {IconLayoutGrid, IconTable} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import useTranslation from '@/hooks/useTranslation';
+import useIsDarkMode from '@/hooks/useIsDarkMode';
 
 type SwitchViewProps = {
   readonly viewMode: 'table' | 'grid';
+  readonly visibleFrom?: MantineBreakpoint;
   readonly setViewMode: (viewMode: 'table' | 'grid') => void;
 };
-export function SwitchView({viewMode, setViewMode}: SwitchViewProps) {
+export function SwitchView({
+  visibleFrom,
+  viewMode,
+  setViewMode,
+}: SwitchViewProps) {
   const {t} = useTranslation();
   const isDarkMode = useIsDarkMode();
   const tooltipStyles = {
@@ -20,7 +31,7 @@ export function SwitchView({viewMode, setViewMode}: SwitchViewProps) {
   };
 
   return (
-    <Box visibleFrom="md">
+    <Box visibleFrom={visibleFrom}>
       <SegmentedControl
         value={viewMode}
         data={[

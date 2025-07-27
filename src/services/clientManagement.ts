@@ -42,7 +42,7 @@ export const clientManagementService = {
         firstName: data.rootUserFirstName,
         lastName: data.rootUserLastName,
       },
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
     };
   },
 

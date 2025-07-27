@@ -226,7 +226,7 @@ export class BaseApiClient {
     // Add configurable delay in development mode
     if (isDevelopment) {
       const delayMs = Number(import.meta.env.VITE_DEV_API_DELAY) || 0;
-      if (delayMs > 0) {
+      if (delayMs > 0 && console.ignore) {
         console.ignore(
           `[API] Delaying request for ${delayMs}ms: ${init.method ?? 'GET'} ${endpoint}`,
         );
@@ -290,7 +290,7 @@ export class BaseApiClient {
       let data = hasJsonContent ? await response.json() : undefined;
 
       // @todo: refactor this later
-      if ('success' in data) {
+      if (data && 'success' in data) {
         data = data.data;
       }
 

@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import {useMediaQuery} from '@mantine/hooks';
 
 export type Orientation = 'portrait' | 'landscape';
 
@@ -9,20 +8,19 @@ export function useOrientation(): {
   readonly isLandscape: boolean;
   readonly isMobile: boolean;
 } {
-  const [orientation, setOrientation] = useState<Orientation>(() => {
-    if (globalThis.window === undefined) {
-      return 'portrait';
-    }
-
-    // Initial check - comparing width vs height works better on iOS
-    return window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
-  });
-
   // Check if device is mobile
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const [isMobile, setIsMobile] = useState(false);
+  const [orientation, setOrientation] = useState<Orientation>('portrait');
 
   useEffect(() => {
+    const isMobile = Math.min(window.innerWidth, window.innerHeight) < 769;
+    setIsMobile(isMobile);
+
     const handleOrientationChange = () => {
+      if (!isMobile) {
+        return;
+      }
+
       // Use window dimensions for iOS compatibility
       const isLandscape = window.innerWidth > window.innerHeight;
       setOrientation(isLandscape ? 'landscape' : 'portrait');

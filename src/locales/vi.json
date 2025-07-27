@@ -1,5 +1,8 @@
 {
   "common": {
+    "pages": {
+      "blank": "Trang này là đang được phát triên, nếu bạn thấy trang này, có nghĩa là nó đang được xây dựng, vui lòng bỏ qua"
+    },
     "logout": "Đăng xuất",
     "cancel": "Hủy",
     "previous": "Trước",
@@ -78,7 +81,31 @@
     "disabled": "Đã Tắt",
     "notSet": "Chưa thiết lập",
     "goToHome": "Về Trang Chủ",
-    "createdAt": "Ngày Tạo"
+    "createdAt": "Ngày Tạo",
+    "updatedAt": "Ngày Cập Nhật",
+    "dangerZone": "Khu Vực Nguy Hiểm"
+  },
+  "pcOnly": {
+    "title": "Tính Năng Máy Tính",
+    "description": "Tính năng này yêu cầu máy tính để bàn hoặc laptop để hoạt động tốt. Quản lý file và các tính năng nâng cao hoạt động tốt nhất trên màn hình lớn."
+  },
+  "pwa": {
+    "installTitle": "Cài đặt Credo App",
+    "installDescription": "Cài đặt ứng dụng này trên thiết bị của bạn để có trải nghiệm tốt hơn",
+    "maybeLater": "Để sau",
+    "install": "Cài đặt"
+  },
+  "errors": {
+    "backToHomePage": "Quay lại trang chủ",
+    "backToPreviousPage": "Quay lại trang trước",
+    "failedToCreateStore": "Không thể tạo cửa hàng",
+    "failedToDeleteStore": "Không thể xóa cửa hàng",
+    "failedToLoadClient": "Không thể tải thông tin khách hàng",
+    "failedToLoadStore": "Không thể tải cửa hàng",
+    "failedToUpdateClient": "Không thể cập nhật khách hàng",
+    "failedToUpdateStore": "Không thể cập nhật cửa hàng",
+    "notFound": "Không tìm thấy thông tin được yêu cầu.",
+    "notFoundDescription": "Thông tin bạn đang tìm kiếm không tồn tại."
   },
   "store": {
     "title": "Quản Lý Cửa Hàng",
@@ -173,7 +200,38 @@
     "name": "Tên",
     "department": "Phòng Ban",
     "unit": "Đơn vị",
-    "status": "Trạng Thái"
+    "status": "Trạng Thái",
+    "confirmDeleteTitle": "Xóa Nhân Viên",
+    "confirmDeleteMessage": "Bạn có chắc chắn muốn xóa \"{{name}}\"? Nhân viên sẽ được đánh dấu là không hoạt động.",
+    "deleteWarning": "Cảnh báo: Nhân viên sẽ được đánh dấu là không hoạt động và không thể truy cập hệ thống.",
+    "deleteEmployee": "Xóa Nhân Viên",
+    "employeeDeleted": "Đã xóa nhân viên thành công",
+    "deleteEmployeeFailed": "Không thể xóa nhân viên",
+    "confirmDeactivateTitle": "Khoá Tài Khoản Nhân Viên",
+    "confirmDeactivateMessage": "Bạn có chắc chắn muốn khoá tài khoản \"{{name}}\"? Nhân viên sẽ được đánh dấu là không hoạt động.",
+    "deactivateWarning": "Cảnh báo: Nhân viên sẽ được đánh dấu là không hoạt động và không thể truy cập hệ thống.",
+    "deactivateEmployee": "Khoá Tài Khoản Nhân Viên",
+    "employeeDeactivated": "Đã khoá tài khoản nhân viên thành công",
+    "deactivateEmployeeFailed": "Không thể khoá tài khoản nhân viên",
+    "deactivate": "Khoá tài khoản",
+    "confirmActivateTitle": "Kích Hoạt Nhân Viên",
+    "confirmActivateMessage": "Bạn có chắc chắn muốn kích hoạt \"{{name}}\"? Nhân viên sẽ được khôi phục quyền truy cập hệ thống.",
+    "activateInfo": "Thông tin: Nhân viên sẽ được đánh dấu là hoạt động và có thể truy cập hệ thống.",
+    "activateEmployee": "Kích Hoạt Nhân Viên",
+    "employeeActivated": "Đã kích hoạt nhân viên thành công",
+    "activateEmployeeFailed": "Không thể kích hoạt nhân viên",
+    "activate": "Kích Hoạt",
+    "employeeDetails": "Chi Tiết Nhân Viên",
+    "detailInformation": "Thông Tin Chi Tiết",
+    "timesheet": "Bảng Chấm Công",
+    "salaryConfig": "Cấu Hình Lương",
+    "purchasingOrder": "Đơn Đặt Hàng",
+    "basicInformation": "Thông Tin Cơ Bản",
+    "employeeCode": "Mã Nhân Viên",
+    "notFound": "Không tìm thấy nhân viên",
+    "deleteEmployeeDescription": "Xóa vĩnh viễn nhân viên khỏi hệ thống",
+    "deactivateEmployeeDescription": "Tạm thời vô hiệu hóa quyền truy cập của nhân viên vào hệ thống",
+    "activateEmployeeDescription": "Khôi phục quyền truy cập của nhân viên vào hệ thống"
   },
   "auth": {
     "title": "Credo",
@@ -280,22 +338,6 @@
     "registrationSuccessMessage": "Tài khoản của bạn đã được tạo thành công",
     "registrationFailed": "Đăng ký thất bại",
     "invalidCredentials": "Email hoặc mật khẩu không đúng. Vui lòng thử lại."
-  },
-  "errors": {
-    "notFound": "Không tìm thấy tài nguyên yêu cầu.",
-    "notFoundDescription": "Trang bạn đang tìm kiếm không tồn tại.",
-    "backToPreviousPage": "Quay lại trang trước",
-    "backToHomePage": "Quay lại trang chủ",
-    "failedToCreateStore": "Không thể tạo cửa hàng",
-    "failedToDeleteStore": "Không thể xóa cửa hàng",
-    "failedToUpdateStore": "Không thể cập nhật cửa hàng",
-    "failedToLoadStore": "Không thể tải cửa hàng",
-    "failedToUpdateClient": "Không thể cập nhật khách hàng",
-    "failedToLoadClient": "Không thể tải thông tin khách hàng"
-  },
-  "pcOnly": {
-    "title": "Tính Năng Máy Tính",
-    "description": "Tính năng này yêu cầu máy tính để bàn hoặc laptop để hoạt động tốt. Quản lý file và các tính năng nâng cao hoạt động tốt nhất trên màn hình lớn."
   },
   "permission": {
     "management": "Quản Lý Quyền",
@@ -544,12 +586,6 @@
       "carryOverLimit": "Giới Hạn Chuyển Tiếp:",
       "availableToTake": "Có Thể Sử Dụng:"
     }
-  },
-  "pwa": {
-    "installTitle": "Cài đặt Credo App",
-    "installDescription": "Cài đặt ứng dụng này trên thiết bị của bạn để có trải nghiệm tốt hơn",
-    "maybeLater": "Để sau",
-    "install": "Cài đặt"
   },
   "orientation": {
     "title": "Xoay Thiết Bị",

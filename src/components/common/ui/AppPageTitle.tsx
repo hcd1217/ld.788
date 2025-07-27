@@ -13,8 +13,16 @@ type AppPageTitleProps = {
 
 export function AppPageTitle({title, button}: AppPageTitleProps) {
   return (
-    <Group justify="space-between">
-      <Title order={1} ta="center">
+    <Group justify="space-between" align="center">
+      <Title
+        order={1}
+        ta="center"
+        fz={{
+          base: 'h2',
+          sm: 'h2',
+          md: 'h1',
+        }}
+      >
         {title}
       </Title>
       {button ? (

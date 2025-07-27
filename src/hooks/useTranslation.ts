@@ -15,7 +15,7 @@ type DotNestedKeys<T> =
 
 export type TranslationKey = DotNestedKeys<TranslationResource>;
 
-export function useTranslation() {
+export default function useTranslation() {
   const {t, i18n} = useI18nTranslation();
 
   return {

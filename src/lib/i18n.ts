@@ -98,7 +98,7 @@ export function clearClientTranslations(): void {
  * Helper function to convert flat dot-notation keys to nested object
  */
 function unFlattenTranslations(
-  flatTranslations: Record<string, string>,
+  flatTranslations: string | Dictionary,
 ): Dictionary {
   const result: Dictionary = {};
 

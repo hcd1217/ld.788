@@ -1,20 +1,28 @@
-export {ActionIcons} from './ui/ActionIcons';
-export {ActiveBadge} from './ui/ActiveBadge';
-export {AppPageTitle} from './ui/AppPageTitle';
-export {BlankState} from './ui/BlankState';
-export {DataTable} from './ui/DataTable';
-export {SearchBar} from './ui/SearchBar';
-export {SelectableCard} from './ui/SelectableCard';
-export {SwitchView} from './ui/SwitchView';
-export {ColorSchemeToggle} from './features/ColorSchemeToggle';
-export {LanguageSwitcher} from './features/LanguageSwitcher';
-export {OrientationNotice} from './features/OrientationNotice';
-export {Pagination} from './features/Pagination';
-export {PWAInstallPrompt} from './features/PWAInstallPrompt';
-export {AppLogo} from './navigation/AppLogo';
-export {GoBack} from './navigation/GoBack';
-export {AppLoader} from './feedback/AppLoader';
-export {ErrorAlert} from './feedback/ErrorAlert';
-export {ErrorBoundary} from './feedback/ErrorBoundary';
-export {ErrorModal} from './feedback/ErrorModal';
-export {VersionInformation} from './feedback/VersionInformation';
+export {
+  ActionIcons,
+  ActiveBadge,
+  AppPageTitle,
+  BlankState,
+  DataTable,
+  SearchBar,
+  SelectableCard,
+  SwitchView,
+  CommonMobileHeader,
+  CommonMobileFooter,
+} from './ui';
+export {
+  ColorSchemeToggle,
+  LanguageSwitcher,
+  OrientationNotice,
+  Pagination,
+  PWAInstallPrompt,
+} from './features';
+export {AppLogo, GoBack, MobileUserMenu} from './navigation';
+export {
+  AppLoader,
+  ErrorAlert,
+  ErrorBoundary,
+  ErrorModal,
+  VersionInformation,
+} from './feedback';
+export {DetailPageLayout, ResourceNotFound} from './layouts';

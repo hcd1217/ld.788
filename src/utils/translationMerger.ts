@@ -5,9 +5,7 @@ import type {Dictionary} from '@/types/dictionary';
  * Converts flat dot-notation keys to nested object structure
  * Example: { 'common.login': 'Login' } => { common: { login: 'Login' } }
  */
-function unFlattenTranslations(
-  flatTranslations: Record<string, string>,
-): Dictionary {
+function unFlattenTranslations(flatTranslations: Dictionary): Dictionary {
   const result: Dictionary = {};
 
   for (const [key, value] of Object.entries(flatTranslations)) {
@@ -77,6 +75,10 @@ export function mergeTranslations(
   for (const [lang, translations] of Object.entries(clientTranslations)) {
     if (translations && mergedTranslations[lang]) {
       // Convert flat client translations to nested structure
+      if (typeof translations === 'string') {
+        continue;
+      }
+
       const nestedClientTranslations = unFlattenTranslations(translations);
 
       // Deep merge with base translations
@@ -109,10 +111,10 @@ export function mergeTranslations(
 export function getClientTranslationsForLanguage(
   clientTranslations: ClientConfig['translations'],
   language: string,
-): Record<string, string> | undefined {
+): Dictionary | undefined {
   if (!clientTranslations) {
     return undefined;
   }
 
-  return clientTranslations[language];
+  return clientTranslations[language] as Dictionary;
 }
