@@ -36,7 +36,7 @@ export function useClientSidePagination<T>({
   const isDesktop = useIsDesktop();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSizeState] = React.useState(
-    (defaultPageSize ?? config.pagination.desktop.defaultPageSize).toString(),
+    (defaultPageSize ?? 1e3).toString(),
   );
 
   React.useEffect(() => {

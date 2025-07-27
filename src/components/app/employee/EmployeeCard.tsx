@@ -5,6 +5,7 @@ import useTranslation from '@/hooks/useTranslation';
 import type {Employee} from '@/lib/api/schemas/hr.schemas';
 import {ActiveBadge} from '@/components/common';
 import {useHrActions} from '@/stores/useHrStore';
+import {renderFullName} from '@/utils/string';
 
 type EmployeeCardProps = {
   readonly employee: Employee;
@@ -40,6 +41,8 @@ export function EmployeeCard({
     ...actionIconsStyle,
   };
 
+  const fullName = renderFullName(employee);
+
   return (
     <Card
       withBorder
@@ -49,7 +52,7 @@ export function EmployeeCard({
       style={{cursor: 'pointer', ...style}}
       className={className}
       aria-label={t('employee.employeeCard', {
-        name: `${employee.firstName} ${employee.lastName}`,
+        name: fullName,
       })}
       onClick={() => navigate(`/employees/${employee.id}`)}
     >
@@ -60,7 +63,7 @@ export function EmployeeCard({
       >
         <Box>
           <Text fw={500} size="sm">
-            {employee.firstName} {employee.lastName}
+            {fullName}
           </Text>
           {employee.departmentId ? (
             <Text size="xs" c="dimmed">
