@@ -126,18 +126,38 @@ export function EmployeeDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const deactivateComponent = (
+    <EmployeeDeactivateModal
+      opened={deactivateModalOpened}
+      employee={employeeToDeactivate}
+      onClose={closeDeactivateModal}
+      onConfirm={confirmDeactivateEmployee}
+    />
+  );
+  const activateComponent = (
+    <EmployeeActivateModal
+      opened={activateModalOpened}
+      employee={employeeToActivate}
+      onClose={closeActivateModal}
+      onConfirm={confirmActivateEmployee}
+    />
+  );
+  const title = employee
+    ? renderFullName(employee)
+    : t('employee.employeeDetails');
+
   if (!isDesktop) {
     if (isLoading || !employee) {
       return (
         <AppMobileLayout
-          showLogo
+          withLogo
           isLoading={isLoading}
-          header={<AppPageTitle title={t('employee.employeeDetails')} />}
+          header={<AppPageTitle title={title} />}
         >
           {isLoading ? (
             <LoadingOverlay visible />
           ) : (
-            <ResourceNotFound showGoBack message={t('employee.notFound')} />
+            <ResourceNotFound withGoBack message={t('employee.notFound')} />
           )}
           ;
         </AppMobileLayout>
@@ -146,11 +166,10 @@ export function EmployeeDetailPage() {
 
     return (
       <AppMobileLayout
-        showLogo
-        showGoBack
+        withGoBack
         noFooter
         isLoading={isLoading}
-        header={<AppPageTitle title={renderFullName(employee)} />}
+        header={<AppPageTitle title={title} />}
       >
         <EmployeeDetailAccordion
           employee={employee}
@@ -158,16 +177,14 @@ export function EmployeeDetailPage() {
           onActivate={handleActivate}
           onDeactivate={handleDeactivate}
         />
+        {deactivateComponent}
+        {activateComponent}
       </AppMobileLayout>
     );
   }
 
   return (
-    <DetailPageLayout
-      titleAlign="center"
-      title={t('employee.employeeDetails')}
-      isLoading={isLoading}
-    >
+    <DetailPageLayout titleAlign="center" title={title} isLoading={isLoading}>
       {employee ? (
         <EmployeeDetailTabs
           employee={employee}
@@ -179,22 +196,8 @@ export function EmployeeDetailPage() {
       ) : (
         <ResourceNotFound message={t('employee.notFound')} />
       )}
-
-      {/* Deactivate Confirmation Modal */}
-      <EmployeeDeactivateModal
-        opened={deactivateModalOpened}
-        employee={employeeToDeactivate}
-        onClose={closeDeactivateModal}
-        onConfirm={confirmDeactivateEmployee}
-      />
-
-      {/* Activate Confirmation Modal */}
-      <EmployeeActivateModal
-        opened={activateModalOpened}
-        employee={employeeToActivate}
-        onClose={closeActivateModal}
-        onConfirm={confirmActivateEmployee}
-      />
+      {deactivateComponent}
+      {activateComponent}
     </DetailPageLayout>
   );
 }

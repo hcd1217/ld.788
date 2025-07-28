@@ -135,7 +135,7 @@ export function EmployeeListPage() {
   if (!isDesktop) {
     return (
       <AppMobileLayout
-        showLogo
+        withLogo
         isLoading={isLoading}
         error={error}
         clearError={clearError}

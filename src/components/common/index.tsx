@@ -30,4 +30,5 @@ export {
   AppMobileLayout,
   DetailPageLayout,
   ResourceNotFound,
+  ModalOrDrawer,
 } from './layouts';

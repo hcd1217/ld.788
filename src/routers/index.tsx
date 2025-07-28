@@ -40,9 +40,9 @@ const EmployeeListPage = lazy(async () => {
   return {default: module.EmployeeListPage};
 });
 
-const AddEmployeePage = lazy(async () => {
-  const module = await import('@/pages/app/AddEmployeePage.tsx');
-  return {default: module.AddEmployeePage};
+const EmployeeCreatePage = lazy(async () => {
+  const module = await import('@/pages/app/EmployeeCreatePage');
+  return {default: module.EmployeeCreatePage};
 });
 
 const EditEmployeePage = lazy(async () => {
@@ -227,6 +227,7 @@ const routeObjects: RouteObject[] = [
     children: [
       {path: 'employee-management', Component: EmployeeListPage},
       {path: 'employees/:employeeId', Component: EmployeeDetailPage},
+      {path: 'employees/add', Component: EmployeeCreatePage},
     ],
   },
   // Old APP routes
@@ -260,7 +261,7 @@ const routeObjects: RouteObject[] = [
             path: '',
             Component: PCOnlyLayout,
             children: [
-              {path: 'employees/add', Component: AddEmployeePage},
+              // {path: 'employees/add', Component: EmployeeCreatePage},
               {path: 'employees/edit/:employeeId', Component: EditEmployeePage},
               {path: 'import-users', Component: ImportUsersPage},
               {path: 'role-management', Component: RoleManagementPage},

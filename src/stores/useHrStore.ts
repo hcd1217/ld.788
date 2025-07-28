@@ -7,6 +7,7 @@ type HrState = {
   // Employee data
   employees: Employee[];
   // Departments: Department[];
+  departments: Department[];
   departmentMap: Map<string, Department>;
   currentEmployee: Employee | undefined;
   isLoading: boolean;
@@ -32,6 +33,7 @@ export const useHrStore = create<HrState>()(
       // Initial state
       employees: [],
       departments: [],
+      departmentMap: new Map(),
       currentEmployee: undefined,
       isLoading: false,
       error: undefined,
@@ -47,6 +49,7 @@ export const useHrStore = create<HrState>()(
           const response = await hrApi.getDepartments();
 
           set({
+            departments: response.departments,
             departmentMap: new Map(
               response.departments.map((department) => [
                 department.id,
@@ -92,6 +95,7 @@ export const useHrStore = create<HrState>()(
               const y = (b.isActive ? 1 : -1) * now + b.createdAt.getTime();
               return y - x;
             }),
+            departments: departmentsResponse.departments,
             departmentMap: new Map(
               departmentsResponse.departments.map((department) => [
                 department.id,
@@ -245,8 +249,7 @@ export const useHrStore = create<HrState>()(
 export const useCurrentEmployee = () =>
   useHrStore((state) => state.currentEmployee);
 export const useEmployeeList = () => useHrStore((state) => state.employees);
-export const useDepartmentList = () =>
-  useHrStore((state) => [...state.departmentMap.values()]);
+export const useDepartmentList = () => useHrStore((state) => state.departments);
 export const useHrLoading = () => useHrStore((state) => state.isLoading);
 export const useHrError = () => useHrStore((state) => state.error);
 

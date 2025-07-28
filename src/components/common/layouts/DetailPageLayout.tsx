@@ -17,7 +17,7 @@ interface DetailPageLayoutProps {
   readonly containerFluid?: boolean;
   readonly containerSize?: MantineSize;
   readonly titleAlign?: 'left' | 'center' | 'right';
-  readonly showGoBack?: boolean;
+  readonly withGoBack?: boolean;
 }
 
 export function DetailPageLayout({
@@ -27,7 +27,7 @@ export function DetailPageLayout({
   containerFluid = true,
   containerSize,
   titleAlign = 'center',
-  showGoBack = true,
+  withGoBack = true,
 }: DetailPageLayoutProps) {
   const isDesktop = useIsDesktop();
 
@@ -38,7 +38,7 @@ export function DetailPageLayout({
   return (
     <Container {...containerProps} p={isDesktop ? undefined : 0}>
       <Stack gap="xl" p={isDesktop ? undefined : 0}>
-        {showGoBack ? (
+        {withGoBack ? (
           <Group justify="left">
             <GoBack />
           </Group>

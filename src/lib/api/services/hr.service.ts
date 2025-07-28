@@ -37,6 +37,15 @@ export class HrApi extends BaseApiClient {
     );
   }
 
+  async addBulkEmployees(data: CreateEmployeesRequest[]): Promise<void> {
+    return this.post<void, CreateEmployeesRequest[]>(
+      '/api/hr/employees/bulk',
+      data,
+      undefined,
+      CreateEmployeesRequestSchema.array(),
+    );
+  }
+
   async updateEmployee(
     employeeId: string,
     data: UpdateEmployeeRequest,

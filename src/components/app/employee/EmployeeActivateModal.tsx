@@ -1,8 +1,9 @@
-import {Modal, Stack, Text, Alert, Flex, Button} from '@mantine/core';
+import {Stack, Text, Alert, Flex, Button} from '@mantine/core';
 import {IconAlertTriangle} from '@tabler/icons-react';
 import useTranslation from '@/hooks/useTranslation';
 import type {Employee} from '@/lib/api/schemas/hr.schemas';
 import {renderFullName} from '@/utils/string';
+import {ModalOrDrawer} from '@/components/common';
 
 type EmployeeActivateModalProps = {
   readonly opened: boolean;
@@ -20,12 +21,7 @@ export function EmployeeActivateModal({
   const {t} = useTranslation();
 
   return (
-    <Modal
-      centered
-      opened={opened}
-      title={t('employee.confirmActivateTitle')}
-      onClose={onClose}
-    >
+    <ModalOrDrawer drawerSize="35vh" opened={opened} onClose={onClose}>
       <Stack gap="md">
         <Text>
           {t('employee.confirmActivateMessage', {
@@ -50,6 +46,6 @@ export function EmployeeActivateModal({
           </Button>
         </Flex>
       </Stack>
-    </Modal>
+    </ModalOrDrawer>
   );
 }

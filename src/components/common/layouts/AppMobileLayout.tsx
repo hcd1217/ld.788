@@ -9,8 +9,8 @@ type AppMobileLayoutProps = {
   readonly children: React.ReactNode;
   readonly isLoading?: boolean;
   readonly footer?: React.ReactNode;
-  readonly showLogo?: boolean;
-  readonly showGoBack?: boolean;
+  readonly withLogo?: boolean;
+  readonly withGoBack?: boolean;
   readonly noFooter?: boolean;
   readonly noHeader?: boolean;
   readonly error?: string;
@@ -22,9 +22,9 @@ export function AppMobileLayout({
   footer,
   error,
   clearError,
-  showGoBack = false,
+  withGoBack = false,
   isLoading = false,
-  showLogo = false,
+  withLogo = false,
   noHeader = false,
   noFooter = false,
 }: AppMobileLayoutProps) {
@@ -38,7 +38,8 @@ export function AppMobileLayout({
       {noHeader ? null : (
         <AppShell.Header className={classes.header}>
           <Group my="auto" h="100%" px="sm">
-            {showLogo ? <AppLogo noTitle /> : null}
+            {withGoBack ? <GoBack variant="mobile-header" /> : null}
+            {withLogo ? <AppLogo noTitle /> : null}
             {header ?? <CommonMobileHeader />}
           </Group>
         </AppShell.Header>
@@ -50,11 +51,6 @@ export function AppMobileLayout({
           overlayProps={{blur: 2}}
           transitionProps={{duration: 300}}
         />
-        {showGoBack ? (
-          <Group justify="left" m="sm">
-            <GoBack />
-          </Group>
-        ) : null}
         <ErrorAlert error={error} clearError={clearError} />
         {children}
       </AppShell.Main>

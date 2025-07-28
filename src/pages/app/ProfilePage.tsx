@@ -8,7 +8,6 @@ import {
   Box,
   Stack,
   Badge,
-  SimpleGrid,
   Alert,
   LoadingOverlay,
   Transition,
@@ -157,66 +156,6 @@ export function ProfilePage() {
                     </Group>
                   ))}
                 </Stack>
-              </Card>
-
-              {/* Client Configuration */}
-              <Card shadow="sm" padding="xl" radius="md">
-                <Title order={3} mb="md">
-                  {t('profile.clientConfig')}
-                </Title>
-                <SimpleGrid cols={{base: 1, sm: 2}} spacing="sm">
-                  <Box>
-                    <Text size="sm" c="dimmed">
-                      {t('profile.sessionTimeout')}
-                    </Text>
-                    <Text fw={500}>
-                      {userData.clientConfig?.sessionTimeoutMinutes}{' '}
-                      {t('common.minutes')}
-                    </Text>
-                  </Box>
-                  <Box>
-                    <Text size="sm" c="dimmed">
-                      {t('profile.maxSessions')}
-                    </Text>
-                    <Text fw={500}>
-                      {userData.clientConfig?.maxConcurrentSessions}
-                    </Text>
-                  </Box>
-                  <Box>
-                    <Text size="sm" c="dimmed">
-                      {t('profile.passwordReset')}
-                    </Text>
-                    <Badge
-                      color={
-                        userData.clientConfig?.allowPasswordReset
-                          ? 'green'
-                          : 'red'
-                      }
-                      variant="light"
-                    >
-                      {userData.clientConfig?.allowPasswordReset
-                        ? t('common.enabled')
-                        : t('common.disabled')}
-                    </Badge>
-                  </Box>
-                  <Box>
-                    <Text size="sm" c="dimmed">
-                      {t('profile.selfRegistration')}
-                    </Text>
-                    <Badge
-                      color={
-                        userData.clientConfig?.allowSelfRegistration
-                          ? 'green'
-                          : 'red'
-                      }
-                      variant="light"
-                    >
-                      {userData.clientConfig?.allowSelfRegistration
-                        ? t('common.enabled')
-                        : t('common.disabled')}
-                    </Badge>
-                  </Box>
-                </SimpleGrid>
               </Card>
             </Stack>
           ) : null}

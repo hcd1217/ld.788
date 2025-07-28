@@ -3,6 +3,8 @@
     "pages": {
       "blank": "This page is blank page, if you see this page, it means that the route in under construction, please just ignore this"
     },
+    "firstName": "First name",
+    "lastName": "Last name",
     "logout": "Logout",
     "cancel": "Cancel",
     "previous": "Previous",
@@ -83,7 +85,19 @@
     "enabled": "Enabled",
     "disabled": "Disabled",
     "notSet": "Not set",
-    "goToHome": "Go to Home"
+    "goToHome": "Go to Home",
+    "downloading": "Downloading",
+    "downloadComplete": "Download Complete",
+    "downloadFailed": "Download Failed",
+    "failedToReadFile": "Failed to read file",
+    "failedToParseExcel": "Failed to parse Excel file",
+    "unknownError": "Unknown error",
+    "importResults": "Import Results",
+    "total": "Total",
+    "failed": "Failed",
+    "dragAndDropFile": "Drag and drop your file here",
+    "orClickToSelect": "or click to select",
+    "remove": "Remove"
   },
   "pcOnly": {
     "__check__": "Sun Jul 27 05:22:58 UTC 2025",
@@ -233,7 +247,27 @@
     "notFound": "Employee not found",
     "deleteEmployeeDescription": "Permanently delete this employee from the system",
     "deactivateEmployeeDescription": "Temporarily disable employee access to the system",
-    "activateEmployeeDescription": "Restore employee access to the system"
+    "activateEmployeeDescription": "Restore employee access to the system",
+    "employeeAdded": "Employee added successfully",
+    "addEmployeeFailed": "Failed to add employee",
+    "bulkImport": "Bulk Import",
+    "addSingleEmployee": "Add Single Employee",
+    "bulkImportEmployees": "Bulk Import Employees",
+    "selectDepartment": "Select department",
+    "sampleExcelTemplate": "Sample Excel Template",
+    "sampleExcelDescription": "Download a sample Excel file with the correct format",
+    "downloadSampleExcel": "Download Sample Excel",
+    "uploadEmployeeFile": "Upload Employee File",
+    "supportedFormats": "Supported formats: CSV, XLSX, XLS",
+    "creatingSampleFile": "Creating sample file...",
+    "sampleFileDownloaded": "Sample Excel file downloaded successfully",
+    "failedToDownloadSample": "Failed to download sample file",
+    "fileRequiresHeaderAndData": "File must contain at least a header row and one data row",
+    "noValidEmployeesFound": "No valid employees found in the file",
+    "importedEmployees": "Imported {{success}} out of {{total}} employees",
+    "importEmployees": "Import Employees",
+    "pleaseSelectExcelFile": "Please select a CSV or Excel file",
+    "pleaseSelectFileFirst": "Please select a file first"
   },
   "auth": {
     "title": "Credo",

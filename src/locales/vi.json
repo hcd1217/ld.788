@@ -3,6 +3,8 @@
     "pages": {
       "blank": "Trang này là đang được phát triên, nếu bạn thấy trang này, có nghĩa là nó đang được xây dựng, vui lòng bỏ qua"
     },
+    "firstName": "Tên",
+    "lastName": "Họ",
     "logout": "Đăng xuất",
     "cancel": "Hủy",
     "previous": "Trước",
@@ -83,7 +85,19 @@
     "goToHome": "Về Trang Chủ",
     "createdAt": "Ngày Tạo",
     "updatedAt": "Ngày Cập Nhật",
-    "dangerZone": "Khu Vực Nguy Hiểm"
+    "dangerZone": "Khu Vực Nguy Hiểm",
+    "downloading": "Đang tải xuống",
+    "downloadComplete": "Tải Xuống Hoàn Tất",
+    "downloadFailed": "Tải Xuống Thất Bại",
+    "failedToReadFile": "Không thể đọc file",
+    "failedToParseExcel": "Không thể phân tích file Excel",
+    "unknownError": "Lỗi không xác định",
+    "importResults": "Kết Quả Nhập",
+    "total": "Tổng",
+    "failed": "Thất bại",
+    "dragAndDropFile": "Kéo và thả file vào đây",
+    "orClickToSelect": "hoặc nhấn để chọn",
+    "remove": "Xóa"
   },
   "pcOnly": {
     "title": "Tính Năng Máy Tính",
@@ -231,7 +245,27 @@
     "notFound": "Không tìm thấy nhân viên",
     "deleteEmployeeDescription": "Xóa vĩnh viễn nhân viên khỏi hệ thống",
     "deactivateEmployeeDescription": "Tạm thời vô hiệu hóa quyền truy cập của nhân viên vào hệ thống",
-    "activateEmployeeDescription": "Khôi phục quyền truy cập của nhân viên vào hệ thống"
+    "activateEmployeeDescription": "Khôi phục quyền truy cập của nhân viên vào hệ thống",
+    "employeeAdded": "Đã thêm nhân viên thành công",
+    "addEmployeeFailed": "Không thể thêm nhân viên",
+    "bulkImport": "Nhập Hàng Loạt",
+    "addSingleEmployee": "Thêm Một Nhân Viên",
+    "bulkImportEmployees": "Nhập Nhiều Nhân Viên",
+    "selectDepartment": "Chọn phòng ban",
+    "sampleExcelTemplate": "Mẫu Excel",
+    "sampleExcelDescription": "Tải xuống file Excel mẫu với định dạng đúng",
+    "downloadSampleExcel": "Tải Xuống Excel Mẫu",
+    "uploadEmployeeFile": "Tải Lên Danh Sách Nhân Viên",
+    "supportedFormats": "Định dạng hỗ trợ: CSV, XLSX, XLS",
+    "creatingSampleFile": "Đang tạo file mẫu...",
+    "sampleFileDownloaded": "Đã tải xuống file Excel mẫu thành công",
+    "failedToDownloadSample": "Không thể tải xuống file mẫu",
+    "fileRequiresHeaderAndData": "File phải chứa ít nhất một hàng tiêu đề và một hàng dữ liệu",
+    "noValidEmployeesFound": "Không tìm thấy nhân viên hợp lệ trong file",
+    "importedEmployees": "Đã nhập {{success}} trong số {{total}} nhân viên",
+    "importEmployees": "Nhập Nhân Viên",
+    "pleaseSelectExcelFile": "Vui lòng chọn file CSV hoặc Excel",
+    "pleaseSelectFileFirst": "Vui lòng chọn file trước"
   },
   "auth": {
     "title": "Credo",
