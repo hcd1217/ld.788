@@ -23,7 +23,7 @@ export function Tooltip({children, ...props}: TooltipProps) {
           color: isDarkMode ? 'var(--mantine-color-dark-0)' : 'white',
           backgroundColor: isDarkMode
             ? 'var(--mantine-color-dark-6)'
-            : 'var(--mantine-color-dark-6)',
+            : 'var(--mantine-color-dark-3)',
         },
       }}
       {...props}
