@@ -1,7 +1,8 @@
-import {Drawer, Modal, rem, type MantineSize} from '@mantine/core';
+import {Modal, rem, type MantineSize} from '@mantine/core';
 import type {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
 import useIsDesktop from '@/hooks/useIsDesktop';
+import {Drawer} from '@/components/common/ui';
 
 type ModalOrDrawerProps = {
   readonly opened: boolean;

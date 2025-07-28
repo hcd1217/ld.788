@@ -2,12 +2,11 @@ import {
   Center,
   Box,
   SegmentedControl,
-  Tooltip,
   type MantineBreakpoint,
 } from '@mantine/core';
 import {IconLayoutGrid, IconTable} from '@tabler/icons-react';
+import {Tooltip} from './Tooltip';
 import useTranslation from '@/hooks/useTranslation';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
 
 type SwitchViewProps = {
   readonly viewMode: 'table' | 'grid';
@@ -20,15 +19,6 @@ export function SwitchView({
   setViewMode,
 }: SwitchViewProps) {
   const {t} = useTranslation();
-  const isDarkMode = useIsDarkMode();
-  const tooltipStyles = {
-    tooltip: {
-      color: isDarkMode ? 'var(--mantine-color-dark-0)' : 'white',
-      backgroundColor: isDarkMode
-        ? 'var(--mantine-color-dark-6)'
-        : 'var(--mantine-color-brand-4)',
-    },
-  };
 
   return (
     <Box visibleFrom={visibleFrom}>
@@ -38,11 +28,7 @@ export function SwitchView({
           {
             value: 'table',
             label: (
-              <Tooltip
-                label={t('common.tableView')}
-                position="bottom"
-                styles={tooltipStyles}
-              >
+              <Tooltip label={t('common.tableView')} position="bottom">
                 <Center>
                   <IconTable size={16} />
                 </Center>
@@ -52,11 +38,7 @@ export function SwitchView({
           {
             value: 'grid',
             label: (
-              <Tooltip
-                label={t('common.gridView')}
-                position="bottom"
-                styles={tooltipStyles}
-              >
+              <Tooltip label={t('common.gridView')} position="bottom">
                 <Center>
                   <IconLayoutGrid size={16} />
                 </Center>

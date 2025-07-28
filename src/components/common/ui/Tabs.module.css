@@ -1,0 +1,98 @@
+.tabs {
+  border-bottom: none;
+  background-color: transparent;
+}
+
+.tabsList {
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+  gap: 2px;
+  padding-bottom: 0;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.tab {
+  border-radius: 8px 8px 0 0;
+  border: 1px solid transparent;
+  background-color: var(--mantine-color-gray-0);
+  transition: all 200ms ease;
+  margin-bottom: -1px;
+  padding: 12px 20px;
+  font-weight: 500;
+  color: var(--mantine-color-gray-7);
+  position: relative;
+}
+
+.tab:hover {
+  background-color: var(--mantine-color-gray-1);
+  border-color: var(--mantine-color-gray-3);
+  color: var(--mantine-color-gray-8);
+}
+
+.tab[data-active] {
+  background-color: var(--mantine-color-white);
+  border-color: var(--mantine-color-brand-4);
+  border-bottom-color: transparent;
+  color: var(--mantine-color-brand-7);
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
+/* Add colored top accent for active tab */
+.tab[data-active]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--mantine-color-brand-5);
+  border-radius: 8px 8px 0 0;
+}
+
+/* Hide bottom border for active tab */
+.tab[data-active]::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--mantine-color-white);
+}
+
+/* Dark mode adjustments */
+[data-mantine-color-scheme="dark"] .tab {
+  background-color: var(--mantine-color-dark-6);
+  color: var(--mantine-color-gray-3);
+}
+
+[data-mantine-color-scheme="dark"] .tab:hover {
+  background-color: var(--mantine-color-dark-5);
+  border-color: var(--mantine-color-dark-4);
+  color: var(--mantine-color-gray-1);
+}
+
+[data-mantine-color-scheme="dark"] .tab[data-active] {
+  background-color: var(--mantine-color-dark-7);
+  border-color: var(--mantine-color-brand-4);
+  color: var(--mantine-color-brand-4);
+}
+
+[data-mantine-color-scheme="dark"] .tab[data-active]::after {
+  background-color: var(--mantine-color-dark-7);
+}
+
+[data-mantine-color-scheme="dark"] .tabsList {
+  border-bottom-color: var(--mantine-color-dark-4);
+}
+
+.panel {
+  border-top: none;
+  background-color: var(--mantine-color-white);
+}
+
+[data-mantine-color-scheme="dark"] .panel {
+  background-color: var(--mantine-color-dark-7);
+}

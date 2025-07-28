@@ -3,11 +3,11 @@ import useIsDesktop from './useIsDesktop';
 import {useAppStore} from '@/stores/useAppStore';
 // Ref: https://stackoverflow.com/a/78696557
 
-export interface PaginationOptions<T> {
+export interface PaginationOptions<T, TFilters = {searchQuery?: string}> {
   readonly data: readonly T[];
   readonly defaultPageSize?: number;
-  readonly filterFn?: (item: T, searchQuery: string) => boolean;
-  readonly searchQuery?: string;
+  readonly filterFn?: (item: T, filters: TFilters) => boolean;
+  readonly filters?: TFilters;
 }
 
 export interface PaginationState {
@@ -26,12 +26,16 @@ export interface PaginationHandlers {
   readonly lastPage: () => void;
 }
 
-export function useClientSidePagination<T>({
+export function useClientSidePagination<T, TFilters = {searchQuery?: string}>({
   data,
   defaultPageSize,
   filterFn,
-  searchQuery = '',
-}: PaginationOptions<T>): [readonly T[], PaginationState, PaginationHandlers] {
+  filters,
+}: PaginationOptions<T, TFilters>): [
+  readonly T[],
+  PaginationState,
+  PaginationHandlers,
+] {
   const {config} = useAppStore();
   const isDesktop = useIsDesktop();
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -55,14 +59,14 @@ export function useClientSidePagination<T>({
     isDesktop,
   ]);
 
-  // Filter data based on search query
+  // Filter data based on filters
   const filteredData = React.useMemo(() => {
-    if (!searchQuery.trim() || !filterFn) {
+    if (!filters || !filterFn) {
       return data;
     }
 
-    return data.filter((item) => filterFn(item, searchQuery));
-  }, [data, searchQuery, filterFn]);
+    return data.filter((item) => filterFn(item, filters));
+  }, [data, filters, filterFn]);
 
   // Calculate pagination values
   const totalPages = React.useMemo(() => {
@@ -78,10 +82,10 @@ export function useClientSidePagination<T>({
     return filteredData.slice(startIndex, endIndex);
   }, [filteredData, currentPage, pageSize]);
 
-  // Reset to first page when search query changes
+  // Reset to first page when filters change
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [filters]);
 
   // Ensure current page is valid when total pages change
   React.useEffect(() => {

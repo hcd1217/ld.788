@@ -1,4 +1,4 @@
-import {Tabs, Box, Stack, ScrollArea} from '@mantine/core';
+import {Box, Stack, ScrollArea} from '@mantine/core';
 import {
   IconInfoCircle,
   IconClock,
@@ -7,7 +7,7 @@ import {
 } from '@tabler/icons-react';
 import {EmployeeBasicInfoCard} from './EmployeeBasicInfoCard';
 import {EmployeeDangerZone} from './EmployeeDangerZone';
-import {ComingSoonCard} from '@/components/common/ui/ComingSoonCard';
+import {Tabs, ComingSoonCard} from '@/components/common';
 import useTranslation from '@/hooks/useTranslation';
 import {type Employee, type Department} from '@/lib/api/schemas/hr.schemas';
 
@@ -31,7 +31,7 @@ export function EmployeeDetailTabs({
   return (
     <Tabs defaultValue="info">
       <ScrollArea offsetScrollbars scrollbarSize={4}>
-        <Tabs.List fw="bold" ta="left" style={{flexWrap: 'nowrap'}}>
+        <Tabs.List>
           <Tabs.Tab value="info" leftSection={<IconInfoCircle size={16} />}>
             {t('employee.detailInformation')}
           </Tabs.Tab>

@@ -22,7 +22,7 @@ export function EmployeeDeactivateModal({
 }: EmployeeDeactivateModalProps) {
   const {t} = useTranslation();
   return (
-    <ModalOrDrawer drawerSize="35vh" opened={opened} onClose={onClose}>
+    <ModalOrDrawer drawerSize="350px" opened={opened} onClose={onClose}>
       <Stack gap="md">
         <Text>
           {t('employee.confirmDeactivateMessage', {

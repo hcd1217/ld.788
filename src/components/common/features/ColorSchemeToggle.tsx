@@ -5,6 +5,7 @@ import {
 } from '@mantine/core';
 import {IconSun, IconMoon} from '@tabler/icons-react';
 import {useAppStore} from '@/stores/useAppStore';
+import {isDevelopment} from '@/utils/env';
 
 export function ColorSchemeToggle() {
   const {publicClientConfig} = useAppStore();
@@ -13,7 +14,7 @@ export function ColorSchemeToggle() {
     getInitialValueInEffect: true,
   });
 
-  if (!publicClientConfig?.features?.darkMode) {
+  if (!publicClientConfig?.features?.darkMode && !isDevelopment) {
     return null;
   }
 

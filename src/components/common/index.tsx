@@ -3,12 +3,16 @@ export {
   ActiveBadge,
   AppPageTitle,
   BlankState,
+  ComingSoonCard,
+  CommonMobileFooter,
+  CommonMobileHeader,
   DataTable,
+  Drawer,
   SearchBar,
   SelectableCard,
   SwitchView,
-  CommonMobileHeader,
-  CommonMobileFooter,
+  Tabs,
+  Tooltip,
 } from './ui';
 export {
   ColorSchemeToggle,
@@ -29,6 +33,6 @@ export {
   AppDesktopLayout,
   AppMobileLayout,
   DetailPageLayout,
-  ResourceNotFound,
   ModalOrDrawer,
+  ResourceNotFound,
 } from './layouts';

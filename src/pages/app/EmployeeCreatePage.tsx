@@ -15,7 +15,6 @@ import {
   Badge,
   Divider,
   Container,
-  Tabs,
   rem,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
@@ -41,6 +40,7 @@ import {
   AppMobileLayout,
   AppDesktopLayout,
   GoBack,
+  Tabs,
 } from '@/components/common';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
 import {

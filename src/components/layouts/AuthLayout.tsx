@@ -95,7 +95,7 @@ export function AuthLayout() {
         </Group>
       </AppShell.Header>
       {isMenuOpen ? <NavBar /> : null}
-      <AppShell.Main>
+      <AppShell.Main pl="265px">
         <Outlet />
       </AppShell.Main>
 
