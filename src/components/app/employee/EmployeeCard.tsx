@@ -1,6 +1,5 @@
 import {Card, Group, Box, Text, type MantineStyleProp} from '@mantine/core';
 import {useNavigate} from 'react-router';
-import {EmployeeActions} from './EmployeeActions';
 import useTranslation from '@/hooks/useTranslation';
 import type {Employee} from '@/lib/api/schemas/hr.schemas';
 import {ActiveBadge} from '@/components/common';
@@ -9,37 +8,16 @@ import {renderFullName} from '@/utils/string';
 
 type EmployeeCardProps = {
   readonly employee: Employee;
-  readonly onDeactivate?: () => void;
-  readonly onActivate?: () => void;
   /** Custom styles for the card container */
   readonly style?: MantineStyleProp;
   /** Custom className for the card container */
   readonly className?: string;
-  /** Custom styles for the action icons group */
-  readonly actionIconsStyle?: MantineStyleProp;
-  /** Whether to hide the actions */
-  readonly noActions?: boolean;
 };
 
-export function EmployeeCard({
-  employee,
-  onDeactivate,
-  onActivate,
-  style,
-  className,
-  actionIconsStyle,
-  noActions,
-}: EmployeeCardProps) {
+export function EmployeeCard({employee, style, className}: EmployeeCardProps) {
   const {t} = useTranslation();
   const {getDepartmentById} = useHrActions();
   const navigate = useNavigate();
-
-  const defaultActionIconsStyle: MantineStyleProp = {
-    position: 'absolute',
-    top: 'var(--mantine-spacing-xs)',
-    right: 'var(--mantine-spacing-xs)',
-    ...actionIconsStyle,
-  };
 
   const fullName = renderFullName(employee);
 
@@ -73,15 +51,6 @@ export function EmployeeCard({
             </Text>
           ) : null}
         </Box>
-        {noActions ? null : (
-          <EmployeeActions
-            style={defaultActionIconsStyle}
-            employeeId={employee.id}
-            isActive={employee.isActive}
-            onDeactivate={onDeactivate}
-            onActivate={onActivate}
-          />
-        )}
         <ActiveBadge isActive={employee.isActive} />
       </Group>
     </Card>

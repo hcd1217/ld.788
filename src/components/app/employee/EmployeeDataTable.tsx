@@ -1,6 +1,5 @@
 import {Table, ScrollArea, Badge} from '@mantine/core';
 import {useNavigate} from 'react-router';
-import {EmployeeActions} from './EmployeeActions';
 import useTranslation from '@/hooks/useTranslation';
 import type {Employee} from '@/lib/api/schemas/hr.schemas';
 import {renderFullName} from '@/utils/string';
@@ -8,15 +7,9 @@ import {useHrActions} from '@/stores/useHrStore';
 
 type EmployeeDataTableProps = {
   readonly employees: readonly Employee[];
-  readonly onDeactivateEmployee?: (employee: Employee) => void;
-  readonly onActivateEmployee?: (employee: Employee) => void;
 };
 
-export function EmployeeDataTable({
-  employees,
-  onDeactivateEmployee,
-  onActivateEmployee,
-}: EmployeeDataTableProps) {
+export function EmployeeDataTable({employees}: EmployeeDataTableProps) {
   const {t} = useTranslation();
   const {getDepartmentById} = useHrActions();
   const navigate = useNavigate();
@@ -29,7 +22,7 @@ export function EmployeeDataTable({
             <Table.Th>{t('employee.name')}</Table.Th>
             <Table.Th>{t('employee.unit')}</Table.Th>
             <Table.Th>{t('employee.status')}</Table.Th>
-            <Table.Th style={{width: 100}}>{t('common.actions')}</Table.Th>
+            {/* <Table.Th style={{width: 100}}>{t('common.actions')}</Table.Th> */}
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -55,26 +48,6 @@ export function EmployeeDataTable({
                     ? t('employee.active')
                     : t('employee.inactive')}
                 </Badge>
-              </Table.Td>
-              <Table.Td onClick={(e) => e.stopPropagation()}>
-                <EmployeeActions
-                  employeeId={employee.id}
-                  isActive={employee.isActive}
-                  onDeactivate={
-                    onDeactivateEmployee
-                      ? () => {
-                          onDeactivateEmployee(employee);
-                        }
-                      : undefined
-                  }
-                  onActivate={
-                    onActivateEmployee
-                      ? () => {
-                          onActivateEmployee(employee);
-                        }
-                      : undefined
-                  }
-                />
               </Table.Td>
             </Table.Tr>
           ))}

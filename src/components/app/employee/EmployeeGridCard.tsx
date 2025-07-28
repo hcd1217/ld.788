@@ -1,6 +1,5 @@
 import {Stack, Group, Text, Badge} from '@mantine/core';
 import {useNavigate} from 'react-router';
-import {EmployeeActions} from './EmployeeActions';
 import useTranslation from '@/hooks/useTranslation';
 import type {Employee} from '@/lib/api/schemas/hr.schemas';
 import {SelectableCard} from '@/components/common';
@@ -9,15 +8,9 @@ import {useHrActions} from '@/stores/useHrStore';
 
 type EmployeeGridCardProps = {
   readonly employee: Employee;
-  readonly onDeactivate?: () => void;
-  readonly onActivate?: () => void;
 };
 
-export function EmployeeGridCard({
-  employee,
-  onDeactivate,
-  onActivate,
-}: EmployeeGridCardProps) {
+export function EmployeeGridCard({employee}: EmployeeGridCardProps) {
   const {t} = useTranslation();
   const {getDepartmentById} = useHrActions();
   const navigate = useNavigate();
@@ -51,14 +44,6 @@ export function EmployeeGridCard({
           <Badge color={employee.isActive ? 'green' : 'gray'} variant="light">
             {employee.isActive ? t('employee.active') : t('employee.inactive')}
           </Badge>
-        </Group>
-        <Group justify="flex-end">
-          <EmployeeActions
-            employeeId={employee.id}
-            isActive={employee.isActive}
-            onDeactivate={onDeactivate}
-            onActivate={onActivate}
-          />
         </Group>
       </Stack>
     </SelectableCard>

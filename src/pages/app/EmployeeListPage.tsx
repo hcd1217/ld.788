@@ -2,8 +2,6 @@ import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router';
 import {Stack, Group, Box, SimpleGrid} from '@mantine/core';
 import {IconUser} from '@tabler/icons-react';
-import {useDisclosure} from '@mantine/hooks';
-import {notifications} from '@mantine/notifications';
 import useTranslation from '@/hooks/useTranslation';
 import {useClientSidePagination} from '@/hooks/useClientSidePagination';
 import type {Employee} from '@/lib/api/schemas/hr.schemas';
@@ -26,8 +24,6 @@ import {
   EmployeeCard,
   EmployeeDataTable,
   EmployeeGridCard,
-  EmployeeDeactivateModal,
-  EmployeeActivateModal,
 } from '@/components/app/employee';
 import useIsDesktop from '@/hooks/useIsDesktop';
 
@@ -36,24 +32,9 @@ export function EmployeeListPage() {
   const employees = useEmployeeList();
   const isLoading = useHrLoading();
   const error = useHrError();
-  const {refreshEmployees, deactivateEmployee, activateEmployee, clearError} =
-    useHrActions();
+  const {refreshEmployees, clearError} = useHrActions();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
-  const [employeeToDeactivate, setEmployeeToDeactivate] = useState<
-    Employee | undefined
-  >(undefined);
-  const [employeeToActivate, setEmployeeToActivate] = useState<
-    Employee | undefined
-  >(undefined);
-  const [
-    deactivateModalOpened,
-    {open: openDeactivateModal, close: closeDeactivateModal},
-  ] = useDisclosure(false);
-  const [
-    activateModalOpened,
-    {open: openActivateModal, close: closeActivateModal},
-  ] = useDisclosure(false);
   const isDesktop = useIsDesktop();
   const {t} = useTranslation();
 
@@ -72,65 +53,6 @@ export function EmployeeListPage() {
     void refreshEmployees();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleDeactivateEmployee = (employee: Employee) => {
-    setEmployeeToDeactivate(employee);
-    openDeactivateModal();
-  };
-
-  const handleActivateEmployee = (employee: Employee) => {
-    setEmployeeToActivate(employee);
-    openActivateModal();
-  };
-
-  const confirmDeactivateEmployee = async () => {
-    if (!employeeToDeactivate) return;
-    try {
-      await deactivateEmployee(employeeToDeactivate.id);
-      notifications.show({
-        title: t('common.success'),
-        message: t('employee.employeeDeactivated'),
-        color: 'green',
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t('employee.deactivateEmployeeFailed');
-      notifications.show({
-        title: t('common.error'),
-        message: errorMessage,
-        color: 'red',
-      });
-    }
-
-    closeDeactivateModal();
-  };
-
-  const confirmActivateEmployee = async () => {
-    if (!employeeToActivate) return;
-
-    try {
-      await activateEmployee(employeeToActivate.id);
-      notifications.show({
-        title: t('common.success'),
-        message: t('employee.employeeActivated'),
-        color: 'green',
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t('employee.activateEmployeeFailed');
-      notifications.show({
-        title: t('common.error'),
-        message: errorMessage,
-        color: 'red',
-      });
-    }
-
-    closeActivateModal();
-  };
 
   if (!isDesktop) {
     return (
@@ -166,7 +88,7 @@ export function EmployeeListPage() {
         <Box mt="md">
           <Stack gap="sm" px="sm">
             {paginatedEmployees.map((employee) => (
-              <EmployeeCard key={employee.id} noActions employee={employee} />
+              <EmployeeCard key={employee.id} employee={employee} />
             ))}
           </Stack>
         </Box>
@@ -229,28 +151,11 @@ export function EmployeeListPage() {
           <>
             {/* Desktop View - Table or Grid based on selection */}
             {viewMode === 'table' ? (
-              <EmployeeDataTable
-                employees={paginatedEmployees}
-                onDeactivateEmployee={(employee) => {
-                  handleDeactivateEmployee(employee);
-                }}
-                onActivateEmployee={(employee) => {
-                  handleActivateEmployee(employee);
-                }}
-              />
+              <EmployeeDataTable employees={paginatedEmployees} />
             ) : (
               <SimpleGrid cols={{base: 1, md: 2, lg: 3}} spacing="lg">
                 {paginatedEmployees.map((employee) => (
-                  <EmployeeGridCard
-                    key={employee.id}
-                    employee={employee}
-                    onDeactivate={() => {
-                      handleDeactivateEmployee(employee);
-                    }}
-                    onActivate={() => {
-                      handleActivateEmployee(employee);
-                    }}
-                  />
+                  <EmployeeGridCard key={employee.id} employee={employee} />
                 ))}
               </SimpleGrid>
             )}
@@ -265,22 +170,6 @@ export function EmployeeListPage() {
         currentPage={paginationState.currentPage}
         onPageSizeChange={paginationHandlers.setPageSize}
         onPageChange={paginationHandlers.setCurrentPage}
-      />
-
-      {/* Deactivate Confirmation Modal */}
-      <EmployeeDeactivateModal
-        opened={deactivateModalOpened}
-        employee={employeeToDeactivate}
-        onClose={closeDeactivateModal}
-        onConfirm={confirmDeactivateEmployee}
-      />
-
-      {/* Activate Confirmation Modal */}
-      <EmployeeActivateModal
-        opened={activateModalOpened}
-        employee={employeeToActivate}
-        onClose={closeActivateModal}
-        onConfirm={confirmActivateEmployee}
       />
     </AppDesktopLayout>
   );
