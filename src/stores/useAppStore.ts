@@ -70,7 +70,7 @@ export const useAppStore = create<AppState>()(
       restoreAdminSession();
 
       // Load public client config on initialization
-      const clientCode = localStorage.getItem('clientCode') ?? 'NKTU';
+      const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
       clientApi
         .getPubicClientConfig(clientCode)
         .then((config) => {

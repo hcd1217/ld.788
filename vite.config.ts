@@ -67,9 +67,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'CMngt App',
-        short_name: 'CMngt',
-        description: 'CMngt Progressive Web Application',
+        name: 'Credo App',
+        short_name: 'Credo',
+        description: 'Credo Progressive Web Application',
         theme_color: '#3F60A0',
         background_color: '#ffffff',
         display: 'standalone',

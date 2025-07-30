@@ -6,7 +6,7 @@ type AuthHeaderProps = {
   readonly title?: string;
 };
 
-export function AuthHeader({title: pageTitle = 'CMngt'}: AuthHeaderProps) {
+export function AuthHeader({title: pageTitle = 'Credo'}: AuthHeaderProps) {
   const {publicClientConfig} = useAppStore();
   const [title, setTitle] = useState(pageTitle);
   const [logoUrl, setLogoUrl] = useState('/logo.svg');
