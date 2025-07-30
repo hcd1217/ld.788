@@ -70,7 +70,7 @@ export const useAppStore = create<AppState>()(
       restoreAdminSession();
 
       // Load public client config on initialization
-      const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
+      const clientCode = localStorage.getItem('clientCode') ?? 'NKTU';
       clientApi
         .getPubicClientConfig(clientCode)
         .then((config) => {
@@ -122,8 +122,7 @@ export const useAppStore = create<AppState>()(
             }
           } catch (error) {
             console.error('Failed to fetch user profile:', error);
-            // Don't throw the error, just log it
-            // The UI can handle the undefined userProfile state
+            get().logout();
           }
         },
         setTheme: (theme) => set({theme}),

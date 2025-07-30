@@ -10,7 +10,7 @@ console.ignore = () => {
 };
 
 export function registerLogger() {
-  const debug = true;
+  const debug = false;
   if (debug) {
     return;
   }

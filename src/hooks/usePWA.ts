@@ -20,7 +20,7 @@ export function usePWA() {
     if (offlineReady) {
       notifications.show({
         title: 'Ready to work offline',
-        message: 'Credo App is now available offline!',
+        message: 'CMngt App is now available offline!',
         color: 'green',
       });
     }
@@ -31,7 +31,7 @@ export function usePWA() {
       notifications.show({
         id: 'pwa-update',
         title: 'New version available',
-        message: 'A new version of Credo App is available. Click to update.',
+        message: 'A new version of CMngt App is available. Click to update.',
         color: 'blue',
         autoClose: false,
         onClick() {

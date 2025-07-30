@@ -252,6 +252,10 @@ const routeObjects: RouteObject[] = [
         children: [
           // {path: 'employee-management', Component: EmployeeListPage},
           // {path: 'employees/:employeeId', Component: EmployeeDetailPage},
+          {path: ROUTERS.CUSTOMER_MANAGEMENT, Component: BlankPage},
+          {path: ROUTERS.PO_MANAGEMENT, Component: BlankPage},
+          {path: ROUTERS.PRODUCT_MANAGEMENT, Component: BlankPage},
+          {path: ROUTERS.DEPARTMENT_MANAGEMENT, Component: BlankPage},
           {path: ROUTERS.STORE_MANAGEMENT, Component: BlankPage},
           {path: ROUTERS.SALARY_MANAGEMENT, Component: BlankPage},
           {path: ROUTERS.STORES, Component: StoreListPage},

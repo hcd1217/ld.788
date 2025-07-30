@@ -17,7 +17,7 @@ export function AppLogo({
 }: AppLogoProps) {
   const navigate = useNavigate();
   const {publicClientConfig} = useAppStore();
-  const [title, setTitle] = useState('Credo');
+  const [title, setTitle] = useState('CMngt');
   const [logoUrl, setLogoUrl] = useState('/icons/logo-black-and-white.svg');
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 {
-  "name": "Credo App",
-  "short_name": "Credo",
-  "description": "Credo Progressive Web Application",
+  "name": "CMngt App",
+  "short_name": "CMngt",
+  "description": "CMngt Progressive Web Application",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",

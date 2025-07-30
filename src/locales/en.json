@@ -18,6 +18,10 @@
     "storeManagement": "Store Management",
     "salaryManagement": "Salary Management",
     "employeeManagement": "Employee Management",
+    "poManagement": "PO Management",
+    "departmentManagement": "Department Management",
+    "productManagement": "Product Management",
+    "customerManagement": "Customer Management",
     "configuration": "Configuration",
     "staffManagement": "Staff Management",
     "dashboard": "Dashboard",
@@ -106,7 +110,7 @@
   },
   "pwa": {
     "__check__": "Sun Jul 27 06:18:01 UTC 2025",
-    "installTitle": "Install Credo App",
+    "installTitle": "Install CMngt App",
     "installDescription": "Install this app on your device for a better experience",
     "maybeLater": "Maybe later",
     "install": "Install"
@@ -274,7 +278,7 @@
     "pleaseSelectFileFirst": "Please select a file first"
   },
   "auth": {
-    "title": "Credo",
+    "title": "CMngt",
     "registerTitle": "Create Account",
     "addUserTitle": "Add User",
     "email": "Email",

@@ -15,7 +15,7 @@ import {useDisclosure} from '@mantine/hooks';
 import {
   IconAddressBook,
   IconBuildingStore,
-  IconCash,
+  // IconCash,
   IconCaretDownFilled,
   IconCircle,
   IconLayoutDashboard,
@@ -28,6 +28,9 @@ import {
   IconUsers,
   IconUsersGroup,
   IconSettingsFilled,
+  IconClipboardList,
+  IconUserSquare,
+  IconShoppingCart,
 } from '@tabler/icons-react';
 import type {TFunction} from 'i18next';
 import {useMemo, useState, useEffect} from 'react';
@@ -147,20 +150,42 @@ function buildNavigationItems(t: TFunction, user?: User): NavigationItem[] {
       ],
     },
     {
+      label: t('common.poManagement'),
+      icon: IconClipboardList,
+      path: ROUTERS.PO_MANAGEMENT,
+    },
+    {
       label: t('common.configuration'),
       icon: IconSettingsFilled,
-      path: ROUTERS.CONFIGURATION,
+      path: '/configuration',
       subs: [
         {
-          label: t('common.storeManagement'),
-          icon: IconBuildingStore,
-          path: ROUTERS.STORE_MANAGEMENT,
+          label: t('common.customerManagement'),
+          icon: IconUserSquare,
+          path: ROUTERS.CUSTOMER_MANAGEMENT,
         },
         {
-          label: t('common.salaryManagement'),
-          icon: IconCash,
-          path: ROUTERS.SALARY_MANAGEMENT,
+          label: t('common.productManagement'),
+          icon: IconShoppingCart,
+          path: ROUTERS.PRODUCT_MANAGEMENT,
         },
+        {
+          label: t('common.departmentManagement'),
+          icon: IconBuildingStore,
+          path: ROUTERS.DEPARTMENT_MANAGEMENT,
+        },
+        // {
+        //   label: t('common.storeManagement'),
+        //   icon: IconBuildingStore,
+        //   path: '/store-management',
+        //   hidden: true,
+        // },
+        // {
+        //   label: t('common.salaryManagement'),
+        //   icon: IconCash,
+        //   path: '/salary-management',
+        //   hidden: true,
+        // },
       ],
     },
     {

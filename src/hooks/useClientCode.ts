@@ -4,5 +4,6 @@ import {useAppStore} from '@/stores/useAppStore';
 export function useClientCode() {
   const {clientCode} = useAppStore();
   const params = useParams();
-  return params.clientCode ?? clientCode ?? 'ACME';
+  // Cspell:disable
+  return params.clientCode ?? clientCode ?? 'NKTU';
 }

@@ -29,6 +29,18 @@ export const ROUTERS = {
   EMPLOYEES_ADD: '/employees/add',
   EMPLOYEES_EDIT: '/employees/edit/:employeeId',
 
+  // Purchasing order management
+  PO_MANAGEMENT: '/po-management',
+
+  // Customer management
+  CUSTOMER_MANAGEMENT: '/customer-management',
+
+  // Product management
+  PRODUCT_MANAGEMENT: '/product-management',
+
+  // Department management
+  DEPARTMENT_MANAGEMENT: '/department-management',
+
   // Staff management
   STAFF: '/staff',
   STAFF_ADD: '/staff/add',
