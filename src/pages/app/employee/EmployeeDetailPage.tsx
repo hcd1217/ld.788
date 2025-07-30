@@ -20,6 +20,7 @@ import {
 } from '@/components/app/employee';
 import type {Employee} from '@/lib/api/schemas/hr.schemas';
 import {renderFullName} from '@/utils/string';
+import {getEmployeeDetailRoute} from '@/config/routeConfig';
 
 export function EmployeeDetailPage() {
   const {employeeId} = useParams<{employeeId: string}>();
@@ -55,7 +56,7 @@ export function EmployeeDetailPage() {
 
   const handleEdit = () => {
     if (employee) {
-      navigate(`/employees/${employee.id}`);
+      navigate(getEmployeeDetailRoute(employee.id));
     }
   };
 

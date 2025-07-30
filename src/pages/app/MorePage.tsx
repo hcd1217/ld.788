@@ -28,6 +28,7 @@ import useTranslation from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import useIsDarkMode from '@/hooks/useIsDarkMode';
 import {isDevelopment} from '@/utils/env';
+import {ROUTERS} from '@/config/routeConfig';
 
 export function MorePage() {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ export function MorePage() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate(ROUTERS.ROOT);
   };
 
   const menuItems = [
@@ -45,42 +46,42 @@ export function MorePage() {
       title: t('common.dashboard'),
       description: 'Main dashboard overview',
       icon: IconHome,
-      onClick: () => navigate('/home'),
+      onClick: () => navigate(ROUTERS.HOME),
       color: 'blue',
     },
     {
       title: 'Store Management',
       description: 'Manage your stores and locations',
       icon: IconBuildingStore,
-      onClick: () => navigate('/stores'),
+      onClick: () => navigate(ROUTERS.STORES),
       color: 'indigo',
     },
     {
       title: 'Staff Management',
       description: 'Manage staff members and permissions',
       icon: IconUsersGroup,
-      onClick: () => navigate('/staff'),
+      onClick: () => navigate(ROUTERS.STAFF),
       color: 'violet',
     },
     {
       title: t('common.explore'),
       description: 'Discover new content',
       icon: IconSearch,
-      onClick: () => navigate('/explore'),
+      onClick: () => navigate(ROUTERS.EXPLORE),
       color: 'teal',
     },
     {
       title: t('common.notifications'),
       description: 'Your notifications and alerts',
       icon: IconBell,
-      onClick: () => navigate('/notifications'),
+      onClick: () => navigate(ROUTERS.NOTIFICATIONS),
       color: 'orange',
     },
     {
       title: t('common.profile'),
       description: 'Manage your profile',
       icon: IconUser,
-      onClick: () => navigate('/profile'),
+      onClick: () => navigate(ROUTERS.PROFILE),
       color: 'grape',
     },
   ];
@@ -90,7 +91,7 @@ export function MorePage() {
       title: t('common.addUser'),
       description: 'Add new users to the system',
       icon: IconUserPlus,
-      onClick: () => navigate('/add-user'),
+      onClick: () => navigate(ROUTERS.ADD_USER),
       color: 'blue',
       hidden: !user?.isRoot,
     },
@@ -98,7 +99,7 @@ export function MorePage() {
       title: 'Error Testing',
       description: 'Test error handling (Dev only)',
       icon: IconBugOff,
-      onClick: () => navigate('/sample/errors'),
+      onClick: () => navigate(ROUTERS.SAMPLE_ERRORS),
       color: 'red',
       devOnly: true,
     },
@@ -106,13 +107,13 @@ export function MorePage() {
       title: t('common.about'),
       description: 'About this application',
       icon: IconInfoCircle,
-      onClick: () => navigate('/'),
+      onClick: () => navigate(ROUTERS.ROOT),
       color: 'cyan',
     },
   ].filter((item) => !item.hidden);
 
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to={ROUTERS.LOGIN} />;
   }
 
   return (

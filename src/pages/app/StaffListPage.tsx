@@ -35,6 +35,7 @@ import {StoreSelector} from '@/components/store';
 import {StaffList} from '@/components/staff';
 import type {Staff} from '@/services/staff';
 import {ErrorAlert} from '@/components/common';
+import {ROUTERS, getStaffEditRoute} from '@/config/routeConfig';
 
 export function StaffListPage() {
   const navigate = useNavigate();
@@ -162,7 +163,7 @@ export function StaffListPage() {
       return;
     }
 
-    navigate('/staff/add');
+    navigate(ROUTERS.STAFF_ADD);
   };
 
   if (!currentStore && stores.length > 0) {
@@ -242,7 +243,7 @@ export function StaffListPage() {
             <StaffList
               staffs={staffs}
               onEdit={(staffMember) =>
-                navigate(`/staff/edit/${staffMember.id}`)
+                navigate(getStaffEditRoute(staffMember.id))
               }
               onDelete={handleDeleteStaff}
               onToggleStatus={handleToggleStaffStatus}

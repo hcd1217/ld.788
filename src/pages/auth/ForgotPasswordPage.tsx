@@ -11,6 +11,7 @@ import {getFormValidators} from '@/utils/validation';
 import {FormContainer} from '@/components/form/FormContainer';
 import {AuthHeader, AuthFormLink, AuthSuccessState} from '@/components/auth';
 import {useClientCode} from '@/hooks/useClientCode';
+import {ROUTERS} from '@/config/routeConfig';
 
 type ForgotPasswordFormValues = {
   email: string;
@@ -57,7 +58,7 @@ export function ForgotPasswordPage() {
             title={t('auth.checkYourEmail')}
             description={t('auth.passwordResetEmailSentDescription')}
             buttonText={t('auth.backToLogin')}
-            onButtonClick={() => navigate('/login')}
+            onButtonClick={() => navigate(ROUTERS.LOGIN)}
           />
         </FormContainer>
       </GuestLayout>
@@ -95,7 +96,11 @@ export function ForgotPasswordPage() {
           </Stack>
         </form>
 
-        <AuthFormLink text="" linkText={t('auth.backToLogin')} href="/login" />
+        <AuthFormLink
+          text=""
+          linkText={t('auth.backToLogin')}
+          href={ROUTERS.LOGIN}
+        />
       </FormContainer>
     </GuestLayout>
   );

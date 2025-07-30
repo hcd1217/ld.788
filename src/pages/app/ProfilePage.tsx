@@ -19,6 +19,7 @@ import {useAppStore} from '@/stores/useAppStore';
 import useTranslation from '@/hooks/useTranslation';
 import {authApi, type GetMeResponse} from '@/lib/api';
 import {GoBack} from '@/components/common';
+import {ROUTERS} from '@/config/routeConfig';
 
 export function ProfilePage() {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ export function ProfilePage() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate(ROUTERS.ROOT);
   };
 
   if (!isAuthenticated) {
@@ -61,7 +62,7 @@ export function ProfilePage() {
         <Card shadow="sm" padding="lg">
           <Title order={2}>{t('profile.notLoggedIn')}</Title>
           <Text mt="md">{t('profile.pleaseLogin')}</Text>
-          <Button mt="md" onClick={() => navigate('/')}>
+          <Button mt="md" onClick={() => navigate(ROUTERS.ROOT)}>
             {t('common.goToHome')}
           </Button>
         </Card>

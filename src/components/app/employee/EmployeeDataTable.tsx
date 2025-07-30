@@ -5,6 +5,7 @@ import useTranslation from '@/hooks/useTranslation';
 import type {Employee} from '@/lib/api/schemas/hr.schemas';
 import {renderFullName} from '@/utils/string';
 import {useHrActions} from '@/stores/useHrStore';
+import {getEmployeeDetailRoute} from '@/config/routeConfig';
 
 type EmployeeDataTableProps = {
   readonly employees: readonly Employee[];
@@ -41,7 +42,7 @@ export function EmployeeDataTable({
             <Table.Tr
               key={employee.id}
               style={{cursor: 'pointer'}}
-              onClick={() => navigate(`/employees/${employee.id}`)}
+              onClick={() => navigate(getEmployeeDetailRoute(employee.id))}
             >
               <Table.Td>{renderFullName(employee)}</Table.Td>
               <Table.Td>

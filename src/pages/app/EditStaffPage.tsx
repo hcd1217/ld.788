@@ -34,6 +34,7 @@ import {
   AccessPermissionSection,
 } from '@/components/staff/form';
 import {VALIDATION_RULES} from '@/services/staff';
+import {ROUTERS} from '@/config/routeConfig';
 import type {Staff, StaffFormData} from '@/lib/api/schemas/staff.schemas';
 
 export function EditStaffPage() {
@@ -193,7 +194,7 @@ export function EditStaffPage() {
   useEffect(() => {
     const loadStaffData = async () => {
       if (!staffId) {
-        navigate('/staff');
+        navigate(ROUTERS.STAFF);
         return;
       }
 
@@ -213,7 +214,7 @@ export function EditStaffPage() {
             color: 'red',
             icon: <IconAlertTriangle size={16} />,
           });
-          navigate('/staff');
+          navigate(ROUTERS.STAFF);
           return;
         }
 
@@ -247,7 +248,7 @@ export function EditStaffPage() {
           icon: <IconAlertTriangle size={16} />,
         });
 
-        navigate('/staff');
+        navigate(ROUTERS.STAFF);
       } finally {
         setIsLoading(false);
       }
@@ -321,7 +322,7 @@ export function EditStaffPage() {
         icon: <IconCheck size={16} />,
       });
 
-      navigate('/staff');
+      navigate(ROUTERS.STAFF);
     } catch (error) {
       const errorMessage =
         error instanceof Error

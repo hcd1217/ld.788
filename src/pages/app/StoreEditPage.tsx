@@ -30,6 +30,7 @@ import type {
   UpdateStoreRequest,
   UpdateStoreOperatingHoursRequest,
 } from '@/lib/api/schemas/store.schemas';
+import {ROUTERS} from '@/config/routeConfig';
 
 type StoreEditFormValues = {
   // Required fields
@@ -161,7 +162,7 @@ export function StoreEditPage() {
   useEffect(() => {
     const loadStoreData = async () => {
       if (!storeId) {
-        navigate('/stores');
+        navigate(ROUTERS.STORES);
         return;
       }
 
@@ -182,7 +183,7 @@ export function StoreEditPage() {
             color: 'red',
             icon: <IconAlertCircle size={16} />,
           });
-          navigate('/stores');
+          navigate(ROUTERS.STORES);
           return;
         }
 
@@ -227,7 +228,7 @@ export function StoreEditPage() {
           icon: <IconAlertCircle size={16} />,
         });
 
-        navigate('/stores');
+        navigate(ROUTERS.STORES);
       } finally {
         setIsPageLoading(false);
       }
@@ -279,7 +280,7 @@ export function StoreEditPage() {
       });
 
       // Navigate back to store list
-      navigate('/stores');
+      navigate(ROUTERS.STORES);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -444,9 +445,14 @@ export function StoreEditPage() {
               />
 
               <Group justify="flex-end" mt="xl">
-                <Button variant="light" onClick={() => navigate('/stores')}>
-                  {t('common.cancel')}
-                </Button>
+                {currentStore ? (
+                  <Button
+                    variant="light"
+                    onClick={() => navigate(ROUTERS.STORES)}
+                  >
+                    {t('common.cancel')}
+                  </Button>
+                ) : null}
                 <Button type="submit" loading={isLoading}>
                   {t('common.save')}
                 </Button>

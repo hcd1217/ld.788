@@ -256,6 +256,7 @@
     "bulkImport": "Bulk Import",
     "addSingleEmployee": "Add Single Employee",
     "bulkImportEmployees": "Bulk Import Employees",
+    "fileTooLarge": "File size exceeds the maximum limit of 10MB",
     "selectDepartment": "Select department",
     "sampleExcelTemplate": "Sample Excel Template",
     "sampleExcelDescription": "Download a sample Excel file with the correct format",

@@ -11,6 +11,7 @@ import {useNavigate} from 'react-router';
 import {IconError404, IconArrowLeft, IconHome} from '@tabler/icons-react';
 import useTranslation from '@/hooks/useTranslation';
 import useIsDarkMode from '@/hooks/useIsDarkMode';
+import {ROUTERS} from '@/config/routeConfig';
 
 export function NotFound() {
   const {t} = useTranslation();
@@ -62,7 +63,7 @@ export function NotFound() {
 
             <Button
               leftSection={<IconHome size={16} />}
-              onClick={() => navigate('/')}
+              onClick={() => navigate(ROUTERS.ROOT)}
             >
               {t('errors.backToHomePage')}
             </Button>

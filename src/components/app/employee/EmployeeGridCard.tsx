@@ -6,6 +6,7 @@ import type {Employee} from '@/lib/api/schemas/hr.schemas';
 import {SelectableCard} from '@/components/common';
 import {renderFullName} from '@/utils/string';
 import {useHrActions} from '@/stores/useHrStore';
+import {getEmployeeDetailRoute} from '@/config/routeConfig';
 
 type EmployeeGridCardProps = {
   readonly employee: Employee;
@@ -32,7 +33,7 @@ export function EmployeeGridCard({
       aria-label={t('employee.employeeCard', {
         name: `${employee.firstName} ${employee.lastName}`,
       })}
-      onClick={() => navigate(`/employees/${employee.id}`)}
+      onClick={() => navigate(getEmployeeDetailRoute(employee.id))}
     >
       <Stack gap="sm">
         <Group justify="space-between" align="flex-start">

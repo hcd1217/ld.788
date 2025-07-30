@@ -11,6 +11,7 @@ import {FormContainer} from '@/components/form/FormContainer';
 import {AuthHeader, AuthAlert, AuthFormLink} from '@/components/auth';
 import {generateRandomString} from '@/utils/string';
 import {isProduction} from '@/utils/env';
+import {ROUTERS, getClientLoginRoute} from '@/config/routeConfig';
 
 type RegisterFormValues = {
   clientCode: string;
@@ -61,7 +62,7 @@ export function RegisterPage() {
     successTitle: t('notifications.registrationSuccess'),
     successMessage: t('notifications.registrationSuccessMessage'),
     errorTitle: t('notifications.registrationFailed'),
-    onSuccess: () => navigate(`/${form.values.clientCode}/login`),
+    onSuccess: () => navigate(getClientLoginRoute(form.values.clientCode)),
   });
 
   const onSubmit = handleSubmit(async (values: RegisterFormValues) => {
@@ -149,7 +150,7 @@ export function RegisterPage() {
         <AuthFormLink
           text={t('auth.haveAccount')}
           linkText={t('auth.backToLogin')}
-          href="/login"
+          href={ROUTERS.LOGIN}
         />
       </FormContainer>
     </GuestLayout>

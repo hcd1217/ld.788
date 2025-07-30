@@ -22,6 +22,7 @@ import {
 import {useNavigate} from 'react-router';
 import {useAppStore} from '@/stores/useAppStore';
 import useTranslation from '@/hooks/useTranslation';
+import {ROUTERS} from '@/config/routeConfig';
 
 export function AdminDashboardPage() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export function AdminDashboardPage() {
 
   const handleLogout = () => {
     adminLogout();
-    navigate('/admin/login');
+    navigate(ROUTERS.ADMIN_LOGIN);
   };
 
   const dashboardCards = [
@@ -39,35 +40,35 @@ export function AdminDashboardPage() {
       title: t('admin.dashboard.clients'),
       description: t('admin.dashboard.clientsDescription'),
       color: 'blue',
-      onClick: () => navigate('/admin/clients'),
+      onClick: () => navigate(ROUTERS.ADMIN_CLIENTS),
     },
     {
       icon: IconShieldLock,
       title: t('admin.dashboard.permissions'),
       description: t('admin.dashboard.permissionsDescription'),
       color: 'red',
-      onClick: () => navigate('/admin/permissions'),
+      onClick: () => navigate(ROUTERS.ADMIN_PERMISSIONS),
     },
     {
       icon: IconBuildingStore,
       title: t('admin.dashboard.stores'),
       description: t('admin.dashboard.storesDescription'),
       color: 'grape',
-      onClick: () => navigate('/admin/stores'),
+      onClick: () => navigate(ROUTERS.ADMIN_STORES),
     },
     {
       icon: IconActivity,
       title: t('admin.dashboard.monitoring'),
       description: t('admin.dashboard.monitoringDescription'),
       color: 'green',
-      onClick: () => navigate('/admin/monitoring'),
+      onClick: () => navigate(ROUTERS.ADMIN_MONITORING),
     },
     {
       icon: IconSettings,
       title: t('admin.dashboard.settings'),
       description: t('admin.dashboard.settingsDescription'),
       color: 'orange',
-      onClick: () => navigate('/admin/settings'),
+      onClick: () => navigate(ROUTERS.ADMIN_SETTINGS),
     },
   ];
 

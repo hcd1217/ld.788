@@ -8,6 +8,7 @@ import {
 } from '@tabler/icons-react';
 import classes from './CommonMobileFooter.module.css';
 import useTranslation from '@/hooks/useTranslation';
+import {ROUTERS} from '@/config/routeConfig';
 
 export function CommonMobileFooter() {
   const navigate = useNavigate();
@@ -16,22 +17,22 @@ export function CommonMobileFooter() {
     {
       label: t('common.home'),
       icon: IconHome,
-      path: '/home',
+      path: ROUTERS.HOME,
     },
     {
       label: t('common.employeeManagement'),
       icon: IconAddressBook,
-      path: '/employee-management',
+      path: ROUTERS.EMPLOYEE_MANAGEMENT,
     },
     {
       label: t('common.explore'),
       icon: IconLayoutGrid,
-      path: '/explore',
+      path: ROUTERS.EXPLORE,
     },
     {
       label: t('common.more'),
       icon: IconDots,
-      path: '/more',
+      path: ROUTERS.MORE,
     },
   ];
 

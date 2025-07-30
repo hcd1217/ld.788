@@ -39,6 +39,7 @@ import {
   ClientFeatureFlagsSection,
   ClientUsersSection,
 } from '@/components/admin/ClientManagementComponents';
+import {ROUTERS} from '@/config/routeConfig';
 
 export function ClientDetailPage() {
   const {clientCode} = useParams<{clientCode: string}>();
@@ -155,7 +156,7 @@ export function ClientDetailPage() {
             icon: <IconTrash size={16} />,
           });
 
-          navigate('/admin/clients');
+          navigate(ROUTERS.ADMIN_CLIENTS);
 
           break;
         }

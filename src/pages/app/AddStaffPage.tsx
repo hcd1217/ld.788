@@ -33,6 +33,7 @@ import {
   AccessPermissionSection,
 } from '@/components/staff/form';
 import {VALIDATION_RULES} from '@/services/staff';
+import {ROUTERS} from '@/config/routeConfig';
 import type {StaffFormData} from '@/lib/api/schemas/staff.schemas';
 
 export function AddStaffPage() {
@@ -262,7 +263,7 @@ export function AddStaffPage() {
         icon: <IconCheck size={16} />,
       });
 
-      navigate('/staff');
+      navigate(ROUTERS.STAFF);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : t('staff.createFailedDefault');

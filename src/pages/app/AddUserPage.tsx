@@ -33,6 +33,7 @@ import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastName
 import {useAppStore} from '@/stores/useAppStore';
 import {GoBack} from '@/components/common';
 import {isDevelopment} from '@/utils/env';
+import {ROUTERS} from '@/config/routeConfig';
 
 type AddUserFormValues = {
   email?: string;
@@ -144,7 +145,7 @@ export function AddUserPage() {
   };
 
   if (!user?.isRoot) {
-    return <Navigate to="/home" />;
+    return <Navigate to={ROUTERS.HOME} />;
   }
 
   return (
@@ -161,7 +162,7 @@ export function AddUserPage() {
               color="green"
               leftSection={<IconFileSpreadsheet size={16} />}
               visibleFrom="sm"
-              onClick={() => navigate('/import-users')}
+              onClick={() => navigate(ROUTERS.IMPORT_USERS)}
             >
               {t('common.importUsers')}
             </Button>

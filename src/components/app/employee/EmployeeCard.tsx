@@ -6,6 +6,7 @@ import type {Employee} from '@/lib/api/schemas/hr.schemas';
 import {ActiveBadge} from '@/components/common';
 import {useHrActions} from '@/stores/useHrStore';
 import {renderFullName} from '@/utils/string';
+import {getEmployeeDetailRoute} from '@/config/routeConfig';
 
 type EmployeeCardProps = {
   readonly employee: Employee;
@@ -54,7 +55,7 @@ export function EmployeeCard({
       aria-label={t('employee.employeeCard', {
         name: fullName,
       })}
-      onClick={() => navigate(`/employees/${employee.id}`)}
+      onClick={() => navigate(getEmployeeDetailRoute(employee.id))}
     >
       <Group
         justify="space-between"

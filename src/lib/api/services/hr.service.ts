@@ -12,6 +12,8 @@ import {
   type UpdateEmployeeResponse,
   type GetDepartmentsResponse,
   GetDepartmentsResponseSchema,
+  type CreateBulkEmployeesRequest,
+  CreateBulkEmployeesRequestSchema,
 } from '../schemas/hr.schemas';
 
 export class HrApi extends BaseApiClient {
@@ -26,7 +28,7 @@ export class HrApi extends BaseApiClient {
     );
   }
 
-  async addEmployees(
+  async addEmployee(
     data: CreateEmployeesRequest,
   ): Promise<CreateEmployeesResponse> {
     return this.post<CreateEmployeesResponse, CreateEmployeesRequest>(
@@ -37,12 +39,12 @@ export class HrApi extends BaseApiClient {
     );
   }
 
-  async addBulkEmployees(data: CreateEmployeesRequest[]): Promise<void> {
-    return this.post<void, CreateEmployeesRequest[]>(
-      '/api/hr/employees/bulk',
+  async addBulkEmployees(data: CreateBulkEmployeesRequest): Promise<void> {
+    return this.post<void, CreateBulkEmployeesRequest>(
+      '/api/hr/employees/import/bulk',
       data,
       undefined,
-      CreateEmployeesRequestSchema.array(),
+      CreateBulkEmployeesRequestSchema,
     );
   }
 

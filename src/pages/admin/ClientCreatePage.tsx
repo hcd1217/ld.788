@@ -29,6 +29,7 @@ import {GoBack} from '@/components/common';
 import {getFormValidators} from '@/utils/validation';
 import type {RegisterClientRequest} from '@/lib/api';
 import {isDevelopment} from '@/utils/env';
+import {ROUTERS} from '@/config/routeConfig';
 
 function fakeClient() {
   const clientCode = Math.random().toString(36).slice(2, 8);
@@ -138,7 +139,7 @@ export function ClientCreatePage() {
       icon: <IconCheck size={16} />,
     });
 
-    navigate('/admin/clients');
+    navigate(ROUTERS.ADMIN_CLIENTS);
   };
 
   const handleClientCodeChange = (
@@ -248,7 +249,7 @@ export function ClientCreatePage() {
                   <Group justify="flex-end" mt="xl">
                     <Button
                       variant="light"
-                      onClick={() => navigate('/admin/clients')}
+                      onClick={() => navigate(ROUTERS.ADMIN_CLIENTS)}
                     >
                       {t('common.cancel')}
                     </Button>

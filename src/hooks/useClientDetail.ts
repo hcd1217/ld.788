@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router';
 import useTranslation from '@/hooks/useTranslation';
 import {clientManagementService} from '@/services/clientManagement';
 import type {ClientDetail} from '@/lib/api';
+import {ROUTERS} from '@/config/routeConfig';
 
 export function useClientDetail(clientCode: string | undefined) {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export function useClientDetail(clientCode: string | undefined) {
   const loadClient = useCallback(
     async (withLoadingState = true) => {
       if (!clientCode) {
-        navigate('/admin/clients');
+        navigate(ROUTERS.ADMIN_CLIENTS);
         return;
       }
 

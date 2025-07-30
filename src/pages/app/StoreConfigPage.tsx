@@ -31,6 +31,7 @@ import type {
   UpdateStoreOperatingHoursRequest,
 } from '@/lib/api/schemas/store.schemas';
 import {generateRandomString} from '@/utils/string';
+import {ROUTERS} from '@/config/routeConfig';
 
 type StoreConfigFormValues = {
   // Required fields
@@ -187,7 +188,7 @@ export function StoreConfigPage() {
       form.reset();
 
       // Navigate to store list or dashboard
-      navigate('/stores');
+      navigate(ROUTERS.STORES);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -256,7 +257,7 @@ export function StoreConfigPage() {
               <Button
                 variant="light"
                 size="sm"
-                onClick={() => navigate('/stores')}
+                onClick={() => navigate(ROUTERS.STORES)}
               >
                 {t('store.viewAllStores')}
               </Button>

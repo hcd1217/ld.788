@@ -254,6 +254,7 @@
     "bulkImport": "Nhập Hàng Loạt",
     "addSingleEmployee": "Thêm Một Nhân Viên",
     "bulkImportEmployees": "Nhập Nhiều Nhân Viên",
+    "fileTooLarge": "Kích thước file vượt quá giới hạn 10MB",
     "selectDepartment": "Chọn phòng ban",
     "sampleExcelTemplate": "Mẫu Excel",
     "sampleExcelDescription": "Tải xuống file Excel mẫu với định dạng đúng",

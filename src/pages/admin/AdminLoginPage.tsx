@@ -18,6 +18,7 @@ import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {FormContainer} from '@/components/form/FormContainer';
 import {AuthAlert} from '@/components/auth';
 import {isDevelopment} from '@/utils/env';
+import {ROUTERS} from '@/config/routeConfig';
 
 type AdminLoginFormValues = {
   accessKey: string;
@@ -47,13 +48,13 @@ export function AdminLoginPage() {
     successTitle: t('admin.loginSuccess'),
     successMessage: t('admin.loginSuccessMessage'),
     errorTitle: t('admin.loginFailed'),
-    onSuccess: () => navigate('/admin/dashboard'),
+    onSuccess: () => navigate(ROUTERS.ADMIN_DASHBOARD),
   });
 
   // Redirect if already authenticated
   useEffect(() => {
     if (adminAuthenticated) {
-      navigate('/admin/dashboard');
+      navigate(ROUTERS.ADMIN_DASHBOARD);
     }
   }, [adminAuthenticated, navigate]);
 

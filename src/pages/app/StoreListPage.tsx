@@ -39,6 +39,7 @@ import {
 import {StoreCard} from '@/components/store/StoreCard';
 import type {Store} from '@/lib/api/schemas/store.schemas';
 import {ErrorAlert} from '@/components/common';
+import {ROUTERS, getStoreEditRoute} from '@/config/routeConfig';
 
 export function StoreListPage() {
   const navigate = useNavigate();
@@ -156,7 +157,7 @@ export function StoreListPage() {
   };
 
   const handleEditStore = (store: Store) => {
-    navigate(`/stores/edit/${store.id}`);
+    navigate(getStoreEditRoute(store.id));
   };
 
   const handlePageSizeChange = (value: string | undefined) => {
@@ -176,7 +177,7 @@ export function StoreListPage() {
             </Title>
             <Button
               leftSection={<IconPlus size={16} />}
-              onClick={() => navigate('/store-config')}
+              onClick={() => navigate(ROUTERS.STORE_CONFIG)}
             >
               {t('store.createNewStore')}
             </Button>
@@ -226,7 +227,7 @@ export function StoreListPage() {
                     <Button
                       leftSection={<IconPlus size={16} />}
                       mt="md"
-                      onClick={() => navigate('/store-config')}
+                      onClick={() => navigate(ROUTERS.STORE_CONFIG)}
                     >
                       {t('store.createFirstStore')}
                     </Button>

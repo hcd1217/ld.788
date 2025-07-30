@@ -46,6 +46,7 @@ import i18n from '@/lib/i18n';
 import {getLocaleConfig} from '@/config/localeConfig';
 import {userService, type User} from '@/services/user';
 import {DataTable, GoBack} from '@/components/common';
+import {ROUTERS, getUserDetailRoute} from '@/config/routeConfig';
 
 type EditUserFormValues = {
   email: string;
@@ -132,7 +133,7 @@ export function UserManagementPage() {
   }, [t]);
 
   const handleViewUser = (userId: string) => {
-    navigate(`/user/${userId}`);
+    navigate(getUserDetailRoute(userId));
   };
 
   const handleEditUser = (user: User) => {
@@ -238,7 +239,7 @@ export function UserManagementPage() {
   }, [loadUsers]);
 
   if (!user?.isRoot) {
-    return <Navigate to="/home" />;
+    return <Navigate to={ROUTERS.HOME} />;
   }
 
   return (
@@ -254,13 +255,13 @@ export function UserManagementPage() {
               color="green"
               leftSection={<IconFileSpreadsheet size={16} />}
               visibleFrom="sm"
-              onClick={() => navigate('/import-users')}
+              onClick={() => navigate(ROUTERS.IMPORT_USERS)}
             >
               {t('common.importUsers')}
             </Button>
             <Button
               leftSection={<IconUserPlus size={16} />}
-              onClick={() => navigate('/add-user')}
+              onClick={() => navigate(ROUTERS.ADD_USER)}
             >
               {t('auth.addUser')}
             </Button>

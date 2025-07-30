@@ -41,6 +41,7 @@ import {
   EmployeeActivateModal,
 } from '@/components/app/employee';
 import useIsDesktop from '@/hooks/useIsDesktop';
+import {ROUTERS} from '@/config/routeConfig';
 
 interface EmployeeFilters {
   searchQuery: string;
@@ -61,6 +62,7 @@ export function EmployeeListPage() {
     clearError,
     loadDepartments,
   } = useHrActions();
+
   const [filters, setFilters] = useState<EmployeeFilters>({
     searchQuery: '',
     departmentId: undefined,
@@ -304,7 +306,7 @@ export function EmployeeListPage() {
         button={{
           label: t('employee.addEmployee'),
           onClick() {
-            navigate('/employees/add');
+            navigate(ROUTERS.EMPLOYEES_ADD);
           },
         }}
       />
@@ -370,7 +372,7 @@ export function EmployeeListPage() {
               ? undefined
               : {
                   label: t('employee.createFirstEmployee'),
-                  onClick: () => navigate('/employees/add'),
+                  onClick: () => navigate(ROUTERS.EMPLOYEES_ADD),
                 }
           }
         />

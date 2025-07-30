@@ -1,4 +1,4 @@
-import {BlankPage} from './BlankPage';
+import {BlankPage} from '../BlankPage';
 
 export function EditEmployeePage() {
   return <BlankPage />;

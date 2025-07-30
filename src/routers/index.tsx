@@ -4,6 +4,7 @@ import {ResponsiveAuthLayout} from '@/components/layouts/ResponsiveAuthLayout';
 import {AppLayout} from '@/components/layouts/AppLayout';
 import {ProtectedRoute} from '@/components/layouts/ProtectedRoute';
 import {AdminProtectedRoute} from '@/components/layouts/AdminProtectedRoute';
+import {ROUTERS} from '@/config/routeConfig';
 
 const ServiceLayout = lazy(async () => {
   const module = await import('@/components/layouts/ServiceLayout');
@@ -36,21 +37,21 @@ const BlankPage = lazy(async () => {
 });
 
 const EmployeeListPage = lazy(async () => {
-  const module = await import('@/pages/app/EmployeeListPage');
+  const module = await import('@/pages/app/employee/EmployeeListPage');
   return {default: module.EmployeeListPage};
 });
 
 const EmployeeCreatePage = lazy(async () => {
-  const module = await import('@/pages/app/EmployeeCreatePage');
+  const module = await import('@/pages/app/employee/EmployeeCreatePage');
   return {default: module.EmployeeCreatePage};
 });
 
 const EditEmployeePage = lazy(async () => {
-  const module = await import('@/pages/app/EditEmployeePage.tsx');
+  const module = await import('@/pages/app/employee/EditEmployeePage');
   return {default: module.EditEmployeePage};
 });
 const EmployeeDetailPage = lazy(async () => {
-  const module = await import('@/pages/app/EmployeeDetailPage');
+  const module = await import('@/pages/app/employee/EmployeeDetailPage');
   return {default: module.EmployeeDetailPage};
 });
 
@@ -187,31 +188,31 @@ const AdminPermissionManagementPage = lazy(async () => {
 const routeObjects: RouteObject[] = [
   // Root route
   {
-    path: '/',
-    Component: () => <Navigate to="/login" />,
+    path: ROUTERS.ROOT,
+    Component: () => <Navigate to={ROUTERS.LOGIN} />,
   },
   // AUTH routes
   {
     path: '',
     children: [
       {
-        path: 'login',
+        path: ROUTERS.LOGIN,
         Component: LoginPage,
       },
       {
-        path: '/:clientCode/login',
+        path: ROUTERS.CLIENT_LOGIN,
         Component: LoginPage,
       },
       {
-        path: 'forgot-password',
+        path: ROUTERS.FORGOT_PASSWORD,
         Component: ForgotPasswordPage,
       },
       {
-        path: 'reset-password',
+        path: ROUTERS.RESET_PASSWORD,
         Component: ResetPasswordPage,
       },
       {
-        path: 'register',
+        path: ROUTERS.REGISTER,
         Component: RegisterPage,
       },
     ],
@@ -225,9 +226,9 @@ const routeObjects: RouteObject[] = [
       </ProtectedRoute>
     ),
     children: [
-      {path: 'employee-management', Component: EmployeeListPage},
-      {path: 'employees/:employeeId', Component: EmployeeDetailPage},
-      {path: 'employees/add', Component: EmployeeCreatePage},
+      {path: ROUTERS.EMPLOYEE_MANAGEMENT, Component: EmployeeListPage},
+      {path: ROUTERS.EMPLOYEE_DETAIL, Component: EmployeeDetailPage},
+      {path: ROUTERS.EMPLOYEES_ADD, Component: EmployeeCreatePage},
     ],
   },
   // Old APP routes
@@ -239,38 +240,38 @@ const routeObjects: RouteObject[] = [
       </ProtectedRoute>
     ),
     children: [
-      {path: 'home', Component: HomePage},
-      {path: 'profile', Component: ProfilePage},
-      {path: 'add-user', Component: AddUserPage},
-      {path: 'explore', Component: ExplorePage},
-      {path: 'notifications', Component: NotificationsPage},
-      {path: 'more', Component: MorePage},
+      {path: ROUTERS.HOME, Component: HomePage},
+      {path: ROUTERS.PROFILE, Component: ProfilePage},
+      {path: ROUTERS.ADD_USER, Component: AddUserPage},
+      {path: ROUTERS.EXPLORE, Component: ExplorePage},
+      {path: ROUTERS.NOTIFICATIONS, Component: NotificationsPage},
+      {path: ROUTERS.MORE, Component: MorePage},
       {
         path: '',
         Component: RootUserLayout,
         children: [
           // {path: 'employee-management', Component: EmployeeListPage},
           // {path: 'employees/:employeeId', Component: EmployeeDetailPage},
-          {path: 'store-management', Component: BlankPage},
-          {path: 'salary-management', Component: BlankPage},
-          {path: 'stores', Component: StoreListPage},
-          {path: 'staff', Component: StaffListPage},
-          {path: 'user-management', Component: UserManagementPage},
-          {path: 'user/:userId', Component: UserDetailPage},
+          {path: ROUTERS.STORE_MANAGEMENT, Component: BlankPage},
+          {path: ROUTERS.SALARY_MANAGEMENT, Component: BlankPage},
+          {path: ROUTERS.STORES, Component: StoreListPage},
+          {path: ROUTERS.STAFF, Component: StaffListPage},
+          {path: ROUTERS.USER_MANAGEMENT, Component: UserManagementPage},
+          {path: ROUTERS.USER_DETAIL, Component: UserDetailPage},
           {
             path: '',
             Component: PCOnlyLayout,
             children: [
               // {path: 'employees/add', Component: EmployeeCreatePage},
-              {path: 'employees/edit/:employeeId', Component: EditEmployeePage},
-              {path: 'import-users', Component: ImportUsersPage},
-              {path: 'role-management', Component: RoleManagementPage},
-              {path: 'store-config', Component: StoreConfigPage},
-              {path: 'stores/edit/:storeId', Component: StoreEditPage},
-              {path: 'staff/add', Component: AddStaffPage},
-              {path: 'staff/edit/:staffId', Component: EditStaffPage},
+              {path: ROUTERS.EMPLOYEES_EDIT, Component: EditEmployeePage},
+              {path: ROUTERS.IMPORT_USERS, Component: ImportUsersPage},
+              {path: ROUTERS.ROLE_MANAGEMENT, Component: RoleManagementPage},
+              {path: ROUTERS.STORE_CONFIG, Component: StoreConfigPage},
+              {path: ROUTERS.STORE_EDIT, Component: StoreEditPage},
+              {path: ROUTERS.STAFF_ADD, Component: AddStaffPage},
+              {path: ROUTERS.STAFF_EDIT, Component: EditStaffPage},
               {
-                path: 'permission-management',
+                path: ROUTERS.PERMISSION_MANAGEMENT,
                 Component: PermissionManagementPage,
               },
             ],
@@ -281,22 +282,34 @@ const routeObjects: RouteObject[] = [
   },
   // ADMIN routes
   {
-    path: 'admin',
+    path: '',
     Component: PCOnlyLayout,
     children: [
       {
-        path: 'login',
+        path: ROUTERS.ADMIN_LOGIN,
         Component: AdminLoginPage,
       },
       {
         path: '',
         Component: AdminProtectedRoute,
         children: [
-          {path: 'dashboard', Component: AdminDashboardPage},
-          {path: 'clients', Component: ClientListPage},
-          {path: 'clients/new', Component: ClientCreatePage},
-          {path: 'clients/:clientCode', Component: ClientDetailPage},
-          {path: 'permissions', Component: AdminPermissionManagementPage},
+          {
+            path: ROUTERS.ADMIN_DASHBOARD,
+            Component: AdminDashboardPage,
+          },
+          {path: ROUTERS.ADMIN_CLIENTS, Component: ClientListPage},
+          {
+            path: ROUTERS.ADMIN_CLIENTS_NEW,
+            Component: ClientCreatePage,
+          },
+          {
+            path: ROUTERS.ADMIN_CLIENT_DETAIL,
+            Component: ClientDetailPage,
+          },
+          {
+            path: ROUTERS.ADMIN_PERMISSIONS,
+            Component: AdminPermissionManagementPage,
+          },
         ],
       },
     ],

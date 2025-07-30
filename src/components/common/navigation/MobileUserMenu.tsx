@@ -20,6 +20,7 @@ import {
 import {VersionInformation} from '@/components/common';
 import useTranslation from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
+import {ROUTERS} from '@/config/routeConfig';
 
 export function MobileUserMenu() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export function MobileUserMenu() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate(ROUTERS.LOGIN);
   };
 
   return (
@@ -57,7 +58,7 @@ export function MobileUserMenu() {
         <Menu.Label>{t('common.account')}</Menu.Label>
         <Menu.Item
           leftSection={<IconUser style={{width: rem(14), height: rem(14)}} />}
-          onClick={() => navigate('/profile')}
+          onClick={() => navigate(ROUTERS.PROFILE)}
         >
           {t('common.profile')}
         </Menu.Item>
@@ -65,7 +66,7 @@ export function MobileUserMenu() {
           leftSection={
             <IconSettings style={{width: rem(14), height: rem(14)}} />
           }
-          onClick={() => navigate('/settings')}
+          onClick={() => navigate(ROUTERS.SETTINGS)}
         >
           {t('common.settings')}
         </Menu.Item>

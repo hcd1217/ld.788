@@ -19,6 +19,7 @@ import {FormContainer} from '@/components/form/FormContainer';
 import {AuthHeader, AuthAlert, AuthFormLink} from '@/components/auth';
 import {useClientCode} from '@/hooks/useClientCode';
 import {isDevelopment} from '@/utils/env';
+import {ROUTERS} from '@/config/routeConfig';
 
 type LoginFormValues = {
   identifier: string;
@@ -46,7 +47,7 @@ export function LoginPage() {
       localStorage.setItem('clientCode', clientCodeFromUrl);
       console.log('reload the page without search params', clientCodeFromUrl);
       // Reload the page without search params
-      navigate(`/login`, {replace: true});
+      navigate(ROUTERS.LOGIN, {replace: true});
     }
   }, [navigate, defaultClientCode, clientCodeFromUrl]);
 
@@ -68,7 +69,7 @@ export function LoginPage() {
     successTitle: t('notifications.loginSuccess'),
     successMessage: t('notifications.loginSuccessMessage'),
     errorTitle: t('notifications.loginFailed'),
-    onSuccess: () => navigate('/home'),
+    onSuccess: () => navigate(ROUTERS.HOME),
   });
 
   // Focus identifier input on mount and trigger mount animation
@@ -138,7 +139,7 @@ export function LoginPage() {
                 type="button"
                 size="sm"
                 disabled={isLoading}
-                onClick={() => navigate('/forgot-password')}
+                onClick={() => navigate(ROUTERS.FORGOT_PASSWORD)}
               >
                 {t('auth.forgotPassword')}
               </Anchor>
@@ -153,7 +154,7 @@ export function LoginPage() {
         <AuthFormLink
           text={t('auth.noAccount')}
           linkText={t('auth.createAccount')}
-          href="/register"
+          href={ROUTERS.REGISTER}
         />
       </FormContainer>
     </GuestLayout>

@@ -2,6 +2,7 @@
 const lastNames = [
   'Bùi',
   'Châu',
+  'Cao',
   'Dương',
   'Hoàng',
   'Huỳnh',
@@ -69,9 +70,9 @@ const firstNames: Array<[string, 'F' | 'M']> = [
   ['Chiêu Quân', 'F'],
   ['Chí Công', 'M'],
   ['Chí Thiện', 'M'],
-  ['Chấn Hùng', 'M'],
-  ['Chấn Hưng', 'M'],
-  ['Chấn Phong', 'M'],
+  ['Mạnh Hùng', 'M'],
+  ['Bá Hưng', 'M'],
+  ['Thành Phong', 'M'],
   ['Cát Tường', 'F'],
   ['Công Duy', 'M'],
   ['Công Lý', 'M'],
@@ -126,8 +127,8 @@ const firstNames: Array<[string, 'F' | 'M']> = [
   ['Khánh Chi', 'F'],
   ['Khánh Trâm', 'F'],
   ['Kim Ngân', 'F'],
-  ['Minh Anh', 'F'],
-  ['Minh Anh', 'F'],
+  ['Mai Hương', 'F'],
+  ['Minh Anh', 'M'],
   ['Minh Châu', 'F'],
   ['Minh Khuê', 'F'],
   ['Minh Quân', 'M'],
@@ -260,14 +261,25 @@ const firstNames: Array<[string, 'F' | 'M']> = [
   ['Đức Việt', 'M'],
 ];
 
+export function randomElement<T>(arr: T[]) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+export function firstName() {
+  const [firstName] = randomElement(firstNames);
+  return firstName;
+}
+
+export function lastName() {
+  return randomElement(lastNames);
+}
+
 export function nameAndGender() {
-  const [firstName, gender] =
-    firstNames[Math.floor(Math.random() * firstNames.length)];
-  const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+  const [firstName, gender] = randomElement(firstNames);
   return {
     lastName,
     firstName,
-    name: `${lastName} ${firstName}`,
+    name: `${lastName()} ${firstName}`,
     gender,
   };
 }

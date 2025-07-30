@@ -11,6 +11,7 @@ import {authService} from '@/services/auth';
 import {getFormValidators} from '@/utils/validation';
 import {FormContainer} from '@/components/form/FormContainer';
 import {AuthHeader, AuthFormLink, AuthSuccessState} from '@/components/auth';
+import {ROUTERS} from '@/config/routeConfig';
 
 type ResetPasswordFormValues = {
   password: string;
@@ -54,7 +55,7 @@ export function ResetPasswordPage() {
     errorTitle: t('auth.passwordResetFailed'),
     onSuccess() {
       setIsSubmitted(true);
-      setTimeout(() => navigate('/login'), 3000);
+      setTimeout(() => navigate(ROUTERS.LOGIN), 3000);
     },
   });
 
@@ -81,7 +82,7 @@ export function ResetPasswordPage() {
             title={t('auth.invalidResetLink')}
             description={t('auth.invalidResetLinkDescription')}
             buttonText={t('auth.requestNewLink')}
-            onButtonClick={() => navigate('/forgot-password')}
+            onButtonClick={() => navigate(ROUTERS.FORGOT_PASSWORD)}
           />
         </FormContainer>
       </GuestLayout>
@@ -98,7 +99,7 @@ export function ResetPasswordPage() {
             description={t('auth.passwordResetSuccessDescription')}
             subDescription={t('auth.redirectingToLogin')}
             buttonText={t('auth.backToLogin')}
-            onButtonClick={() => navigate('/login')}
+            onButtonClick={() => navigate(ROUTERS.LOGIN)}
           />
         </FormContainer>
       </GuestLayout>
@@ -147,7 +148,7 @@ export function ResetPasswordPage() {
         <AuthFormLink
           text=""
           linkText={t('auth.backToForgotPassword')}
-          href="/forgot-password"
+          href={ROUTERS.FORGOT_PASSWORD}
         />
       </FormContainer>
     </GuestLayout>

@@ -31,7 +31,10 @@ export const CreateEmployeeSchema = z.object({
   departmentId: z.string().optional(),
 });
 
-export const CreateEmployeesRequestSchema = z.array(CreateEmployeeSchema);
+export const CreateEmployeesRequestSchema = CreateEmployeeSchema;
+export const CreateBulkEmployeesRequestSchema = z.object({
+  employees: CreateEmployeeSchema.array(),
+});
 
 export const UpdateEmployeeRequestSchema = z.object({
   firstName: stringSchema,
@@ -51,10 +54,7 @@ export const GetDepartmentsResponseSchema = z.object({
   pagination: paginationSchema,
 });
 
-export const CreateEmployeesResponseSchema = z.object({
-  employees: z.array(EmployeeSchema),
-  count: z.number(),
-});
+export const CreateEmployeesResponseSchema = EmployeeSchema;
 
 export const UpdateEmployeeResponseSchema = EmployeeSchema;
 
@@ -64,6 +64,9 @@ export type Department = z.infer<typeof DepartmentSchema>;
 export type CreateEmployee = z.infer<typeof CreateEmployeeSchema>;
 export type CreateEmployeesRequest = z.infer<
   typeof CreateEmployeesRequestSchema
+>;
+export type CreateBulkEmployeesRequest = z.infer<
+  typeof CreateBulkEmployeesRequestSchema
 >;
 export type UpdateEmployeeRequest = z.infer<typeof UpdateEmployeeRequestSchema>;
 export type GetEmployeesResponse = z.infer<typeof GetEmployeesResponseSchema>;

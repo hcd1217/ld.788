@@ -33,6 +33,7 @@ import {
   ClientActionModal,
 } from '@/components/admin/ClientManagementComponents';
 import type {Client} from '@/lib/api';
+import {ROUTERS, getAdminClientDetailRoute} from '@/config/routeConfig';
 
 type Action = 'suspend' | 'reactivate' | 'delete';
 
@@ -181,7 +182,7 @@ export function ClientListPage() {
             <GoBack />
             <Button
               leftSection={<IconPlus size={16} />}
-              onClick={() => navigate('/admin/clients/new')}
+              onClick={() => navigate(ROUTERS.ADMIN_CLIENTS_NEW)}
             >
               {t('admin.clients.createNewClient')}
             </Button>
@@ -208,7 +209,7 @@ export function ClientListPage() {
                 <Button
                   leftSection={<IconPlus size={16} />}
                   mt="md"
-                  onClick={() => navigate('/admin/clients/new')}
+                  onClick={() => navigate(ROUTERS.ADMIN_CLIENTS_NEW)}
                 >
                   {t('admin.clients.createFirstClient')}
                 </Button>
@@ -224,7 +225,7 @@ export function ClientListPage() {
                   onReactivate={handleReactivateClient}
                   onDelete={handleDeleteClient}
                   onViewDetails={(clientCode) =>
-                    navigate(`/admin/clients/${clientCode}`)
+                    navigate(getAdminClientDetailRoute(clientCode))
                   }
                 />
               ))}
