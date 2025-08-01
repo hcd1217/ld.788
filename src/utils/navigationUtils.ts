@@ -9,18 +9,18 @@ export function isNavigationItemActive(
   pathname: string,
 ): boolean {
   // Direct path match
-  if (pathname === item.path) {
+  if (pathname === item?.path) {
     return true;
   }
 
   // Check active paths
-  if (item.activePaths?.some((path) => pathname.startsWith(path))) {
+  if (item?.activePaths?.some((path) => pathname.startsWith(path))) {
     return true;
   }
 
   // Check if any sub-item is active
   if (item.subs) {
-    return item.subs.some((sub) => isNavigationItemActive(sub, pathname));
+    return item?.subs.some((sub) => isNavigationItemActive(sub, pathname));
   }
 
   return false;

@@ -72,7 +72,7 @@ function filterNavigationItem(
   if (item.subs) {
     const filteredSubs = item.subs
       .map((sub) => filterNavigationItem(sub, routeConfig))
-      .filter((sub): sub is NavigationItem => sub !== null);
+      .filter((sub): sub is NavigationItem => sub !== undefined);
 
     if (filteredSubs.length === 0 && !item.path) {
       return undefined;
@@ -279,10 +279,9 @@ export function NavBar() {
     const transformed = NAVIGATION_STRUCTURE.map((item) =>
       transformNavigationItem(item, t),
     );
-
     return transformed
       .map((item) => filterNavigationItem(item, routeConfig))
-      .filter((item): item is NavigationItem => item !== null);
+      .filter((item): item is NavigationItem => item !== undefined);
   }, [t, routeConfig]);
 
   // Auto-expand menus that have active submenus
@@ -291,7 +290,7 @@ export function NavBar() {
       item.subs?.some((sub) => isNavigationItemActive(sub, location.pathname)),
     );
 
-    if (itemsWithActiveSubs.length > 0) {
+    if (itemsWithActiveSubs.length > 0 && itemsWithActiveSubs[0]) {
       const newExpandedId = itemsWithActiveSubs[0].id;
       setExpandedMenuId(newExpandedId);
       setPersistedExpandedMenuId(newExpandedId);

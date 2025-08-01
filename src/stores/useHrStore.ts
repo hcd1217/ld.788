@@ -79,7 +79,6 @@ export const useHrStore = create<HrState>()(
 
         set({isLoading: true, error: undefined});
         try {
-          console.log('get data');
           // Load both employees and units in parallel
           const [employees, units] = await Promise.all([
             employeeService.getAllEmployee(),

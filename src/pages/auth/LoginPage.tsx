@@ -45,7 +45,6 @@ export function LoginPage() {
   useEffect(() => {
     if (clientCodeFromUrl && clientCodeFromUrl !== defaultClientCode) {
       localStorage.setItem('clientCode', clientCodeFromUrl);
-      console.log('reload the page without search params', clientCodeFromUrl);
       // Reload the page without search params
       navigate(ROUTERS.LOGIN, {replace: true});
     }
