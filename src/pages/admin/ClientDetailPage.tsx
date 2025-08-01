@@ -24,8 +24,8 @@ import {
   IconFlag,
   IconUsers,
 } from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
+import {useTranslation} from '@/hooks/useTranslation';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useClientDetail} from '@/hooks/useClientDetail';
 import {useClientActions} from '@/stores/useClientStore';
 import {GoBack} from '@/components/common';

@@ -1,7 +1,7 @@
 import {Stack, Text, Alert, Flex, Button} from '@mantine/core';
 import {IconAlertTriangle} from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
-import type {Employee} from '@/lib/api/schemas/hr.schemas';
+import {useTranslation} from '@/hooks/useTranslation';
+import type {Employee} from '@/services/hr/employee';
 import {renderFullName} from '@/utils/string';
 import {ModalOrDrawer} from '@/components/common';
 

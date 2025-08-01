@@ -1,6 +1,6 @@
 import {Group, Text, Stack, ActionIcon} from '@mantine/core';
 import {IconMapPin, IconPhone, IconEdit, IconTrash} from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {SelectableCard} from '@/components/common';
 import type {Store} from '@/lib/api/schemas/store.schemas';
 

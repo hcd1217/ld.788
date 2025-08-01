@@ -8,21 +8,19 @@ import {
 import {EmployeeBasicInfoCard} from './EmployeeBasicInfoCard';
 import {EmployeeDangerZone} from './EmployeeDangerZone';
 import {ComingSoonCard} from '@/components/common/ui/ComingSoonCard';
-import useTranslation from '@/hooks/useTranslation';
-import {type Employee, type Department} from '@/lib/api/schemas/hr.schemas';
+import {useTranslation} from '@/hooks/useTranslation';
+import type {Employee} from '@/services/hr/employee';
 
 type EmployeeDetailAccordionProps = {
   readonly employee: Employee;
   readonly onActivate: () => void;
   readonly onDeactivate: () => void;
-  readonly getDepartmentById: (id: string) => Department | undefined;
 };
 
 export function EmployeeDetailAccordion({
   employee,
   onActivate,
   onDeactivate,
-  getDepartmentById,
 }: EmployeeDetailAccordionProps) {
   const {t} = useTranslation();
 
@@ -34,10 +32,7 @@ export function EmployeeDetailAccordion({
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap="xl" pt="md">
-            <EmployeeBasicInfoCard
-              employee={employee}
-              getDepartmentById={getDepartmentById}
-            />
+            <EmployeeBasicInfoCard employee={employee} />
           </Stack>
         </Accordion.Panel>
       </Accordion.Item>

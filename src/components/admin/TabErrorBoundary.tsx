@@ -3,7 +3,7 @@ import {Alert, Button, Stack, Text, Title} from '@mantine/core';
 import {IconAlertTriangle, IconRefresh} from '@tabler/icons-react';
 import {addComponentError} from '@/stores/error';
 import {isDevelopment} from '@/utils/env';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 
 interface TabErrorBoundaryProps {
   readonly children: ReactNode;

@@ -1,6 +1,6 @@
 import {Select} from '@mantine/core';
 import {IconLanguage} from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 
 const languages = [

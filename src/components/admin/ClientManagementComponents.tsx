@@ -42,7 +42,7 @@ import {
 } from './FilterableAdminDataTable';
 import {ExportButton} from './ExportButton';
 import {TruncatedText} from './TruncatedText';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {type ExportColumn} from '@/utils/export';
 import {convertCamelCaseToText, formatDate} from '@/utils/string';
 import {

@@ -1,7 +1,7 @@
 import {Button, type ButtonProps} from '@mantine/core';
 import {IconDownload} from '@tabler/icons-react';
 import {notifications} from '@mantine/notifications';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {exportToCSV, type ExportColumn} from '@/utils/export';
 
 interface ExportButtonProps<T> extends Omit<ButtonProps, 'onClick'> {

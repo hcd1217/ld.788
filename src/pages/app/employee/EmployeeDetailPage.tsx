@@ -1,9 +1,8 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 import {useDisclosure} from '@mantine/hooks';
-import {notifications} from '@mantine/notifications';
 import {LoadingOverlay} from '@mantine/core';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import useIsDesktop from '@/hooks/useIsDesktop';
 import {useEmployeeList, useHrActions, useHrLoading} from '@/stores/useHrStore';
 import {
@@ -18,9 +17,10 @@ import {
   EmployeeDetailTabs,
   EmployeeDetailAccordion,
 } from '@/components/app/employee';
-import type {Employee} from '@/lib/api/schemas/hr.schemas';
-import {renderFullName} from '@/utils/string';
+import type {Employee} from '@/services/hr/employee';
 import {getEmployeeDetailRoute} from '@/config/routeConfig';
+import {useOnce} from '@/hooks/useOnce';
+import {useAction} from '@/hooks/useAction';
 
 export function EmployeeDetailPage() {
   const {employeeId} = useParams<{employeeId: string}>();
@@ -29,12 +29,7 @@ export function EmployeeDetailPage() {
   const isDesktop = useIsDesktop();
   const employees = useEmployeeList();
   const isLoading = useHrLoading();
-  const {
-    loadEmployees,
-    getDepartmentById,
-    deactivateEmployee,
-    activateEmployee,
-  } = useHrActions();
+  const {loadEmployees, deactivateEmployee, activateEmployee} = useHrActions();
 
   const employee = employees.find((emp) => emp.id === employeeId);
 
@@ -74,58 +69,49 @@ export function EmployeeDetailPage() {
     }
   };
 
-  const confirmDeactivateEmployee = async () => {
-    if (!employeeToDeactivate) return;
+  const confirmDeactivateEmployee = useAction({
+    options: {
+      successTitle: t('common.success'),
+      successMessage: t('employee.employeeDeactivated'),
+      errorTitle: t('common.error'),
+      errorMessage: t('employee.deactivateEmployeeFailed'),
+    },
+    async actionHandler() {
+      if (!employeeToDeactivate) {
+        throw new Error(t('employee.deactivateEmployeeFailed'));
+      }
 
-    try {
       await deactivateEmployee(employeeToDeactivate.id);
       closeDeactivateModal();
-      notifications.show({
-        title: t('common.success'),
-        message: t('employee.employeeDeactivated'),
-        color: 'green',
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t('employee.deactivateEmployeeFailed');
-      notifications.show({
-        title: t('common.error'),
-        message: errorMessage,
-        color: 'red',
-      });
-    }
-  };
+    },
+    cleanupHandler() {
+      setEmployeeToDeactivate(undefined);
+    },
+  });
 
-  const confirmActivateEmployee = async () => {
-    if (!employeeToActivate) return;
+  const confirmActivateEmployee = useAction({
+    options: {
+      successTitle: t('common.success'),
+      successMessage: t('employee.employeeActivated'),
+      errorTitle: t('common.error'),
+      errorMessage: t('employee.activateEmployeeFailed'),
+    },
+    async actionHandler() {
+      if (!employeeToActivate) {
+        throw new Error(t('employee.activateEmployeeFailed'));
+      }
 
-    try {
       await activateEmployee(employeeToActivate.id);
       closeActivateModal();
-      notifications.show({
-        title: t('common.success'),
-        message: t('employee.employeeActivated'),
-        color: 'green',
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t('employee.activateEmployeeFailed');
-      notifications.show({
-        title: t('common.error'),
-        message: errorMessage,
-        color: 'red',
-      });
-    }
-  };
+    },
+    cleanupHandler() {
+      setEmployeeToActivate(undefined);
+    },
+  });
 
-  useEffect(() => {
+  useOnce(() => {
     void loadEmployees();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const deactivateComponent = (
     <EmployeeDeactivateModal
@@ -144,7 +130,7 @@ export function EmployeeDetailPage() {
     />
   );
   const title = employee
-    ? renderFullName(employee)
+    ? (employee.fullNameWithPosition ?? employee.fullName)
     : t('employee.employeeDetails');
 
   if (!isDesktop) {
@@ -174,7 +160,6 @@ export function EmployeeDetailPage() {
       >
         <EmployeeDetailAccordion
           employee={employee}
-          getDepartmentById={getDepartmentById}
           onActivate={handleActivate}
           onDeactivate={handleDeactivate}
         />
@@ -189,7 +174,6 @@ export function EmployeeDetailPage() {
       {employee ? (
         <EmployeeDetailTabs
           employee={employee}
-          getDepartmentById={getDepartmentById}
           onEdit={handleEdit}
           onActivate={handleActivate}
           onDeactivate={handleDeactivate}

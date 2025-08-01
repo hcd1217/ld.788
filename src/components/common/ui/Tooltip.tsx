@@ -4,7 +4,7 @@ import {
   type TooltipProps as MantineTooltipProps,
 } from '@mantine/core';
 import {type ReactNode} from 'react';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 type TooltipProps = MantineTooltipProps & {
   readonly children: ReactNode;

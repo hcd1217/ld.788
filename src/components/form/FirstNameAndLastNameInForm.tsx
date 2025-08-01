@@ -1,7 +1,7 @@
 import {Grid, TextInput} from '@mantine/core';
 import type {UseFormReturnType} from '@mantine/form';
 import {useEffect} from 'react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import i18n from '@/lib/i18n';
 import {getLocaleConfig} from '@/config/localeConfig';
 

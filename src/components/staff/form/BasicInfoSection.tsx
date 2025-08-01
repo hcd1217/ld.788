@@ -24,10 +24,10 @@ import {
 import CryptoJS from 'crypto-js';
 import QRCode from 'qrcode';
 import type {UseFormReturnType} from '@mantine/form';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useCurrentStore} from '@/stores/useStoreConfigStore';
 import type {StaffFormData} from '@/lib/api/schemas/staff.schemas';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export interface BasicInfoSectionProps {
   readonly form: UseFormReturnType<StaffFormData>;

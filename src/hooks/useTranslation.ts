@@ -15,7 +15,7 @@ type DotNestedKeys<T> =
 
 export type TranslationKey = DotNestedKeys<TranslationResource>;
 
-export default function useTranslation() {
+export function useTranslation() {
   const {t, i18n} = useI18nTranslation();
 
   return {
@@ -25,3 +25,5 @@ export default function useTranslation() {
     changeLanguage: (language: string) => i18n.changeLanguage(language),
   };
 }
+
+export default useTranslation;

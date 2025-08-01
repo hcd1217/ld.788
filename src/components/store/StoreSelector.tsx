@@ -1,6 +1,6 @@
 import {Select, Text, Group, Box} from '@mantine/core';
 import {IconBuildingStore, IconChevronDown} from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {
   useCurrentStore,
   useStores,

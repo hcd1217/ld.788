@@ -7,7 +7,7 @@ import {
   IconAddressBook,
 } from '@tabler/icons-react';
 import classes from './CommonMobileFooter.module.css';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {ROUTERS} from '@/config/routeConfig';
 
 export function CommonMobileFooter() {

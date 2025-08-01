@@ -8,15 +8,14 @@ import {
 import {EmployeeBasicInfoCard} from './EmployeeBasicInfoCard';
 import {EmployeeDangerZone} from './EmployeeDangerZone';
 import {Tabs, ComingSoonCard} from '@/components/common';
-import useTranslation from '@/hooks/useTranslation';
-import {type Employee, type Department} from '@/lib/api/schemas/hr.schemas';
+import {useTranslation} from '@/hooks/useTranslation';
+import type {Employee} from '@/services/hr/employee';
 
 type EmployeeDetailTabsProps = {
   readonly employee: Employee;
   readonly onEdit: () => void;
   readonly onActivate: () => void;
   readonly onDeactivate: () => void;
-  readonly getDepartmentById: (id: string) => Department | undefined;
 };
 
 export function EmployeeDetailTabs({
@@ -24,7 +23,6 @@ export function EmployeeDetailTabs({
   onEdit,
   onActivate,
   onDeactivate,
-  getDepartmentById,
 }: EmployeeDetailTabsProps) {
   const {t} = useTranslation();
 
@@ -63,11 +61,7 @@ export function EmployeeDetailTabs({
         >
           <Box style={{maxWidth: '800px', width: '100%'}}>
             <Stack gap="xl">
-              <EmployeeBasicInfoCard
-                employee={employee}
-                getDepartmentById={getDepartmentById}
-                onEdit={onEdit}
-              />
+              <EmployeeBasicInfoCard employee={employee} onEdit={onEdit} />
               <EmployeeDangerZone
                 employee={employee}
                 onActivate={onActivate}

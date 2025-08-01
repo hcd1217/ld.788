@@ -15,7 +15,7 @@ export function SearchBar({
   setSearchQuery,
 }: SearchBarProps) {
   if (hidden) {
-    return <div />;
+    return null;
   }
 
   return (

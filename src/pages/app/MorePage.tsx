@@ -24,9 +24,9 @@ import {
   IconUsersGroup,
 } from '@tabler/icons-react';
 import {Navigate, useNavigate} from 'react-router';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {isDevelopment} from '@/utils/env';
 import {ROUTERS} from '@/config/routeConfig';
 

@@ -14,6 +14,15 @@ export const clientCodeSchema = z
   .max(10)
   .regex(/^[A-Z\d]+$/);
 export const booleanSchema = z.boolean();
+export const optionalBooleanSchema = z.boolean().optional();
+export const falseBooleanSchema = z
+  .boolean()
+  .optional()
+  .transform(() => false);
+export const trueBooleanSchema = z
+  .boolean()
+  .optional()
+  .transform(() => true);
 export const numberSchema = z.number();
 export const stringSchema = z.string();
 export const idSchema = z.string();

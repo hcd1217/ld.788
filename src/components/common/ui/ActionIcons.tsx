@@ -1,6 +1,6 @@
 import {Group, ActionIcon, type MantineStyleProp} from '@mantine/core';
 import {IconEdit, IconTrash} from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 
 type ActionIconsProps = {
   readonly onEdit: () => void;

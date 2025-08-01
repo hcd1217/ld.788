@@ -6,7 +6,7 @@ import {
 } from '@mantine/core';
 import {IconLayoutGrid, IconTable} from '@tabler/icons-react';
 import {Tooltip} from './Tooltip';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 
 type SwitchViewProps = {
   readonly viewMode: 'table' | 'grid';

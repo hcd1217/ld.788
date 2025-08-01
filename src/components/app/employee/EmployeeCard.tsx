@@ -1,10 +1,9 @@
 import {Card, Group, Box, Text, type MantineStyleProp} from '@mantine/core';
 import {useNavigate} from 'react-router';
 import {EmployeeActions} from './EmployeeActions';
-import useTranslation from '@/hooks/useTranslation';
-import type {Employee} from '@/lib/api/schemas/hr.schemas';
+import {useTranslation} from '@/hooks/useTranslation';
+import type {Employee} from '@/services/hr/employee';
 import {ActiveBadge} from '@/components/common';
-import {useHrActions} from '@/stores/useHrStore';
 import {renderFullName} from '@/utils/string';
 import {getEmployeeDetailRoute} from '@/config/routeConfig';
 
@@ -32,7 +31,6 @@ export function EmployeeCard({
   noActions,
 }: EmployeeCardProps) {
   const {t} = useTranslation();
-  const {getDepartmentById} = useHrActions();
   const navigate = useNavigate();
 
   const defaultActionIconsStyle: MantineStyleProp = {
@@ -66,11 +64,9 @@ export function EmployeeCard({
           <Text fw={500} size="sm">
             {fullName}
           </Text>
-          {employee.departmentId ? (
+          {employee.unitId ? (
             <Text size="xs" c="dimmed">
-              {t('employee.unit')}:{' '}
-              {getDepartmentById(employee.departmentId)?.name ||
-                employee.departmentId}
+              {t('employee.unit')}: {employee.unit ?? '-'}
             </Text>
           ) : null}
         </Box>

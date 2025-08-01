@@ -4,7 +4,7 @@ import {Stack, Text, Space, Button, PasswordInput} from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {notifications} from '@mantine/notifications';
 import {IconAlertCircle, IconCheck} from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useAuthForm} from '@/hooks/useAuthForm';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {authService} from '@/services/auth';

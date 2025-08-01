@@ -18,7 +18,7 @@ import {
   IconMoon,
 } from '@tabler/icons-react';
 import {VersionInformation} from '@/components/common';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {ROUTERS} from '@/config/routeConfig';
 

@@ -9,7 +9,7 @@ import {
   type MantineStyleProp,
 } from '@mantine/core';
 import {IconSearch, IconX} from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useTableFilters} from '@/hooks/useTableFilters';
 import {
   type SortableColumn,

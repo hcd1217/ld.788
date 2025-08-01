@@ -29,7 +29,11 @@ export function decodeJWT(token: string): JWTPayload | undefined {
   }
 }
 
-export function isTokenExpired(token: string): boolean {
+export function isTokenExpired(token?: string): boolean {
+  if (!token) {
+    return true;
+  }
+
   const payload = decodeJWT(token);
   if (!payload) {
     return true;

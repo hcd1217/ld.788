@@ -12,7 +12,7 @@ import {
 import {IconAlertCircle, IconShieldCheck} from '@tabler/icons-react';
 import {useForm} from '@mantine/form';
 import {useAppStore} from '@/stores/useAppStore';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useAuthForm} from '@/hooks/useAuthForm';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {FormContainer} from '@/components/form/FormContainer';

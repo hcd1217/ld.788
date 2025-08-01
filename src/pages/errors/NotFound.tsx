@@ -9,8 +9,8 @@ import {
 } from '@mantine/core';
 import {useNavigate} from 'react-router';
 import {IconError404, IconArrowLeft, IconHome} from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
+import {useTranslation} from '@/hooks/useTranslation';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {ROUTERS} from '@/config/routeConfig';
 
 export function NotFound() {

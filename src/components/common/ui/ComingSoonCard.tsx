@@ -1,5 +1,5 @@
 import {Card, Stack, Title, Text} from '@mantine/core';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 
 type ComingSoonCardProps = {
   readonly icon: React.ReactNode;

@@ -1,10 +1,8 @@
-import {Table, ScrollArea, Badge} from '@mantine/core';
+import {Table, Text, ScrollArea, Badge, Group} from '@mantine/core';
 import {useNavigate} from 'react-router';
 import {EmployeeActions} from './EmployeeActions';
-import useTranslation from '@/hooks/useTranslation';
-import type {Employee} from '@/lib/api/schemas/hr.schemas';
-import {renderFullName} from '@/utils/string';
-import {useHrActions} from '@/stores/useHrStore';
+import {useTranslation} from '@/hooks/useTranslation';
+import type {Employee} from '@/services/hr/employee';
 import {getEmployeeDetailRoute} from '@/config/routeConfig';
 
 type EmployeeDataTableProps = {
@@ -21,7 +19,6 @@ export function EmployeeDataTable({
   onActivateEmployee,
 }: EmployeeDataTableProps) {
   const {t} = useTranslation();
-  const {getDepartmentById} = useHrActions();
   const navigate = useNavigate();
 
   return (
@@ -44,13 +41,16 @@ export function EmployeeDataTable({
               style={{cursor: 'pointer'}}
               onClick={() => navigate(getEmployeeDetailRoute(employee.id))}
             >
-              <Table.Td>{renderFullName(employee)}</Table.Td>
               <Table.Td>
-                {employee.departmentId
-                  ? getDepartmentById(employee.departmentId)?.name ||
-                    employee.departmentId
-                  : '-'}
+                <Group gap="sm" justify="start">
+                  {/* @todo: custom this */}
+                  <Text fw={400}>{employee.fullName}</Text>
+                  {employee?.position ? (
+                    <Text c="dimmed"> ({employee?.position})</Text>
+                  ) : null}
+                </Group>
               </Table.Td>
+              <Table.Td>{employee.unit ?? '-'}</Table.Td>
               <Table.Td>
                 <Badge
                   color={employee.isActive ? 'green' : 'gray'}

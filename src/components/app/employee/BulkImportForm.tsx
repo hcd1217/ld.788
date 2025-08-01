@@ -21,7 +21,7 @@ import {
   IconX,
   IconUsers,
 } from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import useIsDesktop from '@/hooks/useIsDesktop';
 
 type ImportResult = {

@@ -1,7 +1,7 @@
 import {type MantineStyleProp, ActionIcon, Group} from '@mantine/core';
 import {IconEdit, IconUserOff, IconUserCheck} from '@tabler/icons-react';
 import {useNavigate} from 'react-router';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {Tooltip} from '@/components/common';
 import {getEmployeeDetailRoute} from '@/config/routeConfig';
 

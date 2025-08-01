@@ -22,8 +22,8 @@ import {
   IconUser,
   IconLock,
 } from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
+import {useTranslation} from '@/hooks/useTranslation';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useClientActions} from '@/stores/useClientStore';
 import {GoBack} from '@/components/common';
 import {getFormValidators} from '@/utils/validation';

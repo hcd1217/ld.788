@@ -13,13 +13,14 @@ import {
   Transition,
 } from '@mantine/core';
 import {useNavigate} from 'react-router';
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import {IconAlertCircle} from '@tabler/icons-react';
 import {useAppStore} from '@/stores/useAppStore';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {authApi, type GetMeResponse} from '@/lib/api';
 import {GoBack} from '@/components/common';
 import {ROUTERS} from '@/config/routeConfig';
+import {useOnce} from '@/hooks/useOnce';
 
 export function ProfilePage() {
   const navigate = useNavigate();
@@ -46,10 +47,9 @@ export function ProfilePage() {
     }
   };
 
-  useEffect(() => {
+  useOnce(() => {
     fetchUserData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const handleLogout = () => {
     logout();

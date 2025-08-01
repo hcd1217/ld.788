@@ -3,6 +3,8 @@
     "pages": {
       "blank": "This page is blank page, if you see this page, it means that the route in under construction, please just ignore this"
     },
+    "filter": "Filter",
+    "applyFilter": "Apply Filters",
     "firstName": "First name",
     "lastName": "Last name",
     "logout": "Logout",
@@ -18,6 +20,8 @@
     "storeManagement": "Store Management",
     "salaryManagement": "Salary Management",
     "employeeManagement": "Employee Management",
+    "customerManagement": "Customer Management",
+    "poManagement": "PO Management",
     "configuration": "Configuration",
     "staffManagement": "Staff Management",
     "dashboard": "Dashboard",
@@ -97,7 +101,10 @@
     "failed": "Failed",
     "dragAndDropFile": "Drag and drop your file here",
     "orClickToSelect": "or click to select",
-    "remove": "Remove"
+    "remove": "Remove",
+    "userMenu": "User Menu",
+    "mainNavigation": "Main Navigation",
+    "dummyFeature": "Dummy Feature"
   },
   "pcOnly": {
     "__check__": "Sun Jul 27 05:22:58 UTC 2025",
@@ -216,7 +223,6 @@
     "employeeCard": "Employee card for {{name}}",
     "tableAriaLabel": "Employee table",
     "name": "Name",
-    "department": "Department",
     "unit": "Unit",
     "allUnit": "All Unit",
     "status": "Status",
@@ -257,7 +263,7 @@
     "addSingleEmployee": "Add Single Employee",
     "bulkImportEmployees": "Bulk Import Employees",
     "fileTooLarge": "File size exceeds the maximum limit of 10MB",
-    "selectDepartment": "Select department",
+    "selectUnit": "Select unit",
     "sampleExcelTemplate": "Sample Excel Template",
     "sampleExcelDescription": "Download a sample Excel file with the correct format",
     "downloadSampleExcel": "Download Sample Excel",

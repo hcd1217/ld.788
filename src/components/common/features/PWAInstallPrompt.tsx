@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {Button, Paper, Text, Group, CloseButton} from '@mantine/core';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 
 type BeforeInstallPromptEvent = {
   prompt: () => Promise<void>;

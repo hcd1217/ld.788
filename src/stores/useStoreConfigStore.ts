@@ -8,6 +8,7 @@ import type {
   StoreOperatingHours,
   UpdateStoreOperatingHoursRequest,
 } from '@/lib/api/schemas/store.schemas';
+import {getErrorMessage} from '@/utils/errorUtils';
 
 type StoreConfigState = {
   // Store data
@@ -98,13 +99,10 @@ export const useStoreConfigStore = create<StoreConfigState>()(
 
             return newStore;
           } catch (error) {
-            let errorMessage = 'Failed to create store';
-
+            let errorMessage = getErrorMessage(error, 'Failed to create store');
             // Handle specific API errors
             if (error instanceof ApiError && error.status === 409) {
               errorMessage = 'A store with this code already exists';
-            } else if (error instanceof Error) {
-              errorMessage = error.message;
             }
 
             set({

@@ -1,7 +1,7 @@
 import {Box, Text, Alert} from '@mantine/core';
 import {IconAlertCircle} from '@tabler/icons-react';
 import {GoogleMap, useLoadScript, Marker} from '@react-google-maps/api';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 
 const libraries: Array<'places'> = ['places'];
 

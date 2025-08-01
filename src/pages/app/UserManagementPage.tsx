@@ -33,7 +33,7 @@ import {
   IconUser,
   IconFileSpreadsheet,
 } from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {
   getFormValidators,
   validateIdentifier,

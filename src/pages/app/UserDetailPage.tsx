@@ -1,6 +1,6 @@
 import {Navigate, useParams} from 'react-router';
 import {Container, Stack, Group, Title, Paper, Text} from '@mantine/core';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {GoBack} from '@/components/common';
 

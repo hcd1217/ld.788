@@ -64,9 +64,6 @@ export const authService = {
 
   async isAuthenticated() {
     const token = this.getAccessToken();
-    if (!token) {
-      return false;
-    }
 
     // Renew token if it is expired
     if (isTokenExpired(token)) {
@@ -76,7 +73,7 @@ export const authService = {
       }
 
       const response = await authApi.renewToken({refreshToken});
-      if (!response.accessToken) {
+      if (response.accessToken) {
         saveTokens({
           accessToken: response.accessToken,
           refreshToken: response.refreshToken,

@@ -3,6 +3,8 @@
     "pages": {
       "blank": "Trang này là đang được phát triên, nếu bạn thấy trang này, có nghĩa là nó đang được xây dựng, vui lòng bỏ qua"
     },
+    "filter": "Lọc",
+    "applyFilter": "Lọc",
     "firstName": "Tên",
     "lastName": "Họ",
     "logout": "Đăng xuất",
@@ -18,6 +20,8 @@
     "storeManagement": "Quản Lý Cửa Hàng",
     "salaryManagement": "Quản Lý Lương",
     "employeeManagement": "Quản Lý Nhân Viên",
+    "poManagement": "Quản Lý Đơn Đặt Hàng",
+    "customerManagement": "Quản Lý Khách Hàng",
     "configuration": "Thiết lập hệ thống",
     "staffManagement": "Quản Lý Nhân Viên",
     "dashboard": "Bảng điều khiển",
@@ -97,7 +101,10 @@
     "failed": "Thất bại",
     "dragAndDropFile": "Kéo và thả file vào đây",
     "orClickToSelect": "hoặc nhấn để chọn",
-    "remove": "Xóa"
+    "remove": "Xóa",
+    "userMenu": "Menu Người Dùng",
+    "mainNavigation": "Điều Hướng Chính",
+    "dummyFeature": "Tính Năng Thử Nghiệm"
   },
   "pcOnly": {
     "title": "Tính Năng Máy Tính",
@@ -214,7 +221,6 @@
     "employeeCard": "Thẻ nhân viên cho {{name}}",
     "tableAriaLabel": "Bảng nhân viên",
     "name": "Tên",
-    "department": "Phòng Ban",
     "unit": "Đơn vị",
     "allUnit": "Tất Cả Đơn Vị",
     "status": "Trạng Thái",
@@ -255,7 +261,7 @@
     "addSingleEmployee": "Thêm Một Nhân Viên",
     "bulkImportEmployees": "Nhập Nhiều Nhân Viên",
     "fileTooLarge": "Kích thước file vượt quá giới hạn 10MB",
-    "selectDepartment": "Chọn phòng ban",
+    "selectUnit": "Chọn đơn vị",
     "sampleExcelTemplate": "Mẫu Excel",
     "sampleExcelDescription": "Tải xuống file Excel mẫu với định dạng đúng",
     "downloadSampleExcel": "Tải Xuống Excel Mẫu",

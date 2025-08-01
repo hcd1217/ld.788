@@ -21,8 +21,8 @@ import {
   IconCalendar,
   IconShield,
 } from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
+import {useTranslation} from '@/hooks/useTranslation';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useStaffActions} from '@/stores/useStaffStore';
 import {useCurrentStore} from '@/stores/useStoreConfigStore';
 import {GoBack} from '@/components/common';

@@ -12,7 +12,7 @@ import {
 } from '@mantine/core';
 import {IconArrowUp, IconArrowDown, IconArrowsSort} from '@tabler/icons-react';
 import {VirtualizedAdminDataTable} from './VirtualizedAdminDataTable';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 
 export interface SortableColumn<T> {
   readonly key: keyof T | string;

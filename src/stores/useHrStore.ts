@@ -1,14 +1,14 @@
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
-import {hrApi, ApiError} from '@/lib/api';
-import type {Department, Employee} from '@/lib/api/schemas/hr.schemas';
+import {employeeService, type Employee} from '@/services/hr/employee';
+import {unitService, type Unit} from '@/services/hr/unit';
+import {getErrorMessage} from '@/utils/errorUtils';
 
 type HrState = {
   // Employee data
   employees: Employee[];
-  // Departments: Department[];
-  departments: Department[];
-  departmentMap: Map<string, Department>;
+  units: Unit[];
+  unitMap: Map<string, Unit>;
   currentEmployee: Employee | undefined;
   isLoading: boolean;
   error: string | undefined;
@@ -16,15 +16,26 @@ type HrState = {
   // Actions
   setCurrentEmployee: (employee: Employee | undefined) => void;
   loadEmployees: (force?: boolean) => Promise<void>;
-  loadDepartments: () => Promise<void>;
+  loadUnits: () => Promise<void>;
   refreshEmployees: () => Promise<void>;
   deactivateEmployee: (id: string) => Promise<void>;
   activateEmployee: (id: string) => Promise<void>;
+  addEmployee: (employee: {
+    firstName: string;
+    lastName: string;
+    unitId?: string | undefined;
+  }) => Promise<void>;
+  addBulkEmployees: (
+    employees: Array<{
+      firstName: string;
+      lastName: string;
+      unitId?: string | undefined;
+    }>,
+  ) => Promise<void>;
   clearError: () => void;
 
   // Selectors
   getEmployeeById: (id: string) => Employee | undefined;
-  getDepartmentById: (id: string) => Department | undefined;
 };
 
 export const useHrStore = create<HrState>()(
@@ -32,8 +43,8 @@ export const useHrStore = create<HrState>()(
     (set, get) => ({
       // Initial state
       employees: [],
-      departments: [],
-      departmentMap: new Map(),
+      units: [],
+      unitMap: new Map(),
       currentEmployee: undefined,
       isLoading: false,
       error: undefined,
@@ -43,33 +54,21 @@ export const useHrStore = create<HrState>()(
         set({currentEmployee: employee, error: undefined});
       },
 
-      async loadDepartments() {
+      async loadUnits() {
         set({isLoading: true, error: undefined});
         try {
-          const response = await hrApi.getDepartments();
+          const units = await unitService.getUnits();
 
           set({
-            departments: response.departments,
-            departmentMap: new Map(
-              response.departments.map((department) => [
-                department.id,
-                department,
-              ]),
-            ),
+            units,
+            unitMap: new Map(units.map((unit) => [unit.id, unit])),
             isLoading: false,
           });
         } catch (error) {
-          const errorMessage =
-            error instanceof ApiError
-              ? error.message
-              : error instanceof Error
-                ? error.message
-                : 'Failed to load departments';
           set({
             isLoading: false,
-            error: errorMessage,
+            error: getErrorMessage(error, 'Failed to load units'),
           });
-          throw error;
         }
       },
 
@@ -81,42 +80,21 @@ export const useHrStore = create<HrState>()(
         set({isLoading: true, error: undefined});
         try {
           console.log('get data');
-          // Load both employees and departments in parallel
-          const [employeesResponse, departmentsResponse] = await Promise.all([
-            hrApi.getEmployees(),
-            hrApi.getDepartments(),
+          // Load both employees and units in parallel
+          const [employees, units] = await Promise.all([
+            employeeService.getAllEmployee(),
+            unitService.getUnits(),
           ]);
-          console.log('get data done', employeesResponse, departmentsResponse);
-          const now = Date.now();
           set({
             isLoading: false,
-            employees: employeesResponse.employees.sort((a, b) => {
-              const x = (a.isActive ? 1 : -1) * now + a.createdAt.getTime();
-              const y = (b.isActive ? 1 : -1) * now + b.createdAt.getTime();
-              return y - x;
-            }),
-            departments: departmentsResponse.departments,
-            departmentMap: new Map(
-              departmentsResponse.departments.map((department) => [
-                department.id,
-                department,
-              ]),
-            ),
+            employees,
+            units,
           });
         } catch (error) {
-          const errorMessage =
-            error instanceof ApiError
-              ? error.message
-              : error instanceof Error
-                ? error.message
-                : 'Failed to load employees';
           set({
             isLoading: false,
-            error: errorMessage,
+            error: getErrorMessage(error, 'Failed to load employees'),
           });
-          throw error;
-        } finally {
-          set({isLoading: false});
         }
       },
 
@@ -149,7 +127,7 @@ export const useHrStore = create<HrState>()(
 
         try {
           // Actually deactivate on server (soft delete)
-          await hrApi.deactivateEmployee(id);
+          await employeeService.deactivateEmployee(id);
 
           set({isLoading: false});
 
@@ -171,7 +149,6 @@ export const useHrStore = create<HrState>()(
             isLoading: false,
             error: errorMessage,
           });
-          throw error;
         }
       },
 
@@ -200,7 +177,7 @@ export const useHrStore = create<HrState>()(
 
         try {
           // Actually activate on server
-          await hrApi.activateEmployee(id);
+          await employeeService.activateEmployee(id);
 
           set({isLoading: false});
 
@@ -222,7 +199,54 @@ export const useHrStore = create<HrState>()(
             isLoading: false,
             error: errorMessage,
           });
-          throw error;
+        }
+      },
+
+      async addEmployee(employee: {
+        firstName: string;
+        lastName: string;
+        unitId?: string | undefined;
+      }) {
+        set({isLoading: true, error: undefined});
+
+        try {
+          // Add employee on server
+          await employeeService.addEmployee(employee);
+
+          set({isLoading: false});
+
+          // Force reload employee list to include the new employee
+          await get().loadEmployees(true);
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: getErrorMessage(error, 'Failed to add employee'),
+          });
+        }
+      },
+
+      async addBulkEmployees(
+        employees: Array<{
+          firstName: string;
+          lastName: string;
+          unitId?: string | undefined;
+        }>,
+      ) {
+        set({isLoading: true, error: undefined});
+
+        try {
+          // Add multiple employees on server
+          await employeeService.addBulkEmployees(employees);
+
+          set({isLoading: false});
+
+          // Force reload employee list to include the new employees
+          await get().loadEmployees(true);
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: getErrorMessage(error, 'Failed to add employee'),
+          });
         }
       },
 
@@ -233,10 +257,6 @@ export const useHrStore = create<HrState>()(
       // Selectors
       getEmployeeById(id) {
         return get().employees.find((employee) => employee.id === id);
-      },
-
-      getDepartmentById(id) {
-        return get().departmentMap.get(id);
       },
     }),
     {
@@ -249,7 +269,7 @@ export const useHrStore = create<HrState>()(
 export const useCurrentEmployee = () =>
   useHrStore((state) => state.currentEmployee);
 export const useEmployeeList = () => useHrStore((state) => state.employees);
-export const useDepartmentList = () => useHrStore((state) => state.departments);
+export const useUnitList = () => useHrStore((state) => state.units);
 export const useHrLoading = () => useHrStore((state) => state.isLoading);
 export const useHrError = () => useHrStore((state) => state.error);
 
@@ -259,12 +279,13 @@ export const useHrActions = () => {
   return {
     setCurrentEmployee: store.setCurrentEmployee,
     loadEmployees: store.loadEmployees,
-    loadDepartments: store.loadDepartments,
+    loadUnits: store.loadUnits,
     refreshEmployees: store.refreshEmployees,
     deactivateEmployee: store.deactivateEmployee,
     activateEmployee: store.activateEmployee,
+    addEmployee: store.addEmployee,
+    addBulkEmployees: store.addBulkEmployees,
     clearError: store.clearError,
     getEmployeeById: store.getEmployeeById,
-    getDepartmentById: store.getDepartmentById,
   };
 };

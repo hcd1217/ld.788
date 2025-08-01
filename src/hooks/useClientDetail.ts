@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {clientManagementService} from '@/services/clientManagement';
 import type {ClientDetail} from '@/lib/api';
 import {ROUTERS} from '@/config/routeConfig';

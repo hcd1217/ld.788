@@ -1,4 +1,4 @@
-import {useState, useEffect, useMemo} from 'react';
+import {useState, useMemo} from 'react';
 import {useNavigate} from 'react-router';
 import * as XLSX from 'xlsx';
 import {Container, rem, Group} from '@mantine/core';
@@ -12,11 +12,9 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import {type TFunction} from 'i18next';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import useIsDesktop from '@/hooks/useIsDesktop';
 import {getFormValidators} from '@/utils/validation';
-import {hrApi} from '@/lib/api';
-import type {CreateEmployee, Department} from '@/lib/api/schemas/hr.schemas';
 import {
   AppPageTitle,
   AppMobileLayout,
@@ -27,7 +25,7 @@ import {
 import {SingleEmployeeForm, BulkImportForm} from '@/components/app/employee';
 import {
   useHrActions,
-  useDepartmentList,
+  useUnitList,
   useHrLoading,
   useHrError,
 } from '@/stores/useHrStore';
@@ -35,11 +33,13 @@ import {firstName, lastName, randomElement} from '@/utils/fake';
 import {ROUTERS} from '@/config/routeConfig';
 import {useAction} from '@/hooks/useAction';
 import {isDevelopment} from '@/utils/env';
+import type {Unit} from '@/services/hr/unit';
+import {useOnce} from '@/hooks/useOnce';
 
 type SingleEmployeeFormValues = {
   firstName: string;
   lastName: string;
-  departmentId?: string;
+  unitId?: string;
 };
 
 type ImportResult = {
@@ -54,7 +54,7 @@ type ImportResult = {
 // Utility functions
 type GenerateSampleExcelParams = {
   isVietnamese: boolean;
-  departmentOptions: Array<{value: string; label: string}>;
+  unitOptions: Array<{value: string; label: string}>;
   keyMap: Record<string, string>;
 };
 
@@ -64,10 +64,10 @@ export function EmployeeCreatePage() {
   const navigate = useNavigate();
   const {t, i18n} = useTranslation();
   const isDesktop = useIsDesktop();
-  const departments = useDepartmentList();
+  const units = useUnitList();
   const isLoading = useHrLoading();
   const error = useHrError();
-  const {loadDepartments, clearError} = useHrActions();
+  const {loadUnits, clearError, addEmployee, addBulkEmployees} = useHrActions();
   const [activeTab, setActiveTab] = useState<string | undefined>('single');
 
   // Single employee form state
@@ -87,10 +87,10 @@ export function EmployeeCreatePage() {
     () => ({
       firstName: t('common.firstName'),
       lastName: t('common.lastName'),
-      department: t('employee.unit'),
+      unit: t('employee.unit'),
       [t('common.firstName')]: 'firstName',
       [t('common.lastName')]: 'lastName',
-      [t('employee.unit')]: 'department',
+      [t('employee.unit')]: 'unit',
     }),
     [t],
   );
@@ -100,23 +100,22 @@ export function EmployeeCreatePage() {
       ? {
           firstName: firstName(),
           lastName: lastName(),
-          departmentId: randomElement(departments)?.id,
+          unitId: randomElement(units)?.id,
         }
       : {
           firstName: '',
           lastName: '',
-          departmentId: undefined,
+          unitId: undefined,
         },
     validate: {
       ...getFormValidators(t, ['firstName', 'lastName']),
     },
   });
 
-  // Load departments on mount
-  useEffect(() => {
-    void loadDepartments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Load units on mount
+  useOnce(() => {
+    void loadUnits();
+  });
 
   // Single employee handlers
   const handleSingleSubmit = useAction<SingleEmployeeFormValues>({
@@ -136,13 +135,11 @@ export function EmployeeCreatePage() {
       setSingleError(undefined);
       setShowSingleAlert(false);
 
-      const employeeData: CreateEmployee = {
+      await addEmployee({
         firstName: values.firstName,
         lastName: values.lastName,
-        departmentId: values.departmentId,
-      };
-
-      await hrApi.addEmployee(employeeData);
+        unitId: values.unitId,
+      });
     },
     errorHandler(error) {
       const errorMessage =
@@ -176,14 +173,14 @@ export function EmployeeCreatePage() {
       await new Promise((resolve) => {
         setTimeout(resolve, 1000);
       });
-      const departmentOptions = departments.map((dept) => ({
-        value: dept.id,
-        label: dept.name,
+      const unitOptions = units.map((unit) => ({
+        value: unit.id,
+        label: unit.name,
       }));
 
       generateSampleExcel({
         keyMap,
-        departmentOptions,
+        unitOptions,
         isVietnamese: i18n.language === 'vi',
       });
     },
@@ -226,14 +223,14 @@ export function EmployeeCreatePage() {
 
       setIsBulkLoading(true);
       setImportResult(undefined);
-      const employees = await parseExcelFile(file, departments, t, keyMap);
+      const employees = await parseExcelFile(file, units, t, keyMap);
 
       if (employees.length === 0) {
         throw new Error(t('employee.noValidEmployeesFound'));
       }
 
       // Use bulk API for multiple employees
-      await hrApi.addBulkEmployees({employees});
+      await addBulkEmployees(employees);
 
       const result: ImportResult = {
         summary: {
@@ -289,7 +286,7 @@ export function EmployeeCreatePage() {
       >
         <SingleEmployeeForm
           form={form}
-          departments={departments}
+          units={units}
           isLoading={isSingleLoading}
           showAlert={showSingleAlert}
           error={singleError}
@@ -339,7 +336,7 @@ export function EmployeeCreatePage() {
           <Tabs.Panel value="single" pt="xl">
             <SingleEmployeeForm
               form={form}
-              departments={departments}
+              units={units}
               isLoading={isSingleLoading}
               showAlert={showSingleAlert}
               error={singleError}
@@ -371,13 +368,13 @@ export function EmployeeCreatePage() {
 
 function generateSampleExcel({
   isVietnamese,
-  departmentOptions,
+  unitOptions,
   keyMap,
 }: GenerateSampleExcelParams) {
   let sampleData: Array<[string, string, string]>;
 
   if (isVietnamese) {
-    sampleData = departmentOptions.map((option) => {
+    sampleData = unitOptions.map((option) => {
       return [lastName(), firstName(), option.label];
     });
     sampleData.unshift([lastName(), firstName(), '']);
@@ -385,10 +382,10 @@ function generateSampleExcel({
     sampleData.unshift(['Họ', 'Tên', 'Bộ phận']);
   } else {
     sampleData = [
-      [keyMap.firstName, keyMap.lastName, keyMap.department],
-      ['John', 'Doe', departmentOptions[0]?.label ?? ''],
-      ['Jane', 'Smith', departmentOptions[1]?.label ?? ''],
-      ['Mike', 'Johnson', departmentOptions[1]?.label ?? ''],
+      [keyMap.firstName, keyMap.lastName, keyMap.unit],
+      ['John', 'Doe', unitOptions[0]?.label ?? ''],
+      ['Jane', 'Smith', unitOptions[1]?.label ?? ''],
+      ['Mike', 'Johnson', unitOptions[1]?.label ?? ''],
       ['Sarah', 'Wilson', ''],
     ];
   }
@@ -415,10 +412,11 @@ function validateFileType(file: File, t: TFunction): boolean {
 
 async function parseExcelFile(
   file: File,
-  departments: Department[],
+  units: Unit[],
   t: TFunction,
   keyMap: Record<string, string>,
-): Promise<CreateEmployee[]> {
+): Promise<SingleEmployeeFormValues[]> {
+  const unitMap = new Map(units.map((unit) => [unit.name, unit.id]));
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -445,20 +443,17 @@ async function parseExcelFile(
         }
 
         const headers = sheetData[0].map((h) => String(h).trim());
-        const employees: CreateEmployee[] = [];
+        const employees: SingleEmployeeFormValues[] = [];
 
         for (let index = 1; index < sheetData.length; index++) {
           const values = sheetData[index].map((v) => String(v).trim());
 
           if (values.every((v) => !v)) continue;
 
-          const employee: CreateEmployee = {
+          const employee: SingleEmployeeFormValues = {
             firstName: '',
             lastName: '',
           };
-          const departmentMap = new Map(
-            departments.map((el) => [el.name, el.id]),
-          );
           for (const [headerIndex, header] of headers.entries()) {
             const value = values[headerIndex];
             if (!value || !keyMap[header]) continue;
@@ -473,8 +468,8 @@ async function parseExcelFile(
                 break;
               }
 
-              case 'department': {
-                employee.departmentId = departmentMap.get(value) ?? undefined;
+              case 'unit': {
+                employee.unitId = unitMap.get(value) ?? undefined;
                 break;
               }
 

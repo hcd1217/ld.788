@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router';
 import {Stack, Text, Space, Button, TextInput} from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {IconInfoCircle} from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useAuthForm} from '@/hooks/useAuthForm';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {authService} from '@/services/auth';

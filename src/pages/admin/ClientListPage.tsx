@@ -20,8 +20,8 @@ import {
   IconBan,
   IconTrash,
 } from '@tabler/icons-react';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
-import useTranslation from '@/hooks/useTranslation';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import {useTranslation} from '@/hooks/useTranslation';
 import {
   useClients,
   useClientError,

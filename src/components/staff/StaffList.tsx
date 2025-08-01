@@ -33,7 +33,7 @@ import {
   IconShieldCheck,
 } from '@tabler/icons-react';
 import type {Staff} from '@/services/staff';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {formatPhoneNumber} from '@/utils/string';
 
 export interface StaffListProps {

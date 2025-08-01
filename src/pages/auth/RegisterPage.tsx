@@ -1,7 +1,7 @@
 import {useNavigate} from 'react-router';
 import {Stack, Space, Button, TextInput, PasswordInput} from '@mantine/core';
 import {useForm} from '@mantine/form';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {useAuthForm} from '@/hooks/useAuthForm';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {clientService} from '@/services/client';

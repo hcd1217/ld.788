@@ -15,9 +15,9 @@ import {
   IconUserCheck,
   IconTrash,
 } from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import useIsDesktop from '@/hooks/useIsDesktop';
-import type {Employee} from '@/lib/api/schemas/hr.schemas';
+import type {Employee} from '@/services/hr/employee';
 
 type EmployeeDangerZoneProps = {
   readonly employee: Employee;

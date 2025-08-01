@@ -9,19 +9,19 @@ import {
 } from '@mantine/core';
 import type {UseFormReturnType} from '@mantine/form';
 import {IconAlertCircle, IconUser} from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
-import type {Department} from '@/lib/api/schemas/hr.schemas';
+import type {Unit} from '@/services/hr/unit';
 
 type SingleEmployeeFormValues = {
   firstName: string;
   lastName: string;
-  departmentId?: string;
+  unitId?: string;
 };
 
 type SingleEmployeeFormProps = {
   readonly form: UseFormReturnType<SingleEmployeeFormValues>;
-  readonly departments: Department[];
+  readonly units: Unit[];
   readonly isLoading: boolean;
   readonly showAlert: boolean;
   readonly error?: string;
@@ -32,7 +32,7 @@ type SingleEmployeeFormProps = {
 
 export function SingleEmployeeForm({
   form,
-  departments,
+  units,
   isLoading,
   showAlert,
   error,
@@ -42,9 +42,9 @@ export function SingleEmployeeForm({
 }: SingleEmployeeFormProps) {
   const {t} = useTranslation();
 
-  const departmentOptions = departments.map((dept) => ({
-    value: dept.id,
-    label: dept.name,
+  const unitOptions = units.map((unit) => ({
+    value: unit.id,
+    label: unit.name,
   }));
 
   return (
@@ -77,10 +77,10 @@ export function SingleEmployeeForm({
           <Select
             searchable
             clearable
-            label={t('employee.department')}
-            placeholder={t('employee.selectDepartment')}
-            data={departmentOptions}
-            {...form.getInputProps('departmentId')}
+            label={t('employee.unit')}
+            placeholder={t('employee.selectUnit')}
+            data={unitOptions}
+            {...form.getInputProps('unitId')}
           />
 
           <Group justify="flex-end">

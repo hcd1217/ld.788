@@ -21,8 +21,8 @@ import {
   IconUserMinus,
   IconUserCheck,
 } from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
+import {useTranslation} from '@/hooks/useTranslation';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {
   useStaffList,
   useStaffLoading,

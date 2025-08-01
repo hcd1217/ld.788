@@ -27,8 +27,8 @@ import {
   IconCheck,
   IconSearch,
 } from '@tabler/icons-react';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
-import useTranslation from '@/hooks/useTranslation';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import {useTranslation} from '@/hooks/useTranslation';
 import {
   useStores,
   useStoreLoading,

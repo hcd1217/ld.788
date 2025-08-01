@@ -228,7 +228,16 @@ const routeObjects: RouteObject[] = [
     children: [
       {path: ROUTERS.EMPLOYEE_MANAGEMENT, Component: EmployeeListPage},
       {path: ROUTERS.EMPLOYEE_DETAIL, Component: EmployeeDetailPage},
+      {path: ROUTERS.EMPLOYEE_EDIT, Component: BlankPage},
       {path: ROUTERS.EMPLOYEES_ADD, Component: EmployeeCreatePage},
+      {path: ROUTERS.CUSTOMER_MANAGEMENT, Component: BlankPage},
+      {path: ROUTERS.CUSTOMER_DETAIL, Component: BlankPage},
+      {path: ROUTERS.CUSTOMER_ADD, Component: BlankPage},
+      {path: ROUTERS.CUSTOMER_EDIT, Component: BlankPage},
+      {path: ROUTERS.PO_MANAGEMENT, Component: BlankPage},
+      {path: ROUTERS.PO_DETAIL, Component: BlankPage},
+      {path: ROUTERS.PO_ADD, Component: BlankPage},
+      {path: ROUTERS.PO_EDIT, Component: BlankPage},
     ],
   },
   // Old APP routes
@@ -263,7 +272,7 @@ const routeObjects: RouteObject[] = [
             Component: PCOnlyLayout,
             children: [
               // {path: 'employees/add', Component: EmployeeCreatePage},
-              {path: ROUTERS.EMPLOYEES_EDIT, Component: EditEmployeePage},
+              {path: ROUTERS.EMPLOYEE_EDIT, Component: EditEmployeePage},
               {path: ROUTERS.IMPORT_USERS, Component: ImportUsersPage},
               {path: ROUTERS.ROLE_MANAGEMENT, Component: RoleManagementPage},
               {path: ROUTERS.STORE_CONFIG, Component: StoreConfigPage},

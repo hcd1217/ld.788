@@ -1,7 +1,7 @@
 import {Portal, Overlay, Center, Loader, Stack, Text} from '@mantine/core';
 import {useAppStore} from '@/stores/useAppStore';
-import useTranslation from '@/hooks/useTranslation';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
+import {useTranslation} from '@/hooks/useTranslation';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export function AdminLoadingOverlay() {
   const {adminApiLoading, adminApiLoadingMessage} = useAppStore();

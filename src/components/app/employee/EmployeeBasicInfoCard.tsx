@@ -10,20 +10,18 @@ import {
   Badge,
 } from '@mantine/core';
 import {IconEdit} from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
-import {type Employee, type Department} from '@/lib/api/schemas/hr.schemas';
+import {useTranslation} from '@/hooks/useTranslation';
+import type {Employee} from '@/services/hr/employee';
 import {renderFullName, formatDate} from '@/utils/string';
 
 type EmployeeBasicInfoCardProps = {
   readonly employee: Employee;
   readonly onEdit?: () => void;
-  readonly getDepartmentById: (id: string) => Department | undefined;
 };
 
 export function EmployeeBasicInfoCard({
   employee,
   onEdit,
-  getDepartmentById,
 }: EmployeeBasicInfoCardProps) {
   const {t} = useTranslation();
 
@@ -67,11 +65,7 @@ export function EmployeeBasicInfoCard({
               <Text c="dimmed" size="sm">
                 {t('employee.unit')}
               </Text>
-              <Text fw={500}>
-                {employee.departmentId
-                  ? getDepartmentById(employee.departmentId)?.name || '-'
-                  : '-'}
-              </Text>
+              <Text fw={500}>{employee.unit ?? '-'}</Text>
             </Stack>
           </Grid.Col>
 

@@ -13,7 +13,7 @@ import {useNavigate} from 'react-router';
 import {LocationInput} from './LocationInput';
 import {OperatingHoursInput, type DaySchedule} from './OperatingHoursInput';
 import {GoogleMapDisplay} from './GoogleMapDisplay';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 
 type StoreConfigFormProps = {
   readonly form: UseFormReturnType<{

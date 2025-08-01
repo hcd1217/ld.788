@@ -9,7 +9,7 @@ import {
 } from '@mantine/core';
 import {TimeInput} from '@mantine/dates';
 import {IconCopy} from '@tabler/icons-react';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 
 export type DaySchedule =
   | {

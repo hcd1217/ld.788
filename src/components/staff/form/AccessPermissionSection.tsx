@@ -19,10 +19,10 @@ import {
   IconInfoCircle,
 } from '@tabler/icons-react';
 import type {UseFormReturnType} from '@mantine/form';
-import useTranslation from '@/hooks/useTranslation';
+import {useTranslation} from '@/hooks/useTranslation';
 import {permissionMatrix} from '@/services/staff';
 import type {StaffFormData} from '@/lib/api/schemas/staff.schemas';
-import useIsDarkMode from '@/hooks/useIsDarkMode';
+import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export interface AccessPermissionSectionProps {
   readonly form: UseFormReturnType<StaffFormData>;
