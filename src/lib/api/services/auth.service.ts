@@ -45,6 +45,7 @@ export class AuthApi extends BaseApiClient {
       data,
       VerifyMagicLinkResponseSchema,
       VerifyMagicLinkRequestSchema,
+      {noError: true},
     );
   }
 

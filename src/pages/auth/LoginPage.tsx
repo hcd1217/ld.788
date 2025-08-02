@@ -20,6 +20,7 @@ import {AuthHeader, AuthAlert, AuthFormLink} from '@/components/auth';
 import {useClientCode} from '@/hooks/useClientCode';
 import {isDevelopment} from '@/utils/env';
 import {ROUTERS} from '@/config/routeConfig';
+import {useOnce} from '@/hooks/useOnce';
 
 type LoginFormValues = {
   identifier: string;
@@ -33,22 +34,24 @@ export function LoginPage() {
   const {login} = useAppStore();
   const [mounted, setMounted] = useState(false);
   const {t} = useTranslation();
-
-  // Extract client-code from URL query params
-  const clientCodeFromUrl = searchParams.get('client-code');
-
-  // Use client code from URL if available, otherwise use default
-  const defaultClientCode = useClientCode();
-  const clientCode = clientCodeFromUrl ?? defaultClientCode;
+  const clientCode = useClientCode();
 
   // Update localStorage if client-code is provided in URL
-  useEffect(() => {
-    if (clientCodeFromUrl && clientCodeFromUrl !== defaultClientCode) {
+  useOnce(() => {
+    // Extract client-code from URL query params
+    const clientCodeFromUrl = searchParams.get('client-code');
+    console.log('clientCodeFromUrl', clientCodeFromUrl);
+
+    // Use client code from URL if available
+    if (clientCodeFromUrl && clientCodeFromUrl !== clientCode) {
       localStorage.setItem('clientCode', clientCodeFromUrl);
+    }
+
+    if (clientCodeFromUrl) {
       // Reload the page without search params
       navigate(ROUTERS.LOGIN, {replace: true});
     }
-  }, [navigate, defaultClientCode, clientCodeFromUrl]);
+  });
 
   const form = useForm<LoginFormValues>({
     initialValues: {

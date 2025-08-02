@@ -163,13 +163,20 @@ export class BaseApiClient {
     data?: unknown,
     schema?: z.ZodSchema<T>,
     dataSchema?: z.ZodSchema<R>,
+    options?: {noError: boolean},
   ): Promise<T> {
     data = dataSchema?.parse(data) ?? data;
-    const result = await this.request<T>(endpoint, {
-      method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
-      schema,
-    });
+    const result = await this.request<T>(
+      endpoint,
+      {
+        method: 'POST',
+        body: data ? JSON.stringify(data) : undefined,
+        schema,
+      },
+      {
+        noError: options?.noError ?? false,
+      },
+    );
 
     // Invalidate related cache entries
     this.invalidateRelatedCache(endpoint);
@@ -287,6 +294,9 @@ export class BaseApiClient {
   private async request<T>(
     endpoint: string,
     config: RequestConfig<T> = {},
+    options?: {
+      noError: boolean;
+    },
   ): Promise<T> {
     const {params, schema, ...init} = config;
     // Add configurable delay in development mode
@@ -367,7 +377,7 @@ export class BaseApiClient {
           data,
         );
         // Log to error store in development
-        if (isDevelopment) {
+        if (!options?.noError && isDevelopment) {
           addApiError(apiError.message, response.status, endpoint, {
             method: init.method ?? 'GET',
             url: url.toString(),

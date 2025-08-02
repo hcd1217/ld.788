@@ -5,6 +5,7 @@ export {EmployeeGridCard} from './EmployeeGridCard';
 export {EmployeeDeactivateModal} from './EmployeeDeactivateModal';
 export {EmployeeActivateModal} from './EmployeeActivateModal';
 export {EmployeeBasicInfoCard} from './EmployeeBasicInfoCard';
+export {EmployeeMagicLinkModal} from './EmployeeMagicLinkModal';
 export {EmployeeDangerZone} from './EmployeeDangerZone';
 export {ComingSoonCard} from '@/components/common/ui/ComingSoonCard';
 export {EmployeeDetailTabs} from './EmployeeDetailTabs';

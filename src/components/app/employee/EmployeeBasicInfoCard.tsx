@@ -9,14 +9,11 @@ import {
   Text,
   Badge,
   Tooltip,
-  Modal,
-  Image,
-  Code,
-  CopyButton,
 } from '@mantine/core';
-import {IconEdit, IconMail, IconCopy, IconCheck} from '@tabler/icons-react';
+import {IconEdit, IconQrcode} from '@tabler/icons-react';
 import {useDisclosure} from '@mantine/hooks';
 import {useState, useEffect} from 'react';
+import {EmployeeMagicLinkModal} from './EmployeeMagicLinkModal';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAction} from '@/hooks/useAction';
 import type {Employee} from '@/services/hr/employee';
@@ -65,7 +62,6 @@ export function EmployeeBasicInfoCard({
         throw new Error('No user ID available');
       }
 
-      console.log('employee.userId', employee.userId, employee);
       const link = await userService.getLoginMagicLink(
         employee.userId,
         clientCode,
@@ -85,7 +81,7 @@ export function EmployeeBasicInfoCard({
               {employee.userId ? (
                 <Tooltip label={t('employee.getMagicLink')}>
                   <Button
-                    leftSection={<IconMail size={16} />}
+                    leftSection={<IconQrcode size={16} />}
                     variant="subtle"
                     onClick={() => handleGetMagicLink()}
                   >
@@ -177,50 +173,13 @@ export function EmployeeBasicInfoCard({
         </Stack>
       </Card>
 
-      {/* Magic Link Modal */}
-      <Modal
-        centered
+      <EmployeeMagicLinkModal
         opened={opened}
-        title={
-          <Title order={3}>
-            {t('employee.magicLinkTitle', {name: renderFullName(employee)})}
-          </Title>
-        }
+        employee={employee}
+        magicLink={magicLink}
+        qrCodeData={qrCodeData}
         onClose={close}
-      >
-        <Stack gap="md" align="center">
-          <Text size="sm" c="dimmed" ta="center">
-            {t('employee.magicLinkDescription')}
-          </Text>
-
-          {qrCodeData ? (
-            <Image src={qrCodeData} alt={t('employee.magicLinkQrAlt')} />
-          ) : null}
-
-          <Stack gap="xs" w="100%">
-            <Text size="xs" c="dimmed">
-              {t('employee.magicLinkUrl')}
-            </Text>
-            <Code block>{magicLink}</Code>
-
-            <CopyButton value={magicLink}>
-              {({copied, copy}) => (
-                <Button
-                  fullWidth
-                  leftSection={
-                    copied ? <IconCheck size={16} /> : <IconCopy size={16} />
-                  }
-                  color={copied ? 'green' : 'blue'}
-                  variant="light"
-                  onClick={copy}
-                >
-                  {copied ? t('common.copied') : t('employee.copyMagicLink')}
-                </Button>
-              )}
-            </CopyButton>
-          </Stack>
-        </Stack>
-      </Modal>
+      />
     </>
   );
 }

@@ -11,6 +11,8 @@ import {AuthHeader} from '@/components/auth';
 import {ROUTERS} from '@/config/routeConfig';
 import {authService} from '@/services/auth';
 
+const MAGIC_LINK_STORAGE_KEY = 'magicLinkParams';
+
 export function MagicLinkLoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -20,24 +22,52 @@ export function MagicLinkLoginPage() {
   const [error, setError] = useState<string | undefined>(undefined);
   const {t} = useTranslation();
 
-  // Extract token and client code from URL query params
-  const token = searchParams.get('token');
-  const clientCode = searchParams.get('clientCode');
-
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Handle URL params and redirect to clean URL
+  useEffect(() => {
+    if (!mounted) {
+      return;
+    }
+
+    // Extract token and client code from URL query params
+    const tokenFromUrl = searchParams.get('token');
+    const clientCodeFromUrl = searchParams.get('clientCode');
+
+    if (tokenFromUrl && clientCodeFromUrl) {
+      // Store params in sessionStorage and redirect to clean URL
+      sessionStorage.setItem(
+        MAGIC_LINK_STORAGE_KEY,
+        JSON.stringify({
+          token: tokenFromUrl,
+          clientCode: clientCodeFromUrl,
+        }),
+      );
+      // Redirect to clean URL (remove query params)
+      navigate(ROUTERS.MAGIC_LINK, {replace: true});
+    }
+  }, [mounted, searchParams, navigate]);
+
   const verifyMagicLink = useAction({
     options: {
-      successTitle: t('notifications.loginSuccess'),
-      successMessage: t('notifications.magicLinkSuccess'),
-      errorTitle: t('notifications.loginFailed'),
-      errorMessage: t('auth.magicLink.verificationFailed'),
       navigateTo: ROUTERS.HOME,
       delay: 1000,
     },
     async actionHandler() {
+      // Get stored params from sessionStorage
+      const storedParams = sessionStorage.getItem(MAGIC_LINK_STORAGE_KEY);
+      if (!storedParams) {
+        setError(t('auth.magicLink.invalidLink'));
+        throw new Error(t('auth.magicLink.invalidLink'));
+      }
+
+      const {token, clientCode} = JSON.parse(storedParams) as {
+        token: string;
+        clientCode: string;
+      };
+
       // Validate required parameters
       if (!token || !clientCode) {
         setError(t('auth.magicLink.invalidLink'));
@@ -47,31 +77,47 @@ export function MagicLinkLoginPage() {
       setIsLoading(true);
       const {user} = await authService.loginWithMagicToken(clientCode, token);
 
+      // Clear stored params after successful verification
+      sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
+
       setUser(user);
       setError(undefined);
     },
     errorHandler(error) {
       console.error('Magic link verification failed:', error);
       setError(t('auth.magicLink.verificationFailed'));
+      // Clear stored params on error
+      sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
     },
     cleanupHandler() {
       setIsLoading(false);
     },
   });
 
+  // Trigger verification after redirect to clean URL
   useEffect(() => {
     if (!mounted) {
       return;
     }
 
-    // Only verify if we have the required parameters
-    if (token && clientCode) {
+    // Check if we have params in URL (means we haven't redirected yet)
+    const hasUrlParams =
+      searchParams.has('token') || searchParams.has('clientCode');
+    if (hasUrlParams) {
+      // Wait for redirect to happen
+      return;
+    }
+
+    // Check if we have stored params (means we've redirected to clean URL)
+    const storedParams = sessionStorage.getItem(MAGIC_LINK_STORAGE_KEY);
+    if (storedParams) {
       void verifyMagicLink();
     } else {
+      // No params found anywhere - show error
       setError(t('auth.magicLink.invalidLink'));
       setIsLoading(false);
     }
-  }, [mounted, token, clientCode, verifyMagicLink, t]);
+  }, [mounted, searchParams, verifyMagicLink, t]);
 
   const handleRetryLogin = () => {
     navigate(ROUTERS.LOGIN);
@@ -83,7 +129,7 @@ export function MagicLinkLoginPage() {
         <AuthHeader title={t('auth.magicLink.title')} />
         <Space h="lg" />
 
-        <Stack gap="lg" align="center">
+        <Stack gap="sm" align="center" p={0}>
           {isLoading ? (
             <Text size="md" ta="center">
               {t('auth.magicLink.verifying')}
@@ -105,8 +151,9 @@ export function MagicLinkLoginPage() {
           {!isLoading && error ? (
             <>
               <Alert
+                w="100%"
+                mb="xl"
                 icon={<IconX size={20} />}
-                title={t('common.error')}
                 color="red"
                 variant="light"
               >

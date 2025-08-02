@@ -5,8 +5,8 @@ import {useNavigate} from 'react-router';
 type UseActionOptions = {
   readonly successTitle?: string;
   readonly successMessage?: string;
-  readonly errorTitle: string;
-  readonly errorMessage: string;
+  readonly errorTitle?: string;
+  readonly errorMessage?: string;
   readonly navigateTo?: string;
   readonly delay?: number;
 };

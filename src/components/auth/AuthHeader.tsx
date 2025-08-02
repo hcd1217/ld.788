@@ -6,7 +6,7 @@ type AuthHeaderProps = {
 };
 
 export function AuthHeader({title: pageTitle = 'Credo'}: AuthHeaderProps) {
-  const {logoUrl, title} = useLogoAndTitle();
+  const {logoUrl, title} = useLogoAndTitle({color: true});
   return (
     <Group justify="center" gap="md" mb="lg">
       <img
