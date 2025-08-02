@@ -7,7 +7,6 @@ import {
   Divider,
   Grid,
   Text,
-  Badge,
   Tooltip,
 } from '@mantine/core';
 import {IconEdit, IconQrcode} from '@tabler/icons-react';
@@ -21,6 +20,8 @@ import {renderFullName, formatDate, salaryFormat} from '@/utils/string';
 import {userService} from '@/services/user/user';
 import {generateQRCodeWithLogo} from '@/utils/qr';
 import {useClientCode} from '@/hooks/useClientCode';
+import { StatusBadge } from './StatusBadge';
+import { WorkTypeBadge } from './WorkTypeBadge';
 
 type EmployeeBasicInfoCardProps = {
   readonly employee: Employee;
@@ -136,15 +137,7 @@ export function EmployeeBasicInfoCard({
                 <Text c="dimmed" size="sm">
                   {t('employee.status')}
                 </Text>
-                <Badge
-                  color={employee.isActive ? 'green' : 'gray'}
-                  variant="light"
-                  size="lg"
-                >
-                  {employee.isActive
-                    ? t('employee.active')
-                    : t('employee.inactive')}
-                </Badge>
+                <StatusBadge isActive={employee.isActive} />
               </Stack>
             </Grid.Col>
 
@@ -176,12 +169,7 @@ export function EmployeeBasicInfoCard({
                   <Text c="dimmed" size="sm">
                     {t('employee.workType')}
                   </Text>
-                  <Badge variant="outline" color="blue">
-                    {employee.workType === 'FULL_TIME'
-                      ? t('employee.fullTime')
-                      : t('employee.partTime')
-                    }
-                  </Badge>
+                  <WorkTypeBadge workType={employee.workType} />
                 </Stack>
               </Grid.Col>
             ) : null}

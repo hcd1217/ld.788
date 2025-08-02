@@ -297,7 +297,11 @@
     "startDate": "Start Date",
     "endDate": "End Date",
     "monthlySalary": "Monthly Salary",
-    "hourlyRate": "Hourly Rate"
+    "hourlyRate": "Hourly Rate",
+    "endingSoon": "Ending Soon",
+    "endedButActive": "Ended but Active",
+    "endingSoonMessage": "This employee's contract will end soon. Please review renewal or transition plans.",
+    "endedButActiveMessage": "This employee's contract has ended but they are still marked as active. Please review their status."
   },
   "auth": {
     "title": "Credo",

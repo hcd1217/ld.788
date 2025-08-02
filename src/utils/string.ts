@@ -22,10 +22,10 @@ export function formatPhoneNumber(phoneNumber: string) {
 
 export function formatDate(date: string | Date) {
   if (date instanceof Date) {
-    return date.toLocaleDateString();
+    return date.toLocaleDateString('vi-VN');
   }
 
-  return new Date(date).toLocaleDateString();
+  return new Date(date).toLocaleDateString('vi-VN');
 }
 
 export function convertCamelCaseToText(text: string) {

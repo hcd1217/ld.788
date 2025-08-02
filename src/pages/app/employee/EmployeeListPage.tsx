@@ -1,5 +1,5 @@
-import {useState} from 'react';
-import {useNavigate} from 'react-router';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import {
   Stack,
   Group,
@@ -10,11 +10,11 @@ import {
   Badge,
   Button,
 } from '@mantine/core';
-import {IconUser, IconFilter} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useClientSidePagination} from '@/hooks/useClientSidePagination';
-import {useOnce} from '@/hooks/useOnce';
-import type {Employee} from '@/services/hr/employee';
+import { IconUser, IconFilter } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useClientSidePagination } from '@/hooks/useClientSidePagination';
+import { useOnce } from '@/hooks/useOnce';
+import type { Employee } from '@/services/hr/employee';
 import {
   useEmployeeList,
   useHrLoading,
@@ -38,8 +38,8 @@ import {
   EmployeeGridCard,
 } from '@/components/app/employee';
 import useIsDesktop from '@/hooks/useIsDesktop';
-import {ROUTERS} from '@/config/routeConfig';
-import {useMobileDrawer} from '@/hooks/useMobileDrawer';
+import { ROUTERS } from '@/config/routeConfig';
+import { useMobileDrawer } from '@/hooks/useMobileDrawer';
 
 interface EmployeeFilters {
   searchQuery: string;
@@ -50,12 +50,12 @@ interface EmployeeFilters {
 export function EmployeeListPage() {
   const navigate = useNavigate();
   const isDesktop = useIsDesktop();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const employees = useEmployeeList();
   const units = useUnitList();
   const isLoading = useHrLoading();
   const error = useHrError();
-  const {refreshEmployees, clearError, loadUnits} = useHrActions();
+  const { refreshEmployees, clearError, loadUnits } = useHrActions();
   const [filters, setFilters] = useState<EmployeeFilters>({
     searchQuery: '',
     unitId: undefined,
@@ -147,25 +147,25 @@ export function EmployeeListPage() {
               placeholder={t('employee.searchPlaceholder')}
               searchQuery={filters.searchQuery}
               setSearchQuery={(query) => {
-                setFilters({...filters, searchQuery: query});
+                setFilters({ ...filters, searchQuery: query });
               }}
             />
             <Select
               clearable
               searchable
               placeholder={t('employee.selectUnit')}
-              data={[{value: '', label: t('employee.allUnit')}, ...unitOptions]}
+              data={[{ value: '', label: t('employee.allUnit') }, ...unitOptions]}
               value={filters.unitId || ''}
               onChange={(value) => {
-                setFilters({...filters, unitId: value || undefined});
+                setFilters({ ...filters, unitId: value || undefined });
               }}
             />
             <SegmentedControl
               value={filters.status}
               data={[
-                {label: t('employee.all'), value: 'all'},
-                {label: t('employee.active'), value: 'active'},
-                {label: t('employee.inactive'), value: 'inactive'},
+                { label: t('employee.all'), value: 'all' },
+                { label: t('employee.active'), value: 'active' },
+                { label: t('employee.inactive'), value: 'inactive' },
               ]}
               onChange={(value) => {
                 setFilters({
@@ -228,18 +228,18 @@ export function EmployeeListPage() {
           placeholder={t('employee.searchPlaceholder')}
           searchQuery={filters.searchQuery}
           setSearchQuery={(query) => {
-            setFilters({...filters, searchQuery: query});
+            setFilters({ ...filters, searchQuery: query });
           }}
         />
         <Select
           clearable
           searchable
           placeholder={t('employee.selectUnit')}
-          data={[{value: '', label: t('employee.allUnit')}, ...unitOptions]}
+          data={[{ value: '', label: t('employee.allUnit') }, ...unitOptions]}
           value={filters.unitId || ''}
-          style={{flex: 1, maxWidth: 300}}
+          style={{ flex: 1, maxWidth: 300 }}
           onChange={(value) => {
-            setFilters({...filters, unitId: value || undefined});
+            setFilters({ ...filters, unitId: value || undefined });
           }}
         />
         {/* Filter Controls */}
@@ -247,9 +247,9 @@ export function EmployeeListPage() {
           <SegmentedControl
             value={filters.status}
             data={[
-              {label: t('employee.all'), value: 'all'},
-              {label: t('employee.active'), value: 'active'},
-              {label: t('employee.inactive'), value: 'inactive'},
+              { label: t('employee.all'), value: 'all' },
+              { label: t('employee.active'), value: 'active' },
+              { label: t('employee.inactive'), value: 'inactive' },
             ]}
             onChange={(value) => {
               setFilters({
@@ -280,9 +280,9 @@ export function EmployeeListPage() {
             filters.searchQuery
               ? undefined
               : {
-                  label: t('employee.createFirstEmployee'),
-                  onClick: () => navigate(ROUTERS.EMPLOYEES_ADD),
-                }
+                label: t('employee.createFirstEmployee'),
+                onClick: () => navigate(ROUTERS.EMPLOYEES_ADD),
+              }
           }
         />
 
@@ -292,7 +292,7 @@ export function EmployeeListPage() {
             {viewMode === 'table' ? (
               <EmployeeDataTable noAction employees={paginatedEmployees} />
             ) : (
-              <SimpleGrid cols={{base: 1, md: 2, lg: 3}} spacing="lg">
+              <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
                 {paginatedEmployees.map((employee) => (
                   <EmployeeGridCard key={employee.id} employee={employee} />
                 ))}
@@ -316,7 +316,7 @@ export function EmployeeListPage() {
 
 // Employee filter function
 function employeeFilterFn(employee: Employee, filters: EmployeeFilters) {
-  const {searchQuery, unitId, status} = filters;
+  const { searchQuery, unitId, status } = filters;
 
   // Status filter
   if (status !== 'all') {

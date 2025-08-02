@@ -6,6 +6,7 @@ import type {Employee} from '@/services/hr/employee';
 import {ActiveBadge} from '@/components/common';
 import {renderFullName} from '@/utils/string';
 import {getEmployeeDetailRoute} from '@/config/routeConfig';
+import {getEndDateHighlightStyles} from '@/utils/time';
 
 type EmployeeCardProps = {
   readonly employee: Employee;
@@ -41,6 +42,7 @@ export function EmployeeCard({
   };
 
   const fullName = renderFullName(employee);
+  const highlightStyles = getEndDateHighlightStyles(employee.endDate, employee.isActive);
 
   return (
     <Card
@@ -48,7 +50,11 @@ export function EmployeeCard({
       shadow="sm"
       padding="md"
       radius="md"
-      style={{cursor: 'pointer', ...style}}
+      style={{
+        cursor: 'pointer',
+        ...highlightStyles,
+        ...style,
+      }}
       className={className}
       aria-label={t('employee.employeeCard', {
         name: fullName,

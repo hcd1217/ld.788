@@ -261,6 +261,10 @@ const firstNames: Array<[string, 'F' | 'M']> = [
   ['Đức Việt', 'M'],
 ];
 
+export function shuffleArray<T>(arr: T[]) {
+  return arr.sort(() => Math.random() - 0.5);
+}
+
 export function randomElement<T>(arr: T[]) {
   return arr[Math.floor(Math.random() * arr.length)];
 }

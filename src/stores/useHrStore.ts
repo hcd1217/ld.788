@@ -55,18 +55,16 @@ export const useHrStore = create<HrState>()(
       },
 
       async loadUnits() {
-        set({isLoading: true, error: undefined});
+        set({error: undefined});
         try {
           const units = await unitService.getUnits();
 
           set({
             units,
             unitMap: new Map(units.map((unit) => [unit.id, unit])),
-            isLoading: false,
           });
         } catch (error) {
           set({
-            isLoading: false,
             error: getErrorMessage(error, 'Failed to load units'),
           });
         }

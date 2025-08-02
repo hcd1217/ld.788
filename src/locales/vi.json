@@ -295,7 +295,11 @@
     "startDate": "Ngày Bắt Đầu",
     "endDate": "Ngày Kết Thúc",
     "monthlySalary": "Lương Tháng",
-    "hourlyRate": "Lương Theo Giờ"
+    "hourlyRate": "Lương Theo Giờ",
+    "endingSoon": "Sắp Kết Thúc",
+    "endedButActive": "Đã Kết Thúc Nhưng Vẫn Hoạt Động",
+    "endingSoonMessage": "Hợp đồng của nhân viên này sẽ kết thúc sớm. Vui lòng xem xét kế hoạch gia hạn hoặc chuyển tiếp.",
+    "endedButActiveMessage": "Hợp đồng của nhân viên này đã kết thúc nhưng vẫn được đánh dấu là hoạt động. Vui lòng xem xét trạng thái của họ."
   },
   "auth": {
     "title": "Credo",

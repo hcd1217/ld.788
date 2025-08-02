@@ -1,8 +1,11 @@
-import {unitService} from './unit';
-import {positionService} from './position';
-import {hrApi} from '@/lib/api';
-import {renderFullName} from '@/utils/string';
-type WorkType = 'FULL_TIME' | 'PART_TIME';
+import { unitService } from './unit';
+import { positionService } from './position';
+import { hrApi } from '@/lib/api';
+import { renderFullName } from '@/utils/string';
+import { shuffleArray } from '@/utils/fake';
+
+export type WorkType = 'FULL_TIME' | 'PART_TIME';
+
 export type Employee = {
   id: string;
   userId?: string;
@@ -30,10 +33,10 @@ export type Employee = {
   positionId?: string;
   position?: string;
   metadata?:
-    | {
-        position?: string;
-      }
-    | undefined;
+  | {
+    position?: string;
+  }
+  | undefined;
 };
 
 export const employeeService = {
@@ -65,13 +68,38 @@ export const employeeService = {
     const unitMap = new Map(units.map((u) => [u.id, u.name]));
     const positions = await positionService.getPositions();
     const positionMap = new Map(positions.map((p) => [p.id, p.title]));
-    return employees.map((employee) => {
+    const endDateStatus = [
+      'normal',
+      'normal',
+      ...shuffleArray([
+        'ended',
+        'ended',
+        'end-soon',
+        ...Array.from({
+          length: employees.length - 4
+        }).map(() => 'normal')
+      ]),
+    ]
+    return employees.map((employee, idx) => {
       const position = positionMap.get(employee.positionId ?? '');
       const fullName = renderFullName(employee);
       const fullNameWithPosition = position
         ? `${fullName} (${position})`
         : undefined;
       const workType = Math.random() > 0.5 ? "FULL_TIME" : "PART_TIME"
+      let endDate: Date | undefined =  undefined
+      switch (endDateStatus[idx]) {
+        case 'normal':
+          break;
+        case 'ended':
+          endDate = new Date('2025-06-15')
+          break;
+        case 'end-soon':
+          endDate = new Date('2025-08-27')
+          break;
+        default:
+          break;
+      }
       return {
         ...employee,
         fullName,
@@ -82,11 +110,10 @@ export const employeeService = {
         // email?: string;
         phone: `0901-${Math.floor(Math.random() * 1e3)}-${Math.floor(Math.random() * 1e3)}`,
         workType,
-        monthlySalary: workType === "FULL_TIME" ?  12000000 : undefined,
+        monthlySalary: workType === "FULL_TIME" ? 12000000 : undefined,
         hourlyRate: workType === "FULL_TIME" ? undefined : 25000,
-        // hourlyRate?: number;
-        startDate: new Date('2020-12-07'),
-        // endDate?: ;
+        startDate: new Date('2020-12-23'),
+        endDate,
       };
     });
   },

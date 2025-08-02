@@ -10,5 +10,6 @@ export {EmployeeDangerZone} from './EmployeeDangerZone';
 export {ComingSoonCard} from '@/components/common/ui/ComingSoonCard';
 export {EmployeeDetailTabs} from './EmployeeDetailTabs';
 export {EmployeeDetailAccordion} from './EmployeeDetailAccordion';
+export {EmployeeDetailAlert} from './EmployeeDetailAlert';
 export {SingleEmployeeForm} from './SingleEmployeeForm';
 export {BulkImportForm} from './BulkImportForm';
