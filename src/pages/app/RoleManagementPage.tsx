@@ -29,7 +29,6 @@ import {
 import {useForm} from '@mantine/form';
 import {useDisclosure} from '@mantine/hooks';
 import {modals} from '@mantine/modals';
-import {notifications} from '@mantine/notifications';
 import {
   IconPlus,
   IconEdit,
@@ -42,6 +41,10 @@ import {
   IconTag,
   IconUsers,
 } from '@tabler/icons-react';
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {clientService} from '@/services/client';
@@ -125,12 +128,7 @@ export function RoleManagementPage() {
       const rolesData = await clientService.getAllRoles();
       setRoles(rolesData);
     } catch {
-      notifications.show({
-        title: t('common.error'),
-        message: t('common.loadingFailed'),
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
+      showErrorNotification(t('common.error'), t('common.loadingFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -162,12 +160,10 @@ export function RoleManagementPage() {
 
   const handleDeleteRole = (role: Role) => {
     if (role.isSystem) {
-      notifications.show({
-        title: t('common.error'),
-        message: t('common.cannotDeleteSystemRole'),
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
+      showErrorNotification(
+        t('common.error'),
+        t('common.cannotDeleteSystemRole'),
+      );
       return;
     }
 
@@ -187,19 +183,9 @@ export function RoleManagementPage() {
           setIsLoading(true);
           await clientService.deleteRole(role.id);
           setRoles((prev) => prev.filter((r) => r.id !== role.id));
-          notifications.show({
-            title: t('common.success'),
-            message: t('common.roleDeleted'),
-            color: 'green',
-            icon: <IconTrash size={16} />,
-          });
+          showSuccessNotification(t('common.success'), t('common.roleDeleted'));
         } catch {
-          notifications.show({
-            title: t('common.error'),
-            message: t('common.deleteFailed'),
-            color: 'red',
-            icon: <IconAlertCircle size={16} />,
-          });
+          showErrorNotification(t('common.error'), t('common.deleteFailed'));
         } finally {
           setIsLoading(false);
         }
@@ -222,12 +208,7 @@ export function RoleManagementPage() {
           isSystem: false,
         };
         setRoles((prev) => [...prev, newRole]);
-        notifications.show({
-          title: t('common.success'),
-          message: t('common.roleAdded'),
-          color: 'green',
-          icon: <IconPlus size={16} />,
-        });
+        showSuccessNotification(t('common.success'), t('common.roleAdded'));
       } else if (selectedRole) {
         await clientService.updateRole(selectedRole.id, values);
         setRoles((prev) =>
@@ -243,24 +224,17 @@ export function RoleManagementPage() {
               : r,
           ),
         );
-        notifications.show({
-          title: t('common.success'),
-          message: t('common.roleUpdated'),
-          color: 'green',
-          icon: <IconEdit size={16} />,
-        });
+        showSuccessNotification(t('common.success'), t('common.roleUpdated'));
       }
 
       closeForm();
       form.reset();
     } catch {
       setShowAlert(true);
-      notifications.show({
-        title: t('common.error'),
-        message: isAddMode ? t('common.addFailed') : t('common.updateFailed'),
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
+      showErrorNotification(
+        t('common.error'),
+        isAddMode ? t('common.addFailed') : t('common.updateFailed'),
+      );
     } finally {
       setIsLoading(false);
     }

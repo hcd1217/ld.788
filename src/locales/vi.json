@@ -286,7 +286,16 @@
     "magicLinkDescription": "Quét mã QR hoặc sử dụng liên kết bên dưới để đăng nhập",
     "magicLinkQrAlt": "Mã QR đăng nhập",
     "magicLinkUrl": "Liên kết đăng nhập:",
-    "copyMagicLink": "Sao chép liên kết"
+    "copyMagicLink": "Sao chép liên kết",
+    "email": "Email",
+    "phone": "Số Điện Thoại",
+    "workType": "Loại Hình Công Việc",
+    "fullTime": "Toàn Thời Gian",
+    "partTime": "Bán Thời Gian",
+    "startDate": "Ngày Bắt Đầu",
+    "endDate": "Ngày Kết Thúc",
+    "monthlySalary": "Lương Tháng",
+    "hourlyRate": "Lương Theo Giờ"
   },
   "auth": {
     "title": "Credo",

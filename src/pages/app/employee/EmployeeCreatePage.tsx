@@ -3,15 +3,13 @@ import {useNavigate} from 'react-router';
 import * as XLSX from 'xlsx';
 import {Container, rem, Group} from '@mantine/core';
 import {useForm} from '@mantine/form';
-import {notifications} from '@mantine/notifications';
-import {
-  IconFileSpreadsheet,
-  IconUser,
-  IconDownload,
-  IconCheck,
-  IconX,
-} from '@tabler/icons-react';
+import {IconFileSpreadsheet, IconUser} from '@tabler/icons-react';
 import {type TFunction} from 'i18next';
+import {
+  showErrorNotification,
+  showSuccessNotification,
+  showInfoNotification,
+} from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
 import useIsDesktop from '@/hooks/useIsDesktop';
 import {getFormValidators} from '@/utils/validation';
@@ -164,12 +162,10 @@ export function EmployeeCreatePage() {
     },
     async actionHandler() {
       setIsDownloading(true);
-      notifications.show({
-        title: t('common.downloading'),
-        message: t('employee.creatingSampleFile'),
-        color: 'blue',
-        icon: <IconDownload size={16} />,
-      });
+      showInfoNotification(
+        t('common.downloading'),
+        t('employee.creatingSampleFile'),
+      );
       await new Promise((resolve) => {
         setTimeout(resolve, 1000);
       });
@@ -195,12 +191,10 @@ export function EmployeeCreatePage() {
       setFile(selectedFile);
       setImportResult(undefined);
     } else {
-      notifications.show({
-        title: t('auth.invalidFileType'),
-        message: t('employee.pleaseSelectExcelFile'),
-        color: 'red',
-        icon: <IconX size={16} />,
-      });
+      showErrorNotification(
+        t('auth.invalidFileType'),
+        t('employee.pleaseSelectExcelFile'),
+      );
     }
   };
 
@@ -242,15 +236,13 @@ export function EmployeeCreatePage() {
 
       setImportResult(result);
 
-      notifications.show({
-        title: t('auth.importSuccess'),
-        message: t('employee.importedEmployees', {
+      showSuccessNotification(
+        t('auth.importSuccess'),
+        t('employee.importedEmployees', {
           success: result.summary.success,
           total: result.summary.total,
         }),
-        color: 'green',
-        icon: <IconCheck size={16} />,
-      });
+      );
     },
     errorHandler(error) {
       const errorMessage =

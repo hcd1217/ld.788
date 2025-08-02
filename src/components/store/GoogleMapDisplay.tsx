@@ -1,3 +1,4 @@
+/* global google */
 import {Box, Text, Alert} from '@mantine/core';
 import {IconAlertCircle} from '@tabler/icons-react';
 import {GoogleMap, useLoadScript, Marker} from '@react-google-maps/api';

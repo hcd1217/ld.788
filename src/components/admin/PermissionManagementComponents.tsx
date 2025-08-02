@@ -24,7 +24,7 @@ import {
   IconCode,
   IconTag,
 } from '@tabler/icons-react';
-import {useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {formatDate} from '@/utils/string';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';

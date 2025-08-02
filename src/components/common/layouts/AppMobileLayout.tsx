@@ -1,3 +1,4 @@
+import React from 'react';
 import {AppShell, Group, LoadingOverlay} from '@mantine/core';
 import {CommonMobileHeader, CommonMobileFooter} from '../ui';
 import {AppLogo, GoBack} from '../navigation';

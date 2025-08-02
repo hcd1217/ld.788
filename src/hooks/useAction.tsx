@@ -1,6 +1,8 @@
-import {notifications} from '@mantine/notifications';
-import {IconAlertCircle, IconCheck} from '@tabler/icons-react';
 import {useNavigate} from 'react-router';
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 
 type UseActionOptions = {
   readonly successTitle?: string;
@@ -30,12 +32,7 @@ export function useAction<T extends Record<string, unknown>>({
       await actionHandler(values);
 
       if (options.successTitle) {
-        notifications.show({
-          title: options.successTitle,
-          message: options.successMessage,
-          color: 'green',
-          icon: <IconCheck size={16} />,
-        });
+        showSuccessNotification(options.successTitle, options.successMessage);
       }
 
       // Navigate after successful action
@@ -49,13 +46,10 @@ export function useAction<T extends Record<string, unknown>>({
       errorHandler?.(error);
 
       if (options.errorTitle) {
-        notifications.show({
-          title: options.errorTitle,
-          message:
-            error instanceof Error ? error.message : options.errorMessage,
-          color: 'red',
-          icon: <IconAlertCircle size={16} />,
-        });
+        showErrorNotification(
+          options.errorTitle,
+          error instanceof Error ? error.message : options.errorMessage,
+        );
       }
     } finally {
       cleanupHandler?.();

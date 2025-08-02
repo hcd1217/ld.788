@@ -142,7 +142,6 @@ export function EmployeeListPage() {
           onExpandedChange={setDrawerExpanded}
         >
           <Stack gap="md">
-            {paginationState.totalPages}
             <SearchBar
               hidden={paginationState.totalPages < 2}
               placeholder={t('employee.searchPlaceholder')}

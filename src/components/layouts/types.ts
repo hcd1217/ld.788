@@ -1,3 +1,5 @@
+import type React from 'react';
+
 export interface NavigationItem {
   id: string; // Made required and must be string for consistency
   label: string;

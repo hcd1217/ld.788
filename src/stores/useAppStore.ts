@@ -84,7 +84,7 @@ export const useAppStore = create<AppState>()(
         clientCode,
         user: authService.getCurrentUser() ?? undefined,
         userProfile: undefined,
-        isAuthenticated: true,
+        isAuthenticated: Boolean(authService.getCurrentUser()),
         adminAuthenticated: isAdminAuthenticated(),
         isLoading: false,
         adminApiLoading: false,
@@ -122,7 +122,10 @@ export const useAppStore = create<AppState>()(
             }
           } catch (error) {
             console.error('Failed to fetch user profile:', error);
-            get().logout();
+            // Only logout if we're not in the middle of a login process
+            if (!get().isLoading) {
+              get().logout();
+            }
           }
         },
         setTheme: (theme) => set({theme}),

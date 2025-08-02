@@ -13,7 +13,6 @@ import {
   Text,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
-import {notifications} from '@mantine/notifications';
 import {
   IconCheck,
   IconAlertTriangle,
@@ -22,7 +21,10 @@ import {
   IconCalendar,
   IconShield,
 } from '@tabler/icons-react';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useStaffActions, useStaffStore} from '@/stores/useStaffStore';
 import {useCurrentStore} from '@/stores/useStoreConfigStore';
@@ -45,7 +47,6 @@ export function EditStaffPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [staff, setStaff] = useState<Staff | undefined>(undefined);
-  const isDarkMode = useIsDarkMode();
 
   const currentStore = useCurrentStore();
   const {updateStaff, loadStaff} = useStaffActions();
@@ -208,12 +209,10 @@ export function EditStaffPage() {
         const staffData = staffList.find((s) => s.id === staffId);
 
         if (!staffData) {
-          notifications.show({
-            title: 'Staff Not Found',
-            message: 'The requested staff member could not be found.',
-            color: 'red',
-            icon: <IconAlertTriangle size={16} />,
-          });
+          showErrorNotification(
+            'Staff Not Found',
+            'The requested staff member could not be found.',
+          );
           navigate(ROUTERS.STAFF);
           return;
         }
@@ -241,12 +240,7 @@ export function EditStaffPage() {
         const errorMessage =
           error instanceof Error ? error.message : t('staff.loadFailed');
 
-        notifications.show({
-          title: 'Load Failed',
-          message: errorMessage,
-          color: 'red',
-          icon: <IconAlertTriangle size={16} />,
-        });
+        showErrorNotification('Load Failed', errorMessage);
 
         navigate(ROUTERS.STAFF);
       } finally {
@@ -315,12 +309,10 @@ export function EditStaffPage() {
       if (!currentStore) throw new Error('No store selected');
       const updatedStaff = await updateStaff(currentStore.id, staffId, values);
 
-      notifications.show({
-        title: 'Staff Updated',
-        message: `${updatedStaff.fullName} has been updated successfully`,
-        color: isDarkMode ? 'green.7' : 'green.9',
-        icon: <IconCheck size={16} />,
-      });
+      showSuccessNotification(
+        'Staff Updated',
+        `${updatedStaff.fullName} has been updated successfully`,
+      );
 
       navigate(ROUTERS.STAFF);
     } catch (error) {
@@ -329,12 +321,7 @@ export function EditStaffPage() {
           ? error.message
           : 'Failed to update staff member';
 
-      notifications.show({
-        title: 'Update Failed',
-        message: errorMessage,
-        color: 'red',
-        icon: <IconAlertTriangle size={16} />,
-      });
+      showErrorNotification('Update Failed', errorMessage);
     } finally {
       setIsSubmitting(false);
     }

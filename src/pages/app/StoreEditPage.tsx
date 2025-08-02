@@ -12,9 +12,11 @@ import {
   Transition,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
-import {notifications} from '@mantine/notifications';
-import {IconAlertCircle, IconCheck, IconEdit} from '@tabler/icons-react';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import {IconAlertCircle, IconEdit} from '@tabler/icons-react';
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
   useStoreActions,
@@ -75,7 +77,6 @@ export function StoreEditPage() {
   );
   const [isPageLoading, setIsPageLoading] = useState(true);
   const {t} = useTranslation();
-  const isDarkMode = useIsDarkMode();
 
   const stores = useStores();
   const isLoading = useStoreLoading();
@@ -177,12 +178,10 @@ export function StoreEditPage() {
         const store = stores.find((s) => s.id === storeId);
 
         if (!store) {
-          notifications.show({
-            title: t('store.storeNotFound'),
-            message: t('store.storeNotFoundMessage'),
-            color: 'red',
-            icon: <IconAlertCircle size={16} />,
-          });
+          showErrorNotification(
+            t('store.storeNotFound'),
+            t('store.storeNotFoundMessage'),
+          );
           navigate(ROUTERS.STORES);
           return;
         }
@@ -221,12 +220,7 @@ export function StoreEditPage() {
             ? error.message
             : t('errors.failedToLoadStore');
 
-        notifications.show({
-          title: t('store.loadFailed'),
-          message: errorMessage,
-          color: 'red',
-          icon: <IconAlertCircle size={16} />,
-        });
+        showErrorNotification(t('store.loadFailed'), errorMessage);
 
         navigate(ROUTERS.STORES);
       } finally {
@@ -272,12 +266,10 @@ export function StoreEditPage() {
       const operatingHours = convertToApiFormat(values.operatingHours);
       await updateOperatingHours(currentStore.id, operatingHours);
 
-      notifications.show({
-        title: t('store.storeUpdated'),
-        message: t('store.storeUpdatedMessage', {name: values.name}),
-        color: isDarkMode ? 'green.7' : 'green.9',
-        icon: <IconCheck size={16} />,
-      });
+      showSuccessNotification(
+        t('store.storeUpdated'),
+        t('store.storeUpdatedMessage', {name: values.name}),
+      );
 
       // Navigate back to store list
       navigate(ROUTERS.STORES);
@@ -289,12 +281,7 @@ export function StoreEditPage() {
 
       setShowAlert(true);
 
-      notifications.show({
-        title: t('store.storeUpdateFailed'),
-        message: errorMessage,
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
+      showErrorNotification(t('store.storeUpdateFailed'), errorMessage);
     }
   };
 

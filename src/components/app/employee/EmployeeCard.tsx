@@ -69,6 +69,16 @@ export function EmployeeCard({
               {t('employee.unit')}: {employee.unit ?? '-'}
             </Text>
           ) : null}
+          {employee.email ? (
+            <Text size="xs" c="dimmed">
+              {t('employee.email')}: {employee.email}
+            </Text>
+          ) : null}
+          {employee.phone ? (
+            <Text size="xs" c="dimmed">
+              {t('employee.phone')}: {employee.phone}
+            </Text>
+          ) : null}
         </Box>
         {noActions ? null : (
           <EmployeeActions

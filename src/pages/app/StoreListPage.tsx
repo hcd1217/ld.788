@@ -19,15 +19,17 @@ import {
   Select,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
-import {notifications} from '@mantine/notifications';
 import {
   IconPlus,
   IconBuildingStore,
   IconAlertTriangle,
-  IconCheck,
   IconSearch,
 } from '@tabler/icons-react';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import {
+  showErrorNotification,
+  showSuccessNotification,
+  showInfoNotification,
+} from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
   useStores,
@@ -52,7 +54,6 @@ export function StoreListPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState('12');
   const {t} = useTranslation();
-  const isDarkMode = useIsDarkMode();
 
   const stores = useStores();
   const currentStore = useCurrentStore();
@@ -118,12 +119,10 @@ export function StoreListPage() {
     try {
       await deleteStore(storeToDelete.id);
 
-      notifications.show({
-        title: t('store.storeDeleted'),
-        message: t('store.storeDeletedMessage', {name: storeToDelete.name}),
-        color: isDarkMode ? 'green.7' : 'green.9',
-        icon: <IconCheck size={16} />,
-      });
+      showSuccessNotification(
+        t('store.storeDeleted'),
+        t('store.storeDeletedMessage', {name: storeToDelete.name}),
+      );
 
       closeDeleteModal();
       setStoreToDelete(undefined);
@@ -133,12 +132,7 @@ export function StoreListPage() {
           ? error.message
           : t('errors.failedToDeleteStore');
 
-      notifications.show({
-        title: t('store.storeDeleteFailed'),
-        message: errorMessage,
-        color: 'red',
-        icon: <IconAlertTriangle size={16} />,
-      });
+      showErrorNotification(t('store.storeDeleteFailed'), errorMessage);
     }
   };
 
@@ -148,12 +142,10 @@ export function StoreListPage() {
     }
 
     setCurrentStore(store);
-    notifications.show({
-      title: t('store.storeSelected'),
-      message: t('store.storeSelectedMessage', {name: store.name}),
-      color: isDarkMode ? 'blue.7' : 'blue.9',
-      icon: <IconBuildingStore size={16} />,
-    });
+    showInfoNotification(
+      t('store.storeSelected'),
+      t('store.storeSelectedMessage', {name: store.name}),
+    );
   };
 
   const handleEditStore = (store: Store) => {

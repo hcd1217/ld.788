@@ -76,10 +76,20 @@ export default function registerGlobalErrorCatcher(): () => void {
       error: event.error as Error | undefined,
     };
 
-    const errorType: ErrorType = 'error';
-    const message = details.error
+    // Filter out known benign errors
+    const errorMessage = details.error
       ? extractErrorMessage(details.error)
       : details.message;
+    
+    // Ignore ResizeObserver errors - these are benign and occur when ResizeObserver
+    // can't deliver all notifications within a single animation frame
+    if (errorMessage.includes('ResizeObserver loop completed with undelivered notifications') ||
+        errorMessage.includes('ResizeObserver loop limit exceeded')) {
+      return;
+    }
+
+    const errorType: ErrorType = 'error';
+    const message = errorMessage;
     const stack = details.error ? extractErrorStack(details.error) : undefined;
     const source = createErrorSource(
       details.filename,

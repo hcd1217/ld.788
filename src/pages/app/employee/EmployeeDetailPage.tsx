@@ -18,7 +18,7 @@ import {
   EmployeeDetailAccordion,
 } from '@/components/app/employee';
 import type {Employee} from '@/services/hr/employee';
-import {getEmployeeDetailRoute} from '@/config/routeConfig';
+import {getEmployeeEditRoute} from '@/config/routeConfig';
 import {useOnce} from '@/hooks/useOnce';
 import {useAction} from '@/hooks/useAction';
 
@@ -51,7 +51,7 @@ export function EmployeeDetailPage() {
 
   const handleEdit = () => {
     if (employee) {
-      navigate(getEmployeeDetailRoute(employee.id));
+      navigate(getEmployeeEditRoute(employee.id));
     }
   };
 

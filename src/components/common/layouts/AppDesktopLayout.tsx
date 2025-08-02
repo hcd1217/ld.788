@@ -1,3 +1,4 @@
+import React from 'react';
 import {Container, LoadingOverlay, Stack} from '@mantine/core';
 import {ErrorAlert} from '../feedback';
 

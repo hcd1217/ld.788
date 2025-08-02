@@ -37,7 +37,11 @@ import {
   IconSettings,
   IconList,
 } from '@tabler/icons-react';
-import {notifications} from '@mantine/notifications';
+import {
+  showErrorNotification,
+  showInfoNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {
   useErrorStore,
   type ErrorRecord,
@@ -125,19 +129,12 @@ function ErrorDetails({error}: {readonly error: ErrorRecord}) {
     try {
       await navigator.clipboard.writeText(JSON.stringify(details, null, 2));
       setCopied(true);
-      notifications.show({
-        message: 'Error details copied to clipboard',
-        color: 'green',
-        icon: <IconCheck size={16} />,
-      });
+      showSuccessNotification('Success', 'Error details copied to clipboard');
       setTimeout(() => {
         setCopied(false);
       }, 2000);
     } catch {
-      notifications.show({
-        message: 'Failed to copy error details',
-        color: 'red',
-      });
+      showErrorNotification('Error', 'Failed to copy error details');
     }
   };
 
@@ -343,10 +340,7 @@ export function ErrorModal({
 
   const handleClearAll = () => {
     clearErrors();
-    notifications.show({
-      message: 'All errors cleared',
-      color: 'blue',
-    });
+    showInfoNotification('Info', 'All errors cleared');
     setOpened(false);
   };
 
@@ -380,11 +374,7 @@ export function ErrorModal({
     link.remove();
     URL.revokeObjectURL(url);
 
-    notifications.show({
-      message: 'Error log exported successfully',
-      color: 'green',
-      icon: <IconCheck size={16} />,
-    });
+    showSuccessNotification('Success', 'Error log exported successfully');
   };
 
   const handleCopyErrors = async () => {
@@ -400,16 +390,9 @@ export function ErrorModal({
 
     try {
       await navigator.clipboard.writeText(JSON.stringify(exportData, null, 2));
-      notifications.show({
-        message: 'Error log copied to clipboard',
-        color: 'green',
-        icon: <IconCheck size={16} />,
-      });
+      showSuccessNotification('Success', 'Error log copied to clipboard');
     } catch {
-      notifications.show({
-        message: 'Failed to copy error log',
-        color: 'red',
-      });
+      showErrorNotification('Error', 'Failed to copy error log');
     }
   };
 

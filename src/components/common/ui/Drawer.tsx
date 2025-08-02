@@ -4,7 +4,7 @@ import {
   rem,
   type DrawerProps as MantineDrawerProps,
 } from '@mantine/core';
-import {type ReactNode, useRef, useCallback, useState, useEffect} from 'react';
+import React, {type ReactNode, useRef, useCallback, useState, useEffect} from 'react';
 
 type DrawerProps = MantineDrawerProps & {
   readonly position?: 'bottom' | 'left' | 'right' | 'top';
@@ -135,16 +135,13 @@ export function Drawer({
                 paddingBottom: 80,
                 height: expanded ? 'calc(90vh - 60px)' : 'calc(50vh - 60px)',
                 overflowY: 'hidden',
-                transition: isDragging
-                  ? 'none'
-                  : 'height 0.3s cubic-bezier(0.22, 0.61, 0.36, 1)',
+                transitionProperty: isDragging ? 'none' : 'height',
+                transitionDuration: isDragging ? '0s' : '0.3s',
+                transitionTimingFunction: isDragging ? undefined : 'cubic-bezier(0.22, 0.61, 0.36, 1)',
               },
               content: {
                 borderTopLeftRadius: rem(16),
                 borderTopRightRadius: rem(16),
-                transition: isDragging
-                  ? 'none'
-                  : 'all 0.3s cubic-bezier(0.22, 0.61, 0.36, 1)',
                 overflow: 'hidden',
                 boxShadow: isDragging
                   ? '0 -4px 20px rgba(0, 0, 0, 0.15)'

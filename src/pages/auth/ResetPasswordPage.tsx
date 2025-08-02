@@ -2,8 +2,8 @@ import {useState, useEffect} from 'react';
 import {useNavigate, useSearchParams} from 'react-router';
 import {Stack, Text, Space, Button, PasswordInput} from '@mantine/core';
 import {useForm} from '@mantine/form';
-import {notifications} from '@mantine/notifications';
 import {IconAlertCircle, IconCheck} from '@tabler/icons-react';
+import {showErrorNotification} from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAuthForm} from '@/hooks/useAuthForm';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
@@ -32,12 +32,10 @@ export function ResetPasswordPage() {
     // Validate that we have both email and token
     if (!email || !token) {
       setIsValidToken(false);
-      notifications.show({
-        title: t('auth.invalidResetLink'),
-        message: t('auth.invalidResetLinkDescription'),
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
+      showErrorNotification(
+        t('auth.invalidResetLink'),
+        t('auth.invalidResetLinkDescription'),
+      );
     }
   }, [email, token, t]);
 

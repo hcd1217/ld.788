@@ -13,9 +13,11 @@ import {
   Box,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
-import {notifications} from '@mantine/notifications';
-import {IconAlertCircle, IconCheck} from '@tabler/icons-react';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import {IconAlertCircle} from '@tabler/icons-react';
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
   useStoreActions,
@@ -71,7 +73,6 @@ export function StoreConfigPage() {
   const navigate = useNavigate();
   const [showAlert, setShowAlert] = useState(false);
   const {t} = useTranslation();
-  const isDarkMode = useIsDarkMode();
 
   const currentStore = useCurrentStore();
   const isLoading = useStoreLoading();
@@ -177,12 +178,10 @@ export function StoreConfigPage() {
 
       const newStore = await createStore(storeData);
 
-      notifications.show({
-        title: t('store.storeCreated'),
-        message: t('store.storeCreatedMessage', {name: newStore.name}),
-        color: isDarkMode ? 'green.7' : 'green.9',
-        icon: <IconCheck size={16} />,
-      });
+      showSuccessNotification(
+        t('store.storeCreated'),
+        t('store.storeCreatedMessage', {name: newStore.name}),
+      );
 
       // Reset form for creating another store
       form.reset();
@@ -197,12 +196,7 @@ export function StoreConfigPage() {
 
       setShowAlert(true);
 
-      notifications.show({
-        title: t('store.storeCreationFailed'),
-        message: errorMessage,
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
+      showErrorNotification(t('store.storeCreationFailed'), errorMessage);
     }
   };
 

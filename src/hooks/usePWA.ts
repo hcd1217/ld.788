@@ -1,6 +1,7 @@
 import {useRegisterSW} from 'virtual:pwa-register/react';
 import {useEffect} from 'react';
 import {notifications} from '@mantine/notifications';
+import {showSuccessNotification} from '@/utils/notifications';
 
 export function usePWA() {
   const {
@@ -18,16 +19,16 @@ export function usePWA() {
 
   useEffect(() => {
     if (offlineReady) {
-      notifications.show({
-        title: 'Ready to work offline',
-        message: 'Credo App is now available offline!',
-        color: 'green',
-      });
+      showSuccessNotification(
+        'Ready to work offline',
+        'Credo App is now available offline!',
+      );
     }
   }, [offlineReady]);
 
   useEffect(() => {
     if (needRefresh) {
+      // For PWA update, we need to use the native API directly for onClick support
       notifications.show({
         id: 'pwa-update',
         title: 'New version available',

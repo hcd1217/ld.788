@@ -1,3 +1,4 @@
+import React from 'react';
 import {useNavigate} from 'react-router';
 import {
   Container,
@@ -13,19 +14,17 @@ import {
   Text,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
-import {notifications} from '@mantine/notifications';
 import {
   IconAlertCircle,
-  IconCheck,
   IconBuilding,
   IconMail,
   IconUser,
   IconLock,
 } from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useClientActions} from '@/stores/useClientStore';
 import {GoBack} from '@/components/common';
+import {showSuccessNotification} from '@/utils/notifications';
 import {getFormValidators} from '@/utils/validation';
 import type {RegisterClientRequest} from '@/lib/api';
 import {isDevelopment} from '@/utils/env';
@@ -47,7 +46,6 @@ function fakeClient() {
 export function ClientCreatePage() {
   const navigate = useNavigate();
   const {t} = useTranslation();
-  const isDarkMode = useIsDarkMode();
 
   const {createClient} = useClientActions();
 
@@ -130,14 +128,12 @@ export function ClientCreatePage() {
   const handleSubmit = async (values: RegisterClientRequest) => {
     await createClient(values);
 
-    notifications.show({
-      title: t('admin.clients.clientCreated'),
-      message: t('admin.clients.clientCreatedMessage', {
+    showSuccessNotification(
+      t('admin.clients.clientCreated'),
+      t('admin.clients.clientCreatedMessage', {
         name: values.clientName,
       }),
-      color: isDarkMode ? 'green.7' : 'green.9',
-      icon: <IconCheck size={16} />,
-    });
+    );
 
     navigate(ROUTERS.ADMIN_CLIENTS);
   };

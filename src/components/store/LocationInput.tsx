@@ -1,4 +1,5 @@
-import {useState, useRef, useEffect} from 'react';
+/* global google */
+import React, {type ReactNode, useState, useRef, useEffect} from 'react';
 import {TextInput, Loader, Text} from '@mantine/core';
 import {IconMapPin} from '@tabler/icons-react';
 import {useLoadScript} from '@react-google-maps/api';
@@ -10,7 +11,7 @@ type LocationInputProps = {
   readonly label?: string;
   readonly placeholder?: string;
   readonly value: string;
-  readonly error?: string | React.ReactNode;
+  readonly error?: string | ReactNode;
   readonly disabled?: boolean;
   readonly onLocationSelect: (
     location: {lat: number; lng: number},
@@ -33,7 +34,8 @@ export function LocationInput({
   const {t} = useTranslation();
   const [inputValue, setInputValue] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | undefined>(
+   
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(
     null,
   );
 
@@ -53,6 +55,7 @@ export function LocationInput({
   useEffect(() => {
     if (isLoaded && inputRef.current && !autocompleteRef.current) {
       // Initialize autocomplete
+       
       autocompleteRef.current = new google.maps.places.Autocomplete(
         inputRef.current,
         {
@@ -82,6 +85,7 @@ export function LocationInput({
 
     return () => {
       if (autocompleteRef.current) {
+         
         google.maps.event.clearInstanceListeners(autocompleteRef.current);
       }
     };

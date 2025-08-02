@@ -46,10 +46,6 @@ const EmployeeCreatePage = lazy(async () => {
   return {default: module.EmployeeCreatePage};
 });
 
-const EditEmployeePage = lazy(async () => {
-  const module = await import('@/pages/app/employee/EditEmployeePage');
-  return {default: module.EditEmployeePage};
-});
 const EmployeeDetailPage = lazy(async () => {
   const module = await import('@/pages/app/employee/EmployeeDetailPage');
   return {default: module.EmployeeDetailPage};
@@ -235,6 +231,7 @@ const routeObjects: RouteObject[] = [
       </ProtectedRoute>
     ),
     children: [
+      {path: ROUTERS.HOME, Component: HomePage},
       {path: ROUTERS.EMPLOYEE_MANAGEMENT, Component: EmployeeListPage},
       {path: ROUTERS.EMPLOYEE_DETAIL, Component: EmployeeDetailPage},
       {path: ROUTERS.EMPLOYEE_EDIT, Component: BlankPage},
@@ -258,7 +255,6 @@ const routeObjects: RouteObject[] = [
       </ProtectedRoute>
     ),
     children: [
-      {path: ROUTERS.HOME, Component: HomePage},
       {path: ROUTERS.PROFILE, Component: ProfilePage},
       {path: ROUTERS.ADD_USER, Component: AddUserPage},
       {path: ROUTERS.EXPLORE, Component: ExplorePage},
@@ -280,8 +276,6 @@ const routeObjects: RouteObject[] = [
             path: '',
             Component: PCOnlyLayout,
             children: [
-              // {path: 'employees/add', Component: EmployeeCreatePage},
-              {path: ROUTERS.EMPLOYEE_EDIT, Component: EditEmployeePage},
               {path: ROUTERS.IMPORT_USERS, Component: ImportUsersPage},
               {path: ROUTERS.ROLE_MANAGEMENT, Component: RoleManagementPage},
               {path: ROUTERS.STORE_CONFIG, Component: StoreConfigPage},

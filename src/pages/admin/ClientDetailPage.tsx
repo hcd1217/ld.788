@@ -12,24 +12,23 @@ import {
   Tabs,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
-import {notifications} from '@mantine/notifications';
 import {
   IconAlertCircle,
-  IconBan,
-  IconTrash,
-  IconCheck,
-  IconAlertTriangle,
   IconInfoCircle,
   IconLock,
   IconFlag,
   IconUsers,
 } from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {useClientDetail} from '@/hooks/useClientDetail';
 import {useClientActions} from '@/stores/useClientStore';
 import {GoBack} from '@/components/common';
 import {TabErrorBoundary} from '@/components/admin/TabErrorBoundary';
+import {
+  showErrorNotification,
+  showInfoNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {
   ClientBasicInfo,
   RootUserInfo,
@@ -45,7 +44,6 @@ export function ClientDetailPage() {
   const {clientCode} = useParams<{clientCode: string}>();
   const navigate = useNavigate();
   const {t} = useTranslation();
-  const isDarkMode = useIsDarkMode();
   const {client, isLoading, error, reload} = useClientDetail(clientCode);
   const [deleteConfirmCode, setDeleteConfirmCode] = useState('');
   const [deleteReason, setDeleteReason] = useState('');
@@ -84,26 +82,22 @@ export function ClientDetailPage() {
       switch (actionType) {
         case 'suspend': {
           if (!suspendReason.trim()) {
-            notifications.show({
-              title: t('validation.error'),
-              message: t('admin.clients.validation.suspendReasonRequired'),
-              color: 'red',
-              icon: <IconAlertCircle size={16} />,
-            });
+            showErrorNotification(
+              t('validation.error'),
+              t('admin.clients.validation.suspendReasonRequired'),
+            );
             return;
           }
 
           await suspendClient(clientCode, suspendReason);
           await reload(false);
 
-          notifications.show({
-            title: t('admin.clients.clientSuspended'),
-            message: t('admin.clients.clientSuspendedMessage', {
+          showInfoNotification(
+            t('admin.clients.clientSuspended'),
+            t('admin.clients.clientSuspendedMessage', {
               name: client.clientName,
             }),
-            color: isDarkMode ? 'yellow.7' : 'yellow.9',
-            icon: <IconBan size={16} />,
-          });
+          );
 
           break;
         }
@@ -112,49 +106,41 @@ export function ClientDetailPage() {
           await reactivateClient(clientCode);
           await reload(false);
 
-          notifications.show({
-            title: t('admin.clients.clientActivated'),
-            message: t('admin.clients.clientActivatedMessage', {
+          showSuccessNotification(
+            t('admin.clients.clientActivated'),
+            t('admin.clients.clientActivatedMessage', {
               name: client.clientName,
             }),
-            color: isDarkMode ? 'green.7' : 'green.9',
-            icon: <IconCheck size={16} />,
-          });
+          );
 
           break;
         }
 
         case 'delete': {
           if (deleteConfirmCode !== clientCode) {
-            notifications.show({
-              title: t('validation.error'),
-              message: t('admin.clients.validation.confirmCodeMismatch'),
-              color: 'red',
-              icon: <IconAlertCircle size={16} />,
-            });
+            showErrorNotification(
+              t('validation.error'),
+              t('admin.clients.validation.confirmCodeMismatch'),
+            );
             return;
           }
 
           if (!deleteReason.trim()) {
-            notifications.show({
-              title: t('validation.error'),
-              message: t('admin.clients.validation.deleteReasonRequired'),
-              color: 'red',
-              icon: <IconAlertCircle size={16} />,
-            });
+            showErrorNotification(
+              t('validation.error'),
+              t('admin.clients.validation.deleteReasonRequired'),
+            );
             return;
           }
 
           await hardDeleteClient(clientCode, deleteConfirmCode, deleteReason);
 
-          notifications.show({
-            title: t('admin.clients.clientDeleted'),
-            message: t('admin.clients.clientDeletedMessage', {
+          showErrorNotification(
+            t('admin.clients.clientDeleted'),
+            t('admin.clients.clientDeletedMessage', {
               name: client.clientName,
             }),
-            color: 'red',
-            icon: <IconTrash size={16} />,
-          });
+          );
 
           navigate(ROUTERS.ADMIN_CLIENTS);
 
@@ -170,12 +156,7 @@ export function ClientDetailPage() {
         error instanceof Error
           ? error.message
           : t('errors.failedToUpdateClient');
-      notifications.show({
-        title: t('admin.clients.updateFailed'),
-        message: errorMessage,
-        color: 'red',
-        icon: <IconAlertTriangle size={16} />,
-      });
+      showErrorNotification(t('admin.clients.updateFailed'), errorMessage);
     }
   };
 

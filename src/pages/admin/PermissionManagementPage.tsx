@@ -13,15 +13,7 @@ import {
   Paper,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
-import {notifications} from '@mantine/notifications';
-import {
-  IconPlus,
-  IconCheck,
-  IconTrash,
-  IconSearch,
-  IconShieldCheck,
-} from '@tabler/icons-react';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import {IconPlus, IconSearch, IconShieldCheck} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
   usePermissions,
@@ -29,6 +21,11 @@ import {
   usePermissionActions,
 } from '@/stores/usePermissionStore';
 import {ErrorAlert, GoBack} from '@/components/common';
+import {
+  showErrorNotification,
+  showInfoNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {
   PermissionTable,
   CreatePermissionModal,
@@ -50,7 +47,6 @@ export function PermissionManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const {t} = useTranslation();
-  const isDarkMode = useIsDarkMode();
 
   const allPermissions = usePermissions();
   const error = usePermissionError();
@@ -110,12 +106,10 @@ export function PermissionManagementPage() {
     description: string;
   }) => {
     await createPermission(data);
-    notifications.show({
-      title: t('admin.permissions.permissionCreated'),
-      message: t('admin.permissions.permissionCreatedMessage'),
-      color: isDarkMode ? 'green.7' : 'green.9',
-      icon: <IconCheck size={16} />,
-    });
+    showSuccessNotification(
+      t('admin.permissions.permissionCreated'),
+      t('admin.permissions.permissionCreatedMessage'),
+    );
   };
 
   const handleEditPermission = (permission: AdminPermission) => {
@@ -125,12 +119,10 @@ export function PermissionManagementPage() {
 
   const handleUpdatePermission = async (id: string, description: string) => {
     await updatePermission(id, {description});
-    notifications.show({
-      title: t('admin.permissions.permissionUpdated'),
-      message: t('admin.permissions.permissionUpdatedMessage'),
-      color: isDarkMode ? 'blue.7' : 'blue.9',
-      icon: <IconCheck size={16} />,
-    });
+    showInfoNotification(
+      t('admin.permissions.permissionUpdated'),
+      t('admin.permissions.permissionUpdatedMessage'),
+    );
   };
 
   const handleDeletePermission = (permission: AdminPermission) => {
@@ -140,12 +132,10 @@ export function PermissionManagementPage() {
 
   const handleConfirmDelete = async (id: string) => {
     await deletePermission(id);
-    notifications.show({
-      title: t('admin.permissions.permissionDeleted'),
-      message: t('admin.permissions.permissionDeletedMessage'),
-      color: 'red',
-      icon: <IconTrash size={16} />,
-    });
+    showErrorNotification(
+      t('admin.permissions.permissionDeleted'),
+      t('admin.permissions.permissionDeletedMessage'),
+    );
   };
 
   const handleSearch = (value: string) => {

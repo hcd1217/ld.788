@@ -15,13 +15,11 @@ import {
   Card,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
-import {notifications} from '@mantine/notifications';
+import {IconAlertCircle, IconFileSpreadsheet} from '@tabler/icons-react';
 import {
-  IconAlertCircle,
-  IconUserPlus,
-  IconFileSpreadsheet,
-} from '@tabler/icons-react';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+  showErrorNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
   getFormValidators,
@@ -50,7 +48,6 @@ export function AddUserPage() {
   const [showAlert, setShowAlert] = useState(false);
   const {t} = useTranslation();
   const {user} = useAppStore();
-  const isDarkMode = useIsDarkMode();
 
   const form = useForm<AddUserFormValues>({
     initialValues: isDevelopment
@@ -110,12 +107,10 @@ export function AddUserPage() {
         lastName: values.lastName,
       });
 
-      notifications.show({
-        title: t('auth.userAdded'),
-        message: `User ${values.email} added successfully`,
-        color: isDarkMode ? 'green.7' : 'green.9',
-        icon: <IconUserPlus size={16} />,
-      });
+      showSuccessNotification(
+        t('auth.userAdded'),
+        `User ${values.email} added successfully`,
+      );
 
       // Reset form
       form.reset();
@@ -133,12 +128,7 @@ export function AddUserPage() {
 
       setShowAlert(true);
 
-      notifications.show({
-        title: t('auth.addUserFailed'),
-        message: errorMessage,
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
+      showErrorNotification(t('auth.addUserFailed'), errorMessage);
     } finally {
       setIsLoading(false);
     }

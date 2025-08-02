@@ -17,7 +17,7 @@ import {EmployeeMagicLinkModal} from './EmployeeMagicLinkModal';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAction} from '@/hooks/useAction';
 import type {Employee} from '@/services/hr/employee';
-import {renderFullName, formatDate} from '@/utils/string';
+import {renderFullName, formatDate, salaryFormat} from '@/utils/string';
 import {userService} from '@/services/user/user';
 import {generateQRCodeWithLogo} from '@/utils/qr';
 import {useClientCode} from '@/hooks/useClientCode';
@@ -147,6 +147,96 @@ export function EmployeeBasicInfoCard({
                 </Badge>
               </Stack>
             </Grid.Col>
+
+            {employee.email ? (
+              <Grid.Col span={{base: 6}}>
+                <Stack gap="xs">
+                  <Text c="dimmed" size="sm">
+                    {t('employee.email')}
+                  </Text>
+                  <Text fw={500}>{employee.email}</Text>
+                </Stack>
+              </Grid.Col>
+            ) : null}
+
+            {employee.phone ? (
+              <Grid.Col span={{base: 6}}>
+                <Stack gap="xs">
+                  <Text c="dimmed" size="sm">
+                    {t('employee.phone')}
+                  </Text>
+                  <Text fw={500}>{employee.phone}</Text>
+                </Stack>
+              </Grid.Col>
+            ) : null}
+
+            {employee.workType ? (
+              <Grid.Col span={{base: 6}}>
+                <Stack gap="xs">
+                  <Text c="dimmed" size="sm">
+                    {t('employee.workType')}
+                  </Text>
+                  <Badge variant="outline" color="blue">
+                    {employee.workType === 'FULL_TIME'
+                      ? t('employee.fullTime')
+                      : t('employee.partTime')
+                    }
+                  </Badge>
+                </Stack>
+              </Grid.Col>
+            ) : null}
+
+            {employee.startDate ? (
+              <Grid.Col span={{base: 6}}>
+                <Stack gap="xs">
+                  <Text c="dimmed" size="sm">
+                    {t('employee.startDate')}
+                  </Text>
+                  <Text fw={500}>
+                    {formatDate(employee.startDate.toString())}
+                  </Text>
+                </Stack>
+              </Grid.Col>
+            ) : null}
+
+            {employee.endDate ? (
+              <Grid.Col span={{base: 6}}>
+                <Stack gap="xs">
+                  <Text c="dimmed" size="sm">
+                    {t('employee.endDate')}
+                  </Text>
+                  <Text fw={500}>
+                    {formatDate(employee.endDate.toString())}
+                  </Text>
+                </Stack>
+              </Grid.Col>
+            ) : null}
+
+            {employee.monthlySalary ? (
+              <Grid.Col span={{base: 6}}>
+                <Stack gap="xs">
+                  <Text c="dimmed" size="sm">
+                    {t('employee.monthlySalary')}
+                  </Text>
+                  <Text fw={500}>
+                    {salaryFormat(employee.monthlySalary)}
+                  </Text>
+                </Stack>
+              </Grid.Col>
+            ) : null}
+
+            {employee.hourlyRate ? (
+              <Grid.Col span={{base: 6}}>
+                <Stack gap="xs">
+                  <Text c="dimmed" size="sm">
+                    {t('employee.hourlyRate')}
+                  </Text>
+                  <Text fw={500}>
+                    {salaryFormat(employee.hourlyRate)}
+                  </Text>
+                </Stack>
+              </Grid.Col>
+            ) : null}
 
             <Grid.Col span={{base: 6}} visibleFrom="sm">
               <Stack gap="xs">

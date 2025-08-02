@@ -40,6 +40,16 @@ export function EmployeeGridCard({employee}: EmployeeGridCardProps) {
                 {t('employee.unit')}: {employee.unit ?? '-'}
               </Text>
             ) : null}
+            {employee.email ? (
+              <Text size="sm" c="dimmed">
+                {t('employee.email')}: {employee.email}
+              </Text>
+            ) : null}
+            {employee.phone ? (
+              <Text size="sm" c="dimmed">
+                {t('employee.phone')}: {employee.phone}
+              </Text>
+            ) : null}
           </div>
           <Badge color={employee.isActive ? 'green' : 'gray'} variant="light">
             {employee.isActive ? t('employee.active') : t('employee.inactive')}

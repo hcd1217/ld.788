@@ -1,4 +1,4 @@
-import {useState, useRef} from 'react';
+import React, {useState, useRef} from 'react';
 import * as XLSX from 'xlsx';
 import {Navigate} from 'react-router';
 import {
@@ -17,16 +17,18 @@ import {
   Divider,
   Progress,
 } from '@mantine/core';
-import {notifications} from '@mantine/notifications';
 import {
-  IconAlertCircle,
   IconFileSpreadsheet,
   IconDownload,
   IconUpload,
   IconCheck,
-  IconX,
   IconUsers,
 } from '@tabler/icons-react';
+import {
+  showErrorNotification,
+  showInfoNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {GoBack} from '@/components/common';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
@@ -90,12 +92,10 @@ export function ImportUsersPage() {
     if (excelFile) {
       setFile(excelFile);
     } else if (droppedFiles.length > 0) {
-      notifications.show({
-        title: t('auth.invalidFileType'),
-        message: 'Please select a CSV or Excel file',
-        color: 'red',
-        icon: <IconX size={16} />,
-      });
+      showErrorNotification(
+        t('auth.invalidFileType'),
+        'Please select a CSV or Excel file',
+      );
     }
   };
 
@@ -151,12 +151,10 @@ export function ImportUsersPage() {
     try {
       setIsDownloading(true);
 
-      notifications.show({
-        title: t('auth.downloadingSample'),
-        message: 'Creating sample file...',
-        color: 'blue',
-        icon: <IconDownload size={16} />,
-      });
+      showInfoNotification(
+        t('auth.downloadingSample'),
+        'Creating sample file...',
+      );
 
       // Simulate download delay
       await new Promise((resolve) => {
@@ -165,19 +163,15 @@ export function ImportUsersPage() {
 
       generateSampleExcel();
 
-      notifications.show({
-        title: 'Download Complete',
-        message: 'Sample Excel file downloaded successfully',
-        color: 'green',
-        icon: <IconCheck size={16} />,
-      });
+      showSuccessNotification(
+        'Download Complete',
+        'Sample Excel file downloaded successfully',
+      );
     } catch {
-      notifications.show({
-        title: 'Download Failed',
-        message: 'Failed to download sample file',
-        color: 'red',
-        icon: <IconX size={16} />,
-      });
+      showErrorNotification(
+        'Download Failed',
+        'Failed to download sample file',
+      );
     } finally {
       setIsDownloading(false);
     }
@@ -297,23 +291,19 @@ export function ImportUsersPage() {
 
   const handleFileUpload = async () => {
     if (!file) {
-      notifications.show({
-        title: t('auth.noFileSelected'),
-        message: 'Please select a file first',
-        color: 'red',
-        icon: <IconX size={16} />,
-      });
+      showErrorNotification(
+        t('auth.noFileSelected'),
+        'Please select a file first',
+      );
       return;
     }
 
     // Validate file type
     if (!validateFileType(file)) {
-      notifications.show({
-        title: t('auth.invalidFileType'),
-        message: 'Please select a CSV or Excel file',
-        color: 'red',
-        icon: <IconX size={16} />,
-      });
+      showErrorNotification(
+        t('auth.invalidFileType'),
+        'Please select a CSV or Excel file',
+      );
       return;
     }
 
@@ -336,22 +326,17 @@ export function ImportUsersPage() {
         details: result,
       });
 
-      notifications.show({
-        title: t('auth.importSuccess'),
-        message: `Imported ${result.summary.success} out of ${result.summary.total} users`,
-        color: result.summary.failed > 0 ? 'yellow' : 'green',
-        icon: <IconCheck size={16} />,
-      });
+      const notificationMessage = `Imported ${result.summary.success} out of ${result.summary.total} users`;
+      if (result.summary.failed > 0) {
+        showInfoNotification(t('auth.importSuccess'), notificationMessage);
+      } else {
+        showSuccessNotification(t('auth.importSuccess'), notificationMessage);
+      }
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : t('auth.importFailed');
 
-      notifications.show({
-        title: t('auth.importFailed'),
-        message: errorMessage,
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
+      showErrorNotification(t('auth.importFailed'), errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -488,12 +473,10 @@ export function ImportUsersPage() {
                       if (selectedFile && validateFileType(selectedFile)) {
                         setFile(selectedFile);
                       } else if (selectedFile) {
-                        notifications.show({
-                          title: t('auth.invalidFileType'),
-                          message: 'Please select a CSV or Excel file',
-                          color: 'red',
-                          icon: <IconX size={16} />,
-                        });
+                        showErrorNotification(
+                          t('auth.invalidFileType'),
+                          'Please select a CSV or Excel file',
+                        );
                       }
                     }}
                   />

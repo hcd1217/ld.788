@@ -259,13 +259,16 @@ const NavigationSubItem = memo(
 
 NavigationSubItem.displayName = 'NavigationSubItem';
 
+// Stable empty object reference to avoid infinite loops
+const EMPTY_ROUTE_CONFIG = {};
+
 export function NavBar() {
   const navigate = useNavigate();
   const location = useLocation();
 
   // Use selector to only subscribe to routeConfig changes
   const routeConfig = useAppStore(
-    (state) => state.userProfile?.routeConfig || {},
+    (state) => state.userProfile?.routeConfig || EMPTY_ROUTE_CONFIG,
   );
 
   const {t} = useTranslation();

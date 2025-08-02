@@ -1,8 +1,11 @@
 import {Button, type ButtonProps} from '@mantine/core';
 import {IconDownload} from '@tabler/icons-react';
-import {notifications} from '@mantine/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
 import {exportToCSV, type ExportColumn} from '@/utils/export';
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 
 interface ExportButtonProps<T> extends Omit<ButtonProps, 'onClick'> {
   readonly data: readonly T[];
@@ -24,19 +27,14 @@ export function ExportButton<T extends Record<string, unknown>>({
   const handleExport = () => {
     try {
       exportToCSV(data, columns, filename);
-      notifications.show({
-        title: t('common.success'),
-        message: t('common.exportSuccess', {count: data.length}),
-        color: 'green',
-      });
+      showSuccessNotification(
+        t('common.success'),
+        t('common.exportSuccess', {count: data.length}),
+      );
       onExport?.();
     } catch (error) {
       console.error('Export failed:', error);
-      notifications.show({
-        title: t('common.error'),
-        message: t('common.exportFailed'),
-        color: 'red',
-      });
+      showErrorNotification(t('common.error'), t('common.exportFailed'));
     }
   };
 

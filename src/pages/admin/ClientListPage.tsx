@@ -11,16 +11,7 @@ import {
   SimpleGrid,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
-import {notifications} from '@mantine/notifications';
-import {
-  IconPlus,
-  IconUsers,
-  IconAlertTriangle,
-  IconCheck,
-  IconBan,
-  IconTrash,
-} from '@tabler/icons-react';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import {IconPlus, IconUsers} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
   useClients,
@@ -28,6 +19,11 @@ import {
   useClientActions,
 } from '@/stores/useClientStore';
 import {ErrorAlert, GoBack} from '@/components/common';
+import {
+  showErrorNotification,
+  showInfoNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {
   ClientCard,
   ClientActionModal,
@@ -47,7 +43,6 @@ export function ClientListPage() {
   const [deleteReason, setDeleteReason] = useState('');
   const [suspendReason, setSuspendReason] = useState('');
   const {t} = useTranslation();
-  const isDarkMode = useIsDarkMode();
 
   const clients = useClients();
   const error = useClientError();
@@ -93,60 +88,50 @@ export function ClientListPage() {
     switch (actionType) {
       case 'suspend': {
         if (!suspendReason.trim()) {
-          notifications.show({
-            title: t('validation.error'),
-            message: t('admin.clients.validation.suspendReasonRequired'),
-            color: 'red',
-            icon: <IconAlertTriangle size={16} />,
-          });
+          showErrorNotification(
+            t('validation.error'),
+            t('admin.clients.validation.suspendReasonRequired'),
+          );
           return;
         }
 
         await suspendClient(selectedClient.clientCode, suspendReason);
-        notifications.show({
-          title: t('admin.clients.clientSuspended'),
-          message: t('admin.clients.clientSuspendedMessage', {
+        showInfoNotification(
+          t('admin.clients.clientSuspended'),
+          t('admin.clients.clientSuspendedMessage', {
             name: selectedClient.clientName,
           }),
-          color: isDarkMode ? 'yellow.7' : 'yellow.9',
-          icon: <IconBan size={16} />,
-        });
+        );
 
         break;
       }
 
       case 'reactivate': {
         await reactivateClient(selectedClient.clientCode);
-        notifications.show({
-          title: t('admin.clients.clientActivated'),
-          message: t('admin.clients.clientActivatedMessage', {
+        showSuccessNotification(
+          t('admin.clients.clientActivated'),
+          t('admin.clients.clientActivatedMessage', {
             name: selectedClient.clientName,
           }),
-          color: isDarkMode ? 'green.7' : 'green.9',
-          icon: <IconCheck size={16} />,
-        });
+        );
 
         break;
       }
 
       case 'delete': {
         if (deleteConfirmCode !== selectedClient.clientCode) {
-          notifications.show({
-            title: t('validation.error'),
-            message: t('admin.clients.validation.confirmCodeMismatch'),
-            color: 'red',
-            icon: <IconAlertTriangle size={16} />,
-          });
+          showErrorNotification(
+            t('validation.error'),
+            t('admin.clients.validation.confirmCodeMismatch'),
+          );
           return;
         }
 
         if (!deleteReason.trim()) {
-          notifications.show({
-            title: t('validation.error'),
-            message: t('admin.clients.validation.deleteReasonRequired'),
-            color: 'red',
-            icon: <IconAlertTriangle size={16} />,
-          });
+          showErrorNotification(
+            t('validation.error'),
+            t('admin.clients.validation.deleteReasonRequired'),
+          );
           return;
         }
 
@@ -155,14 +140,12 @@ export function ClientListPage() {
           deleteConfirmCode,
           deleteReason,
         );
-        notifications.show({
-          title: t('admin.clients.clientDeleted'),
-          message: t('admin.clients.clientDeletedMessage', {
+        showErrorNotification(
+          t('admin.clients.clientDeleted'),
+          t('admin.clients.clientDeletedMessage', {
             name: selectedClient.clientName,
           }),
-          color: 'red',
-          icon: <IconTrash size={16} />,
-        });
+        );
 
         break;
       }

@@ -12,7 +12,6 @@ import {
   Paper,
 } from '@mantine/core';
 import {useForm} from '@mantine/form';
-import {notifications} from '@mantine/notifications';
 import {
   IconCheck,
   IconAlertTriangle,
@@ -22,7 +21,10 @@ import {
   IconShield,
 } from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {useStaffActions} from '@/stores/useStaffStore';
 import {useCurrentStore} from '@/stores/useStoreConfigStore';
 import {GoBack} from '@/components/common';
@@ -41,7 +43,6 @@ export function AddStaffPage() {
   const {t} = useTranslation();
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isDarkMode = useIsDarkMode();
 
   const currentStore = useCurrentStore();
   const {createStaff} = useStaffActions();
@@ -235,12 +236,7 @@ export function AddStaffPage() {
 
   const handleSubmit = async (values: StaffFormData) => {
     if (!currentStore) {
-      notifications.show({
-        title: t('common.error'),
-        message: t('staff.noStoreSelectedError'),
-        color: 'red',
-        icon: <IconAlertTriangle size={16} />,
-      });
+      showErrorNotification(t('common.error'), t('staff.noStoreSelectedError'));
       return;
     }
 
@@ -256,24 +252,17 @@ export function AddStaffPage() {
 
       const newStaff = await createStaff(currentStore.id, finalValues);
 
-      notifications.show({
-        title: t('staff.createSuccess'),
-        message: t('staff.createSuccessMessage', {name: newStaff.fullName}),
-        color: isDarkMode ? 'green.7' : 'green.9',
-        icon: <IconCheck size={16} />,
-      });
+      showSuccessNotification(
+        t('staff.createSuccess'),
+        t('staff.createSuccessMessage', {name: newStaff.fullName}),
+      );
 
       navigate(ROUTERS.STAFF);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : t('staff.createFailedDefault');
 
-      notifications.show({
-        title: t('staff.createFailed'),
-        message: errorMessage,
-        color: 'red',
-        icon: <IconAlertTriangle size={16} />,
-      });
+      showErrorNotification(t('staff.createFailed'), errorMessage);
     } finally {
       setIsSubmitting(false);
     }

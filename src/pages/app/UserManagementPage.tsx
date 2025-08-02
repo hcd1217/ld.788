@@ -23,16 +23,18 @@ import {
 import {useForm} from '@mantine/form';
 import {useDisclosure} from '@mantine/hooks';
 import {modals} from '@mantine/modals';
-import {notifications} from '@mantine/notifications';
 import {
   IconUserPlus,
   IconEye,
   IconEdit,
   IconTrash,
   IconAlertCircle,
-  IconUser,
   IconFileSpreadsheet,
 } from '@tabler/icons-react';
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
 import {
   getFormValidators,
@@ -117,12 +119,7 @@ export function UserManagementPage() {
 
       setUsers(users);
     } catch {
-      notifications.show({
-        title: t('common.error'),
-        message: t('common.loadingFailed'),
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
+      showErrorNotification(t('common.error'), t('common.loadingFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -167,19 +164,9 @@ export function UserManagementPage() {
           // Remove user from local state
           setUsers((prev) => prev.filter((u) => u.id !== user.id));
 
-          notifications.show({
-            title: t('common.success'),
-            message: t('common.userDeleted'),
-            color: 'green',
-            icon: <IconTrash size={16} />,
-          });
+          showSuccessNotification(t('common.success'), t('common.userDeleted'));
         } catch {
-          notifications.show({
-            title: t('common.error'),
-            message: t('common.deleteFailed'),
-            color: 'red',
-            icon: <IconAlertCircle size={16} />,
-          });
+          showErrorNotification(t('common.error'), t('common.deleteFailed'));
         } finally {
           setIsLoading(false);
         }
@@ -209,22 +196,12 @@ export function UserManagementPage() {
         ),
       );
 
-      notifications.show({
-        title: t('common.success'),
-        message: t('common.userUpdated'),
-        color: 'green',
-        icon: <IconUser size={16} />,
-      });
+      showSuccessNotification(t('common.success'), t('common.userUpdated'));
       closeEdit();
       form.reset();
     } catch {
       setShowAlert(true);
-      notifications.show({
-        title: t('common.error'),
-        message: t('common.updateFailed'),
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
+      showErrorNotification(t('common.error'), t('common.updateFailed'));
     } finally {
       setIsLoading(false);
     }

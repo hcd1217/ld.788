@@ -1,7 +1,9 @@
 import {useState} from 'react';
-import {notifications} from '@mantine/notifications';
-import {IconAlertCircle, IconCheck} from '@tabler/icons-react';
 import type {UseFormReturnType} from '@mantine/form';
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 
 type UseAuthFormOptions = {
   readonly onSuccess?: () => void;
@@ -23,7 +25,7 @@ export function useAuthForm<T extends Record<string, unknown>>(
     successTitle = 'Success',
     successMessage = 'Operation completed successfully',
     errorTitle = 'Error',
-    showSuccessNotification = true,
+    showSuccessNotification: shouldShowSuccessNotification = true,
   } = options;
 
   const clearErrors = () => {
@@ -36,13 +38,8 @@ export function useAuthForm<T extends Record<string, unknown>>(
         setIsLoading(true);
         await submitFn(values);
 
-        if (showSuccessNotification) {
-          notifications.show({
-            title: successTitle,
-            message: successMessage,
-            color: 'green',
-            icon: <IconCheck size={16} />,
-          });
+        if (shouldShowSuccessNotification) {
+          showSuccessNotification(successTitle, successMessage);
         }
 
         onSuccess?.();
@@ -58,12 +55,7 @@ export function useAuthForm<T extends Record<string, unknown>>(
 
         setShowAlert(true);
 
-        notifications.show({
-          title: errorTitle,
-          message: errorMessage,
-          color: 'red',
-          icon: <IconAlertCircle size={16} />,
-        });
+        showErrorNotification(errorTitle, errorMessage);
       } finally {
         setIsLoading(false);
       }

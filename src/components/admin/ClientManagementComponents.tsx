@@ -34,7 +34,6 @@ import {
   IconChevronDown,
   IconChevronUp,
 } from '@tabler/icons-react';
-import {notifications} from '@mantine/notifications';
 import {AdminDataTable, type TableColumn} from './AdminDataTable';
 import {
   FilterableAdminDataTable,
@@ -42,6 +41,10 @@ import {
 } from './FilterableAdminDataTable';
 import {ExportButton} from './ExportButton';
 import {TruncatedText} from './TruncatedText';
+import {
+  showSuccessNotification,
+  showErrorNotification,
+} from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
 import {type ExportColumn} from '@/utils/export';
 import {convertCamelCaseToText, formatDate} from '@/utils/string';
@@ -654,19 +657,17 @@ export const ClientFeatureFlagsSection = React.memo(function ({
         });
       }
 
-      notifications.show({
-        title: t('common.success'),
-        message: t('admin.clients.featureFlagUpdated'),
-        color: 'green',
-      });
+      showSuccessNotification(
+        t('common.success'),
+        t('admin.clients.featureFlagUpdated'),
+      );
       onUpdate?.();
     } catch (error) {
       console.log(error);
-      notifications.show({
-        title: t('common.error'),
-        message: t('admin.clients.featureFlagUpdateFailed'),
-        color: 'red',
-      });
+      showErrorNotification(
+        t('common.error'),
+        t('admin.clients.featureFlagUpdateFailed'),
+      );
     } finally {
       setUpdating((prev) => {
         const next = new Set(prev);
@@ -694,19 +695,17 @@ export const ClientFeatureFlagsSection = React.memo(function ({
         description: flag.description,
         rolloutPercentage: flag.rolloutPercentage,
       });
-      notifications.show({
-        title: t('common.success'),
-        message: t('admin.clients.featureFlagValueUpdated'),
-        color: 'green',
-      });
+      showSuccessNotification(
+        t('common.success'),
+        t('admin.clients.featureFlagValueUpdated'),
+      );
       onUpdate?.();
     } catch (error) {
       console.log(error);
-      notifications.show({
-        title: t('common.error'),
-        message: t('admin.clients.featureFlagUpdateFailed'),
-        color: 'red',
-      });
+      showErrorNotification(
+        t('common.error'),
+        t('admin.clients.featureFlagUpdateFailed'),
+      );
     } finally {
       setUpdating((prev) => {
         const next = new Set(prev);

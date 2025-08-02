@@ -17,7 +17,7 @@ export function AuthLayout() {
   const isDesktop = useIsDesktop();
 
   if (!isDesktop) {
-    return null;
+  return <Outlet />;
   }
 
   // Dynamic calculation of main padding based on navbar state

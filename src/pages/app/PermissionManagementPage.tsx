@@ -25,7 +25,6 @@ import {
 import {useForm} from '@mantine/form';
 import {useDisclosure} from '@mantine/hooks';
 import {modals} from '@mantine/modals';
-import {notifications} from '@mantine/notifications';
 import {
   IconPlus,
   IconEdit,
@@ -35,6 +34,10 @@ import {
   IconAlertCircle,
   IconLock,
 } from '@tabler/icons-react';
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAppStore} from '@/stores/useAppStore';
 import {clientService} from '@/services/client';
@@ -108,12 +111,7 @@ export function PermissionManagementPage() {
       const permissionsData = await clientService.getAllPermissions();
       setPermissions(permissionsData);
     } catch {
-      notifications.show({
-        title: t('common.error'),
-        message: t('common.loadingFailed'),
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
+      showErrorNotification(t('common.error'), t('common.loadingFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -155,19 +153,15 @@ export function PermissionManagementPage() {
           setIsLoading(true);
           await clientService.revokePermission(permission.id);
           setPermissions((prev) => prev.filter((p) => p.id !== permission.id));
-          notifications.show({
-            title: t('common.success'),
-            message: t('permission.revokeSuccess'),
-            color: 'green',
-            icon: <IconTrash size={16} />,
-          });
+          showSuccessNotification(
+            t('common.success'),
+            t('permission.revokeSuccess'),
+          );
         } catch {
-          notifications.show({
-            title: t('common.error'),
-            message: t('permission.revokeFailed'),
-            color: 'red',
-            icon: <IconAlertCircle size={16} />,
-          });
+          showErrorNotification(
+            t('common.error'),
+            t('permission.revokeFailed'),
+          );
         } finally {
           setIsLoading(false);
         }
@@ -189,12 +183,10 @@ export function PermissionManagementPage() {
           description: values.description,
         };
         setPermissions((prev) => [...prev, newPermission]);
-        notifications.show({
-          title: t('common.success'),
-          message: t('permission.addSuccess'),
-          color: 'green',
-          icon: <IconPlus size={16} />,
-        });
+        showSuccessNotification(
+          t('common.success'),
+          t('permission.addSuccess'),
+        );
       } else if (selectedPermission) {
         await clientService.updatePermission(selectedPermission.id, values);
         setPermissions((prev) =>
@@ -210,26 +202,20 @@ export function PermissionManagementPage() {
               : p,
           ),
         );
-        notifications.show({
-          title: t('common.success'),
-          message: t('permission.updateSuccess'),
-          color: 'green',
-          icon: <IconEdit size={16} />,
-        });
+        showSuccessNotification(
+          t('common.success'),
+          t('permission.updateSuccess'),
+        );
       }
 
       closeForm();
       form.reset();
     } catch {
       setShowAlert(true);
-      notifications.show({
-        title: t('common.error'),
-        message: isAddMode
-          ? t('permission.addFailed')
-          : t('permission.updateFailed'),
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
+      showErrorNotification(
+        t('common.error'),
+        isAddMode ? t('permission.addFailed') : t('permission.updateFailed'),
+      );
     } finally {
       setIsLoading(false);
     }

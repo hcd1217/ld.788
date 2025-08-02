@@ -4,6 +4,7 @@ import {EmployeeActions} from './EmployeeActions';
 import {useTranslation} from '@/hooks/useTranslation';
 import type {Employee} from '@/services/hr/employee';
 import {getEmployeeDetailRoute} from '@/config/routeConfig';
+import {formatDate} from '@/utils/string';
 
 type EmployeeDataTableProps = {
   readonly employees: readonly Employee[];
@@ -28,6 +29,10 @@ export function EmployeeDataTable({
           <Table.Tr>
             <Table.Th>{t('employee.name')}</Table.Th>
             <Table.Th>{t('employee.unit')}</Table.Th>
+            <Table.Th>{t('employee.email')}</Table.Th>
+            <Table.Th>{t('employee.phone')}</Table.Th>
+            <Table.Th>{t('employee.workType')}</Table.Th>
+            <Table.Th>{t('employee.startDate')}</Table.Th>
             <Table.Th>{t('employee.status')}</Table.Th>
             {noAction ? null : (
               <Table.Th style={{width: 100}}>{t('common.actions')}</Table.Th>
@@ -51,6 +56,26 @@ export function EmployeeDataTable({
                 </Group>
               </Table.Td>
               <Table.Td>{employee.unit ?? '-'}</Table.Td>
+              <Table.Td>{employee.email ?? '-'}</Table.Td>
+              <Table.Td>{employee.phone ?? '-'}</Table.Td>
+              <Table.Td>
+                {employee.workType ? (
+                  <Badge variant="outline" color="blue">
+                    {employee.workType === 'FULL_TIME' 
+                      ? t('employee.fullTime') 
+                      : t('employee.partTime')
+                    }
+                  </Badge>
+                ) : (
+                  '-'
+                )}
+              </Table.Td>
+              <Table.Td>
+                {employee.startDate 
+                  ? formatDate(employee.startDate.toString())
+                  : '-'
+                }
+              </Table.Td>
               <Table.Td>
                 <Badge
                   color={employee.isActive ? 'green' : 'gray'}

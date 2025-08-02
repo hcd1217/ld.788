@@ -13,16 +13,13 @@ import {
   Flex,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
-import {notifications} from '@mantine/notifications';
+import {IconPlus, IconAlertTriangle} from '@tabler/icons-react';
 import {
-  IconPlus,
-  IconAlertTriangle,
-  IconCheck,
-  IconUserMinus,
-  IconUserCheck,
-} from '@tabler/icons-react';
+  showErrorNotification,
+  showSuccessNotification,
+  showInfoNotification,
+} from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 import {
   useStaffList,
   useStaffLoading,
@@ -45,7 +42,6 @@ export function StaffListPage() {
   const [staffToDelete, setStaffToDelete] = useState<Staff | undefined>(
     undefined,
   );
-  const isDarkMode = useIsDarkMode();
 
   const staffs = useStaffList();
   const isLoading = useStaffLoading();
@@ -84,14 +80,12 @@ export function StaffListPage() {
       if (!currentStore) throw new Error('No store selected');
       await deleteStaff(currentStore.id, staffToDelete.id);
 
-      notifications.show({
-        title: t('staff.deleteSuccess'),
-        message: t('staff.deleteSuccessMessage', {
+      showSuccessNotification(
+        t('staff.deleteSuccess'),
+        t('staff.deleteSuccessMessage', {
           name: staffToDelete.fullName,
         }),
-        color: isDarkMode ? 'green.7' : 'green.9',
-        icon: <IconCheck size={16} />,
-      });
+      );
 
       closeDeleteModal();
       setStaffToDelete(undefined);
@@ -99,12 +93,7 @@ export function StaffListPage() {
       const errorMessage =
         error instanceof Error ? error.message : t('staff.deleteFailedDefault');
 
-      notifications.show({
-        title: t('staff.deleteFailed'),
-        message: errorMessage,
-        color: 'red',
-        icon: <IconAlertTriangle size={16} />,
-      });
+      showErrorNotification(t('staff.deleteFailed'), errorMessage);
     }
   };
 
@@ -112,24 +101,20 @@ export function StaffListPage() {
     try {
       if (staffMember.status === 'active') {
         await deactivateStaff(staffMember.id);
-        notifications.show({
-          title: t('staff.deactivateSuccess'),
-          message: t('staff.deactivateSuccessMessage', {
+        showInfoNotification(
+          t('staff.deactivateSuccess'),
+          t('staff.deactivateSuccessMessage', {
             name: staffMember.fullName,
           }),
-          color: 'orange',
-          icon: <IconUserMinus size={16} />,
-        });
+        );
       } else {
         await activateStaff(staffMember.id);
-        notifications.show({
-          title: t('staff.activateSuccess'),
-          message: t('staff.activateSuccessMessage', {
+        showSuccessNotification(
+          t('staff.activateSuccess'),
+          t('staff.activateSuccessMessage', {
             name: staffMember.fullName,
           }),
-          color: isDarkMode ? 'green.7' : 'green.9',
-          icon: <IconUserCheck size={16} />,
-        });
+        );
       }
     } catch (error) {
       const errorMessage =
@@ -137,12 +122,7 @@ export function StaffListPage() {
           ? error.message
           : t('staff.updateStatusFailedDefault');
 
-      notifications.show({
-        title: t('staff.updateFailed'),
-        message: errorMessage,
-        color: 'red',
-        icon: <IconAlertTriangle size={16} />,
-      });
+      showErrorNotification(t('staff.updateFailed'), errorMessage);
     }
   };
 
@@ -154,12 +134,10 @@ export function StaffListPage() {
 
   const handleAddStaff = () => {
     if (!currentStore) {
-      notifications.show({
-        title: t('staff.noStoreSelected'),
-        message: t('staff.selectStoreBeforeAdding'),
-        color: 'orange',
-        icon: <IconAlertTriangle size={16} />,
-      });
+      showInfoNotification(
+        t('staff.noStoreSelected'),
+        t('staff.selectStoreBeforeAdding'),
+      );
       return;
     }
 

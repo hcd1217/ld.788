@@ -288,7 +288,16 @@
     "magicLinkDescription": "Scan this QR code or use the link below to login",
     "magicLinkQrAlt": "Magic Link QR Code",
     "magicLinkUrl": "Magic Link URL:",
-    "copyMagicLink": "Copy Magic Link"
+    "copyMagicLink": "Copy Magic Link",
+    "email": "Email",
+    "phone": "Phone",
+    "workType": "Work Type",
+    "fullTime": "Full Time",
+    "partTime": "Part Time",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "monthlySalary": "Monthly Salary",
+    "hourlyRate": "Hourly Rate"
   },
   "auth": {
     "title": "Credo",

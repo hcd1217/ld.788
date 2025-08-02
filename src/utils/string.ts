@@ -7,6 +7,13 @@ export function generateRandomString(length: number): string {
     .slice(2, 2 + length);
 }
 
+export function salaryFormat(salary: number) {
+  return salary.toLocaleString('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+  });
+}
+
 export function formatPhoneNumber(phoneNumber: string) {
   return phoneNumber
     .replace('+84', '0')

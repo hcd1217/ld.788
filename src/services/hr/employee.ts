@@ -2,11 +2,22 @@ import {unitService} from './unit';
 import {positionService} from './position';
 import {hrApi} from '@/lib/api';
 import {renderFullName} from '@/utils/string';
-
+type WorkType = 'FULL_TIME' | 'PART_TIME';
 export type Employee = {
   id: string;
   userId?: string;
   firstName: string;
+  email?: string;
+  phone?: string;
+  workType?: WorkType;
+  monthlySalary?: number;
+  hourlyRate?: number;
+  startDate?: Date;
+  endDate?: Date;
+  // isProbation?: boolean;
+  // probationEndDate?: Date;
+  // probationReason?: string;
+  // probationStatus?: string;
   lastName: string;
   fullName: string;
   fullNameWithPosition?: string;
@@ -60,6 +71,7 @@ export const employeeService = {
       const fullNameWithPosition = position
         ? `${fullName} (${position})`
         : undefined;
+      const workType = Math.random() > 0.5 ? "FULL_TIME" : "PART_TIME"
       return {
         ...employee,
         fullName,
@@ -67,6 +79,14 @@ export const employeeService = {
         position,
         unitId: employee.departmentId,
         unit: unitMap.get(employee.departmentId ?? ''),
+        // email?: string;
+        phone: `0901-${Math.floor(Math.random() * 1e3)}-${Math.floor(Math.random() * 1e3)}`,
+        workType,
+        monthlySalary: workType === "FULL_TIME" ?  12000000 : undefined,
+        hourlyRate: workType === "FULL_TIME" ? undefined : 25000,
+        // hourlyRate?: number;
+        startDate: new Date('2020-12-07'),
+        // endDate?: ;
       };
     });
   },
