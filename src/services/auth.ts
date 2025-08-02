@@ -1,7 +1,6 @@
 import {
   authApi,
   type LoginRequest,
-  type LoginResponse,
   type ForgotPasswordRequest,
   type ForgotPasswordResponse,
   type ResetPasswordRequest,
@@ -16,30 +15,24 @@ export type User = {
 };
 
 export const authService = {
-  async login(
-    credentials: LoginRequest,
-  ): Promise<{response: LoginResponse; user: User}> {
+  async loginWithMagicToken(clientCode: string, token: string) {
+    try {
+      saveClientCode(clientCode);
+      const response = await authApi.verifyMagicLink({
+        token,
+      });
+      return await resolveAuthResponse(response);
+    } catch (error) {
+      console.error('Login failed', error);
+      throw error;
+    }
+  },
+
+  async login(credentials: LoginRequest): Promise<{user: User}> {
     try {
       saveClientCode(credentials.clientCode);
       const response = await authApi.login(credentials);
-      saveTokens({
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
-      });
-
-      // Extract user info from JWT
-      const payload = decodeJWT(response.accessToken);
-      if (!payload) {
-        throw new Error('Invalid token received');
-      }
-
-      const user: User = {
-        id: payload.sub,
-        email: payload.email,
-        isRoot: payload.isRoot,
-      };
-
-      return {response, user};
+      return await resolveAuthResponse(response);
     } catch (error) {
       console.error('Login failed', error);
       throw error;
@@ -149,4 +142,28 @@ function saveTokens({
 function clearTokens() {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
+}
+
+async function resolveAuthResponse(response: {
+  accessToken: string;
+  refreshToken: string;
+}) {
+  saveTokens({
+    accessToken: response.accessToken,
+    refreshToken: response.refreshToken,
+  });
+
+  // Extract user info from JWT
+  const payload = decodeJWT(response.accessToken);
+  if (!payload) {
+    throw new Error('Invalid token received');
+  }
+
+  const user: User = {
+    id: payload.sub,
+    email: payload.email,
+    isRoot: payload.isRoot,
+  };
+
+  return {user};
 }

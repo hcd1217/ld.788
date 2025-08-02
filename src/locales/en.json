@@ -83,6 +83,7 @@
     "createdAt": "Created At",
     "updatedAt": "Updated At",
     "back": "Back",
+    "copied": "Copied!",
     "dangerZone": "Danger Zone",
     "cannotBeUndone": "This action cannot be undone.",
     "minutes": "minutes",
@@ -277,7 +278,17 @@
     "importedEmployees": "Imported {{success}} out of {{total}} employees",
     "importEmployees": "Import Employees",
     "pleaseSelectExcelFile": "Please select a CSV or Excel file",
-    "pleaseSelectFileFirst": "Please select a file first"
+    "pleaseSelectFileFirst": "Please select a file first",
+    "magicLink": "Magic Link",
+    "getMagicLink": "Get login magic link",
+    "magicLinkCopied": "Magic link copied to clipboard",
+    "magicLinkFailed": "Failed to get magic link",
+    "magicLinkGenerated": "Magic link generated successfully",
+    "magicLinkTitle": "Magic Link - {{name}}",
+    "magicLinkDescription": "Scan this QR code or use the link below to login",
+    "magicLinkQrAlt": "Magic Link QR Code",
+    "magicLinkUrl": "Magic Link URL:",
+    "copyMagicLink": "Copy Magic Link"
   },
   "auth": {
     "title": "Credo",
@@ -330,6 +341,15 @@
     "importFailed": "Failed to import users",
     "importSummary": "Import Summary",
     "totalUsers": "Total Users",
+    "magicLink": {
+      "title": "Magic Link Login",
+      "verifying": "Verifying your magic link...",
+      "success": "Login successful!",
+      "redirecting": "Redirecting to your dashboard...",
+      "invalidLink": "Invalid or expired magic link.",
+      "verificationFailed": "Failed to verify magic link. Please try again.",
+      "tryAgain": "Go to Login"
+    },
     "successfulImports": "Successful Imports",
     "failedImports": "Failed Imports",
     "noFileSelected": "Please select an Excel file",
@@ -383,7 +403,8 @@
     "registrationSuccess": "Welcome!",
     "registrationSuccessMessage": "Your account has been created successfully",
     "registrationFailed": "Registration failed",
-    "invalidCredentials": "Invalid email or password. Please try again."
+    "invalidCredentials": "Invalid email or password. Please try again.",
+    "magicLinkSuccess": "You have been logged in via magic link"
   },
   "permission": {
     "management": "Permission Management",

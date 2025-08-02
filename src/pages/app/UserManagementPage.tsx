@@ -44,7 +44,7 @@ import {useAppStore} from '@/stores/useAppStore';
 import {delay} from '@/utils/time';
 import i18n from '@/lib/i18n';
 import {getLocaleConfig} from '@/config/localeConfig';
-import {userService, type User} from '@/services/user';
+import {userService, type User} from '@/services/user/user';
 import {DataTable, GoBack} from '@/components/common';
 import {ROUTERS, getUserDetailRoute} from '@/config/routeConfig';
 
@@ -56,8 +56,6 @@ type EditUserFormValues = {
   password?: string;
   confirmPassword?: string;
 };
-
-const USERS_PER_PAGE = 10;
 
 const getDisplayName = (firstName: string, lastName: string) => {
   const localeConfig = getLocaleConfig(i18n.language);
@@ -115,9 +113,7 @@ export function UserManagementPage() {
     try {
       setIsLoading(true);
 
-      const users = await userService.getUsers({
-        limit: USERS_PER_PAGE,
-      });
+      const users = await userService.getUsers();
 
       setUsers(users);
     } catch {

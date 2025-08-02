@@ -28,6 +28,15 @@ export const LoginResponseSchema = z.object({
   refreshToken: jwtTokenSchema,
 });
 
+export const VerifyMagicLinkRequestSchema = z.object({
+  token: stringSchema,
+});
+
+export const VerifyMagicLinkResponseSchema = z.object({
+  accessToken: jwtTokenSchema,
+  refreshToken: jwtTokenSchema,
+});
+
 export const RenewTokenRequestSchema = z.object({
   refreshToken: jwtTokenSchema,
 });
@@ -164,6 +173,12 @@ export const GetMeResponseSchema = z.object({
 // Types derived from schemas
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 export type LoginResponse = z.infer<typeof LoginResponseSchema>;
+export type VerifyMagicLinkRequest = z.infer<
+  typeof VerifyMagicLinkRequestSchema
+>;
+export type VerifyMagicLinkResponse = z.infer<
+  typeof VerifyMagicLinkResponseSchema
+>;
 export type RenewTokenRequest = z.infer<typeof RenewTokenRequestSchema>;
 export type RenewTokenResponse = z.infer<typeof RenewTokenResponseSchema>;
 export type JWTPayload = z.infer<typeof JWTPayloadSchema>;

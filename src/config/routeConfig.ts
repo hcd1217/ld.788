@@ -4,6 +4,7 @@ export const ROUTERS = {
 
   // Auth routes
   LOGIN: '/login',
+  MAGIC_LINK: '/magic-link',
   CLIENT_LOGIN: '/:clientCode/login',
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',

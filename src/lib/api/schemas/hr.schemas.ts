@@ -25,6 +25,7 @@ export const PositionSchema = z.object({
 // Employee schema
 export const EmployeeSchema = z.object({
   id: stringSchema,
+  userId: idSchema,
   firstName: stringSchema,
   lastName: stringSchema,
   employeeCode: stringSchema,

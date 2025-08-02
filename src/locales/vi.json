@@ -89,6 +89,7 @@
     "goToHome": "Về Trang Chủ",
     "createdAt": "Ngày Tạo",
     "updatedAt": "Ngày Cập Nhật",
+    "copied": "Đã sao chép!",
     "dangerZone": "Khu Vực Nguy Hiểm",
     "downloading": "Đang tải xuống",
     "downloadComplete": "Tải Xuống Hoàn Tất",
@@ -275,7 +276,17 @@
     "importedEmployees": "Đã nhập {{success}} trong số {{total}} nhân viên",
     "importEmployees": "Nhập Nhân Viên",
     "pleaseSelectExcelFile": "Vui lòng chọn file CSV hoặc Excel",
-    "pleaseSelectFileFirst": "Vui lòng chọn file trước"
+    "pleaseSelectFileFirst": "Vui lòng chọn file trước",
+    "magicLink": "Đăng nhập bằng QR",
+    "getMagicLink": "Lấy mã đăng nhập QR",
+    "magicLinkCopied": "Đã sao chép liên kết vào clipboard",
+    "magicLinkFailed": "Không thể lấy liên kết đăng nhập",
+    "magicLinkGenerated": "Đã tạo mã đăng nhập thành công",
+    "magicLinkTitle": "Mã đăng nhập - {{name}}",
+    "magicLinkDescription": "Quét mã QR hoặc sử dụng liên kết bên dưới để đăng nhập",
+    "magicLinkQrAlt": "Mã QR đăng nhập",
+    "magicLinkUrl": "Liên kết đăng nhập:",
+    "copyMagicLink": "Sao chép liên kết"
   },
   "auth": {
     "title": "Credo",
@@ -328,6 +339,15 @@
     "importFailed": "Không thể nhập người dùng",
     "importSummary": "Tóm Tắt Nhập",
     "totalUsers": "Tổng Người Dùng",
+    "magicLink": {
+      "title": "Đăng Nhập Bằng Liên Kết",
+      "verifying": "Đang xác thực liên kết của bạn...",
+      "success": "Đăng nhập thành công!",
+      "redirecting": "Đang chuyển hướng đến trang chủ...",
+      "invalidLink": "Liên kết không hợp lệ hoặc đã hết hạn.",
+      "verificationFailed": "Không thể xác thực liên kết. Vui lòng thử lại.",
+      "tryAgain": "Quay Lại Đăng Nhập"
+    },
     "successfulImports": "Nhập Thành Công",
     "failedImports": "Nhập Thất Bại",
     "noFileSelected": "Vui lòng chọn file Excel",
@@ -381,7 +401,8 @@
     "registrationSuccess": "Chào mừng!",
     "registrationSuccessMessage": "Tài khoản của bạn đã được tạo thành công",
     "registrationFailed": "Đăng ký thất bại",
-    "invalidCredentials": "Email hoặc mật khẩu không đúng. Vui lòng thử lại."
+    "invalidCredentials": "Email hoặc mật khẩu không đúng. Vui lòng thử lại.",
+    "magicLinkSuccess": "Bạn đã đăng nhập thành công qua liên kết"
   },
   "permission": {
     "management": "Quản Lý Quyền",

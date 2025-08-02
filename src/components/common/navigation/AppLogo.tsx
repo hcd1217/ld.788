@@ -1,7 +1,6 @@
 import {type MantineStyleProps, Group, Title, Box} from '@mantine/core';
 import {useNavigate} from 'react-router';
-import {useState, useEffect} from 'react';
-import {useAppStore} from '@/stores/useAppStore';
+import {useLogoAndTitle} from '@/hooks/useLogoAndTitle';
 
 type AppLogoProps = {
   readonly c?: string;
@@ -16,19 +15,7 @@ export function AppLogo({
   link = '/home',
 }: AppLogoProps) {
   const navigate = useNavigate();
-  const {publicClientConfig} = useAppStore();
-  const [title, setTitle] = useState('Credo');
-  const [logoUrl, setLogoUrl] = useState('/icons/logo-black-and-white.svg');
-
-  useEffect(() => {
-    if (publicClientConfig?.clientName) {
-      setTitle(publicClientConfig.clientName);
-    }
-
-    if (publicClientConfig?.logoUrl) {
-      setLogoUrl(publicClientConfig?.logoUrl);
-    }
-  }, [publicClientConfig]);
+  const {logoUrl, title} = useLogoAndTitle();
 
   return (
     <Group gap="xs" style={{cursor: 'pointer'}} onClick={() => navigate(link)}>

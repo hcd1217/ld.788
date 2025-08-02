@@ -5,6 +5,7 @@ import {renderFullName} from '@/utils/string';
 
 export type Employee = {
   id: string;
+  userId?: string;
   firstName: string;
   lastName: string;
   fullName: string;

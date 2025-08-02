@@ -31,6 +31,12 @@ export const GetUsersResponseSchema = z.object({
   }),
 });
 
+export const GetMagicLinkResponseSchema = z.object({
+  magicToken: z.string(),
+});
+
 export type GetUsersRequest = z.infer<typeof GetUsersRequestSchema>;
 
 export type GetUsersResponse = z.infer<typeof GetUsersResponseSchema>;
+
+export type GetMagicLinkResponse = z.infer<typeof GetMagicLinkResponseSchema>;

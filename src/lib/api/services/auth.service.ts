@@ -20,6 +20,10 @@ import {
   type RenewTokenRequest,
   type RenewTokenResponse,
   type GetMeResponse,
+  type VerifyMagicLinkRequest,
+  type VerifyMagicLinkResponse,
+  VerifyMagicLinkResponseSchema,
+  VerifyMagicLinkRequestSchema,
 } from '../schemas/auth.schemas';
 
 export class AuthApi extends BaseApiClient {
@@ -30,6 +34,17 @@ export class AuthApi extends BaseApiClient {
       data,
       LoginResponseSchema,
       LoginRequestSchema,
+    );
+  }
+
+  async verifyMagicLink(
+    data: VerifyMagicLinkRequest,
+  ): Promise<VerifyMagicLinkResponse> {
+    return this.post<VerifyMagicLinkResponse, VerifyMagicLinkRequest>(
+      '/auth/magic-link/verify',
+      data,
+      VerifyMagicLinkResponseSchema,
+      VerifyMagicLinkRequestSchema,
     );
   }
 

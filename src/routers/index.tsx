@@ -155,6 +155,11 @@ const RegisterPage = lazy(async () => {
   return {default: module.RegisterPage};
 });
 
+const MagicLinkLoginPage = lazy(async () => {
+  const module = await import('@/pages/auth/MagicLinkLoginPage');
+  return {default: module.MagicLinkLoginPage};
+});
+
 const AdminLoginPage = lazy(async () => {
   const module = await import('@/pages/admin/AdminLoginPage');
   return {default: module.AdminLoginPage};
@@ -198,6 +203,10 @@ const routeObjects: RouteObject[] = [
       {
         path: ROUTERS.LOGIN,
         Component: LoginPage,
+      },
+      {
+        path: ROUTERS.MAGIC_LINK,
+        Component: MagicLinkLoginPage,
       },
       {
         path: ROUTERS.CLIENT_LOGIN,
