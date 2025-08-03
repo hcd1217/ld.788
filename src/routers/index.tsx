@@ -50,6 +50,10 @@ const EmployeeDetailPage = lazy(async () => {
   const module = await import('@/pages/app/employee/EmployeeDetailPage');
   return {default: module.EmployeeDetailPage};
 });
+const EditEmployeePage = lazy(async () => {
+  const module = await import('@/pages/app/employee/EditEmployeePage');
+  return {default: module.EditEmployeePage};
+});
 
 const HomePage = lazy(async () => {
   const module = await import('@/pages/app/HomePage');
@@ -234,7 +238,8 @@ const routeObjects: RouteObject[] = [
       {path: ROUTERS.HOME, Component: HomePage},
       {path: ROUTERS.EMPLOYEE_MANAGEMENT, Component: EmployeeListPage},
       {path: ROUTERS.EMPLOYEE_DETAIL, Component: EmployeeDetailPage},
-      {path: ROUTERS.EMPLOYEE_EDIT, Component: BlankPage},
+      {path: `/11`, Component: EditEmployeePage},
+      {path: ROUTERS.EMPLOYEE_EDIT, Component: EditEmployeePage},
       {path: ROUTERS.EMPLOYEES_ADD, Component: EmployeeCreatePage},
       {path: ROUTERS.CUSTOMER_MANAGEMENT, Component: BlankPage},
       {path: ROUTERS.CUSTOMER_DETAIL, Component: BlankPage},

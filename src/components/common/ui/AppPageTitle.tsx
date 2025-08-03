@@ -9,15 +9,16 @@ type AppPageTitleProps = {
     readonly onClick?: () => void;
     readonly icon?: React.ReactNode;
   };
+  readonly fz?: string;
 };
 
-export function AppPageTitle({title, button}: AppPageTitleProps) {
+export function AppPageTitle({title, button, fz}: AppPageTitleProps) {
   return (
     <Group justify="space-between" align="center">
       <Title
         order={1}
         ta="center"
-        fz={{
+        fz={fz ?? {
           base: 'h3',
           sm: 'h3',
           md: 'h2',

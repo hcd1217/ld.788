@@ -160,14 +160,15 @@ export function EmployeeDetailPage() {
         header={<AppPageTitle title={title} />}
       >
         <Stack gap="md">
-          <EmployeeDetailAlert 
-            endDate={employee.endDate} 
-            isActive={employee.isActive} 
+          <EmployeeDetailAlert
+            endDate={employee.endDate}
+            isActive={employee.isActive}
           />
           <EmployeeDetailAccordion
             employee={employee}
             onActivate={handleActivate}
             onDeactivate={handleDeactivate}
+            onEdit={handleEdit}
           />
         </Stack>
         {deactivateComponent}
@@ -180,9 +181,9 @@ export function EmployeeDetailPage() {
     <DetailPageLayout titleAlign="center" title={title} isLoading={isLoading}>
       {employee ? (
         <Stack gap="md">
-          <EmployeeDetailAlert 
-            endDate={employee.endDate} 
-            isActive={employee.isActive} 
+          <EmployeeDetailAlert
+            endDate={employee.endDate}
+            isActive={employee.isActive}
           />
           <EmployeeDetailTabs
             employee={employee}

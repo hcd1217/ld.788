@@ -38,6 +38,12 @@ type SingleEmployeeFormValues = {
   firstName: string;
   lastName: string;
   unitId?: string;
+  email?: string;
+  phone?: string;
+  workType?: 'FULL_TIME' | 'PART_TIME';
+  monthlySalary?: number;
+  hourlyRate?: number;
+  startDate?: Date;
 };
 
 type ImportResult = {
@@ -99,14 +105,40 @@ export function EmployeeCreatePage() {
           firstName: firstName(),
           lastName: lastName(),
           unitId: randomElement(units)?.id,
+          email: `${firstName().toLowerCase()}.${lastName().toLowerCase()}@example.com`,
+          phone: `0901-${Math.floor(Math.random() * 1e3)}-${Math.floor(Math.random() * 1e3)}`,
+          workType: Math.random() > 0.5 ? 'FULL_TIME' : 'PART_TIME',
+          monthlySalary: 12000000,
+          hourlyRate: 25000,
+          startDate: new Date(),
         }
       : {
           firstName: '',
           lastName: '',
           unitId: undefined,
+          email: undefined,
+          phone: undefined,
+          workType: undefined,
+          monthlySalary: undefined,
+          hourlyRate: undefined,
+          startDate: undefined,
         },
     validate: {
       ...getFormValidators(t, ['firstName', 'lastName']),
+      email: (value) => value && !value.match(/^\S+@\S+\.\S+$/) ? t('validation.invalidEmail') : undefined,
+      phone: (value) => value && value.length < 10 ? t('validation.phoneTooShort') : undefined,
+      monthlySalary: (value, values) => {
+        if (values.workType === 'FULL_TIME' && !value) {
+          return t('validation.fieldRequired');
+        }
+        return undefined;
+      },
+      hourlyRate: (value, values) => {
+        if (values.workType === 'PART_TIME' && !value) {
+          return t('validation.fieldRequired');
+        }
+        return undefined;
+      },
     },
   });
 
@@ -137,6 +169,12 @@ export function EmployeeCreatePage() {
         firstName: values.firstName,
         lastName: values.lastName,
         unitId: values.unitId,
+        email: values.email,
+        phone: values.phone,
+        workType: values.workType,
+        monthlySalary: values.monthlySalary,
+        hourlyRate: values.hourlyRate,
+        startDate: values.startDate,
       });
     },
     errorHandler(error) {

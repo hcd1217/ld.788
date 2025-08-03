@@ -4,6 +4,7 @@ import {MantineProvider} from '@mantine/core';
 import {Notifications} from '@mantine/notifications';
 import {ModalsProvider} from '@mantine/modals';
 import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 import './index.css';
 import i18n from './lib/i18n';

@@ -25,6 +25,16 @@ export function validateEmail(
   return undefined;
 }
 
+// Phone validation
+export function validatePhone(
+  value: string,
+  t: TranslationFunction,
+): string | undefined {
+  if (!value) return t('validation.phoneRequired');
+  if (value.length < 10) return t('validation.phoneTooShort');
+  return undefined;
+}
+
 // Password validation
 export function validatePassword(
   value: string,
@@ -92,6 +102,7 @@ export function validateIdentifier(
 export function createAuthValidation(t: TranslationFunction) {
   return {
     email: (value: string) => validateEmail(value, t),
+    phone: (value: string) => validatePhone(value, t),
     password: (value: string) => validatePassword(value, t),
     confirmPassword: (value: string, values: {password: string}) =>
       validateConfirmPassword(value, values.password, t),

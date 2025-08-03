@@ -24,6 +24,12 @@ type HrState = {
     firstName: string;
     lastName: string;
     unitId?: string | undefined;
+    email?: string;
+    phone?: string;
+    workType?: 'FULL_TIME' | 'PART_TIME';
+    monthlySalary?: number;
+    hourlyRate?: number;
+    startDate?: Date;
   }) => Promise<void>;
   addBulkEmployees: (
     employees: Array<{
@@ -203,6 +209,12 @@ export const useHrStore = create<HrState>()(
         firstName: string;
         lastName: string;
         unitId?: string | undefined;
+        email?: string;
+        phone?: string;
+        workType?: 'FULL_TIME' | 'PART_TIME';
+        monthlySalary?: number;
+        hourlyRate?: number;
+        startDate?: Date;
       }) {
         set({isLoading: true, error: undefined});
 

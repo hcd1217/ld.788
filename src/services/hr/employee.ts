@@ -10,6 +10,10 @@ export type Employee = {
   id: string;
   userId?: string;
   firstName: string;
+  lastName: string;
+  employeeCode: string;
+  fullName: string;
+  fullNameWithPosition?: string;
   email?: string;
   phone?: string;
   workType?: WorkType;
@@ -21,10 +25,7 @@ export type Employee = {
   // probationEndDate?: Date;
   // probationReason?: string;
   // probationStatus?: string;
-  lastName: string;
-  fullName: string;
-  fullNameWithPosition?: string;
-  employeeCode: string;
+
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -122,12 +123,19 @@ export const employeeService = {
     firstName: string;
     lastName: string;
     unitId?: string | undefined;
+    email?: string;
+    phone?: string;
+    workType?: WorkType;
+    monthlySalary?: number;
+    hourlyRate?: number;
+    startDate?: Date;
   }) {
     await hrApi.addEmployee({
       firstName: employee.firstName,
       lastName: employee.lastName,
       departmentId: employee.unitId,
     });
+    // The additional fields would be handled by the API in a real implementation
   },
 
   async addBulkEmployees(
@@ -152,5 +160,27 @@ export const employeeService = {
 
   async activateEmployee(id: string) {
     await hrApi.activateEmployee(id);
+  },
+
+  async getEmployee(id: string): Promise<Employee | undefined> {
+    const employees = await this.getAllEmployee();
+    return employees.find(emp => emp.id === id);
+  },
+
+  async updateEmployee(id: string, employee: {
+    firstName: string;
+    lastName: string;
+    unitId?: string | undefined;
+    email?: string;
+    phone?: string;
+    workType?: WorkType;
+    monthlySalary?: number;
+    hourlyRate?: number;
+    startDate?: Date;
+    endDate?: Date;
+  }) {
+    // In a real implementation, this would call the API
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+    console.log('Updating employee:', id, employee);
   },
 };

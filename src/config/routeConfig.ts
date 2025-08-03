@@ -79,12 +79,12 @@ export const ROUTERS = {
 export type RouteConfig = Partial<Record<keyof typeof ROUTERS, boolean>>;
 
 // Helper functions for parameterized routes
+export const getEmployeeDetailRoute = (employeeId: string) =>
+  ROUTERS.EMPLOYEE_DETAIL.replace(':employeeId', employeeId);
+export const getEmployeeEditRoute = (employeeId: string) =>
+  ROUTERS.EMPLOYEE_EDIT.replace(':employeeId', employeeId);
 export const getClientLoginRoute = (clientCode: string) =>
   `/${clientCode}/login`;
-export const getEmployeeDetailRoute = (employeeId: string) =>
-  `/employees/${employeeId}`;
-export const getEmployeeEditRoute = (employeeId: string) =>
-  `/employees/edit/${employeeId}`;
 export const getStoreEditRoute = (storeId: string) => `/stores/edit/${storeId}`;
 export const getStaffEditRoute = (staffId: string) => `/staff/edit/${staffId}`;
 export const getUserDetailRoute = (userId: string) => `/user/${userId}`;

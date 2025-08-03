@@ -15,12 +15,14 @@ type EmployeeDetailAccordionProps = {
   readonly employee: Employee;
   readonly onActivate: () => void;
   readonly onDeactivate: () => void;
+  readonly onEdit: () => void;
 };
 
 export function EmployeeDetailAccordion({
   employee,
   onActivate,
   onDeactivate,
+  onEdit,
 }: EmployeeDetailAccordionProps) {
   const {t} = useTranslation();
 
@@ -32,7 +34,7 @@ export function EmployeeDetailAccordion({
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap="xl" pt="md">
-            <EmployeeBasicInfoCard employee={employee} />
+            <EmployeeBasicInfoCard employee={employee} onEdit={onEdit} />
           </Stack>
         </Accordion.Panel>
       </Accordion.Item>

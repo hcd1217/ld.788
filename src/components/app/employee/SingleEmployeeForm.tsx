@@ -6,9 +6,15 @@ import {
   Transition,
   Group,
   Card,
+  TextInput,
+  SegmentedControl,
+  NumberInput,
+  Text,
+  Switch,
 } from '@mantine/core';
 import type {UseFormReturnType} from '@mantine/form';
-import {IconAlertCircle, IconUser} from '@tabler/icons-react';
+import {IconAlertCircle, IconUser, IconMail, IconPhone} from '@tabler/icons-react';
+import {DateInput} from '@mantine/dates';
 import {useTranslation} from '@/hooks/useTranslation';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
 import type {Unit} from '@/services/hr/unit';
@@ -17,6 +23,14 @@ type SingleEmployeeFormValues = {
   firstName: string;
   lastName: string;
   unitId?: string;
+  email?: string;
+  phone?: string;
+  workType?: 'FULL_TIME' | 'PART_TIME';
+  monthlySalary?: number;
+  hourlyRate?: number;
+  startDate?: Date;
+  endDate?: Date;
+  isEndDateEnabled?: boolean;
 };
 
 type SingleEmployeeFormProps = {
@@ -28,6 +42,7 @@ type SingleEmployeeFormProps = {
   readonly onSubmit: (values: SingleEmployeeFormValues) => void;
   readonly onCancel: () => void;
   readonly setShowAlert: (show: boolean) => void;
+  readonly isEditMode?: boolean;
 };
 
 export function SingleEmployeeForm({
@@ -39,6 +54,7 @@ export function SingleEmployeeForm({
   onSubmit,
   onCancel,
   setShowAlert,
+  isEditMode = false,
 }: SingleEmployeeFormProps) {
   const {t} = useTranslation();
 
@@ -83,6 +99,79 @@ export function SingleEmployeeForm({
             {...form.getInputProps('unitId')}
           />
 
+          <TextInput
+            label={t('employee.email')}
+            placeholder="john.doe@example.com"
+            leftSection={<IconMail size={16} />}
+            {...form.getInputProps('email')}
+          />
+
+          <TextInput
+            label={t('employee.phone')}
+            placeholder="0901-234-567"
+            leftSection={<IconPhone size={16} />}
+            {...form.getInputProps('phone')}
+          />
+
+          <Stack gap="xs">
+            <Text size="sm" fw={500}>
+              {t('employee.workType')}
+            </Text>
+            <SegmentedControl
+              data={[
+                { label: t('employee.fullTime'), value: 'FULL_TIME' },
+                { label: t('employee.partTime'), value: 'PART_TIME' },
+              ]}
+              {...form.getInputProps('workType')}
+            />
+          </Stack>
+
+          {form.values.workType === 'FULL_TIME' && (
+            <NumberInput
+              label={t('employee.monthlySalary')}
+              placeholder="12,000,000"
+              min={0}
+              thousandSeparator=","
+              leftSection="₫"
+              {...form.getInputProps('monthlySalary')}
+            />
+          )}
+
+          {form.values.workType === 'PART_TIME' && (
+            <NumberInput
+              label={t('employee.hourlyRate')}
+              placeholder="25,000"
+              min={0}
+              thousandSeparator=","
+              leftSection="₫"
+              {...form.getInputProps('hourlyRate')}
+            />
+          )}
+
+          <DateInput
+            label={t('employee.startDate')}
+            placeholder="Select start date"
+            clearable
+            {...form.getInputProps('startDate')}
+          />
+
+          {isEditMode && (
+            <Switch
+              label={t('employee.updateEndDate')}
+              description={t('employee.updateEndDateDescription')}
+              {...form.getInputProps('isEndDateEnabled', { type: 'checkbox' })}
+            />
+          )}
+
+          {isEditMode && form.values.isEndDateEnabled && (
+            <DateInput
+              label={t('employee.endDate')}
+              placeholder="Select end date"
+              clearable
+              {...form.getInputProps('endDate')}
+            />
+          )}
+
           <Group justify="flex-end">
             <Button variant="light" disabled={isLoading} onClick={onCancel}>
               {t('common.cancel')}
@@ -92,7 +181,7 @@ export function SingleEmployeeForm({
               loading={isLoading}
               leftSection={<IconUser size={16} />}
             >
-              {t('employee.addEmployee')}
+              {isEditMode ? t('employee.updateEmployee', 'Update Employee') : t('employee.addEmployee')}
             </Button>
           </Group>
         </Stack>
