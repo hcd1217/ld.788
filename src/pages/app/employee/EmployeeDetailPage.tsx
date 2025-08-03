@@ -130,9 +130,7 @@ export function EmployeeDetailPage() {
       onConfirm={confirmActivateEmployee}
     />
   );
-  const title = employee
-    ? (employee.fullNameWithPosition ?? employee.fullName)
-    : t('employee.employeeDetails');
+  const title = employee ? (employee.fullName) : t('employee.employeeDetails');
 
   if (!isDesktop) {
     if (isLoading || !employee) {

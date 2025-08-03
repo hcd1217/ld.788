@@ -14,10 +14,13 @@ import {
 } from '@mantine/core';
 import type {UseFormReturnType} from '@mantine/form';
 import {IconAlertCircle, IconUser, IconMail, IconPhone} from '@tabler/icons-react';
-import {DateInput} from '@mantine/dates';
+import {DateInput, DatesProvider} from '@mantine/dates';
+import 'dayjs/locale/vi';
+import 'dayjs/locale/en';
 import {useTranslation} from '@/hooks/useTranslation';
 import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
 import type {Unit} from '@/services/hr/unit';
+import i18n from '@/lib/i18n';
 
 type SingleEmployeeFormValues = {
   firstName: string;
@@ -63,10 +66,16 @@ export function SingleEmployeeForm({
     label: unit.name,
   }));
 
+  const locale = i18n.language;
+  const valueFormat = locale === 'vi' ? "DD/MM/YYYY" : "MMM DD, YYYY";
   return (
-    <Card withBorder radius="md" p="xl">
-      <form onSubmit={form.onSubmit(onSubmit)}>
-        <Stack gap="lg">
+    <DatesProvider settings={{
+      locale,
+      firstDayOfWeek: 1
+    }}>
+      <Card withBorder radius="md" p="xl">
+        <form onSubmit={form.onSubmit(onSubmit)}>
+          <Stack gap="lg">
           <Transition mounted={showAlert} transition="fade">
             {(styles) => (
               <Alert
@@ -150,8 +159,9 @@ export function SingleEmployeeForm({
 
           <DateInput
             label={t('employee.startDate')}
-            placeholder="Select start date"
+            placeholder={t('employee.startDatePlaceholder')}
             clearable
+            valueFormat={valueFormat}
             {...form.getInputProps('startDate')}
           />
 
@@ -166,8 +176,9 @@ export function SingleEmployeeForm({
           {isEditMode && form.values.isEndDateEnabled && (
             <DateInput
               label={t('employee.endDate')}
-              placeholder="Select end date"
+              placeholder={t('employee.endDatePlaceholder')}
               clearable
+              valueFormat={valueFormat}
               {...form.getInputProps('endDate')}
             />
           )}
@@ -181,11 +192,12 @@ export function SingleEmployeeForm({
               loading={isLoading}
               leftSection={<IconUser size={16} />}
             >
-              {isEditMode ? t('employee.updateEmployee', 'Update Employee') : t('employee.addEmployee')}
+              {isEditMode ? t('employee.updateEmployee') : t('employee.addEmployee')}
             </Button>
           </Group>
         </Stack>
       </form>
     </Card>
+    </DatesProvider>
   );
 }

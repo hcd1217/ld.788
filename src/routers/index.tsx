@@ -238,7 +238,6 @@ const routeObjects: RouteObject[] = [
       {path: ROUTERS.HOME, Component: HomePage},
       {path: ROUTERS.EMPLOYEE_MANAGEMENT, Component: EmployeeListPage},
       {path: ROUTERS.EMPLOYEE_DETAIL, Component: EmployeeDetailPage},
-      {path: `/11`, Component: EditEmployeePage},
       {path: ROUTERS.EMPLOYEE_EDIT, Component: EditEmployeePage},
       {path: ROUTERS.EMPLOYEES_ADD, Component: EmployeeCreatePage},
       {path: ROUTERS.CUSTOMER_MANAGEMENT, Component: BlankPage},

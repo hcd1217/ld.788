@@ -19,9 +19,9 @@ export function AppPageTitle({title, button, fz}: AppPageTitleProps) {
         order={1}
         ta="center"
         fz={fz ?? {
-          base: 'h3',
-          sm: 'h3',
-          md: 'h2',
+          base: 'h4',
+          sm: 'h4',
+          md: 'h3',
         }}
       >
         {title}
