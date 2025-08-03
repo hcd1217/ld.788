@@ -1,7 +1,8 @@
 import {Modal, Text, Stack, Alert, Button, TextInput, Group, FileInput, Tabs, rem} from '@mantine/core';
 import {IconAlertCircle, IconUpload, IconClipboard, IconCamera} from '@tabler/icons-react';
-import {useState, useEffect} from 'react';
-import {QrReader} from 'react-qr-reader';
+import {useState} from 'react';
+import {Scanner, type IDetectedBarcode} from '@yudiel/react-qr-scanner';
+import jsQR from 'jsqr';
 import {useTranslation} from '@/hooks/useTranslation';
 
 type QrScannerModalProps = {
@@ -16,26 +17,22 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
   const [manualInput, setManualInput] = useState('');
   const [activeTab, setActiveTab] = useState<string | null>('camera');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [cameraKey, setCameraKey] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  // Force camera re-initialization when modal opens
-  useEffect(() => {
-    if (opened && activeTab === 'camera') {
-      setCameraKey(prev => prev + 1);
-    }
-  }, [opened, activeTab]);
-
-  const handleQrResult = (result: any, error: any) => {
-    if (result?.text) {
-      onScan(result.text);
+  const handleQrScan = (detectedCodes: IDetectedBarcode[]) => {
+    if (detectedCodes.length > 0 && detectedCodes[0].rawValue) {
+      onScan(detectedCodes[0].rawValue);
+      setIsPaused(true);
       onClose();
     }
+  };
 
-    if (error?.message) {
-      // Only show camera permission error, ignore other scanning errors
-      if (error.message.includes('Permission') || error.message.includes('NotAllowedError')) {
-        setError(t('auth.magicLink.cameraPermissionDenied'));
-      }
+  const handleQrError = (error: unknown) => {
+    console.error('QR Scanner error:', error);
+    // Check if it's a permission error
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('Permission') || errorMessage.includes('NotAllowed')) {
+      setError(t('auth.magicLink.cameraPermissionDenied'));
     }
   };
 
@@ -52,19 +49,56 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
     setManualInput('');
     setActiveTab('camera');
     setIsProcessing(false);
-    // Force camera to stop by resetting the key
-    setCameraKey(prev => prev + 1);
+    setIsPaused(false); // Reset pause state for next opening
     onClose();
   };
 
-  const processImage = async (_file: File | Blob) => {
+  const processImage = async (file: File | Blob) => {
     setError(undefined);
     setIsProcessing(true);
 
     try {
-      // Since jsQR is not installed, we cannot decode QR codes from images yet
-      // Show a user-friendly message explaining the limitation
-      setError(t('auth.magicLink.uploadNotSupported') || 'QR code upload is not supported yet. Please use camera scanning or manual code entry.');
+      // Create an image element to load the file
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.src = url;
+      });
+
+      // Create a canvas to extract image data
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      
+      if (!context) {
+        throw new Error('Failed to create canvas context');
+      }
+
+      // Set canvas size to match the image
+      canvas.width = img.width;
+      canvas.height = img.height;
+      
+      // Draw the image on the canvas
+      context.drawImage(img, 0, 0);
+      
+      // Get the image data
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      
+      // Decode QR code using jsQR
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      
+      // Clean up the object URL
+      URL.revokeObjectURL(url);
+      
+      if (code && code.data) {
+        // QR code found, pass the data
+        onScan(code.data);
+        onClose();
+      } else {
+        setError(t('auth.magicLink.noQrCodeFound'));
+      }
     } catch (err) {
       console.error('Error processing image:', err);
       setError(t('auth.magicLink.invalidImageFormat'));
@@ -133,13 +167,17 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
           <Tabs.Panel value="camera" pt="md">
             {opened && activeTab === 'camera' && (
               <Stack gap="md">
-                <div style={{position: 'relative', width: '100%', maxWidth: 400, margin: '0 auto'}}>
-                  <QrReader
-                    key={cameraKey}
-                    onResult={handleQrResult}
+                <div style={{position: 'relative', width: '100%', maxWidth: 400, margin: '0 auto', borderRadius: 8, overflow: 'hidden'}}>
+                  <Scanner
+                    onScan={handleQrScan}
+                    onError={handleQrError}
                     constraints={{ facingMode: 'environment' }}
-                    containerStyle={{ width: '100%' }}
-                    videoStyle={{ width: '100%', borderRadius: 8 }}
+                    paused={isPaused || !opened || activeTab !== 'camera'}
+                    scanDelay={500}
+                    styles={{
+                      container: { width: '100%' },
+                      video: { width: '100%', borderRadius: 8 }
+                    }}
                   />
                 </div>
                 

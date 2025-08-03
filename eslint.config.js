@@ -12,6 +12,7 @@ export default tseslint.config(
   },
   {
     files: ['**/*.{ts,tsx,js,jsx}'],
+    ignores: ['vite.config.ts'],
     settings: {
       react: {
         version: 'detect',
@@ -91,6 +92,30 @@ export default tseslint.config(
       'no-new': 'off',
       'complexity': 'off',
       'max-depth': 'off',
+    },
+  },
+  {
+    files: ['vite.config.ts'],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        project: './tsconfig.node.json',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...tseslint.configs.recommended.rules,
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
     },
   },
 );

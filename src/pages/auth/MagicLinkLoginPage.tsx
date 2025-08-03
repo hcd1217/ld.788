@@ -127,21 +127,33 @@ export function MagicLinkLoginPage() {
 
   const handleQrScan = (data: string) => {
     try {
-      // Parse the scanned data - it should be a URL with token and clientCode
-      const url = new URL(data);
-      const token = url.searchParams.get('token');
-      const clientCode = url.searchParams.get('clientCode');
+      const trimmedData = data.trim();
+      
+      // Try to parse as URL first
+      if (trimmedData.includes('?') || trimmedData.startsWith('http')) {
+        const url = new URL(trimmedData);
+        const token = url.searchParams.get('token');
+        const clientCode = url.searchParams.get('clientCode');
 
-      if (token && clientCode) {
-        // Store params and reload to trigger verification
+        if (token && clientCode) {
+          // Store params and trigger verification
+          sessionStorage.setItem(
+            MAGIC_LINK_STORAGE_KEY,
+            JSON.stringify({ token, clientCode }),
+          );
+          void verifyMagicLink();
+        } else {
+          setError(t('auth.magicLink.invalidQrCode'));
+        }
+      } else {
+        // Treat as token-only and use clientCode from localStorage
+        const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
+        
         sessionStorage.setItem(
           MAGIC_LINK_STORAGE_KEY,
-          JSON.stringify({ token, clientCode }),
+          JSON.stringify({ token: trimmedData, clientCode }),
         );
-        // Trigger verification
         void verifyMagicLink();
-      } else {
-        setError(t('auth.magicLink.invalidQrCode'));
       }
     } catch (err) {
       console.error('Invalid QR code:', err);
@@ -151,21 +163,20 @@ export function MagicLinkLoginPage() {
 
   const handleManualCodeSubmit = () => {
     try {
-      // Manual code could be in format: token:clientCode or just the token
-      const parts = manualCode.split(':');
-
-      if (parts.length === 2) {
-        const [token, clientCode] = parts;
+      const trimmedCode = manualCode.trim();
+      
+      // If it looks like a URL, try parsing it
+      if (trimmedCode.includes('?') || trimmedCode.startsWith('http')) {
+        handleQrScan(trimmedCode);
+      } else {
+        // Treat as token-only input and use clientCode from localStorage
+        const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
+        
         sessionStorage.setItem(
           MAGIC_LINK_STORAGE_KEY,
-          JSON.stringify({ token: token.trim(), clientCode: clientCode.trim() }),
+          JSON.stringify({ token: trimmedCode, clientCode }),
         );
         void verifyMagicLink();
-      } else if (parts.length === 1 && manualCode.includes('?')) {
-        // Try parsing as URL
-        handleQrScan(manualCode);
-      } else {
-        setError(t('auth.magicLink.invalidLink'));
       }
     } catch (err) {
       console.error('Invalid manual code:', err);

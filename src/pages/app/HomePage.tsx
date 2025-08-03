@@ -6,7 +6,7 @@ export function HomePage() {
   const isDesktop = useIsDesktop();
 
   if (!isDesktop) {
-    return <AppMobileLayout showLogo>
+    return <AppMobileLayout>
       <Stack gap="xl">
         <Box
           style={{

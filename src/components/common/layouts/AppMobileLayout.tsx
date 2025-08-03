@@ -29,6 +29,7 @@ export function AppMobileLayout({
   noHeader = false,
   noFooter = false,
 }: AppMobileLayoutProps) {
+  const isDefaultHeader = !header && !noHeader;
   return (
     <AppShell
       header={{height: 60}}
@@ -38,11 +39,11 @@ export function AppMobileLayout({
     >
       {noHeader ? null : (
         <AppShell.Header className={classes.header}>
-          <Group my="auto" h="100%" px="sm">
+          {isDefaultHeader ? <CommonMobileHeader /> : <Group my="auto" h="100%" px="sm">
             {withGoBack ? <GoBack variant="mobile-header" /> : null}
             {showLogo ? <AppLogo noTitle /> : null}
-            {header ?? <CommonMobileHeader />}
-          </Group>
+            {header}
+          </Group>}
         </AppShell.Header>
       )}
 
