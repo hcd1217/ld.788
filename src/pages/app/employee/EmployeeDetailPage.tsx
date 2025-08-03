@@ -136,7 +136,7 @@ export function EmployeeDetailPage() {
     if (isLoading || !employee) {
       return (
         <AppMobileLayout
-          withLogo
+          showLogo
           isLoading={isLoading}
           header={<AppPageTitle title={title} />}
         >

@@ -13,3 +13,4 @@ export {EmployeeDetailAccordion} from './EmployeeDetailAccordion';
 export {EmployeeDetailAlert} from './EmployeeDetailAlert';
 export {SingleEmployeeForm} from './SingleEmployeeForm';
 export {BulkImportForm} from './BulkImportForm';
+export {EmployeeListSkeleton} from './EmployeeListSkeleton';

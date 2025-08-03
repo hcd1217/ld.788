@@ -307,7 +307,7 @@ export function EmployeeCreatePage() {
   if (!isDesktop) {
     return (
       <AppMobileLayout
-        withLogo
+        showLogo
         withGoBack
         isLoading={isLoading}
         error={error}
@@ -339,7 +339,7 @@ export function EmployeeCreatePage() {
       </Group>
       <AppPageTitle title={t('employee.addEmployee')} />
 
-      <Container fluid w="100%">
+      <Container size="md">
         <Tabs
           value={activeTab}
           onChange={(value) => {

@@ -151,7 +151,9 @@ export class BaseApiClient {
       this.setCachedData(cacheKey, result);
       return result;
     } catch (error) {
-      console.error(error);
+      if (isDevelopment) {
+        console.error(error);
+      }
       throw error;
     } finally {
       this.locks.delete(cacheKey);

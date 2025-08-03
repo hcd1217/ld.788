@@ -22,6 +22,7 @@ import {employeeService} from '@/services/hr/employee';
 import {ROUTERS} from '@/config/routeConfig';
 import {useAction} from '@/hooks/useAction';
 import {useOnce} from '@/hooks/useOnce';
+import { isDevelopment } from '@/utils/env';
 
 type SingleEmployeeFormValues = {
   firstName: string;
@@ -120,7 +121,9 @@ export function EditEmployeePage() {
         isEndDateEnabled: false, // By default, don't update endDate
       });
     } catch (error) {
-      console.error(error);
+      if (isDevelopment) {
+        console.error(error);
+      }
       setSingleError(t('employee.notFound'));
       setShowSingleAlert(true);
     } finally {
@@ -131,14 +134,14 @@ export function EditEmployeePage() {
   const handleSingleSubmit = useAction<SingleEmployeeFormValues>({
     options: {
       successTitle: t('common.success'),
-      successMessage: t('employee.employeeUpdated', 'Employee updated successfully'),
+      successMessage: t('employee.employeeUpdated'),
       errorTitle: t('common.error'),
-      errorMessage: t('employee.updateEmployeeFailed', 'Failed to update employee'),
+      errorMessage: t('employee.updateEmployeeFailed'),
       navigateTo: ROUTERS.EMPLOYEE_MANAGEMENT,
     },
     async actionHandler(values) {
       if (!values || !id) {
-        throw new Error(t('employee.updateEmployeeFailed', 'Failed to update employee'));
+        throw new Error(t('employee.updateEmployeeFailed'));
       }
 
       setIsSingleLoading(true);
@@ -162,7 +165,7 @@ export function EditEmployeePage() {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : t('employee.updateEmployeeFailed', 'Failed to update employee');
+          : t('employee.updateEmployeeFailed');
 
       setSingleError(errorMessage);
       setShowSingleAlert(true);
@@ -216,7 +219,7 @@ export function EditEmployeePage() {
       </Group>
       <AppPageTitle title={t('employee.editEmployee')} />
 
-      <Container fluid w="100%">
+      <Container size="md">
         <SingleEmployeeForm
           form={form}
           units={units}
