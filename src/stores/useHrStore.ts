@@ -3,6 +3,7 @@ import {devtools} from 'zustand/middleware';
 import {employeeService, type Employee} from '@/services/hr/employee';
 import {unitService, type Unit} from '@/services/hr/unit';
 import {getErrorMessage} from '@/utils/errorUtils';
+import {useMemo} from 'react';
 
 type HrState = {
   // Employee data
@@ -284,17 +285,38 @@ export const useHrError = () => useHrStore((state) => state.error);
 
 // Helper hooks for HR operations
 export const useHrActions = () => {
-  const store = useHrStore();
-  return {
-    setCurrentEmployee: store.setCurrentEmployee,
-    loadEmployees: store.loadEmployees,
-    loadUnits: store.loadUnits,
-    refreshEmployees: store.refreshEmployees,
-    deactivateEmployee: store.deactivateEmployee,
-    activateEmployee: store.activateEmployee,
-    addEmployee: store.addEmployee,
-    addBulkEmployees: store.addBulkEmployees,
-    clearError: store.clearError,
-    getEmployeeById: store.getEmployeeById,
-  };
+  const setCurrentEmployee = useHrStore((state) => state.setCurrentEmployee);
+  const loadEmployees = useHrStore((state) => state.loadEmployees);
+  const loadUnits = useHrStore((state) => state.loadUnits);
+  const refreshEmployees = useHrStore((state) => state.refreshEmployees);
+  const deactivateEmployee = useHrStore((state) => state.deactivateEmployee);
+  const activateEmployee = useHrStore((state) => state.activateEmployee);
+  const addEmployee = useHrStore((state) => state.addEmployee);
+  const addBulkEmployees = useHrStore((state) => state.addBulkEmployees);
+  const clearError = useHrStore((state) => state.clearError);
+  const getEmployeeById = useHrStore((state) => state.getEmployeeById);
+
+  return useMemo(() => ({
+    setCurrentEmployee,
+    loadEmployees,
+    loadUnits,
+    refreshEmployees,
+    deactivateEmployee,
+    activateEmployee,
+    addEmployee,
+    addBulkEmployees,
+    clearError,
+    getEmployeeById,
+  }), [
+    setCurrentEmployee,
+    loadEmployees,
+    loadUnits,
+    refreshEmployees,
+    deactivateEmployee,
+    activateEmployee,
+    addEmployee,
+    addBulkEmployees,
+    clearError,
+    getEmployeeById,
+  ]);
 };

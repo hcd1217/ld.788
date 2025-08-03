@@ -6,7 +6,7 @@ import {
   Text,
   UnstyledButton,
 } from '@mantine/core';
-import {IconCaretDownFilled, IconCircle} from '@tabler/icons-react';
+import {IconCaretDownFilled} from '@tabler/icons-react';
 import type {TFunction} from 'i18next';
 import {useEffect, useMemo, useState, useCallback, memo} from 'react';
 import {useLocation, useNavigate} from 'react-router';
@@ -21,7 +21,7 @@ import {isNavigationItemActive} from '@/utils/navigationUtils';
 // Transform static navigation structure to NavigationItem format with translations
 function transformNavigationItem(
   item: (typeof NAVIGATION_STRUCTURE)[number],
-  t: TFunction,
+  t: any, // Temporarily use any to bypass type depth issue
 ): NavigationItem {
   const base: NavigationItem = {
     id: item.id,
@@ -120,7 +120,6 @@ const NavigationItemComponent = memo(
     pathname,
     onToggle,
     onNavigate,
-    t,
   }: {
     readonly item: NavigationItem;
     readonly isActive: boolean;
@@ -131,7 +130,6 @@ const NavigationItemComponent = memo(
     readonly t: TFunction;
   }) => {
     const Icon = item.icon;
-    const isDummy = item.dummy ?? false;
 
     const handleClick = () => {
       if (item.subs) {
@@ -166,15 +164,6 @@ const NavigationItemComponent = memo(
             >
               {item.label}
             </Text>
-            {isDummy ? (
-              <IconCircle
-                className={classes.dummyIndicator}
-                color="red"
-                fill="red"
-                size={LAYOUT_CONFIG.DUMMY_INDICATOR_SIZE}
-                aria-label={t('common.dummyFeature')}
-              />
-            ) : null}
           </Group>
           {item.subs ? (
             <IconCaretDownFilled
