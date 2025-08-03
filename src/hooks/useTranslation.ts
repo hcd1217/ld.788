@@ -13,5 +13,3 @@ export function useTranslation() {
     changeLanguage: (language: string) => i18n.changeLanguage(language),
   };
 }
-
-export default useTranslation;

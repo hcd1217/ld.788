@@ -4,7 +4,7 @@ import {
   Pagination as MantinePagination,
   Select,
 } from '@mantine/core';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 import {useAppStore} from '@/stores/useAppStore';
 
 type PaginationProps = {

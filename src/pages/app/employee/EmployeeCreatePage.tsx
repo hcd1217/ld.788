@@ -11,7 +11,7 @@ import {
   showInfoNotification,
 } from '@/utils/notifications';
 import {useTranslation} from '@/hooks/useTranslation';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 import {getFormValidators} from '@/utils/validation';
 import {
   AppPageTitle,

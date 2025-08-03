@@ -7,10 +7,8 @@ import {
   SimpleGrid,
   Select,
   SegmentedControl,
-  Badge,
-  Button,
 } from '@mantine/core';
-import { IconUser, IconFilter } from '@tabler/icons-react';
+import { IconUser } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { useOnce } from '@/hooks/useOnce';
@@ -30,18 +28,20 @@ import {
   BlankState,
   AppMobileLayout,
   AppDesktopLayout,
-  Drawer,
 } from '@/components/common';
 import {
   EmployeeCard,
   EmployeeDataTable,
   EmployeeGridCard,
   EmployeeListSkeleton,
+  EmployeeFilterBar,
+  EmployeeUnitDrawer,
+  EmployeeStatusDrawer,
 } from '@/components/app/employee';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 import { ROUTERS } from '@/config/routeConfig';
-import { useMobileDrawer } from '@/hooks/useMobileDrawer';
 import { EMPLOYEE_STATUS, VIEW_MODE, type ViewModeType } from '@/constants/employee';
+import { useDisclosure } from '@mantine/hooks';
 
 export function EmployeeListPage() {
   const navigate = useNavigate();
@@ -52,18 +52,15 @@ export function EmployeeListPage() {
   const isLoading = useHrLoading();
   const error = useHrError();
   const { refreshEmployees, clearError, loadUnits } = useHrActions();
-  
+
   // Use the new employee filters hook
   const [filteredEmployees, filters, filterHandlers] = useEmployeeFilters(employees);
-  
+
   const [viewMode, setViewMode] = useState<ViewModeType>(VIEW_MODE.TABLE);
-  const {
-    filterDrawerOpened,
-    drawerExpanded,
-    openFilterDrawer,
-    setDrawerExpanded,
-    handleDrawerClose,
-  } = useMobileDrawer();
+  
+  // Drawer states using Mantine's useDisclosure directly
+  const [unitDrawerOpened, { open: openUnitDrawer, close: closeUnitDrawer }] = useDisclosure(false);
+  const [statusDrawerOpened, { open: openStatusDrawer, close: closeStatusDrawer }] = useDisclosure(false);
 
   // Use client-side pagination hook with filtered employees
   const [paginatedEmployees, paginationState, paginationHandlers] =
@@ -78,13 +75,23 @@ export function EmployeeListPage() {
   });
 
   // Prepare department options for select
-  const unitOptions = useMemo(() => 
+  const unitOptions = useMemo(() =>
     units.map((unit) => ({
       value: unit.id,
       label: unit.name,
     })),
     [units]
   );
+
+  // Check if any filters are active
+  const hasActiveFilters = !!(filters.searchQuery || filters.unitId || filters.status !== EMPLOYEE_STATUS.ALL);
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    filterHandlers.setSearchQuery('');
+    filterHandlers.setUnitId(undefined);
+    filterHandlers.setStatus(EMPLOYEE_STATUS.ALL);
+  };
 
   if (!isDesktop) {
     return (
@@ -95,77 +102,35 @@ export function EmployeeListPage() {
         clearError={clearError}
         header={<AppPageTitle title={t('employee.title')} />}
       >
-        {/* Search & Filter Controls */}
-        <Stack gap="sm" p="sm">
-          <Group justify="space-between" align="center">
-            <Button
-              variant="subtle"
-              leftSection={<IconFilter size={20} />}
-              size="compact-md"
-              onClick={openFilterDrawer}
-            >
-              {t('common.filter')}
-            </Button>
-            <Group gap="xs">
-              {/* Show active filter indicators */}
-              {filters.searchQuery ? (
-                <Badge size="sm" variant="light" color="gray">
-                  {t('common.search')}: {filters.searchQuery}
-                </Badge>
-              ) : null}
-              {filters.unitId ? (
-                <Badge size="sm" variant="light" color="gray">
-                  {units.find((unit) => unit.id === filters.unitId)?.name}
-                </Badge>
-              ) : null}
-              {filters.status !== EMPLOYEE_STATUS.ALL && (
-                <Badge size="sm" variant="light" color="gray">
-                  {t(`employee.${filters.status}`)}
-                </Badge>
-              )}
-            </Group>
-          </Group>
-        </Stack>
+        {/* Filter Bar */}
+        <EmployeeFilterBar
+          searchQuery={filters.searchQuery}
+          unitId={filters.unitId}
+          status={filters.status}
+          units={units}
+          hasActiveFilters={hasActiveFilters}
+          onSearchChange={filterHandlers.setSearchQuery}
+          onUnitClick={openUnitDrawer}
+          onStatusClick={openStatusDrawer}
+          onClearFilters={clearAllFilters}
+        />
 
-        {/* Filter Drawer */}
-        <Drawer
-          expandable
-          opened={filterDrawerOpened}
-          size="300px"
-          title={t('employee.filterTitle')}
-          expanded={drawerExpanded}
-          onClose={handleDrawerClose}
-          onExpandedChange={setDrawerExpanded}
-        >
-          <Stack gap="md">
-            <SearchBar
-              hidden={paginationState.totalPages < 2}
-              placeholder={t('employee.searchPlaceholder')}
-              searchQuery={filters.searchQuery}
-              setSearchQuery={filterHandlers.setSearchQuery}
-            />
-            <Select
-              clearable
-              searchable
-              placeholder={t('employee.selectUnit')}
-              data={[{ value: '', label: t('employee.allUnit') }, ...unitOptions]}
-              value={filters.unitId || ''}
-              onChange={(value) => filterHandlers.setUnitId(value || undefined)}
-            />
-            <SegmentedControl
-              value={filters.status}
-              data={[
-                { label: t('employee.all'), value: EMPLOYEE_STATUS.ALL },
-                { label: t('employee.active'), value: EMPLOYEE_STATUS.ACTIVE },
-                { label: t('employee.inactive'), value: EMPLOYEE_STATUS.INACTIVE },
-              ]}
-              onChange={(value) => filterHandlers.setStatus(value as typeof EMPLOYEE_STATUS[keyof typeof EMPLOYEE_STATUS])}
-            />
-            <Button fullWidth onClick={handleDrawerClose}>
-              {t('common.applyFilter')}
-            </Button>
-          </Stack>
-        </Drawer>
+        {/* Unit Selection Drawer */}
+        <EmployeeUnitDrawer
+          opened={unitDrawerOpened}
+          units={units}
+          selectedUnitId={filters.unitId}
+          onClose={closeUnitDrawer}
+          onUnitSelect={filterHandlers.setUnitId}
+        />
+
+        {/* Status Selection Drawer */}
+        <EmployeeStatusDrawer
+          opened={statusDrawerOpened}
+          selectedStatus={filters.status}
+          onClose={closeStatusDrawer}
+          onStatusSelect={filterHandlers.setStatus}
+        />
 
         <BlankState
           hidden={paginationState.totalItems > 0 || isLoading}

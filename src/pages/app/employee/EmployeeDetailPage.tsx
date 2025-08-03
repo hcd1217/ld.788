@@ -3,7 +3,7 @@ import {useNavigate, useParams} from 'react-router';
 import {useDisclosure} from '@mantine/hooks';
 import {LoadingOverlay, Stack} from '@mantine/core';
 import {useTranslation} from '@/hooks/useTranslation';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 import {useEmployeeList, useHrActions, useHrLoading} from '@/stores/useHrStore';
 import {
   ResourceNotFound,

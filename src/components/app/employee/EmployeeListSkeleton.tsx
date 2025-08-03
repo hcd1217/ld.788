@@ -1,14 +1,14 @@
 import { Stack, Skeleton, Table, Group, SimpleGrid } from '@mantine/core';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 
 interface EmployeeListSkeletonProps {
   readonly viewMode?: 'table' | 'grid';
   readonly count?: number;
 }
 
-export function EmployeeListSkeleton({ 
-  viewMode = 'table', 
-  count = 5 
+export function EmployeeListSkeleton({
+  viewMode = 'table',
+  count = 5
 }: EmployeeListSkeletonProps) {
   const isDesktop = useIsDesktop();
 

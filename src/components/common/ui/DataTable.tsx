@@ -8,7 +8,7 @@ import {
   ScrollArea,
 } from '@mantine/core';
 import {useTranslation} from '@/hooks/useTranslation';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 
 type DataTableColumn<T> = {
   key: string;

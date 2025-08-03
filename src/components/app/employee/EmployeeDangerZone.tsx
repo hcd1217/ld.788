@@ -16,7 +16,7 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 import type {Employee} from '@/services/hr/employee';
 
 type EmployeeDangerZoneProps = {

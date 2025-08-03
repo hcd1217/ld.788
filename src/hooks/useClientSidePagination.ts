@@ -1,5 +1,5 @@
 import * as React from 'react';
-import useIsDesktop from './useIsDesktop';
+import {useIsDesktop} from './useIsDesktop';
 import {useAppStore} from '@/stores/useAppStore';
 // Ref: https://stackoverflow.com/a/78696557
 

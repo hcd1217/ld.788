@@ -7,7 +7,7 @@ import {
   LoadingOverlay,
   type MantineSize,
 } from '@mantine/core';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 import {GoBack} from '@/components/common';
 
 interface DetailPageLayoutProps {

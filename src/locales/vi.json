@@ -20,7 +20,9 @@
     "storeManagement": "Quản Lý Cửa Hàng",
     "salaryManagement": "Quản Lý Lương",
     "employeeManagement": "Quản Lý Nhân Viên",
+    "employeeManagementMobile": "Nhân Viên",
     "poManagement": "Quản Lý Đơn Đặt Hàng",
+    "poManagementMobile": "Đơn Đặt Hàng",
     "customerManagement": "Quản Lý Khách Hàng",
     "configuration": "Thiết lập hệ thống",
     "staffManagement": "Quản Lý Nhân Viên",
@@ -96,8 +98,10 @@
     "dragAndDropFile": "Kéo và thả file vào đây",
     "orClickToSelect": "hoặc nhấn để chọn",
     "remove": "Xóa",
+    "clear": "Xóa",
     "userMenu": "Menu Người Dùng",
-    "mainNavigation": "Điều Hướng Chính"
+    "mainNavigation": "Điều Hướng Chính",
+    "apply": "Áp dụng"
   },
   "pcOnly": {
     "title": "Tính Năng Máy Tính",
@@ -1003,6 +1007,11 @@
     "exportExcel": "Xuất Excel",
     "printInitiated": "Đã mở hộp thoại in",
     "exportPDFComingSoon": "Tính năng xuất PDF sắp ra mắt",
-    "exportExcelComingSoon": "Tính năng xuất Excel sắp ra mắt"
+    "exportExcelComingSoon": "Tính năng xuất Excel sắp ra mắt",
+    "searchCustomer": "Tìm kiếm khách hàng",
+    "selectDateRange": "Chọn khoảng thời gian",
+    "selectEndDate": "Chọn ngày kết thúc",
+    "selectStartDate": "Chọn ngày bắt đầu",
+    "dateRange": "Khoảng thời gian"
   }
 }

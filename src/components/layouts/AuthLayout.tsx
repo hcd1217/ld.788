@@ -10,7 +10,7 @@ import {
   AppLogo,
 } from '@/components/common';
 import {LAYOUT_CONFIG} from '@/config/layoutConfig';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 
 export function AuthLayout() {
   const [isMenuOpen, {toggle: toggleMenu}] = useDisclosure(true);

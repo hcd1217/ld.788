@@ -14,3 +14,6 @@ export {EmployeeDetailAlert} from './EmployeeDetailAlert';
 export {SingleEmployeeForm} from './SingleEmployeeForm';
 export {BulkImportForm} from './BulkImportForm';
 export {EmployeeListSkeleton} from './EmployeeListSkeleton';
+export {EmployeeFilterBar} from './EmployeeFilterBar';
+export {EmployeeUnitDrawer} from './EmployeeUnitDrawer';
+export {EmployeeStatusDrawer} from './EmployeeStatusDrawer';

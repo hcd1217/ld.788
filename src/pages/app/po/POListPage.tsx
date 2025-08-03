@@ -6,10 +6,8 @@ import {
   Box,
   SimpleGrid,
   Select,
-  Badge,
-  Button,
 } from '@mantine/core';
-import { IconFileInvoice, IconFilter } from '@tabler/icons-react';
+import { IconFileInvoice } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { useOnce } from '@/hooks/useOnce';
@@ -29,19 +27,21 @@ import {
   BlankState,
   AppMobileLayout,
   AppDesktopLayout,
-  Drawer,
 } from '@/components/common';
 import {
   POCard,
   PODataTable,
   POGridCard,
   POListSkeleton,
+  POFilterBar,
+  POCustomerDrawer,
+  POStatusDrawer,
+  PODateDrawer,
 } from '@/components/app/po';
 import useIsDesktop from '@/hooks/useIsDesktop';
 import { ROUTERS } from '@/config/routeConfig';
-import { useMobileDrawer } from '@/hooks/useMobileDrawer';
 import { PO_STATUS, VIEW_MODE, type ViewModeType } from '@/constants/purchaseOrder';
-import { DatePickerInput } from '@mantine/dates';
+import { useDisclosure } from '@mantine/hooks';
 
 export function POListPage() {
   const navigate = useNavigate();
@@ -57,13 +57,11 @@ export function POListPage() {
   const [filteredPOs, filters, filterHandlers] = usePOFilters(purchaseOrders);
 
   const [viewMode, setViewMode] = useState<ViewModeType>(VIEW_MODE.TABLE);
-  const {
-    filterDrawerOpened,
-    drawerExpanded,
-    openFilterDrawer,
-    setDrawerExpanded,
-    handleDrawerClose,
-  } = useMobileDrawer();
+
+  // Drawer states using Mantine's useDisclosure directly
+  const [customerDrawerOpened, { open: openCustomerDrawer, close: closeCustomerDrawer }] = useDisclosure(false);
+  const [statusDrawerOpened, { open: openStatusDrawer, close: closeStatusDrawer }] = useDisclosure(false);
+  const [dateDrawerOpened, { open: openDateDrawer, close: closeDateDrawer }] = useDisclosure(false);
 
   // Use client-side pagination hook with filtered POs
   const [paginatedPOs, paginationState, paginationHandlers] =
@@ -98,6 +96,18 @@ export function POListPage() {
     { value: PO_STATUS.REFUNDED, label: t('po.status.REFUNDED') },
   ];
 
+  // Check if any filters are active
+  const hasActiveFilters = !!(filters.searchQuery || filters.customerId || filters.status !== PO_STATUS.ALL || filters.dateRange.start || filters.dateRange.end);
+  const hasDateFilter = !!(filters.dateRange.start || filters.dateRange.end);
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    filterHandlers.setSearchQuery('');
+    filterHandlers.setCustomerId(undefined);
+    filterHandlers.setStatus(PO_STATUS.ALL);
+    filterHandlers.setDateRange(undefined, undefined);
+  };
+
   if (!isDesktop) {
     return (
       <AppMobileLayout
@@ -107,87 +117,46 @@ export function POListPage() {
         clearError={clearError}
         header={<AppPageTitle title={t('po.title')} />}
       >
-        {/* Search & Filter Controls */}
-        <Stack gap="sm" p="sm">
-          <Group justify="space-between" align="center">
-            <Button
-              variant="subtle"
-              leftSection={<IconFilter size={20} />}
-              size="compact-md"
-              onClick={openFilterDrawer}
-            >
-              {t('common.filter')}
-            </Button>
-            <Group gap="xs">
-              {/* Show active filter indicators */}
-              {filters.searchQuery ? (
-                <Badge size="sm" variant="light" color="gray">
-                  {t('common.search')}: {filters.searchQuery}
-                </Badge>
-              ) : null}
-              {filters.customerId ? (
-                <Badge size="sm" variant="light" color="gray">
-                  {customers.find((c) => c.id === filters.customerId)?.name}
-                </Badge>
-              ) : null}
-              {filters.status !== PO_STATUS.ALL && (
-                <Badge size="sm" variant="light" color="gray">
-                  {t(`po.status.${filters.status}`)}
-                </Badge>
-              )}
-            </Group>
-          </Group>
-        </Stack>
+        {/* Filter Bar */}
+        <POFilterBar
+          searchQuery={filters.searchQuery}
+          customerId={filters.customerId}
+          status={filters.status}
+          hasDateFilter={hasDateFilter}
+          customers={customers}
+          hasActiveFilters={hasActiveFilters}
+          onSearchChange={filterHandlers.setSearchQuery}
+          onCustomerClick={openCustomerDrawer}
+          onStatusClick={openStatusDrawer}
+          onDateClick={openDateDrawer}
+          onClearFilters={clearAllFilters}
+        />
 
-        {/* Filter Drawer */}
-        <Drawer
-          expandable
-          opened={filterDrawerOpened}
-          size="300px"
-          title={t('po.filterTitle')}
-          expanded={drawerExpanded}
-          onClose={handleDrawerClose}
-          onExpandedChange={setDrawerExpanded}
-        >
-          <Stack gap="md">
-            <SearchBar
-              hidden={paginationState.totalPages < 2}
-              placeholder={t('po.searchPlaceholder')}
-              searchQuery={filters.searchQuery}
-              setSearchQuery={filterHandlers.setSearchQuery}
-            />
-            <Select
-              clearable
-              searchable
-              placeholder={t('po.selectCustomer')}
-              data={[{ value: '', label: t('po.allCustomers') }, ...customerOptions]}
-              value={filters.customerId || ''}
-              onChange={(value) => filterHandlers.setCustomerId(value || undefined)}
-            />
-            <Select
-              clearable
-              placeholder={t('po.selectStatus')}
-              data={statusOptions}
-              value={filters.status}
-              onChange={(value) => filterHandlers.setStatus(value as typeof PO_STATUS[keyof typeof PO_STATUS])}
-            />
-            <DatePickerInput
-              clearable
-              placeholder={t('po.startDate')}
-              value={filters.dateRange.start}
-              onChange={(date) => filterHandlers.setDateRange(date ? new Date(date) : undefined, filters.dateRange.end)}
-            />
-            <DatePickerInput
-              clearable
-              placeholder={t('po.endDate')}
-              value={filters.dateRange.end}
-              onChange={(date) => filterHandlers.setDateRange(filters.dateRange.start, date ? new Date(date) : undefined)}
-            />
-            <Button fullWidth onClick={handleDrawerClose}>
-              {t('common.applyFilter')}
-            </Button>
-          </Stack>
-        </Drawer>
+        {/* Customer Selection Drawer */}
+        <POCustomerDrawer
+          opened={customerDrawerOpened}
+          customers={customers}
+          selectedCustomerId={filters.customerId}
+          onClose={closeCustomerDrawer}
+          onCustomerSelect={filterHandlers.setCustomerId}
+        />
+
+        {/* Status Selection Drawer */}
+        <POStatusDrawer
+          opened={statusDrawerOpened}
+          selectedStatus={filters.status}
+          onClose={closeStatusDrawer}
+          onStatusSelect={filterHandlers.setStatus}
+        />
+
+        {/* Date Range Selection Drawer */}
+        <PODateDrawer
+          opened={dateDrawerOpened}
+          startDate={filters.dateRange.start}
+          endDate={filters.dateRange.end}
+          onClose={closeDateDrawer}
+          onDateRangeSelect={filterHandlers.setDateRange}
+        />
 
         <BlankState
           hidden={paginationState.totalItems > 0 || isLoading}

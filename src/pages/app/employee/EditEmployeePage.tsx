@@ -3,7 +3,7 @@ import {useParams, useNavigate} from 'react-router';
 import {Container, Group, Loader, Center} from '@mantine/core';
 import {useForm} from '@mantine/form';
 import {useTranslation} from '@/hooks/useTranslation';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 import {getFormValidators} from '@/utils/validation';
 import {
   AppPageTitle,

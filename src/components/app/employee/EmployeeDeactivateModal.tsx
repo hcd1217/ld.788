@@ -4,7 +4,7 @@ import {IconAlertTriangle} from '@tabler/icons-react';
 import {useTranslation} from '@/hooks/useTranslation';
 import type {Employee} from '@/services/hr/employee';
 import {renderFullName} from '@/utils/string';
-// Import useIsDesktop from '@/hooks/useIsDesktop';
+// import {useIsDesktop} from '@/hooks/useIsDesktop';
 import {ModalOrDrawer} from '@/components/common';
 
 type EmployeeDeactivateModalProps = {

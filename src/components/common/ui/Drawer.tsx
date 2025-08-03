@@ -4,7 +4,7 @@ import {
   rem,
   type DrawerProps as MantineDrawerProps,
 } from '@mantine/core';
-import React, {type ReactNode, useRef, useCallback, useState, useEffect} from 'react';
+import {type ReactNode, useRef} from 'react';
 
 type DrawerProps = MantineDrawerProps & {
   readonly position?: 'bottom' | 'left' | 'right' | 'top';
@@ -23,70 +23,12 @@ export function Drawer({
   size,
   ...props
 }: DrawerProps) {
-  const touchStartY = useRef(0);
-  const touchStartTime = useRef(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState(0);
 
   // Reset drag state when expanded changes
-  useEffect(() => {
-    setDragOffset(0);
-    setIsDragging(false);
-  }, [expanded]);
 
-  // Handle touch start
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      if (!expandable) return;
-      touchStartY.current = e.touches[0].clientY;
-      touchStartTime.current = Date.now();
-      setIsDragging(true);
-    },
-    [expandable],
-  );
 
-  // Handle touch move for swipe detection
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (!expandable || !touchStartY.current || !isDragging) return;
-
-      const currentY = e.touches[0].clientY;
-      const diffY = touchStartY.current - currentY;
-
-      // Only allow dragging in the correct direction
-      if (!expanded && diffY > 0) {
-        // Dragging up when collapsed - show expansion preview
-        setDragOffset(Math.min(diffY, 200));
-      } else if (expanded && diffY < 0 && contentRef.current?.scrollTop === 0) {
-        // Dragging down when expanded - show collapse preview
-        setDragOffset(Math.max(diffY, -200));
-      }
-    },
-    [expandable, expanded, isDragging],
-  );
-
-  // Handle touch end
-  const handleTouchEnd = useCallback(() => {
-    if (!isDragging) return;
-
-    const touchDuration = Date.now() - touchStartTime.current;
-    const velocity = Math.abs(dragOffset) / touchDuration;
-
-    // Determine action based on offset and velocity
-    if (!expanded && (dragOffset > 100 || velocity > 0.5)) {
-      onExpandedChange?.(true);
-    } else if (expanded && (dragOffset < -100 || velocity > 0.5)) {
-      onExpandedChange?.(false);
-    }
-
-    // Reset state
-    setIsDragging(false);
-    setDragOffset(0);
-    touchStartY.current = 0;
-    touchStartTime.current = 0;
-  }, [dragOffset, expanded, isDragging, onExpandedChange]);
 
   const isBottomDrawer = position === 'bottom';
   const showMobileStyles =
@@ -95,23 +37,12 @@ export function Drawer({
   // Calculate dynamic size based on drag state
   const getDrawerSize = () => {
     if (!expandable) return expanded ? '90vh' : size;
-
-    if (isDragging) {
-      const baseSize = expanded ? 90 : 30;
-      const offsetPercentage = (dragOffset / window.innerHeight) * 100;
-      const newSize = Math.max(20, Math.min(90, baseSize + offsetPercentage));
-      return `${newSize}vh`;
-    }
-
     return expanded ? '90vh' : size || '300px';
   };
 
   // Calculate opacity for backdrop during drag
   const getBackdropOpacity = () => {
-    if (!isDragging) return undefined;
-    const maxOffset = 200;
-    const opacity = 0.5 + (Math.abs(dragOffset) / maxOffset) * 0.3;
-    return Math.min(0.8, opacity);
+    return 0.8;
   };
 
   return (
@@ -121,11 +52,10 @@ export function Drawer({
       size={getDrawerSize()}
       overlayProps={{
         opacity: getBackdropOpacity(),
-        blur: isDragging ? 2 : undefined,
       }}
       transitionProps={{
         transition: 'slide-up',
-        duration: isDragging ? 0 : 300,
+        duration: 300,
         timingFunction: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
       }}
       styles={
@@ -135,17 +65,15 @@ export function Drawer({
                 paddingBottom: 80,
                 height: expanded ? 'calc(90vh - 60px)' : 'calc(50vh - 60px)',
                 overflowY: 'hidden',
-                transitionProperty: isDragging ? 'none' : 'height',
-                transitionDuration: isDragging ? '0s' : '0.3s',
-                transitionTimingFunction: isDragging ? undefined : 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+                transitionProperty: 'height',
+                transitionDuration: '0.3s',
+                transitionTimingFunction: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
               },
               content: {
                 borderTopLeftRadius: rem(16),
                 borderTopRightRadius: rem(16),
                 overflow: 'hidden',
-                boxShadow: isDragging
-                  ? '0 -4px 20px rgba(0, 0, 0, 0.15)'
-                  : undefined,
+                boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.15)',
               },
               header: {
                 padding: 'var(--mantine-spacing-md)',
@@ -179,11 +107,7 @@ export function Drawer({
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
             touchAction: 'pan-y',
-            cursor: isDragging ? 'grabbing' : 'grab',
           }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
         >
           {children}
         </Box>

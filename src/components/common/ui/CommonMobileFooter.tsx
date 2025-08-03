@@ -1,10 +1,10 @@
 import {Group, Text, UnstyledButton, Stack} from '@mantine/core';
 import {useNavigate} from 'react-router';
 import {
-  IconLayoutGrid,
-  IconHome,
-  IconDots,
   IconAddressBook,
+  IconDots,
+  IconHome,
+  IconShoppingCart,
 } from '@tabler/icons-react';
 import classes from './CommonMobileFooter.module.css';
 import {useTranslation} from '@/hooks/useTranslation';
@@ -25,9 +25,9 @@ export function CommonMobileFooter() {
       path: ROUTERS.EMPLOYEE_MANAGEMENT,
     },
     {
-      label: t('common.explore'),
-      icon: IconLayoutGrid,
-      path: ROUTERS.EXPLORE,
+      label: t('common.poManagementMobile'),
+      icon: IconShoppingCart,
+      path: ROUTERS.PO_MANAGEMENT,
     },
     {
       label: t('common.more'),
@@ -37,7 +37,7 @@ export function CommonMobileFooter() {
   ];
 
   return (
-    <Group h="100%" px="xs" justify="space-around">
+    <Group px="xs" justify="space-around">
       {navigationItems.map((item) => {
         const Icon = item.icon;
         const isActive = location.pathname === item.path;

@@ -13,7 +13,7 @@ import {
 import {IconArrowLeft, IconDeviceDesktop} from '@tabler/icons-react';
 import {Outlet, useNavigate} from 'react-router';
 import {useTranslation} from '@/hooks/useTranslation';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import {useIsDesktop} from '@/hooks/useIsDesktop';
 import {useIsDarkMode} from '@/hooks/useIsDarkMode';
 
 export function PCOnlyLayout() {
