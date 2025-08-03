@@ -14,7 +14,7 @@ export function useOrientation(): {
 
   useEffect(() => {
     const handleOrientationChange = () => {
-      const isMobile = Math.min(window.innerWidth, window.innerHeight) < 769;
+      const isMobile = Math.min(window.innerWidth, window.innerHeight) < 600;
       setIsMobile(isMobile);
       if (!isMobile) {
         return;
