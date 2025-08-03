@@ -8,8 +8,10 @@ import {
   Modal,
   CopyButton,
 } from '@mantine/core';
-import {IconCopy, IconCheck} from '@tabler/icons-react';
+import {IconCopy, IconCheck, IconPhoto} from '@tabler/icons-react';
+import {useCallback, useState} from 'react';
 import {useTranslation} from '@/hooks/useTranslation';
+import {showSuccessNotification, showErrorNotification} from '@/utils/notifications';
 import type {Employee} from '@/services/hr/employee';
 import {renderFullName} from '@/utils/string';
 
@@ -29,6 +31,49 @@ export function EmployeeMagicLinkModal({
   qrCodeData,
 }: EmployeeMagicLinkModalProps) {
   const {t} = useTranslation();
+  const [copiedImage, setCopiedImage] = useState(false);
+
+  const handleCopyQrCode = useCallback(async () => {
+    try {
+      // Convert data URL to blob
+      const response = await fetch(qrCodeData);
+      const blob = await response.blob();
+
+      // Check if browser supports clipboard API for images
+      if (!navigator.clipboard || !ClipboardItem) {
+        showErrorNotification(
+          t('common.error'),
+          t('employee.copyQrCodeNotSupported')
+        );
+        return;
+      }
+
+      // Create clipboard item with the image blob
+      const clipboardItem = new ClipboardItem({
+        [blob.type]: blob
+      });
+
+      // Write to clipboard
+      await navigator.clipboard.write([clipboardItem]);
+
+      setCopiedImage(true);
+      showSuccessNotification(
+        t('common.success'),
+        t('employee.qrCodeCopied')
+      );
+
+      // Reset copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedImage(false);
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to copy QR code:', error);
+      showErrorNotification(
+        t('common.error'),
+        t('employee.copyQrCodeFailed')
+      );
+    }
+  }, [qrCodeData, t]);
 
   return (
     <Modal
@@ -47,7 +92,20 @@ export function EmployeeMagicLinkModal({
         </Text>
 
         {qrCodeData ? (
-          <Image src={qrCodeData} alt={t('employee.magicLinkQrAlt')} />
+          <Stack gap="xs" align="center" w="100%">
+            <Image src={qrCodeData} alt={t('employee.magicLinkQrAlt')} />
+            <Button
+              fullWidth
+              leftSection={
+                copiedImage ? <IconCheck size={16} /> : <IconPhoto size={16} />
+              }
+              color={copiedImage ? 'green' : 'blue'}
+              variant="light"
+              onClick={handleCopyQrCode}
+            >
+              {copiedImage ? t('common.copied') : t('employee.copyQrCode')}
+            </Button>
+          </Stack>
         ) : null}
 
         <Stack gap="xs" w="100%">

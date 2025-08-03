@@ -339,7 +339,7 @@ export function EmployeeCreatePage() {
       </Group>
       <AppPageTitle title={t('employee.addEmployee')} />
 
-      <Container size="md">
+      <Container fluid w="100%">
         <Tabs
           value={activeTab}
           onChange={(value) => {

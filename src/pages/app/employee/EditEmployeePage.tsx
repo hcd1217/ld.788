@@ -36,6 +36,7 @@ type SingleEmployeeFormValues = {
   startDate?: Date;
   endDate?: Date;
   isEndDateEnabled?: boolean;
+  displayOrder?: number;
 };
 
 export function EditEmployeePage() {
@@ -119,6 +120,7 @@ export function EditEmployeePage() {
         startDate: employee.startDate,
         endDate: employee.endDate,
         isEndDateEnabled: false, // By default, don't update endDate
+        displayOrder: employee.displayOrder,
       });
     } catch (error) {
       if (isDevelopment) {
@@ -157,7 +159,8 @@ export function EditEmployeePage() {
         workType: values.workType,
         monthlySalary: values.monthlySalary,
         hourlyRate: values.hourlyRate,
-        startDate: values.startDate,
+        startDate: values.startDate ?? new Date(),
+        displayOrder: values.displayOrder,
         ...(values.isEndDateEnabled && { endDate: values.endDate }),
       });
     },
@@ -219,7 +222,7 @@ export function EditEmployeePage() {
       </Group>
       <AppPageTitle title={t('employee.editEmployee')} />
 
-      <Container size="md">
+      <Container fluid w="100%">
         <SingleEmployeeForm
           form={form}
           units={units}

@@ -2,7 +2,6 @@ import { unitService } from './unit';
 import { positionService } from './position';
 import { hrApi } from '@/lib/api';
 import { renderFullName } from '@/utils/string';
-import { shuffleArray } from '@/utils/fake';
 
 export type WorkType = 'FULL_TIME' | 'PART_TIME';
 
@@ -25,7 +24,6 @@ export type Employee = {
   // probationEndDate?: Date;
   // probationReason?: string;
   // probationStatus?: string;
-
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -33,11 +31,7 @@ export type Employee = {
   unit?: string;
   positionId?: string;
   position?: string;
-  metadata?:
-  | {
-    position?: string;
-  }
-  | undefined;
+  displayOrder?: number;
 };
 
 export const employeeService = {
@@ -69,40 +63,16 @@ export const employeeService = {
     const unitMap = new Map(units.map((u) => [u.id, u.name]));
     const positions = await positionService.getPositions();
     const positionMap = new Map(positions.map((p) => [p.id, p.title]));
-    const endDateStatus = [
-      'normal',
-      'normal',
-      ...shuffleArray([
-        'ended',
-        'ended',
-        'end-soon',
-        ...Array.from({
-          length: employees.length - 4
-        }).map(() => 'normal')
-      ]),
-    ]
-    return employees.map((employee, idx) => {
+    return employees.map((employee) => {
       const position = positionMap.get(employee.positionId ?? '');
       const fullName = renderFullName(employee);
       const fullNameWithPosition = position
         ? `${fullName} (${position})`
         : undefined;
-      const workType = Math.random() > 0.5 ? "FULL_TIME" : "PART_TIME"
-      let endDate: Date | undefined =  undefined
-      switch (endDateStatus[idx]) {
-        case 'normal':
-          break;
-        case 'ended':
-          endDate = new Date('2025-06-15')
-          break;
-        case 'end-soon':
-          endDate = new Date('2025-08-27')
-          break;
-        default:
-          break;
-      }
+      const workType = employee.employmentType === "PART_TIME" ? "PART_TIME" : "FULL_TIME"
       return {
         ...employee,
+        startDate: employee.hireDate,
         fullName,
         fullNameWithPosition,
         position,
@@ -111,10 +81,10 @@ export const employeeService = {
         // email?: string;
         phone: `0901-${Math.floor(Math.random() * 1e3)}-${Math.floor(Math.random() * 1e3)}`,
         workType,
-        monthlySalary: workType === "FULL_TIME" ? 12000000 : undefined,
-        hourlyRate: workType === "FULL_TIME" ? undefined : 25000,
-        startDate: new Date('2020-12-23'),
-        endDate,
+        monthlySalary: employee.metadata?.monthlySalary,
+        hourlyRate: employee.metadata?.hourRate,
+        endDate: employee.terminationDate,
+        displayOrder: employee.metadata?.displayOrder,
       };
     });
   },
@@ -134,6 +104,11 @@ export const employeeService = {
       firstName: employee.firstName,
       lastName: employee.lastName,
       departmentId: employee.unitId,
+      employmentType: employee.workType ?? "FULL_TIME",
+      metadata: {
+        hourRate: employee.workType === "FULL_TIME" ? undefined : employee.hourlyRate,
+        monthlySalary: employee.workType === "FULL_TIME" ? employee.monthlySalary : undefined,
+      }
     });
     // The additional fields would be handled by the API in a real implementation
   },
@@ -143,6 +118,9 @@ export const employeeService = {
       firstName: string;
       lastName: string;
       unitId?: string | undefined;
+      workType?: WorkType;
+      monthlySalary?: number;
+      hourlyRate?: number;
     }>,
   ) {
     await hrApi.addBulkEmployees({
@@ -150,6 +128,11 @@ export const employeeService = {
         firstName: employee.firstName,
         lastName: employee.lastName,
         departmentId: employee.unitId,
+        employmentType: employee.workType ?? "FULL_TIME",
+        metadata: {
+          hourRate: employee.workType === "FULL_TIME" ? undefined : employee.hourlyRate,
+          monthlySalary: employee.workType === "FULL_TIME" ? employee.monthlySalary : undefined,
+        }
       })),
     });
   },
@@ -176,11 +159,22 @@ export const employeeService = {
     workType?: WorkType;
     monthlySalary?: number;
     hourlyRate?: number;
-    startDate?: Date;
+    startDate: Date;
     endDate?: Date;
+    displayOrder?: number;
   }) {
-    // In a real implementation, this would call the API
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-    console.log('Updating employee:', id, employee);
+    await hrApi.updateEmployee(id, {
+      firstName: employee.firstName,
+      lastName: employee.lastName,
+      departmentId: employee.unitId,
+      employmentType: employee.workType,
+      hireDate: new Date(employee.startDate).toISOString(),
+      terminationDate: employee.endDate ? new Date(employee.endDate).toISOString() : undefined,
+      metadata: {
+        displayOrder: employee.displayOrder,
+        hourRate: employee.workType === "FULL_TIME" ? undefined : employee.hourlyRate,
+        monthlySalary: employee.workType === "FULL_TIME" ? employee.monthlySalary : undefined,
+      }
+    });
   },
 };

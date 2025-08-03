@@ -54,7 +54,7 @@ export class HrApi extends BaseApiClient {
     employeeId: string,
     data: UpdateEmployeeRequest,
   ): Promise<UpdateEmployeeResponse> {
-    return this.put<UpdateEmployeeResponse, UpdateEmployeeRequest>(
+    return this.patch<UpdateEmployeeResponse, UpdateEmployeeRequest>(
       `/api/hr/employees/${employeeId}`,
       data,
       UpdateEmployeeResponseSchema,

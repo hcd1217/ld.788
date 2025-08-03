@@ -1,5 +1,6 @@
 import * as z from 'zod/v4';
 import {
+  emailSchema,
   idSchema,
   numberSchema,
   optionalStringSchema,
@@ -29,13 +30,17 @@ export const EmployeeSchema = z.object({
   firstName: stringSchema,
   lastName: stringSchema,
   employeeCode: stringSchema,
+  employmentType: z.enum(['FULL_TIME', 'PART_TIME']).optional().transform((val) => val ?? 'FULL_TIME'),
+  hireDate: timestampSchema,
+  terminationDate: timestampSchema.optional(),
   departmentId: idSchema.optional(),
   positionId: idSchema.optional(),
   isActive: z.boolean(),
   metadata: z
     .object({
       displayOrder: numberSchema.optional(),
-      position: optionalStringSchema,
+      hourRate: numberSchema.optional(),
+      monthlySalary: numberSchema.optional(),
     })
     .optional(),
   createdAt: timestampSchema,
@@ -46,6 +51,14 @@ export const EmployeeSchema = z.object({
 export const CreateEmployeeSchema = z.object({
   firstName: stringSchema,
   lastName: stringSchema,
+  email: emailSchema.optional(),
+  employeeCode: optionalStringSchema,
+  employmentType: z.enum(['FULL_TIME', 'PART_TIME']).optional().transform((val) => val ?? 'FULL_TIME'),
+  metadata: z.object({
+    displayOrder: numberSchema.optional(),
+    hourRate: numberSchema.optional(),
+    monthlySalary: numberSchema.optional(),
+  }).optional(),
   departmentId: z.string().optional(),
 });
 
@@ -58,7 +71,14 @@ export const UpdateEmployeeRequestSchema = z.object({
   firstName: stringSchema,
   lastName: stringSchema,
   departmentId: z.string().optional(),
-  isActive: z.boolean().optional(),
+  employmentType: z.enum(['FULL_TIME', 'PART_TIME']).optional(),
+  hireDate: stringSchema.optional(),
+  terminationDate: stringSchema.optional(),
+  metadata: z.object({
+    displayOrder: numberSchema.optional(),
+    hourRate: numberSchema.optional(),
+    monthlySalary: numberSchema.optional(),
+  }).optional(),
 });
 
 // Response schemas
