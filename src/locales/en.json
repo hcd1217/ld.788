@@ -378,7 +378,15 @@
       "closeScanner": "Close Scanner",
       "invalidQrCode": "Invalid QR code. Please scan a valid magic link QR code.",
       "or": "or",
-      "useMagicLink": "Use Magic Link"
+      "useMagicLink": "Use Magic Link",
+      "uploadQrImage": "Upload QR Image",
+      "pasteFromClipboard": "Paste from Clipboard",
+      "dragDropImage": "Drag and drop an image here",
+      "clickToUpload": "or click to upload",
+      "processingImage": "Processing image...",
+      "invalidImageFormat": "Invalid image format. Please upload a valid image file.",
+      "noQrCodeFound": "No QR code found in the image. Please try another image.",
+      "uploadNotSupported": "QR code upload is not supported yet. Please use camera scanning or manual code entry."
     },
     "successfulImports": "Successful Imports",
     "failedImports": "Failed Imports",

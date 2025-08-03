@@ -20,7 +20,7 @@ export function CommonMobileFooter() {
       path: ROUTERS.HOME,
     },
     {
-      label: t('common.employeeManagement'),
+      label: t('common.employeeManagementMobile'),
       icon: IconAddressBook,
       path: ROUTERS.EMPLOYEE_MANAGEMENT,
     },

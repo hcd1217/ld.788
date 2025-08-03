@@ -1,18 +1,12 @@
 import {Title, Text, Container, Card, Box, Stack} from '@mantine/core';
 import {useIsDesktop} from '@/hooks/useIsDesktop';
-import { AppPageTitle } from '@/components/common/ui/AppPageTitle';
 import { AppMobileLayout } from '@/components/common';
-import { useTranslation } from 'react-i18next';
 
 export function HomePage() {
   const isDesktop = useIsDesktop();
-  const { t } = useTranslation();
 
   if (!isDesktop) {
-    return <AppMobileLayout
-      showLogo
-      header={<AppPageTitle title={t('common.home')} />}
-    >
+    return <AppMobileLayout showLogo>
       <Stack gap="xl">
         <Box
           style={{

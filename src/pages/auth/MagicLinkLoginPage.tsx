@@ -23,6 +23,7 @@ export function MagicLinkLoginPage() {
   const [showQrScanner, setShowQrScanner] = useState(false);
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [manualCode, setManualCode] = useState('');
+  const [showOptions, setShowOptions] = useState(false);
   const {t} = useTranslation();
 
   useEffect(() => {
@@ -80,19 +81,16 @@ export function MagicLinkLoginPage() {
       setIsLoading(true);
       const {user} = await authService.loginWithMagicToken(clientCode, token);
 
-      // Clear stored params after successful verification
-      sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
-
       setUser(user);
       setError(undefined);
     },
     errorHandler(error) {
       console.error('Magic link verification failed:', error);
       setError(t('auth.magicLink.verificationFailed'));
-      // Clear stored params on error
-      sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
     },
     cleanupHandler() {
+      // Clear stored params on error or after successful verification
+      sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
       setIsLoading(false);
     },
   });
@@ -116,9 +114,10 @@ export function MagicLinkLoginPage() {
     if (storedParams) {
       void verifyMagicLink();
     } else {
-      // No params found anywhere - show error
-      setError(t('auth.magicLink.invalidLink'));
+      // No params found - show QR/manual entry options instead of error
+      setShowOptions(true);
       setIsLoading(false);
+      setError(undefined);
     }
   }, [mounted, searchParams, verifyMagicLink, t]);
 
@@ -132,7 +131,7 @@ export function MagicLinkLoginPage() {
       const url = new URL(data);
       const token = url.searchParams.get('token');
       const clientCode = url.searchParams.get('clientCode');
-      
+
       if (token && clientCode) {
         // Store params and reload to trigger verification
         sessionStorage.setItem(
@@ -154,7 +153,7 @@ export function MagicLinkLoginPage() {
     try {
       // Manual code could be in format: token:clientCode or just the token
       const parts = manualCode.split(':');
-      
+
       if (parts.length === 2) {
         const [token, clientCode] = parts;
         sessionStorage.setItem(
@@ -187,7 +186,7 @@ export function MagicLinkLoginPage() {
             </Text>
           ) : null}
 
-          {!isLoading && !error && (
+          {!isLoading && !error && !showOptions && (
             <>
               <IconCheck size={48} color="var(--mantine-color-green-6)" />
               <Text size="md" ta="center" c="green">
@@ -199,17 +198,20 @@ export function MagicLinkLoginPage() {
             </>
           )}
 
-          {!isLoading && error ? (
+          {!isLoading && (error || showOptions) ? (
             <>
-              <Alert
-                w="100%"
-                mb="xl"
-                icon={<IconX size={20} />}
-                color="red"
-                variant="light"
-              >
-                {error}
-              </Alert>
+
+              {error && (
+                <Alert
+                  w="100%"
+                  mb="xl"
+                  icon={<IconX size={20} />}
+                  color="red"
+                  variant="light"
+                >
+                  {error}
+                </Alert>
+              )}
 
               {!showManualEntry ? (
                 <Stack gap="md" w="100%">
@@ -249,7 +251,7 @@ export function MagicLinkLoginPage() {
                   <Text size="sm" c="dimmed">
                     {t('auth.magicLink.enterCodeDescription')}
                   </Text>
-                  
+
                   <TextInput
                     placeholder={t('auth.magicLink.magicLinkCode')}
                     value={manualCode}
@@ -272,7 +274,7 @@ export function MagicLinkLoginPage() {
                     >
                       {t('common.cancel')}
                     </Button>
-                    
+
                     <Button
                       variant="filled"
                       onClick={handleManualCodeSubmit}

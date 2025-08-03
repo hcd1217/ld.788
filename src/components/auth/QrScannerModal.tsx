@@ -1,6 +1,7 @@
-import {Modal, Text, Stack, Alert, Button, TextInput, Group} from '@mantine/core';
-import {IconAlertCircle, IconCamera, IconX} from '@tabler/icons-react';
-import {useEffect, useRef, useState} from 'react';
+import {Modal, Text, Stack, Alert, Button, TextInput, Group, FileInput, Tabs, rem} from '@mantine/core';
+import {IconAlertCircle, IconUpload, IconClipboard, IconCamera} from '@tabler/icons-react';
+import {useState, useEffect} from 'react';
+import {QrReader} from 'react-qr-reader';
 import {useTranslation} from '@/hooks/useTranslation';
 
 type QrScannerModalProps = {
@@ -11,47 +12,31 @@ type QrScannerModalProps = {
 
 export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
   const {t} = useTranslation();
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<string | undefined>(undefined);
-  const [isScanning, setIsScanning] = useState(false);
   const [manualInput, setManualInput] = useState('');
-  const streamRef = useRef<MediaStream | null>(null);
+  const [activeTab, setActiveTab] = useState<string | null>('camera');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [cameraKey, setCameraKey] = useState(0);
 
-  const startCamera = async () => {
-    try {
-      setError(undefined);
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {facingMode: 'environment'},
-      });
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        setIsScanning(true);
-        startScanning();
+  // Force camera re-initialization when modal opens
+  useEffect(() => {
+    if (opened && activeTab === 'camera') {
+      setCameraKey(prev => prev + 1);
+    }
+  }, [opened, activeTab]);
+
+  const handleQrResult = (result: any, error: any) => {
+    if (result?.text) {
+      onScan(result.text);
+      onClose();
+    }
+
+    if (error?.message) {
+      // Only show camera permission error, ignore other scanning errors
+      if (error.message.includes('Permission') || error.message.includes('NotAllowedError')) {
+        setError(t('auth.magicLink.cameraPermissionDenied'));
       }
-    } catch (err) {
-      console.error('Camera access error:', err);
-      setError(t('auth.magicLink.cameraPermissionDenied'));
     }
-  };
-
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    setIsScanning(false);
-  };
-
-  const startScanning = () => {
-    // NOTE: This currently shows the camera feed with manual code entry
-    // To implement actual QR code scanning, you would need to:
-    // 1. Install a QR scanning library (e.g., qr-scanner, react-qr-reader, or @zxing/browser)
-    // 2. Process video frames to detect and decode QR codes
-    // 3. Automatically call onScan when a valid QR code is detected
-    // For now, users can manually enter the code shown in the QR code
-    setError(undefined);
   };
 
   const handleManualSubmit = () => {
@@ -62,22 +47,62 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
     }
   };
 
-  useEffect(() => {
-    if (opened) {
-      void startCamera();
-    } else {
-      stopCamera();
-    }
-
-    return () => {
-      stopCamera();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [opened]);
-
   const handleClose = () => {
-    stopCamera();
+    setError(undefined);
+    setManualInput('');
+    setActiveTab('camera');
+    setIsProcessing(false);
+    // Force camera to stop by resetting the key
+    setCameraKey(prev => prev + 1);
     onClose();
+  };
+
+  const processImage = async (_file: File | Blob) => {
+    setError(undefined);
+    setIsProcessing(true);
+
+    try {
+      // Since jsQR is not installed, we cannot decode QR codes from images yet
+      // Show a user-friendly message explaining the limitation
+      setError(t('auth.magicLink.uploadNotSupported') || 'QR code upload is not supported yet. Please use camera scanning or manual code entry.');
+    } catch (err) {
+      console.error('Error processing image:', err);
+      setError(t('auth.magicLink.invalidImageFormat'));
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleFileUpload = (file: File | null) => {
+    if (file) {
+      void processImage(file);
+    }
+  };
+
+  const handlePaste = async () => {
+    try {
+      const clipboardItems = await navigator.clipboard.read();
+      
+      for (const item of clipboardItems) {
+        if (item.types.includes('image/png') || item.types.includes('image/jpeg')) {
+          const blob = await item.getType(item.types.find(type => type.startsWith('image/')) || 'image/png');
+          void processImage(blob);
+          return;
+        }
+      }
+      
+      // If no image found, try text
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        onScan(text);
+        onClose();
+      } else {
+        setError(t('auth.magicLink.noQrCodeFound'));
+      }
+    } catch (err) {
+      console.error('Error reading clipboard:', err);
+      setError(t('auth.magicLink.invalidImageFormat'));
+    }
   };
 
   return (
@@ -89,76 +114,103 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
       centered
     >
       <Stack gap="md">
-        <Text size="sm" c="dimmed">
-          {t('auth.magicLink.scanQrCodeDescription')}
-        </Text>
-
-        {error ? (
+        {error && (
           <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
             {error}
           </Alert>
-        ) : isScanning ? (
-          <Stack gap="md">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              style={{width: '100%', maxWidth: 400, borderRadius: 8, margin: '0 auto', display: 'block'}}
-            />
-            <Text size="sm" c="dimmed" ta="center">
-              {t('auth.magicLink.scanningQrCode')}
-            </Text>
-            
-            <Stack gap="sm">
-              <Text size="sm" c="dimmed">
-                {t('auth.magicLink.or')} {t('auth.magicLink.enterCodeDescription')}
-              </Text>
-              <TextInput
-                placeholder={t('auth.magicLink.magicLinkCode')}
-                value={manualInput}
-                onChange={(e) => setManualInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && manualInput) {
-                    handleManualSubmit();
-                  }
-                }}
-              />
-              <Group grow>
-                <Button
-                  variant="default"
-                  onClick={handleClose}
-                >
-                  {t('common.cancel')}
-                </Button>
-                <Button
-                  variant="filled"
-                  onClick={handleManualSubmit}
-                  disabled={!manualInput}
-                >
-                  {t('auth.magicLink.verifyCode')}
-                </Button>
-              </Group>
-            </Stack>
-          </Stack>
-        ) : (
-          <Stack align="center" gap="md" py="xl">
-            <IconCamera size={64} stroke={1.5} color="var(--mantine-color-gray-5)" />
-            <Text size="sm" c="dimmed">
-              Initializing camera...
-            </Text>
-          </Stack>
         )}
 
-        {!isScanning && (
-          <Button
-            fullWidth
-            variant="default"
-            onClick={handleClose}
-            leftSection={<IconX size={16} />}
-          >
-            {t('auth.magicLink.closeScanner')}
-          </Button>
-        )}
+        <Tabs value={activeTab} onChange={setActiveTab}>
+          <Tabs.List grow>
+            <Tabs.Tab value="camera" leftSection={<IconCamera size={16} />}>
+              {t('auth.magicLink.scanQrCode')}
+            </Tabs.Tab>
+            <Tabs.Tab value="upload" leftSection={<IconUpload size={16} />}>
+              {t('auth.magicLink.uploadQrImage')}
+            </Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="camera" pt="md">
+            {opened && activeTab === 'camera' && (
+              <Stack gap="md">
+                <div style={{position: 'relative', width: '100%', maxWidth: 400, margin: '0 auto'}}>
+                  <QrReader
+                    key={cameraKey}
+                    onResult={handleQrResult}
+                    constraints={{ facingMode: 'environment' }}
+                    containerStyle={{ width: '100%' }}
+                    videoStyle={{ width: '100%', borderRadius: 8 }}
+                  />
+                </div>
+                
+                <Text size="sm" c="dimmed" ta="center">
+                  {t('auth.magicLink.scanningQrCode')}
+                </Text>
+              </Stack>
+            )}
+          </Tabs.Panel>
+
+          <Tabs.Panel value="upload" pt="md">
+            <Stack gap="md">
+              <FileInput
+                accept="image/*"
+                leftSection={<IconUpload size={rem(16)} />}
+                placeholder={t('auth.magicLink.clickToUpload')}
+                onChange={handleFileUpload}
+                disabled={isProcessing}
+              />
+              
+              <Button
+                fullWidth
+                variant="default"
+                leftSection={<IconClipboard size={16} />}
+                onClick={() => void handlePaste()}
+                disabled={isProcessing}
+              >
+                {t('auth.magicLink.pasteFromClipboard')}
+              </Button>
+
+              {isProcessing && (
+                <Text size="sm" c="dimmed" ta="center">
+                  {t('auth.magicLink.processingImage')}
+                </Text>
+              )}
+            </Stack>
+          </Tabs.Panel>
+        </Tabs>
+
+        <Stack gap="sm" mt="md">
+          <Text size="sm" c="dimmed">
+            {t('auth.magicLink.or')} {t('auth.magicLink.enterCodeDescription')}
+          </Text>
+          <TextInput
+            placeholder={t('auth.magicLink.magicLinkCode')}
+            value={manualInput}
+            onChange={(e) => setManualInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && manualInput) {
+                handleManualSubmit();
+              }
+            }}
+            disabled={isProcessing}
+          />
+          <Group grow>
+            <Button
+              variant="default"
+              onClick={handleClose}
+              disabled={isProcessing}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="filled"
+              onClick={handleManualSubmit}
+              disabled={!manualInput || isProcessing}
+            >
+              {t('auth.magicLink.verifyCode')}
+            </Button>
+          </Group>
+        </Stack>
       </Stack>
     </Modal>
   );

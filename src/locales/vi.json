@@ -378,7 +378,15 @@
       "closeScanner": "Đóng Máy Quét",
       "invalidQrCode": "Mã QR không hợp lệ. Vui lòng quét mã QR đăng nhập hợp lệ.",
       "or": "hoặc",
-      "useMagicLink": "Sử Dụng Liên Kết Đăng Nhập"
+      "useMagicLink": "Sử Dụng Liên Kết Đăng Nhập",
+      "uploadQrImage": "Tải Lên Hình QR",
+      "pasteFromClipboard": "Dán Từ Clipboard",
+      "dragDropImage": "Kéo thả hình ảnh vào đây",
+      "clickToUpload": "hoặc nhấn để tải lên",
+      "processingImage": "Đang xử lý hình ảnh...",
+      "invalidImageFormat": "Định dạng hình ảnh không hợp lệ. Vui lòng tải lên file hình ảnh hợp lệ.",
+      "noQrCodeFound": "Không tìm thấy mã QR trong hình ảnh. Vui lòng thử hình ảnh khác.",
+      "uploadNotSupported": "Tính năng tải lên mã QR chưa được hỗ trợ. Vui lòng sử dụng quét camera hoặc nhập mã thủ công."
     },
     "successfulImports": "Nhập Thành Công",
     "failedImports": "Nhập Thất Bại",
