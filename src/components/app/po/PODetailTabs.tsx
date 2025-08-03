@@ -13,6 +13,7 @@ import {POBasicInfoCard} from './POBasicInfoCard';
 import {POActionZone} from './POActionZone';
 import {POTimeline} from './POTimeline';
 import {POItemsList} from './POItemsList';
+import {POErrorBoundary} from './POErrorBoundary';
 import {Tabs, ComingSoonCard} from '@/components/common';
 import {useTranslation} from '@/hooks/useTranslation';
 import {notifications} from '@mantine/notifications';
@@ -100,7 +101,9 @@ export function PODetailTabs({
         >
           <Box style={{maxWidth: '800px', width: '100%'}}>
             <Stack gap="xl">
-              <POBasicInfoCard purchaseOrder={purchaseOrder} onEdit={onEdit} />
+              <POErrorBoundary componentName="POBasicInfoCard">
+                <POBasicInfoCard purchaseOrder={purchaseOrder} onEdit={onEdit} />
+              </POErrorBoundary>
               <POActionZone
                 purchaseOrder={purchaseOrder}
                 onConfirm={onConfirm}

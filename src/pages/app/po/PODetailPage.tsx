@@ -24,6 +24,8 @@ import {
   PODeliverModal,
   POCancelModal,
   PORefundModal,
+  POErrorBoundary,
+  PODetailTabsSkeleton,
 } from '@/components/app/po';
 import type {PurchaseOrder} from '@/services/sales/purchaseOrder';
 import {getPOEditRoute} from '@/config/routeConfig';
@@ -333,19 +335,25 @@ export function PODetailPage() {
   }
 
   return (
-    <DetailPageLayout titleAlign="center" title={title} isLoading={isLoading}>
-      {purchaseOrder ? (
+    <DetailPageLayout titleAlign="center" title={title} isLoading={false}>
+      {isLoading ? (
         <Stack gap="md">
-          <PODetailTabs
-            purchaseOrder={purchaseOrder}
-            onEdit={handleEdit}
-            onConfirm={handleConfirm}
-            onProcess={handleProcess}
-            onShip={handleShip}
-            onDeliver={handleDeliver}
-            onCancel={handleCancel}
-            onRefund={handleRefund}
-          />
+          <PODetailTabsSkeleton />
+        </Stack>
+      ) : purchaseOrder ? (
+        <Stack gap="md">
+          <POErrorBoundary componentName="PODetailTabs">
+            <PODetailTabs
+              purchaseOrder={purchaseOrder}
+              onEdit={handleEdit}
+              onConfirm={handleConfirm}
+              onProcess={handleProcess}
+              onShip={handleShip}
+              onDeliver={handleDeliver}
+              onCancel={handleCancel}
+              onRefund={handleRefund}
+            />
+          </POErrorBoundary>
         </Stack>
       ) : (
         <ResourceNotFound message={t('po.notFound')} />

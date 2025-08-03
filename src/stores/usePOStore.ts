@@ -157,33 +157,123 @@ export const usePOStore = create<POState>()(
       },
 
       async confirmPO(id) {
-        await purchaseOrderService.confirmPO(id);
-        await get().refreshPOs();
+        set({isLoading: true, error: undefined});
+        try {
+          const updatedPO = await purchaseOrderService.confirmPO(id);
+          set((state) => ({
+            isLoading: false,
+            purchaseOrders: state.purchaseOrders.map((po) =>
+              po.id === id ? updatedPO : po
+            ),
+            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+          }));
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: getErrorMessage(error, 'Failed to confirm purchase order'),
+          });
+          throw error;
+        }
       },
 
       async processPO(id) {
-        await purchaseOrderService.processPO(id);
-        await get().refreshPOs();
+        set({isLoading: true, error: undefined});
+        try {
+          const updatedPO = await purchaseOrderService.processPO(id);
+          set((state) => ({
+            isLoading: false,
+            purchaseOrders: state.purchaseOrders.map((po) =>
+              po.id === id ? updatedPO : po
+            ),
+            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+          }));
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: getErrorMessage(error, 'Failed to process purchase order'),
+          });
+          throw error;
+        }
       },
 
       async shipPO(id) {
-        await purchaseOrderService.shipPO(id);
-        await get().refreshPOs();
+        set({isLoading: true, error: undefined});
+        try {
+          const updatedPO = await purchaseOrderService.shipPO(id);
+          set((state) => ({
+            isLoading: false,
+            purchaseOrders: state.purchaseOrders.map((po) =>
+              po.id === id ? updatedPO : po
+            ),
+            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+          }));
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: getErrorMessage(error, 'Failed to ship purchase order'),
+          });
+          throw error;
+        }
       },
 
       async deliverPO(id) {
-        await purchaseOrderService.deliverPO(id);
-        await get().refreshPOs();
+        set({isLoading: true, error: undefined});
+        try {
+          const updatedPO = await purchaseOrderService.deliverPO(id);
+          set((state) => ({
+            isLoading: false,
+            purchaseOrders: state.purchaseOrders.map((po) =>
+              po.id === id ? updatedPO : po
+            ),
+            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+          }));
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: getErrorMessage(error, 'Failed to deliver purchase order'),
+          });
+          throw error;
+        }
       },
 
       async cancelPO(id) {
-        await purchaseOrderService.cancelPO(id);
-        await get().refreshPOs();
+        set({isLoading: true, error: undefined});
+        try {
+          const updatedPO = await purchaseOrderService.cancelPO(id);
+          set((state) => ({
+            isLoading: false,
+            purchaseOrders: state.purchaseOrders.map((po) =>
+              po.id === id ? updatedPO : po
+            ),
+            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+          }));
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: getErrorMessage(error, 'Failed to cancel purchase order'),
+          });
+          throw error;
+        }
       },
 
       async refundPO(id) {
-        await purchaseOrderService.refundPO(id);
-        await get().refreshPOs();
+        set({isLoading: true, error: undefined});
+        try {
+          const updatedPO = await purchaseOrderService.refundPO(id);
+          set((state) => ({
+            isLoading: false,
+            purchaseOrders: state.purchaseOrders.map((po) =>
+              po.id === id ? updatedPO : po
+            ),
+            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+          }));
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: getErrorMessage(error, 'Failed to refund purchase order'),
+          });
+          throw error;
+        }
       },
 
       clearError() {

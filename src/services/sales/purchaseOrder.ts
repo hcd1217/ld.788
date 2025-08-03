@@ -178,37 +178,37 @@ export const purchaseOrderService = {
     return Promise.resolve(this.purchaseOrders[index]);
   },
 
-  async confirmPO(id: string): Promise<void> {
-    await this.updatePO(id, { 
+  async confirmPO(id: string): Promise<PurchaseOrder> {
+    return this.updatePO(id, { 
       status: 'CONFIRMED', 
       processedBy: `${lastName()} ${firstName()}` 
     });
   },
 
-  async processPO(id: string): Promise<void> {
-    await this.updatePO(id, { status: 'PROCESSING' });
+  async processPO(id: string): Promise<PurchaseOrder> {
+    return this.updatePO(id, { status: 'PROCESSING' });
   },
 
-  async shipPO(id: string): Promise<void> {
+  async shipPO(id: string): Promise<PurchaseOrder> {
     const daysAhead = Math.floor(Math.random() * 7) + 1;
-    await this.updatePO(id, { 
+    return this.updatePO(id, { 
       status: 'SHIPPED',
       deliveryDate: new Date(Date.now() + daysAhead * 24 * 60 * 60 * 1000)
     });
   },
 
-  async deliverPO(id: string): Promise<void> {
-    await this.updatePO(id, { 
+  async deliverPO(id: string): Promise<PurchaseOrder> {
+    return this.updatePO(id, { 
       status: 'DELIVERED',
       completedDate: new Date()
     });
   },
 
-  async cancelPO(id: string): Promise<void> {
-    await this.updatePO(id, { status: 'CANCELLED' });
+  async cancelPO(id: string): Promise<PurchaseOrder> {
+    return this.updatePO(id, { status: 'CANCELLED' });
   },
 
-  async refundPO(id: string): Promise<void> {
-    await this.updatePO(id, { status: 'REFUNDED' });
+  async refundPO(id: string): Promise<PurchaseOrder> {
+    return this.updatePO(id, { status: 'REFUNDED' });
   },
 };

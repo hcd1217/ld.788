@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 
-export default function useIsDesktop() {
+export function useIsDesktop() {
   const [isDesktop, setIsDesktop] = useState(true);
   useEffect(() => {
     if (globalThis.window === undefined) {
@@ -19,3 +19,4 @@ export default function useIsDesktop() {
   }, []);
   return isDesktop;
 }
+export default useIsDesktop;
