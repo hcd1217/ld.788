@@ -20,6 +20,7 @@ export {
   OrientationNotice,
   Pagination,
   PWAInstallPrompt,
+  SafariPWAGuide,
 } from './features';
 export {AppLogo, GoBack, MobileUserMenu} from './navigation';
 export {

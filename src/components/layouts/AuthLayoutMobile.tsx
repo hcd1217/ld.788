@@ -2,7 +2,6 @@ import {AppShell} from '@mantine/core';
 import {Outlet} from 'react-router';
 import classes from './AuthLayoutMobile.module.css';
 import {
-  PWAInstallPrompt,
   CommonMobileFooter,
   CommonMobileHeader,
 } from '@/components/common';
@@ -22,7 +21,6 @@ export function AuthLayoutMobile() {
 
       <AppShell.Main className={classes.main} my="sm">
         <Outlet />
-        <PWAInstallPrompt />
       </AppShell.Main>
 
       <AppShell.Footer className={classes.footer}>

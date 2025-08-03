@@ -4,7 +4,6 @@ import {useDisclosure} from '@mantine/hooks';
 import {NavBar} from './NavBar';
 import {UserMenu} from './UserMenu';
 import {
-  PWAInstallPrompt,
   ColorSchemeToggle,
   LanguageSwitcher,
   AppLogo,
@@ -65,8 +64,6 @@ export function AuthLayout() {
       <AppShell.Main pl={mainPaddingLeft}>
         <Outlet />
       </AppShell.Main>
-
-      <PWAInstallPrompt />
     </AppShell>
   );
 }

@@ -111,7 +111,23 @@
     "installTitle": "Cài đặt Credo App",
     "installDescription": "Cài đặt ứng dụng này trên thiết bị của bạn để có trải nghiệm tốt hơn",
     "maybeLater": "Để sau",
-    "install": "Cài đặt"
+    "install": "Cài đặt",
+    "safari": {
+      "installTitle": "Cài đặt Credo App",
+      "installDescription": "Thêm Credo vào màn hình chính để truy cập nhanh và sử dụng ngoại tuyến",
+      "remindLater": "Nhắc tôi sau",
+      "dontShowAgain": "Không hiện lại",
+      "ios": {
+        "step1": "Nhấn nút Chia sẻ trên thanh công cụ Safari",
+        "step2": "Cuộn xuống và nhấn 'Thêm vào Màn hình chính'",
+        "step3": "Nhấn 'Thêm' để cài đặt ứng dụng"
+      },
+      "mac": {
+        "step1": "Nhấp vào menu File trong Safari",
+        "step2": "Chọn 'Add to Dock' từ menu",
+        "step3": "Ứng dụng sẽ được thêm vào Dock để dễ dàng truy cập"
+      }
+    }
   },
   "errors": {
     "backToHomePage": "Quay lại trang chủ",

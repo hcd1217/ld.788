@@ -111,7 +111,23 @@
     "installTitle": "Install Credo App",
     "installDescription": "Install this app on your device for a better experience",
     "maybeLater": "Maybe later",
-    "install": "Install"
+    "install": "Install",
+    "safari": {
+      "installTitle": "Install Credo App",
+      "installDescription": "Add Credo to your home screen for quick access and offline use",
+      "remindLater": "Remind me later",
+      "dontShowAgain": "Don't show again",
+      "ios": {
+        "step1": "Tap the Share button in Safari toolbar",
+        "step2": "Scroll down and tap 'Add to Home Screen'",
+        "step3": "Tap 'Add' to install the app"
+      },
+      "mac": {
+        "step1": "Click File menu in Safari",
+        "step2": "Select 'Add to Dock' from the menu",
+        "step3": "The app will be added to your Dock for easy access"
+      }
+    }
   },
   "errors": {
     "backToHomePage": "Back to home",
