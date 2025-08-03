@@ -8,7 +8,10 @@ import {
   Button,
   TextInput,
   PasswordInput,
+  Divider,
+  Text,
 } from '@mantine/core';
+import {IconQrcode} from '@tabler/icons-react';
 import {useForm} from '@mantine/form';
 import {useAppStore} from '@/stores/useAppStore';
 import {useTranslation} from '@/hooks/useTranslation';
@@ -152,6 +155,27 @@ export function LoginPage() {
             </Button>
           </Stack>
         </form>
+
+        <Stack gap="md" mt="xl">
+          <Divider
+            label={
+              <Text size="sm" c="dimmed">
+                {t('auth.magicLink.or')}
+              </Text>
+            }
+            labelPosition="center"
+          />
+
+          <Button
+            variant="default"
+            fullWidth
+            leftSection={<IconQrcode size={20} />}
+            onClick={() => navigate(ROUTERS.MAGIC_LINK)}
+            disabled={isLoading}
+          >
+            {t('auth.magicLink.useMagicLink')}
+          </Button>
+        </Stack>
 
         <AuthFormLink
           text={t('auth.noAccount')}

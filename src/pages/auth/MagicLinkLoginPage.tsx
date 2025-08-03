@@ -1,13 +1,13 @@
 import {useEffect, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router';
-import {Stack, Space, Button, Text, Alert} from '@mantine/core';
-import {IconX, IconCheck} from '@tabler/icons-react';
+import {Stack, Space, Button, Text, Alert, TextInput, Group} from '@mantine/core';
+import {IconX, IconCheck, IconQrcode, IconForms} from '@tabler/icons-react';
 import {useAppStore} from '@/stores/useAppStore';
 import {useTranslation} from '@/hooks/useTranslation';
 import {useAction} from '@/hooks/useAction';
 import {GuestLayout} from '@/components/layouts/GuestLayout';
 import {FormContainer} from '@/components/form/FormContainer';
-import {AuthHeader} from '@/components/auth';
+import {AuthHeader, QrScannerModal} from '@/components/auth';
 import {ROUTERS} from '@/config/routeConfig';
 import {authService} from '@/services/auth';
 
@@ -20,6 +20,9 @@ export function MagicLinkLoginPage() {
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
+  const [showQrScanner, setShowQrScanner] = useState(false);
+  const [showManualEntry, setShowManualEntry] = useState(false);
+  const [manualCode, setManualCode] = useState('');
   const {t} = useTranslation();
 
   useEffect(() => {
@@ -123,6 +126,54 @@ export function MagicLinkLoginPage() {
     navigate(ROUTERS.LOGIN);
   };
 
+  const handleQrScan = (data: string) => {
+    try {
+      // Parse the scanned data - it should be a URL with token and clientCode
+      const url = new URL(data);
+      const token = url.searchParams.get('token');
+      const clientCode = url.searchParams.get('clientCode');
+      
+      if (token && clientCode) {
+        // Store params and reload to trigger verification
+        sessionStorage.setItem(
+          MAGIC_LINK_STORAGE_KEY,
+          JSON.stringify({ token, clientCode }),
+        );
+        // Trigger verification
+        void verifyMagicLink();
+      } else {
+        setError(t('auth.magicLink.invalidQrCode'));
+      }
+    } catch (err) {
+      console.error('Invalid QR code:', err);
+      setError(t('auth.magicLink.invalidQrCode'));
+    }
+  };
+
+  const handleManualCodeSubmit = () => {
+    try {
+      // Manual code could be in format: token:clientCode or just the token
+      const parts = manualCode.split(':');
+      
+      if (parts.length === 2) {
+        const [token, clientCode] = parts;
+        sessionStorage.setItem(
+          MAGIC_LINK_STORAGE_KEY,
+          JSON.stringify({ token: token.trim(), clientCode: clientCode.trim() }),
+        );
+        void verifyMagicLink();
+      } else if (parts.length === 1 && manualCode.includes('?')) {
+        // Try parsing as URL
+        handleQrScan(manualCode);
+      } else {
+        setError(t('auth.magicLink.invalidLink'));
+      }
+    } catch (err) {
+      console.error('Invalid manual code:', err);
+      setError(t('auth.magicLink.invalidLink'));
+    }
+  };
+
   return (
     <GuestLayout>
       <FormContainer isLoading={isLoading} mounted={mounted}>
@@ -160,13 +211,88 @@ export function MagicLinkLoginPage() {
                 {error}
               </Alert>
 
-              <Button fullWidth variant="auth-form" onClick={handleRetryLogin}>
-                {t('auth.magicLink.tryAgain')}
-              </Button>
+              {!showManualEntry ? (
+                <Stack gap="md" w="100%">
+                  <Button
+                    fullWidth
+                    variant="filled"
+                    leftSection={<IconQrcode size={20} />}
+                    onClick={() => setShowQrScanner(true)}
+                  >
+                    {t('auth.magicLink.scanQrCode')}
+                  </Button>
+
+                  <Text ta="center" size="sm" c="dimmed">
+                    {t('auth.magicLink.or')}
+                  </Text>
+
+                  <Button
+                    fullWidth
+                    variant="default"
+                    leftSection={<IconForms size={20} />}
+                    onClick={() => setShowManualEntry(true)}
+                  >
+                    {t('auth.magicLink.enterCodeManually')}
+                  </Button>
+
+                  <Button
+                    fullWidth
+                    variant="subtle"
+                    onClick={handleRetryLogin}
+                    mt="md"
+                  >
+                    {t('auth.magicLink.tryAgain')}
+                  </Button>
+                </Stack>
+              ) : (
+                <Stack gap="md" w="100%">
+                  <Text size="sm" c="dimmed">
+                    {t('auth.magicLink.enterCodeDescription')}
+                  </Text>
+                  
+                  <TextInput
+                    placeholder={t('auth.magicLink.magicLinkCode')}
+                    value={manualCode}
+                    onChange={(e) => setManualCode(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && manualCode) {
+                        handleManualCodeSubmit();
+                      }
+                    }}
+                  />
+
+                  <Group grow>
+                    <Button
+                      variant="default"
+                      onClick={() => {
+                        setShowManualEntry(false);
+                        setManualCode('');
+                        setError(undefined);
+                      }}
+                    >
+                      {t('common.cancel')}
+                    </Button>
+                    
+                    <Button
+                      variant="filled"
+                      onClick={handleManualCodeSubmit}
+                      disabled={!manualCode}
+                    >
+                      {t('auth.magicLink.verifyCode')}
+                    </Button>
+                  </Group>
+                </Stack>
+              )}
             </>
           ) : null}
         </Stack>
       </FormContainer>
+
+      <QrScannerModal
+        opened={showQrScanner}
+        onClose={() => setShowQrScanner(false)}
+        onScan={handleQrScan}
+      />
     </GuestLayout>
   );
 }
