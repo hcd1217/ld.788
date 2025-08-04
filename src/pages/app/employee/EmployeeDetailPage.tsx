@@ -1,10 +1,10 @@
-import {useState} from 'react';
-import {useNavigate, useParams} from 'react-router';
-import {useDisclosure} from '@mantine/hooks';
-import {LoadingOverlay, Stack} from '@mantine/core';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
-import {useEmployeeList, useHrActions, useHrLoading} from '@/stores/useHrStore';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import { useDisclosure } from '@mantine/hooks';
+import { LoadingOverlay, Stack } from '@mantine/core';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useEmployeeList, useHrActions, useHrLoading } from '@/stores/useHrStore';
 import {
   ResourceNotFound,
   DetailPageLayout,
@@ -18,37 +18,29 @@ import {
   EmployeeDetailAccordion,
   EmployeeDetailAlert,
 } from '@/components/app/employee';
-import type {Employee} from '@/services/hr/employee';
-import {getEmployeeEditRoute} from '@/config/routeConfig';
-import {useOnce} from '@/hooks/useOnce';
-import {useAction} from '@/hooks/useAction';
+import type { Employee } from '@/services/hr/employee';
+import { getEmployeeEditRoute } from '@/config/routeConfig';
+import { useOnce } from '@/hooks/useOnce';
+import { useAction } from '@/hooks/useAction';
 
 export function EmployeeDetailPage() {
-  const {employeeId} = useParams<{employeeId: string}>();
+  const { employeeId } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const isDesktop = useIsDesktop();
   const employees = useEmployeeList();
   const isLoading = useHrLoading();
-  const {loadEmployees, deactivateEmployee, activateEmployee} = useHrActions();
+  const { loadEmployees, deactivateEmployee, activateEmployee } = useHrActions();
 
   const employee = employees.find((emp) => emp.id === employeeId);
 
-  const [employeeToDeactivate, setEmployeeToDeactivate] = useState<
-    Employee | undefined
-  >(undefined);
-  const [employeeToActivate, setEmployeeToActivate] = useState<
-    Employee | undefined
-  >(undefined);
+  const [employeeToDeactivate, setEmployeeToDeactivate] = useState<Employee | undefined>(undefined);
+  const [employeeToActivate, setEmployeeToActivate] = useState<Employee | undefined>(undefined);
 
-  const [
-    deactivateModalOpened,
-    {open: openDeactivateModal, close: closeDeactivateModal},
-  ] = useDisclosure(false);
-  const [
-    activateModalOpened,
-    {open: openActivateModal, close: closeActivateModal},
-  ] = useDisclosure(false);
+  const [deactivateModalOpened, { open: openDeactivateModal, close: closeDeactivateModal }] =
+    useDisclosure(false);
+  const [activateModalOpened, { open: openActivateModal, close: closeActivateModal }] =
+    useDisclosure(false);
 
   const handleEdit = () => {
     if (employee) {
@@ -130,16 +122,12 @@ export function EmployeeDetailPage() {
       onConfirm={confirmActivateEmployee}
     />
   );
-  const title = employee ? (employee.fullName) : t('employee.employeeDetails');
+  const title = employee ? employee.fullName : t('employee.employeeDetails');
 
   if (!isDesktop) {
     if (isLoading || !employee) {
       return (
-        <AppMobileLayout
-          showLogo
-          isLoading={isLoading}
-          header={<AppPageTitle title={title} />}
-        >
+        <AppMobileLayout showLogo isLoading={isLoading} header={<AppPageTitle title={title} />}>
           {isLoading ? (
             <LoadingOverlay visible />
           ) : (
@@ -158,10 +146,7 @@ export function EmployeeDetailPage() {
         header={<AppPageTitle title={title} />}
       >
         <Stack gap="md">
-          <EmployeeDetailAlert
-            endDate={employee.endDate}
-            isActive={employee.isActive}
-          />
+          <EmployeeDetailAlert endDate={employee.endDate} isActive={employee.isActive} />
           <EmployeeDetailAccordion
             employee={employee}
             onActivate={handleActivate}
@@ -179,10 +164,7 @@ export function EmployeeDetailPage() {
     <DetailPageLayout titleAlign="center" title={title} isLoading={isLoading}>
       {employee ? (
         <Stack gap="md">
-          <EmployeeDetailAlert
-            endDate={employee.endDate}
-            isActive={employee.isActive}
-          />
+          <EmployeeDetailAlert endDate={employee.endDate} isActive={employee.isActive} />
           <EmployeeDetailTabs
             employee={employee}
             onEdit={handleEdit}

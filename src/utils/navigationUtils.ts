@@ -1,13 +1,10 @@
-import type {NavigationItem} from '@/components/layouts/types';
+import type { NavigationItem } from '@/components/layouts/types';
 
 /**
  * Check if a navigation item or any of its sub-items is active
  * based on the current pathname
  */
-export function isNavigationItemActive(
-  item: NavigationItem,
-  pathname: string,
-): boolean {
+export function isNavigationItemActive(item: NavigationItem, pathname: string): boolean {
   // Direct path match
   if (pathname === item?.path) {
     return true;

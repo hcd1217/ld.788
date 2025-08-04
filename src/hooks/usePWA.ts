@@ -1,9 +1,9 @@
-import {useRegisterSW} from 'virtual:pwa-register/react';
-import {useEffect, useRef, useCallback} from 'react';
-import {notifications} from '@mantine/notifications';
-import {useLocalStorage} from '@mantine/hooks';
-import {showSuccessNotification} from '@/utils/notifications';
-import {useTranslation} from '@/hooks/useTranslation';
+import { useRegisterSW } from 'virtual:pwa-register/react';
+import { useEffect, useRef, useCallback } from 'react';
+import { notifications } from '@mantine/notifications';
+import { useLocalStorage } from '@mantine/hooks';
+import { showSuccessNotification } from '@/utils/notifications';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // Browser detection utilities
 const isChromium = () => {
@@ -17,22 +17,22 @@ const isSafari = () => {
 };
 
 const isStandalone = () => {
-  return window.matchMedia('(display-mode: standalone)').matches
-    || (window.navigator as any).standalone === true;
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as any).standalone === true
+  );
 };
 
 // Safari cache clearing utility
 const clearSafariCaches = async () => {
   if ('caches' in window) {
     const cacheNames = await caches.keys();
-    await Promise.all(
-      cacheNames.map(cacheName => caches.delete(cacheName))
-    );
+    await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
   }
 };
 
 export function usePWA() {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const updateCheckInterval = useRef<number | undefined>(undefined);
   const lastNotificationTime = useRef<number>(0);
   const lastDetectedVersion = useRef<string>('');
@@ -44,7 +44,7 @@ export function usePWA() {
     key: 'pwa-current-version',
     defaultValue: '',
   });
-  
+
   const {
     offlineReady: [offlineReady],
     needRefresh: [needRefresh],
@@ -52,12 +52,15 @@ export function usePWA() {
   } = useRegisterSW({
     onRegistered(r) {
       console.log('PWA Service Worker registered:', r);
-      
+
       // More aggressive update checks for Safari
       if (r && isSafari()) {
-        window.setInterval(() => {
-          r.update();
-        }, 30 * 60 * 1000); // 30 minutes for Safari
+        window.setInterval(
+          () => {
+            r.update();
+          },
+          30 * 60 * 1000,
+        ); // 30 minutes for Safari
       }
     },
     onRegisterError(error) {
@@ -69,37 +72,37 @@ export function usePWA() {
   const checkForUpdates = useCallback(async () => {
     try {
       const currentBuild = import.meta.env.VITE_APP_BUILD as string;
-      
+
       // Initialize stored version if empty
       if (!storedVersion) {
         setStoredVersion(currentBuild);
         console.log('Initialized PWA version:', currentBuild);
         return;
       }
-      
+
       // Check if current build differs from stored version
       if (currentBuild && currentBuild !== storedVersion) {
         console.log('New version detected:', currentBuild, '(previous:', storedVersion, ')');
-        
+
         // Prevent duplicate notifications
         const now = Date.now();
         const timeSinceLastNotification = now - lastNotificationTime.current;
         const isSameVersion = lastDetectedVersion.current === currentBuild;
-        
+
         // Skip if same version was already notified within last 10 minutes
         if (isSameVersion && timeSinceLastNotification < 10 * 60 * 1000) {
           console.log('Skipping duplicate notification for version:', currentBuild);
           return;
         }
-        
+
         // Update tracking refs
         lastNotificationTime.current = now;
         lastDetectedVersion.current = currentBuild;
-        
+
         if (isSafari() && isStandalone()) {
           // Clear all caches first for Safari
           await clearSafariCaches();
-          
+
           // Safari in standalone mode - requires complete app restart
           notifications.show({
             id: 'safari-update',
@@ -122,7 +125,7 @@ export function usePWA() {
             color: 'blue',
             autoClose: 3000,
           });
-          
+
           setTimeout(() => {
             // Update stored version before reload
             setStoredVersion(currentBuild);
@@ -155,7 +158,7 @@ export function usePWA() {
   useEffect(() => {
     // Initial check immediately on mount
     void checkForUpdates();
-    
+
     // Check on visibility change (app comes to foreground)
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -163,10 +166,10 @@ export function usePWA() {
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     // Optional periodic check every 30 minutes as fallback
     updateCheckInterval.current = window.setInterval(checkForUpdates, 30 * 60 * 1000);
-    
+
     return () => {
       if (updateCheckInterval.current) {
         window.clearInterval(updateCheckInterval.current);
@@ -180,13 +183,13 @@ export function usePWA() {
     if (needRefresh) {
       // Check if we already handled this through app-level version checking
       const now = Date.now();
-      const recentlyNotified = (now - lastNotificationTime.current) < 5 * 60 * 1000; // 5 minutes
-      
+      const recentlyNotified = now - lastNotificationTime.current < 5 * 60 * 1000; // 5 minutes
+
       if (recentlyNotified) {
         console.log('Skipping service worker notification - already handled by app-level check');
         return;
       }
-      
+
       if (isChromium()) {
         if (autoUpdate) {
           // Auto-update after delay
@@ -197,7 +200,7 @@ export function usePWA() {
             updateServiceWorker(true);
             window.location.reload();
           }, 3000);
-          
+
           notifications.show({
             id: 'pwa-updating',
             title: t('common.pwa.update.updating'),
@@ -239,7 +242,7 @@ export function usePWA() {
           },
         });
       }
-      
+
       // Update tracking to prevent duplicate app-level notifications
       lastNotificationTime.current = now;
     }

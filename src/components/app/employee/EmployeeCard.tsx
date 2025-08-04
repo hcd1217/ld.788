@@ -1,12 +1,12 @@
-import {Card, Group, Box, Text, type MantineStyleProp} from '@mantine/core';
-import {useNavigate} from 'react-router';
-import {EmployeeActions} from './EmployeeActions';
-import {useTranslation} from '@/hooks/useTranslation';
-import type {Employee} from '@/services/hr/employee';
-import {ActiveBadge} from '@/components/common';
-import {renderFullName} from '@/utils/string';
-import {getEmployeeDetailRoute} from '@/config/routeConfig';
-import {getEndDateHighlightStyles} from '@/utils/time';
+import { Card, Group, Box, Text, type MantineStyleProp } from '@mantine/core';
+import { useNavigate } from 'react-router';
+import { EmployeeActions } from './EmployeeActions';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { Employee } from '@/services/hr/employee';
+import { ActiveBadge } from '@/components/common';
+import { renderFullName } from '@/utils/string';
+import { getEmployeeDetailRoute } from '@/config/routeConfig';
+import { getEndDateHighlightStyles } from '@/utils/time';
 
 type EmployeeCardProps = {
   readonly employee: Employee;
@@ -31,7 +31,7 @@ export function EmployeeCard({
   actionIconsStyle,
   noActions,
 }: EmployeeCardProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const defaultActionIconsStyle: MantineStyleProp = {
@@ -61,11 +61,7 @@ export function EmployeeCard({
       })}
       onClick={() => navigate(getEmployeeDetailRoute(employee.id))}
     >
-      <Group
-        justify="space-between"
-        align="flex-start"
-        style={{position: 'relative'}}
-      >
+      <Group justify="space-between" align="flex-start" style={{ position: 'relative' }}>
         <Box>
           <Text fw={500} size="sm">
             {fullName}

@@ -20,8 +20,8 @@ import {
   IconCheck,
   IconBriefcase,
 } from '@tabler/icons-react';
-import type {Staff} from '@/services/staff';
-import {useTranslation} from '@/hooks/useTranslation';
+import type { Staff } from '@/services/staff';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export interface StaffCardProps {
   readonly staff: Staff;
@@ -40,7 +40,7 @@ export function StaffCard({
   onShowQrCode,
   showActions = true,
 }: StaffCardProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const getRoleBadgeColor = (role: Staff['role']) => {
     switch (role) {
       case 'admin': {
@@ -69,15 +69,12 @@ export function StaffCard({
   };
 
   const formatWorkingPattern = (staff: Staff) => {
-    const pattern =
-      staff.workingPattern === 'fulltime'
-        ? t('staff.fulltime')
-        : t('staff.shift');
+    const pattern = staff.workingPattern === 'fulltime' ? t('staff.fulltime') : t('staff.shift');
     const hours =
       staff.workingPattern === 'fulltime'
         ? staff.defaultWeeklyHours || staff.weeklyContractedHours
         : staff.weeklyContractedHours;
-    return `${pattern} (${t('staff.hoursPerWeek', {hours})})`;
+    return `${pattern} (${t('staff.hoursPerWeek', { hours })})`;
   };
 
   return (
@@ -92,11 +89,7 @@ export function StaffCard({
               <Text fw={600} size="sm">
                 {staff.fullName}
               </Text>
-              <Badge
-                size="xs"
-                color={getRoleBadgeColor(staff.role)}
-                variant="light"
-              >
+              <Badge size="xs" color={getRoleBadgeColor(staff.role)} variant="light">
                 {t(`staff.${staff.role}`)}
               </Badge>
             </div>
@@ -142,7 +135,7 @@ export function StaffCard({
           <Group
             justify="space-between"
             pt="sm"
-            style={{borderTop: '1px solid var(--mantine-color-gray-3)'}}
+            style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}
           >
             <Group gap="xs">
               {onShowQrCode ? (
@@ -161,23 +154,15 @@ export function StaffCard({
               ) : null}
 
               <CopyButton value={staff.clockInUrl}>
-                {({copied, copy}) => (
-                  <Tooltip
-                    label={
-                      copied ? t('staff.copied') : t('staff.copyClockInUrl')
-                    }
-                  >
+                {({ copied, copy }) => (
+                  <Tooltip label={copied ? t('staff.copied') : t('staff.copyClockInUrl')}>
                     <ActionIcon
                       variant="light"
                       color={copied ? 'green' : 'gray'}
                       size="sm"
                       onClick={copy}
                     >
-                      {copied ? (
-                        <IconCheck size={14} />
-                      ) : (
-                        <IconCopy size={14} />
-                      )}
+                      {copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
                     </ActionIcon>
                   </Tooltip>
                 )}

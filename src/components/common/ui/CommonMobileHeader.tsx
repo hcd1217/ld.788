@@ -1,5 +1,5 @@
-import {Group} from '@mantine/core';
-import {AppLogo, MobileUserMenu} from '../navigation';
+import { Group } from '@mantine/core';
+import { AppLogo, MobileUserMenu } from '../navigation';
 
 export function CommonMobileHeader() {
   return (

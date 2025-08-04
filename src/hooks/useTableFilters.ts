@@ -1,4 +1,4 @@
-import {useState, useMemo, useCallback} from 'react';
+import { useState, useMemo, useCallback } from 'react';
 
 export interface TableFilters {
   searchQuery: string;
@@ -27,15 +27,15 @@ export function useTableFilters<T extends Record<string, unknown>>(
 
   const handlers: TableFilterHandlers = {
     setSearchQuery: useCallback((query: string) => {
-      setFilters((prev) => ({...prev, searchQuery: query}));
+      setFilters((prev) => ({ ...prev, searchQuery: query }));
     }, []),
 
     setSortBy: useCallback((field: string) => {
-      setFilters((prev) => ({...prev, sortBy: field}));
+      setFilters((prev) => ({ ...prev, sortBy: field }));
     }, []),
 
     setSortDirection: useCallback((direction: 'asc' | 'desc') => {
-      setFilters((prev) => ({...prev, sortDirection: direction}));
+      setFilters((prev) => ({ ...prev, sortDirection: direction }));
     }, []),
 
     toggleSort: useCallback((field: string) => {

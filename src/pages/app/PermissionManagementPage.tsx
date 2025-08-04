@@ -1,5 +1,5 @@
-import {useState, useEffect, useCallback} from 'react';
-import {Navigate} from 'react-router';
+import { useState, useEffect, useCallback } from 'react';
+import { Navigate } from 'react-router';
 import {
   Button,
   Paper,
@@ -22,9 +22,9 @@ import {
   Transition,
   ScrollArea,
 } from '@mantine/core';
-import {useForm} from '@mantine/form';
-import {useDisclosure} from '@mantine/hooks';
-import {modals} from '@mantine/modals';
+import { useForm } from '@mantine/form';
+import { useDisclosure } from '@mantine/hooks';
+import { modals } from '@mantine/modals';
 import {
   IconPlus,
   IconEdit,
@@ -34,15 +34,12 @@ import {
   IconAlertCircle,
   IconLock,
 } from '@tabler/icons-react';
-import {
-  showErrorNotification,
-  showSuccessNotification,
-} from '@/utils/notifications';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAppStore} from '@/stores/useAppStore';
-import {clientService} from '@/services/client';
-import type {Permission} from '@/lib/api';
-import {GoBack} from '@/components/common';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/stores/useAppStore';
+import { clientService } from '@/services/client';
+import type { Permission } from '@/lib/api';
+import { GoBack } from '@/components/common';
 
 type PermissionFormValues = {
   resource: string;
@@ -52,40 +49,38 @@ type PermissionFormValues = {
 };
 
 const RESOURCE_OPTIONS = [
-  {value: '*', label: 'All Resources (*)'},
-  {value: 'user', label: 'User'},
-  {value: 'report', label: 'Report'},
-  {value: 'analytics', label: 'Analytics'},
+  { value: '*', label: 'All Resources (*)' },
+  { value: 'user', label: 'User' },
+  { value: 'report', label: 'Report' },
+  { value: 'analytics', label: 'Analytics' },
 ];
 
 const ACTION_OPTIONS = [
-  {value: 'read', label: 'Read'},
-  {value: 'create', label: 'Create'},
-  {value: 'update', label: 'Update'},
-  {value: 'delete', label: 'Delete'},
-  {value: '*', label: 'All Actions (*)'},
+  { value: 'read', label: 'Read' },
+  { value: 'create', label: 'Create' },
+  { value: 'update', label: 'Update' },
+  { value: 'delete', label: 'Delete' },
+  { value: '*', label: 'All Actions (*)' },
 ];
 
 const SCOPE_OPTIONS = [
-  {value: 'all', label: 'All'},
-  {value: 'own', label: 'Own'},
-  {value: 'department', label: 'Department'},
-  {value: '*', label: 'All Scopes (*)'},
+  { value: 'all', label: 'All' },
+  { value: 'own', label: 'Own' },
+  { value: 'department', label: 'Department' },
+  { value: '*', label: 'All Scopes (*)' },
 ];
 
 export function PermissionManagementPage() {
-  const {t} = useTranslation();
-  const {user} = useAppStore();
+  const { t } = useTranslation();
+  const { user } = useAppStore();
 
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPermission, setSelectedPermission] = useState<
-    Permission | undefined
-  >(undefined);
+  const [selectedPermission, setSelectedPermission] = useState<Permission | undefined>(undefined);
   const [showAlert, setShowAlert] = useState(false);
   const [isAddMode, setIsAddMode] = useState(false);
 
-  const [formOpened, {open: openForm, close: closeForm}] = useDisclosure(false);
+  const [formOpened, { open: openForm, close: closeForm }] = useDisclosure(false);
 
   const form = useForm<PermissionFormValues>({
     initialValues: {
@@ -99,9 +94,7 @@ export function PermissionManagementPage() {
       action: (value) => (value ? null : t('validation.fieldRequired')),
       scope: (value) => (value ? null : t('validation.fieldRequired')),
       description: (value) =>
-        !value || value.length < 10
-          ? t('validation.descriptionMinLength')
-          : null,
+        !value || value.length < 10 ? t('validation.descriptionMinLength') : null,
     },
   });
 
@@ -146,22 +139,16 @@ export function PermissionManagementPage() {
           })}
         </Text>
       ),
-      labels: {confirm: t('permission.revoke'), cancel: t('common.cancel')},
-      confirmProps: {color: 'red'},
+      labels: { confirm: t('permission.revoke'), cancel: t('common.cancel') },
+      confirmProps: { color: 'red' },
       async onConfirm() {
         try {
           setIsLoading(true);
           await clientService.revokePermission(permission.id);
           setPermissions((prev) => prev.filter((p) => p.id !== permission.id));
-          showSuccessNotification(
-            t('common.success'),
-            t('permission.revokeSuccess'),
-          );
+          showSuccessNotification(t('common.success'), t('permission.revokeSuccess'));
         } catch {
-          showErrorNotification(
-            t('common.error'),
-            t('permission.revokeFailed'),
-          );
+          showErrorNotification(t('common.error'), t('permission.revokeFailed'));
         } finally {
           setIsLoading(false);
         }
@@ -183,10 +170,7 @@ export function PermissionManagementPage() {
           description: values.description,
         };
         setPermissions((prev) => [...prev, newPermission]);
-        showSuccessNotification(
-          t('common.success'),
-          t('permission.addSuccess'),
-        );
+        showSuccessNotification(t('common.success'), t('permission.addSuccess'));
       } else if (selectedPermission) {
         await clientService.updatePermission(selectedPermission.id, values);
         setPermissions((prev) =>
@@ -202,10 +186,7 @@ export function PermissionManagementPage() {
               : p,
           ),
         );
-        showSuccessNotification(
-          t('common.success'),
-          t('permission.updateSuccess'),
-        );
+        showSuccessNotification(t('common.success'), t('permission.updateSuccess'));
       }
 
       closeForm();
@@ -235,10 +216,7 @@ export function PermissionManagementPage() {
         <Group justify="space-between">
           <GoBack />
 
-          <Button
-            leftSection={<IconPlus size={16} />}
-            onClick={handleAddPermission}
-          >
+          <Button leftSection={<IconPlus size={16} />} onClick={handleAddPermission}>
             {t('permission.add')}
           </Button>
         </Group>
@@ -250,7 +228,7 @@ export function PermissionManagementPage() {
         <Paper withBorder shadow="md" p="md" radius="md">
           <Stack gap="md">
             <Group justify="space-between" align="flex-start">
-              <Box style={{flex: 1}} />
+              <Box style={{ flex: 1 }} />
 
               <Tooltip label={t('common.refresh')}>
                 <ActionIcon variant="light" size="lg" onClick={loadPermissions}>
@@ -259,11 +237,11 @@ export function PermissionManagementPage() {
               </Tooltip>
             </Group>
 
-            <Box style={{position: 'relative'}}>
+            <Box style={{ position: 'relative' }}>
               <LoadingOverlay
                 visible={isLoading}
-                overlayProps={{blur: 2}}
-                transitionProps={{duration: 300}}
+                overlayProps={{ blur: 2 }}
+                transitionProps={{ duration: 300 }}
               />
 
               <Box visibleFrom="md">
@@ -343,19 +321,15 @@ export function PermissionManagementPage() {
 
       <Modal
         opened={formOpened}
-        title={
-          <Title order={3}>
-            {isAddMode ? t('permission.add') : t('permission.edit')}
-          </Title>
-        }
+        title={<Title order={3}>{isAddMode ? t('permission.add') : t('permission.edit')}</Title>}
         size="md"
         onClose={closeForm}
       >
-        <Box style={{position: 'relative'}}>
+        <Box style={{ position: 'relative' }}>
           <LoadingOverlay
             visible={isLoading}
-            overlayProps={{blur: 2}}
-            transitionProps={{duration: 300}}
+            overlayProps={{ blur: 2 }}
+            transitionProps={{ duration: 300 }}
           />
 
           <form onSubmit={form.onSubmit(handleSavePermission)}>
@@ -416,9 +390,7 @@ export function PermissionManagementPage() {
               />
 
               <Transition
-                mounted={Boolean(
-                  showAlert && Object.keys(form.errors).length > 0,
-                )}
+                mounted={Boolean(showAlert && Object.keys(form.errors).length > 0)}
                 transition="fade"
                 duration={300}
                 timingFunction="ease"
@@ -440,11 +412,7 @@ export function PermissionManagementPage() {
               </Transition>
 
               <Group justify="flex-end" mt="md">
-                <Button
-                  variant="outline"
-                  disabled={isLoading}
-                  onClick={closeForm}
-                >
+                <Button variant="outline" disabled={isLoading} onClick={closeForm}>
                   {t('common.cancel')}
                 </Button>
                 <Button type="submit" loading={isLoading}>

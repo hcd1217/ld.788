@@ -1,17 +1,7 @@
-import {useState} from 'react';
-import {useNavigate, useParams} from 'react-router';
-import {
-  Container,
-  Title,
-  Stack,
-  Card,
-  Group,
-  Box,
-  Alert,
-  Divider,
-  Tabs,
-} from '@mantine/core';
-import {useDisclosure} from '@mantine/hooks';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import { Container, Title, Stack, Card, Group, Box, Alert, Divider, Tabs } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import {
   IconAlertCircle,
   IconInfoCircle,
@@ -19,11 +9,11 @@ import {
   IconFlag,
   IconUsers,
 } from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useClientDetail} from '@/hooks/useClientDetail';
-import {useClientActions} from '@/stores/useClientStore';
-import {GoBack} from '@/components/common';
-import {TabErrorBoundary} from '@/components/admin/TabErrorBoundary';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useClientDetail } from '@/hooks/useClientDetail';
+import { useClientActions } from '@/stores/useClientStore';
+import { GoBack } from '@/components/common';
+import { TabErrorBoundary } from '@/components/admin/TabErrorBoundary';
 import {
   showErrorNotification,
   showInfoNotification,
@@ -38,24 +28,20 @@ import {
   ClientFeatureFlagsSection,
   ClientUsersSection,
 } from '@/components/admin/ClientManagementComponents';
-import {ROUTERS} from '@/config/routeConfig';
+import { ROUTERS } from '@/config/routeConfig';
 
 export function ClientDetailPage() {
-  const {clientCode} = useParams<{clientCode: string}>();
+  const { clientCode } = useParams<{ clientCode: string }>();
   const navigate = useNavigate();
-  const {t} = useTranslation();
-  const {client, isLoading, error, reload} = useClientDetail(clientCode);
+  const { t } = useTranslation();
+  const { client, isLoading, error, reload } = useClientDetail(clientCode);
   const [deleteConfirmCode, setDeleteConfirmCode] = useState('');
   const [deleteReason, setDeleteReason] = useState('');
   const [suspendReason, setSuspendReason] = useState('');
-  const [actionType, setActionType] = useState<
-    'suspend' | 'reactivate' | 'delete' | undefined
-  >();
+  const [actionType, setActionType] = useState<'suspend' | 'reactivate' | 'delete' | undefined>();
 
-  const [modalOpened, {open: openModal, close: closeModal}] =
-    useDisclosure(false);
-  const {suspendClient, reactivateClient, hardDeleteClient} =
-    useClientActions();
+  const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const { suspendClient, reactivateClient, hardDeleteClient } = useClientActions();
 
   const handleSuspend = () => {
     setActionType('suspend');
@@ -153,9 +139,7 @@ export function ClientDetailPage() {
       closeModal();
     } catch (error) {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t('errors.failedToUpdateClient');
+        error instanceof Error ? error.message : t('errors.failedToUpdateClient');
       showErrorNotification(t('admin.clients.updateFailed'), errorMessage);
     }
   };
@@ -180,7 +164,7 @@ export function ClientDetailPage() {
               icon={<IconAlertCircle size={16} />}
               color="red"
               variant="light"
-              style={{maxWidth: '600px', width: '100%'}}
+              style={{ maxWidth: '600px', width: '100%' }}
             >
               {error}
             </Alert>
@@ -216,18 +200,14 @@ export function ClientDetailPage() {
           {client ? (
             <Tabs defaultValue="info">
               <Tabs.List grow fw="bold" ta="left">
-                <Tabs.Tab
-                  value="info"
-                  leftSection={<IconInfoCircle size={16} />}
-                >
+                <Tabs.Tab value="info" leftSection={<IconInfoCircle size={16} />}>
                   {t('admin.clients.information')}
                 </Tabs.Tab>
                 <Tabs.Tab value="roles" leftSection={<IconLock size={16} />}>
                   {t('admin.clients.roles')} ({client.roles.length})
                 </Tabs.Tab>
                 <Tabs.Tab value="features" leftSection={<IconFlag size={16} />}>
-                  {t('admin.clients.featureFlags')} (
-                  {client.dynamicFeatureFlags.length})
+                  {t('admin.clients.featureFlags')} ({client.dynamicFeatureFlags.length})
                 </Tabs.Tab>
                 <Tabs.Tab value="users" leftSection={<IconUsers size={16} />}>
                   {t('admin.clients.users')} ({client.users.length})
@@ -243,7 +223,7 @@ export function ClientDetailPage() {
                       width: '100%',
                     }}
                   >
-                    <Box style={{maxWidth: '80vw', width: '100%'}}>
+                    <Box style={{ maxWidth: '80vw', width: '100%' }}>
                       <Card shadow="sm" padding="xl" radius="md">
                         <Stack gap="lg">
                           <ClientBasicInfo client={client} />

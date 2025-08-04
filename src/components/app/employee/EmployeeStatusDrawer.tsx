@@ -5,9 +5,9 @@ import { EMPLOYEE_STATUS } from '@/constants/employee';
 
 interface EmployeeStatusDrawerProps {
   readonly opened: boolean;
-  readonly selectedStatus: typeof EMPLOYEE_STATUS[keyof typeof EMPLOYEE_STATUS];
+  readonly selectedStatus: (typeof EMPLOYEE_STATUS)[keyof typeof EMPLOYEE_STATUS];
   readonly onClose: () => void;
-  readonly onStatusSelect: (status: typeof EMPLOYEE_STATUS[keyof typeof EMPLOYEE_STATUS]) => void;
+  readonly onStatusSelect: (status: (typeof EMPLOYEE_STATUS)[keyof typeof EMPLOYEE_STATUS]) => void;
 }
 
 export function EmployeeStatusDrawer({
@@ -18,7 +18,7 @@ export function EmployeeStatusDrawer({
 }: EmployeeStatusDrawerProps) {
   const { t } = useTranslation();
 
-  const handleStatusSelect = (status: typeof EMPLOYEE_STATUS[keyof typeof EMPLOYEE_STATUS]) => {
+  const handleStatusSelect = (status: (typeof EMPLOYEE_STATUS)[keyof typeof EMPLOYEE_STATUS]) => {
     onStatusSelect(status);
     onClose();
   };
@@ -31,7 +31,7 @@ export function EmployeeStatusDrawer({
     const gapHeight = 8;
     const padding = 32;
     const headerHeight = 60;
-    const calculatedHeight = headerHeight + padding + (rows * buttonHeight) + ((rows - 1) * gapHeight);
+    const calculatedHeight = headerHeight + padding + rows * buttonHeight + (rows - 1) * gapHeight;
     return `${calculatedHeight}px`;
   };
 

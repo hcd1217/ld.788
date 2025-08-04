@@ -8,7 +8,7 @@ import type { Unit } from '@/services/hr/unit';
 interface EmployeeFilterBarProps {
   readonly searchQuery: string;
   readonly unitId?: string;
-  readonly status: typeof EMPLOYEE_STATUS[keyof typeof EMPLOYEE_STATUS];
+  readonly status: (typeof EMPLOYEE_STATUS)[keyof typeof EMPLOYEE_STATUS];
   readonly units: readonly Unit[];
   readonly hasActiveFilters: boolean;
   readonly onSearchChange: (query: string) => void;
@@ -44,19 +44,17 @@ export function EmployeeFilterBar({
         <Group gap="xs">
           <Button
             size="xs"
-            variant={unitId ? "filled" : "light"}
+            variant={unitId ? 'filled' : 'light'}
             rightSection={<IconChevronDown size={16} />}
             onClick={onUnitClick}
             style={{ flex: 1 }}
           >
-            {unitId
-              ? units.find((unit) => unit.id === unitId)?.name
-              : t('employee.allUnit')}
+            {unitId ? units.find((unit) => unit.id === unitId)?.name : t('employee.allUnit')}
           </Button>
 
           <Button
             size="xs"
-            variant={status !== EMPLOYEE_STATUS.ALL ? "filled" : "light"}
+            variant={status !== EMPLOYEE_STATUS.ALL ? 'filled' : 'light'}
             rightSection={<IconChevronDown size={16} />}
             onClick={onStatusClick}
             style={{ flex: 1 }}

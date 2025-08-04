@@ -9,7 +9,7 @@ import {
   IconUsers,
   IconUsersGroup,
 } from '@tabler/icons-react';
-import {ROUTERS} from './routeConfig';
+import { ROUTERS } from './routeConfig';
 
 // Static navigation structure with stable IDs
 // This prevents regenerating IDs on every render
@@ -33,23 +33,14 @@ export const NAVIGATION_STRUCTURE = [
     translationKey: 'common.employeeManagement',
     icon: IconUsers,
     path: ROUTERS.EMPLOYEE_MANAGEMENT,
-    activePaths: [
-      ROUTERS.EMPLOYEE_MANAGEMENT,
-      ROUTERS.EMPLOYEES_ADD,
-      ROUTERS.EMPLOYEE_EDIT,
-    ],
+    activePaths: [ROUTERS.EMPLOYEE_MANAGEMENT, ROUTERS.EMPLOYEES_ADD, ROUTERS.EMPLOYEE_EDIT],
   },
   {
     id: 'nav-po-management',
     translationKey: 'common.poManagement',
     icon: IconShoppingCart,
     path: ROUTERS.PO_MANAGEMENT,
-    activePaths: [
-      ROUTERS.PO_ADD,
-      ROUTERS.PO_DETAIL,
-      ROUTERS.PO_EDIT,
-      ROUTERS.PO_MANAGEMENT,
-    ],
+    activePaths: [ROUTERS.PO_ADD, ROUTERS.PO_DETAIL, ROUTERS.PO_EDIT, ROUTERS.PO_MANAGEMENT],
   },
   {
     id: 'nav-configuration',
@@ -61,11 +52,7 @@ export const NAVIGATION_STRUCTURE = [
         translationKey: 'common.customerManagement',
         icon: IconAddressBook,
         path: ROUTERS.CUSTOMER_MANAGEMENT,
-        activePaths: [
-          ROUTERS.CUSTOMER_MANAGEMENT,
-          ROUTERS.CUSTOMER_ADD,
-          ROUTERS.CUSTOMER_EDIT,
-        ],
+        activePaths: [ROUTERS.CUSTOMER_MANAGEMENT, ROUTERS.CUSTOMER_ADD, ROUTERS.CUSTOMER_EDIT],
       },
       {
         id: 'nav-store-management-sub',

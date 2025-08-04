@@ -1,9 +1,9 @@
 /* global google */
-import React, {type ReactNode, useState, useRef, useEffect} from 'react';
-import {TextInput, Loader, Text} from '@mantine/core';
-import {IconMapPin} from '@tabler/icons-react';
-import {useLoadScript} from '@react-google-maps/api';
-import {useTranslation} from '@/hooks/useTranslation';
+import React, { type ReactNode, useState, useRef, useEffect } from 'react';
+import { TextInput, Loader, Text } from '@mantine/core';
+import { IconMapPin } from '@tabler/icons-react';
+import { useLoadScript } from '@react-google-maps/api';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const libraries: Array<'places'> = ['places'];
 
@@ -13,10 +13,7 @@ type LocationInputProps = {
   readonly value: string;
   readonly error?: string | ReactNode;
   readonly disabled?: boolean;
-  readonly onLocationSelect: (
-    location: {lat: number; lng: number},
-    address: string,
-  ) => void;
+  readonly onLocationSelect: (location: { lat: number; lng: number }, address: string) => void;
   readonly onAddressChange: (address: string) => void;
   readonly onFocus?: () => void;
 };
@@ -31,19 +28,17 @@ export function LocationInput({
   onAddressChange,
   onFocus,
 }: LocationInputProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
-   
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(
-    null,
-  );
+
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   const defaultLabel = label || t('store.address');
   const defaultPlaceholder = placeholder || t('store.searchForAddress');
 
   // Load Google Maps API
-  const {isLoaded, loadError} = useLoadScript({
+  const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
     libraries,
   });
@@ -55,14 +50,11 @@ export function LocationInput({
   useEffect(() => {
     if (isLoaded && inputRef.current && !autocompleteRef.current) {
       // Initialize autocomplete
-       
-      autocompleteRef.current = new google.maps.places.Autocomplete(
-        inputRef.current,
-        {
-          types: ['establishment', 'geocode'],
-          fields: ['formatted_address', 'geometry.location', 'name'],
-        },
-      );
+
+      autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
+        types: ['establishment', 'geocode'],
+        fields: ['formatted_address', 'geometry.location', 'name'],
+      });
 
       // Handle place selection
       autocompleteRef.current.addListener('place_changed', () => {
@@ -85,7 +77,6 @@ export function LocationInput({
 
     return () => {
       if (autocompleteRef.current) {
-         
         google.maps.event.clearInstanceListeners(autocompleteRef.current);
       }
     };

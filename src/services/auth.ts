@@ -6,7 +6,7 @@ import {
   type ResetPasswordRequest,
   type ResetPasswordResponse,
 } from '@/lib/api';
-import {decodeJWT, isTokenExpired} from '@/utils/jwt';
+import { decodeJWT, isTokenExpired } from '@/utils/jwt';
 
 export type User = {
   id: string;
@@ -28,7 +28,7 @@ export const authService = {
     }
   },
 
-  async login(credentials: LoginRequest): Promise<{user: User}> {
+  async login(credentials: LoginRequest): Promise<{ user: User }> {
     try {
       saveClientCode(credentials.clientCode);
       const response = await authApi.login(credentials);
@@ -65,7 +65,7 @@ export const authService = {
         return false;
       }
 
-      const response = await authApi.renewToken({refreshToken});
+      const response = await authApi.renewToken({ refreshToken });
       if (response.accessToken) {
         saveTokens({
           accessToken: response.accessToken,
@@ -99,9 +99,7 @@ export const authService = {
     };
   },
 
-  async forgotPassword(
-    data: ForgotPasswordRequest,
-  ): Promise<ForgotPasswordResponse> {
+  async forgotPassword(data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
     try {
       const response = await authApi.forgotPassword(data);
       return response;
@@ -111,9 +109,7 @@ export const authService = {
     }
   },
 
-  async resetPassword(
-    data: ResetPasswordRequest,
-  ): Promise<ResetPasswordResponse> {
+  async resetPassword(data: ResetPasswordRequest): Promise<ResetPasswordResponse> {
     try {
       const response = await authApi.resetPassword(data);
       return response;
@@ -128,13 +124,7 @@ function saveClientCode(clientCode: string) {
   localStorage.setItem('clientCode', clientCode);
 }
 
-function saveTokens({
-  accessToken,
-  refreshToken,
-}: {
-  accessToken: string;
-  refreshToken: string;
-}) {
+function saveTokens({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) {
   localStorage.setItem('accessToken', accessToken);
   localStorage.setItem('refreshToken', refreshToken);
 }
@@ -144,10 +134,7 @@ function clearTokens() {
   localStorage.removeItem('refreshToken');
 }
 
-async function resolveAuthResponse(response: {
-  accessToken: string;
-  refreshToken: string;
-}) {
+async function resolveAuthResponse(response: { accessToken: string; refreshToken: string }) {
   saveTokens({
     accessToken: response.accessToken,
     refreshToken: response.refreshToken,
@@ -165,5 +152,5 @@ async function resolveAuthResponse(response: {
     isRoot: payload.isRoot,
   };
 
-  return {user};
+  return { user };
 }

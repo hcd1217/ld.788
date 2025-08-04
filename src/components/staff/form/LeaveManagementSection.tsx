@@ -1,13 +1,4 @@
-import {
-  Stack,
-  Group,
-  Text,
-  NumberInput,
-  Alert,
-  Paper,
-  Divider,
-  SimpleGrid,
-} from '@mantine/core';
+import { Stack, Group, Text, NumberInput, Alert, Paper, Divider, SimpleGrid } from '@mantine/core';
 import {
   IconCalendar,
   IconBeach,
@@ -16,18 +7,18 @@ import {
   IconInfoCircle,
   IconCalculator,
 } from '@tabler/icons-react';
-import type {UseFormReturnType} from '@mantine/form';
-import {useTranslation} from '@/hooks/useTranslation';
-import {VALIDATION_RULES} from '@/services/staff';
-import type {StaffFormData} from '@/lib/api/schemas/staff.schemas';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import type { UseFormReturnType } from '@mantine/form';
+import { useTranslation } from '@/hooks/useTranslation';
+import { VALIDATION_RULES } from '@/services/staff';
+import type { StaffFormData } from '@/lib/api/schemas/staff.schemas';
+import { useIsDarkMode } from '@/hooks/useIsDarkMode';
 
 export interface LeaveManagementSectionProps {
   readonly form: UseFormReturnType<StaffFormData>;
 }
 
-export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
-  const {t} = useTranslation();
+export function LeaveManagementSection({ form }: LeaveManagementSectionProps) {
+  const { t } = useTranslation();
   const isDarkMode = useIsDarkMode();
   const isShiftWorker = form.values.workingPattern === 'shift';
 
@@ -44,8 +35,7 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
 
     const totalDays = calculateTotalLeaveBalance();
     const hoursPerDay =
-      form.values.leaveHoursEquivalent ||
-      VALIDATION_RULES.leave.hoursPerDay.default;
+      form.values.leaveHoursEquivalent || VALIDATION_RULES.leave.hoursPerDay.default;
     return totalDays * hoursPerDay;
   };
 
@@ -82,9 +72,7 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
             placeholder="20"
             min={VALIDATION_RULES.leave.daysPerYear.min}
             max={VALIDATION_RULES.leave.daysPerYear.max}
-            description={t(
-              'staff.leaveManagement.bookableLeaveDaysDescription',
-            )}
+            description={t('staff.leaveManagement.bookableLeaveDaysDescription')}
             {...form.getInputProps('bookableLeaveDays')}
           />
 
@@ -99,11 +87,7 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
                 {...form.getInputProps('leaveHoursEquivalent')}
               />
 
-              <Alert
-                icon={<IconInfoCircle size={16} />}
-                color="blue"
-                variant="light"
-              >
+              <Alert icon={<IconInfoCircle size={16} />} color="blue" variant="light">
                 {t('staff.leaveManagement.shiftWorkerAlert', {
                   hours: form.values.leaveHoursEquivalent || 8,
                 })}
@@ -135,7 +119,7 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
             <Text
               size="xs"
               c="blue"
-              style={{cursor: 'pointer'}}
+              style={{ cursor: 'pointer' }}
               onClick={setDefaultLeaveBalances}
             >
               <Group gap={4}>
@@ -197,17 +181,12 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
           </Group>
 
           <Group justify="space-between">
-            <Text size="sm">
-              {t('staff.leaveManagement.remainingAllocation')}
-            </Text>
+            <Text size="sm">{t('staff.leaveManagement.remainingAllocation')}</Text>
             <Text
               size="sm"
               fw={600}
               c={
-                form.values.bookableLeaveDays - calculateTotalLeaveBalance() >=
-                0
-                  ? 'green'
-                  : 'red'
+                form.values.bookableLeaveDays - calculateTotalLeaveBalance() >= 0 ? 'green' : 'red'
               }
             >
               {form.values.bookableLeaveDays - calculateTotalLeaveBalance()}{' '}
@@ -216,11 +195,7 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
           </Group>
 
           {calculateTotalLeaveBalance() > form.values.bookableLeaveDays && (
-            <Alert
-              icon={<IconInfoCircle size={16} />}
-              color="orange"
-              variant="light"
-            >
+            <Alert icon={<IconInfoCircle size={16} />} color="orange" variant="light">
               {t('staff.leaveManagement.balanceExceedsWarning')}
             </Alert>
           )}
@@ -242,18 +217,14 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
           </Text>
 
           <Group justify="space-between">
-            <Text size="sm">
-              {t('staff.leaveManagement.annualEntitlementLabel')}
-            </Text>
+            <Text size="sm">{t('staff.leaveManagement.annualEntitlementLabel')}</Text>
             <Text size="sm" fw={600}>
               {form.values.bookableLeaveDays} {t('staff.leaveManagement.days')}
             </Text>
           </Group>
 
           <Group justify="space-between">
-            <Text size="sm">
-              {t('staff.leaveManagement.currentBalanceLabel')}
-            </Text>
+            <Text size="sm">{t('staff.leaveManagement.currentBalanceLabel')}</Text>
             <Text size="sm" fw={600}>
               {calculateTotalLeaveBalance()} {t('staff.leaveManagement.days')}
             </Text>
@@ -278,12 +249,11 @@ export function LeaveManagementSection({form}: LeaveManagementSectionProps) {
           <Group
             justify="space-between"
             pt="xs"
-            style={{borderTop: '1px solid var(--mantine-color-green-2)'}}
+            style={{ borderTop: '1px solid var(--mantine-color-green-2)' }}
           >
             <Text size="sm">{t('staff.leaveManagement.availableToTake')}</Text>
             <Text size="sm" fw={600}>
-              {Math.max(0, calculateTotalLeaveBalance())}{' '}
-              {t('staff.leaveManagement.days')}
+              {Math.max(0, calculateTotalLeaveBalance())} {t('staff.leaveManagement.days')}
             </Text>
           </Group>
         </Stack>

@@ -1,4 +1,4 @@
-import {Title, Text, Container, Card, Stack} from '@mantine/core';
+import { Title, Text, Container, Card, Stack } from '@mantine/core';
 
 export function DashboardPage() {
   return (

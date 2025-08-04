@@ -1,13 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import {
-  Stack,
-  Group,
-  Box,
-  SimpleGrid,
-  Select,
-  SegmentedControl,
-} from '@mantine/core';
+import { Stack, Group, Box, SimpleGrid, Select, SegmentedControl } from '@mantine/core';
 import { IconUser } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
@@ -38,7 +31,7 @@ import {
   EmployeeUnitDrawer,
   EmployeeStatusDrawer,
 } from '@/components/app/employee';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { ROUTERS } from '@/config/routeConfig';
 import { EMPLOYEE_STATUS, VIEW_MODE, type ViewModeType } from '@/constants/employee';
 import { useDisclosure } from '@mantine/hooks';
@@ -57,17 +50,17 @@ export function EmployeeListPage() {
   const [filteredEmployees, filters, filterHandlers] = useEmployeeFilters(employees);
 
   const [viewMode, setViewMode] = useState<ViewModeType>(VIEW_MODE.TABLE);
-  
+
   // Drawer states using Mantine's useDisclosure directly
   const [unitDrawerOpened, { open: openUnitDrawer, close: closeUnitDrawer }] = useDisclosure(false);
-  const [statusDrawerOpened, { open: openStatusDrawer, close: closeStatusDrawer }] = useDisclosure(false);
+  const [statusDrawerOpened, { open: openStatusDrawer, close: closeStatusDrawer }] =
+    useDisclosure(false);
 
   // Use client-side pagination hook with filtered employees
-  const [paginatedEmployees, paginationState, paginationHandlers] =
-    useClientSidePagination({
-      data: filteredEmployees,
-      defaultPageSize: isDesktop ? undefined : 1000,
-    });
+  const [paginatedEmployees, paginationState, paginationHandlers] = useClientSidePagination({
+    data: filteredEmployees,
+    defaultPageSize: isDesktop ? undefined : 1000,
+  });
 
   useOnce(() => {
     void refreshEmployees();
@@ -75,16 +68,21 @@ export function EmployeeListPage() {
   });
 
   // Prepare department options for select
-  const unitOptions = useMemo(() =>
-    units.map((unit) => ({
-      value: unit.id,
-      label: unit.name,
-    })),
-    [units]
+  const unitOptions = useMemo(
+    () =>
+      units.map((unit) => ({
+        value: unit.id,
+        label: unit.name,
+      })),
+    [units],
   );
 
   // Check if any filters are active
-  const hasActiveFilters = !!(filters.searchQuery || filters.unitId || filters.status !== EMPLOYEE_STATUS.ALL);
+  const hasActiveFilters = !!(
+    filters.searchQuery ||
+    filters.unitId ||
+    filters.status !== EMPLOYEE_STATUS.ALL
+  );
 
   // Clear all filters
   const clearAllFilters = () => {
@@ -162,11 +160,7 @@ export function EmployeeListPage() {
   }
 
   return (
-    <AppDesktopLayout
-      isLoading={isLoading}
-      error={error}
-      clearError={clearError}
-    >
+    <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
       <AppPageTitle
         title={t('employee.title')}
         button={{
@@ -203,7 +197,11 @@ export function EmployeeListPage() {
               { label: t('employee.active'), value: EMPLOYEE_STATUS.ACTIVE },
               { label: t('employee.inactive'), value: EMPLOYEE_STATUS.INACTIVE },
             ]}
-            onChange={(value) => filterHandlers.setStatus(value as typeof EMPLOYEE_STATUS[keyof typeof EMPLOYEE_STATUS])}
+            onChange={(value) =>
+              filterHandlers.setStatus(
+                value as (typeof EMPLOYEE_STATUS)[keyof typeof EMPLOYEE_STATUS],
+              )
+            }
           />
           <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
         </Group>
@@ -227,9 +225,9 @@ export function EmployeeListPage() {
             filters.searchQuery
               ? undefined
               : {
-                label: t('employee.createFirstEmployee'),
-                onClick: () => navigate(ROUTERS.EMPLOYEES_ADD),
-              }
+                  label: t('employee.createFirstEmployee'),
+                  onClick: () => navigate(ROUTERS.EMPLOYEES_ADD),
+                }
           }
         />
 

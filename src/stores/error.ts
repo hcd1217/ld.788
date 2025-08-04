@@ -1,11 +1,7 @@
-import {create} from 'zustand';
-import {devtools} from 'zustand/middleware';
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 
-export type ErrorType =
-  | 'error'
-  | 'unhandledRejection'
-  | 'apiError'
-  | 'componentError';
+export type ErrorType = 'error' | 'unhandledRejection' | 'apiError' | 'componentError';
 export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
 
 export type ErrorRecord = {
@@ -20,10 +16,7 @@ export type ErrorRecord = {
   count: number;
 };
 
-type ErrorInput = Omit<
-  ErrorRecord,
-  'id' | 'timestamp' | 'count' | 'severity'
-> & {
+type ErrorInput = Omit<ErrorRecord, 'id' | 'timestamp' | 'count' | 'severity'> & {
   severity?: ErrorSeverity;
 };
 
@@ -63,10 +56,7 @@ function getErrorSeverity(
   return 'low';
 }
 
-function isDuplicateError(
-  newError: ErrorInput,
-  existingError: ErrorRecord,
-): boolean {
+function isDuplicateError(newError: ErrorInput, existingError: ErrorRecord): boolean {
   return (
     newError.type === existingError.type &&
     newError.message === existingError.message &&
@@ -82,11 +72,9 @@ export const useErrorStore = create<ErrorState>()(
 
       addError(error: ErrorInput) {
         set((state) => {
-          const existingErrorIndex = state.errors.findIndex(
-            (e: ErrorRecord) => {
-              return isDuplicateError(error, e);
-            },
-          );
+          const existingErrorIndex = state.errors.findIndex((e: ErrorRecord) => {
+            return isDuplicateError(error, e);
+          });
 
           // If duplicate found, increment count
           if (existingErrorIndex !== -1) {
@@ -100,7 +88,7 @@ export const useErrorStore = create<ErrorState>()(
               };
             }
 
-            return {errors: updatedErrors};
+            return { errors: updatedErrors };
           }
 
           // Add new error
@@ -113,17 +101,14 @@ export const useErrorStore = create<ErrorState>()(
           };
 
           // Maintain max errors limit (remove oldest)
-          const errors = [newError, ...state.errors].slice(
-            0,
-            Number(state.maxErrors),
-          );
+          const errors = [newError, ...state.errors].slice(0, Number(state.maxErrors));
 
-          return {errors};
+          return { errors };
         });
       },
 
       clearErrors() {
-        set({errors: []});
+        set({ errors: [] });
       },
 
       clearError(id: string) {
@@ -133,17 +118,17 @@ export const useErrorStore = create<ErrorState>()(
       },
 
       getRecentErrors(count: number) {
-        const {errors} = get();
+        const { errors } = get();
         return errors.slice(0, count);
       },
 
       getErrorsByType(type: ErrorType) {
-        const {errors} = get();
+        const { errors } = get();
         return errors.filter((error) => error.type === type);
       },
 
       getErrorCount() {
-        const {errors} = get();
+        const { errors } = get();
         return errors.reduce((total, error) => {
           return Number(total) + Number(error.count ?? 0);
         }, 0);
@@ -174,11 +159,7 @@ export function addApiError(
 }
 
 // Helper function for adding component errors
-export function addComponentError(
-  message: string,
-  componentName: string,
-  error?: Error,
-): void {
+export function addComponentError(message: string, componentName: string, error?: Error): void {
   useErrorStore.getState().addError({
     type: 'componentError',
     message,

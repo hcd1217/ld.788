@@ -31,12 +31,10 @@ const ClientBaseSchema = z.object({
   status: z.enum(['active', 'suspended']).default('active'),
 });
 
-export const ClientSchema = ClientBaseSchema.transform(
-  ({isActive, ...data}) => {
-    const status: 'active' | 'suspended' = isActive ? 'active' : 'suspended';
-    return {...data, status};
-  },
-);
+export const ClientSchema = ClientBaseSchema.transform(({ isActive, ...data }) => {
+  const status: 'active' | 'suspended' = isActive ? 'active' : 'suspended';
+  return { ...data, status };
+});
 
 export const AdminRegisterClientRequestSchema = z.object({
   clientCode: clientCodeSchema,
@@ -116,7 +114,7 @@ export const ClientDetailSchema = ClientBaseSchema.extend({
     ),
   ]),
   users: z.array(ClientUserSchema),
-}).transform(({isActive, dynamicFeatureFlags, ...rest}) => {
+}).transform(({ isActive, dynamicFeatureFlags, ...rest }) => {
   // Transform object format to array format if needed
   let flagsArray: DynamicFeatureFlagDetail[] = [];
 
@@ -299,56 +297,24 @@ export type AdminLoginResponse = z.infer<typeof AdminLoginResponseSchema>;
 export type Client = z.infer<typeof ClientSchema>;
 export type ClientDetail = z.infer<typeof ClientDetailSchema>;
 export type RoleDetail = z.infer<typeof RoleDetailSchema>;
-export type DynamicFeatureFlagDetail = z.infer<
-  typeof DynamicFeatureFlagDetailSchema
->;
+export type DynamicFeatureFlagDetail = z.infer<typeof DynamicFeatureFlagDetailSchema>;
 export type ClientUser = z.infer<typeof ClientUserSchema>;
-export type AdminRegisterClientRequest = z.infer<
-  typeof AdminRegisterClientRequestSchema
->;
-export type AdminRegisterClientResponse = z.infer<
-  typeof AdminRegisterClientResponseSchema
->;
+export type AdminRegisterClientRequest = z.infer<typeof AdminRegisterClientRequestSchema>;
+export type AdminRegisterClientResponse = z.infer<typeof AdminRegisterClientResponseSchema>;
 export type ClientListResponse = z.infer<typeof ClientListResponseSchema>;
 export type SuspendClientRequest = z.infer<typeof SuspendClientRequestSchema>;
 export type SuspendClientResponse = z.infer<typeof SuspendClientResponseSchema>;
-export type ReactivateClientRequest = z.infer<
-  typeof ReactivateClientRequestSchema
->;
-export type ReactivateClientResponse = z.infer<
-  typeof ReactivateClientResponseSchema
->;
-export type HardDeleteClientRequest = z.infer<
-  typeof HardDeleteClientRequestSchema
->;
-export type HardDeleteClientResponse = z.infer<
-  typeof HardDeleteClientResponseSchema
->;
+export type ReactivateClientRequest = z.infer<typeof ReactivateClientRequestSchema>;
+export type ReactivateClientResponse = z.infer<typeof ReactivateClientResponseSchema>;
+export type HardDeleteClientRequest = z.infer<typeof HardDeleteClientRequestSchema>;
+export type HardDeleteClientResponse = z.infer<typeof HardDeleteClientResponseSchema>;
 export type AdminPermission = z.infer<typeof AdminPermissionSchema>;
-export type GetAllAdminPermissionsResponse = z.infer<
-  typeof GetAllAdminPermissionsResponseSchema
->;
-export type CreateAdminPermissionRequest = z.infer<
-  typeof CreateAdminPermissionRequestSchema
->;
-export type CreateAdminPermissionResponse = z.infer<
-  typeof CreateAdminPermissionResponseSchema
->;
-export type UpdateAdminPermissionRequest = z.infer<
-  typeof UpdateAdminPermissionRequestSchema
->;
-export type UpdateAdminPermissionResponse = z.infer<
-  typeof UpdateAdminPermissionResponseSchema
->;
-export type DeleteAdminPermissionResponse = z.infer<
-  typeof DeleteAdminPermissionResponseSchema
->;
-export type CreateDynamicFeatureFlagRequest = z.infer<
-  typeof CreateDynamicFeatureFlagRequestSchema
->;
-export type UpdateDynamicFeatureFlagRequest = z.infer<
-  typeof UpdateDynamicFeatureFlagRequestSchema
->;
-export type DynamicFeatureFlagResponse = z.infer<
-  typeof DynamicFeatureFlagResponseSchema
->;
+export type GetAllAdminPermissionsResponse = z.infer<typeof GetAllAdminPermissionsResponseSchema>;
+export type CreateAdminPermissionRequest = z.infer<typeof CreateAdminPermissionRequestSchema>;
+export type CreateAdminPermissionResponse = z.infer<typeof CreateAdminPermissionResponseSchema>;
+export type UpdateAdminPermissionRequest = z.infer<typeof UpdateAdminPermissionRequestSchema>;
+export type UpdateAdminPermissionResponse = z.infer<typeof UpdateAdminPermissionResponseSchema>;
+export type DeleteAdminPermissionResponse = z.infer<typeof DeleteAdminPermissionResponseSchema>;
+export type CreateDynamicFeatureFlagRequest = z.infer<typeof CreateDynamicFeatureFlagRequestSchema>;
+export type UpdateDynamicFeatureFlagRequest = z.infer<typeof UpdateDynamicFeatureFlagRequestSchema>;
+export type DynamicFeatureFlagResponse = z.infer<typeof DynamicFeatureFlagResponseSchema>;

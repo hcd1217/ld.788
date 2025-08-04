@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import {
   Stack,
   Group,
@@ -23,18 +23,18 @@ import {
 } from '@tabler/icons-react';
 import CryptoJS from 'crypto-js';
 import QRCode from 'qrcode';
-import type {UseFormReturnType} from '@mantine/form';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useCurrentStore} from '@/stores/useStoreConfigStore';
-import type {StaffFormData} from '@/lib/api/schemas/staff.schemas';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import type { UseFormReturnType } from '@mantine/form';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useCurrentStore } from '@/stores/useStoreConfigStore';
+import type { StaffFormData } from '@/lib/api/schemas/staff.schemas';
+import { useIsDarkMode } from '@/hooks/useIsDarkMode';
 
 export interface BasicInfoSectionProps {
   readonly form: UseFormReturnType<StaffFormData>;
 }
 
-export function BasicInfoSection({form}: BasicInfoSectionProps) {
-  const {t} = useTranslation();
+export function BasicInfoSection({ form }: BasicInfoSectionProps) {
+  const { t } = useTranslation();
   const [previewQrCode, setPreviewQrCode] = useState<string>('');
   const [isGeneratingQr, setIsGeneratingQr] = useState(false);
   const currentStore = useCurrentStore();
@@ -156,11 +156,7 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
             }}
           >
             <Stack gap="md">
-              <Alert
-                icon={<IconInfoCircle size={16} />}
-                color="blue"
-                variant="light"
-              >
+              <Alert icon={<IconInfoCircle size={16} />} color="blue" variant="light">
                 {t('staff.basicInfo.clockInPreview.autoGenerateMessage')}
               </Alert>
 
@@ -171,15 +167,9 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
                 <Code block>{previewUrl}</Code>
 
                 <CopyButton value={previewUrl}>
-                  {({copied, copy}) => (
+                  {({ copied, copy }) => (
                     <Button
-                      leftSection={
-                        copied ? (
-                          <IconCheck size={16} />
-                        ) : (
-                          <IconCopy size={16} />
-                        )
-                      }
+                      leftSection={copied ? <IconCheck size={16} /> : <IconCopy size={16} />}
                       color={copied ? 'green' : 'blue'}
                       variant="light"
                       size="xs"
@@ -205,9 +195,9 @@ export function BasicInfoSection({form}: BasicInfoSectionProps) {
                       alt={t('staff.basicInfo.clockInPreview.qrAlt')}
                       width={120}
                       height={120}
-                      style={{border: '1px solid var(--mantine-color-gray-3)'}}
+                      style={{ border: '1px solid var(--mantine-color-gray-3)' }}
                     />
-                    <Stack gap="xs" style={{flex: 1}}>
+                    <Stack gap="xs" style={{ flex: 1 }}>
                       <Text size="xs" c="dimmed">
                         {t('staff.basicInfo.clockInPreview.qrDescription1')}
                       </Text>

@@ -1,5 +1,5 @@
-import {useEffect, useState, useMemo} from 'react';
-import {useNavigate} from 'react-router';
+import { useEffect, useState, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 import {
   Container,
   Title,
@@ -18,19 +18,14 @@ import {
   Center,
   Select,
 } from '@mantine/core';
-import {useDisclosure} from '@mantine/hooks';
-import {
-  IconPlus,
-  IconBuildingStore,
-  IconAlertTriangle,
-  IconSearch,
-} from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
+import { IconPlus, IconBuildingStore, IconAlertTriangle, IconSearch } from '@tabler/icons-react';
 import {
   showErrorNotification,
   showSuccessNotification,
   showInfoNotification,
 } from '@/utils/notifications';
-import {useTranslation} from '@/hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   useStores,
   useStoreLoading,
@@ -38,29 +33,26 @@ import {
   useStoreActions,
   useCurrentStore,
 } from '@/stores/useStoreConfigStore';
-import {StoreCard} from '@/components/store/StoreCard';
-import type {Store} from '@/lib/api/schemas/store.schemas';
-import {ErrorAlert} from '@/components/common';
-import {ROUTERS, getStoreEditRoute} from '@/config/routeConfig';
+import { StoreCard } from '@/components/store/StoreCard';
+import type { Store } from '@/lib/api/schemas/store.schemas';
+import { ErrorAlert } from '@/components/common';
+import { ROUTERS, getStoreEditRoute } from '@/config/routeConfig';
 
 export function StoreListPage() {
   const navigate = useNavigate();
-  const [deleteModalOpened, {open: openDeleteModal, close: closeDeleteModal}] =
+  const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
-  const [storeToDelete, setStoreToDelete] = useState<Store | undefined>(
-    undefined,
-  );
+  const [storeToDelete, setStoreToDelete] = useState<Store | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState('12');
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const stores = useStores();
   const currentStore = useCurrentStore();
   const isLoading = useStoreLoading();
   const error = useStoreError();
-  const {loadStores, deleteStore, setCurrentStore, clearError} =
-    useStoreActions();
+  const { loadStores, deleteStore, setCurrentStore, clearError } = useStoreActions();
 
   useEffect(() => {
     const load = async () => {
@@ -121,16 +113,13 @@ export function StoreListPage() {
 
       showSuccessNotification(
         t('store.storeDeleted'),
-        t('store.storeDeletedMessage', {name: storeToDelete.name}),
+        t('store.storeDeletedMessage', { name: storeToDelete.name }),
       );
 
       closeDeleteModal();
       setStoreToDelete(undefined);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t('errors.failedToDeleteStore');
+      const errorMessage = error instanceof Error ? error.message : t('errors.failedToDeleteStore');
 
       showErrorNotification(t('store.storeDeleteFailed'), errorMessage);
     }
@@ -144,7 +133,7 @@ export function StoreListPage() {
     setCurrentStore(store);
     showInfoNotification(
       t('store.storeSelected'),
-      t('store.storeSelectedMessage', {name: store.name}),
+      t('store.storeSelectedMessage', { name: store.name }),
     );
   };
 
@@ -189,25 +178,20 @@ export function StoreListPage() {
 
           <ErrorAlert error={error} clearError={clearError} />
 
-          <div style={{position: 'relative'}}>
+          <div style={{ position: 'relative' }}>
             <LoadingOverlay
               visible={isLoading}
-              overlayProps={{blur: 2}}
-              transitionProps={{duration: 300}}
+              overlayProps={{ blur: 2 }}
+              transitionProps={{ duration: 300 }}
             />
 
             {filteredStores.length === 0 && !isLoading ? (
               <Card shadow="sm" padding="xl" radius="md" ta="center">
                 <Stack gap="md">
-                  <IconBuildingStore
-                    size={48}
-                    color="var(--mantine-color-gray-5)"
-                  />
+                  <IconBuildingStore size={48} color="var(--mantine-color-gray-5)" />
                   <div>
                     <Title order={3} c="dimmed">
-                      {searchQuery
-                        ? t('store.noStoresFoundSearch')
-                        : t('store.noStoresFound')}
+                      {searchQuery ? t('store.noStoresFoundSearch') : t('store.noStoresFound')}
                     </Title>
                     <Text c="dimmed" mt="xs">
                       {searchQuery
@@ -227,7 +211,7 @@ export function StoreListPage() {
                 </Stack>
               </Card>
             ) : (
-              <SimpleGrid cols={{base: 1, sm: 2, lg: 3}} spacing="lg">
+              <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
                 {paginatedStores.map((store) => (
                   <StoreCard
                     key={store.id}
@@ -250,12 +234,12 @@ export function StoreListPage() {
                   <Select
                     value={pageSize}
                     data={[
-                      {value: '6', label: '6'},
-                      {value: '12', label: '12'},
-                      {value: '24', label: '24'},
-                      {value: '48', label: '48'},
+                      { value: '6', label: '6' },
+                      { value: '12', label: '12' },
+                      { value: '24', label: '24' },
+                      { value: '48', label: '48' },
                     ]}
-                    style={{width: 100}}
+                    style={{ width: 100 }}
                     onChange={(value) => {
                       handlePageSizeChange(value ?? undefined);
                     }}
@@ -268,7 +252,7 @@ export function StoreListPage() {
                       onChange={setCurrentPage}
                     />
                   </Center>
-                  <div style={{width: 100}} /> {/* Spacer for balance */}
+                  <div style={{ width: 100 }} /> {/* Spacer for balance */}
                 </Group>
               )}
             </Stack>
@@ -284,15 +268,9 @@ export function StoreListPage() {
         onClose={closeDeleteModal}
       >
         <Stack gap="md">
-          <Text>
-            {t('store.confirmDeleteMessage', {name: storeToDelete?.name || ''})}
-          </Text>
+          <Text>{t('store.confirmDeleteMessage', { name: storeToDelete?.name || '' })}</Text>
 
-          <Alert
-            icon={<IconAlertTriangle size={16} />}
-            color="red"
-            variant="light"
-          >
+          <Alert icon={<IconAlertTriangle size={16} />} color="red" variant="light">
             {t('store.deleteWarning')}
           </Alert>
 

@@ -223,16 +223,10 @@ export const GrantPermissionToRoleRequestSchema = z.object({
 });
 
 export type RegisterClientRequest = z.infer<typeof RegisterClientRequestSchema>;
-export type RegisterClientResponse = z.infer<
-  typeof RegisterClientResponseSchema
->;
+export type RegisterClientResponse = z.infer<typeof RegisterClientResponseSchema>;
 
-export type RegisterUserByRootUserRequest = z.infer<
-  typeof RegisterUserByRootUserRequestSchema
->;
-export type RegisterUserByRootUserResponse = z.infer<
-  typeof RegisterUserByRootUserResponseSchema
->;
+export type RegisterUserByRootUserRequest = z.infer<typeof RegisterUserByRootUserRequestSchema>;
+export type RegisterUserByRootUserResponse = z.infer<typeof RegisterUserByRootUserResponseSchema>;
 
 export type RegisterBulkUsersByRootUserRequest = z.infer<
   typeof RegisterBulkUsersByRootUserRequestSchema
@@ -251,51 +245,29 @@ export type UpdateRoleResponse = z.infer<typeof UpdateRoleResponseSchema>;
 
 // Permission Management Types
 export type Permission = z.infer<typeof PermissionSchema>;
-export type GetAllPermissionsResponse = z.infer<
-  typeof GetAllPermissionsResponseSchema
->;
+export type GetAllPermissionsResponse = z.infer<typeof GetAllPermissionsResponseSchema>;
 
 export type AddPermissionRequest = z.infer<typeof AddPermissionRequestSchema>;
 export type AddPermissionResponse = z.infer<typeof AddPermissionResponseSchema>;
 
-export type UpdatePermissionRequest = z.infer<
-  typeof UpdatePermissionRequestSchema
->;
-export type UpdatePermissionResponse = z.infer<
-  typeof UpdatePermissionResponseSchema
->;
+export type UpdatePermissionRequest = z.infer<typeof UpdatePermissionRequestSchema>;
+export type UpdatePermissionResponse = z.infer<typeof UpdatePermissionResponseSchema>;
 
-export type PermissionCheckRequest = z.infer<
-  typeof PermissionCheckRequestSchema
->;
-export type PermissionCheckResponse = z.infer<
-  typeof PermissionCheckResponseSchema
->;
+export type PermissionCheckRequest = z.infer<typeof PermissionCheckRequestSchema>;
+export type PermissionCheckResponse = z.infer<typeof PermissionCheckResponseSchema>;
 
-export type MultiplePermissionCheckRequest = z.infer<
-  typeof MultiplePermissionCheckRequestSchema
->;
-export type MultiplePermissionCheckResponse = z.infer<
-  typeof MultiplePermissionCheckResponseSchema
->;
+export type MultiplePermissionCheckRequest = z.infer<typeof MultiplePermissionCheckRequestSchema>;
+export type MultiplePermissionCheckResponse = z.infer<typeof MultiplePermissionCheckResponseSchema>;
 
 export type UserPermission = z.infer<typeof UserPermissionSchema>;
 export type UserRole = z.infer<typeof UserRoleSchema>;
 
-export type GetMyPermissionsResponse = z.infer<
-  typeof GetMyPermissionsResponseSchema
->;
-export type GetUserPermissionsResponse = z.infer<
-  typeof GetUserPermissionsResponseSchema
->;
+export type GetMyPermissionsResponse = z.infer<typeof GetMyPermissionsResponseSchema>;
+export type GetUserPermissionsResponse = z.infer<typeof GetUserPermissionsResponseSchema>;
 
 export type GetMyRolesResponse = z.infer<typeof GetMyRolesResponseSchema>;
 export type GetUserRolesResponse = z.infer<typeof GetUserRolesResponseSchema>;
 
-export type GrantPermissionToRoleRequest = z.infer<
-  typeof GrantPermissionToRoleRequestSchema
->;
+export type GrantPermissionToRoleRequest = z.infer<typeof GrantPermissionToRoleRequestSchema>;
 
-export type ClientPublicConfigResponse = z.infer<
-  typeof ClientPublicConfigSchema
->;
+export type ClientPublicConfigResponse = z.infer<typeof ClientPublicConfigSchema>;

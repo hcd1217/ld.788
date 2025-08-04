@@ -1,20 +1,12 @@
-import {
-  Button,
-  Container,
-  Group,
-  Text,
-  Title,
-  Stack,
-  Paper,
-} from '@mantine/core';
-import {useNavigate} from 'react-router';
-import {IconError404, IconArrowLeft, IconHome} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-import {ROUTERS} from '@/config/routeConfig';
+import { Button, Container, Group, Text, Title, Stack, Paper } from '@mantine/core';
+import { useNavigate } from 'react-router';
+import { IconError404, IconArrowLeft, IconHome } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useIsDarkMode } from '@/hooks/useIsDarkMode';
+import { ROUTERS } from '@/config/routeConfig';
 
 export function NotFound() {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const isDarkMode = useIsDarkMode();
   const navigate = useNavigate();
 
@@ -61,10 +53,7 @@ export function NotFound() {
               {t('errors.backToPreviousPage')}
             </Button>
 
-            <Button
-              leftSection={<IconHome size={16} />}
-              onClick={() => navigate(ROUTERS.ROOT)}
-            >
+            <Button leftSection={<IconHome size={16} />} onClick={() => navigate(ROUTERS.ROOT)}>
               {t('errors.backToHomePage')}
             </Button>
           </Group>

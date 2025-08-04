@@ -1,8 +1,8 @@
-import {Group, Text, Stack, ActionIcon} from '@mantine/core';
-import {IconMapPin, IconPhone, IconEdit, IconTrash} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {SelectableCard} from '@/components/common';
-import type {Store} from '@/lib/api/schemas/store.schemas';
+import { Group, Text, Stack, ActionIcon } from '@mantine/core';
+import { IconMapPin, IconPhone, IconEdit, IconTrash } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { SelectableCard } from '@/components/common';
+import type { Store } from '@/lib/api/schemas/store.schemas';
 
 export interface StoreCardProps {
   readonly store: Store;
@@ -12,19 +12,13 @@ export interface StoreCardProps {
   readonly onDelete: (store: Store) => void;
 }
 
-export function StoreCard({
-  store,
-  isSelected,
-  onSelect,
-  onEdit,
-  onDelete,
-}: StoreCardProps) {
-  const {t} = useTranslation();
+export function StoreCard({ store, isSelected, onSelect, onEdit, onDelete }: StoreCardProps) {
+  const { t } = useTranslation();
 
   return (
     <SelectableCard
       isSelected={isSelected}
-      style={{position: 'relative'}}
+      style={{ position: 'relative' }}
       onClick={() => {
         onSelect(store);
       }}
@@ -74,7 +68,7 @@ export function StoreCard({
             </Text>
           </Group>
           <Group gap="xs" c="dimmed" justify="left" wrap="nowrap">
-            <IconMapPin size={14} style={{flexShrink: 0}} />
+            <IconMapPin size={14} style={{ flexShrink: 0 }} />
             <Text
               size="sm"
               style={{

@@ -1,5 +1,5 @@
 import type * as z from 'zod/v4';
-import {BaseApiClient} from '../base';
+import { BaseApiClient } from '../base';
 import {
   AdminLoginResponseSchema,
   ClientListResponseSchema,
@@ -43,7 +43,7 @@ import {
   type UpdateDynamicFeatureFlagRequest,
   type DynamicFeatureFlagResponse,
 } from '../schemas/admin.schemas';
-import {useAppStore} from '@/stores/useAppStore';
+import { useAppStore } from '@/stores/useAppStore';
 
 export class AdminApi extends BaseApiClient {
   setAdminAccessKey(accessKey: string) {
@@ -61,9 +61,7 @@ export class AdminApi extends BaseApiClient {
     schema?: z.ZodSchema<T>,
     paramsSchema?: z.ZodSchema<R>,
   ): Promise<T> {
-    return this.requestWrapper(async () =>
-      super.get(endpoint, params, schema, paramsSchema),
-    );
+    return this.requestWrapper(async () => super.get(endpoint, params, schema, paramsSchema));
   }
 
   async post<T, R = unknown>(
@@ -72,9 +70,7 @@ export class AdminApi extends BaseApiClient {
     schema?: z.ZodSchema<T>,
     dataSchema?: z.ZodSchema<R>,
   ): Promise<T> {
-    return this.requestWrapper(async () =>
-      super.post(endpoint, data, schema, dataSchema),
-    );
+    return this.requestWrapper(async () => super.post(endpoint, data, schema, dataSchema));
   }
 
   async put<T, R = unknown>(
@@ -83,9 +79,7 @@ export class AdminApi extends BaseApiClient {
     schema?: z.ZodSchema<T>,
     dataSchema?: z.ZodSchema<R>,
   ): Promise<T> {
-    return this.requestWrapper(async () =>
-      super.put(endpoint, data, schema, dataSchema),
-    );
+    return this.requestWrapper(async () => super.put(endpoint, data, schema, dataSchema));
   }
 
   async patch<T, R = unknown>(
@@ -94,9 +88,7 @@ export class AdminApi extends BaseApiClient {
     schema?: z.ZodSchema<T>,
     dataSchema?: z.ZodSchema<R>,
   ): Promise<T> {
-    return this.requestWrapper(async () =>
-      super.patch(endpoint, data, schema, dataSchema),
-    );
+    return this.requestWrapper(async () => super.patch(endpoint, data, schema, dataSchema));
   }
 
   async delete<T, R = unknown>(
@@ -105,7 +97,7 @@ export class AdminApi extends BaseApiClient {
     schema?: z.ZodSchema<T>,
     dataSchema?: z.ZodSchema<R>,
   ): Promise<T> {
-    const {setAdminApiLoading} = useAppStore.getState();
+    const { setAdminApiLoading } = useAppStore.getState();
 
     try {
       setAdminApiLoading(true);
@@ -134,16 +126,10 @@ export class AdminApi extends BaseApiClient {
   }
 
   async getClient(clientCode: string): Promise<ClientDetail> {
-    return this.get(
-      `/admin/clients/${clientCode}`,
-      undefined,
-      ClientDetailSchema,
-    );
+    return this.get(`/admin/clients/${clientCode}`, undefined, ClientDetailSchema);
   }
 
-  async registerClient(
-    data: AdminRegisterClientRequest,
-  ): Promise<AdminRegisterClientResponse> {
+  async registerClient(data: AdminRegisterClientRequest): Promise<AdminRegisterClientResponse> {
     return this.post<AdminRegisterClientResponse, AdminRegisterClientRequest>(
       '/admin/clients/register',
       data,
@@ -176,9 +162,7 @@ export class AdminApi extends BaseApiClient {
     );
   }
 
-  async reactivateClient(
-    clientCode: string,
-  ): Promise<ReactivateClientResponse> {
+  async reactivateClient(clientCode: string): Promise<ReactivateClientResponse> {
     return this.patch<ReactivateClientResponse, ReactivateClientRequest>(
       `/admin/clients/${clientCode}/reactivate`,
       {},
@@ -195,10 +179,8 @@ export class AdminApi extends BaseApiClient {
   }): Promise<GetAllAdminPermissionsResponse> {
     const queryParams = new URLSearchParams();
     if (params?.search) queryParams.append('search', params.search);
-    if (params?.offset !== undefined)
-      queryParams.append('offset', params.offset.toString());
-    if (params?.limit !== undefined)
-      queryParams.append('limit', params.limit.toString());
+    if (params?.offset !== undefined) queryParams.append('offset', params.offset.toString());
+    if (params?.limit !== undefined) queryParams.append('limit', params.limit.toString());
 
     const url = `/admin/permissions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
@@ -212,10 +194,7 @@ export class AdminApi extends BaseApiClient {
   async createAdminPermission(
     data: CreateAdminPermissionRequest,
   ): Promise<CreateAdminPermissionResponse> {
-    return this.post<
-      CreateAdminPermissionResponse,
-      CreateAdminPermissionRequest
-    >(
+    return this.post<CreateAdminPermissionResponse, CreateAdminPermissionRequest>(
       '/admin/permissions',
       data,
       CreateAdminPermissionResponseSchema,
@@ -227,10 +206,7 @@ export class AdminApi extends BaseApiClient {
     id: string,
     data: UpdateAdminPermissionRequest,
   ): Promise<UpdateAdminPermissionResponse> {
-    return this.put<
-      UpdateAdminPermissionResponse,
-      UpdateAdminPermissionRequest
-    >(
+    return this.put<UpdateAdminPermissionResponse, UpdateAdminPermissionRequest>(
       `/admin/permissions/${id}`,
       data,
       UpdateAdminPermissionResponseSchema,
@@ -238,9 +214,7 @@ export class AdminApi extends BaseApiClient {
     );
   }
 
-  async deleteAdminPermission(
-    id: string,
-  ): Promise<DeleteAdminPermissionResponse> {
+  async deleteAdminPermission(id: string): Promise<DeleteAdminPermissionResponse> {
     return this.delete<DeleteAdminPermissionResponse>(
       `/admin/permissions/${id}`,
       undefined,
@@ -252,10 +226,7 @@ export class AdminApi extends BaseApiClient {
   async createDynamicFeatureFlag(
     data: CreateDynamicFeatureFlagRequest,
   ): Promise<DynamicFeatureFlagResponse> {
-    return this.post<
-      DynamicFeatureFlagResponse,
-      CreateDynamicFeatureFlagRequest
-    >(
+    return this.post<DynamicFeatureFlagResponse, CreateDynamicFeatureFlagRequest>(
       '/admin/dynamic-feature-flags',
       data,
       DynamicFeatureFlagResponseSchema,
@@ -268,10 +239,7 @@ export class AdminApi extends BaseApiClient {
     key: string,
     data: UpdateDynamicFeatureFlagRequest,
   ): Promise<DynamicFeatureFlagResponse> {
-    return this.put<
-      DynamicFeatureFlagResponse,
-      UpdateDynamicFeatureFlagRequest
-    >(
+    return this.put<DynamicFeatureFlagResponse, UpdateDynamicFeatureFlagRequest>(
       `/admin/dynamic-feature-flags/${clientId}/${key}`,
       data,
       DynamicFeatureFlagResponseSchema,
@@ -280,7 +248,7 @@ export class AdminApi extends BaseApiClient {
   }
 
   private async requestWrapper<R>(handler: () => Promise<R>): Promise<R> {
-    const {setAdminApiLoading} = useAppStore.getState();
+    const { setAdminApiLoading } = useAppStore.getState();
 
     try {
       setAdminApiLoading(true);

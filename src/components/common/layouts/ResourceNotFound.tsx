@@ -1,15 +1,12 @@
-import {Container, Stack, Box, Alert, Group} from '@mantine/core';
-import {IconAlertCircle} from '@tabler/icons-react';
-import {GoBack} from '@/components/common';
+import { Container, Stack, Box, Alert, Group } from '@mantine/core';
+import { IconAlertCircle } from '@tabler/icons-react';
+import { GoBack } from '@/components/common';
 
 type ResourceNotFoundProps = {
   readonly message: string;
   readonly withGoBack?: boolean;
 };
-export function ResourceNotFound({
-  message,
-  withGoBack = false,
-}: ResourceNotFoundProps) {
+export function ResourceNotFound({ message, withGoBack = false }: ResourceNotFoundProps) {
   return (
     <Container fluid w="100%" mt="xl">
       <Stack gap="xl">
@@ -31,7 +28,7 @@ export function ResourceNotFound({
             icon={<IconAlertCircle size={16} />}
             color="red"
             variant="light"
-            style={{maxWidth: '600px', width: '100%'}}
+            style={{ maxWidth: '600px', width: '100%' }}
           >
             {message}
           </Alert>

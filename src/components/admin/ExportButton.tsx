@@ -1,11 +1,8 @@
-import {Button, type ButtonProps} from '@mantine/core';
-import {IconDownload} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {exportToCSV, type ExportColumn} from '@/utils/export';
-import {
-  showErrorNotification,
-  showSuccessNotification,
-} from '@/utils/notifications';
+import { Button, type ButtonProps } from '@mantine/core';
+import { IconDownload } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { exportToCSV, type ExportColumn } from '@/utils/export';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
 
 interface ExportButtonProps<T> extends Omit<ButtonProps, 'onClick'> {
   readonly data: readonly T[];
@@ -22,14 +19,14 @@ export function ExportButton<T extends Record<string, unknown>>({
   children,
   ...buttonProps
 }: ExportButtonProps<T>) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const handleExport = () => {
     try {
       exportToCSV(data, columns, filename);
       showSuccessNotification(
         t('common.success'),
-        t('common.exportSuccess', {count: data.length}),
+        t('common.exportSuccess', { count: data.length }),
       );
       onExport?.();
     } catch (error) {

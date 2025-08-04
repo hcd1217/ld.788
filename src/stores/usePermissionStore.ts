@@ -1,6 +1,6 @@
-import {create} from 'zustand';
-import {devtools} from 'zustand/middleware';
-import {adminApi, type AdminPermission} from '@/lib/api';
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { adminApi, type AdminPermission } from '@/lib/api';
 
 interface PermissionState {
   // State
@@ -17,18 +17,14 @@ interface PermissionState {
   };
 
   // Actions
-  loadPermissions: (params?: {
-    search?: string;
-    offset?: number;
-    limit?: number;
-  }) => Promise<void>;
+  loadPermissions: (params?: { search?: string; offset?: number; limit?: number }) => Promise<void>;
   createPermission: (data: {
     resource: string;
     action: string;
     scope: string;
     description: string;
   }) => Promise<void>;
-  updatePermission: (id: string, data: {description: string}) => Promise<void>;
+  updatePermission: (id: string, data: { description: string }) => Promise<void>;
   deletePermission: (id: string) => Promise<void>;
   setSearchQuery: (query: string) => void;
   clearError: () => void;
@@ -57,7 +53,7 @@ export const usePermissionStore = create<PermissionState>()(
       ...initialState,
 
       async loadPermissions(params) {
-        set({isLoading: true, error: undefined});
+        set({ isLoading: true, error: undefined });
         try {
           const response = await adminApi.getAllAdminPermissions({
             search: params?.search ?? get().searchQuery,
@@ -77,69 +73,57 @@ export const usePermissionStore = create<PermissionState>()(
             isLoading: false,
           });
         } catch (error) {
-          const message =
-            error instanceof Error
-              ? error.message
-              : 'Failed to load permissions';
-          set({error: message, isLoading: false});
+          const message = error instanceof Error ? error.message : 'Failed to load permissions';
+          set({ error: message, isLoading: false });
           throw error;
         }
       },
 
       async createPermission(data) {
-        set({isLoading: true, error: undefined});
+        set({ isLoading: true, error: undefined });
         try {
           await adminApi.createAdminPermission(data);
           // Reload permissions to get the updated list
           await get().loadPermissions();
         } catch (error) {
-          const message =
-            error instanceof Error
-              ? error.message
-              : 'Failed to create permission';
-          set({error: message, isLoading: false});
+          const message = error instanceof Error ? error.message : 'Failed to create permission';
+          set({ error: message, isLoading: false });
           throw error;
         }
       },
 
       async updatePermission(id, data) {
-        set({isLoading: true, error: undefined});
+        set({ isLoading: true, error: undefined });
         try {
           await adminApi.updateAdminPermission(id, data);
           // Reload permissions to get the updated list
           await get().loadPermissions();
         } catch (error) {
-          const message =
-            error instanceof Error
-              ? error.message
-              : 'Failed to update permission';
-          set({error: message, isLoading: false});
+          const message = error instanceof Error ? error.message : 'Failed to update permission';
+          set({ error: message, isLoading: false });
           throw error;
         }
       },
 
       async deletePermission(id) {
-        set({isLoading: true, error: undefined});
+        set({ isLoading: true, error: undefined });
         try {
           await adminApi.deleteAdminPermission(id);
           // Reload permissions to get the updated list
           await get().loadPermissions();
         } catch (error) {
-          const message =
-            error instanceof Error
-              ? error.message
-              : 'Failed to delete permission';
-          set({error: message, isLoading: false});
+          const message = error instanceof Error ? error.message : 'Failed to delete permission';
+          set({ error: message, isLoading: false });
           throw error;
         }
       },
 
       setSearchQuery(query) {
-        set({searchQuery: query});
+        set({ searchQuery: query });
       },
 
       clearError() {
-        set({error: undefined});
+        set({ error: undefined });
       },
 
       reset() {
@@ -153,14 +137,10 @@ export const usePermissionStore = create<PermissionState>()(
 );
 
 // Selector hooks
-export const usePermissions = () =>
-  usePermissionStore((state) => state.permissions);
-export const usePermissionLoading = () =>
-  usePermissionStore((state) => state.isLoading);
-export const usePermissionError = () =>
-  usePermissionStore((state) => state.error);
-export const usePermissionPagination = () =>
-  usePermissionStore((state) => state.pagination);
+export const usePermissions = () => usePermissionStore((state) => state.permissions);
+export const usePermissionLoading = () => usePermissionStore((state) => state.isLoading);
+export const usePermissionError = () => usePermissionStore((state) => state.error);
+export const usePermissionPagination = () => usePermissionStore((state) => state.pagination);
 export const usePermissionActions = () => ({
   loadPermissions: usePermissionStore((state) => state.loadPermissions),
   createPermission: usePermissionStore((state) => state.createPermission),

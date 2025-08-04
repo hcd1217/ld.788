@@ -1,20 +1,29 @@
-import {useState, useEffect} from 'react';
-import {Paper, Text, Group, CloseButton, Stack, List, ThemeIcon, Button} from '@mantine/core';
-import {IconShare, IconSquareRoundedPlus, IconDeviceMobile, IconDeviceDesktop, IconCheckbox} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useLocalStorage} from '@mantine/hooks';
+import { useState, useEffect } from 'react';
+import { Paper, Text, Group, CloseButton, Stack, List, ThemeIcon, Button } from '@mantine/core';
+import {
+  IconShare,
+  IconSquareRoundedPlus,
+  IconDeviceMobile,
+  IconDeviceDesktop,
+  IconCheckbox,
+} from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useLocalStorage } from '@mantine/hooks';
 
 // Detect if browser is Safari
 const isSafari = () => {
   const ua = navigator.userAgent.toLowerCase();
-  const isSafariBrowser = ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
+  const isSafariBrowser =
+    ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
   return isSafariBrowser;
 };
 
 // Detect if app is running in standalone mode (already installed)
 const isStandalone = () => {
-  return window.matchMedia('(display-mode: standalone)').matches
-    || (window.navigator as any).standalone === true;
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as any).standalone === true
+  );
 };
 
 // Detect if iOS or macOS
@@ -22,7 +31,7 @@ const isIOS = () => /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
 const isMacOS = () => /macintosh|mac os x/.test(navigator.userAgent.toLowerCase());
 
 export function SafariPWAGuide() {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [showGuide, setShowGuide] = useState(false);
   const [dismissed, setDismissed] = useLocalStorage({
     key: 'safari-pwa-guide-dismissed',
@@ -73,13 +82,9 @@ export function SafariPWAGuide() {
       }}
     >
       <Group align="start" mb="sm">
-        <div style={{flex: 1}}>
+        <div style={{ flex: 1 }}>
           <Group gap="xs" mb={4}>
-            {isIOSDevice ? (
-              <IconDeviceMobile size={20} />
-            ) : (
-              <IconDeviceDesktop size={20} />
-            )}
+            {isIOSDevice ? <IconDeviceMobile size={20} /> : <IconDeviceDesktop size={20} />}
             <Text size="sm" fw={500}>
               {t('pwa.safari.installTitle')}
             </Text>
@@ -127,7 +132,9 @@ export function SafariPWAGuide() {
             <List.Item
               icon={
                 <ThemeIcon color="blue" size={20} radius="xl">
-                  <Text size="xs" fw={700}>1</Text>
+                  <Text size="xs" fw={700}>
+                    1
+                  </Text>
                 </ThemeIcon>
               }
             >
@@ -136,7 +143,9 @@ export function SafariPWAGuide() {
             <List.Item
               icon={
                 <ThemeIcon color="blue" size={20} radius="xl">
-                  <Text size="xs" fw={700}>2</Text>
+                  <Text size="xs" fw={700}>
+                    2
+                  </Text>
                 </ThemeIcon>
               }
             >
@@ -145,7 +154,9 @@ export function SafariPWAGuide() {
             <List.Item
               icon={
                 <ThemeIcon color="blue" size={20} radius="xl">
-                  <Text size="xs" fw={700}>3</Text>
+                  <Text size="xs" fw={700}>
+                    3
+                  </Text>
                 </ThemeIcon>
               }
             >

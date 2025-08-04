@@ -1,12 +1,12 @@
-import {Group, Title} from '@mantine/core';
-import {useLogoAndTitle} from '@/hooks/useLogoAndTitle';
+import { Group, Title } from '@mantine/core';
+import { useLogoAndTitle } from '@/hooks/useLogoAndTitle';
 
 type AuthHeaderProps = {
   readonly title?: string;
 };
 
-export function AuthHeader({title: pageTitle = 'Credo'}: AuthHeaderProps) {
-  const {logoUrl, title} = useLogoAndTitle({color: true});
+export function AuthHeader({ title: pageTitle = 'Credo' }: AuthHeaderProps) {
+  const { logoUrl, title } = useLogoAndTitle({ color: true });
   return (
     <Group justify="center" gap="md" mb="lg">
       <img

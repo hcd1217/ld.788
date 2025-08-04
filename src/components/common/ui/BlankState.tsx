@@ -1,6 +1,6 @@
-import {Title, Stack, Card, Button, Text} from '@mantine/core';
+import { Title, Stack, Card, Button, Text } from '@mantine/core';
 import React from 'react';
-import {IconPlus} from '@tabler/icons-react';
+import { IconPlus } from '@tabler/icons-react';
 
 type BlankStateProps = {
   readonly hidden?: boolean;
@@ -14,13 +14,7 @@ type BlankStateProps = {
   };
 };
 
-export function BlankState({
-  hidden,
-  icon,
-  title,
-  description,
-  button,
-}: BlankStateProps) {
+export function BlankState({ hidden, icon, title, description, button }: BlankStateProps) {
   if (hidden) {
     return null;
   }

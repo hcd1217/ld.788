@@ -1,8 +1,8 @@
-import {Modal, rem, type MantineSize} from '@mantine/core';
-import type {ReactNode} from 'react';
-import {useTranslation} from 'react-i18next';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
-import {Drawer} from '@/components/common/ui';
+import { Modal, rem, type MantineSize } from '@mantine/core';
+import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { Drawer } from '@/components/common/ui';
 
 type ModalOrDrawerProps = {
   readonly opened: boolean;
@@ -10,13 +10,8 @@ type ModalOrDrawerProps = {
   readonly children: ReactNode;
   readonly onClose: () => void;
 };
-export function ModalOrDrawer({
-  drawerSize,
-  opened,
-  onClose,
-  children,
-}: ModalOrDrawerProps) {
-  const {t} = useTranslation();
+export function ModalOrDrawer({ drawerSize, opened, onClose, children }: ModalOrDrawerProps) {
+  const { t } = useTranslation();
   const isDesktop = useIsDesktop();
   if (isDesktop) {
     return (

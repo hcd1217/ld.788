@@ -1,16 +1,16 @@
-import {Select} from '@mantine/core';
-import {IconLanguage} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAppStore} from '@/stores/useAppStore';
+import { Select } from '@mantine/core';
+import { IconLanguage } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/stores/useAppStore';
 
 const languages = [
-  {value: 'en', label: 'English'},
-  {value: 'vi', label: 'Tiếng Việt'},
+  { value: 'en', label: 'English' },
+  { value: 'vi', label: 'Tiếng Việt' },
 ];
 
 export function LanguageSwitcher() {
-  const {currentLanguage, changeLanguage} = useTranslation();
-  const {publicClientConfig} = useAppStore();
+  const { currentLanguage, changeLanguage } = useTranslation();
+  const { publicClientConfig } = useAppStore();
 
   if (!publicClientConfig?.features?.language) {
     return null;

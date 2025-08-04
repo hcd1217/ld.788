@@ -1,11 +1,6 @@
-import {
-  Stack,
-  Group,
-  Pagination as MantinePagination,
-  Select,
-} from '@mantine/core';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
-import {useAppStore} from '@/stores/useAppStore';
+import { Stack, Group, Pagination as MantinePagination, Select } from '@mantine/core';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useAppStore } from '@/stores/useAppStore';
 
 type PaginationProps = {
   readonly hidden?: boolean;
@@ -24,7 +19,7 @@ export function Pagination({
   onPageSizeChange,
   onPageChange,
 }: PaginationProps) {
-  const {config} = useAppStore();
+  const { config } = useAppStore();
   const isDesktop = useIsDesktop();
   if (hidden) {
     return null;
@@ -43,7 +38,7 @@ export function Pagination({
               value={pageSize.toString()}
               data={pagingOptions}
               disabled={pagingOptions.length < 2}
-              style={{width: 100}}
+              style={{ width: 100 }}
               onChange={(value) => {
                 const size = Number(value);
                 if (Number.isNaN(size) || !size) {

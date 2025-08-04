@@ -3,11 +3,10 @@ import {
   FilterableAdminDataTable,
   type FilterableAdminDataTableProps,
 } from './FilterableAdminDataTable';
-import {ExportButton} from './ExportButton';
-import {type ExportColumn} from '@/utils/export';
+import { ExportButton } from './ExportButton';
+import { type ExportColumn } from '@/utils/export';
 
-interface ExportableAdminDataTableProps<T>
-  extends FilterableAdminDataTableProps<T> {
+interface ExportableAdminDataTableProps<T> extends FilterableAdminDataTableProps<T> {
   readonly exportColumns?: ReadonlyArray<ExportColumn<T>>;
   readonly exportFilename: string;
   readonly showExportButton?: boolean;
@@ -61,11 +60,7 @@ export function ExportableAdminDataTable<T extends Record<string, unknown>>({
       extraActions={
         <>
           {showExportButton ? (
-            <ExportButton
-              data={props.data}
-              columns={columns}
-              filename={exportFilename}
-            />
+            <ExportButton data={props.data} columns={columns} filename={exportFilename} />
           ) : null}
           {props.extraActions}
         </>

@@ -2,9 +2,7 @@
 // This file will be removed after testing
 
 export function throwTestError() {
-  throw new Error(
-    'Test error: This is a test error to verify error handling is working!',
-  );
+  throw new Error('Test error: This is a test error to verify error handling is working!');
 }
 
 export function throwAsyncError() {
@@ -14,7 +12,5 @@ export function throwAsyncError() {
 }
 
 export function throwUnhandledRejection() {
-  Promise.reject(
-    new Error('Test unhandled rejection: This promise was rejected'),
-  );
+  Promise.reject(new Error('Test unhandled rejection: This promise was rejected'));
 }

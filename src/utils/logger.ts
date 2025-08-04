@@ -1,4 +1,4 @@
-import {isDevelopment} from './env';
+import { isDevelopment } from './env';
 
 declare global {
   interface Console {
@@ -32,11 +32,7 @@ export function registerLogger() {
     error: '36px',
   };
 
-  function log(
-    level: 'info' | 'warn' | 'error',
-    message: unknown,
-    ...args: unknown[]
-  ) {
+  function log(level: 'info' | 'warn' | 'error', message: unknown, ...args: unknown[]) {
     if (!isDevelopment) {
       return;
     }

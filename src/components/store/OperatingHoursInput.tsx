@@ -1,23 +1,15 @@
 import React from 'react';
-import {
-  Stack,
-  Group,
-  Text,
-  Switch,
-  Paper,
-  ActionIcon,
-  Tooltip,
-} from '@mantine/core';
-import {TimeInput} from '@mantine/dates';
-import {IconCopy} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
+import { Stack, Group, Text, Switch, Paper, ActionIcon, Tooltip } from '@mantine/core';
+import { TimeInput } from '@mantine/dates';
+import { IconCopy } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export type DaySchedule =
   | {
       open: string;
       close: string;
     }
-  | {closed: true};
+  | { closed: true };
 
 type OperatingHours = Record<string, DaySchedule>;
 
@@ -49,31 +41,24 @@ export function OperatingHoursInput({
   onChange,
   disabled = false,
 }: OperatingHoursInputProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const handleDayToggle = (day: string) => {
-    const currentDay = value[day] || {open: '09:00', close: '17:00'};
+    const currentDay = value[day] || { open: '09:00', close: '17:00' };
     const isClosed = 'closed' in currentDay && currentDay.closed;
 
     const updatedHours = {
       ...value,
-      [day]: isClosed
-        ? {open: '09:00', close: '17:00'}
-        : {closed: true as const},
+      [day]: isClosed ? { open: '09:00', close: '17:00' } : { closed: true as const },
     };
     onChange(updatedHours as OperatingHours);
   };
 
-  const handleTimeChange = (
-    day: string,
-    field: 'open' | 'close',
-    time: string,
-  ) => {
-    const currentDay = value[day] || {open: '09:00', close: '17:00'};
+  const handleTimeChange = (day: string, field: 'open' | 'close', time: string) => {
+    const currentDay = value[day] || { open: '09:00', close: '17:00' };
 
     // If it's a closed day, we need to convert it to an open day first
-    const daySchedule =
-      'closed' in currentDay ? {open: '09:00', close: '17:00'} : currentDay;
+    const daySchedule = 'closed' in currentDay ? { open: '09:00', close: '17:00' } : currentDay;
 
     const updatedHours = {
       ...value,
@@ -86,7 +71,7 @@ export function OperatingHoursInput({
   };
 
   const copyToAllDays = (sourceDay: string) => {
-    const sourceSchedule = value[sourceDay] || {open: '09:00', close: '17:00'};
+    const sourceSchedule = value[sourceDay] || { open: '09:00', close: '17:00' };
 
     const updatedHours: OperatingHours = {};
     for (const dayKey of daysOfWeekKeys) {
@@ -99,13 +84,13 @@ export function OperatingHoursInput({
   return (
     <Stack gap="xs">
       {daysOfWeekKeys.map((key) => {
-        const daySchedule = value[key] || {open: '09:00', close: '17:00'};
+        const daySchedule = value[key] || { open: '09:00', close: '17:00' };
         const isClosed = 'closed' in daySchedule && daySchedule.closed;
 
         return (
           <Paper key={key} withBorder p="xs">
             <Group justify="space-between" wrap="nowrap" p={0}>
-              <Group gap="sm" style={{flex: 1}} p={0}>
+              <Group gap="sm" style={{ flex: 1 }} p={0}>
                 <Text w={100} fw={500}>
                   {t(`store.${key}` as const)}
                 </Text>

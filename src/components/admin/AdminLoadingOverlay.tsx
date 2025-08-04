@@ -1,12 +1,12 @@
-import {Portal, Overlay, Center, Loader, Stack, Text} from '@mantine/core';
-import {useAppStore} from '@/stores/useAppStore';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import { Portal, Overlay, Center, Loader, Stack, Text } from '@mantine/core';
+import { useAppStore } from '@/stores/useAppStore';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useIsDarkMode } from '@/hooks/useIsDarkMode';
 
 export function AdminLoadingOverlay() {
-  const {adminApiLoading, adminApiLoadingMessage} = useAppStore();
+  const { adminApiLoading, adminApiLoadingMessage } = useAppStore();
   const isDarkMode = useIsDarkMode();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   if (!adminApiLoading) {
     return null;
@@ -20,9 +20,7 @@ export function AdminLoadingOverlay() {
         blur={3}
         styles={{
           root: {
-            backgroundColor: isDarkMode
-              ? 'var(--mantine-color-dark-9)'
-              : 'white',
+            backgroundColor: isDarkMode ? 'var(--mantine-color-dark-9)' : 'white',
             opacity: 0.95,
             zIndex: 10_000, // Ensure it's above all other content
           },

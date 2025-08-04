@@ -1,22 +1,22 @@
-import {Alert} from '@mantine/core';
-import {IconAlertTriangle, IconClock} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {getEndDateStatus} from '@/utils/time';
+import { Alert } from '@mantine/core';
+import { IconAlertTriangle, IconClock } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { getEndDateStatus } from '@/utils/time';
 
 type EmployeeDetailAlertProps = {
   readonly endDate: Date | undefined;
   readonly isActive: boolean;
 };
 
-export function EmployeeDetailAlert({endDate, isActive}: EmployeeDetailAlertProps) {
-  const {t} = useTranslation();
-  
+export function EmployeeDetailAlert({ endDate, isActive }: EmployeeDetailAlertProps) {
+  const { t } = useTranslation();
+
   const status = getEndDateStatus(endDate, isActive);
-  
+
   if (status === 'none') {
     return null;
   }
-  
+
   const getAlertProps = () => {
     switch (status) {
       case 'ending_soon':
@@ -37,13 +37,13 @@ export function EmployeeDetailAlert({endDate, isActive}: EmployeeDetailAlertProp
         return null;
     }
   };
-  
+
   const alertProps = getAlertProps();
-  
+
   if (!alertProps) {
     return null;
   }
-  
+
   return (
     <Alert
       variant="light"
@@ -51,7 +51,7 @@ export function EmployeeDetailAlert({endDate, isActive}: EmployeeDetailAlertProp
       icon={alertProps.icon}
       title={alertProps.title}
       radius="md"
-      style={{marginBottom: 'var(--mantine-spacing-md)'}}
+      style={{ marginBottom: 'var(--mantine-spacing-md)' }}
     >
       {alertProps.message}
     </Alert>

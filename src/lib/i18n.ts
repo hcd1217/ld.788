@@ -1,11 +1,11 @@
 import i18n from 'i18next';
-import {initReactI18next} from 'react-i18next';
+import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import en from '@/locales/en.json';
 import vi from '@/locales/vi.json';
-import {isDevelopment} from '@/utils/env';
-import type {ClientConfig} from '@/lib/api/schemas/auth.schemas';
-import type {Dictionary} from '@/types/dictionary';
+import { isDevelopment } from '@/utils/env';
+import type { ClientConfig } from '@/lib/api/schemas/auth.schemas';
+import type { Dictionary } from '@/types/dictionary';
 
 const baseResources = {
   en: {
@@ -37,9 +37,7 @@ i18n
  * Updates i18n resources with client-specific translations
  * Client translations override base translations
  */
-export function updateClientTranslations(
-  clientTranslations?: ClientConfig['translations'],
-): void {
+export function updateClientTranslations(clientTranslations?: ClientConfig['translations']): void {
   if (!clientTranslations) {
     return;
   }
@@ -53,13 +51,7 @@ export function updateClientTranslations(
 
         // Add or update the resource bundle
         // The 'true' parameter performs a deep merge
-        i18n.addResourceBundle(
-          lang,
-          'translation',
-          nestedTranslations,
-          true,
-          true,
-        );
+        i18n.addResourceBundle(lang, 'translation', nestedTranslations, true, true);
       }
     }
   } catch (error) {
@@ -80,13 +72,7 @@ export function clearClientTranslations(): void {
       const baseTranslation = baseResources[lang as keyof typeof baseResources];
       if (baseTranslation) {
         // Replace the entire resource bundle with base translations
-        i18n.addResourceBundle(
-          lang,
-          'translation',
-          baseTranslation.translation,
-          false,
-          false,
-        );
+        i18n.addResourceBundle(lang, 'translation', baseTranslation.translation, false, false);
       }
     }
   } catch (error) {
@@ -97,9 +83,7 @@ export function clearClientTranslations(): void {
 /**
  * Helper function to convert flat dot-notation keys to nested object
  */
-function unFlattenTranslations(
-  flatTranslations: string | Dictionary,
-): Dictionary {
+function unFlattenTranslations(flatTranslations: string | Dictionary): Dictionary {
   const result: Dictionary = {};
 
   for (const [key, value] of Object.entries(flatTranslations)) {
@@ -121,5 +105,5 @@ function unFlattenTranslations(
   return result;
 }
 
-export {baseResources};
+export { baseResources };
 export default i18n;

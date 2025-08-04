@@ -10,9 +10,9 @@ import {
   Tooltip,
   type MantineStyleProp,
 } from '@mantine/core';
-import {IconArrowUp, IconArrowDown, IconArrowsSort} from '@tabler/icons-react';
-import {VirtualizedAdminDataTable} from './VirtualizedAdminDataTable';
-import {useTranslation} from '@/hooks/useTranslation';
+import { IconArrowUp, IconArrowDown, IconArrowsSort } from '@tabler/icons-react';
+import { VirtualizedAdminDataTable } from './VirtualizedAdminDataTable';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export interface SortableColumn<T> {
   readonly key: keyof T | string;
@@ -37,11 +37,7 @@ export interface SortableAdminDataTableProps<T> {
   readonly striped?: boolean;
   readonly highlightOnHover?: boolean;
   readonly minHeight?: number | string;
-  readonly renderRow?: (
-    item: T,
-    index: number,
-    children: React.ReactNode,
-  ) => React.ReactNode;
+  readonly renderRow?: (item: T, index: number, children: React.ReactNode) => React.ReactNode;
   readonly getRowKey?: (item: T, index: number) => string | number;
   readonly tableStyles?: MantineStyleProp;
   readonly virtualScroll?:
@@ -72,7 +68,7 @@ export const SortableAdminDataTable = React.memo(function <T>({
   tableStyles,
   virtualScroll,
 }: SortableAdminDataTableProps<T>) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const handleSort = (field: string) => {
     if (!onSort) return;
@@ -156,9 +152,7 @@ export const SortableAdminDataTable = React.memo(function <T>({
 
   if (shouldVirtualize && !renderRow) {
     const virtualConfig =
-      typeof virtualScroll === 'object'
-        ? virtualScroll
-        : {enabled: true, height: 600};
+      typeof virtualScroll === 'object' ? virtualScroll : { enabled: true, height: 600 };
 
     return (
       <VirtualizedAdminDataTable
@@ -195,7 +189,7 @@ export const SortableAdminDataTable = React.memo(function <T>({
             const rowContent = (
               <Table.Tr
                 key={rowKey}
-                style={{cursor: onRowClick ? 'pointer' : undefined}}
+                style={{ cursor: onRowClick ? 'pointer' : undefined }}
                 onClick={
                   onRowClick
                     ? () => {

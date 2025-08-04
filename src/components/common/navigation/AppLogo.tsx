@@ -1,6 +1,6 @@
-import {type MantineStyleProps, Group, Title, Box} from '@mantine/core';
-import {useNavigate} from 'react-router';
-import {useLogoAndTitle} from '@/hooks/useLogoAndTitle';
+import { type MantineStyleProps, Group, Title, Box } from '@mantine/core';
+import { useNavigate } from 'react-router';
+import { useLogoAndTitle } from '@/hooks/useLogoAndTitle';
 
 type AppLogoProps = {
   readonly c?: string;
@@ -8,17 +8,12 @@ type AppLogoProps = {
   readonly link?: string;
   readonly noTitle?: boolean;
 };
-export function AppLogo({
-  noTitle = false,
-  c,
-  fw,
-  link = '/home',
-}: AppLogoProps) {
+export function AppLogo({ noTitle = false, c, fw, link = '/home' }: AppLogoProps) {
   const navigate = useNavigate();
-  const {logoUrl, title} = useLogoAndTitle();
+  const { logoUrl, title } = useLogoAndTitle();
 
   return (
-    <Group gap="xs" style={{cursor: 'pointer'}} onClick={() => navigate(link)}>
+    <Group gap="xs" style={{ cursor: 'pointer' }} onClick={() => navigate(link)}>
       <Box
         component="img"
         src={logoUrl || '/icons/logo-black-and-white.svg'}

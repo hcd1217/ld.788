@@ -1,0 +1,62 @@
+# Build outputs
+dist/
+build/
+coverage/
+.vite/
+
+# Dependencies
+node_modules/
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# Generated files
+public/version.json
+*.min.js
+*.min.css
+
+# PWA assets
+public/apple-splash-*.png
+public/pwa-*.png
+public/maskable-icon-*.png
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Cache
+.cache/
+.turbo/
+
+# IDE
+.idea/
+.vscode/local.settings.json
+
+# Scripts and data
+scripts/seed-data/
+scripts/schema.bk/
+
+# Documentation and reports
+*.md
+implementation-plan/
+docs/
+guides/
+
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# JSON translation files (preserve formatting)
+src/locales/*.json
+scripts/i18n/*.json
+
+# Sample and backup files
+*.bak
+*.bak.*
+sample.*

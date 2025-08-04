@@ -1,27 +1,17 @@
-import {useState} from 'react';
-import {useParams, useNavigate} from 'react-router';
-import {Container, Group, Loader, Center} from '@mantine/core';
-import {useForm} from '@mantine/form';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
-import {getFormValidators} from '@/utils/validation';
-import {
-  AppPageTitle,
-  AppMobileLayout,
-  AppDesktopLayout,
-  GoBack,
-} from '@/components/common';
-import {SingleEmployeeForm} from '@/components/app/employee';
-import {
-  useHrActions,
-  useUnitList,
-  useHrLoading,
-  useHrError,
-} from '@/stores/useHrStore';
-import {employeeService} from '@/services/hr/employee';
-import {ROUTERS} from '@/config/routeConfig';
-import {useAction} from '@/hooks/useAction';
-import {useOnce} from '@/hooks/useOnce';
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router';
+import { Container, Group, Loader, Center } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { getFormValidators } from '@/utils/validation';
+import { AppPageTitle, AppMobileLayout, AppDesktopLayout, GoBack } from '@/components/common';
+import { SingleEmployeeForm } from '@/components/app/employee';
+import { useHrActions, useUnitList, useHrLoading, useHrError } from '@/stores/useHrStore';
+import { employeeService } from '@/services/hr/employee';
+import { ROUTERS } from '@/config/routeConfig';
+import { useAction } from '@/hooks/useAction';
+import { useOnce } from '@/hooks/useOnce';
 import { isDevelopment } from '@/utils/env';
 
 type SingleEmployeeFormValues = {
@@ -40,14 +30,14 @@ type SingleEmployeeFormValues = {
 };
 
 export function EditEmployeePage() {
-  const {employeeId: id} = useParams<{employeeId: string}>();
+  const { employeeId: id } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const isDesktop = useIsDesktop();
   const units = useUnitList();
   const isLoading = useHrLoading();
   const error = useHrError();
-  const {loadUnits, clearError} = useHrActions();
+  const { loadUnits, clearError } = useHrActions();
 
   const [isLoadingEmployee, setIsLoadingEmployee] = useState(true);
   const [isSingleLoading, setIsSingleLoading] = useState(false);
@@ -70,8 +60,9 @@ export function EditEmployeePage() {
     },
     validate: {
       ...getFormValidators(t, ['firstName', 'lastName']),
-      email: (value) => value && !value.match(/^\S+@\S+\.\S+$/) ? t('validation.invalidEmail') : undefined,
-      phone: (value) => value && value.length < 10 ? t('validation.phoneTooShort') : undefined,
+      email: (value) =>
+        value && !value.match(/^\S+@\S+\.\S+$/) ? t('validation.invalidEmail') : undefined,
+      phone: (value) => (value && value.length < 10 ? t('validation.phoneTooShort') : undefined),
       monthlySalary: (value, values) => {
         if (values.workType === 'FULL_TIME' && !value) {
           return t('validation.fieldRequired');
@@ -166,9 +157,7 @@ export function EditEmployeePage() {
     },
     errorHandler(error) {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t('employee.updateEmployeeFailed');
+        error instanceof Error ? error.message : t('employee.updateEmployeeFailed');
 
       setSingleError(errorMessage);
       setShowSingleAlert(true);
@@ -177,7 +166,6 @@ export function EditEmployeePage() {
       setIsSingleLoading(false);
     },
   });
-
 
   if (isLoadingEmployee) {
     return (
@@ -212,11 +200,7 @@ export function EditEmployeePage() {
   }
 
   return (
-    <AppDesktopLayout
-      isLoading={isLoading}
-      error={error}
-      clearError={clearError}
-    >
+    <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
       <Group justify="space-between" mb="md">
         <GoBack />
       </Group>

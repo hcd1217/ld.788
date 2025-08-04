@@ -25,9 +25,7 @@ export type Client = {
 };
 
 export const clientService = {
-  async registerNewClient(
-    data: RegisterClientRequest,
-  ): Promise<RegisterClientResponse> {
+  async registerNewClient(data: RegisterClientRequest): Promise<RegisterClientResponse> {
     return clientApi.register(data);
   },
 
@@ -51,10 +49,7 @@ export const clientService = {
     return clientApi.addRole(data);
   },
 
-  async updateRole(
-    id: string,
-    data: UpdateRoleRequest,
-  ): Promise<UpdateRoleResponse> {
+  async updateRole(id: string, data: UpdateRoleRequest): Promise<UpdateRoleResponse> {
     return clientApi.updateRole(id, data);
   },
 
@@ -66,9 +61,7 @@ export const clientService = {
     return clientApi.getAllPermissions();
   },
 
-  async addPermission(
-    data: AddPermissionRequest,
-  ): Promise<AddPermissionResponse> {
+  async addPermission(data: AddPermissionRequest): Promise<AddPermissionResponse> {
     return clientApi.addPermission(data);
   },
 

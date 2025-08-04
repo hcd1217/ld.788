@@ -1,5 +1,5 @@
-import {userApi} from '@/lib/api';
-import {delay} from '@/utils/time';
+import { userApi } from '@/lib/api';
+import { delay } from '@/utils/time';
 
 export type User = {
   id: string;
@@ -50,6 +50,6 @@ export const userService = {
   }) {
     await delay(100);
     console.log('updatePassword', userId, password, currentPassword);
-    return {success: true};
+    return { success: true };
   },
 };

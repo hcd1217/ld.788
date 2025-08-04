@@ -1,4 +1,4 @@
-import {BaseApiClient} from '../base';
+import { BaseApiClient } from '../base';
 import {
   GetUsersRequestSchema,
   GetUsersResponseSchema,
@@ -20,11 +20,6 @@ export class UserApi extends BaseApiClient {
   }
 
   async getUsers(params?: GetUsersRequest): Promise<GetUsersResponse> {
-    return this.get(
-      '/api/users',
-      params,
-      GetUsersResponseSchema,
-      GetUsersRequestSchema,
-    );
+    return this.get('/api/users', params, GetUsersResponseSchema, GetUsersRequestSchema);
   }
 }

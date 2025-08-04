@@ -14,7 +14,7 @@ import {
   stringSchema,
   trueBooleanSchema,
 } from './common.schemas';
-import {ROUTERS} from '@/config/routeConfig';
+import { ROUTERS } from '@/config/routeConfig';
 
 // Schemas
 export const LoginRequestSchema = z.object({
@@ -173,19 +173,13 @@ export const GetMeResponseSchema = z.object({
 // Types derived from schemas
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 export type LoginResponse = z.infer<typeof LoginResponseSchema>;
-export type VerifyMagicLinkRequest = z.infer<
-  typeof VerifyMagicLinkRequestSchema
->;
-export type VerifyMagicLinkResponse = z.infer<
-  typeof VerifyMagicLinkResponseSchema
->;
+export type VerifyMagicLinkRequest = z.infer<typeof VerifyMagicLinkRequestSchema>;
+export type VerifyMagicLinkResponse = z.infer<typeof VerifyMagicLinkResponseSchema>;
 export type RenewTokenRequest = z.infer<typeof RenewTokenRequestSchema>;
 export type RenewTokenResponse = z.infer<typeof RenewTokenResponseSchema>;
 export type JWTPayload = z.infer<typeof JWTPayloadSchema>;
 export type ForgotPasswordRequest = z.infer<typeof ForgotPasswordRequestSchema>;
-export type ForgotPasswordResponse = z.infer<
-  typeof ForgotPasswordResponseSchema
->;
+export type ForgotPasswordResponse = z.infer<typeof ForgotPasswordResponseSchema>;
 export type ResetPasswordRequest = z.infer<typeof ResetPasswordRequestSchema>;
 export type ResetPasswordResponse = z.infer<typeof ResetPasswordResponseSchema>;
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;

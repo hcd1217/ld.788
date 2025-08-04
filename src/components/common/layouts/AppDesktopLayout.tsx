@@ -1,6 +1,6 @@
 import React from 'react';
-import {Container, LoadingOverlay, Stack} from '@mantine/core';
-import {ErrorAlert} from '../feedback';
+import { Container, LoadingOverlay, Stack } from '@mantine/core';
+import { ErrorAlert } from '../feedback';
 
 type AppDesktopLayoutProps = {
   readonly children: React.ReactNode;
@@ -19,8 +19,8 @@ export function AppDesktopLayout({
       <ErrorAlert error={error} clearError={clearError} />
       <LoadingOverlay
         visible={isLoading}
-        overlayProps={{blur: 2}}
-        transitionProps={{duration: 300}}
+        overlayProps={{ blur: 2 }}
+        transitionProps={{ duration: 300 }}
       />
       <Stack gap="xl">{children}</Stack>
     </Container>

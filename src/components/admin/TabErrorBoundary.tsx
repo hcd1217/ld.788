@@ -1,9 +1,9 @@
-import {Component, type ReactNode, type ErrorInfo} from 'react';
-import {Alert, Button, Stack, Text, Title} from '@mantine/core';
-import {IconAlertTriangle, IconRefresh} from '@tabler/icons-react';
-import {addComponentError} from '@/stores/error';
-import {isDevelopment} from '@/utils/env';
-import {useTranslation} from '@/hooks/useTranslation';
+import { Component, type ReactNode, type ErrorInfo } from 'react';
+import { Alert, Button, Stack, Text, Title } from '@mantine/core';
+import { IconAlertTriangle, IconRefresh } from '@tabler/icons-react';
+import { addComponentError } from '@/stores/error';
+import { isDevelopment } from '@/utils/env';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface TabErrorBoundaryProps {
   readonly children: ReactNode;
@@ -16,24 +16,20 @@ interface TabErrorBoundaryState {
 }
 
 // Wrapper component to inject translations
-export function TabErrorBoundary({children, tabName}: TabErrorBoundaryProps) {
-  return (
-    <TabErrorBoundaryInternal tabName={tabName}>
-      {children}
-    </TabErrorBoundaryInternal>
-  );
+export function TabErrorBoundary({ children, tabName }: TabErrorBoundaryProps) {
+  return <TabErrorBoundaryInternal tabName={tabName}>{children}</TabErrorBoundaryInternal>;
 }
 
 // Internal class component
 class TabErrorBoundaryInternal extends Component<
-  TabErrorBoundaryProps & {readonly t?: (key: string) => string},
+  TabErrorBoundaryProps & { readonly t?: (key: string) => string },
   TabErrorBoundaryState
 > {
   static getDerivedStateFromError(error: Error): TabErrorBoundaryState {
-    return {hasError: true, error};
+    return { hasError: true, error };
   }
 
-  state: TabErrorBoundaryState = {hasError: false, error: undefined};
+  state: TabErrorBoundaryState = { hasError: false, error: undefined };
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log to console in development
@@ -50,7 +46,7 @@ class TabErrorBoundaryInternal extends Component<
   }
 
   handleReset = (): void => {
-    this.setState({hasError: false, error: undefined});
+    this.setState({ hasError: false, error: undefined });
   };
 
   render(): ReactNode {
@@ -75,8 +71,8 @@ interface ErrorFallbackProps {
   readonly onReset: () => void;
 }
 
-function ErrorFallback({error, tabName, onReset}: ErrorFallbackProps) {
-  const {t} = useTranslation();
+function ErrorFallback({ error, tabName, onReset }: ErrorFallbackProps) {
+  const { t } = useTranslation();
 
   return (
     <Alert

@@ -66,10 +66,8 @@ export const employeeService = {
     return employees.map((employee) => {
       const position = positionMap.get(employee.positionId ?? '');
       const fullName = renderFullName(employee);
-      const fullNameWithPosition = position
-        ? `${fullName} (${position})`
-        : undefined;
-      const workType = employee.employmentType === "PART_TIME" ? "PART_TIME" : "FULL_TIME"
+      const fullNameWithPosition = position ? `${fullName} (${position})` : undefined;
+      const workType = employee.employmentType === 'PART_TIME' ? 'PART_TIME' : 'FULL_TIME';
       return {
         ...employee,
         startDate: employee.hireDate,
@@ -104,11 +102,11 @@ export const employeeService = {
       firstName: employee.firstName,
       lastName: employee.lastName,
       departmentId: employee.unitId,
-      employmentType: employee.workType ?? "FULL_TIME",
+      employmentType: employee.workType ?? 'FULL_TIME',
       metadata: {
-        hourRate: employee.workType === "FULL_TIME" ? undefined : employee.hourlyRate,
-        monthlySalary: employee.workType === "FULL_TIME" ? employee.monthlySalary : undefined,
-      }
+        hourRate: employee.workType === 'FULL_TIME' ? undefined : employee.hourlyRate,
+        monthlySalary: employee.workType === 'FULL_TIME' ? employee.monthlySalary : undefined,
+      },
     });
     // The additional fields would be handled by the API in a real implementation
   },
@@ -128,11 +126,11 @@ export const employeeService = {
         firstName: employee.firstName,
         lastName: employee.lastName,
         departmentId: employee.unitId,
-        employmentType: employee.workType ?? "FULL_TIME",
+        employmentType: employee.workType ?? 'FULL_TIME',
         metadata: {
-          hourRate: employee.workType === "FULL_TIME" ? undefined : employee.hourlyRate,
-          monthlySalary: employee.workType === "FULL_TIME" ? employee.monthlySalary : undefined,
-        }
+          hourRate: employee.workType === 'FULL_TIME' ? undefined : employee.hourlyRate,
+          monthlySalary: employee.workType === 'FULL_TIME' ? employee.monthlySalary : undefined,
+        },
       })),
     });
   },
@@ -147,22 +145,25 @@ export const employeeService = {
 
   async getEmployee(id: string): Promise<Employee | undefined> {
     const employees = await this.getAllEmployee();
-    return employees.find(emp => emp.id === id);
+    return employees.find((emp) => emp.id === id);
   },
 
-  async updateEmployee(id: string, employee: {
-    firstName: string;
-    lastName: string;
-    unitId?: string | undefined;
-    email?: string;
-    phone?: string;
-    workType?: WorkType;
-    monthlySalary?: number;
-    hourlyRate?: number;
-    startDate: Date;
-    endDate?: Date;
-    displayOrder?: number;
-  }) {
+  async updateEmployee(
+    id: string,
+    employee: {
+      firstName: string;
+      lastName: string;
+      unitId?: string | undefined;
+      email?: string;
+      phone?: string;
+      workType?: WorkType;
+      monthlySalary?: number;
+      hourlyRate?: number;
+      startDate: Date;
+      endDate?: Date;
+      displayOrder?: number;
+    },
+  ) {
     await hrApi.updateEmployee(id, {
       firstName: employee.firstName,
       lastName: employee.lastName,
@@ -172,9 +173,9 @@ export const employeeService = {
       terminationDate: employee.endDate ? new Date(employee.endDate).toISOString() : undefined,
       metadata: {
         displayOrder: employee.displayOrder,
-        hourRate: employee.workType === "FULL_TIME" ? undefined : employee.hourlyRate,
-        monthlySalary: employee.workType === "FULL_TIME" ? employee.monthlySalary : undefined,
-      }
+        hourRate: employee.workType === 'FULL_TIME' ? undefined : employee.hourlyRate,
+        monthlySalary: employee.workType === 'FULL_TIME' ? employee.monthlySalary : undefined,
+      },
     });
   },
 };

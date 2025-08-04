@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {useIsDesktop} from './useIsDesktop';
-import {useAppStore} from '@/stores/useAppStore';
+import { useIsDesktop } from './useIsDesktop';
+import { useAppStore } from '@/stores/useAppStore';
 // Ref: https://stackoverflow.com/a/78696557
 
-export interface PaginationOptions<T, TFilters = {searchQuery?: string}> {
+export interface PaginationOptions<T, TFilters = { searchQuery?: string }> {
   readonly data: readonly T[];
   readonly defaultPageSize?: number;
   readonly filterFn?: (item: T, filters: TFilters) => boolean;
@@ -26,22 +26,16 @@ export interface PaginationHandlers {
   readonly lastPage: () => void;
 }
 
-export function useClientSidePagination<T, TFilters = {searchQuery?: string}>({
+export function useClientSidePagination<T, TFilters = { searchQuery?: string }>({
   data,
   defaultPageSize,
   filterFn,
   filters,
-}: PaginationOptions<T, TFilters>): [
-  readonly T[],
-  PaginationState,
-  PaginationHandlers,
-] {
-  const {config} = useAppStore();
+}: PaginationOptions<T, TFilters>): [readonly T[], PaginationState, PaginationHandlers] {
+  const { config } = useAppStore();
   const isDesktop = useIsDesktop();
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [pageSize, setPageSizeState] = React.useState(
-    (defaultPageSize ?? 1e3).toString(),
-  );
+  const [pageSize, setPageSizeState] = React.useState((defaultPageSize ?? 1e3).toString());
 
   React.useEffect(() => {
     setPageSizeState(

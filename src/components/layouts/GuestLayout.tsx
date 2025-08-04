@@ -1,16 +1,16 @@
-import {type ReactNode} from 'react';
-import {Affix, Box, Center, Container, Group} from '@mantine/core';
-import {Navigate} from 'react-router';
-import {VersionInformation} from '../common';
-import {LanguageSwitcher, ColorSchemeToggle} from '@/components/common';
-import {useAppStore} from '@/stores/useAppStore';
+import { type ReactNode } from 'react';
+import { Affix, Box, Center, Container, Group } from '@mantine/core';
+import { Navigate } from 'react-router';
+import { VersionInformation } from '../common';
+import { LanguageSwitcher, ColorSchemeToggle } from '@/components/common';
+import { useAppStore } from '@/stores/useAppStore';
 
 type GuestLayoutProps = {
   readonly children: ReactNode;
 };
 
-export function GuestLayout({children}: GuestLayoutProps) {
-  const {isAuthenticated} = useAppStore();
+export function GuestLayout({ children }: GuestLayoutProps) {
+  const { isAuthenticated } = useAppStore();
 
   if (isAuthenticated) {
     return <Navigate replace to="/home" />;
@@ -50,11 +50,11 @@ export function GuestLayout({children}: GuestLayoutProps) {
           zIndex: 1,
         }}
       >
-        <Container size={420} style={{width: '100%'}}>
+        <Container size={420} style={{ width: '100%' }}>
           {children}
         </Container>
       </Center>
-      <Affix position={{bottom: 0, right: 0}} p="sm">
+      <Affix position={{ bottom: 0, right: 0 }} p="sm">
         <VersionInformation />
       </Affix>
     </Box>

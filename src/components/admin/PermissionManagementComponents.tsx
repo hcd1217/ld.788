@@ -24,11 +24,11 @@ import {
   IconCode,
   IconTag,
 } from '@tabler/icons-react';
-import React, {useState, useEffect} from 'react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {formatDate} from '@/utils/string';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-import type {AdminPermission} from '@/lib/api';
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { formatDate } from '@/utils/string';
+import { useIsDarkMode } from '@/hooks/useIsDarkMode';
+import type { AdminPermission } from '@/lib/api';
 
 // Missing imports
 
@@ -39,12 +39,8 @@ interface PermissionTableProps {
   readonly onDelete: (permission: AdminPermission) => void;
 }
 
-export function PermissionTable({
-  permissions,
-  onEdit,
-  onDelete,
-}: PermissionTableProps) {
-  const {t} = useTranslation();
+export function PermissionTable({ permissions, onEdit, onDelete }: PermissionTableProps) {
+  const { t } = useTranslation();
 
   const rows = permissions.map((permission) => (
     <Table.Tr key={permission.id}>
@@ -120,9 +116,7 @@ export function PermissionTable({
             <Table.Th>{t('admin.permissions.scope')}</Table.Th>
             <Table.Th>{t('admin.permissions.description')}</Table.Th>
             <Table.Th>{t('admin.permissions.createdAt')}</Table.Th>
-            <Table.Th style={{width: 80}}>
-              {t('admin.permissions.actions')}
-            </Table.Th>
+            <Table.Th style={{ width: 80 }}>{t('admin.permissions.actions')}</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
@@ -137,7 +131,7 @@ interface CodeProps {
   readonly size?: 'xs' | 'sm' | 'md';
 }
 
-function Code({children, size = 'sm'}: CodeProps) {
+function Code({ children, size = 'sm' }: CodeProps) {
   const isDarkMode = useIsDarkMode();
   return (
     <Text
@@ -169,12 +163,8 @@ interface CreatePermissionModalProps {
   }) => Promise<void>;
 }
 
-export function CreatePermissionModal({
-  opened,
-  onClose,
-  onConfirm,
-}: CreatePermissionModalProps) {
-  const {t} = useTranslation();
+export function CreatePermissionModal({ opened, onClose, onConfirm }: CreatePermissionModalProps) {
+  const { t } = useTranslation();
   const [resource, setResource] = useState('');
   const [action, setAction] = useState('');
   const [scope, setScope] = useState('');
@@ -190,12 +180,7 @@ export function CreatePermissionModal({
   };
 
   const handleSubmit = async () => {
-    if (
-      !resource.trim() ||
-      !action.trim() ||
-      !scope.trim() ||
-      !description.trim()
-    ) {
+    if (!resource.trim() || !action.trim() || !scope.trim() || !description.trim()) {
       return;
     }
 
@@ -216,18 +201,12 @@ export function CreatePermissionModal({
   return (
     <Modal
       opened={opened}
-      title={
-        <Title order={4}>{t('admin.permissions.createNewPermission')}</Title>
-      }
+      title={<Title order={4}>{t('admin.permissions.createNewPermission')}</Title>}
       size="md"
       onClose={handleClose}
     >
       <Stack gap="md">
-        <Alert
-          icon={<IconAlertTriangle size={16} />}
-          color="yellow"
-          variant="light"
-        >
+        <Alert icon={<IconAlertTriangle size={16} />} color="yellow" variant="light">
           {t('admin.permissions.createWarning')}
         </Alert>
 
@@ -274,21 +253,12 @@ export function CreatePermissionModal({
         />
 
         <Group justify="flex-end">
-          <Button
-            variant="subtle"
-            disabled={isSubmitting}
-            onClick={handleClose}
-          >
+          <Button variant="subtle" disabled={isSubmitting} onClick={handleClose}>
             {t('common.cancel')}
           </Button>
           <Button
             loading={isSubmitting}
-            disabled={
-              !resource.trim() ||
-              !action.trim() ||
-              !scope.trim() ||
-              !description.trim()
-            }
+            disabled={!resource.trim() || !action.trim() || !scope.trim() || !description.trim()}
             onClick={handleSubmit}
           >
             {t('admin.permissions.createPermission')}
@@ -313,7 +283,7 @@ export function EditPermissionModal({
   onClose,
   onConfirm,
 }: EditPermissionModalProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -382,18 +352,10 @@ export function EditPermissionModal({
             />
 
             <Group justify="flex-end">
-              <Button
-                variant="subtle"
-                disabled={isSubmitting}
-                onClick={handleClose}
-              >
+              <Button variant="subtle" disabled={isSubmitting} onClick={handleClose}>
                 {t('common.cancel')}
               </Button>
-              <Button
-                loading={isSubmitting}
-                disabled={!description.trim()}
-                onClick={handleSubmit}
-              >
+              <Button loading={isSubmitting} disabled={!description.trim()} onClick={handleSubmit}>
                 {t('admin.permissions.updatePermission')}
               </Button>
             </Group>
@@ -418,7 +380,7 @@ export function DeletePermissionModal({
   onClose,
   onConfirm,
 }: DeletePermissionModalProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const isDarkMode = useIsDarkMode();
   const [confirmText, setConfirmText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -459,11 +421,7 @@ export function DeletePermissionModal({
       <Stack gap="md">
         {permission ? (
           <>
-            <Alert
-              icon={<IconAlertTriangle size={16} />}
-              color="red"
-              variant="light"
-            >
+            <Alert icon={<IconAlertTriangle size={16} />} color="red" variant="light">
               {t('admin.permissions.deleteWarning')}
             </Alert>
 
@@ -491,11 +449,7 @@ export function DeletePermissionModal({
             />
 
             <Group justify="flex-end">
-              <Button
-                variant="subtle"
-                disabled={isSubmitting}
-                onClick={handleClose}
-              >
+              <Button variant="subtle" disabled={isSubmitting} onClick={handleClose}>
                 {t('common.cancel')}
               </Button>
               <Button

@@ -1,9 +1,9 @@
-import {Stack, Text, Alert, Flex, Button} from '@mantine/core';
-import {IconAlertTriangle} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import type {Employee} from '@/services/hr/employee';
-import {renderFullName} from '@/utils/string';
-import {ModalOrDrawer} from '@/components/common';
+import { Stack, Text, Alert, Flex, Button } from '@mantine/core';
+import { IconAlertTriangle } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { Employee } from '@/services/hr/employee';
+import { renderFullName } from '@/utils/string';
+import { ModalOrDrawer } from '@/components/common';
 
 type EmployeeActivateModalProps = {
   readonly opened: boolean;
@@ -18,7 +18,7 @@ export function EmployeeActivateModal({
   employee,
   onConfirm,
 }: EmployeeActivateModalProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <ModalOrDrawer drawerSize="350px" opened={opened} onClose={onClose}>

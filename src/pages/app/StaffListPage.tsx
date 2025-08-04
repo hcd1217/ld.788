@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import {
   Container,
   Title,
@@ -12,14 +12,14 @@ import {
   Text,
   Flex,
 } from '@mantine/core';
-import {useDisclosure} from '@mantine/hooks';
-import {IconPlus, IconAlertTriangle} from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
+import { IconPlus, IconAlertTriangle } from '@tabler/icons-react';
 import {
   showErrorNotification,
   showSuccessNotification,
   showInfoNotification,
 } from '@/utils/notifications';
-import {useTranslation} from '@/hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   useStaffList,
   useStaffLoading,
@@ -27,21 +27,19 @@ import {
   useStaffPagination,
   useStaffActions,
 } from '@/stores/useStaffStore';
-import {useCurrentStore, useStores} from '@/stores/useStoreConfigStore';
-import {StoreSelector} from '@/components/store';
-import {StaffList} from '@/components/staff';
-import type {Staff} from '@/services/staff';
-import {ErrorAlert} from '@/components/common';
-import {ROUTERS, getStaffEditRoute} from '@/config/routeConfig';
+import { useCurrentStore, useStores } from '@/stores/useStoreConfigStore';
+import { StoreSelector } from '@/components/store';
+import { StaffList } from '@/components/staff';
+import type { Staff } from '@/services/staff';
+import { ErrorAlert } from '@/components/common';
+import { ROUTERS, getStaffEditRoute } from '@/config/routeConfig';
 
 export function StaffListPage() {
   const navigate = useNavigate();
-  const {t} = useTranslation();
-  const [deleteModalOpened, {open: openDeleteModal, close: closeDeleteModal}] =
+  const { t } = useTranslation();
+  const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
-  const [staffToDelete, setStaffToDelete] = useState<Staff | undefined>(
-    undefined,
-  );
+  const [staffToDelete, setStaffToDelete] = useState<Staff | undefined>(undefined);
 
   const staffs = useStaffList();
   const isLoading = useStaffLoading();
@@ -50,8 +48,7 @@ export function StaffListPage() {
   const stores = useStores();
   const currentStore = useCurrentStore();
 
-  const {loadStaff, deleteStaff, deactivateStaff, activateStaff, clearError} =
-    useStaffActions();
+  const { loadStaff, deleteStaff, deactivateStaff, activateStaff, clearError } = useStaffActions();
 
   // Load staff when component mounts or store changes
   useEffect(() => {
@@ -90,8 +87,7 @@ export function StaffListPage() {
       closeDeleteModal();
       setStaffToDelete(undefined);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : t('staff.deleteFailedDefault');
+      const errorMessage = error instanceof Error ? error.message : t('staff.deleteFailedDefault');
 
       showErrorNotification(t('staff.deleteFailed'), errorMessage);
     }
@@ -118,9 +114,7 @@ export function StaffListPage() {
       }
     } catch (error) {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t('staff.updateStatusFailedDefault');
+        error instanceof Error ? error.message : t('staff.updateStatusFailedDefault');
 
       showErrorNotification(t('staff.updateFailed'), errorMessage);
     }
@@ -134,10 +128,7 @@ export function StaffListPage() {
 
   const handleAddStaff = () => {
     if (!currentStore) {
-      showInfoNotification(
-        t('staff.noStoreSelected'),
-        t('staff.selectStoreBeforeAdding'),
-      );
+      showInfoNotification(t('staff.noStoreSelected'), t('staff.selectStoreBeforeAdding'));
       return;
     }
 
@@ -152,11 +143,7 @@ export function StaffListPage() {
             {t('staff.title')}
           </Title>
 
-          <Alert
-            icon={<IconAlertTriangle size={16} />}
-            color="orange"
-            variant="light"
-          >
+          <Alert icon={<IconAlertTriangle size={16} />} color="orange" variant="light">
             <Stack gap="md">
               <Text>{t('staff.selectStoreToManage')}</Text>
               <StoreSelector />
@@ -175,11 +162,7 @@ export function StaffListPage() {
             {t('staff.title')}
           </Title>
 
-          <Alert
-            icon={<IconAlertTriangle size={16} />}
-            color="orange"
-            variant="light"
-          >
+          <Alert icon={<IconAlertTriangle size={16} />} color="orange" variant="light">
             {t('staff.noStoresFound')}
           </Alert>
         </Stack>
@@ -193,7 +176,7 @@ export function StaffListPage() {
         <Stack gap="xl">
           <Group justify="space-between">
             <Title order={1} ta="center">
-              {t('staff.titleWithStore', {storeName: currentStore.name})}
+              {t('staff.titleWithStore', { storeName: currentStore.name })}
             </Title>
             <Group gap="md">
               <Button
@@ -211,18 +194,16 @@ export function StaffListPage() {
 
           <ErrorAlert error={error} clearError={clearError} />
 
-          <div style={{position: 'relative'}}>
+          <div style={{ position: 'relative' }}>
             <LoadingOverlay
               visible={isLoading}
-              overlayProps={{blur: 2}}
-              transitionProps={{duration: 300}}
+              overlayProps={{ blur: 2 }}
+              transitionProps={{ duration: 300 }}
             />
 
             <StaffList
               staffs={staffs}
-              onEdit={(staffMember) =>
-                navigate(getStaffEditRoute(staffMember.id))
-              }
+              onEdit={(staffMember) => navigate(getStaffEditRoute(staffMember.id))}
               onDelete={handleDeleteStaff}
               onToggleStatus={handleToggleStaffStatus}
             />
@@ -269,15 +250,11 @@ export function StaffListPage() {
       >
         <Stack gap="md">
           <Text>
-            {t('staff.deleteConfirmation', {name: staffToDelete?.fullName})}{' '}
+            {t('staff.deleteConfirmation', { name: staffToDelete?.fullName })}{' '}
             {t('common.cannotBeUndone')}
           </Text>
 
-          <Alert
-            icon={<IconAlertTriangle size={16} />}
-            color="red"
-            variant="light"
-          >
+          <Alert icon={<IconAlertTriangle size={16} />} color="red" variant="light">
             {t('staff.deleteWarning')}
           </Alert>
 

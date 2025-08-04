@@ -1,6 +1,6 @@
-import React, {useState, useRef} from 'react';
+import React, { useState, useRef } from 'react';
 import * as XLSX from 'xlsx';
-import {Navigate} from 'react-router';
+import { Navigate } from 'react-router';
 import {
   Button,
   Paper,
@@ -29,14 +29,11 @@ import {
   showInfoNotification,
   showSuccessNotification,
 } from '@/utils/notifications';
-import {GoBack} from '@/components/common';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAppStore} from '@/stores/useAppStore';
-import {clientService} from '@/services/client';
-import type {
-  RegisterUserByRootUserRequest,
-  RegisterBulkUsersByRootUserResponse,
-} from '@/lib/api';
+import { GoBack } from '@/components/common';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/stores/useAppStore';
+import { clientService } from '@/services/client';
+import type { RegisterUserByRootUserRequest, RegisterBulkUsersByRootUserResponse } from '@/lib/api';
 
 type ImportResult = {
   summary: {
@@ -48,15 +45,13 @@ type ImportResult = {
 };
 
 export function ImportUsersPage() {
-  const {user} = useAppStore();
-  const {t, i18n} = useTranslation();
+  const { user } = useAppStore();
+  const { t, i18n } = useTranslation();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [file, setFile] = useState<File | undefined>(undefined);
-  const [importResult, setImportResult] = useState<ImportResult | undefined>(
-    undefined,
-  );
+  const [importResult, setImportResult] = useState<ImportResult | undefined>(undefined);
   const [mounted, setMounted] = useState(true);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -66,9 +61,7 @@ export function ImportUsersPage() {
 
   const validateFileType = (file: File): boolean => {
     const allowedTypes = ['.csv', '.xlsx', '.xls'];
-    const fileExtension = file.name
-      .toLowerCase()
-      .slice(Math.max(0, file.name.lastIndexOf('.')));
+    const fileExtension = file.name.toLowerCase().slice(Math.max(0, file.name.lastIndexOf('.')));
     return allowedTypes.includes(fileExtension);
   };
 
@@ -92,10 +85,7 @@ export function ImportUsersPage() {
     if (excelFile) {
       setFile(excelFile);
     } else if (droppedFiles.length > 0) {
-      showErrorNotification(
-        t('auth.invalidFileType'),
-        'Please select a CSV or Excel file',
-      );
+      showErrorNotification(t('auth.invalidFileType'), 'Please select a CSV or Excel file');
     }
   };
 
@@ -111,26 +101,14 @@ export function ImportUsersPage() {
       ? [
           ['lastName', 'firstName', 'email', 'userName', 'password'],
           ['Nguyễn', 'An', 'an.nguyen@example.com', 'nguyen.an', 'MatKhau123!'],
-          [
-            'Trần',
-            'Hương',
-            'huong.tran@example.com',
-            'tran.huong',
-            'BaoMat456!',
-          ],
+          ['Trần', 'Hương', 'huong.tran@example.com', 'tran.huong', 'BaoMat456!'],
           ['Lê', 'Minh', '', 'le.minh', 'PassCuaToi789!'],
           ['Phạm', 'Mai', 'mai.pham@example.com', '', 'PassManh012!'],
         ]
       : [
           ['firstName', 'lastName', 'email', 'userName', 'password'],
           ['John', 'Doe', 'john.doe@example.com', 'john.doe', 'Password123!'],
-          [
-            'Jane',
-            'Smith',
-            'jane.smith@example.com',
-            'jane.smith',
-            'SecurePass456!',
-          ],
+          ['Jane', 'Smith', 'jane.smith@example.com', 'jane.smith', 'SecurePass456!'],
           ['Mike', 'Johnson', '', 'mike.johnson', 'MyPassword789!'],
           ['Sarah', 'Wilson', 'sarah.wilson@example.com', '', 'StrongPass012!'],
         ];
@@ -151,10 +129,7 @@ export function ImportUsersPage() {
     try {
       setIsDownloading(true);
 
-      showInfoNotification(
-        t('auth.downloadingSample'),
-        'Creating sample file...',
-      );
+      showInfoNotification(t('auth.downloadingSample'), 'Creating sample file...');
 
       // Simulate download delay
       await new Promise((resolve) => {
@@ -163,23 +138,15 @@ export function ImportUsersPage() {
 
       generateSampleExcel();
 
-      showSuccessNotification(
-        'Download Complete',
-        'Sample Excel file downloaded successfully',
-      );
+      showSuccessNotification('Download Complete', 'Sample Excel file downloaded successfully');
     } catch {
-      showErrorNotification(
-        'Download Failed',
-        'Failed to download sample file',
-      );
+      showErrorNotification('Download Failed', 'Failed to download sample file');
     } finally {
       setIsDownloading(false);
     }
   };
 
-  const parseExcelFile = async (
-    file: File,
-  ): Promise<RegisterUserByRootUserRequest[]> => {
+  const parseExcelFile = async (file: File): Promise<RegisterUserByRootUserRequest[]> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
@@ -192,7 +159,7 @@ export function ImportUsersPage() {
           }
 
           // Parse the Excel file
-          const workbook = XLSX.read(data, {type: 'array'});
+          const workbook = XLSX.read(data, { type: 'array' });
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
 
@@ -203,17 +170,11 @@ export function ImportUsersPage() {
           }) as string[][];
 
           if (sheetData.length < 2) {
-            reject(
-              new Error(
-                'File must contain at least a header row and one data row',
-              ),
-            );
+            reject(new Error('File must contain at least a header row and one data row'));
             return;
           }
 
-          const headers = sheetData[0].map((h) =>
-            String(h).trim().toLowerCase(),
-          );
+          const headers = sheetData[0].map((h) => String(h).trim().toLowerCase());
           const users: RegisterUserByRootUserRequest[] = [];
 
           for (let index = 1; index < sheetData.length; index++) {
@@ -291,19 +252,13 @@ export function ImportUsersPage() {
 
   const handleFileUpload = async () => {
     if (!file) {
-      showErrorNotification(
-        t('auth.noFileSelected'),
-        'Please select a file first',
-      );
+      showErrorNotification(t('auth.noFileSelected'), 'Please select a file first');
       return;
     }
 
     // Validate file type
     if (!validateFileType(file)) {
-      showErrorNotification(
-        t('auth.invalidFileType'),
-        'Please select a CSV or Excel file',
-      );
+      showErrorNotification(t('auth.invalidFileType'), 'Please select a CSV or Excel file');
       return;
     }
 
@@ -333,8 +288,7 @@ export function ImportUsersPage() {
         showSuccessNotification(t('auth.importSuccess'), notificationMessage);
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : t('auth.importFailed');
+      const errorMessage = error instanceof Error ? error.message : t('auth.importFailed');
 
       showErrorNotification(t('auth.importFailed'), errorMessage);
     } finally {
@@ -357,22 +311,14 @@ export function ImportUsersPage() {
           {t('auth.importUsersTitle')}
         </Title>
 
-        <Transition
-          mounted={mounted}
-          transition="slide-up"
-          duration={400}
-          timingFunction="ease"
-        >
+        <Transition mounted={mounted} transition="slide-up" duration={400} timingFunction="ease">
           {(styles) => (
             <Stack gap="md" style={styles}>
               {/* Download Sample Section */}
               <Paper withBorder shadow="sm" p="lg" radius="md">
                 <Stack gap="md">
                   <Group>
-                    <IconFileSpreadsheet
-                      size={24}
-                      color="var(--mantine-color-blue-6)"
-                    />
+                    <IconFileSpreadsheet size={24} color="var(--mantine-color-blue-6)" />
                     <div>
                       <Text fw={500} size="lg">
                         {t('auth.sampleExcelTemplate')}
@@ -395,17 +341,11 @@ export function ImportUsersPage() {
               </Paper>
 
               {/* Upload Section */}
-              <Paper
-                withBorder
-                shadow="sm"
-                p="lg"
-                radius="md"
-                style={{position: 'relative'}}
-              >
+              <Paper withBorder shadow="sm" p="lg" radius="md" style={{ position: 'relative' }}>
                 <LoadingOverlay
                   visible={isLoading}
-                  overlayProps={{blur: 2}}
-                  transitionProps={{duration: 300}}
+                  overlayProps={{ blur: 2 }}
+                  transitionProps={{ duration: 300 }}
                 />
 
                 <Stack gap="md">
@@ -413,17 +353,13 @@ export function ImportUsersPage() {
                   <Box
                     style={{
                       border: `2px dashed ${
-                        isDragOver
-                          ? 'var(--mantine-color-green-6)'
-                          : 'var(--mantine-color-gray-4)'
+                        isDragOver ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-gray-4)'
                       }`,
                       borderRadius: 'var(--mantine-radius-md)',
                       padding: 'var(--mantine-spacing-xl)',
                       textAlign: 'center',
                       cursor: 'pointer',
-                      backgroundColor: isDragOver
-                        ? 'var(--mantine-color-green-0)'
-                        : 'transparent',
+                      backgroundColor: isDragOver ? 'var(--mantine-color-green-0)' : 'transparent',
                       transition: 'all 0.2s ease',
                     }}
                     onDragOver={handleDragOver}
@@ -467,7 +403,7 @@ export function ImportUsersPage() {
                     ref={fileInputRef}
                     type="file"
                     accept=".csv,.xlsx,.xls"
-                    style={{display: 'none'}}
+                    style={{ display: 'none' }}
                     onChange={(event) => {
                       const selectedFile = event.target.files?.[0];
                       if (selectedFile && validateFileType(selectedFile)) {
@@ -499,10 +435,7 @@ export function ImportUsersPage() {
                 <Paper withBorder shadow="sm" p="lg" radius="md">
                   <Stack gap="md">
                     <Group>
-                      <IconCheck
-                        size={24}
-                        color="var(--mantine-color-green-6)"
-                      />
+                      <IconCheck size={24} color="var(--mantine-color-green-6)" />
                       <Text fw={500} size="lg">
                         {t('auth.importSummary')}
                       </Text>
@@ -534,47 +467,32 @@ export function ImportUsersPage() {
                         <Divider mt="sm" />
 
                         <Progress
-                          value={
-                            (importResult.summary.success /
-                              importResult.summary.total) *
-                            100
-                          }
-                          color={
-                            importResult.summary.failed > 0 ? 'yellow' : 'green'
-                          }
+                          value={(importResult.summary.success / importResult.summary.total) * 100}
+                          color={importResult.summary.failed > 0 ? 'yellow' : 'green'}
                           size="lg"
                           mt="sm"
                         />
                       </Stack>
                     </Card>
 
-                    {importResult.summary.failed > 0 &&
-                    importResult.details?.errors ? (
+                    {importResult.summary.failed > 0 && importResult.details?.errors ? (
                       <Card withBorder>
                         <Text fw={500} mb="sm" c="red">
                           Failed Imports:
                         </Text>
                         <Stack gap="xs">
-                          {importResult.details.errors
-                            .slice(0, 5)
-                            .map((error, index) => (
-                              <Text
-                                key={`error-${
-                                  error.user.email ||
-                                  error.user.userName ||
-                                  index
-                                }`}
-                                size="sm"
-                                c="dimmed"
-                              >
-                                {error.user.firstName} {error.user.lastName}:{' '}
-                                {error.error}
-                              </Text>
-                            ))}
+                          {importResult.details.errors.slice(0, 5).map((error, index) => (
+                            <Text
+                              key={`error-${error.user.email || error.user.userName || index}`}
+                              size="sm"
+                              c="dimmed"
+                            >
+                              {error.user.firstName} {error.user.lastName}: {error.error}
+                            </Text>
+                          ))}
                           {importResult.details.errors.length > 5 && (
                             <Text size="sm" c="dimmed">
-                              ... and {importResult.details.errors.length - 5}{' '}
-                              more
+                              ... and {importResult.details.errors.length - 5} more
                             </Text>
                           )}
                         </Stack>

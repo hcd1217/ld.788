@@ -1,9 +1,9 @@
-import {create} from 'zustand';
-import {devtools} from 'zustand/middleware';
-import {employeeService, type Employee} from '@/services/hr/employee';
-import {unitService, type Unit} from '@/services/hr/unit';
-import {getErrorMessage} from '@/utils/errorUtils';
-import {useMemo} from 'react';
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { employeeService, type Employee } from '@/services/hr/employee';
+import { unitService, type Unit } from '@/services/hr/unit';
+import { getErrorMessage } from '@/utils/errorUtils';
+import { useMemo } from 'react';
 
 type HrState = {
   // Employee data
@@ -58,11 +58,11 @@ export const useHrStore = create<HrState>()(
 
       // Actions
       setCurrentEmployee(employee) {
-        set({currentEmployee: employee, error: undefined});
+        set({ currentEmployee: employee, error: undefined });
       },
 
       async loadUnits() {
-        set({error: undefined});
+        set({ error: undefined });
         try {
           const units = await unitService.getUnits();
 
@@ -82,7 +82,7 @@ export const useHrStore = create<HrState>()(
           return;
         }
 
-        set({isLoading: true, error: undefined});
+        set({ isLoading: true, error: undefined });
         try {
           // Load both employees and units in parallel
           const [employees, units] = await Promise.all([
@@ -108,7 +108,7 @@ export const useHrStore = create<HrState>()(
 
       async deactivateEmployee(id: string) {
         // Optimistic update: mark employee as inactive immediately
-        const {employees} = get();
+        const { employees } = get();
         const employeeToDeactivate = employees.find((e) => e.id === id);
 
         if (!employeeToDeactivate) {
@@ -120,7 +120,7 @@ export const useHrStore = create<HrState>()(
 
         // Optimistically update state
         const updatedEmployees = employees.map((e) =>
-          e.id === id ? {...e, isActive: false} : e,
+          e.id === id ? { ...e, isActive: false } : e,
         );
 
         set({
@@ -133,7 +133,7 @@ export const useHrStore = create<HrState>()(
           // Actually deactivate on server (soft delete)
           await employeeService.deactivateEmployee(id);
 
-          set({isLoading: false});
+          set({ isLoading: false });
 
           // Refresh in background to sync with server state
           get()
@@ -144,9 +144,7 @@ export const useHrStore = create<HrState>()(
         } catch (error) {
           // Rollback on error
           const errorMessage =
-            error instanceof Error
-              ? error.message
-              : 'Failed to deactivate employee';
+            error instanceof Error ? error.message : 'Failed to deactivate employee';
 
           set({
             employees: previousEmployees,
@@ -158,7 +156,7 @@ export const useHrStore = create<HrState>()(
 
       async activateEmployee(id: string) {
         // Optimistic update: mark employee as active immediately
-        const {employees} = get();
+        const { employees } = get();
         const employeeToActivate = employees.find((e) => e.id === id);
 
         if (!employeeToActivate) {
@@ -169,9 +167,7 @@ export const useHrStore = create<HrState>()(
         const previousEmployees = employees;
 
         // Optimistically update state
-        const updatedEmployees = employees.map((e) =>
-          e.id === id ? {...e, isActive: true} : e,
-        );
+        const updatedEmployees = employees.map((e) => (e.id === id ? { ...e, isActive: true } : e));
 
         set({
           employees: updatedEmployees,
@@ -183,7 +179,7 @@ export const useHrStore = create<HrState>()(
           // Actually activate on server
           await employeeService.activateEmployee(id);
 
-          set({isLoading: false});
+          set({ isLoading: false });
 
           // Refresh in background to sync with server state
           get()
@@ -194,9 +190,7 @@ export const useHrStore = create<HrState>()(
         } catch (error) {
           // Rollback on error
           const errorMessage =
-            error instanceof Error
-              ? error.message
-              : 'Failed to activate employee';
+            error instanceof Error ? error.message : 'Failed to activate employee';
 
           set({
             employees: previousEmployees,
@@ -217,13 +211,13 @@ export const useHrStore = create<HrState>()(
         hourlyRate?: number;
         startDate?: Date;
       }) {
-        set({isLoading: true, error: undefined});
+        set({ isLoading: true, error: undefined });
 
         try {
           // Add employee on server
           await employeeService.addEmployee(employee);
 
-          set({isLoading: false});
+          set({ isLoading: false });
 
           // Force reload employee list to include the new employee
           await get().loadEmployees(true);
@@ -242,13 +236,13 @@ export const useHrStore = create<HrState>()(
           unitId?: string | undefined;
         }>,
       ) {
-        set({isLoading: true, error: undefined});
+        set({ isLoading: true, error: undefined });
 
         try {
           // Add multiple employees on server
           await employeeService.addBulkEmployees(employees);
 
-          set({isLoading: false});
+          set({ isLoading: false });
 
           // Force reload employee list to include the new employees
           await get().loadEmployees(true);
@@ -261,7 +255,7 @@ export const useHrStore = create<HrState>()(
       },
 
       clearError() {
-        set({error: undefined});
+        set({ error: undefined });
       },
 
       // Selectors
@@ -276,8 +270,7 @@ export const useHrStore = create<HrState>()(
 );
 
 // Computed selectors for convenience
-export const useCurrentEmployee = () =>
-  useHrStore((state) => state.currentEmployee);
+export const useCurrentEmployee = () => useHrStore((state) => state.currentEmployee);
 export const useEmployeeList = () => useHrStore((state) => state.employees);
 export const useUnitList = () => useHrStore((state) => state.units);
 export const useHrLoading = () => useHrStore((state) => state.isLoading);
@@ -296,27 +289,30 @@ export const useHrActions = () => {
   const clearError = useHrStore((state) => state.clearError);
   const getEmployeeById = useHrStore((state) => state.getEmployeeById);
 
-  return useMemo(() => ({
-    setCurrentEmployee,
-    loadEmployees,
-    loadUnits,
-    refreshEmployees,
-    deactivateEmployee,
-    activateEmployee,
-    addEmployee,
-    addBulkEmployees,
-    clearError,
-    getEmployeeById,
-  }), [
-    setCurrentEmployee,
-    loadEmployees,
-    loadUnits,
-    refreshEmployees,
-    deactivateEmployee,
-    activateEmployee,
-    addEmployee,
-    addBulkEmployees,
-    clearError,
-    getEmployeeById,
-  ]);
+  return useMemo(
+    () => ({
+      setCurrentEmployee,
+      loadEmployees,
+      loadUnits,
+      refreshEmployees,
+      deactivateEmployee,
+      activateEmployee,
+      addEmployee,
+      addBulkEmployees,
+      clearError,
+      getEmployeeById,
+    }),
+    [
+      setCurrentEmployee,
+      loadEmployees,
+      loadUnits,
+      refreshEmployees,
+      deactivateEmployee,
+      activateEmployee,
+      addEmployee,
+      addBulkEmployees,
+      clearError,
+      getEmployeeById,
+    ],
+  );
 };

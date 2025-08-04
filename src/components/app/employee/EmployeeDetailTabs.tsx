@@ -1,15 +1,15 @@
-import {Box, Stack, ScrollArea} from '@mantine/core';
+import { Box, Stack, ScrollArea } from '@mantine/core';
 import {
   IconInfoCircle,
   IconClock,
   IconCurrencyDollar,
   IconShoppingCart,
 } from '@tabler/icons-react';
-import {EmployeeBasicInfoCard} from './EmployeeBasicInfoCard';
-import {EmployeeDangerZone} from './EmployeeDangerZone';
-import {Tabs, ComingSoonCard} from '@/components/common';
-import {useTranslation} from '@/hooks/useTranslation';
-import type {Employee} from '@/services/hr/employee';
+import { EmployeeBasicInfoCard } from './EmployeeBasicInfoCard';
+import { EmployeeDangerZone } from './EmployeeDangerZone';
+import { Tabs, ComingSoonCard } from '@/components/common';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { Employee } from '@/services/hr/employee';
 
 type EmployeeDetailTabsProps = {
   readonly employee: Employee;
@@ -24,7 +24,7 @@ export function EmployeeDetailTabs({
   onActivate,
   onDeactivate,
 }: EmployeeDetailTabsProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <Tabs defaultValue="info">
@@ -36,16 +36,10 @@ export function EmployeeDetailTabs({
           <Tabs.Tab value="timesheet" leftSection={<IconClock size={16} />}>
             {t('employee.timesheet')}
           </Tabs.Tab>
-          <Tabs.Tab
-            value="salary"
-            leftSection={<IconCurrencyDollar size={16} />}
-          >
+          <Tabs.Tab value="salary" leftSection={<IconCurrencyDollar size={16} />}>
             {t('employee.salaryConfig')}
           </Tabs.Tab>
-          <Tabs.Tab
-            value="purchasing"
-            leftSection={<IconShoppingCart size={16} />}
-          >
+          <Tabs.Tab value="purchasing" leftSection={<IconShoppingCart size={16} />}>
             {t('employee.purchasingOrder')}
           </Tabs.Tab>
         </Tabs.List>
@@ -59,7 +53,7 @@ export function EmployeeDetailTabs({
             width: '100%',
           }}
         >
-          <Box style={{maxWidth: '800px', width: '100%'}}>
+          <Box style={{ maxWidth: '800px', width: '100%' }}>
             <Stack gap="xl">
               <EmployeeBasicInfoCard employee={employee} onEdit={onEdit} />
               <EmployeeDangerZone
@@ -81,18 +75,14 @@ export function EmployeeDetailTabs({
 
       <Tabs.Panel value="salary" pt="xl">
         <ComingSoonCard
-          icon={
-            <IconCurrencyDollar size={48} color="var(--mantine-color-gray-5)" />
-          }
+          icon={<IconCurrencyDollar size={48} color="var(--mantine-color-gray-5)" />}
           title={t('employee.salaryConfig')}
         />
       </Tabs.Panel>
 
       <Tabs.Panel value="purchasing" pt="xl">
         <ComingSoonCard
-          icon={
-            <IconShoppingCart size={48} color="var(--mantine-color-gray-5)" />
-          }
+          icon={<IconShoppingCart size={48} color="var(--mantine-color-gray-5)" />}
           title={t('employee.purchasingOrder')}
         />
       </Tabs.Panel>

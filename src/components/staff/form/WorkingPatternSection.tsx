@@ -8,24 +8,19 @@ import {
   Paper,
   Divider,
 } from '@mantine/core';
-import {
-  IconClock,
-  IconCash,
-  IconInfoCircle,
-  IconCalculator,
-} from '@tabler/icons-react';
-import type {UseFormReturnType} from '@mantine/form';
-import {useTranslation} from '@/hooks/useTranslation';
-import {VALIDATION_RULES} from '@/services/staff';
-import type {StaffFormData} from '@/lib/api/schemas/staff.schemas';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import { IconClock, IconCash, IconInfoCircle, IconCalculator } from '@tabler/icons-react';
+import type { UseFormReturnType } from '@mantine/form';
+import { useTranslation } from '@/hooks/useTranslation';
+import { VALIDATION_RULES } from '@/services/staff';
+import type { StaffFormData } from '@/lib/api/schemas/staff.schemas';
+import { useIsDarkMode } from '@/hooks/useIsDarkMode';
 
 export interface WorkingPatternSectionProps {
   readonly form: UseFormReturnType<StaffFormData>;
 }
 
-export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
-  const {t} = useTranslation();
+export function WorkingPatternSection({ form }: WorkingPatternSectionProps) {
+  const { t } = useTranslation();
   const isDarkMode = useIsDarkMode();
   const isFulltime = form.values.workingPattern === 'fulltime';
 
@@ -51,14 +46,8 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
 
     // Set default values based on pattern
     if (value === 'fulltime') {
-      form.setFieldValue(
-        'weeklyContractedHours',
-        VALIDATION_RULES.workingHours.fulltime.default,
-      );
-      form.setFieldValue(
-        'defaultWeeklyHours',
-        VALIDATION_RULES.workingHours.fulltime.default,
-      );
+      form.setFieldValue('weeklyContractedHours', VALIDATION_RULES.workingHours.fulltime.default);
+      form.setFieldValue('defaultWeeklyHours', VALIDATION_RULES.workingHours.fulltime.default);
     } else {
       form.setFieldValue('weeklyContractedHours', 32);
       form.setFieldValue('defaultWeeklyHours', undefined);
@@ -108,11 +97,7 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
 
           {isFulltime ? (
             <>
-              <Alert
-                icon={<IconInfoCircle size={16} />}
-                color="blue"
-                variant="light"
-              >
+              <Alert icon={<IconInfoCircle size={16} />} color="blue" variant="light">
                 {t('staff.workingPattern.fulltimeDescription')}
               </Alert>
 
@@ -131,20 +116,14 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
                   placeholder="40"
                   min={VALIDATION_RULES.workingHours.fulltime.min}
                   max={VALIDATION_RULES.workingHours.fulltime.max}
-                  description={t(
-                    'staff.workingPattern.standardHoursDescription',
-                  )}
+                  description={t('staff.workingPattern.standardHoursDescription')}
                   {...form.getInputProps('defaultWeeklyHours')}
                 />
               </Group>
             </>
           ) : (
             <>
-              <Alert
-                icon={<IconInfoCircle size={16} />}
-                color="green"
-                variant="light"
-              >
+              <Alert icon={<IconInfoCircle size={16} />} color="green" variant="light">
                 {t('staff.workingPattern.shiftDescription')}
               </Alert>
 
@@ -154,9 +133,7 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
                 placeholder="32"
                 min={VALIDATION_RULES.workingHours.shift.min}
                 max={VALIDATION_RULES.workingHours.shift.max}
-                description={t(
-                  'staff.workingPattern.maxContractedHoursDescription',
-                )}
+                description={t('staff.workingPattern.maxContractedHoursDescription')}
                 {...form.getInputProps('weeklyContractedHours')}
               />
             </>
@@ -217,7 +194,7 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
                   <Text
                     size="xs"
                     c="blue"
-                    style={{cursor: 'pointer'}}
+                    style={{ cursor: 'pointer' }}
                     onClick={calculateOvertimeRate}
                   >
                     {t('staff.workingPattern.autoCalculateOvertime')}
@@ -242,7 +219,7 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
                   <Text
                     size="xs"
                     c="blue"
-                    style={{cursor: 'pointer'}}
+                    style={{ cursor: 'pointer' }}
                     onClick={calculateHolidayRate}
                   >
                     {t('staff.workingPattern.autoCalculateHoliday')}
@@ -277,24 +254,16 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
               </Text>
             </Group>
             <Group justify="space-between">
-              <Text size="sm">
-                {t('staff.workingPattern.overtimeRateLabel')}
-              </Text>
+              <Text size="sm">{t('staff.workingPattern.overtimeRateLabel')}</Text>
               <Text size="sm" fw={600}>
-                {formatCurrency(
-                  form.values.overtimeRate || form.values.hourlyRate * 1.5,
-                )}
+                {formatCurrency(form.values.overtimeRate || form.values.hourlyRate * 1.5)}
                 {t('staff.workingPattern.perHour')}
               </Text>
             </Group>
             <Group justify="space-between">
-              <Text size="sm">
-                {t('staff.workingPattern.holidayRateLabel')}
-              </Text>
+              <Text size="sm">{t('staff.workingPattern.holidayRateLabel')}</Text>
               <Text size="sm" fw={600}>
-                {formatCurrency(
-                  form.values.holidayRate || form.values.hourlyRate * 2,
-                )}
+                {formatCurrency(form.values.holidayRate || form.values.hourlyRate * 2)}
                 {t('staff.workingPattern.perHour')}
               </Text>
             </Group>
@@ -303,15 +272,11 @@ export function WorkingPatternSection({form}: WorkingPatternSectionProps) {
               <Group
                 justify="space-between"
                 pt="xs"
-                style={{borderTop: '1px solid var(--mantine-color-blue-2)'}}
+                style={{ borderTop: '1px solid var(--mantine-color-blue-2)' }}
               >
-                <Text size="sm">
-                  {t('staff.workingPattern.weeklyEstimateLabel')}
-                </Text>
+                <Text size="sm">{t('staff.workingPattern.weeklyEstimateLabel')}</Text>
                 <Text size="sm" fw={600}>
-                  {formatCurrency(
-                    form.values.hourlyRate * form.values.defaultWeeklyHours,
-                  )}
+                  {formatCurrency(form.values.hourlyRate * form.values.defaultWeeklyHours)}
                   {t('staff.workingPattern.perWeek')}
                 </Text>
               </Group>

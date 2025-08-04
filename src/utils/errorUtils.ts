@@ -1,4 +1,4 @@
-import {ApiError} from '@/lib/api';
+import { ApiError } from '@/lib/api';
 
 /**
  * Extracts a user-friendly error message from an unknown error
@@ -6,10 +6,7 @@ import {ApiError} from '@/lib/api';
  * @param defaultMessage - The default message to use if error cannot be parsed
  * @returns A user-friendly error message
  */
-export function getErrorMessage(
-  error: unknown,
-  defaultMessage: string,
-): string {
+export function getErrorMessage(error: unknown, defaultMessage: string): string {
   if (error instanceof ApiError) {
     return error.message;
   }

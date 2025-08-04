@@ -1,17 +1,15 @@
-import {useEffect, useState} from 'react';
-import {Button, Paper, Text, Group, CloseButton} from '@mantine/core';
-import {useTranslation} from '@/hooks/useTranslation';
+import { useEffect, useState } from 'react';
+import { Button, Paper, Text, Group, CloseButton } from '@mantine/core';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type BeforeInstallPromptEvent = {
   prompt: () => Promise<void>;
-  userChoice: Promise<{outcome: 'accepted' | 'dismissed'}>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 } & Event;
 
 export function PWAInstallPrompt() {
-  const {t} = useTranslation();
-  const [deferredPrompt, setDeferredPrompt] = useState<
-    BeforeInstallPromptEvent | undefined
-  >();
+  const { t } = useTranslation();
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | undefined>();
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
 
   useEffect(() => {
@@ -32,7 +30,7 @@ export function PWAInstallPrompt() {
     if (!deferredPrompt) return;
 
     await deferredPrompt.prompt();
-    const {outcome} = await deferredPrompt.userChoice;
+    const { outcome } = await deferredPrompt.userChoice;
 
     if (outcome === 'accepted') {
       setDeferredPrompt(undefined);
@@ -64,7 +62,7 @@ export function PWAInstallPrompt() {
       }}
     >
       <Group align="start">
-        <div style={{flex: 1}}>
+        <div style={{ flex: 1 }}>
           <Text size="sm" fw={500} mb={4}>
             {t('pwa.installTitle')}
           </Text>

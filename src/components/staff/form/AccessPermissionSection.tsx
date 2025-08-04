@@ -18,18 +18,18 @@ import {
   IconCheck,
   IconInfoCircle,
 } from '@tabler/icons-react';
-import type {UseFormReturnType} from '@mantine/form';
-import {useTranslation} from '@/hooks/useTranslation';
-import {permissionMatrix} from '@/services/staff';
-import type {StaffFormData} from '@/lib/api/schemas/staff.schemas';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import type { UseFormReturnType } from '@mantine/form';
+import { useTranslation } from '@/hooks/useTranslation';
+import { permissionMatrix } from '@/services/staff';
+import type { StaffFormData } from '@/lib/api/schemas/staff.schemas';
+import { useIsDarkMode } from '@/hooks/useIsDarkMode';
 
 export interface AccessPermissionSectionProps {
   readonly form: UseFormReturnType<StaffFormData>;
 }
 
-export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
-  const {t} = useTranslation();
+export function AccessPermissionSection({ form }: AccessPermissionSectionProps) {
+  const { t } = useTranslation();
   const isDarkMode = useIsDarkMode();
 
   const roleData = [
@@ -71,28 +71,17 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
     const descriptions: Record<string, string> = {
       manage_store: t('staff.accessPermissions.permissions.manage_store'),
       manage_staff: t('staff.accessPermissions.permissions.manage_staff'),
-      view_all_reports: t(
-        'staff.accessPermissions.permissions.view_all_reports',
-      ),
-      manage_permissions: t(
-        'staff.accessPermissions.permissions.manage_permissions',
-      ),
+      view_all_reports: t('staff.accessPermissions.permissions.view_all_reports'),
+      manage_permissions: t('staff.accessPermissions.permissions.manage_permissions'),
       manage_schedule: t('staff.accessPermissions.permissions.manage_schedule'),
-      view_all_profiles: t(
-        'staff.accessPermissions.permissions.view_all_profiles',
-      ),
+      view_all_profiles: t('staff.accessPermissions.permissions.view_all_profiles'),
       clock_in: t('staff.accessPermissions.permissions.clock_in'),
       view_reports: t('staff.accessPermissions.permissions.view_reports'),
-      view_own_profile: t(
-        'staff.accessPermissions.permissions.view_own_profile',
-      ),
+      view_own_profile: t('staff.accessPermissions.permissions.view_own_profile'),
       view_schedule: t('staff.accessPermissions.permissions.view_schedule'),
     };
 
-    return (
-      descriptions[permission] ||
-      t('staff.accessPermissions.permissions.default')
-    );
+    return descriptions[permission] || t('staff.accessPermissions.permissions.default');
   };
 
   return (
@@ -151,7 +140,7 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
           </Group>
 
           {permissions.length > 0 ? (
-            <SimpleGrid cols={{base: 1, sm: 2}} spacing="md">
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
               {permissions.map((permission) => (
                 <Paper
                   key={permission}
@@ -165,15 +154,10 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
                   }}
                 >
                   <Group gap="sm" align="flex-start">
-                    <ThemeIcon
-                      color="green"
-                      variant="light"
-                      size="sm"
-                      radius="xl"
-                    >
+                    <ThemeIcon color="green" variant="light" size="sm" radius="xl">
                       <IconCheck size={12} />
                     </ThemeIcon>
-                    <div style={{flex: 1}}>
+                    <div style={{ flex: 1 }}>
                       <Text size="sm" fw={500}>
                         {formatPermissionName(permission)}
                       </Text>
@@ -186,11 +170,7 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
               ))}
             </SimpleGrid>
           ) : (
-            <Alert
-              icon={<IconInfoCircle size={16} />}
-              color="orange"
-              variant="light"
-            >
+            <Alert icon={<IconInfoCircle size={16} />} color="orange" variant="light">
               {t('staff.accessPermissions.noPermissionsDefined')}
             </Alert>
           )}
@@ -211,7 +191,7 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
           <Text size="sm" fw={500}>
             {t('staff.accessPermissions.roleComparison')}
           </Text>
-          <SimpleGrid cols={{base: 1, sm: 3}} spacing="md">
+          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
             {roleData.map((role) => (
               <Paper
                 key={role.value}
@@ -241,9 +221,7 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
                     </Badge>
                   </Group>
                   <Text size="xs" ta="center" c="dimmed">
-                    {permissionMatrix[
-                      role.value as keyof typeof permissionMatrix
-                    ]?.length || 0}{' '}
+                    {permissionMatrix[role.value as keyof typeof permissionMatrix]?.length || 0}{' '}
                     {t('staff.accessPermissions.permissionsCount')}
                   </Text>
                 </Stack>
@@ -255,7 +233,7 @@ export function AccessPermissionSection({form}: AccessPermissionSectionProps) {
             icon={<IconInfoCircle size={16} />}
             color="blue"
             variant="light"
-            style={{fontSize: '0.8rem'}}
+            style={{ fontSize: '0.8rem' }}
           >
             <Text size="xs">
               <strong>{t('staff.accessPermissions.noteTitle')}</strong>{' '}

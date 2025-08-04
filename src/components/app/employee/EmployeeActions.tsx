@@ -1,9 +1,9 @@
-import {type MantineStyleProp, ActionIcon, Group} from '@mantine/core';
-import {IconEdit, IconUserOff, IconUserCheck} from '@tabler/icons-react';
-import {useNavigate} from 'react-router';
-import {useTranslation} from '@/hooks/useTranslation';
-import {Tooltip} from '@/components/common';
-import {getEmployeeEditRoute} from '@/config/routeConfig';
+import { type MantineStyleProp, ActionIcon, Group } from '@mantine/core';
+import { IconEdit, IconUserOff, IconUserCheck } from '@tabler/icons-react';
+import { useNavigate } from 'react-router';
+import { useTranslation } from '@/hooks/useTranslation';
+import { Tooltip } from '@/components/common';
+import { getEmployeeEditRoute } from '@/config/routeConfig';
 
 type EmployeeActionsProps = {
   readonly employeeId: string;
@@ -23,7 +23,7 @@ export function EmployeeActions({
   style,
 }: EmployeeActionsProps) {
   const navigate = useNavigate();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const handleEdit = () => {
     navigate(getEmployeeEditRoute(employeeId));

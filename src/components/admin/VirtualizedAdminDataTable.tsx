@@ -1,14 +1,7 @@
-import React, {useRef} from 'react';
-import {
-  Table,
-  ScrollArea,
-  Center,
-  Stack,
-  Text,
-  type MantineStyleProp,
-} from '@mantine/core';
-import {useVirtualizer} from '@tanstack/react-virtual';
-import type {TableColumn} from './AdminDataTable';
+import React, { useRef } from 'react';
+import { Table, ScrollArea, Center, Stack, Text, type MantineStyleProp } from '@mantine/core';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import type { TableColumn } from './AdminDataTable';
 
 interface VirtualizedAdminDataTableProps<T> {
   readonly data: T[];
@@ -68,13 +61,12 @@ export const VirtualizedAdminDataTable = React.memo(function <T>({
   const virtualItems = virtualizer.getVirtualItems();
   const totalSize = virtualizer.getTotalSize();
   const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
-  const paddingBottom =
-    virtualItems.length > 0 ? totalSize - (virtualItems?.at(-1)?.end ?? 0) : 0;
+  const paddingBottom = virtualItems.length > 0 ? totalSize - (virtualItems?.at(-1)?.end ?? 0) : 0;
 
   return (
     <ScrollArea
       ref={parentRef}
-      style={{height: typeof height === 'number' ? `${height}px` : height}}
+      style={{ height: typeof height === 'number' ? `${height}px` : height }}
     >
       <Table
         ref={tableRef}
@@ -88,7 +80,7 @@ export const VirtualizedAdminDataTable = React.memo(function <T>({
             {columns.map((column) => (
               <Table.Th
                 key={String(column.key)}
-                style={column.width ? {width: column.width} : undefined}
+                style={column.width ? { width: column.width } : undefined}
               >
                 {column.label}
               </Table.Th>
@@ -96,12 +88,10 @@ export const VirtualizedAdminDataTable = React.memo(function <T>({
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {paddingTop > 0 && <tr style={{height: paddingTop}} />}
+          {paddingTop > 0 && <tr style={{ height: paddingTop }} />}
           {virtualItems.map((virtualRow) => {
             const item = data[virtualRow.index];
-            const rowKey = getRowKey
-              ? getRowKey(item, virtualRow.index)
-              : virtualRow.index;
+            const rowKey = getRowKey ? getRowKey(item, virtualRow.index) : virtualRow.index;
 
             return (
               <Table.Tr
@@ -130,7 +120,7 @@ export const VirtualizedAdminDataTable = React.memo(function <T>({
               </Table.Tr>
             );
           })}
-          {paddingBottom > 0 && <tr style={{height: paddingBottom}} />}
+          {paddingBottom > 0 && <tr style={{ height: paddingBottom }} />}
         </Table.Tbody>
       </Table>
     </ScrollArea>

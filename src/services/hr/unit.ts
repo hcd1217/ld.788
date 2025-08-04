@@ -1,4 +1,4 @@
-import {hrApi} from '@/lib/api';
+import { hrApi } from '@/lib/api';
 
 export type Unit = {
   id: string;

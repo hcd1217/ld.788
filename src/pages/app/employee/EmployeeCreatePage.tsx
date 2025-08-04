@@ -1,38 +1,27 @@
-import {useState, useMemo} from 'react';
-import {useNavigate} from 'react-router';
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 import * as XLSX from 'xlsx';
-import {Container, rem, Group} from '@mantine/core';
-import {useForm} from '@mantine/form';
-import {IconFileSpreadsheet, IconUser} from '@tabler/icons-react';
-import {type TFunction} from 'i18next';
+import { Container, rem, Group } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { IconFileSpreadsheet, IconUser } from '@tabler/icons-react';
+import { type TFunction } from 'i18next';
 import {
   showErrorNotification,
   showSuccessNotification,
   showInfoNotification,
 } from '@/utils/notifications';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
-import {getFormValidators} from '@/utils/validation';
-import {
-  AppPageTitle,
-  AppMobileLayout,
-  AppDesktopLayout,
-  GoBack,
-  Tabs,
-} from '@/components/common';
-import {SingleEmployeeForm, BulkImportForm} from '@/components/app/employee';
-import {
-  useHrActions,
-  useUnitList,
-  useHrLoading,
-  useHrError,
-} from '@/stores/useHrStore';
-import {firstName, lastName, randomElement} from '@/utils/fake';
-import {ROUTERS} from '@/config/routeConfig';
-import {useAction} from '@/hooks/useAction';
-import {isDevelopment} from '@/utils/env';
-import type {Unit} from '@/services/hr/unit';
-import {useOnce} from '@/hooks/useOnce';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { getFormValidators } from '@/utils/validation';
+import { AppPageTitle, AppMobileLayout, AppDesktopLayout, GoBack, Tabs } from '@/components/common';
+import { SingleEmployeeForm, BulkImportForm } from '@/components/app/employee';
+import { useHrActions, useUnitList, useHrLoading, useHrError } from '@/stores/useHrStore';
+import { firstName, lastName, randomElement } from '@/utils/fake';
+import { ROUTERS } from '@/config/routeConfig';
+import { useAction } from '@/hooks/useAction';
+import { isDevelopment } from '@/utils/env';
+import type { Unit } from '@/services/hr/unit';
+import { useOnce } from '@/hooks/useOnce';
 
 type SingleEmployeeFormValues = {
   firstName: string;
@@ -58,7 +47,7 @@ type ImportResult = {
 // Utility functions
 type GenerateSampleExcelParams = {
   isVietnamese: boolean;
-  unitOptions: Array<{value: string; label: string}>;
+  unitOptions: Array<{ value: string; label: string }>;
   keyMap: Record<string, string>;
 };
 
@@ -66,12 +55,12 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export function EmployeeCreatePage() {
   const navigate = useNavigate();
-  const {t, i18n} = useTranslation();
+  const { t, i18n } = useTranslation();
   const isDesktop = useIsDesktop();
   const units = useUnitList();
   const isLoading = useHrLoading();
   const error = useHrError();
-  const {loadUnits, clearError, addEmployee, addBulkEmployees} = useHrActions();
+  const { loadUnits, clearError, addEmployee, addBulkEmployees } = useHrActions();
   const [activeTab, setActiveTab] = useState<string | undefined>('single');
 
   // Single employee form state
@@ -83,9 +72,7 @@ export function EmployeeCreatePage() {
   const [isBulkLoading, setIsBulkLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [file, setFile] = useState<File | undefined>(undefined);
-  const [importResult, setImportResult] = useState<ImportResult | undefined>(
-    undefined,
-  );
+  const [importResult, setImportResult] = useState<ImportResult | undefined>(undefined);
 
   const keyMap = useMemo(
     () => ({
@@ -125,8 +112,9 @@ export function EmployeeCreatePage() {
         },
     validate: {
       ...getFormValidators(t, ['firstName', 'lastName']),
-      email: (value) => value && !value.match(/^\S+@\S+\.\S+$/) ? t('validation.invalidEmail') : undefined,
-      phone: (value) => value && value.length < 10 ? t('validation.phoneTooShort') : undefined,
+      email: (value) =>
+        value && !value.match(/^\S+@\S+\.\S+$/) ? t('validation.invalidEmail') : undefined,
+      phone: (value) => (value && value.length < 10 ? t('validation.phoneTooShort') : undefined),
       monthlySalary: (value, values) => {
         if (values.workType === 'FULL_TIME' && !value) {
           return t('validation.fieldRequired');
@@ -178,10 +166,7 @@ export function EmployeeCreatePage() {
       });
     },
     errorHandler(error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t('employee.addEmployeeFailed');
+      const errorMessage = error instanceof Error ? error.message : t('employee.addEmployeeFailed');
 
       setSingleError(errorMessage);
       setShowSingleAlert(true);
@@ -200,10 +185,7 @@ export function EmployeeCreatePage() {
     },
     async actionHandler() {
       setIsDownloading(true);
-      showInfoNotification(
-        t('common.downloading'),
-        t('employee.creatingSampleFile'),
-      );
+      showInfoNotification(t('common.downloading'), t('employee.creatingSampleFile'));
       await new Promise((resolve) => {
         setTimeout(resolve, 1000);
       });
@@ -229,10 +211,7 @@ export function EmployeeCreatePage() {
       setFile(selectedFile);
       setImportResult(undefined);
     } else {
-      showErrorNotification(
-        t('auth.invalidFileType'),
-        t('employee.pleaseSelectExcelFile'),
-      );
+      showErrorNotification(t('auth.invalidFileType'), t('employee.pleaseSelectExcelFile'));
     }
   };
 
@@ -283,8 +262,7 @@ export function EmployeeCreatePage() {
       );
     },
     errorHandler(error) {
-      const errorMessage =
-        error instanceof Error ? error.message : t('auth.importFailed');
+      const errorMessage = error instanceof Error ? error.message : t('auth.importFailed');
 
       const result: ImportResult = {
         summary: {
@@ -302,7 +280,7 @@ export function EmployeeCreatePage() {
     },
   });
 
-  const iconStyle = {width: rem(12), height: rem(12)};
+  const iconStyle = { width: rem(12), height: rem(12) };
 
   if (!isDesktop) {
     return (
@@ -329,11 +307,7 @@ export function EmployeeCreatePage() {
   }
 
   return (
-    <AppDesktopLayout
-      isLoading={isLoading}
-      error={error}
-      clearError={clearError}
-    >
+    <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
       <Group justify="space-between" mb="md">
         <GoBack />
       </Group>
@@ -349,16 +323,10 @@ export function EmployeeCreatePage() {
           }}
         >
           <Tabs.List>
-            <Tabs.Tab
-              value="single"
-              leftSection={<IconUser style={iconStyle} />}
-            >
+            <Tabs.Tab value="single" leftSection={<IconUser style={iconStyle} />}>
               {t('employee.addSingleEmployee')}
             </Tabs.Tab>
-            <Tabs.Tab
-              value="bulk"
-              leftSection={<IconFileSpreadsheet style={iconStyle} />}
-            >
+            <Tabs.Tab value="bulk" leftSection={<IconFileSpreadsheet style={iconStyle} />}>
               {t('employee.bulkImportEmployees')}
             </Tabs.Tab>
           </Tabs.List>
@@ -396,11 +364,7 @@ export function EmployeeCreatePage() {
   );
 }
 
-function generateSampleExcel({
-  isVietnamese,
-  unitOptions,
-  keyMap,
-}: GenerateSampleExcelParams) {
+function generateSampleExcel({ isVietnamese, unitOptions, keyMap }: GenerateSampleExcelParams) {
   let sampleData: Array<[string, string, string]>;
 
   if (isVietnamese) {
@@ -430,9 +394,7 @@ function generateSampleExcel({
 
 function validateFileType(file: File, t: TFunction): boolean {
   const allowedTypes = ['.csv', '.xlsx', '.xls'];
-  const fileExtension = file.name
-    .toLowerCase()
-    .slice(Math.max(0, file.name.lastIndexOf('.')));
+  const fileExtension = file.name.toLowerCase().slice(Math.max(0, file.name.lastIndexOf('.')));
   if (file.size > MAX_FILE_SIZE) {
     throw new Error(t('employee.fileTooLarge'));
   }
@@ -458,7 +420,7 @@ async function parseExcelFile(
           return;
         }
 
-        const workbook = XLSX.read(data, {type: 'array'});
+        const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
 

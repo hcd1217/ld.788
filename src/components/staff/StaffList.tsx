@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import {
   Stack,
   Card,
@@ -19,7 +19,7 @@ import {
   ScrollArea,
   Title,
 } from '@mantine/core';
-import {useDisclosure, useMediaQuery} from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import {
   IconEdit,
   IconTrash,
@@ -32,9 +32,9 @@ import {
   IconUsers,
   IconShieldCheck,
 } from '@tabler/icons-react';
-import type {Staff} from '@/services/staff';
-import {useTranslation} from '@/hooks/useTranslation';
-import {formatPhoneNumber} from '@/utils/string';
+import type { Staff } from '@/services/staff';
+import { useTranslation } from '@/hooks/useTranslation';
+import { formatPhoneNumber } from '@/utils/string';
 
 export interface StaffListProps {
   readonly staffs: readonly Staff[];
@@ -43,19 +43,11 @@ export interface StaffListProps {
   readonly onToggleStatus: (staff: Staff) => void;
 }
 
-export function StaffList({
-  staffs,
-  onEdit,
-  onDelete,
-  onToggleStatus,
-}: StaffListProps) {
-  const {t} = useTranslation();
+export function StaffList({ staffs, onEdit, onDelete, onToggleStatus }: StaffListProps) {
+  const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
-  const [qrModalOpened, {open: openQrModal, close: closeQrModal}] =
-    useDisclosure(false);
-  const [selectedStaff, setSelectedStaff] = useState<Staff | undefined>(
-    undefined,
-  );
+  const [qrModalOpened, { open: openQrModal, close: closeQrModal }] = useDisclosure(false);
+  const [selectedStaff, setSelectedStaff] = useState<Staff | undefined>(undefined);
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   const handleShowQrCode = (staffMember: Staff) => {
@@ -105,9 +97,7 @@ export function StaffList({
   };
 
   const formatWorkingPattern = (staff: Staff) => {
-    return staff.workingPattern === 'fulltime'
-      ? t('staff.fulltime')
-      : t('staff.shift');
+    return staff.workingPattern === 'fulltime' ? t('staff.fulltime') : t('staff.shift');
   };
 
   const callPhone = (staff: Staff) => {
@@ -142,9 +132,7 @@ export function StaffList({
           <Group justify="space-between">
             <Text size="sm" c="dimmed">
               {staffs.length}{' '}
-              {staffs.length === 1
-                ? t('staff.staffMember')
-                : t('staff.staffMembers')}
+              {staffs.length === 1 ? t('staff.staffMember') : t('staff.staffMembers')}
             </Text>
             {!isMobile && (
               <Button
@@ -154,26 +142,18 @@ export function StaffList({
                   setViewMode(viewMode === 'table' ? 'cards' : 'table');
                 }}
               >
-                {viewMode === 'table'
-                  ? t('staff.cardView')
-                  : t('staff.tableView')}
+                {viewMode === 'table' ? t('staff.cardView') : t('staff.tableView')}
               </Button>
             )}
           </Group>
 
-          <SimpleGrid cols={{base: 1, sm: 2, lg: 3}} spacing="md">
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
             {staffs.map((staffMember) => (
-              <Card
-                key={staffMember.id}
-                withBorder
-                shadow="sm"
-                padding="lg"
-                radius="md"
-              >
+              <Card key={staffMember.id} withBorder shadow="sm" padding="lg" radius="md">
                 <Stack gap="md">
                   <Group justify="space-between" align="flex-start">
                     <Group gap="sm">
-                      <div style={{position: 'relative'}}>
+                      <div style={{ position: 'relative' }}>
                         <Avatar size={40} radius="xl" color="blue">
                           {staffMember.fullName.charAt(0).toUpperCase()}
                         </Avatar>
@@ -186,9 +166,7 @@ export function StaffList({
                             height: 10,
                             borderRadius: '50%',
                             backgroundColor:
-                              staffMember.status === 'active'
-                                ? '#29CA42'
-                                : '#8E8E8E',
+                              staffMember.status === 'active' ? '#29CA42' : '#8E8E8E',
                             border: '2px solid white',
                           }}
                         />
@@ -212,9 +190,7 @@ export function StaffList({
                       <Switch
                         size="sm"
                         checked={staffMember.status === 'active'}
-                        color={
-                          staffMember.status === 'active' ? 'green' : 'orange'
-                        }
+                        color={staffMember.status === 'active' ? 'green' : 'orange'}
                         onChange={() => {
                           onToggleStatus(staffMember);
                         }}
@@ -236,9 +212,7 @@ export function StaffList({
                       }}
                     >
                       <IconPhone size={22} />
-                      <Text size="xs">
-                        {formatPhoneNumber(staffMember.phoneNumber)}
-                      </Text>
+                      <Text size="xs">{formatPhoneNumber(staffMember.phoneNumber)}</Text>
                     </Group>
 
                     <Group gap="xs" c="dimmed">
@@ -250,7 +224,7 @@ export function StaffList({
                   <Group
                     justify="space-between"
                     pt="sm"
-                    style={{borderTop: '1px solid var(--mantine-color-gray-3)'}}
+                    style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}
                   >
                     <Group gap="xs">
                       <Tooltip label={t('staff.viewQrCode')}>
@@ -267,25 +241,15 @@ export function StaffList({
                       </Tooltip>
 
                       <CopyButton value={staffMember.clockInUrl}>
-                        {({copied, copy}) => (
-                          <Tooltip
-                            label={
-                              copied
-                                ? t('staff.copied')
-                                : t('staff.copyClockInUrl')
-                            }
-                          >
+                        {({ copied, copy }) => (
+                          <Tooltip label={copied ? t('staff.copied') : t('staff.copyClockInUrl')}>
                             <ActionIcon
                               variant="light"
                               color={copied ? 'green' : 'gray'}
                               size="sm"
                               onClick={copy}
                             >
-                              {copied ? (
-                                <IconCheck size={22} />
-                              ) : (
-                                <IconCopy size={22} />
-                              )}
+                              {copied ? <IconCheck size={22} /> : <IconCopy size={22} />}
                             </ActionIcon>
                           </Tooltip>
                         )}
@@ -325,9 +289,7 @@ export function StaffList({
           centered
           opened={qrModalOpened}
           title={
-            <Title order={3}>
-              {t('staff.qrCodeTitle', {name: selectedStaff?.fullName})}
-            </Title>
+            <Title order={3}>{t('staff.qrCodeTitle', { name: selectedStaff?.fullName })}</Title>
           }
           onClose={closeQrModal}
         >
@@ -353,16 +315,10 @@ export function StaffList({
                 <Code block>{selectedStaff.clockInUrl}</Code>
 
                 <CopyButton value={selectedStaff.clockInUrl}>
-                  {({copied, copy}) => (
+                  {({ copied, copy }) => (
                     <Button
                       fullWidth
-                      leftSection={
-                        copied ? (
-                          <IconCheck size={16} />
-                        ) : (
-                          <IconCopy size={16} />
-                        )
-                      }
+                      leftSection={copied ? <IconCheck size={16} /> : <IconCopy size={16} />}
                       color={copied ? 'green' : 'blue'}
                       variant="light"
                       onClick={copy}
@@ -385,10 +341,7 @@ export function StaffList({
       <Stack gap="md">
         <Group justify="space-between">
           <Text size="sm" c="dimmed">
-            {staffs.length}{' '}
-            {staffs.length === 1
-              ? t('staff.staffMember')
-              : t('staff.staffMembers')}
+            {staffs.length} {staffs.length === 1 ? t('staff.staffMember') : t('staff.staffMembers')}
           </Text>
           <Button
             variant="light"
@@ -445,9 +398,7 @@ export function StaffList({
                           }}
                         >
                           <IconPhone size={12} />
-                          <Text size="xs">
-                            {formatPhoneNumber(staffMember.phoneNumber)}
-                          </Text>
+                          <Text size="xs">{formatPhoneNumber(staffMember.phoneNumber)}</Text>
                         </Group>
                       ) : null}
                     </Table.Td>
@@ -484,23 +435,15 @@ export function StaffList({
                         </Tooltip>
 
                         <CopyButton value={staffMember.clockInUrl}>
-                          {({copied, copy}) => (
-                            <Tooltip
-                              label={
-                                copied ? t('staff.copied') : t('staff.copyUrl')
-                              }
-                            >
+                          {({ copied, copy }) => (
+                            <Tooltip label={copied ? t('staff.copied') : t('staff.copyUrl')}>
                               <ActionIcon
                                 variant="light"
                                 color={copied ? 'green' : 'gray'}
                                 size="sm"
                                 onClick={copy}
                               >
-                                {copied ? (
-                                  <IconCheck size={22} />
-                                ) : (
-                                  <IconCopy size={22} />
-                                )}
+                                {copied ? <IconCheck size={22} /> : <IconCopy size={22} />}
                               </ActionIcon>
                             </Tooltip>
                           )}
@@ -548,11 +491,7 @@ export function StaffList({
       <Modal
         centered
         opened={qrModalOpened}
-        title={
-          <Title order={3}>
-            {t('staff.qrCodeTitle', {name: selectedStaff?.fullName})}
-          </Title>
-        }
+        title={<Title order={3}>{t('staff.qrCodeTitle', { name: selectedStaff?.fullName })}</Title>}
         onClose={closeQrModal}
       >
         {selectedStaff ? (
@@ -577,12 +516,10 @@ export function StaffList({
               <Code block>{selectedStaff.clockInUrl}</Code>
 
               <CopyButton value={selectedStaff.clockInUrl}>
-                {({copied, copy}) => (
+                {({ copied, copy }) => (
                   <Button
                     fullWidth
-                    leftSection={
-                      copied ? <IconCheck size={16} /> : <IconCopy size={16} />
-                    }
+                    leftSection={copied ? <IconCheck size={16} /> : <IconCopy size={16} />}
                     color={copied ? 'green' : 'blue'}
                     variant="light"
                     onClick={copy}

@@ -1,6 +1,6 @@
-import {create} from 'zustand';
-import {devtools, persist} from 'zustand/middleware';
-import {storeApi, ApiError} from '@/lib/api';
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+import { storeApi, ApiError } from '@/lib/api';
 import type {
   Store,
   CreateStoreRequest,
@@ -8,7 +8,7 @@ import type {
   StoreOperatingHours,
   UpdateStoreOperatingHoursRequest,
 } from '@/lib/api/schemas/store.schemas';
-import {getErrorMessage} from '@/utils/errorUtils';
+import { getErrorMessage } from '@/utils/errorUtils';
 
 type StoreConfigState = {
   // Store data
@@ -27,10 +27,7 @@ type StoreConfigState = {
   refreshStores: () => Promise<void>;
   clearError: () => void;
   loadOperatingHours: (storeId: string) => Promise<StoreOperatingHours[]>;
-  updateOperatingHours: (
-    storeId: string,
-    hours: UpdateStoreOperatingHoursRequest,
-  ) => Promise<void>;
+  updateOperatingHours: (storeId: string, hours: UpdateStoreOperatingHoursRequest) => Promise<void>;
 
   // Selectors
   getStoreById: (id: string) => Store | undefined;
@@ -50,11 +47,11 @@ export const useStoreConfigStore = create<StoreConfigState>()(
 
         // Actions
         setCurrentStore(store) {
-          set({currentStore: store, error: undefined});
+          set({ currentStore: store, error: undefined });
         },
 
         async loadStores() {
-          set({isLoading: true, error: undefined});
+          set({ isLoading: true, error: undefined });
           try {
             const response = await storeApi.getStores();
 
@@ -65,8 +62,7 @@ export const useStoreConfigStore = create<StoreConfigState>()(
               currentStore: get().currentStore ?? response.stores[0],
             });
           } catch (error) {
-            const errorMessage =
-              error instanceof Error ? error.message : 'Failed to load stores';
+            const errorMessage = error instanceof Error ? error.message : 'Failed to load stores';
             set({
               isLoading: false,
               error: errorMessage,
@@ -76,7 +72,7 @@ export const useStoreConfigStore = create<StoreConfigState>()(
         },
 
         async createStore(data) {
-          set({isLoading: true, error: undefined});
+          set({ isLoading: true, error: undefined });
           try {
             const newStore = await storeApi.createStore(data);
 
@@ -114,30 +110,24 @@ export const useStoreConfigStore = create<StoreConfigState>()(
         },
 
         async updateStore(id, data) {
-          set({isLoading: true, error: undefined});
+          set({ isLoading: true, error: undefined });
           try {
             const response = await storeApi.updateStore(id, data);
             const updatedStore = response.store;
 
             // Update the store in the list
             const currentStores = get().stores;
-            const updatedStores = currentStores.map((s) =>
-              s.id === id ? updatedStore : s,
-            );
+            const updatedStores = currentStores.map((s) => (s.id === id ? updatedStore : s));
 
             set({
               stores: updatedStores,
-              currentStore:
-                get().currentStore?.id === id
-                  ? updatedStore
-                  : get().currentStore,
+              currentStore: get().currentStore?.id === id ? updatedStore : get().currentStore,
               isLoading: false,
             });
 
             return updatedStore;
           } catch (error) {
-            const errorMessage =
-              error instanceof Error ? error.message : 'Failed to update store';
+            const errorMessage = error instanceof Error ? error.message : 'Failed to update store';
             set({
               isLoading: false,
               error: errorMessage,
@@ -148,7 +138,7 @@ export const useStoreConfigStore = create<StoreConfigState>()(
 
         async deleteStore(id) {
           // Optimistic update: remove store immediately
-          const {stores, currentStore, operatingHoursCache} = get();
+          const { stores, currentStore, operatingHoursCache } = get();
           const storeToDelete = stores.find((s) => s.id === id);
 
           if (!storeToDelete) {
@@ -162,13 +152,12 @@ export const useStoreConfigStore = create<StoreConfigState>()(
 
           // Optimistically update state
           const updatedStores = stores.filter((s) => s.id !== id);
-          const newCache = {...operatingHoursCache};
+          const newCache = { ...operatingHoursCache };
           delete newCache[id];
 
           set({
             stores: updatedStores,
-            currentStore:
-              currentStore?.id === id ? updatedStores[0] : currentStore,
+            currentStore: currentStore?.id === id ? updatedStores[0] : currentStore,
             operatingHoursCache: newCache,
             isLoading: true,
             error: undefined,
@@ -178,7 +167,7 @@ export const useStoreConfigStore = create<StoreConfigState>()(
             // Actually delete on server
             await storeApi.deleteStore(id);
 
-            set({isLoading: false});
+            set({ isLoading: false });
 
             // Refresh in background to sync with server state
             get()
@@ -188,8 +177,7 @@ export const useStoreConfigStore = create<StoreConfigState>()(
               });
           } catch (error) {
             // Rollback on error
-            const errorMessage =
-              error instanceof Error ? error.message : 'Failed to delete store';
+            const errorMessage = error instanceof Error ? error.message : 'Failed to delete store';
 
             set({
               stores: previousStores,
@@ -209,17 +197,15 @@ export const useStoreConfigStore = create<StoreConfigState>()(
 
           // Restore current store selection after refresh
           if (currentStoreId) {
-            const refreshedCurrentStore = get().stores.find(
-              (store) => store.id === currentStoreId,
-            );
+            const refreshedCurrentStore = get().stores.find((store) => store.id === currentStoreId);
             if (refreshedCurrentStore) {
-              set({currentStore: refreshedCurrentStore});
+              set({ currentStore: refreshedCurrentStore });
             }
           }
         },
 
         clearError() {
-          set({error: undefined});
+          set({ error: undefined });
         },
 
         // Selectors
@@ -230,7 +216,7 @@ export const useStoreConfigStore = create<StoreConfigState>()(
         async isStoreCodeUnique(code, excludeId) {
           try {
             // First check local state for immediate feedback
-            const {stores} = get();
+            const { stores } = get();
             const existsLocally = stores.some(
               (store) => store.code === code && store.id !== excludeId,
             );
@@ -251,10 +237,7 @@ export const useStoreConfigStore = create<StoreConfigState>()(
               return !existsOnServer;
             } catch (apiError) {
               // If API check fails, fall back to local check only
-              console.error(
-                'API check failed, using local validation only:',
-                apiError,
-              );
+              console.error('API check failed, using local validation only:', apiError);
               return true; // Assume it's unique if we can't verify
             }
           } catch (error) {
@@ -273,9 +256,9 @@ export const useStoreConfigStore = create<StoreConfigState>()(
             const hours = await storeApi.getStoreOperatingHours(storeId);
 
             // Update cache
-            const newCache = {...get().operatingHoursCache};
+            const newCache = { ...get().operatingHoursCache };
             newCache[storeId] = hours;
-            set({operatingHoursCache: newCache});
+            set({ operatingHoursCache: newCache });
 
             return hours;
           } catch (error) {
@@ -286,20 +269,15 @@ export const useStoreConfigStore = create<StoreConfigState>()(
 
         async updateOperatingHours(storeId, hours) {
           try {
-            const updatedHours = await storeApi.updateStoreOperatingHours(
-              storeId,
-              hours,
-            );
+            const updatedHours = await storeApi.updateStoreOperatingHours(storeId, hours);
 
             // Update cache
-            const newCache = {...get().operatingHoursCache};
+            const newCache = { ...get().operatingHoursCache };
             newCache[storeId] = updatedHours;
-            set({operatingHoursCache: newCache});
+            set({ operatingHoursCache: newCache });
           } catch (error) {
             const errorMessage =
-              error instanceof Error
-                ? error.message
-                : 'Failed to update operating hours';
+              error instanceof Error ? error.message : 'Failed to update operating hours';
             throw new Error(errorMessage);
           }
         },
@@ -329,11 +307,9 @@ export const useStoreConfigStore = create<StoreConfigState>()(
 );
 
 // Computed selectors for convenience
-export const useCurrentStore = () =>
-  useStoreConfigStore((state) => state.currentStore);
+export const useCurrentStore = () => useStoreConfigStore((state) => state.currentStore);
 export const useStores = () => useStoreConfigStore((state) => state.stores);
-export const useStoreLoading = () =>
-  useStoreConfigStore((state) => state.isLoading);
+export const useStoreLoading = () => useStoreConfigStore((state) => state.isLoading);
 export const useStoreError = () => useStoreConfigStore((state) => state.error);
 
 // Helper hooks for store operations

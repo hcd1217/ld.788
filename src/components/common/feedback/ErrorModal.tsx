@@ -1,4 +1,4 @@
-import {useState, useEffect, useMemo} from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Modal,
   ScrollArea,
@@ -48,7 +48,7 @@ import {
   type ErrorSeverity,
   type ErrorType,
 } from '@/stores/error';
-import {isDevelopment, isProduction} from '@/utils/env';
+import { isDevelopment, isProduction } from '@/utils/env';
 
 type ErrorModalProps = {
   readonly isAutoOpen?: boolean;
@@ -112,7 +112,7 @@ function formatTimestamp(date: Date): string {
   }).format(date);
 }
 
-function ErrorDetails({error}: {readonly error: ErrorRecord}) {
+function ErrorDetails({ error }: { readonly error: ErrorRecord }) {
   const [copied, setCopied] = useState(false);
 
   const copyErrorDetails = async () => {
@@ -187,7 +187,7 @@ function ErrorDetails({error}: {readonly error: ErrorRecord}) {
             Stack Trace:
           </Text>
           <ScrollArea offsetScrollbars h={100}>
-            <Code block style={{fontSize: '11px'}}>
+            <Code block style={{ fontSize: '11px' }}>
               {error.stack}
             </Code>
           </ScrollArea>
@@ -199,7 +199,7 @@ function ErrorDetails({error}: {readonly error: ErrorRecord}) {
           <Text size="sm" c="dimmed" mt="xs" mb="xs">
             Context:
           </Text>
-          <Code block style={{fontSize: '11px'}}>
+          <Code block style={{ fontSize: '11px' }}>
             {JSON.stringify(error.context as Record<string, unknown>, null, 2)}
           </Code>
         </>
@@ -208,20 +208,15 @@ function ErrorDetails({error}: {readonly error: ErrorRecord}) {
   );
 }
 
-export function ErrorModal({
-  isAutoOpen = true,
-  autoCloseDelay,
-}: ErrorModalProps) {
+export function ErrorModal({ isAutoOpen = true, autoCloseDelay }: ErrorModalProps) {
   const [opened, setOpened] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<ErrorType | 'all'>('all');
-  const [filterSeverity, setFilterSeverity] = useState<ErrorSeverity | 'all'>(
-    'all',
-  );
+  const [filterSeverity, setFilterSeverity] = useState<ErrorSeverity | 'all'>('all');
   const [autoOpen, setAutoOpen] = useState(isAutoOpen);
   const [activeTab, setActiveTab] = useState<string | undefined>('errors');
 
-  const {errors, clearErrors, clearError, getErrorCount} = useErrorStore();
+  const { errors, clearErrors, clearError, getErrorCount } = useErrorStore();
   const errorCount = getErrorCount();
 
   // Filter errors based on search and filters
@@ -230,12 +225,10 @@ export function ErrorModal({
       const matchesSearch =
         !searchQuery ||
         error.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (error.source?.toLowerCase().includes(searchQuery.toLowerCase()) ??
-          false);
+        (error.source?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
 
       const matchesType = filterType === 'all' || error.type === filterType;
-      const matchesSeverity =
-        filterSeverity === 'all' || error.severity === filterSeverity;
+      const matchesSeverity = filterSeverity === 'all' || error.severity === filterSeverity;
 
       return matchesSearch && matchesType && matchesSeverity;
     });
@@ -313,7 +306,7 @@ export function ErrorModal({
       }
     }
 
-    return {typeCount, severityCount};
+    return { typeCount, severityCount };
   }, [errors]);
 
   // Auto-open modal when new errors arrive in development
@@ -409,7 +402,7 @@ export function ErrorModal({
             radius="xl"
             color="red"
             variant="filled"
-            style={{zIndex: 1000}}
+            style={{ zIndex: 1000 }}
             onClick={() => {
               setOpened(true);
             }}
@@ -465,11 +458,7 @@ export function ErrorModal({
           <Tabs.Panel value="errors" pt="xs">
             <Stack>
               {errors.length === 0 ? (
-                <Alert
-                  icon={<IconCheck size={16} />}
-                  title="No errors"
-                  color="green"
-                >
+                <Alert icon={<IconCheck size={16} />} title="No errors" color="green">
                   All errors have been cleared.
                 </Alert>
               ) : (
@@ -491,14 +480,14 @@ export function ErrorModal({
                         placeholder="Filter by type"
                         leftSection={<IconFilter size={16} />}
                         data={[
-                          {value: 'all', label: 'All Types'},
-                          {value: 'error', label: 'Runtime Error'},
+                          { value: 'all', label: 'All Types' },
+                          { value: 'error', label: 'Runtime Error' },
                           {
                             value: 'unhandledRejection',
                             label: 'Promise Rejection',
                           },
-                          {value: 'apiError', label: 'API Error'},
-                          {value: 'componentError', label: 'Component Error'},
+                          { value: 'apiError', label: 'API Error' },
+                          { value: 'componentError', label: 'Component Error' },
                         ]}
                         value={filterType}
                         size="sm"
@@ -510,11 +499,11 @@ export function ErrorModal({
                       <Select
                         placeholder="Filter by severity"
                         data={[
-                          {value: 'all', label: 'All Severities'},
-                          {value: 'critical', label: 'Critical'},
-                          {value: 'high', label: 'High'},
-                          {value: 'medium', label: 'Medium'},
-                          {value: 'low', label: 'Low'},
+                          { value: 'all', label: 'All Severities' },
+                          { value: 'critical', label: 'Critical' },
+                          { value: 'high', label: 'High' },
+                          { value: 'medium', label: 'Medium' },
+                          { value: 'low', label: 'Low' },
                         ]}
                         value={filterSeverity}
                         size="sm"
@@ -570,7 +559,7 @@ export function ErrorModal({
                       }}
                     >
                       {filteredErrors.map((error) => (
-                        <div key={error.id} style={{position: 'relative'}}>
+                        <div key={error.id} style={{ position: 'relative' }}>
                           <ActionIcon
                             pos="absolute"
                             top={8}
@@ -602,14 +591,12 @@ export function ErrorModal({
                     Errors by Type
                   </Title>
                   <Stack gap="xs">
-                    {Object.entries(errorStats.typeCount).map(
-                      ([type, count]) => (
-                        <Group key={type} justify="space-between">
-                          <Text size="sm">{getErrorTypeLabel(type)}</Text>
-                          <Badge>{count}</Badge>
-                        </Group>
-                      ),
-                    )}
+                    {Object.entries(errorStats.typeCount).map(([type, count]) => (
+                      <Group key={type} justify="space-between">
+                        <Text size="sm">{getErrorTypeLabel(type)}</Text>
+                        <Badge>{count}</Badge>
+                      </Group>
+                    ))}
                   </Stack>
                 </Card>
 
@@ -618,18 +605,14 @@ export function ErrorModal({
                     Errors by Severity
                   </Title>
                   <Stack gap="xs">
-                    {Object.entries(errorStats.severityCount).map(
-                      ([severity, count]) => (
-                        <Group key={severity} justify="space-between">
-                          <Badge
-                            color={getSeverityColor(severity as ErrorSeverity)}
-                          >
-                            {severity}
-                          </Badge>
-                          <Badge variant="light">{count}</Badge>
-                        </Group>
-                      ),
-                    )}
+                    {Object.entries(errorStats.severityCount).map(([severity, count]) => (
+                      <Group key={severity} justify="space-between">
+                        <Badge color={getSeverityColor(severity as ErrorSeverity)}>
+                          {severity}
+                        </Badge>
+                        <Badge variant="light">{count}</Badge>
+                      </Group>
+                    ))}
                   </Stack>
                 </Card>
               </SimpleGrid>
@@ -644,24 +627,19 @@ export function ErrorModal({
                     thickness={16}
                     sections={[
                       {
-                        value:
-                          (errorStats.severityCount.critical / errorCount) *
-                          100,
+                        value: (errorStats.severityCount.critical / errorCount) * 100,
                         color: 'red',
                       },
                       {
-                        value:
-                          (errorStats.severityCount.high / errorCount) * 100,
+                        value: (errorStats.severityCount.high / errorCount) * 100,
                         color: 'orange',
                       },
                       {
-                        value:
-                          (errorStats.severityCount.medium / errorCount) * 100,
+                        value: (errorStats.severityCount.medium / errorCount) * 100,
                         color: 'yellow',
                       },
                       {
-                        value:
-                          (errorStats.severityCount.low / errorCount) * 100,
+                        value: (errorStats.severityCount.low / errorCount) * 100,
                         color: 'blue',
                       },
                     ]}

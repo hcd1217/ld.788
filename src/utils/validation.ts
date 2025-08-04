@@ -1,10 +1,9 @@
-import type {TranslationFunction} from '@/hooks/useTranslation';
+import type { TranslationFunction } from '@/hooks/useTranslation';
 
 // Validation regex patterns
 export const VALIDATION_PATTERNS = {
   email: /^\S+@\S+\.\S+$/,
-  password:
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&()^])[A-Za-z\d@#$!%*?&()^]{8,}$/,
+  password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&()^])[A-Za-z\d@#$!%*?&()^]{8,}$/,
 } as const;
 
 // Validation constraints
@@ -15,31 +14,21 @@ export const VALIDATION_CONSTRAINTS = {
 } as const;
 
 // Email validation
-export function validateEmail(
-  value: string,
-  t: TranslationFunction,
-): string | undefined {
+export function validateEmail(value: string, t: TranslationFunction): string | undefined {
   if (!value) return t('validation.emailRequired');
-  if (!VALIDATION_PATTERNS.email.test(value))
-    return t('validation.invalidEmail');
+  if (!VALIDATION_PATTERNS.email.test(value)) return t('validation.invalidEmail');
   return undefined;
 }
 
 // Phone validation
-export function validatePhone(
-  value: string,
-  t: TranslationFunction,
-): string | undefined {
+export function validatePhone(value: string, t: TranslationFunction): string | undefined {
   if (!value) return t('validation.phoneRequired');
   if (value.length < 10) return t('validation.phoneTooShort');
   return undefined;
 }
 
 // Password validation
-export function validatePassword(
-  value: string,
-  t: TranslationFunction,
-): string | undefined {
+export function validatePassword(value: string, t: TranslationFunction): string | undefined {
   if (!value) return t('validation.passwordRequired');
   if (!VALIDATION_PATTERNS.password.test(value)) {
     return t('validation.passwordWeak');
@@ -63,10 +52,7 @@ export function validateConfirmPassword(
 }
 
 // Required field validation
-export function validateRequired(
-  value: string,
-  t: TranslationFunction,
-): string | undefined {
+export function validateRequired(value: string, t: TranslationFunction): string | undefined {
   if (!value) return t('validation.fieldRequired');
   return undefined;
 }
@@ -86,10 +72,7 @@ export function validateName(
 }
 
 // Identifier validation (userName/email for login)
-export function validateIdentifier(
-  value: string,
-  t: TranslationFunction,
-): string | undefined {
+export function validateIdentifier(value: string, t: TranslationFunction): string | undefined {
   if (!value) return t('validation.identifierRequired');
   if (value.length < VALIDATION_CONSTRAINTS.minIdentifierLength) {
     return t('validation.identifierTooShort');
@@ -104,7 +87,7 @@ export function createAuthValidation(t: TranslationFunction) {
     email: (value: string) => validateEmail(value, t),
     phone: (value: string) => validatePhone(value, t),
     password: (value: string) => validatePassword(value, t),
-    confirmPassword: (value: string, values: {password: string}) =>
+    confirmPassword: (value: string, values: { password: string }) =>
       validateConfirmPassword(value, values.password, t),
     firstName: (value: string) => validateName(value, t, 'firstName'),
     lastName: (value: string) => validateName(value, t, 'lastName'),
@@ -116,9 +99,7 @@ export function createAuthValidation(t: TranslationFunction) {
 }
 
 // Helper to get only the validators needed for a specific form
-export function getFormValidators<
-  T extends keyof ReturnType<typeof createAuthValidation>,
->(
+export function getFormValidators<T extends keyof ReturnType<typeof createAuthValidation>>(
   t: TranslationFunction,
   fields: T[],
 ): Pick<ReturnType<typeof createAuthValidation>, T> {
@@ -130,4 +111,18 @@ export function getFormValidators<
   }
 
   return result as Pick<ReturnType<typeof createAuthValidation>, T>;
+}
+
+// Simple validation helpers for basic forms
+export function getBasicValidators(): {
+  required: (message: string) => (value: string) => string | null;
+} {
+  return {
+    required: (message: string) => (value: string) => {
+      if (!value || value.trim() === '') {
+        return message;
+      }
+      return null;
+    },
+  };
 }

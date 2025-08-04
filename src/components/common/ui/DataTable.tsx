@@ -1,14 +1,7 @@
 import React from 'react';
-import {
-  Table,
-  LoadingOverlay,
-  Box,
-  Center,
-  Text,
-  ScrollArea,
-} from '@mantine/core';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
+import { Table, LoadingOverlay, Box, Center, Text, ScrollArea } from '@mantine/core';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 
 type DataTableColumn<T> = {
   key: string;
@@ -25,14 +18,14 @@ type DataTableProps<T> = {
   readonly renderActions?: (item: T) => React.ReactNode;
 };
 
-export function DataTable<T extends Record<string, unknown> & {id: string}>({
+export function DataTable<T extends Record<string, unknown> & { id: string }>({
   data,
   columns,
   isLoading = false,
   emptyMessage,
   renderActions,
 }: DataTableProps<T>) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const isDesktop = useIsDesktop();
 
   const defaultEmptyMessage = emptyMessage || t('common.noDataFound');
@@ -42,11 +35,11 @@ export function DataTable<T extends Record<string, unknown> & {id: string}>({
   }
 
   return (
-    <Box style={{position: 'relative'}}>
+    <Box style={{ position: 'relative' }}>
       <LoadingOverlay
         visible={isLoading}
-        overlayProps={{blur: 2}}
-        transitionProps={{duration: 300}}
+        overlayProps={{ blur: 2 }}
+        transitionProps={{ duration: 300 }}
       />
 
       <Box visibleFrom="md">
@@ -57,22 +50,16 @@ export function DataTable<T extends Record<string, unknown> & {id: string}>({
                 {columns.map((column) => (
                   <Table.Th key={column.key}>{column.header}</Table.Th>
                 ))}
-                {renderActions ? (
-                  <Table.Th>{t('common.actions')}</Table.Th>
-                ) : null}
+                {renderActions ? <Table.Th>{t('common.actions')}</Table.Th> : null}
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {data.map((item) => (
                 <Table.Tr key={item.id}>
                   {columns.map((column) => (
-                    <Table.Td key={column.key}>
-                      {renderCellContent(item, column)}
-                    </Table.Td>
+                    <Table.Td key={column.key}>{renderCellContent(item, column)}</Table.Td>
                   ))}
-                  {renderActions ? (
-                    <Table.Td>{renderActions(item)}</Table.Td>
-                  ) : null}
+                  {renderActions ? <Table.Td>{renderActions(item)}</Table.Td> : null}
                 </Table.Tr>
               ))}
             </Table.Tbody>
@@ -89,10 +76,7 @@ export function DataTable<T extends Record<string, unknown> & {id: string}>({
   );
 }
 
-function renderCellContent<T>(
-  item: T,
-  column: DataTableColumn<T>,
-): string | React.ReactNode {
+function renderCellContent<T>(item: T, column: DataTableColumn<T>): string | React.ReactNode {
   if (column.render) {
     return column.render(item);
   }

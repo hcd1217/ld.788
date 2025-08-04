@@ -19,15 +19,15 @@ import {
   IconShieldCheck,
   IconShieldLock,
 } from '@tabler/icons-react';
-import {useNavigate} from 'react-router';
-import {useAppStore} from '@/stores/useAppStore';
-import {useTranslation} from '@/hooks/useTranslation';
-import {ROUTERS} from '@/config/routeConfig';
+import { useNavigate } from 'react-router';
+import { useAppStore } from '@/stores/useAppStore';
+import { useTranslation } from '@/hooks/useTranslation';
+import { ROUTERS } from '@/config/routeConfig';
 
 export function AdminDashboardPage() {
   const navigate = useNavigate();
-  const {adminLogout} = useAppStore();
-  const {t} = useTranslation();
+  const { adminLogout } = useAppStore();
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     adminLogout();
@@ -111,13 +111,13 @@ export function AdminDashboardPage() {
         <Container fluid px="md">
           <Grid>
             {dashboardCards.map((card) => (
-              <Grid.Col key={card.title} span={{base: 12, sm: 6, md: 3}}>
+              <Grid.Col key={card.title} span={{ base: 12, sm: 6, md: 3 }}>
                 <Card
                   withBorder
                   shadow="sm"
                   padding="lg"
                   radius="md"
-                  style={{cursor: 'pointer'}}
+                  style={{ cursor: 'pointer' }}
                   h={160}
                   onClick={card.onClick}
                 >

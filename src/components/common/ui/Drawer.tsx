@@ -4,7 +4,7 @@ import {
   rem,
   type DrawerProps as MantineDrawerProps,
 } from '@mantine/core';
-import {type ReactNode, useRef} from 'react';
+import { type ReactNode, useRef } from 'react';
 
 type DrawerProps = MantineDrawerProps & {
   readonly position?: 'bottom' | 'left' | 'right' | 'top';
@@ -28,11 +28,8 @@ export function Drawer({
 
   // Reset drag state when expanded changes
 
-
-
   const isBottomDrawer = position === 'bottom';
-  const showMobileStyles =
-    expandable || (isBottomDrawer && expanded !== undefined);
+  const showMobileStyles = expandable || (isBottomDrawer && expanded !== undefined);
 
   // Calculate dynamic size based on drag state
   const getDrawerSize = () => {

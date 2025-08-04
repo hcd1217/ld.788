@@ -33,7 +33,7 @@ export function EmployeeUnitDrawer({
     const gapHeight = 8;
     const padding = 32;
     const headerHeight = 60;
-    const calculatedHeight = headerHeight + padding + (rows * buttonHeight) + ((rows - 1) * gapHeight);
+    const calculatedHeight = headerHeight + padding + rows * buttonHeight + (rows - 1) * gapHeight;
     return `${Math.min(calculatedHeight, 400)}px`; // Max height 400px
   };
 

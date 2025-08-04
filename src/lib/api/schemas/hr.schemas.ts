@@ -30,7 +30,10 @@ export const EmployeeSchema = z.object({
   firstName: stringSchema,
   lastName: stringSchema,
   employeeCode: stringSchema,
-  employmentType: z.enum(['FULL_TIME', 'PART_TIME']).optional().transform((val) => val ?? 'FULL_TIME'),
+  employmentType: z
+    .enum(['FULL_TIME', 'PART_TIME'])
+    .optional()
+    .transform((val) => val ?? 'FULL_TIME'),
   hireDate: timestampSchema,
   terminationDate: timestampSchema.optional(),
   departmentId: idSchema.optional(),
@@ -53,12 +56,17 @@ export const CreateEmployeeSchema = z.object({
   lastName: stringSchema,
   email: emailSchema.optional(),
   employeeCode: optionalStringSchema,
-  employmentType: z.enum(['FULL_TIME', 'PART_TIME']).optional().transform((val) => val ?? 'FULL_TIME'),
-  metadata: z.object({
-    displayOrder: numberSchema.optional(),
-    hourRate: numberSchema.optional(),
-    monthlySalary: numberSchema.optional(),
-  }).optional(),
+  employmentType: z
+    .enum(['FULL_TIME', 'PART_TIME'])
+    .optional()
+    .transform((val) => val ?? 'FULL_TIME'),
+  metadata: z
+    .object({
+      displayOrder: numberSchema.optional(),
+      hourRate: numberSchema.optional(),
+      monthlySalary: numberSchema.optional(),
+    })
+    .optional(),
   departmentId: z.string().optional(),
 });
 
@@ -74,11 +82,13 @@ export const UpdateEmployeeRequestSchema = z.object({
   employmentType: z.enum(['FULL_TIME', 'PART_TIME']).optional(),
   hireDate: stringSchema.optional(),
   terminationDate: stringSchema.optional(),
-  metadata: z.object({
-    displayOrder: numberSchema.optional(),
-    hourRate: numberSchema.optional(),
-    monthlySalary: numberSchema.optional(),
-  }).optional(),
+  metadata: z
+    .object({
+      displayOrder: numberSchema.optional(),
+      hourRate: numberSchema.optional(),
+      monthlySalary: numberSchema.optional(),
+    })
+    .optional(),
 });
 
 // Response schemas
@@ -103,19 +113,11 @@ export const UpdateEmployeeResponseSchema = EmployeeSchema;
 
 // Type exports
 export type CreateEmployee = z.infer<typeof CreateEmployeeSchema>;
-export type CreateEmployeesRequest = z.infer<
-  typeof CreateEmployeesRequestSchema
->;
-export type CreateBulkEmployeesRequest = z.infer<
-  typeof CreateBulkEmployeesRequestSchema
->;
+export type CreateEmployeesRequest = z.infer<typeof CreateEmployeesRequestSchema>;
+export type CreateBulkEmployeesRequest = z.infer<typeof CreateBulkEmployeesRequestSchema>;
 export type UpdateEmployeeRequest = z.infer<typeof UpdateEmployeeRequestSchema>;
 export type GetEmployeesResponse = z.infer<typeof GetEmployeesResponseSchema>;
 export type GetUnitsResponse = z.infer<typeof GetUnitsResponseSchema>;
 export type GetPositionsResponse = z.infer<typeof GetPositionsResponseSchema>;
-export type CreateEmployeesResponse = z.infer<
-  typeof CreateEmployeesResponseSchema
->;
-export type UpdateEmployeeResponse = z.infer<
-  typeof UpdateEmployeeResponseSchema
->;
+export type CreateEmployeesResponse = z.infer<typeof CreateEmployeesResponseSchema>;
+export type UpdateEmployeeResponse = z.infer<typeof UpdateEmployeeResponseSchema>;

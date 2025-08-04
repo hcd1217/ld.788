@@ -1,24 +1,15 @@
-import {
-  Center,
-  Box,
-  SegmentedControl,
-  type MantineBreakpoint,
-} from '@mantine/core';
-import {IconLayoutGrid, IconTable} from '@tabler/icons-react';
-import {Tooltip} from './Tooltip';
-import {useTranslation} from '@/hooks/useTranslation';
+import { Center, Box, SegmentedControl, type MantineBreakpoint } from '@mantine/core';
+import { IconLayoutGrid, IconTable } from '@tabler/icons-react';
+import { Tooltip } from './Tooltip';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type SwitchViewProps = {
   readonly viewMode: 'table' | 'grid';
   readonly visibleFrom?: MantineBreakpoint;
   readonly setViewMode: (viewMode: 'table' | 'grid') => void;
 };
-export function SwitchView({
-  visibleFrom,
-  viewMode,
-  setViewMode,
-}: SwitchViewProps) {
-  const {t} = useTranslation();
+export function SwitchView({ visibleFrom, viewMode, setViewMode }: SwitchViewProps) {
+  const { t } = useTranslation();
 
   return (
     <Box visibleFrom={visibleFrom}>

@@ -21,18 +21,7 @@ export type CustomColors = {
   inActiveColor: string;
 };
 type CustomThemeConfig = {
-  brandColors: [
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-  ];
+  brandColors: [string, string, string, string, string, string, string, string, string, string];
   default: CustomColors;
   light?: CustomColors;
   dark?: CustomColors;

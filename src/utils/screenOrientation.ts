@@ -30,7 +30,7 @@ export async function lockToPortrait(): Promise<boolean> {
     const isStandalone =
       globalThis.matchMedia('(display-mode: standalone)').matches ||
       globalThis.matchMedia('(display-mode: fullscreen)').matches ||
-      (globalThis.navigator as {standalone?: boolean}).standalone === true; // IOS specific
+      (globalThis.navigator as { standalone?: boolean }).standalone === true; // IOS specific
 
     if (!isStandalone) {
       console.info('Orientation lock only works in PWA standalone mode');
@@ -90,8 +90,8 @@ export function initializeOrientationLock(): void {
   };
 
   // Add listeners for user interaction
-  document.addEventListener('click', attemptLock, {once: true});
-  document.addEventListener('touchstart', attemptLock, {once: true});
+  document.addEventListener('click', attemptLock, { once: true });
+  document.addEventListener('touchstart', attemptLock, { once: true });
 
   // Also try when app gains focus (in case user switches back)
   document.addEventListener('visibilitychange', () => {

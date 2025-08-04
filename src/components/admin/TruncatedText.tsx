@@ -1,5 +1,5 @@
-import {useRef, useState, useEffect} from 'react';
-import {Text, Tooltip, type TextProps} from '@mantine/core';
+import { useRef, useState, useEffect } from 'react';
+import { Text, Tooltip, type TextProps } from '@mantine/core';
 
 interface TruncatedTextProps extends TextProps {
   readonly text: string;
@@ -44,7 +44,7 @@ export function TruncatedText({
     <Text
       ref={textRef}
       lineClamp={lineClamp}
-      style={{maxWidth, cursor: isTruncated ? 'help' : 'inherit'}}
+      style={{ maxWidth, cursor: isTruncated ? 'help' : 'inherit' }}
       {...textProps}
     >
       {text}
@@ -58,7 +58,7 @@ export function TruncatedText({
         withArrow
         label={tooltipLabel || text}
         maw={400}
-        transitionProps={{duration: 200}}
+        transitionProps={{ duration: 200 }}
       >
         {textElement}
       </Tooltip>

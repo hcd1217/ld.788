@@ -1,13 +1,13 @@
-import {useCallback, useEffect, useState} from 'react';
-import {useNavigate} from 'react-router';
-import {useTranslation} from '@/hooks/useTranslation';
-import {clientManagementService} from '@/services/clientManagement';
-import type {ClientDetail} from '@/lib/api';
-import {ROUTERS} from '@/config/routeConfig';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
+import { useTranslation } from '@/hooks/useTranslation';
+import { clientManagementService } from '@/services/clientManagement';
+import type { ClientDetail } from '@/lib/api';
+import { ROUTERS } from '@/config/routeConfig';
 
 export function useClientDetail(clientCode: string | undefined) {
   const navigate = useNavigate();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [client, setClient] = useState<ClientDetail | undefined>(undefined);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -25,14 +25,11 @@ export function useClientDetail(clientCode: string | undefined) {
       }
 
       try {
-        const clientData =
-          await clientManagementService.getClientByClientCode(clientCode);
+        const clientData = await clientManagementService.getClientByClientCode(clientCode);
         setClient(clientData);
       } catch (error) {
         const errorMessage =
-          error instanceof Error
-            ? error.message
-            : t('errors.failedToLoadClient');
+          error instanceof Error ? error.message : t('errors.failedToLoadClient');
         if (withLoadingState) {
           setError(errorMessage);
         }

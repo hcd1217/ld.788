@@ -1,5 +1,5 @@
-import {useState, useEffect, useCallback} from 'react';
-import {Navigate} from 'react-router';
+import { useState, useEffect, useCallback } from 'react';
+import { Navigate } from 'react-router';
 import {
   Button,
   Paper,
@@ -26,9 +26,9 @@ import {
   Card,
   ScrollArea,
 } from '@mantine/core';
-import {useForm} from '@mantine/form';
-import {useDisclosure} from '@mantine/hooks';
-import {modals} from '@mantine/modals';
+import { useForm } from '@mantine/form';
+import { useDisclosure } from '@mantine/hooks';
+import { modals } from '@mantine/modals';
 import {
   IconPlus,
   IconEdit,
@@ -41,14 +41,11 @@ import {
   IconTag,
   IconUsers,
 } from '@tabler/icons-react';
-import {
-  showErrorNotification,
-  showSuccessNotification,
-} from '@/utils/notifications';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAppStore} from '@/stores/useAppStore';
-import {clientService} from '@/services/client';
-import {GoBack} from '@/components/common';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/stores/useAppStore';
+import { clientService } from '@/services/client';
+import { GoBack } from '@/components/common';
 
 type Role = {
   id: string;
@@ -69,8 +66,8 @@ type RoleFormValues = {
 const ROLES_PER_PAGE = 10;
 
 export function RoleManagementPage() {
-  const {t} = useTranslation();
-  const {user} = useAppStore();
+  const { t } = useTranslation();
+  const { user } = useAppStore();
 
   const [roles, setRoles] = useState<Role[]>([]);
   const [filteredRoles, setFilteredRoles] = useState<Role[]>([]);
@@ -81,7 +78,7 @@ export function RoleManagementPage() {
   const [showAlert, setShowAlert] = useState(false);
   const [isAddMode, setIsAddMode] = useState(false);
 
-  const [formOpened, {open: openForm, close: closeForm}] = useDisclosure(false);
+  const [formOpened, { open: openForm, close: closeForm }] = useDisclosure(false);
 
   const form = useForm<RoleFormValues>({
     initialValues: {
@@ -160,10 +157,7 @@ export function RoleManagementPage() {
 
   const handleDeleteRole = (role: Role) => {
     if (role.isSystem) {
-      showErrorNotification(
-        t('common.error'),
-        t('common.cannotDeleteSystemRole'),
-      );
+      showErrorNotification(t('common.error'), t('common.cannotDeleteSystemRole'));
       return;
     }
 
@@ -176,8 +170,8 @@ export function RoleManagementPage() {
           })}
         </Text>
       ),
-      labels: {confirm: t('common.delete'), cancel: t('common.cancel')},
-      confirmProps: {color: 'red'},
+      labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
+      confirmProps: { color: 'red' },
       async onConfirm() {
         try {
           setIsLoading(true);
@@ -287,7 +281,7 @@ export function RoleManagementPage() {
         <Paper withBorder shadow="md" p="md" radius="md">
           <Stack gap="md">
             <Group justify="space-between" align="flex-start">
-              <Stack gap="md" style={{flex: 1}}>
+              <Stack gap="md" style={{ flex: 1 }}>
                 <Box hiddenFrom="sm">
                   <TextInput
                     placeholder={t('common.searchRoles')}
@@ -304,7 +298,7 @@ export function RoleManagementPage() {
                     placeholder={t('common.searchRoles')}
                     leftSection={<IconSearch size={16} />}
                     value={searchQuery}
-                    style={{minWidth: 250}}
+                    style={{ minWidth: 250 }}
                     onChange={(event) => {
                       handleSearch(event.currentTarget.value);
                     }}
@@ -313,22 +307,17 @@ export function RoleManagementPage() {
               </Stack>
 
               <Tooltip label={t('common.refresh')}>
-                <ActionIcon
-                  variant="light"
-                  size="lg"
-                  loading={isLoading}
-                  onClick={loadRoles}
-                >
+                <ActionIcon variant="light" size="lg" loading={isLoading} onClick={loadRoles}>
                   <IconRefresh size={16} />
                 </ActionIcon>
               </Tooltip>
             </Group>
 
-            <Box style={{position: 'relative'}}>
+            <Box style={{ position: 'relative' }}>
               <LoadingOverlay
                 visible={isLoading}
-                overlayProps={{blur: 2}}
-                transitionProps={{duration: 300}}
+                overlayProps={{ blur: 2 }}
+                transitionProps={{ duration: 300 }}
               />
 
               <Box hiddenFrom="md">
@@ -523,11 +512,11 @@ export function RoleManagementPage() {
         size="md"
         onClose={closeForm}
       >
-        <Box style={{position: 'relative'}}>
+        <Box style={{ position: 'relative' }}>
           <LoadingOverlay
             visible={isLoading}
-            overlayProps={{blur: 2}}
-            transitionProps={{duration: 300}}
+            overlayProps={{ blur: 2 }}
+            transitionProps={{ duration: 300 }}
           />
 
           <form onSubmit={form.onSubmit(handleSaveRole)}>
@@ -587,9 +576,7 @@ export function RoleManagementPage() {
               />
 
               <Transition
-                mounted={Boolean(
-                  showAlert && Object.keys(form.errors).length > 0,
-                )}
+                mounted={Boolean(showAlert && Object.keys(form.errors).length > 0)}
                 transition="fade"
                 duration={300}
                 timingFunction="ease"
@@ -611,11 +598,7 @@ export function RoleManagementPage() {
               </Transition>
 
               <Group justify="flex-end" mt="md">
-                <Button
-                  variant="outline"
-                  disabled={isLoading}
-                  onClick={closeForm}
-                >
+                <Button variant="outline" disabled={isLoading} onClick={closeForm}>
                   {t('common.cancel')}
                 </Button>
                 <Button type="submit" loading={isLoading}>

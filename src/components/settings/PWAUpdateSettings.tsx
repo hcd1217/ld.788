@@ -1,16 +1,16 @@
-import {Switch, Group, Text} from '@mantine/core';
-import {usePWA} from '@/hooks/usePWA';
-import {useTranslation} from '@/hooks/useTranslation';
+import { Switch, Group, Text } from '@mantine/core';
+import { usePWA } from '@/hooks/usePWA';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function PWAUpdateSettings() {
-  const {t} = useTranslation();
-  const {autoUpdate, setAutoUpdate, isChromium} = usePWA();
-  
+  const { t } = useTranslation();
+  const { autoUpdate, setAutoUpdate, isChromium } = usePWA();
+
   // Only show for Chromium browsers
   if (!isChromium) {
     return null;
   }
-  
+
   return (
     <Group justify="space-between">
       <div>

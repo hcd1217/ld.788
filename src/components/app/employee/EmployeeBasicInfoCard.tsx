@@ -1,25 +1,15 @@
-import {
-  Card,
-  Stack,
-  Group,
-  Title,
-  Button,
-  Divider,
-  Grid,
-  Text,
-  Tooltip,
-} from '@mantine/core';
-import {IconEdit, IconQrcode} from '@tabler/icons-react';
-import {useDisclosure} from '@mantine/hooks';
-import {useState, useEffect} from 'react';
-import {EmployeeMagicLinkModal} from './EmployeeMagicLinkModal';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAction} from '@/hooks/useAction';
-import type {Employee} from '@/services/hr/employee';
-import {renderFullName, formatDate, salaryFormat} from '@/utils/string';
-import {userService} from '@/services/user/user';
-import {generateQRCodeWithLogo} from '@/utils/qr';
-import {useClientCode} from '@/hooks/useClientCode';
+import { Card, Stack, Group, Title, Button, Divider, Grid, Text, Tooltip } from '@mantine/core';
+import { IconEdit, IconQrcode } from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
+import { useState, useEffect } from 'react';
+import { EmployeeMagicLinkModal } from './EmployeeMagicLinkModal';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAction } from '@/hooks/useAction';
+import type { Employee } from '@/services/hr/employee';
+import { renderFullName, formatDate, salaryFormat } from '@/utils/string';
+import { userService } from '@/services/user/user';
+import { generateQRCodeWithLogo } from '@/utils/qr';
+import { useClientCode } from '@/hooks/useClientCode';
 import { StatusBadge } from './StatusBadge';
 import { WorkTypeBadge } from './WorkTypeBadge';
 
@@ -28,12 +18,9 @@ type EmployeeBasicInfoCardProps = {
   readonly onEdit?: () => void;
 };
 
-export function EmployeeBasicInfoCard({
-  employee,
-  onEdit,
-}: EmployeeBasicInfoCardProps) {
-  const {t} = useTranslation();
-  const [opened, {open, close}] = useDisclosure(false);
+export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCardProps) {
+  const { t } = useTranslation();
+  const [opened, { open, close }] = useDisclosure(false);
   const clientCode = useClientCode();
   const [magicLink, setMagicLink] = useState<string>('');
   const [qrCodeData, setQrCodeData] = useState<string>('');
@@ -63,10 +50,7 @@ export function EmployeeBasicInfoCard({
         throw new Error('No user ID available');
       }
 
-      const link = await userService.getLoginMagicLink(
-        employee.userId,
-        clientCode,
-      );
+      const link = await userService.getLoginMagicLink(employee.userId, clientCode);
       setMagicLink(link);
       open();
     },
@@ -90,11 +74,7 @@ export function EmployeeBasicInfoCard({
                   </Button>
                 </Tooltip>
               ) : null}
-              <Button
-                leftSection={<IconEdit size={16} />}
-                variant="subtle"
-                onClick={onEdit}
-              >
+              <Button leftSection={<IconEdit size={16} />} variant="subtle" onClick={onEdit}>
                 {t('common.edit')}
               </Button>
             </Group>
@@ -103,7 +83,7 @@ export function EmployeeBasicInfoCard({
           <Divider />
 
           <Grid>
-            <Grid.Col span={{base: 6}}>
+            <Grid.Col span={{ base: 6 }}>
               <Stack gap="xs">
                 <Text c="dimmed" size="sm">
                   {t('employee.name')}
@@ -112,18 +92,16 @@ export function EmployeeBasicInfoCard({
               </Stack>
             </Grid.Col>
 
-            <Grid.Col span={{base: 6}}>
+            <Grid.Col span={{ base: 6 }}>
               <Stack gap="xs">
                 <Text c="dimmed" size="sm">
                   {t('employee.employeeCode')}
                 </Text>
-                <Text fw={500}>
-                  {employee.employeeCode.toLocaleUpperCase()}
-                </Text>
+                <Text fw={500}>{employee.employeeCode.toLocaleUpperCase()}</Text>
               </Stack>
             </Grid.Col>
 
-            <Grid.Col span={{base: 6}}>
+            <Grid.Col span={{ base: 6 }}>
               <Stack gap="xs">
                 <Text c="dimmed" size="sm">
                   {t('employee.unit')}
@@ -132,7 +110,7 @@ export function EmployeeBasicInfoCard({
               </Stack>
             </Grid.Col>
 
-            <Grid.Col span={{base: 6}}>
+            <Grid.Col span={{ base: 6 }}>
               <Stack gap="xs">
                 <Text c="dimmed" size="sm">
                   {t('employee.status')}
@@ -142,7 +120,7 @@ export function EmployeeBasicInfoCard({
             </Grid.Col>
 
             {employee.email ? (
-              <Grid.Col span={{base: 6}}>
+              <Grid.Col span={{ base: 6 }}>
                 <Stack gap="xs">
                   <Text c="dimmed" size="sm">
                     {t('employee.email')}
@@ -153,7 +131,7 @@ export function EmployeeBasicInfoCard({
             ) : null}
 
             {employee.phone ? (
-              <Grid.Col span={{base: 6}}>
+              <Grid.Col span={{ base: 6 }}>
                 <Stack gap="xs">
                   <Text c="dimmed" size="sm">
                     {t('employee.phone')}
@@ -164,7 +142,7 @@ export function EmployeeBasicInfoCard({
             ) : null}
 
             {employee.workType ? (
-              <Grid.Col span={{base: 6}}>
+              <Grid.Col span={{ base: 6 }}>
                 <Stack gap="xs">
                   <Text c="dimmed" size="sm">
                     {t('employee.workType')}
@@ -175,76 +153,64 @@ export function EmployeeBasicInfoCard({
             ) : null}
 
             {employee.startDate ? (
-              <Grid.Col span={{base: 6}}>
+              <Grid.Col span={{ base: 6 }}>
                 <Stack gap="xs">
                   <Text c="dimmed" size="sm">
                     {t('employee.startDate')}
                   </Text>
-                  <Text fw={500}>
-                    {formatDate(employee.startDate.toString())}
-                  </Text>
+                  <Text fw={500}>{formatDate(employee.startDate.toString())}</Text>
                 </Stack>
               </Grid.Col>
             ) : null}
 
             {employee.endDate ? (
-              <Grid.Col span={{base: 6}}>
+              <Grid.Col span={{ base: 6 }}>
                 <Stack gap="xs">
                   <Text c="dimmed" size="sm">
                     {t('employee.endDate')}
                   </Text>
-                  <Text fw={500}>
-                    {formatDate(employee.endDate.toString())}
-                  </Text>
+                  <Text fw={500}>{formatDate(employee.endDate.toString())}</Text>
                 </Stack>
               </Grid.Col>
             ) : null}
 
             {employee.monthlySalary ? (
-              <Grid.Col span={{base: 6}}>
+              <Grid.Col span={{ base: 6 }}>
                 <Stack gap="xs">
                   <Text c="dimmed" size="sm">
                     {t('employee.monthlySalary')}
                   </Text>
-                  <Text fw={500}>
-                    {salaryFormat(employee.monthlySalary)}
-                  </Text>
+                  <Text fw={500}>{salaryFormat(employee.monthlySalary)}</Text>
                 </Stack>
               </Grid.Col>
             ) : null}
 
             {employee.hourlyRate ? (
-              <Grid.Col span={{base: 6}}>
+              <Grid.Col span={{ base: 6 }}>
                 <Stack gap="xs">
                   <Text c="dimmed" size="sm">
                     {t('employee.hourlyRate')}
                   </Text>
-                  <Text fw={500}>
-                    {salaryFormat(employee.hourlyRate)}
-                  </Text>
+                  <Text fw={500}>{salaryFormat(employee.hourlyRate)}</Text>
                 </Stack>
               </Grid.Col>
             ) : null}
 
-            <Grid.Col span={{base: 6}} visibleFrom="sm">
+            <Grid.Col span={{ base: 6 }} visibleFrom="sm">
               <Stack gap="xs">
                 <Text c="dimmed" size="sm">
                   {t('common.createdAt')}
                 </Text>
-                <Text fw={500}>
-                  {formatDate(employee.createdAt.toString())}
-                </Text>
+                <Text fw={500}>{formatDate(employee.createdAt.toString())}</Text>
               </Stack>
             </Grid.Col>
 
-            <Grid.Col span={{base: 6}} visibleFrom="sm">
+            <Grid.Col span={{ base: 6 }} visibleFrom="sm">
               <Stack gap="xs">
                 <Text c="dimmed" size="sm">
                   {t('common.updatedAt')}
                 </Text>
-                <Text fw={500}>
-                  {formatDate(employee.updatedAt.toString())}
-                </Text>
+                <Text fw={500}>{formatDate(employee.updatedAt.toString())}</Text>
               </Stack>
             </Grid.Col>
           </Grid>

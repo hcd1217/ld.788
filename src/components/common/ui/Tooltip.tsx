@@ -3,14 +3,14 @@ import {
   rem,
   type TooltipProps as MantineTooltipProps,
 } from '@mantine/core';
-import {type ReactNode} from 'react';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
+import { type ReactNode } from 'react';
+import { useIsDarkMode } from '@/hooks/useIsDarkMode';
 
 type TooltipProps = MantineTooltipProps & {
   readonly children: ReactNode;
 };
 
-export function Tooltip({children, ...props}: TooltipProps) {
+export function Tooltip({ children, ...props }: TooltipProps) {
   const isDarkMode = useIsDarkMode();
 
   return (

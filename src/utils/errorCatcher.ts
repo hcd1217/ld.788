@@ -1,5 +1,5 @@
-import {isDevelopment, isProduction} from './env';
-import {useErrorStore, type ErrorType} from '@/stores/error';
+import { isDevelopment, isProduction } from './env';
+import { useErrorStore, type ErrorType } from '@/stores/error';
 
 type ErrorEventDetails = {
   message: string;
@@ -42,11 +42,7 @@ function extractErrorStack(error: unknown): string | undefined {
   return undefined;
 }
 
-function createErrorSource(
-  filename?: string,
-  lineno?: number,
-  colno?: number,
-): string | undefined {
+function createErrorSource(filename?: string, lineno?: number, colno?: number): string | undefined {
   if (!filename) {
     return undefined;
   }
@@ -77,25 +73,21 @@ export default function registerGlobalErrorCatcher(): () => void {
     };
 
     // Filter out known benign errors
-    const errorMessage = details.error
-      ? extractErrorMessage(details.error)
-      : details.message;
-    
+    const errorMessage = details.error ? extractErrorMessage(details.error) : details.message;
+
     // Ignore ResizeObserver errors - these are benign and occur when ResizeObserver
     // can't deliver all notifications within a single animation frame
-    if (errorMessage.includes('ResizeObserver loop completed with undelivered notifications') ||
-        errorMessage.includes('ResizeObserver loop limit exceeded')) {
+    if (
+      errorMessage.includes('ResizeObserver loop completed with undelivered notifications') ||
+      errorMessage.includes('ResizeObserver loop limit exceeded')
+    ) {
       return;
     }
 
     const errorType: ErrorType = 'error';
     const message = errorMessage;
     const stack = details.error ? extractErrorStack(details.error) : undefined;
-    const source = createErrorSource(
-      details.filename,
-      details.lineno,
-      details.colno,
-    );
+    const source = createErrorSource(details.filename, details.lineno, details.colno);
 
     // Add to error store
     useErrorStore.getState().addError({
@@ -116,7 +108,7 @@ export default function registerGlobalErrorCatcher(): () => void {
     if (isProduction) {
       // Future: Integrate with error tracking service (e.g., Sentry)
       // For now, log to console in production
-      console.error('Production error:', {message, stack, source});
+      console.error('Production error:', { message, stack, source });
     }
   };
 
@@ -168,17 +160,12 @@ export default function registerGlobalErrorCatcher(): () => void {
   // Return cleanup function
   return () => {
     globalThis.removeEventListener('error', errorHandler);
-    globalThis.removeEventListener(
-      'unhandledrejection',
-      unhandledRejectionHandler,
-    );
+    globalThis.removeEventListener('unhandledrejection', unhandledRejectionHandler);
   };
 }
 
 // Optional: Rate limiting wrapper to prevent error spam
-export function registerGlobalErrorCatcherWithRateLimit(
-  maxErrorsPerMinute = 30,
-): () => void {
+export function registerGlobalErrorCatcherWithRateLimit(maxErrorsPerMinute = 30): () => void {
   const errorTimestamps: number[] = [];
   const oneMinute = 60 * 1000;
 
@@ -192,19 +179,13 @@ export function registerGlobalErrorCatcherWithRateLimit(
       const now = Date.now();
 
       // Remove timestamps older than one minute
-      while (
-        errorTimestamps.length > 0 &&
-        errorTimestamps[0] < now - oneMinute
-      ) {
+      while (errorTimestamps.length > 0 && errorTimestamps[0] < now - oneMinute) {
         errorTimestamps.shift();
       }
 
       // Check if we've exceeded the rate limit
       if (errorTimestamps.length >= maxErrorsPerMinute) {
-        console.warn(
-          'Error rate limit exceeded, dropping error:',
-          error.message,
-        );
+        console.warn('Error rate limit exceeded, dropping error:', error.message);
         return;
       }
 
@@ -217,6 +198,6 @@ export function registerGlobalErrorCatcherWithRateLimit(
   // Return cleanup function that also restores the original addError
   return () => {
     originalRegister();
-    useErrorStore.setState({addError: originalAddError});
+    useErrorStore.setState({ addError: originalAddError });
   };
 }

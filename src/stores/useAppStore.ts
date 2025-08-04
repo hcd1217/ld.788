@@ -1,17 +1,17 @@
-import {create} from 'zustand';
-import {devtools} from 'zustand/middleware';
-import {authService} from '@/services/auth';
-import {adminService} from '@/services/admin';
-import {delay} from '@/utils/time';
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { authService } from '@/services/auth';
+import { adminService } from '@/services/admin';
+import { delay } from '@/utils/time';
 import {
   storeAdminSession,
   clearAdminSession,
   isAdminAuthenticated,
   restoreAdminSession,
 } from '@/utils/adminSessionManager';
-import {authApi, clientApi, type ClientPublicConfigResponse} from '@/lib/api';
-import {updateClientTranslations, clearClientTranslations} from '@/lib/i18n';
-import type {GetMeResponse} from '@/lib/api/schemas/auth.schemas';
+import { authApi, clientApi, type ClientPublicConfigResponse } from '@/lib/api';
+import { updateClientTranslations, clearClientTranslations } from '@/lib/i18n';
+import type { GetMeResponse } from '@/lib/api/schemas/auth.schemas';
 
 type User = {
   id: string;
@@ -37,11 +37,11 @@ type AppState = {
     pagination: {
       mobile: {
         defaultPageSize: number;
-        pagingOptions: Array<{value: string; label: string}>;
+        pagingOptions: Array<{ value: string; label: string }>;
       };
       desktop: {
         defaultPageSize: number;
-        pagingOptions: Array<{value: string; label: string}>;
+        pagingOptions: Array<{ value: string; label: string }>;
       };
     };
   };
@@ -52,11 +52,7 @@ type AppState = {
   setAdminAuth: (authenticated: boolean) => void;
   setAdminApiLoading: (loading: boolean, message?: string) => void;
   fetchPublicClientConfig: (clientCode: string) => Promise<void>;
-  login: (params: {
-    identifier: string;
-    password: string;
-    clientCode: string;
-  }) => Promise<void>;
+  login: (params: { identifier: string; password: string; clientCode: string }) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<boolean>;
   adminLogin: (accessKey: string) => Promise<void>;
@@ -74,7 +70,7 @@ export const useAppStore = create<AppState>()(
       clientApi
         .getPubicClientConfig(clientCode)
         .then((config) => {
-          set({publicClientConfig: config});
+          set({ publicClientConfig: config });
         })
         .catch((error) => {
           console.error('Failed to fetch initial public client config:', error);
@@ -94,25 +90,25 @@ export const useAppStore = create<AppState>()(
           pagination: {
             mobile: {
               defaultPageSize: 1000,
-              PagingOptions: [{value: '1000', label: '1000'}],
+              PagingOptions: [{ value: '1000', label: '1000' }],
             },
             desktop: {
               defaultPageSize: 12,
               pagingOptions: [
-                {value: '6', label: '6'},
-                {value: '12', label: '12'},
-                {value: '24', label: '24'},
-                {value: '48', label: '48'},
+                { value: '6', label: '6' },
+                { value: '12', label: '12' },
+                { value: '24', label: '24' },
+                { value: '48', label: '48' },
               ],
             },
           },
         },
-        setUser: (user) => set({user, isAuthenticated: Boolean(user)}),
-        setUserProfile: (profile) => set({userProfile: profile}),
+        setUser: (user) => set({ user, isAuthenticated: Boolean(user) }),
+        setUserProfile: (profile) => set({ userProfile: profile }),
         async fetchUserProfile() {
           try {
             const profile = await authApi.getMe();
-            set({userProfile: profile});
+            set({ userProfile: profile });
 
             // Apply client-specific translations if available
             if (profile.clientConfig?.translations) {
@@ -128,15 +124,14 @@ export const useAppStore = create<AppState>()(
             }
           }
         },
-        setTheme: (theme) => set({theme}),
-        setAdminAuth: (authenticated) =>
-          set({adminAuthenticated: authenticated}),
+        setTheme: (theme) => set({ theme }),
+        setAdminAuth: (authenticated) => set({ adminAuthenticated: authenticated }),
         setAdminApiLoading: (loading, message = '') =>
-          set({adminApiLoading: loading, adminApiLoadingMessage: message}),
+          set({ adminApiLoading: loading, adminApiLoadingMessage: message }),
         async fetchPublicClientConfig(clientCode: string) {
           try {
             const config = await clientApi.getPubicClientConfig(clientCode);
-            set({publicClientConfig: config});
+            set({ publicClientConfig: config });
           } catch (error) {
             console.error('Failed to fetch public client config:', error);
             // Don't throw the error, just log it
@@ -144,7 +139,7 @@ export const useAppStore = create<AppState>()(
           }
         },
         async login(params) {
-          set({isLoading: true, clientCode: params.clientCode});
+          set({ isLoading: true, clientCode: params.clientCode });
           try {
             // Fetch public client config if clientCode has changed
             const currentClientCode = get().clientCode;
@@ -152,7 +147,7 @@ export const useAppStore = create<AppState>()(
               await get().fetchPublicClientConfig(params.clientCode);
             }
 
-            const {user} = await authService.login({
+            const { user } = await authService.login({
               identifier: params.identifier,
               password: params.password,
               clientCode: params.clientCode ?? get().clientCode,
@@ -166,7 +161,7 @@ export const useAppStore = create<AppState>()(
             // Fetch user profile after successful login
             await get().fetchUserProfile();
           } catch (error) {
-            set({isLoading: false});
+            set({ isLoading: false });
             throw error;
           }
         },
@@ -187,7 +182,7 @@ export const useAppStore = create<AppState>()(
           if (isAuthenticated) {
             await delay(100);
             const user = authService.getCurrentUser();
-            set({isAuthenticated, user: user ?? undefined});
+            set({ isAuthenticated, user: user ?? undefined });
             // Fetch user profile when checking auth
             await get().fetchUserProfile();
           } else {
@@ -201,18 +196,18 @@ export const useAppStore = create<AppState>()(
           return isAuthenticated;
         },
         async adminLogin(accessKey: string) {
-          set({isLoading: true});
+          set({ isLoading: true });
           try {
-            const response = await adminService.login({accessKey});
+            const response = await adminService.login({ accessKey });
             if (response.success) {
               storeAdminSession(accessKey);
-              set({adminAuthenticated: true, isLoading: false});
+              set({ adminAuthenticated: true, isLoading: false });
             } else {
-              set({isLoading: false});
+              set({ isLoading: false });
               throw new Error('Invalid access key');
             }
           } catch (error) {
-            set({isLoading: false});
+            set({ isLoading: false });
             clearAdminSession();
             throw error;
           }
@@ -220,7 +215,7 @@ export const useAppStore = create<AppState>()(
         adminLogout() {
           clearAdminSession();
           adminService.logout();
-          set({adminAuthenticated: false});
+          set({ adminAuthenticated: false });
         },
       };
     },
@@ -231,7 +226,5 @@ export const useAppStore = create<AppState>()(
 );
 
 // Computed selectors for convenience
-export const useClientConfig = () =>
-  useAppStore((state) => state.userProfile?.clientConfig);
-export const usePublicClientConfig = () =>
-  useAppStore((state) => state.publicClientConfig);
+export const useClientConfig = () => useAppStore((state) => state.userProfile?.clientConfig);
+export const usePublicClientConfig = () => useAppStore((state) => state.publicClientConfig);

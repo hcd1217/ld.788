@@ -1,19 +1,11 @@
-import {
-  Grid,
-  Stack,
-  TextInput,
-  Fieldset,
-  Group,
-  Button,
-  Box,
-} from '@mantine/core';
-import {type UseFormReturnType} from '@mantine/form';
-import {IconBuildingStore} from '@tabler/icons-react';
-import {useNavigate} from 'react-router';
-import {LocationInput} from './LocationInput';
-import {OperatingHoursInput, type DaySchedule} from './OperatingHoursInput';
-import {GoogleMapDisplay} from './GoogleMapDisplay';
-import {useTranslation} from '@/hooks/useTranslation';
+import { Grid, Stack, TextInput, Fieldset, Group, Button, Box } from '@mantine/core';
+import { type UseFormReturnType } from '@mantine/form';
+import { IconBuildingStore } from '@tabler/icons-react';
+import { useNavigate } from 'react-router';
+import { LocationInput } from './LocationInput';
+import { OperatingHoursInput, type DaySchedule } from './OperatingHoursInput';
+import { GoogleMapDisplay } from './GoogleMapDisplay';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type StoreConfigFormProps = {
   readonly form: UseFormReturnType<{
@@ -33,19 +25,12 @@ type StoreConfigFormProps = {
     operatingHours: Record<string, DaySchedule>;
   }>;
   readonly isLoading: boolean;
-  readonly onLocationChange: (
-    location: {lat: number; lng: number},
-    address: string,
-  ) => void;
+  readonly onLocationChange: (location: { lat: number; lng: number }, address: string) => void;
   readonly onAddressChange: (address: string) => void;
-  readonly onOperatingHoursChange: (
-    operatingHours: Record<string, DaySchedule>,
-  ) => void;
+  readonly onOperatingHoursChange: (operatingHours: Record<string, DaySchedule>) => void;
   readonly onFocus?: () => void;
 };
-const isGoogleMapsApiKeyConfigured = Boolean(
-  import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-);
+const isGoogleMapsApiKeyConfigured = Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
 
 export function StoreConfigForm({
   form,
@@ -56,7 +41,7 @@ export function StoreConfigForm({
   onFocus,
 }: StoreConfigFormProps) {
   const navigate = useNavigate();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const buttonGroups = (
     <Group justify="flex-end" mt="xl">
@@ -71,11 +56,7 @@ export function StoreConfigForm({
         {t('common.cancel')}
       </Button>
 
-      <Button
-        type="submit"
-        leftSection={<IconBuildingStore size={16} />}
-        disabled={isLoading}
-      >
+      <Button type="submit" leftSection={<IconBuildingStore size={16} />} disabled={isLoading}>
         {t('store.createStore')}
       </Button>
     </Group>
@@ -84,7 +65,7 @@ export function StoreConfigForm({
   return (
     <Grid gutter="xl">
       {/* Basic Store Information */}
-      <Grid.Col span={{base: 12, sm: 12, md: 12, lg: 6}}>
+      <Grid.Col span={{ base: 12, sm: 12, md: 12, lg: 6 }}>
         <Fieldset legend={t('store.storeInformation')}>
           <Stack gap="md">
             <TextInput
@@ -195,10 +176,7 @@ export function StoreConfigForm({
 
             {/* Map Display */}
             {form.values.location.lat && form.values.location.lng ? (
-              <GoogleMapDisplay
-                location={form.values.location}
-                address={form.values.address}
-              />
+              <GoogleMapDisplay location={form.values.location} address={form.values.address} />
             ) : null}
           </Stack>
         </Fieldset>
@@ -208,7 +186,7 @@ export function StoreConfigForm({
       </Grid.Col>
 
       {/* Operating Hours */}
-      <Grid.Col span={{base: 12, sm: 12, md: 12, lg: 6}}>
+      <Grid.Col span={{ base: 12, sm: 12, md: 12, lg: 6 }}>
         <Fieldset legend={t('store.operatingHours')}>
           <OperatingHoursInput
             value={form.values.operatingHours}

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   Badge,
   Group,
@@ -34,20 +34,14 @@ import {
   IconChevronDown,
   IconChevronUp,
 } from '@tabler/icons-react';
-import {AdminDataTable, type TableColumn} from './AdminDataTable';
-import {
-  FilterableAdminDataTable,
-  type FilterableColumn,
-} from './FilterableAdminDataTable';
-import {ExportButton} from './ExportButton';
-import {TruncatedText} from './TruncatedText';
-import {
-  showSuccessNotification,
-  showErrorNotification,
-} from '@/utils/notifications';
-import {useTranslation} from '@/hooks/useTranslation';
-import {type ExportColumn} from '@/utils/export';
-import {convertCamelCaseToText, formatDate} from '@/utils/string';
+import { AdminDataTable, type TableColumn } from './AdminDataTable';
+import { FilterableAdminDataTable, type FilterableColumn } from './FilterableAdminDataTable';
+import { ExportButton } from './ExportButton';
+import { TruncatedText } from './TruncatedText';
+import { showSuccessNotification, showErrorNotification } from '@/utils/notifications';
+import { useTranslation } from '@/hooks/useTranslation';
+import { type ExportColumn } from '@/utils/export';
+import { convertCamelCaseToText, formatDate } from '@/utils/string';
 import {
   adminApi,
   type Client,
@@ -62,23 +56,12 @@ interface ClientStatusBadgeProps extends BadgeProps {
   readonly status: 'active' | 'suspended';
 }
 
-export function ClientStatusBadge({
-  status,
-  size = 'lg',
-  ...props
-}: ClientStatusBadgeProps) {
-  const {t} = useTranslation();
+export function ClientStatusBadge({ status, size = 'lg', ...props }: ClientStatusBadgeProps) {
+  const { t } = useTranslation();
 
   return (
-    <Badge
-      size={size}
-      color={status === 'active' ? 'green' : 'red'}
-      variant="filled"
-      {...props}
-    >
-      {status === 'active'
-        ? t('admin.clients.active')
-        : t('admin.clients.suspended')}
+    <Badge size={size} color={status === 'active' ? 'green' : 'red'} variant="filled" {...props}>
+      {status === 'active' ? t('admin.clients.active') : t('admin.clients.suspended')}
     </Badge>
   );
 }
@@ -90,11 +73,7 @@ interface ClientInfoDisplayProps {
   readonly icon?: React.ReactNode;
 }
 
-export function ClientInfoDisplay({
-  label,
-  value,
-  icon,
-}: ClientInfoDisplayProps) {
+export function ClientInfoDisplay({ label, value, icon }: ClientInfoDisplayProps) {
   return (
     <Box>
       <Text size="sm" c="dimmed" mb={4}>
@@ -117,8 +96,8 @@ interface ClientBasicInfoProps {
   readonly client: Client;
 }
 
-export function ClientBasicInfo({client}: ClientBasicInfoProps) {
-  const {t} = useTranslation();
+export function ClientBasicInfo({ client }: ClientBasicInfoProps) {
+  const { t } = useTranslation();
 
   return (
     <>
@@ -157,8 +136,8 @@ interface RootUserInfoProps {
   readonly rootUser: Client['rootUser'];
 }
 
-export function RootUserInfo({rootUser}: RootUserInfoProps) {
-  const {t} = useTranslation();
+export function RootUserInfo({ rootUser }: RootUserInfoProps) {
+  const { t } = useTranslation();
 
   return (
     <>
@@ -219,7 +198,7 @@ export function ClientActionModal({
   onConfirm,
   confirmButtonColor,
 }: ClientActionModalProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const getTitle = () => {
     switch (actionType) {
@@ -273,18 +252,11 @@ export function ClientActionModal({
   };
 
   return (
-    <Modal
-      centered
-      opened={opened}
-      title={<Title order={3}>{getTitle()}</Title>}
-      onClose={onClose}
-    >
+    <Modal centered opened={opened} title={<Title order={3}>{getTitle()}</Title>} onClose={onClose}>
       <Stack gap="md">
         {actionType === 'suspend' && (
           <>
-            <Text>
-              {t('admin.clients.confirmSuspendMessage', {name: clientName})}
-            </Text>
+            <Text>{t('admin.clients.confirmSuspendMessage', { name: clientName })}</Text>
 
             <TextInput
               required
@@ -294,35 +266,23 @@ export function ClientActionModal({
               onChange={(e) => onSuspendReasonChange?.(e.currentTarget.value)}
             />
 
-            <Alert
-              icon={<IconAlertTriangle size={16} />}
-              color="yellow"
-              variant="light"
-            >
+            <Alert icon={<IconAlertTriangle size={16} />} color="yellow" variant="light">
               {t('admin.clients.suspendWarning')}
             </Alert>
           </>
         )}
 
         {actionType === 'reactivate' && (
-          <Text>
-            {t('admin.clients.confirmActivateMessage', {name: clientName})}
-          </Text>
+          <Text>{t('admin.clients.confirmActivateMessage', { name: clientName })}</Text>
         )}
 
         {actionType === 'delete' && (
           <>
-            <Alert
-              icon={<IconAlertTriangle size={16} />}
-              color="red"
-              variant="filled"
-            >
+            <Alert icon={<IconAlertTriangle size={16} />} color="red" variant="filled">
               {t('admin.clients.deleteWarning')}
             </Alert>
 
-            <Text c="dimmed">
-              {t('admin.clients.confirmDeleteMessage', {name: clientName})}
-            </Text>
+            <Text c="dimmed">{t('admin.clients.confirmDeleteMessage', { name: clientName })}</Text>
 
             <TextInput
               required
@@ -332,9 +292,7 @@ export function ClientActionModal({
               })}
               placeholder={clientCode}
               value={deleteConfirmCode}
-              onChange={(e) =>
-                onDeleteConfirmCodeChange?.(e.currentTarget.value)
-              }
+              onChange={(e) => onDeleteConfirmCodeChange?.(e.currentTarget.value)}
             />
 
             <TextInput
@@ -385,17 +343,13 @@ export function ClientActionMenu({
   onDelete,
   size = 'sm',
 }: ClientActionMenuProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const isSuspended = client.status === 'suspended';
 
   return (
     <Menu shadow="md" width={200}>
       <Menu.Target>
-        <ActionIcon
-          variant="light"
-          size={size}
-          title={t('admin.clients.moreActions')}
-        >
+        <ActionIcon variant="light" size={size} title={t('admin.clients.moreActions')}>
           <IconDotsVertical size={size === 'sm' ? 14 : 16} />
         </ActionIcon>
       </Menu.Target>
@@ -410,20 +364,12 @@ export function ClientActionMenu({
             {t('admin.clients.activateClient')}
           </Menu.Item>
         ) : (
-          <Menu.Item
-            leftSection={<IconBan size={14} />}
-            color="yellow"
-            onClick={onSuspend}
-          >
+          <Menu.Item leftSection={<IconBan size={14} />} color="yellow" onClick={onSuspend}>
             {t('admin.clients.suspendClient')}
           </Menu.Item>
         )}
         <Menu.Divider />
-        <Menu.Item
-          leftSection={<IconTrash size={14} />}
-          color="red"
-          onClick={onDelete}
-        >
+        <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={onDelete}>
           {t('admin.clients.deleteClient')}
         </Menu.Item>
       </Menu.Dropdown>
@@ -438,7 +384,7 @@ export function ClientCard({
   onDelete,
   onViewDetails,
 }: ClientCardProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const isSuspended = client.status === 'suspended';
 
   return (
@@ -447,11 +393,11 @@ export function ClientCard({
       shadow="sm"
       padding="lg"
       radius="md"
-      style={isSuspended ? {opacity: 0.7} : undefined}
+      style={isSuspended ? { opacity: 0.7 } : undefined}
     >
       <Stack gap="md">
         <Group justify="space-between" align="flex-start">
-          <Stack gap={4} style={{flex: 1}}>
+          <Stack gap={4} style={{ flex: 1 }}>
             <Group gap="xs" wrap="nowrap">
               <Text truncate fw={700} size="lg">
                 {client.clientName}
@@ -504,7 +450,7 @@ export function ClientCard({
         <Group
           justify="space-between"
           pt="md"
-          style={{borderTop: '1px solid var(--mantine-color-gray-3)'}}
+          style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}
         >
           <Group gap="xs" c="dimmed">
             <IconCalendar size={14} />
@@ -523,10 +469,8 @@ interface ClientRolesSectionProps {
   readonly roles: RoleDetail[];
 }
 
-export const ClientRolesSection = React.memo(function ({
-  roles,
-}: ClientRolesSectionProps) {
-  const {t} = useTranslation();
+export const ClientRolesSection = React.memo(function ({ roles }: ClientRolesSectionProps) {
+  const { t } = useTranslation();
 
   const columns: Array<TableColumn<RoleDetail>> = [
     {
@@ -621,7 +565,7 @@ export const ClientFeatureFlagsSection = React.memo(function ({
   clientId,
   onUpdate,
 }: ClientFeatureFlagsSectionProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [expandedFlags, setExpandedFlags] = useState<Set<string>>(new Set());
   const [updating, setUpdating] = useState<Set<string>>(new Set());
 
@@ -657,17 +601,11 @@ export const ClientFeatureFlagsSection = React.memo(function ({
         });
       }
 
-      showSuccessNotification(
-        t('common.success'),
-        t('admin.clients.featureFlagUpdated'),
-      );
+      showSuccessNotification(t('common.success'), t('admin.clients.featureFlagUpdated'));
       onUpdate?.();
     } catch (error) {
       console.log(error);
-      showErrorNotification(
-        t('common.error'),
-        t('admin.clients.featureFlagUpdateFailed'),
-      );
+      showErrorNotification(t('common.error'), t('admin.clients.featureFlagUpdateFailed'));
     } finally {
       setUpdating((prev) => {
         const next = new Set(prev);
@@ -695,17 +633,11 @@ export const ClientFeatureFlagsSection = React.memo(function ({
         description: flag.description,
         rolloutPercentage: flag.rolloutPercentage,
       });
-      showSuccessNotification(
-        t('common.success'),
-        t('admin.clients.featureFlagValueUpdated'),
-      );
+      showSuccessNotification(t('common.success'), t('admin.clients.featureFlagValueUpdated'));
       onUpdate?.();
     } catch (error) {
       console.log(error);
-      showErrorNotification(
-        t('common.error'),
-        t('admin.clients.featureFlagUpdateFailed'),
-      );
+      showErrorNotification(t('common.error'), t('admin.clients.featureFlagUpdateFailed'));
     } finally {
       setUpdating((prev) => {
         const next = new Set(prev);
@@ -731,11 +663,7 @@ export const ClientFeatureFlagsSection = React.memo(function ({
               toggleExpanded(flag.id ?? flag.key);
             }}
           >
-            {isExpanded ? (
-              <IconChevronUp size={16} />
-            ) : (
-              <IconChevronDown size={16} />
-            )}
+            {isExpanded ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
           </ActionIcon>
         ) : null;
       },
@@ -754,9 +682,7 @@ export const ClientFeatureFlagsSection = React.memo(function ({
       label: t('admin.clients.featureFlagStatus'),
       render: (flag) => (
         <Badge color={flag.enabled ? 'green' : 'red'} variant="filled">
-          {flag.enabled
-            ? t('admin.clients.enabled')
-            : t('admin.clients.disabled')}
+          {flag.enabled ? t('admin.clients.enabled') : t('admin.clients.disabled')}
         </Badge>
       ),
     },
@@ -813,10 +739,7 @@ export const ClientFeatureFlagsSection = React.memo(function ({
         {rowContent}
         {isExpanded && hasValues ? (
           <Table.Tr key={`${flag.id ?? flag.key}-expanded`}>
-            <Table.Td
-              colSpan={7}
-              style={{backgroundColor: 'var(--mantine-color-gray-0)'}}
-            >
+            <Table.Td colSpan={7} style={{ backgroundColor: 'var(--mantine-color-gray-0)' }}>
               <Box p="md">
                 <Stack gap="xs">
                   {Object.entries(flag.value || {}).map(([key, value]) => (
@@ -827,12 +750,8 @@ export const ClientFeatureFlagsSection = React.memo(function ({
                       <Switch
                         size="sm"
                         checked={value}
-                        disabled={
-                          !flag.enabled || updating.has(`${flag.key}-${key}`)
-                        }
-                        onChange={async () =>
-                          handleToggleValue(flag, key, value)
-                        }
+                        disabled={!flag.enabled || updating.has(`${flag.key}-${key}`)}
+                        onChange={async () => handleToggleValue(flag, key, value)}
                       />
                     </Group>
                   ))}
@@ -867,18 +786,14 @@ interface ClientUsersSectionProps {
   readonly users: ClientUser[];
 }
 
-export const ClientUsersSection = React.memo(function ({
-  users,
-}: ClientUsersSectionProps) {
-  const {t} = useTranslation();
+export const ClientUsersSection = React.memo(function ({ users }: ClientUsersSectionProps) {
+  const { t } = useTranslation();
 
   const columns: Array<FilterableColumn<ClientUser>> = [
     {
       key: 'userName',
       label: t('admin.clients.userName'),
-      render: (user) => (
-        <Text fw={500}>{user.userName || user.email.split('@')[0]}</Text>
-      ),
+      render: (user) => <Text fw={500}>{user.userName || user.email.split('@')[0]}</Text>,
     },
     {
       key: 'email',
@@ -968,16 +883,13 @@ export const ClientUsersSection = React.memo(function ({
       key: 'roles',
       label: t('admin.clients.roles'),
       getValue: (user) =>
-        user.roles.map((role) => role.displayName).join('; ') ||
-        t('admin.clients.noRoles'),
+        user.roles.map((role) => role.displayName).join('; ') || t('admin.clients.noRoles'),
     },
     {
       key: 'isRoot',
       label: t('admin.clients.userType'),
       getValue: (user) =>
-        user.isRoot
-          ? t('admin.clients.rootUser')
-          : t('admin.clients.regularUser'),
+        user.isRoot ? t('admin.clients.rootUser') : t('admin.clients.regularUser'),
     },
     {
       key: 'createdAt',
@@ -1005,13 +917,7 @@ export const ClientUsersSection = React.memo(function ({
         height: 600,
         rowHeight: 60,
       }}
-      extraActions={
-        <ExportButton
-          data={users}
-          columns={exportColumns}
-          filename="client-users"
-        />
-      }
+      extraActions={<ExportButton data={users} columns={exportColumns} filename="client-users" />}
     />
   );
 });

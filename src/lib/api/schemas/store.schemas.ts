@@ -6,8 +6,8 @@ import {
   paginationSchema,
   timestampSchema,
 } from './common.schemas';
-import {generateRandomString} from '@/utils/string';
-import {permissionMatrix} from '@/services/staff';
+import { generateRandomString } from '@/utils/string';
+import { permissionMatrix } from '@/services/staff';
 
 // Store schemas
 export const StoreSchema = z.object({
@@ -115,8 +115,7 @@ export const StoreStaffSchema = z
       },
       carryOverDays: 5,
       role,
-      accessPermissions:
-        permissionMatrix[role as keyof typeof permissionMatrix],
+      accessPermissions: permissionMatrix[role as keyof typeof permissionMatrix],
       status: val.isActive ? 'active' : 'inactive',
     };
   });
@@ -161,17 +160,11 @@ export const StoreOperatingHoursRequestSchema = z.object({
   isClosed: z.boolean(),
 });
 
-export const GetStoreOperatingHoursResponseSchema = z.array(
-  StoreOperatingHoursSchema,
-);
+export const GetStoreOperatingHoursResponseSchema = z.array(StoreOperatingHoursSchema);
 
-export const UpdateStoreOperatingHoursRequestSchema = z.array(
-  StoreOperatingHoursRequestSchema,
-);
+export const UpdateStoreOperatingHoursRequestSchema = z.array(StoreOperatingHoursRequestSchema);
 
-export const UpdateStoreOperatingHoursResponseSchema = z.array(
-  StoreOperatingHoursSchema,
-);
+export const UpdateStoreOperatingHoursResponseSchema = z.array(StoreOperatingHoursSchema);
 
 // Type exports
 export type Store = z.infer<typeof StoreSchema>;
@@ -182,30 +175,16 @@ export type UpdateStoreResponse = z.infer<typeof UpdateStoreResponseSchema>;
 export type GetStoresResponse = z.infer<typeof GetStoresResponseSchema>;
 
 export type StoreStaff = z.infer<typeof StoreStaffSchema>;
-export type CreateStoreStaffRequest = z.infer<
-  typeof CreateStoreStaffRequestSchema
->;
-export type CreateStoreStaffResponse = z.infer<
-  typeof CreateStoreStaffResponseSchema
->;
+export type CreateStoreStaffRequest = z.infer<typeof CreateStoreStaffRequestSchema>;
+export type CreateStoreStaffResponse = z.infer<typeof CreateStoreStaffResponseSchema>;
 export type GetStoreStaffResponse = z.infer<typeof GetStoreStaffResponseSchema>;
-export type UpdateStoreStaffRequest = z.infer<
-  typeof UpdateStoreStaffRequestSchema
->;
-export type UpdateStoreStaffResponse = z.infer<
-  typeof UpdateStoreStaffResponseSchema
->;
-export type DeleteStoreStaffResponse = z.infer<
-  typeof DeleteStoreStaffResponseSchema
->;
+export type UpdateStoreStaffRequest = z.infer<typeof UpdateStoreStaffRequestSchema>;
+export type UpdateStoreStaffResponse = z.infer<typeof UpdateStoreStaffResponseSchema>;
+export type DeleteStoreStaffResponse = z.infer<typeof DeleteStoreStaffResponseSchema>;
 
 export type StoreOperatingHours = z.infer<typeof StoreOperatingHoursSchema>;
-export type StoreOperatingHoursRequest = z.infer<
-  typeof StoreOperatingHoursRequestSchema
->;
-export type GetStoreOperatingHoursResponse = z.infer<
-  typeof GetStoreOperatingHoursResponseSchema
->;
+export type StoreOperatingHoursRequest = z.infer<typeof StoreOperatingHoursRequestSchema>;
+export type GetStoreOperatingHoursResponse = z.infer<typeof GetStoreOperatingHoursResponseSchema>;
 export type UpdateStoreOperatingHoursRequest = z.infer<
   typeof UpdateStoreOperatingHoursRequestSchema
 >;

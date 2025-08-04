@@ -1,11 +1,11 @@
-import {Alert} from '@mantine/core';
-import {IconAlertTriangle} from '@tabler/icons-react';
+import { Alert } from '@mantine/core';
+import { IconAlertTriangle } from '@tabler/icons-react';
 
 type ErrorAlertProps = {
   readonly error?: string;
   readonly clearError?: () => void;
 };
-export function ErrorAlert({error, clearError}: ErrorAlertProps) {
+export function ErrorAlert({ error, clearError }: ErrorAlertProps) {
   if (!error) {
     return null;
   }

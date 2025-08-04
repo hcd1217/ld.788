@@ -1,24 +1,16 @@
-import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router';
-import {
-  Stack,
-  Space,
-  Button,
-  PasswordInput,
-  Title,
-  Text,
-  Alert,
-} from '@mantine/core';
-import {IconAlertCircle, IconShieldCheck} from '@tabler/icons-react';
-import {useForm} from '@mantine/form';
-import {useAppStore} from '@/stores/useAppStore';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAuthForm} from '@/hooks/useAuthForm';
-import {GuestLayout} from '@/components/layouts/GuestLayout';
-import {FormContainer} from '@/components/form/FormContainer';
-import {AuthAlert} from '@/components/auth';
-import {isDevelopment} from '@/utils/env';
-import {ROUTERS} from '@/config/routeConfig';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
+import { Stack, Space, Button, PasswordInput, Title, Text, Alert } from '@mantine/core';
+import { IconAlertCircle, IconShieldCheck } from '@tabler/icons-react';
+import { useForm } from '@mantine/form';
+import { useAppStore } from '@/stores/useAppStore';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAuthForm } from '@/hooks/useAuthForm';
+import { GuestLayout } from '@/components/layouts/GuestLayout';
+import { FormContainer } from '@/components/form/FormContainer';
+import { AuthAlert } from '@/components/auth';
+import { isDevelopment } from '@/utils/env';
+import { ROUTERS } from '@/config/routeConfig';
 
 type AdminLoginFormValues = {
   accessKey: string;
@@ -26,9 +18,9 @@ type AdminLoginFormValues = {
 
 export function AdminLoginPage() {
   const navigate = useNavigate();
-  const {adminLogin, adminAuthenticated} = useAppStore();
+  const { adminLogin, adminAuthenticated } = useAppStore();
   const [mounted, setMounted] = useState(false);
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const form = useForm<AdminLoginFormValues>({
     initialValues: isDevelopment
@@ -39,12 +31,11 @@ export function AdminLoginPage() {
           accessKey: '',
         },
     validate: {
-      accessKey: (value) =>
-        value.trim().length === 0 ? t('validation.fieldRequired') : null,
+      accessKey: (value) => (value.trim().length === 0 ? t('validation.fieldRequired') : null),
     },
   });
 
-  const {isLoading, showAlert, clearErrors, handleSubmit} = useAuthForm(form, {
+  const { isLoading, showAlert, clearErrors, handleSubmit } = useAuthForm(form, {
     successTitle: t('admin.loginSuccess'),
     successMessage: t('admin.loginSuccessMessage'),
     errorTitle: t('admin.loginFailed'),
@@ -62,9 +53,7 @@ export function AdminLoginPage() {
   useEffect(() => {
     setMounted(true);
     const timer = setTimeout(() => {
-      const input = document.querySelector<HTMLInputElement>(
-        'input[name="accessKey"]',
-      );
+      const input = document.querySelector<HTMLInputElement>('input[name="accessKey"]');
       input?.focus();
     }, 300);
     return () => {
@@ -98,7 +87,7 @@ export function AdminLoginPage() {
               type="text"
               name="username"
               autoComplete="username"
-              style={{display: 'none'}}
+              style={{ display: 'none' }}
               aria-hidden="true"
               tabIndex={-1}
             />
@@ -119,20 +108,11 @@ export function AdminLoginPage() {
               onClose={clearErrors}
             />
 
-            <Alert
-              icon={<IconAlertCircle size={16} />}
-              variant="light"
-              color="blue"
-            >
+            <Alert icon={<IconAlertCircle size={16} />} variant="light" color="blue">
               {t('admin.securityNotice')}
             </Alert>
 
-            <Button
-              fullWidth
-              variant="filled"
-              type="submit"
-              disabled={isLoading}
-            >
+            <Button fullWidth variant="filled" type="submit" disabled={isLoading}>
               {t('admin.signIn')}
             </Button>
           </Stack>

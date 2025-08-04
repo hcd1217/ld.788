@@ -1,4 +1,4 @@
-import {getLocaleConfig} from '@/config/localeConfig';
+import { getLocaleConfig } from '@/config/localeConfig';
 import i18n from '@/lib/i18n';
 
 export function generateRandomString(length: number): string {
@@ -15,9 +15,7 @@ export function salaryFormat(salary: number) {
 }
 
 export function formatPhoneNumber(phoneNumber: string) {
-  return phoneNumber
-    .replace('+84', '0')
-    .replace(/(\d{4})(\d{3})(\d+)/, '$1-$2-$3');
+  return phoneNumber.replace('+84', '0').replace(/(\d{4})(\d{3})(\d+)/, '$1-$2-$3');
 }
 
 export function formatDate(date: string | Date) {
@@ -194,12 +192,8 @@ export function renderFullName({
   const isVietnameseLocale = i18n.language === 'vi';
 
   // Normalize Vietnamese characters if displaying in English
-  const normalizedFirstName = isVietnameseLocale
-    ? firstName
-    : normalizeVietnameseChars(firstName);
-  const normalizedLastName = isVietnameseLocale
-    ? lastName
-    : normalizeVietnameseChars(lastName);
+  const normalizedFirstName = isVietnameseLocale ? firstName : normalizeVietnameseChars(firstName);
+  const normalizedLastName = isVietnameseLocale ? lastName : normalizeVietnameseChars(lastName);
 
   if (localeConfig.nameOrder === 'family-first') {
     return `${normalizedLastName} ${normalizedFirstName}`;

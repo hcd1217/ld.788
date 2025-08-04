@@ -1,18 +1,13 @@
-import {Grid, Text, UnstyledButton, Stack} from '@mantine/core';
-import {useNavigate} from 'react-router';
-import {
-  IconAddressBook,
-  IconDots,
-  IconHome,
-  IconShoppingCart,
-} from '@tabler/icons-react';
+import { Grid, Text, UnstyledButton, Stack } from '@mantine/core';
+import { useNavigate } from 'react-router';
+import { IconAddressBook, IconDots, IconHome, IconShoppingCart } from '@tabler/icons-react';
 import classes from './CommonMobileFooter.module.css';
-import {useTranslation} from '@/hooks/useTranslation';
-import {ROUTERS} from '@/config/routeConfig';
+import { useTranslation } from '@/hooks/useTranslation';
+import { ROUTERS } from '@/config/routeConfig';
 
 export function CommonMobileFooter() {
   const navigate = useNavigate();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigationItems = [
     {
       label: t('common.home'),
@@ -53,11 +48,7 @@ export function CommonMobileFooter() {
               w="100%"
             >
               <Stack gap={4} align="center">
-                <Icon
-                  size={24}
-                  stroke={isActive ? 2.5 : 1.5}
-                  className={classes.navIcon}
-                />
+                <Icon size={24} stroke={isActive ? 2.5 : 1.5} className={classes.navIcon} />
                 <Text size="xs" fw={isActive ? 600 : 400}>
                   {item.label}
                 </Text>

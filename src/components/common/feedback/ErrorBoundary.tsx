@@ -1,8 +1,8 @@
-import {Component, type ReactNode, type ErrorInfo} from 'react';
-import {Alert, Button, Stack, Text, Title} from '@mantine/core';
-import {IconAlertTriangle} from '@tabler/icons-react';
-import {addComponentError} from '@/stores/error';
-import {isDevelopment} from '@/utils/env';
+import { Component, type ReactNode, type ErrorInfo } from 'react';
+import { Alert, Button, Stack, Text, Title } from '@mantine/core';
+import { IconAlertTriangle } from '@tabler/icons-react';
+import { addComponentError } from '@/stores/error';
+import { isDevelopment } from '@/utils/env';
 
 type Props = {
   readonly children: ReactNode;
@@ -20,10 +20,10 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   static getDerivedStateFromError(error: Error): State {
-    return {hasError: true, error};
+    return { hasError: true, error };
   }
 
-  state: State = {hasError: false, error: undefined};
+  state: State = { hasError: false, error: undefined };
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log to console in development
@@ -32,15 +32,11 @@ export class ErrorBoundary extends Component<Props, State> {
     }
 
     // Add to error store
-    addComponentError(
-      error.message,
-      errorInfo.componentStack ?? '',
-      error.cause as Error,
-    );
+    addComponentError(error.message, errorInfo.componentStack ?? '', error.cause as Error);
   }
 
   handleReset = (): void => {
-    this.setState({hasError: false, error: undefined});
+    this.setState({ hasError: false, error: undefined });
   };
 
   render(): ReactNode {
@@ -71,12 +67,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 </Text>
               ) : null}
             </div>
-            <Button
-              color="red"
-              size="sm"
-              variant="white"
-              onClick={this.handleReset}
-            >
+            <Button color="red" size="sm" variant="white" onClick={this.handleReset}>
               Try Again
             </Button>
           </Stack>

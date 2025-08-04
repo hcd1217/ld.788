@@ -23,17 +23,17 @@ import {
   IconBuildingStore,
   IconUsersGroup,
 } from '@tabler/icons-react';
-import {Navigate, useNavigate} from 'react-router';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAppStore} from '@/stores/useAppStore';
-import {useIsDarkMode} from '@/hooks/useIsDarkMode';
-import {isDevelopment} from '@/utils/env';
-import {ROUTERS} from '@/config/routeConfig';
+import { Navigate, useNavigate } from 'react-router';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/stores/useAppStore';
+import { useIsDarkMode } from '@/hooks/useIsDarkMode';
+import { isDevelopment } from '@/utils/env';
+import { ROUTERS } from '@/config/routeConfig';
 
 export function MorePage() {
   const navigate = useNavigate();
-  const {t} = useTranslation();
-  const {user, logout} = useAppStore();
+  const { t } = useTranslation();
+  const { user, logout } = useAppStore();
   const isDarkMode = useIsDarkMode();
 
   const handleLogout = () => {
@@ -127,18 +127,13 @@ export function MorePage() {
             padding: '0 16px',
           }}
         >
-          <Box style={{maxWidth: '600px', width: '100%'}}>
+          <Box style={{ maxWidth: '600px', width: '100%' }}>
             <Card shadow="sm" padding="lg" radius="md">
               <Title order={1} mb="lg">
                 {t('common.more')}
               </Title>
 
-              <Card
-                withBorder
-                p="md"
-                mb="lg"
-                bg={isDarkMode ? 'dark.6' : 'gray.0'}
-              >
+              <Card withBorder p="md" mb="lg" bg={isDarkMode ? 'dark.6' : 'gray.0'}>
                 <Group>
                   <IconUser size={20} />
                   <div>
@@ -161,7 +156,7 @@ export function MorePage() {
                         key={item.title}
                         withBorder
                         p="md"
-                        style={{cursor: 'pointer'}}
+                        style={{ cursor: 'pointer' }}
                         onClick={item.onClick}
                       >
                         <Group justify="space-between">
@@ -181,7 +176,7 @@ export function MorePage() {
                           </Group>
                           <IconExternalLink
                             size={16}
-                            style={{color: 'var(--mantine-color-gray-5)'}}
+                            style={{ color: 'var(--mantine-color-gray-5)' }}
                           />
                         </Group>
                       </Card>
@@ -203,7 +198,7 @@ export function MorePage() {
                           key={item.title}
                           withBorder
                           p="md"
-                          style={{cursor: 'pointer'}}
+                          style={{ cursor: 'pointer' }}
                           onClick={item.onClick}
                         >
                           <Group justify="space-between">
@@ -223,7 +218,7 @@ export function MorePage() {
                             </Group>
                             <IconExternalLink
                               size={16}
-                              style={{color: 'var(--mantine-color-gray-5)'}}
+                              style={{ color: 'var(--mantine-color-gray-5)' }}
                             />
                           </Group>
                         </Card>
@@ -232,12 +227,7 @@ export function MorePage() {
                 </div>
 
                 <Divider />
-                <Button
-                  fullWidth
-                  color="red"
-                  variant="light"
-                  onClick={handleLogout}
-                >
+                <Button fullWidth color="red" variant="light" onClick={handleLogout}>
                   <IconLogout size={rem(16)} />
                   <Text ml="xs">{t('common.logout')}</Text>
                 </Button>

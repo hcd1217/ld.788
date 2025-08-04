@@ -1,9 +1,20 @@
-import {Modal, Text, Stack, Alert, Button, TextInput, Group, FileInput, Tabs, rem} from '@mantine/core';
-import {IconAlertCircle, IconUpload, IconClipboard, IconCamera} from '@tabler/icons-react';
-import {useState} from 'react';
-import {Scanner, type IDetectedBarcode} from '@yudiel/react-qr-scanner';
+import {
+  Modal,
+  Text,
+  Stack,
+  Alert,
+  Button,
+  TextInput,
+  Group,
+  FileInput,
+  Tabs,
+  rem,
+} from '@mantine/core';
+import { IconAlertCircle, IconUpload, IconClipboard, IconCamera } from '@tabler/icons-react';
+import { useState } from 'react';
+import { Scanner, type IDetectedBarcode } from '@yudiel/react-qr-scanner';
 import jsQR from 'jsqr';
-import {useTranslation} from '@/hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type QrScannerModalProps = {
   readonly opened: boolean;
@@ -11,8 +22,8 @@ type QrScannerModalProps = {
   readonly onScan: (data: string) => void;
 };
 
-export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
-  const {t} = useTranslation();
+export function QrScannerModal({ opened, onClose, onScan }: QrScannerModalProps) {
+  const { t } = useTranslation();
   const [error, setError] = useState<string | undefined>(undefined);
   const [manualInput, setManualInput] = useState('');
   const [activeTab, setActiveTab] = useState<string | null>('camera');
@@ -61,7 +72,7 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
       // Create an image element to load the file
       const img = new Image();
       const url = URL.createObjectURL(file);
-      
+
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
         img.onerror = () => reject(new Error('Failed to load image'));
@@ -71,7 +82,7 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
       // Create a canvas to extract image data
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      
+
       if (!context) {
         throw new Error('Failed to create canvas context');
       }
@@ -79,19 +90,19 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
       // Set canvas size to match the image
       canvas.width = img.width;
       canvas.height = img.height;
-      
+
       // Draw the image on the canvas
       context.drawImage(img, 0, 0);
-      
+
       // Get the image data
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-      
+
       // Decode QR code using jsQR
       const code = jsQR(imageData.data, imageData.width, imageData.height);
-      
+
       // Clean up the object URL
       URL.revokeObjectURL(url);
-      
+
       if (code && code.data) {
         // QR code found, pass the data
         onScan(code.data);
@@ -116,15 +127,17 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
   const handlePaste = async () => {
     try {
       const clipboardItems = await navigator.clipboard.read();
-      
+
       for (const item of clipboardItems) {
         if (item.types.includes('image/png') || item.types.includes('image/jpeg')) {
-          const blob = await item.getType(item.types.find(type => type.startsWith('image/')) || 'image/png');
+          const blob = await item.getType(
+            item.types.find((type) => type.startsWith('image/')) || 'image/png',
+          );
           void processImage(blob);
           return;
         }
       }
-      
+
       // If no image found, try text
       const text = await navigator.clipboard.readText();
       if (text) {
@@ -167,7 +180,16 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
           <Tabs.Panel value="camera" pt="md">
             {opened && activeTab === 'camera' && (
               <Stack gap="md">
-                <div style={{position: 'relative', width: '100%', maxWidth: 400, margin: '0 auto', borderRadius: 8, overflow: 'hidden'}}>
+                <div
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    maxWidth: 400,
+                    margin: '0 auto',
+                    borderRadius: 8,
+                    overflow: 'hidden',
+                  }}
+                >
                   <Scanner
                     onScan={handleQrScan}
                     onError={handleQrError}
@@ -176,11 +198,11 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
                     scanDelay={500}
                     styles={{
                       container: { width: '100%' },
-                      video: { width: '100%', borderRadius: 8 }
+                      video: { width: '100%', borderRadius: 8 },
                     }}
                   />
                 </div>
-                
+
                 <Text size="sm" c="dimmed" ta="center">
                   {t('auth.magicLink.scanningQrCode')}
                 </Text>
@@ -197,7 +219,7 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
                 onChange={handleFileUpload}
                 disabled={isProcessing}
               />
-              
+
               <Button
                 fullWidth
                 variant="default"
@@ -233,11 +255,7 @@ export function QrScannerModal({opened, onClose, onScan}: QrScannerModalProps) {
             disabled={isProcessing}
           />
           <Group grow>
-            <Button
-              variant="default"
-              onClick={handleClose}
-              disabled={isProcessing}
-            >
+            <Button variant="default" onClick={handleClose} disabled={isProcessing}>
               {t('common.cancel')}
             </Button>
             <Button

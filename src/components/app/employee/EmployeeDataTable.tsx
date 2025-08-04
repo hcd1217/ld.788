@@ -38,9 +38,7 @@ export function EmployeeDataTable({
             <Table.Th>{t('employee.startDate')}</Table.Th>
             <Table.Th>{t('employee.endDate')}</Table.Th>
             <Table.Th>{t('employee.status')}</Table.Th>
-            {noAction ? null : (
-              <Table.Th style={{ width: 100 }}>{t('common.actions')}</Table.Th>
-            )}
+            {noAction ? null : <Table.Th style={{ width: 100 }}>{t('common.actions')}</Table.Th>}
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -59,9 +57,7 @@ export function EmployeeDataTable({
                   <Group gap="sm" justify="start">
                     {/* @todo: custom this */}
                     <Text fw={400}>{employee.fullName}</Text>
-                    {employee?.position ? (
-                      <Text c="dimmed"> ({employee?.position})</Text>
-                    ) : null}
+                    {employee?.position ? <Text c="dimmed"> ({employee?.position})</Text> : null}
                   </Group>
                 </Table.Td>
                 <Table.Td>{employee.unit ?? '-'}</Table.Td>
@@ -71,16 +67,10 @@ export function EmployeeDataTable({
                   <WorkTypeBadge workType={employee.workType} />
                 </Table.Td>
                 <Table.Td>
-                  {employee.startDate
-                    ? formatDate(employee.startDate.toString())
-                    : '-'
-                  }
+                  {employee.startDate ? formatDate(employee.startDate.toString()) : '-'}
                 </Table.Td>
                 <Table.Td>
-                  {employee.endDate
-                    ? formatDate(employee.endDate.toString())
-                    : '-'
-                  }
+                  {employee.endDate ? formatDate(employee.endDate.toString()) : '-'}
                 </Table.Td>
                 <Table.Td>
                   <StatusBadge isActive={employee.isActive} />
@@ -93,15 +83,15 @@ export function EmployeeDataTable({
                       onDeactivate={
                         onDeactivateEmployee
                           ? () => {
-                            onDeactivateEmployee(employee);
-                          }
+                              onDeactivateEmployee(employee);
+                            }
                           : undefined
                       }
                       onActivate={
                         onActivateEmployee
                           ? () => {
-                            onActivateEmployee(employee);
-                          }
+                              onActivateEmployee(employee);
+                            }
                           : undefined
                       }
                     />

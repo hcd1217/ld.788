@@ -1,15 +1,15 @@
-import {Accordion, Stack, Box, Text} from '@mantine/core';
+import { Accordion, Stack, Box, Text } from '@mantine/core';
 import {
   IconInfoCircle,
   IconClock,
   IconCurrencyDollar,
   IconShoppingCart,
 } from '@tabler/icons-react';
-import {EmployeeBasicInfoCard} from './EmployeeBasicInfoCard';
-import {EmployeeDangerZone} from './EmployeeDangerZone';
-import {ComingSoonCard} from '@/components/common/ui/ComingSoonCard';
-import {useTranslation} from '@/hooks/useTranslation';
-import type {Employee} from '@/services/hr/employee';
+import { EmployeeBasicInfoCard } from './EmployeeBasicInfoCard';
+import { EmployeeDangerZone } from './EmployeeDangerZone';
+import { ComingSoonCard } from '@/components/common/ui/ComingSoonCard';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { Employee } from '@/services/hr/employee';
 
 type EmployeeDetailAccordionProps = {
   readonly employee: Employee;
@@ -24,7 +24,7 @@ export function EmployeeDetailAccordion({
   onDeactivate,
   onEdit,
 }: EmployeeDetailAccordionProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <Accordion defaultValue="info" chevronPosition="right" p={0}>
@@ -60,12 +60,7 @@ export function EmployeeDetailAccordion({
         <Accordion.Panel>
           <Box pt="md">
             <ComingSoonCard
-              icon={
-                <IconCurrencyDollar
-                  size={48}
-                  color="var(--mantine-color-gray-5)"
-                />
-              }
+              icon={<IconCurrencyDollar size={48} color="var(--mantine-color-gray-5)" />}
               title={t('employee.salaryConfig')}
             />
           </Box>
@@ -79,12 +74,7 @@ export function EmployeeDetailAccordion({
         <Accordion.Panel>
           <Box pt="md">
             <ComingSoonCard
-              icon={
-                <IconShoppingCart
-                  size={48}
-                  color="var(--mantine-color-gray-5)"
-                />
-              }
+              icon={<IconShoppingCart size={48} color="var(--mantine-color-gray-5)" />}
               title={t('employee.purchasingOrder')}
             />
           </Box>

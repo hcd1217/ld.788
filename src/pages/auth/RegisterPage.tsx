@@ -1,17 +1,17 @@
-import {useNavigate} from 'react-router';
-import {Stack, Space, Button, TextInput, PasswordInput} from '@mantine/core';
-import {useForm} from '@mantine/form';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAuthForm} from '@/hooks/useAuthForm';
-import {GuestLayout} from '@/components/layouts/GuestLayout';
-import {clientService} from '@/services/client';
-import {getFormValidators} from '@/utils/validation';
-import {FirstNameAndLastNameInForm} from '@/components/form/FirstNameAndLastNameInForm';
-import {FormContainer} from '@/components/form/FormContainer';
-import {AuthHeader, AuthAlert, AuthFormLink} from '@/components/auth';
-import {generateRandomString} from '@/utils/string';
-import {isProduction} from '@/utils/env';
-import {ROUTERS, getClientLoginRoute} from '@/config/routeConfig';
+import { useNavigate } from 'react-router';
+import { Stack, Space, Button, TextInput, PasswordInput } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAuthForm } from '@/hooks/useAuthForm';
+import { GuestLayout } from '@/components/layouts/GuestLayout';
+import { clientService } from '@/services/client';
+import { getFormValidators } from '@/utils/validation';
+import { FirstNameAndLastNameInForm } from '@/components/form/FirstNameAndLastNameInForm';
+import { FormContainer } from '@/components/form/FormContainer';
+import { AuthHeader, AuthAlert, AuthFormLink } from '@/components/auth';
+import { generateRandomString } from '@/utils/string';
+import { isProduction } from '@/utils/env';
+import { ROUTERS, getClientLoginRoute } from '@/config/routeConfig';
 
 type RegisterFormValues = {
   clientCode: string;
@@ -25,7 +25,7 @@ type RegisterFormValues = {
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const form = useForm<RegisterFormValues>({
     initialValues: isProduction
@@ -58,7 +58,7 @@ export function RegisterPage() {
     ]),
   });
 
-  const {isLoading, showAlert, clearErrors, handleSubmit} = useAuthForm(form, {
+  const { isLoading, showAlert, clearErrors, handleSubmit } = useAuthForm(form, {
     successTitle: t('notifications.registrationSuccess'),
     successMessage: t('notifications.registrationSuccessMessage'),
     errorTitle: t('notifications.registrationFailed'),
@@ -66,7 +66,7 @@ export function RegisterPage() {
   });
 
   const onSubmit = handleSubmit(async (values: RegisterFormValues) => {
-    const {client} = await clientService.registerNewClient({
+    const { client } = await clientService.registerNewClient({
       clientCode: values.clientCode,
       clientName: values.clientName,
       rootUserEmail: values.email,
@@ -132,11 +132,7 @@ export function RegisterPage() {
             />
 
             <AuthAlert
-              show={
-                showAlert
-                  ? Boolean(form.errors.email && form.errors.password)
-                  : false
-              }
+              show={showAlert ? Boolean(form.errors.email && form.errors.password) : false}
               message={t('notifications.registrationFailed')}
               onClose={clearErrors}
             />

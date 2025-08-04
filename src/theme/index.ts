@@ -6,7 +6,7 @@ import {
   TextInput,
   type CSSVariablesResolver,
 } from '@mantine/core';
-import {defaultConfig, type CustomColors} from './customTheme';
+import { defaultConfig, type CustomColors } from './customTheme';
 
 export const theme = createTheme({
   primaryColor: 'brand',
@@ -81,14 +81,8 @@ export const theme = createTheme({
 
 export const resolver: CSSVariablesResolver = () => ({
   variables: _build(defaultConfig.default),
-  light: _build(
-    defaultConfig.light ?? defaultConfig.default,
-    defaultConfig.default,
-  ),
-  dark: _build(
-    defaultConfig.dark ?? defaultConfig.default,
-    defaultConfig.default,
-  ),
+  light: _build(defaultConfig.light ?? defaultConfig.default, defaultConfig.default),
+  dark: _build(defaultConfig.dark ?? defaultConfig.default, defaultConfig.default),
 });
 
 function _build(colors: CustomColors, defaultColors?: CustomColors) {
@@ -97,43 +91,27 @@ function _build(colors: CustomColors, defaultColors?: CustomColors) {
     '--app-active-color': colors.activeColor,
     '--app-inactive-color': colors.inActiveColor,
     '--app-shell-background-color':
-      colors.appShell?.backgroundColor ??
-      defaultColors?.appShell?.backgroundColor ??
-      'white',
-    '--app-shell-color':
-      colors.appShell?.color ?? defaultColors?.appShell?.color ?? 'white',
-    '--box-shadow-color':
-      colors.borderColor ?? defaultColors?.borderColor ?? 'transparent',
-    '--card-border-color':
-      colors.borderColor ?? defaultColors?.borderColor ?? 'transparent',
+      colors.appShell?.backgroundColor ?? defaultColors?.appShell?.backgroundColor ?? 'white',
+    '--app-shell-color': colors.appShell?.color ?? defaultColors?.appShell?.color ?? 'white',
+    '--box-shadow-color': colors.borderColor ?? defaultColors?.borderColor ?? 'transparent',
+    '--card-border-color': colors.borderColor ?? defaultColors?.borderColor ?? 'transparent',
     '--input-border-color': colors.inputBorderColor,
     '--menu-active-color':
-      colors.appShell?.menu?.active?.color ??
-      defaultColors?.appShell?.menu?.active?.color ??
-      '',
+      colors.appShell?.menu?.active?.color ?? defaultColors?.appShell?.menu?.active?.color ?? '',
     '--menu-active-background-color':
       colors.appShell?.menu?.active?.background ??
       defaultColors?.appShell?.menu?.active?.background ??
       '',
-    '--menu-color':
-      colors.appShell?.menu?.color ??
-      defaultColors?.appShell?.menu?.color ??
-      '',
+    '--menu-color': colors.appShell?.menu?.color ?? defaultColors?.appShell?.menu?.color ?? '',
     '--menu-background-color':
       colors.appShell?.menu?.background ??
       defaultColors?.appShell?.menu?.background ??
       'transparent',
     '--menu-hover-color':
-      colors.appShell?.menu?.hover ??
-      defaultColors?.appShell?.menu?.hover ??
-      'transparent',
+      colors.appShell?.menu?.hover ?? defaultColors?.appShell?.menu?.hover ?? 'transparent',
     '--menu-border-color':
-      colors.appShell?.menu?.border ??
-      defaultColors?.appShell?.menu?.border ??
-      'transparent',
+      colors.appShell?.menu?.border ?? defaultColors?.appShell?.menu?.border ?? 'transparent',
     '--menu-inactive-color':
-      colors.appShell?.menu?.inactive ??
-      defaultColors?.appShell?.menu?.inactive ??
-      'transparent',
+      colors.appShell?.menu?.inactive ?? defaultColors?.appShell?.menu?.inactive ?? 'transparent',
   };
 }

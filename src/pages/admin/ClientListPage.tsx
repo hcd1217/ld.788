@@ -1,58 +1,36 @@
-import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router';
-import {
-  Container,
-  Title,
-  Stack,
-  Card,
-  Group,
-  Button,
-  Text,
-  SimpleGrid,
-} from '@mantine/core';
-import {useDisclosure} from '@mantine/hooks';
-import {IconPlus, IconUsers} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {
-  useClients,
-  useClientError,
-  useClientActions,
-} from '@/stores/useClientStore';
-import {ErrorAlert, GoBack} from '@/components/common';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
+import { Container, Title, Stack, Card, Group, Button, Text, SimpleGrid } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { IconPlus, IconUsers } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useClients, useClientError, useClientActions } from '@/stores/useClientStore';
+import { ErrorAlert, GoBack } from '@/components/common';
 import {
   showErrorNotification,
   showInfoNotification,
   showSuccessNotification,
 } from '@/utils/notifications';
-import {
-  ClientCard,
-  ClientActionModal,
-} from '@/components/admin/ClientManagementComponents';
-import type {Client} from '@/lib/api';
-import {ROUTERS, getAdminClientDetailRoute} from '@/config/routeConfig';
+import { ClientCard, ClientActionModal } from '@/components/admin/ClientManagementComponents';
+import type { Client } from '@/lib/api';
+import { ROUTERS, getAdminClientDetailRoute } from '@/config/routeConfig';
 
 type Action = 'suspend' | 'reactivate' | 'delete';
 
 export function ClientListPage() {
   const navigate = useNavigate();
-  const [modalOpened, {open: openModal, close: closeModal}] =
-    useDisclosure(false);
+  const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
   const [selectedClient, setSelectedClient] = useState<Client>();
   const [actionType, setActionType] = useState<Action>('suspend');
   const [deleteConfirmCode, setDeleteConfirmCode] = useState('');
   const [deleteReason, setDeleteReason] = useState('');
   const [suspendReason, setSuspendReason] = useState('');
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const clients = useClients();
   const error = useClientError();
-  const {
-    loadClients,
-    suspendClient,
-    reactivateClient,
-    hardDeleteClient,
-    clearError,
-  } = useClientActions();
+  const { loadClients, suspendClient, reactivateClient, hardDeleteClient, clearError } =
+    useClientActions();
 
   useEffect(() => {
     const load = async () => {
@@ -135,11 +113,7 @@ export function ClientListPage() {
           return;
         }
 
-        await hardDeleteClient(
-          selectedClient.clientCode,
-          deleteConfirmCode,
-          deleteReason,
-        );
+        await hardDeleteClient(selectedClient.clientCode, deleteConfirmCode, deleteReason);
         showErrorNotification(
           t('admin.clients.clientDeleted'),
           t('admin.clients.clientDeletedMessage', {
@@ -199,7 +173,7 @@ export function ClientListPage() {
               </Stack>
             </Card>
           ) : (
-            <SimpleGrid cols={{base: 1, sm: 2, lg: 3}} spacing="lg">
+            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
               {clients.map((client) => (
                 <ClientCard
                   key={client.id}
@@ -207,9 +181,7 @@ export function ClientListPage() {
                   onSuspend={handleSuspendClient}
                   onReactivate={handleReactivateClient}
                   onDelete={handleDeleteClient}
-                  onViewDetails={(clientCode) =>
-                    navigate(getAdminClientDetailRoute(clientCode))
-                  }
+                  onViewDetails={(clientCode) => navigate(getAdminClientDetailRoute(clientCode))}
                 />
               ))}
             </SimpleGrid>

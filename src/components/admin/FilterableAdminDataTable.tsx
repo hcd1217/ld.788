@@ -8,9 +8,9 @@ import {
   Group,
   type MantineStyleProp,
 } from '@mantine/core';
-import {IconSearch, IconX} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useTableFilters} from '@/hooks/useTableFilters';
+import { IconSearch, IconX } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useTableFilters } from '@/hooks/useTableFilters';
 import {
   type SortableColumn,
   SortableAdminDataTable,
@@ -35,11 +35,7 @@ export interface FilterableAdminDataTableProps<T> {
   readonly striped?: boolean;
   readonly highlightOnHover?: boolean;
   readonly minHeight?: number | string;
-  readonly renderRow?: (
-    item: T,
-    index: number,
-    children: React.ReactNode,
-  ) => React.ReactNode;
+  readonly renderRow?: (item: T, index: number, children: React.ReactNode) => React.ReactNode;
   readonly getRowKey?: (item: T, index: number) => string | number;
   readonly tableStyles?: MantineStyleProp;
   readonly virtualScroll?:
@@ -54,9 +50,7 @@ export interface FilterableAdminDataTableProps<T> {
   readonly extraActions?: React.ReactNode;
 }
 
-export const FilterableAdminDataTable = React.memo(function <
-  T extends Record<string, unknown>,
->({
+export const FilterableAdminDataTable = React.memo(function <T extends Record<string, unknown>>({
   data,
   columns,
   emptyState,
@@ -74,12 +68,11 @@ export const FilterableAdminDataTable = React.memo(function <
   virtualScroll,
   extraActions,
 }: FilterableAdminDataTableProps<T>) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   // Determine which fields are searchable
   const effectiveSearchFields =
-    searchFields ||
-    columns.filter((col) => col.searchable !== false).map((col) => col.key);
+    searchFields || columns.filter((col) => col.searchable !== false).map((col) => col.key);
 
   const [filteredData, filters, handlers] = useTableFilters(
     data,
@@ -102,19 +95,13 @@ export const FilterableAdminDataTable = React.memo(function <
           value={filters.searchQuery}
           rightSection={
             filters.searchQuery ? (
-              <ActionIcon
-                size="sm"
-                variant="subtle"
-                onClick={() => handlers.setSearchQuery('')}
-              >
+              <ActionIcon size="sm" variant="subtle" onClick={() => handlers.setSearchQuery('')}>
                 <IconX size={14} />
               </ActionIcon>
             ) : null
           }
-          style={{flex: 1}}
-          onChange={(event) =>
-            handlers.setSearchQuery(event.currentTarget.value)
-          }
+          style={{ flex: 1 }}
+          onChange={(event) => handlers.setSearchQuery(event.currentTarget.value)}
         />
         {extraActions ? <Group gap="sm">{extraActions}</Group> : null}
       </Group>
@@ -125,9 +112,7 @@ export const FilterableAdminDataTable = React.memo(function <
           <Stack align="center" gap="xs">
             {emptyState.icon}
             <Text c="dimmed">
-              {filters.searchQuery
-                ? t('common.noResultsFound')
-                : emptyState.message}
+              {filters.searchQuery ? t('common.noResultsFound') : emptyState.message}
             </Text>
           </Stack>
         </Center>

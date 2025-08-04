@@ -22,14 +22,8 @@ export {
   PWAInstallPrompt,
   SafariPWAGuide,
 } from './features';
-export {AppLogo, GoBack, MobileUserMenu} from './navigation';
-export {
-  AppLoader,
-  ErrorAlert,
-  ErrorBoundary,
-  ErrorModal,
-  VersionInformation,
-} from './feedback';
+export { AppLogo, GoBack, MobileUserMenu } from './navigation';
+export { AppLoader, ErrorAlert, ErrorBoundary, ErrorModal, VersionInformation } from './feedback';
 export {
   AppDesktopLayout,
   AppMobileLayout,

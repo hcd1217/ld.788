@@ -1,9 +1,6 @@
-import {useState} from 'react';
-import type {UseFormReturnType} from '@mantine/form';
-import {
-  showErrorNotification,
-  showSuccessNotification,
-} from '@/utils/notifications';
+import { useState } from 'react';
+import type { UseFormReturnType } from '@mantine/form';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
 
 type UseAuthFormOptions = {
   readonly onSuccess?: () => void;
@@ -32,34 +29,30 @@ export function useAuthForm<T extends Record<string, unknown>>(
     setShowAlert(false);
   };
 
-  const handleSubmit =
-    (submitFn: (values: T) => Promise<void>) => async (values: T) => {
-      try {
-        setIsLoading(true);
-        await submitFn(values);
+  const handleSubmit = (submitFn: (values: T) => Promise<void>) => async (values: T) => {
+    try {
+      setIsLoading(true);
+      await submitFn(values);
 
-        if (shouldShowSuccessNotification) {
-          showSuccessNotification(successTitle, successMessage);
-        }
-
-        onSuccess?.();
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'An error occurred';
-
-        const formFields = Object.keys(form.values);
-        const errors = Object.fromEntries(
-          formFields.map((field) => [field, ' ']),
-        );
-        form.setErrors(errors);
-
-        setShowAlert(true);
-
-        showErrorNotification(errorTitle, errorMessage);
-      } finally {
-        setIsLoading(false);
+      if (shouldShowSuccessNotification) {
+        showSuccessNotification(successTitle, successMessage);
       }
-    };
+
+      onSuccess?.();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+
+      const formFields = Object.keys(form.values);
+      const errors = Object.fromEntries(formFields.map((field) => [field, ' ']));
+      form.setErrors(errors);
+
+      setShowAlert(true);
+
+      showErrorNotification(errorTitle, errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return {
     isLoading,

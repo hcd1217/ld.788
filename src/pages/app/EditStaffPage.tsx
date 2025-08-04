@@ -1,5 +1,5 @@
-import {useState, useEffect} from 'react';
-import {useNavigate, useParams} from 'react-router';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import {
   Container,
   Title,
@@ -12,7 +12,7 @@ import {
   Paper,
   Text,
 } from '@mantine/core';
-import {useForm} from '@mantine/form';
+import { useForm } from '@mantine/form';
 import {
   IconCheck,
   IconAlertTriangle,
@@ -21,35 +21,32 @@ import {
   IconCalendar,
   IconShield,
 } from '@tabler/icons-react';
-import {
-  showErrorNotification,
-  showSuccessNotification,
-} from '@/utils/notifications';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useStaffActions, useStaffStore} from '@/stores/useStaffStore';
-import {useCurrentStore} from '@/stores/useStoreConfigStore';
-import {GoBack} from '@/components/common';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useStaffActions, useStaffStore } from '@/stores/useStaffStore';
+import { useCurrentStore } from '@/stores/useStoreConfigStore';
+import { GoBack } from '@/components/common';
 import {
   BasicInfoSection,
   WorkingPatternSection,
   LeaveManagementSection,
   AccessPermissionSection,
 } from '@/components/staff/form';
-import {VALIDATION_RULES} from '@/services/staff';
-import {ROUTERS} from '@/config/routeConfig';
-import type {Staff, StaffFormData} from '@/lib/api/schemas/staff.schemas';
+import { VALIDATION_RULES } from '@/services/staff';
+import { ROUTERS } from '@/config/routeConfig';
+import type { Staff, StaffFormData } from '@/lib/api/schemas/staff.schemas';
 
 export function EditStaffPage() {
   const navigate = useNavigate();
-  const {t} = useTranslation();
-  const {staffId} = useParams<{staffId: string}>();
+  const { t } = useTranslation();
+  const { staffId } = useParams<{ staffId: string }>();
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [staff, setStaff] = useState<Staff | undefined>(undefined);
 
   const currentStore = useCurrentStore();
-  const {updateStaff, loadStaff} = useStaffActions();
+  const { updateStaff, loadStaff } = useStaffActions();
   const staffList = useStaffStore((state) => state.staffs);
 
   const form = useForm<StaffFormData>({
@@ -115,10 +112,7 @@ export function EditStaffPage() {
             ? VALIDATION_RULES.workingHours.fulltime.max
             : VALIDATION_RULES.workingHours.shift.max;
 
-        if (
-          values.weeklyContractedHours < 0 ||
-          values.weeklyContractedHours > maxHours
-        ) {
+        if (values.weeklyContractedHours < 0 || values.weeklyContractedHours > maxHours) {
           errors.weeklyContractedHours = t('validation.weeklyHoursRange', {
             min: 0,
             max: maxHours,
@@ -129,10 +123,8 @@ export function EditStaffPage() {
       if (
         values.workingPattern === 'fulltime' &&
         values.defaultWeeklyHours &&
-        (values.defaultWeeklyHours <
-          VALIDATION_RULES.workingHours.fulltime.min ||
-          values.defaultWeeklyHours >
-            VALIDATION_RULES.workingHours.fulltime.max)
+        (values.defaultWeeklyHours < VALIDATION_RULES.workingHours.fulltime.min ||
+          values.defaultWeeklyHours > VALIDATION_RULES.workingHours.fulltime.max)
       ) {
         errors.defaultWeeklyHours = t('validation.defaultWeeklyHoursRange', {
           min: VALIDATION_RULES.workingHours.fulltime.min,
@@ -237,8 +229,7 @@ export function EditStaffPage() {
           role: staffData.role,
         });
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : t('staff.loadFailed');
+        const errorMessage = error instanceof Error ? error.message : t('staff.loadFailed');
 
         showErrorNotification('Load Failed', errorMessage);
 
@@ -254,9 +245,7 @@ export function EditStaffPage() {
   const validateCurrentStep = () => {
     const errors = form.validate();
     const stepFields = getStepFields(activeStep);
-    const stepErrors = Object.keys(errors.errors).filter((field) =>
-      stepFields.includes(field),
-    );
+    const stepErrors = Object.keys(errors.errors).filter((field) => stepFields.includes(field));
     return stepErrors.length === 0;
   };
 
@@ -267,12 +256,7 @@ export function EditStaffPage() {
       }
 
       case 1: {
-        return [
-          'workingPattern',
-          'weeklyContractedHours',
-          'defaultWeeklyHours',
-          'hourlyRate',
-        ];
+        return ['workingPattern', 'weeklyContractedHours', 'defaultWeeklyHours', 'hourlyRate'];
       }
 
       case 2: {
@@ -316,10 +300,7 @@ export function EditStaffPage() {
 
       navigate(ROUTERS.STAFF);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Failed to update staff member';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update staff member';
 
       showErrorNotification('Update Failed', errorMessage);
     } finally {
@@ -344,11 +325,7 @@ export function EditStaffPage() {
             {t('staff.editTitle')}
           </Title>
 
-          <Alert
-            icon={<IconAlertTriangle size={16} />}
-            color="orange"
-            variant="light"
-          >
+          <Alert icon={<IconAlertTriangle size={16} />} color="orange" variant="light">
             {t('staff.notFoundOrNoStore')}
           </Alert>
         </Stack>
@@ -364,11 +341,11 @@ export function EditStaffPage() {
         </Group>
 
         <Title order={1} ta="center">
-          {t('staff.editTitleWithName', {name: staff.fullName})}
+          {t('staff.editTitleWithName', { name: staff.fullName })}
         </Title>
 
         <Text ta="center" c="dimmed">
-          {t('staff.storeName', {name: currentStore.name})}
+          {t('staff.storeName', { name: currentStore.name })}
         </Text>
 
         <Paper shadow="sm" p="xl" radius="md">
@@ -385,11 +362,11 @@ export function EditStaffPage() {
                 ))}
               </Stepper>
 
-              <div style={{position: 'relative', minHeight: '400px'}}>
+              <div style={{ position: 'relative', minHeight: '400px' }}>
                 <LoadingOverlay
                   visible={isSubmitting}
-                  overlayProps={{blur: 2}}
-                  transitionProps={{duration: 300}}
+                  overlayProps={{ blur: 2 }}
+                  transitionProps={{ duration: 300 }}
                 />
 
                 {activeStep === 0 && <BasicInfoSection form={form} />}
@@ -402,11 +379,7 @@ export function EditStaffPage() {
               </div>
 
               <Group justify="space-between" pt="md">
-                <Button
-                  variant="default"
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                >
+                <Button variant="default" disabled={activeStep === 0} onClick={handleBack}>
                   {t('common.back')}
                 </Button>
 

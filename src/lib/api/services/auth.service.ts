@@ -1,5 +1,5 @@
 import { isDevelopment } from '@/utils/env';
-import {BaseApiClient} from '../base';
+import { BaseApiClient } from '../base';
 import {
   LoginRequestSchema,
   LoginResponseSchema,
@@ -38,21 +38,17 @@ export class AuthApi extends BaseApiClient {
     );
   }
 
-  async verifyMagicLink(
-    data: VerifyMagicLinkRequest,
-  ): Promise<VerifyMagicLinkResponse> {
+  async verifyMagicLink(data: VerifyMagicLinkRequest): Promise<VerifyMagicLinkResponse> {
     return this.post<VerifyMagicLinkResponse, VerifyMagicLinkRequest>(
       '/auth/magic-link/verify',
       data,
       VerifyMagicLinkResponseSchema,
       VerifyMagicLinkRequestSchema,
-      {noError: true},
+      { noError: true },
     );
   }
 
-  async forgotPassword(
-    data: ForgotPasswordRequest,
-  ): Promise<ForgotPasswordResponse> {
+  async forgotPassword(data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
     return this.post<ForgotPasswordResponse, ForgotPasswordRequest>(
       '/auth/forgot-password',
       data,
@@ -60,9 +56,7 @@ export class AuthApi extends BaseApiClient {
     );
   }
 
-  async resetPassword(
-    data: ResetPasswordRequest,
-  ): Promise<ResetPasswordResponse> {
+  async resetPassword(data: ResetPasswordRequest): Promise<ResetPasswordResponse> {
     return this.post<ResetPasswordResponse, ResetPasswordRequest>(
       '/auth/reset-password',
       data,
@@ -90,7 +84,7 @@ export class AuthApi extends BaseApiClient {
         console.error(error);
       }
       // If the request fails, it means the token is expired, just reload the page
-      return {refreshToken: '', accessToken: ''};
+      return { refreshToken: '', accessToken: '' };
     });
   }
 

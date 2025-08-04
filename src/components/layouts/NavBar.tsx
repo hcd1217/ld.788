@@ -1,27 +1,20 @@
-import {
-  AppShell,
-  Collapse,
-  Group,
-  Stack,
-  Text,
-  UnstyledButton,
-} from '@mantine/core';
-import {IconCaretDownFilled, IconCircle} from '@tabler/icons-react';
-import type {TFunction} from 'i18next';
-import {useEffect, useMemo, useState, useCallback, memo} from 'react';
-import {useLocation, useNavigate} from 'react-router';
+import { AppShell, Collapse, Group, Stack, Text, UnstyledButton } from '@mantine/core';
+import { IconCaretDownFilled } from '@tabler/icons-react';
+import type { TFunction } from 'i18next';
+import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import classes from './AuthLayout.module.css';
-import type {NavigationItem} from './types';
-import {LAYOUT_CONFIG} from '@/config/layoutConfig';
-import {NAVIGATION_STRUCTURE} from '@/config/navigationConfig';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAppStore} from '@/stores/useAppStore';
-import {isNavigationItemActive} from '@/utils/navigationUtils';
+import type { NavigationItem } from './types';
+import { LAYOUT_CONFIG } from '@/config/layoutConfig';
+import { NAVIGATION_STRUCTURE } from '@/config/navigationConfig';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/stores/useAppStore';
+import { isNavigationItemActive } from '@/utils/navigationUtils';
 
 // Transform static navigation structure to NavigationItem format with translations
 function transformNavigationItem(
   item: (typeof NAVIGATION_STRUCTURE)[number],
-  t: TFunction,
+  t: any, // Temporarily use any to bypass type depth issue
 ): NavigationItem {
   const base: NavigationItem = {
     id: item.id,
@@ -45,8 +38,7 @@ function transformNavigationItem(
 
       // Add optional properties if they exist
       if ('path' in sub) subItem.path = sub.path;
-      if ('hidden' in sub && typeof sub.hidden === 'boolean')
-        subItem.hidden = sub.hidden;
+      if ('hidden' in sub && typeof sub.hidden === 'boolean') subItem.hidden = sub.hidden;
       if ('activePaths' in sub) subItem.activePaths = [...sub.activePaths];
 
       return subItem;
@@ -120,7 +112,6 @@ const NavigationItemComponent = memo(
     pathname,
     onToggle,
     onNavigate,
-    t,
   }: {
     readonly item: NavigationItem;
     readonly isActive: boolean;
@@ -131,7 +122,6 @@ const NavigationItemComponent = memo(
     readonly t: TFunction;
   }) => {
     const Icon = item.icon;
-    const isDummy = item.dummy ?? false;
 
     const handleClick = () => {
       if (item.subs) {
@@ -166,15 +156,6 @@ const NavigationItemComponent = memo(
             >
               {item.label}
             </Text>
-            {isDummy ? (
-              <IconCircle
-                className={classes.dummyIndicator}
-                color="red"
-                fill="red"
-                size={LAYOUT_CONFIG.DUMMY_INDICATOR_SIZE}
-                aria-label={t('common.dummyFeature')}
-              />
-            ) : null}
           </Group>
           {item.subs ? (
             <IconCaretDownFilled
@@ -242,9 +223,7 @@ const NavigationSubItem = memo(
         }}
       >
         <Group className={classes.subNavGroup}>
-          {isActive ? (
-            <div className={classes.activeTag} aria-hidden="true" />
-          ) : null}
+          {isActive ? <div className={classes.activeTag} aria-hidden="true" /> : null}
           <Text
             c={isActive ? 'var(--menu-active-color)' : 'var(--menu-color)'}
             className={classes.subNavLabel}
@@ -267,11 +246,9 @@ export function NavBar() {
   const location = useLocation();
 
   // Use selector to only subscribe to routeConfig changes
-  const routeConfig = useAppStore(
-    (state) => state.userProfile?.routeConfig || EMPTY_ROUTE_CONFIG,
-  );
+  const routeConfig = useAppStore((state) => state.userProfile?.routeConfig || EMPTY_ROUTE_CONFIG);
 
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [expandedMenuId, setExpandedMenuId] = useState<string | undefined>(
     getPersistedExpandedMenuId(),
   );
@@ -279,9 +256,7 @@ export function NavBar() {
   // Transform and filter navigation items
   // This is now more efficient as NAVIGATION_STRUCTURE is static
   const navigationItems = useMemo(() => {
-    const transformed = NAVIGATION_STRUCTURE.map((item) =>
-      transformNavigationItem(item, t),
-    );
+    const transformed = NAVIGATION_STRUCTURE.map((item) => transformNavigationItem(item, t));
     return transformed
       .map((item) => filterNavigationItem(item, routeConfig))
       .filter((item): item is NavigationItem => item !== undefined);

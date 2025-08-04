@@ -1,7 +1,7 @@
 import * as z from 'zod/v4';
-import {idSchema, timestampSchema} from './common.schemas';
-import {generateRandomString} from '@/utils/string';
-import {permissionMatrix} from '@/services/staff';
+import { idSchema, timestampSchema } from './common.schemas';
+import { generateRandomString } from '@/utils/string';
+import { permissionMatrix } from '@/services/staff';
 
 // Base staff schema from API
 export const StaffSchema = z
@@ -16,13 +16,10 @@ export const StaffSchema = z
   .transform((val) => {
     // Generate random role
     const roles = Object.keys(permissionMatrix);
-    const role = roles[
-      Math.floor(roles.length * Math.random())
-    ] as keyof typeof permissionMatrix;
+    const role = roles[Math.floor(roles.length * Math.random())] as keyof typeof permissionMatrix;
 
     // Generate random working pattern
-    const workingPattern: 'fulltime' | 'shift' =
-      Math.random() > 0.5 ? 'fulltime' : 'shift';
+    const workingPattern: 'fulltime' | 'shift' = Math.random() > 0.5 ? 'fulltime' : 'shift';
 
     // Transform to include all UI fields with mock data
     return {
@@ -88,10 +85,7 @@ export type GetStaffListResponse = z.infer<typeof GetStaffListResponseSchema>;
 export type DeleteStaffResponse = z.infer<typeof DeleteStaffResponseSchema>;
 
 // UI types for forms (includes all fields but only sends supported ones to API)
-export type StaffFormData = Omit<
-  Staff,
-  'id' | 'storeId' | 'createdAt' | 'updatedAt'
->;
+export type StaffFormData = Omit<Staff, 'id' | 'storeId' | 'createdAt' | 'updatedAt'>;
 
 // Form initial values type (partial for form initialization)
 export type StaffFormInitialValues = Pick<

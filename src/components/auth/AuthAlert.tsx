@@ -1,5 +1,5 @@
-import {Alert, Transition} from '@mantine/core';
-import {IconAlertCircle} from '@tabler/icons-react';
+import { Alert, Transition } from '@mantine/core';
+import { IconAlertCircle } from '@tabler/icons-react';
 
 type AuthAlertProps = {
   readonly show: boolean;
@@ -7,14 +7,9 @@ type AuthAlertProps = {
   readonly onClose: () => void;
 };
 
-export function AuthAlert({show, message, onClose}: AuthAlertProps) {
+export function AuthAlert({ show, message, onClose }: AuthAlertProps) {
   return (
-    <Transition
-      mounted={show}
-      transition="fade"
-      duration={300}
-      timingFunction="ease"
-    >
+    <Transition mounted={show} transition="fade" duration={300} timingFunction="ease">
       {(styles) => (
         <Alert
           withCloseButton

@@ -1,26 +1,21 @@
-import {Avatar, Group, Menu, Text, UnstyledButton, rem} from '@mantine/core';
-import {
-  IconCaretDownFilled,
-  IconLogout,
-  IconSettings,
-  IconUser,
-} from '@tabler/icons-react';
-import {useNavigate} from 'react-router';
+import { Avatar, Group, Menu, Text, UnstyledButton, rem } from '@mantine/core';
+import { IconCaretDownFilled, IconLogout, IconSettings, IconUser } from '@tabler/icons-react';
+import { useNavigate } from 'react-router';
 import classes from './AuthLayout.module.css';
-import {VersionInformation} from '@/components/common';
-import {LAYOUT_CONFIG} from '@/config/layoutConfig';
-import {ROUTERS} from '@/config/routeConfig';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAppStore} from '@/stores/useAppStore';
+import { VersionInformation } from '@/components/common';
+import { LAYOUT_CONFIG } from '@/config/layoutConfig';
+import { ROUTERS } from '@/config/routeConfig';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/stores/useAppStore';
 
 interface UserMenuProps {
   readonly c?: string;
 }
 
-export function UserMenu({c}: UserMenuProps) {
+export function UserMenu({ c }: UserMenuProps) {
   const navigate = useNavigate();
-  const {user, logout} = useAppStore();
-  const {t} = useTranslation();
+  const { user, logout } = useAppStore();
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     logout();
@@ -34,7 +29,7 @@ export function UserMenu({c}: UserMenuProps) {
       shadow="md"
       width={LAYOUT_CONFIG.USER_MENU_WIDTH}
       position="bottom-end"
-      transitionProps={{transition: 'pop-top-right'}}
+      transitionProps={{ transition: 'pop-top-right' }}
     >
       <Menu.Target>
         <UnstyledButton

@@ -1,5 +1,5 @@
 import * as z from 'zod/v4';
-import {idSchema, optionalStringSchema} from './common.schemas';
+import { idSchema, optionalStringSchema } from './common.schemas';
 
 export const GetUsersRequestSchema = z.object({
   cursor: optionalStringSchema,

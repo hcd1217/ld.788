@@ -1,4 +1,4 @@
-import {Title, Text, Container, Card, Box, Stack} from '@mantine/core';
+import { Title, Text, Container, Card, Box, Stack } from '@mantine/core';
 
 export function ExplorePage() {
   return (
@@ -12,7 +12,7 @@ export function ExplorePage() {
             padding: '0 16px',
           }}
         >
-          <Box style={{maxWidth: '600px', width: '100%'}}>
+          <Box style={{ maxWidth: '600px', width: '100%' }}>
             <Card shadow="sm" padding="lg">
               <Title order={1}>Explore</Title>
               <Text mt="md" size="lg">

@@ -1,5 +1,5 @@
-import type {ClientConfig} from '@/lib/api/schemas/auth.schemas';
-import type {Dictionary} from '@/types/dictionary';
+import type { ClientConfig } from '@/lib/api/schemas/auth.schemas';
+import type { Dictionary } from '@/types/dictionary';
 
 /**
  * Converts flat dot-notation keys to nested object structure
@@ -31,21 +31,18 @@ function unFlattenTranslations(flatTranslations: Dictionary): Dictionary {
  * Deep merges two objects, with source overriding target values
  */
 function deepMerge(target: Dictionary, source: Dictionary): Dictionary {
-  const output = {...target};
+  const output = { ...target };
 
   if (isObject(target) && isObject(source)) {
     for (const key of Object.keys(source)) {
       if (isObject(source[key])) {
         if (key in target) {
-          output[key] = deepMerge(
-            target[key] as Dictionary,
-            source[key] as Dictionary,
-          );
+          output[key] = deepMerge(target[key] as Dictionary, source[key] as Dictionary);
         } else {
-          Object.assign(output, {[key]: source[key]});
+          Object.assign(output, { [key]: source[key] });
         }
       } else {
-        Object.assign(output, {[key]: source[key]});
+        Object.assign(output, { [key]: source[key] });
       }
     }
   }
@@ -69,7 +66,7 @@ export function mergeTranslations(
     return baseTranslations;
   }
 
-  const mergedTranslations = {...baseTranslations};
+  const mergedTranslations = { ...baseTranslations };
 
   // Process each language
   for (const [lang, translations] of Object.entries(clientTranslations)) {
@@ -94,10 +91,7 @@ export function mergeTranslations(
 
       // Const x = mergedTranslations[lang].translation
       mergedTranslations[lang] = {
-        translation: deepMerge(
-          mergedTranslation as Dictionary,
-          nestedClientTranslations,
-        ),
+        translation: deepMerge(mergedTranslation as Dictionary, nestedClientTranslations),
       };
     }
   }

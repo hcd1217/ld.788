@@ -1,12 +1,8 @@
-import {Select, Text, Group, Box} from '@mantine/core';
-import {IconBuildingStore, IconChevronDown} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {
-  useCurrentStore,
-  useStores,
-  useStoreActions,
-} from '@/stores/useStoreConfigStore';
-import type {Store} from '@/lib/api/schemas/store.schemas';
+import { Select, Text, Group, Box } from '@mantine/core';
+import { IconBuildingStore, IconChevronDown } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useCurrentStore, useStores, useStoreActions } from '@/stores/useStoreConfigStore';
+import type { Store } from '@/lib/api/schemas/store.schemas';
 
 type StoreSelectorProps = {
   readonly placeholder?: string;
@@ -21,10 +17,10 @@ export function StoreSelector({
   size = 'sm',
   variant = 'default',
 }: StoreSelectorProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const currentStore = useCurrentStore();
   const stores = useStores();
-  const {setCurrentStore} = useStoreActions();
+  const { setCurrentStore } = useStoreActions();
 
   const defaultPlaceholder = placeholder || t('store.selectAStore');
 
@@ -45,7 +41,7 @@ export function StoreSelector({
   const renderSelectOption = (store: Store) => (
     <Group gap="sm" wrap="nowrap">
       <IconBuildingStore size={16} />
-      <Box style={{flex: 1}}>
+      <Box style={{ flex: 1 }}>
         <Text size="sm" fw={500}>
           {store.name}
         </Text>
@@ -80,7 +76,7 @@ export function StoreSelector({
         variant={variant}
         leftSection={<IconBuildingStore size={16} />}
         rightSection={<IconChevronDown size={16} />}
-        renderOption={({option}) => {
+        renderOption={({ option }) => {
           const store = stores.find((s) => s.id === option.value);
           return store ? renderSelectOption(store) : option.label;
         }}
@@ -101,7 +97,7 @@ export function StoreSelector({
       leftSection={<IconBuildingStore size={16} />}
       rightSection={<IconChevronDown size={16} />}
       maxDropdownHeight={300}
-      renderOption={({option}) => {
+      renderOption={({ option }) => {
         const store = stores.find((s) => s.id === option.value);
         return store ? renderSelectOption(store) : option.label;
       }}

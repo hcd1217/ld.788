@@ -1,12 +1,12 @@
-import {Badge} from '@mantine/core';
-import {useTranslation} from '@/hooks/useTranslation';
+import { Badge } from '@mantine/core';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type ActiveBadgeProps = {
   readonly isActive?: boolean;
 };
 
-export function ActiveBadge({isActive}: ActiveBadgeProps) {
-  const {t} = useTranslation();
+export function ActiveBadge({ isActive }: ActiveBadgeProps) {
+  const { t } = useTranslation();
   return (
     <Badge
       color={isActive ? 'var(--app-active-color)' : 'var(--app-inactive-color)'}

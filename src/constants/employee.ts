@@ -9,5 +9,5 @@ export const VIEW_MODE = {
   GRID: 'grid',
 } as const;
 
-export type EmployeeStatusType = typeof EMPLOYEE_STATUS[keyof typeof EMPLOYEE_STATUS];
-export type ViewModeType = typeof VIEW_MODE[keyof typeof VIEW_MODE];
+export type EmployeeStatusType = (typeof EMPLOYEE_STATUS)[keyof typeof EMPLOYEE_STATUS];
+export type ViewModeType = (typeof VIEW_MODE)[keyof typeof VIEW_MODE];

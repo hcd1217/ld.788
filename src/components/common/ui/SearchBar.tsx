@@ -1,5 +1,5 @@
-import {TextInput} from '@mantine/core';
-import {IconSearch} from '@tabler/icons-react';
+import { TextInput } from '@mantine/core';
+import { IconSearch } from '@tabler/icons-react';
 
 type SearchBarProps = {
   readonly hidden?: boolean;
@@ -8,12 +8,7 @@ type SearchBarProps = {
   readonly setSearchQuery: (query: string) => void;
 };
 
-export function SearchBar({
-  hidden,
-  placeholder,
-  searchQuery,
-  setSearchQuery,
-}: SearchBarProps) {
+export function SearchBar({ hidden, placeholder, searchQuery, setSearchQuery }: SearchBarProps) {
   if (hidden) {
     return null;
   }
@@ -23,7 +18,7 @@ export function SearchBar({
       placeholder={placeholder}
       leftSection={<IconSearch size={16} />}
       value={searchQuery}
-      style={{flex: 1, maxWidth: 400}}
+      style={{ flex: 1, maxWidth: 400 }}
       onChange={(e) => {
         setSearchQuery(e.target.value);
       }}

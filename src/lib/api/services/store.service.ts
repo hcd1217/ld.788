@@ -1,4 +1,4 @@
-import {BaseApiClient} from '../base';
+import { BaseApiClient } from '../base';
 import {
   StoreSchema,
   CreateStoreRequestSchema,
@@ -63,10 +63,7 @@ export class StoreApi extends BaseApiClient {
     return this.get<Store, void>(`/stores/${id}`, undefined, StoreSchema);
   }
 
-  async updateStore(
-    id: string,
-    data: UpdateStoreRequest,
-  ): Promise<UpdateStoreResponse> {
+  async updateStore(id: string, data: UpdateStoreRequest): Promise<UpdateStoreResponse> {
     return this.patch<UpdateStoreResponse, UpdateStoreRequest>(
       `/stores/${id}`,
       data,
@@ -88,10 +85,7 @@ export class StoreApi extends BaseApiClient {
     );
   }
 
-  async createStoreStaff(
-    storeId: string,
-    data: CreateStaffRequest,
-  ): Promise<CreateStaffResponse> {
+  async createStoreStaff(storeId: string, data: CreateStaffRequest): Promise<CreateStaffResponse> {
     return this.post<CreateStaffResponse, CreateStaffRequest>(
       `/stores/${storeId}/staff`,
       data,
@@ -113,10 +107,7 @@ export class StoreApi extends BaseApiClient {
     );
   }
 
-  async deleteStoreStaff(
-    storeId: string,
-    staffId: string,
-  ): Promise<DeleteStaffResponse> {
+  async deleteStoreStaff(storeId: string, staffId: string): Promise<DeleteStaffResponse> {
     return this.delete<DeleteStaffResponse, void>(
       `/stores/${storeId}/staff/${staffId}`,
       undefined,
@@ -125,9 +116,7 @@ export class StoreApi extends BaseApiClient {
   }
 
   // Store Operating Hours methods
-  async getStoreOperatingHours(
-    storeId: string,
-  ): Promise<GetStoreOperatingHoursResponse> {
+  async getStoreOperatingHours(storeId: string): Promise<GetStoreOperatingHoursResponse> {
     return this.get<GetStoreOperatingHoursResponse, void>(
       `/stores/${storeId}/operating-hours`,
       undefined,
@@ -139,10 +128,7 @@ export class StoreApi extends BaseApiClient {
     storeId: string,
     data: UpdateStoreOperatingHoursRequest,
   ): Promise<UpdateStoreOperatingHoursResponse> {
-    return this.put<
-      UpdateStoreOperatingHoursResponse,
-      UpdateStoreOperatingHoursRequest
-    >(
+    return this.put<UpdateStoreOperatingHoursResponse, UpdateStoreOperatingHoursRequest>(
       `/stores/${storeId}/operating-hours`,
       data,
       UpdateStoreOperatingHoursResponseSchema,

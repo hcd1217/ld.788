@@ -1,44 +1,35 @@
-import {Container, Title, Text, Group, Badge, Stack, Tabs} from '@mantine/core';
-import {IconUsers, IconLock} from '@tabler/icons-react';
-import {useState} from 'react';
-import {
-  AdminDataTable,
-  type TableColumn,
-} from '@/components/admin/AdminDataTable';
+import { Container, Title, Text, Group, Badge, Stack, Tabs } from '@mantine/core';
+import { IconUsers, IconLock } from '@tabler/icons-react';
+import { useState } from 'react';
+import { AdminDataTable, type TableColumn } from '@/components/admin/AdminDataTable';
 
 // Generate demo data
 const generateDemoUsers = (count: number) => {
-  return Array.from({length: count}, (_, i) => ({
+  return Array.from({ length: count }, (_, i) => ({
     id: `user-${i}`,
     userName: `user${i}`,
     email: `user${i}@example.com`,
     firstName: `First${i}`,
     lastName: `Last${i}`,
     isActive: i % 3 !== 0,
-    createdAt: new Date(
-      Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000,
-    ).toISOString(),
+    createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
   }));
 };
 
 const generateDemoRoles = (count: number) => {
-  return Array.from({length: count}, (_, i) => ({
+  return Array.from({ length: count }, (_, i) => ({
     id: `role-${i}`,
     name: `role_${i}`,
     displayName: `Role ${i}`,
     description: `This is a description for role ${i}. It can be quite long and detailed.`,
     level: Math.floor(Math.random() * 5) + 1,
     isSystem: i % 4 === 0,
-    createdAt: new Date(
-      Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000,
-    ).toISOString(),
+    createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
   }));
 };
 
 export function VirtualScrollDemo() {
-  const [dataSize, setDataSize] = useState<'small' | 'medium' | 'large'>(
-    'medium',
-  );
+  const [dataSize, setDataSize] = useState<'small' | 'medium' | 'large'>('medium');
 
   const getUserCount = () => {
     switch (dataSize) {
@@ -121,7 +112,7 @@ export function VirtualScrollDemo() {
       key: 'description',
       label: 'Description',
       render: (role) => (
-        <Text size="sm" c="dimmed" style={{maxWidth: '300px'}} lineClamp={2}>
+        <Text size="sm" c="dimmed" style={{ maxWidth: '300px' }} lineClamp={2}>
           {role.description}
         </Text>
       ),
@@ -155,9 +146,7 @@ export function VirtualScrollDemo() {
     <Container fluid px="xl">
       <Stack gap="lg">
         <Title order={2}>Virtual Scrolling Demo</Title>
-        <Text c="dimmed">
-          Test virtual scrolling performance with different dataset sizes.
-        </Text>
+        <Text c="dimmed">Test virtual scrolling performance with different dataset sizes.</Text>
 
         <Group>
           <Text fw={500}>Dataset Size:</Text>
@@ -165,7 +154,7 @@ export function VirtualScrollDemo() {
             <Badge
               variant={dataSize === 'small' ? 'filled' : 'light'}
               color="blue"
-              style={{cursor: 'pointer'}}
+              style={{ cursor: 'pointer' }}
               onClick={() => {
                 setDataSize('small');
               }}
@@ -175,7 +164,7 @@ export function VirtualScrollDemo() {
             <Badge
               variant={dataSize === 'medium' ? 'filled' : 'light'}
               color="blue"
-              style={{cursor: 'pointer'}}
+              style={{ cursor: 'pointer' }}
               onClick={() => {
                 setDataSize('medium');
               }}
@@ -185,7 +174,7 @@ export function VirtualScrollDemo() {
             <Badge
               variant={dataSize === 'large' ? 'filled' : 'light'}
               color="blue"
-              style={{cursor: 'pointer'}}
+              style={{ cursor: 'pointer' }}
               onClick={() => {
                 setDataSize('large');
               }}

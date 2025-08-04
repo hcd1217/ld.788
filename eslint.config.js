@@ -4,6 +4,8 @@ import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
+import prettier from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
 import customPlugin from './eslint-rules/index.js';
 
 export default tseslint.config(
@@ -34,6 +36,7 @@ export default tseslint.config(
       react: react,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      prettier: prettier,
       custom: customPlugin,
     },
     rules: {
@@ -92,6 +95,12 @@ export default tseslint.config(
       'no-new': 'off',
       'complexity': 'off',
       'max-depth': 'off',
+
+      // Prettier integration
+      'prettier/prettier': 'error',
+      
+      // Disable conflicting rules
+      ...prettierConfig.rules,
     },
   },
   {

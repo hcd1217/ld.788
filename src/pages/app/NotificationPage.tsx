@@ -1,4 +1,4 @@
-import {Title, Text, Container, Card, Box, Stack} from '@mantine/core';
+import { Title, Text, Container, Card, Box, Stack } from '@mantine/core';
 
 export function NotificationsPage() {
   return (
@@ -12,7 +12,7 @@ export function NotificationsPage() {
             padding: '0 16px',
           }}
         >
-          <Box style={{maxWidth: '600px', width: '100%'}}>
+          <Box style={{ maxWidth: '600px', width: '100%' }}>
             <Card shadow="sm" padding="lg">
               <Title order={1}>Notifications</Title>
               <Text mt="md" size="lg">

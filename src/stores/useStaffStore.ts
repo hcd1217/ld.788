@@ -1,6 +1,6 @@
-import {create} from 'zustand';
-import {devtools} from 'zustand/middleware';
-import {storeApi, ApiError} from '@/lib/api';
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { storeApi, ApiError } from '@/lib/api';
 import {
   type Staff,
   type CreateStaffRequest,
@@ -33,11 +33,7 @@ type StaffState = {
   setCurrentStaff: (staff: Staff | undefined) => void;
   loadStaff: (storeId: string, cursor?: string) => Promise<void>;
   createStaff: (storeId: string, data: StaffFormData) => Promise<Staff>;
-  updateStaff: (
-    storeId: string,
-    staffId: string,
-    data: StaffFormData,
-  ) => Promise<Staff>;
+  updateStaff: (storeId: string, staffId: string, data: StaffFormData) => Promise<Staff>;
   deleteStaff: (storeId: string, staffId: string) => Promise<void>;
   refreshStaff: (storeId: string) => Promise<void>;
   clearError: () => void;
@@ -60,17 +56,17 @@ export const useStaffStore = create<StaffState>()(
 
       // Actions
       setCurrentStaff(staffs) {
-        set({currentStaff: staffs, error: undefined});
+        set({ currentStaff: staffs, error: undefined });
       },
 
       setCurrentStoreId(storeId) {
-        set({currentStoreId: storeId});
+        set({ currentStoreId: storeId });
       },
 
       async loadStaff(storeId) {
-        set({isLoading: true, error: undefined, currentStoreId: storeId});
+        set({ isLoading: true, error: undefined, currentStoreId: storeId });
         try {
-          const {staffs} = await storeApi.getStoreStaff(storeId);
+          const { staffs } = await storeApi.getStoreStaff(storeId);
 
           set({
             staffs,
@@ -92,7 +88,7 @@ export const useStaffStore = create<StaffState>()(
       },
 
       async createStaff(storeId, data) {
-        set({isLoading: true, error: undefined});
+        set({ isLoading: true, error: undefined });
         try {
           // Extract only the field that API accepts
           const apiRequest: CreateStaffRequest = {
@@ -124,28 +120,19 @@ export const useStaffStore = create<StaffState>()(
       },
 
       async updateStaff(storeId, staffId, data) {
-        set({isLoading: true, error: undefined});
+        set({ isLoading: true, error: undefined });
         try {
           // Extract only the field that API accepts
           const apiRequest: UpdateStaffRequest = {
             isActive: data.status === 'active',
           };
 
-          const response = await storeApi.updateStoreStaff(
-            storeId,
-            staffId,
-            apiRequest,
-          );
+          const response = await storeApi.updateStoreStaff(storeId, staffId, apiRequest);
           const updatedStaff = response.staff;
 
           set((state) => ({
-            staffs: state.staffs.map((staff) =>
-              staff.id === staffId ? updatedStaff : staff,
-            ),
-            currentStaff:
-              state.currentStaff?.id === staffId
-                ? updatedStaff
-                : state.currentStaff,
+            staffs: state.staffs.map((staff) => (staff.id === staffId ? updatedStaff : staff)),
+            currentStaff: state.currentStaff?.id === staffId ? updatedStaff : state.currentStaff,
             isLoading: false,
           }));
 
@@ -166,16 +153,13 @@ export const useStaffStore = create<StaffState>()(
       },
 
       async deleteStaff(storeId, staffId) {
-        set({isLoading: true, error: undefined});
+        set({ isLoading: true, error: undefined });
         try {
           await storeApi.deleteStoreStaff(storeId, staffId);
 
           set((state) => ({
             staff: state.staffs.filter((staff) => staff.id !== staffId),
-            currentStaff:
-              state.currentStaff?.id === staffId
-                ? undefined
-                : state.currentStaff,
+            currentStaff: state.currentStaff?.id === staffId ? undefined : state.currentStaff,
             isLoading: false,
           }));
         } catch (error) {
@@ -198,7 +182,7 @@ export const useStaffStore = create<StaffState>()(
       },
 
       clearError() {
-        set({error: undefined});
+        set({ error: undefined });
       },
 
       // Selectors
@@ -213,13 +197,11 @@ export const useStaffStore = create<StaffState>()(
 );
 
 // Computed selectors for convenience
-export const useCurrentStaff = () =>
-  useStaffStore((state) => state.currentStaff);
+export const useCurrentStaff = () => useStaffStore((state) => state.currentStaff);
 export const useStaffList = () => useStaffStore((state) => state.staffs);
 export const useStaffLoading = () => useStaffStore((state) => state.isLoading);
 export const useStaffError = () => useStaffStore((state) => state.error);
-export const useStaffPagination = () =>
-  useStaffStore((state) => state.pagination);
+export const useStaffPagination = () => useStaffStore((state) => state.pagination);
 
 // Helper hooks for staff operations
 export const useStaffActions = () => {

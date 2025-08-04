@@ -1,5 +1,5 @@
 import * as z from 'zod/v4';
-import {BaseApiClient} from '../base';
+import { BaseApiClient } from '../base';
 import {
   RegisterClientRequestSchema,
   RegisterClientResponseSchema,
@@ -53,7 +53,7 @@ import {
   type GetUserRolesResponse,
   type ClientPublicConfigResponse,
 } from '../schemas/client.schemas';
-import {ClientPublicConfigSchema} from '../schemas';
+import { ClientPublicConfigSchema } from '../schemas';
 
 export class ClientApi extends BaseApiClient {
   async register(data: RegisterClientRequest): Promise<RegisterClientResponse> {
@@ -68,10 +68,7 @@ export class ClientApi extends BaseApiClient {
   async registerUserByRootUser(
     data: RegisterUserByRootUserRequest,
   ): Promise<RegisterUserByRootUserResponse> {
-    return this.post<
-      RegisterUserByRootUserResponse,
-      RegisterUserByRootUserRequest
-    >(
+    return this.post<RegisterUserByRootUserResponse, RegisterUserByRootUserRequest>(
       '/clients/user/register',
       data,
       RegisterUserByRootUserResponseSchema,
@@ -82,10 +79,7 @@ export class ClientApi extends BaseApiClient {
   async registerBulkUsersByRootUser(
     data: RegisterBulkUsersByRootUserRequest,
   ): Promise<RegisterBulkUsersByRootUserResponse> {
-    return this.post<
-      RegisterBulkUsersByRootUserResponse,
-      RegisterBulkUsersByRootUserRequest
-    >(
+    return this.post<RegisterBulkUsersByRootUserResponse, RegisterBulkUsersByRootUserRequest>(
       '/clients/user/register/bulk',
       data,
       RegisterBulkUsersByRootUserResponseSchema,
@@ -94,11 +88,7 @@ export class ClientApi extends BaseApiClient {
   }
 
   async getAllRoles(): Promise<GetAllRolesResponse> {
-    return this.get<GetAllRolesResponse, void>(
-      '/api/roles',
-      undefined,
-      GetAllRolesResponseSchema,
-    );
+    return this.get<GetAllRolesResponse, void>('/api/roles', undefined, GetAllRolesResponseSchema);
   }
 
   async addRole(data: AddRoleRequest): Promise<AddRoleResponse> {
@@ -110,10 +100,7 @@ export class ClientApi extends BaseApiClient {
     );
   }
 
-  async updateRole(
-    id: string,
-    data: UpdateRoleRequest,
-  ): Promise<UpdateRoleResponse> {
+  async updateRole(id: string, data: UpdateRoleRequest): Promise<UpdateRoleResponse> {
     return this.put<UpdateRoleResponse, UpdateRoleRequest>(
       `/api/roles/${id}`,
       data,
@@ -146,9 +133,7 @@ export class ClientApi extends BaseApiClient {
     );
   }
 
-  async addPermission(
-    data: AddPermissionRequest,
-  ): Promise<AddPermissionResponse> {
+  async addPermission(data: AddPermissionRequest): Promise<AddPermissionResponse> {
     return this.post<AddPermissionResponse, AddPermissionRequest>(
       '/api/permissions',
       data,
@@ -181,9 +166,7 @@ export class ClientApi extends BaseApiClient {
     );
   }
 
-  async checkPermission(
-    data: PermissionCheckRequest,
-  ): Promise<PermissionCheckResponse> {
+  async checkPermission(data: PermissionCheckRequest): Promise<PermissionCheckResponse> {
     return this.post<PermissionCheckResponse, PermissionCheckRequest>(
       '/api/permissions/check',
       data,
@@ -195,10 +178,7 @@ export class ClientApi extends BaseApiClient {
   async checkMultiplePermissions(
     data: MultiplePermissionCheckRequest,
   ): Promise<MultiplePermissionCheckResponse> {
-    return this.post<
-      MultiplePermissionCheckResponse,
-      MultiplePermissionCheckRequest
-    >(
+    return this.post<MultiplePermissionCheckResponse, MultiplePermissionCheckRequest>(
       '/api/permissions/check-multiple',
       data,
       MultiplePermissionCheckResponseSchema,
@@ -206,10 +186,7 @@ export class ClientApi extends BaseApiClient {
     );
   }
 
-  async grantPermissionToRole(
-    roleId: string,
-    data: GrantPermissionToRoleRequest,
-  ): Promise<void> {
+  async grantPermissionToRole(roleId: string, data: GrantPermissionToRoleRequest): Promise<void> {
     await this.post<void, GrantPermissionToRoleRequest>(
       `/api/roles/${roleId}/permissions`,
       data,
@@ -218,10 +195,7 @@ export class ClientApi extends BaseApiClient {
     );
   }
 
-  async revokePermissionFromRole(
-    roleId: string,
-    permissionId: string,
-  ): Promise<void> {
+  async revokePermissionFromRole(roleId: string, permissionId: string): Promise<void> {
     await this.delete(`/api/roles/${roleId}/permissions/${permissionId}`);
   }
 
@@ -233,9 +207,7 @@ export class ClientApi extends BaseApiClient {
     );
   }
 
-  async getUserPermissions(
-    userId: string,
-  ): Promise<GetUserPermissionsResponse> {
+  async getUserPermissions(userId: string): Promise<GetUserPermissionsResponse> {
     return this.get<GetUserPermissionsResponse, void>(
       `/api/users/${userId}/permissions`,
       undefined,
@@ -251,9 +223,7 @@ export class ClientApi extends BaseApiClient {
     );
   }
 
-  async getPubicClientConfig(
-    clientCode: string,
-  ): Promise<ClientPublicConfigResponse> {
+  async getPubicClientConfig(clientCode: string): Promise<ClientPublicConfigResponse> {
     return this.get<ClientPublicConfigResponse, void>(
       `/clients/${clientCode}/public-config`,
       undefined,

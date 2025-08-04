@@ -1,17 +1,17 @@
-import {useState} from 'react';
-import {useNavigate} from 'react-router';
-import {Stack, Text, Space, Button, TextInput} from '@mantine/core';
-import {useForm} from '@mantine/form';
-import {IconInfoCircle} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAuthForm} from '@/hooks/useAuthForm';
-import {GuestLayout} from '@/components/layouts/GuestLayout';
-import {authService} from '@/services/auth';
-import {getFormValidators} from '@/utils/validation';
-import {FormContainer} from '@/components/form/FormContainer';
-import {AuthHeader, AuthFormLink, AuthSuccessState} from '@/components/auth';
-import {useClientCode} from '@/hooks/useClientCode';
-import {ROUTERS} from '@/config/routeConfig';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { Stack, Text, Space, Button, TextInput } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { IconInfoCircle } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAuthForm } from '@/hooks/useAuthForm';
+import { GuestLayout } from '@/components/layouts/GuestLayout';
+import { authService } from '@/services/auth';
+import { getFormValidators } from '@/utils/validation';
+import { FormContainer } from '@/components/form/FormContainer';
+import { AuthHeader, AuthFormLink, AuthSuccessState } from '@/components/auth';
+import { useClientCode } from '@/hooks/useClientCode';
+import { ROUTERS } from '@/config/routeConfig';
 
 type ForgotPasswordFormValues = {
   email: string;
@@ -20,7 +20,7 @@ type ForgotPasswordFormValues = {
 
 export function ForgotPasswordPage() {
   const navigate = useNavigate();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const clientCode = useClientCode();
 
@@ -32,7 +32,7 @@ export function ForgotPasswordPage() {
     validate: getFormValidators(t, ['email']),
   });
 
-  const {isLoading, handleSubmit} = useAuthForm(form, {
+  const { isLoading, handleSubmit } = useAuthForm(form, {
     successTitle: t('auth.passwordResetRequested'),
     successMessage: t('auth.passwordResetEmailSent'),
     onSuccess() {
@@ -52,9 +52,7 @@ export function ForgotPasswordPage() {
       <GuestLayout>
         <FormContainer mounted isLoading={false}>
           <AuthSuccessState
-            icon={
-              <IconInfoCircle size={48} color="var(--mantine-color-green-6)" />
-            }
+            icon={<IconInfoCircle size={48} color="var(--mantine-color-green-6)" />}
             title={t('auth.checkYourEmail')}
             description={t('auth.passwordResetEmailSentDescription')}
             buttonText={t('auth.backToLogin')}
@@ -96,11 +94,7 @@ export function ForgotPasswordPage() {
           </Stack>
         </form>
 
-        <AuthFormLink
-          text=""
-          linkText={t('auth.backToLogin')}
-          href={ROUTERS.LOGIN}
-        />
+        <AuthFormLink text="" linkText={t('auth.backToLogin')} href={ROUTERS.LOGIN} />
       </FormContainer>
     </GuestLayout>
   );

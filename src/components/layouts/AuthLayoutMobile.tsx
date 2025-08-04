@@ -1,17 +1,14 @@
-import {AppShell} from '@mantine/core';
-import {Outlet} from 'react-router';
+import { AppShell } from '@mantine/core';
+import { Outlet } from 'react-router';
 import classes from './AuthLayoutMobile.module.css';
-import {
-  CommonMobileFooter,
-  CommonMobileHeader,
-} from '@/components/common';
+import { CommonMobileFooter, CommonMobileHeader } from '@/components/common';
 
 // @deprecated: This method should not be used any more
 export function AuthLayoutMobile() {
   return (
     <AppShell
-      header={{height: 60}}
-      footer={{height: 60}}
+      header={{ height: 60 }}
+      footer={{ height: 60 }}
       padding={0}
       className={classes.mobileLayout}
     >

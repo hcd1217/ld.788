@@ -97,13 +97,7 @@ export const permissionMatrix = {
     'view_all_profiles',
     'clock_in',
   ],
-  manager: [
-    'manage_staff',
-    'view_reports',
-    'manage_schedule',
-    'view_all_profiles',
-    'clock_in',
-  ],
+  manager: ['manage_staff', 'view_reports', 'manage_schedule', 'view_all_profiles', 'clock_in'],
   member: ['view_own_profile', 'clock_in', 'view_schedule'],
 };
 
@@ -372,8 +366,7 @@ const delay = async (ms: number) =>
   });
 
 // Generate unique ID
-const generateId = () =>
-  `staff-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+const generateId = () => `staff-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 
 // Generate MD5 hash
 const generateMD5 = (text: string): string => CryptoJS.MD5(text).toString();
@@ -479,9 +472,7 @@ export const staffService = {
 
   async getStaffById(id: string): Promise<Staff | undefined> {
     await delay(300);
-    return mockStaff.find(
-      (staff) => staff.id === id && staff.status !== 'deleted',
-    );
+    return mockStaff.find((staff) => staff.id === id && staff.status !== 'deleted');
   },
 
   async createStaff(data: CreateStaffRequest): Promise<Staff> {
@@ -501,9 +492,7 @@ export const staffService = {
     );
 
     if (existingStaff) {
-      throw new Error(
-        'Staff member with this email or phone number already exists',
-      );
+      throw new Error('Staff member with this email or phone number already exists');
     }
 
     const staffId = generateId();
@@ -541,14 +530,11 @@ export const staffService = {
         (staff) =>
           staff.id !== id &&
           staff.status !== 'deleted' &&
-          (staff.email === data.email ||
-            staff.phoneNumber === data.phoneNumber),
+          (staff.email === data.email || staff.phoneNumber === data.phoneNumber),
       );
 
       if (existingStaff) {
-        throw new Error(
-          'Staff member with this email or phone number already exists',
-        );
+        throw new Error('Staff member with this email or phone number already exists');
       }
     }
 
@@ -558,9 +544,7 @@ export const staffService = {
       ...data,
       updatedAt: new Date(),
       // Update permissions if role changed
-      accessPermissions: data.role
-        ? permissionMatrix[data.role]
-        : currentStaff.accessPermissions,
+      accessPermissions: data.role ? permissionMatrix[data.role] : currentStaff.accessPermissions,
     };
 
     mockStaff[staffIndex] = updatedStaff;
@@ -568,11 +552,11 @@ export const staffService = {
   },
 
   async deactivateStaff(id: string): Promise<Staff> {
-    return this.updateStaff(id, {status: 'inactive'});
+    return this.updateStaff(id, { status: 'inactive' });
   },
 
   async activateStaff(id: string): Promise<Staff> {
-    return this.updateStaff(id, {status: 'active'});
+    return this.updateStaff(id, { status: 'active' });
   },
 
   async deleteStaff(id: string): Promise<void> {
@@ -607,24 +591,15 @@ export const staffService = {
   } {
     const errors: string[] = [];
 
-    if (
-      'fullName' in data &&
-      (!data.fullName || data.fullName.trim().length < 2)
-    ) {
+    if ('fullName' in data && (!data.fullName || data.fullName.trim().length < 2)) {
       errors.push('Full name must be at least 2 characters long');
     }
 
-    if (
-      'email' in data &&
-      (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))
-    ) {
+    if ('email' in data && (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))) {
       errors.push('Valid email address is required');
     }
 
-    if (
-      'phoneNumber' in data &&
-      (!data.phoneNumber || data.phoneNumber.length < 10)
-    ) {
+    if ('phoneNumber' in data && (!data.phoneNumber || data.phoneNumber.length < 10)) {
       errors.push('Valid phone number is required');
     }
 
@@ -639,19 +614,13 @@ export const staffService = {
       );
     }
 
-    if (
-      'weeklyContractedHours' in data &&
-      data.weeklyContractedHours !== undefined
-    ) {
+    if ('weeklyContractedHours' in data && data.weeklyContractedHours !== undefined) {
       const maxHours =
         data.workingPattern === 'fulltime'
           ? VALIDATION_RULES.workingHours.fulltime.max
           : VALIDATION_RULES.workingHours.shift.max;
 
-      if (
-        data.weeklyContractedHours < 0 ||
-        data.weeklyContractedHours > maxHours
-      ) {
+      if (data.weeklyContractedHours < 0 || data.weeklyContractedHours > maxHours) {
         errors.push(`Weekly hours must be between 0 and ${maxHours}`);
       }
     }
@@ -676,9 +645,7 @@ export const staffService = {
     await delay(200);
     return !mockStaff.some(
       (staff) =>
-        staff.id !== excludeId &&
-        staff.status !== 'deleted' &&
-        staff.phoneNumber === phone,
+        staff.id !== excludeId && staff.status !== 'deleted' && staff.phoneNumber === phone,
     );
   },
 
@@ -698,9 +665,7 @@ export const staffService = {
   async regenerateQRCode(staffId: string): Promise<string> {
     await delay(300);
 
-    const staff = mockStaff.find(
-      (s) => s.id === staffId && s.status !== 'deleted',
-    );
+    const staff = mockStaff.find((s) => s.id === staffId && s.status !== 'deleted');
     if (!staff) {
       throw new Error('Staff member not found');
     }

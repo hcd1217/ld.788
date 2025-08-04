@@ -46,11 +46,8 @@ export const clientManagementService = {
     };
   },
 
-  async suspendClient(
-    clientCode: string,
-    reason: string,
-  ): Promise<ClientDetail> {
-    const response = await adminApi.suspendClient(clientCode, {reason});
+  async suspendClient(clientCode: string, reason: string): Promise<ClientDetail> {
+    const response = await adminApi.suspendClient(clientCode, { reason });
     if (!response.success) {
       throw new Error(response.message || 'Failed to suspend client');
     }
@@ -75,7 +72,7 @@ export const clientManagementService = {
     reason: string,
   ): Promise<void> {
     try {
-      const data: HardDeleteClientRequest = {confirmClientCode, reason};
+      const data: HardDeleteClientRequest = { confirmClientCode, reason };
       await adminApi.hardDeleteClient(clientCode, data);
     } catch (error) {
       console.error(`Failed to delete client ${clientCode}:`, error);
@@ -135,7 +132,7 @@ export const clientManagementService = {
 
   async isClientCodeUnique(code: string): Promise<boolean> {
     try {
-      const {clients} = await adminApi.getClients();
+      const { clients } = await adminApi.getClients();
       return !clients.some((client) => client.clientCode === code);
     } catch (error) {
       console.error('Failed to check client code uniqueness:', error);

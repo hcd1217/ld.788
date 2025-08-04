@@ -1,6 +1,6 @@
-import {Button, Stack, Text, Title} from '@mantine/core';
-import {type ReactElement} from 'react';
-import {AuthHeader} from './AuthHeader';
+import { Button, Stack, Text, Title } from '@mantine/core';
+import { type ReactElement } from 'react';
+import { AuthHeader } from './AuthHeader';
 
 type AuthSuccessStateProps = {
   readonly icon: ReactElement;

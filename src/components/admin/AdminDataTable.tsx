@@ -1,13 +1,6 @@
 import React from 'react';
-import {
-  Table,
-  ScrollArea,
-  Center,
-  Stack,
-  Text,
-  type MantineStyleProp,
-} from '@mantine/core';
-import {VirtualizedAdminDataTable} from './VirtualizedAdminDataTable';
+import { Table, ScrollArea, Center, Stack, Text, type MantineStyleProp } from '@mantine/core';
+import { VirtualizedAdminDataTable } from './VirtualizedAdminDataTable';
 
 export interface TableColumn<T> {
   readonly key: keyof T | string;
@@ -28,11 +21,7 @@ export interface AdminDataTableProps<T> {
   readonly striped?: boolean;
   readonly highlightOnHover?: boolean;
   readonly minHeight?: number | string;
-  readonly renderRow?: (
-    item: T,
-    index: number,
-    children: React.ReactNode,
-  ) => React.ReactNode;
+  readonly renderRow?: (item: T, index: number, children: React.ReactNode) => React.ReactNode;
   readonly getRowKey?: (item: T, index: number) => string | number;
   readonly tableStyles?: MantineStyleProp;
   readonly virtualScroll?:
@@ -68,8 +57,7 @@ export const AdminDataTable = React.memo(function <T>({
 
     if (virtualScroll && typeof virtualScroll === 'object') {
       if (virtualScroll.enabled) return true;
-      if (virtualScroll.threshold && data.length >= virtualScroll.threshold)
-        return true;
+      if (virtualScroll.threshold && data.length >= virtualScroll.threshold) return true;
     }
 
     // Default: use virtual scrolling for large datasets
@@ -79,9 +67,7 @@ export const AdminDataTable = React.memo(function <T>({
   // Virtual scrolling doesn't support renderRow, so use regular table if renderRow is provided
   if (shouldUseVirtualScroll && !renderRow) {
     const virtualConfig =
-      typeof virtualScroll === 'object' && virtualScroll
-        ? virtualScroll
-        : undefined;
+      typeof virtualScroll === 'object' && virtualScroll ? virtualScroll : undefined;
 
     return (
       <VirtualizedAdminDataTable
@@ -126,7 +112,7 @@ export const AdminDataTable = React.memo(function <T>({
             {columns.map((column) => (
               <Table.Th
                 key={String(column.key)}
-                style={column.width ? {width: column.width} : undefined}
+                style={column.width ? { width: column.width } : undefined}
               >
                 {column.label}
               </Table.Th>
@@ -139,7 +125,7 @@ export const AdminDataTable = React.memo(function <T>({
             const rowContent = (
               <Table.Tr
                 key={rowKey}
-                style={onRowClick ? {cursor: 'pointer'} : undefined}
+                style={onRowClick ? { cursor: 'pointer' } : undefined}
                 onClick={
                   onRowClick
                     ? () => {

@@ -1,14 +1,7 @@
-import type {ReactNode} from 'react';
-import {
-  Container,
-  Stack,
-  Group,
-  Title,
-  LoadingOverlay,
-  type MantineSize,
-} from '@mantine/core';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
-import {GoBack} from '@/components/common';
+import type { ReactNode } from 'react';
+import { Container, Stack, Group, Title, LoadingOverlay, type MantineSize } from '@mantine/core';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { GoBack } from '@/components/common';
 
 interface DetailPageLayoutProps {
   readonly title: string;
@@ -32,8 +25,8 @@ export function DetailPageLayout({
   const isDesktop = useIsDesktop();
 
   const containerProps = containerFluid
-    ? {fluid: true, px: isDesktop ? 'xl' : 'md'}
-    : {size: containerSize || 'md'};
+    ? { fluid: true, px: isDesktop ? 'xl' : 'md' }
+    : { size: containerSize || 'md' };
 
   return (
     <Container {...containerProps} p={isDesktop ? undefined : 0}>
@@ -50,8 +43,8 @@ export function DetailPageLayout({
 
         <LoadingOverlay
           visible={isLoading}
-          overlayProps={{blur: 2}}
-          transitionProps={{duration: 300}}
+          overlayProps={{ blur: 2 }}
+          transitionProps={{ duration: 300 }}
         />
 
         {children}

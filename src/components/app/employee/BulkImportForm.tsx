@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Button,
   Stack,
@@ -11,7 +11,7 @@ import {
   Badge,
   Divider,
 } from '@mantine/core';
-import {useDisclosure} from '@mantine/hooks';
+import { useDisclosure } from '@mantine/hooks';
 import {
   IconAlertCircle,
   IconFileSpreadsheet,
@@ -21,8 +21,8 @@ import {
   IconX,
   IconUsers,
 } from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 
 type ImportResult = {
   summary: {
@@ -58,7 +58,7 @@ export function BulkImportForm({
   onCancel,
   validateFileType,
 }: BulkImportFormProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const isDesktop = useIsDesktop();
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -88,9 +88,7 @@ export function BulkImportForm({
     fileInputRef.current?.click();
   };
 
-  const handleFileInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile && validateFileType(selectedFile)) {
       onFileSelect(selectedFile);
@@ -103,10 +101,7 @@ export function BulkImportForm({
       <Paper withBorder shadow="sm" p="lg" radius="md">
         <Stack gap="md">
           <Group>
-            <IconFileSpreadsheet
-              size={24}
-              color="var(--mantine-color-blue-6)"
-            />
+            <IconFileSpreadsheet size={24} color="var(--mantine-color-blue-6)" />
             <div>
               <Text fw={500} size="lg">
                 {t('employee.sampleExcelTemplate')}
@@ -152,9 +147,7 @@ export function BulkImportForm({
                   p="xl"
                   radius="md"
                   style={{
-                    backgroundColor: isDragOver
-                      ? 'var(--mantine-color-gray-0)'
-                      : undefined,
+                    backgroundColor: isDragOver ? 'var(--mantine-color-gray-0)' : undefined,
                     border: isDragOver
                       ? '2px dashed var(--mantine-color-blue-5)'
                       : '2px dashed var(--mantine-color-gray-3)',
@@ -167,11 +160,8 @@ export function BulkImportForm({
                   onClick={handleFileInputClick}
                 >
                   <Stack align="center" gap="md">
-                    <IconFileSpreadsheet
-                      size={48}
-                      color="var(--mantine-color-gray-5)"
-                    />
-                    <div style={{textAlign: 'center'}}>
+                    <IconFileSpreadsheet size={48} color="var(--mantine-color-gray-5)" />
+                    <div style={{ textAlign: 'center' }}>
                       <Text size="lg" fw={500}>
                         {t('common.dragAndDropFile')}
                       </Text>
@@ -184,7 +174,7 @@ export function BulkImportForm({
                     ref={fileInputRef}
                     type="file"
                     accept=".csv,.xlsx,.xls"
-                    style={{display: 'none'}}
+                    style={{ display: 'none' }}
                     onChange={handleFileInputChange}
                   />
                 </Paper>
@@ -201,12 +191,7 @@ export function BulkImportForm({
                   {(file.size / 1024).toFixed(2)} KB
                 </Badge>
               </Group>
-              <Button
-                variant="subtle"
-                color="red"
-                size="xs"
-                onClick={onFileRemove}
-              >
+              <Button variant="subtle" color="red" size="xs" onClick={onFileRemove}>
                 {t('common.remove')}
               </Button>
             </Group>
@@ -220,44 +205,24 @@ export function BulkImportForm({
                   {t('common.importResults')}
                 </Text>
                 <Progress
-                  value={
-                    (importResult.summary.success /
-                      importResult.summary.total) *
-                    100
-                  }
+                  value={(importResult.summary.success / importResult.summary.total) * 100}
                   color={importResult.summary.failed > 0 ? 'yellow' : 'green'}
                   size="xl"
                   radius="md"
                 />
                 <Group justify="space-between">
-                  <Badge
-                    color="blue"
-                    variant="light"
-                    leftSection={<IconUsers size={14} />}
-                  >
+                  <Badge color="blue" variant="light" leftSection={<IconUsers size={14} />}>
                     {t('common.total')}: {importResult.summary.total}
                   </Badge>
-                  <Badge
-                    color="green"
-                    variant="light"
-                    leftSection={<IconCheck size={14} />}
-                  >
+                  <Badge color="green" variant="light" leftSection={<IconCheck size={14} />}>
                     {t('common.success')}: {importResult.summary.success}
                   </Badge>
-                  <Badge
-                    color="red"
-                    variant="light"
-                    leftSection={<IconX size={14} />}
-                  >
+                  <Badge color="red" variant="light" leftSection={<IconX size={14} />}>
                     {t('common.failed')}: {importResult.summary.failed}
                   </Badge>
                 </Group>
                 {importResult.errors && importResult.errors.length > 0 ? (
-                  <Alert
-                    icon={<IconAlertCircle size={16} />}
-                    color="red"
-                    variant="light"
-                  >
+                  <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
                     {importResult.errors.join(', ')}
                   </Alert>
                 ) : null}

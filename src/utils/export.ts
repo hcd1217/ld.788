@@ -78,12 +78,8 @@ export function convertToCSV<T extends Record<string, unknown>>(
 /**
  * Downloads a file with the given content
  */
-export function downloadFile(
-  content: string,
-  filename: string,
-  mimeType = 'text/plain',
-): void {
-  const blob = new Blob([content], {type: mimeType});
+export function downloadFile(content: string, filename: string, mimeType = 'text/plain'): void {
+  const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;

@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 
 export type Orientation = 'portrait' | 'landscape';
 
@@ -37,10 +37,7 @@ export function useOrientation(): {
 
     return () => {
       window.removeEventListener('resize', handleOrientationChange);
-      globalThis.removeEventListener(
-        'orientationchange',
-        handleOrientationChange,
-      );
+      globalThis.removeEventListener('orientationchange', handleOrientationChange);
       document.removeEventListener('visibilitychange', handleOrientationChange);
     };
   }, []);

@@ -1,13 +1,11 @@
-import {Grid, TextInput} from '@mantine/core';
-import type {UseFormReturnType} from '@mantine/form';
-import {useEffect} from 'react';
-import {useTranslation} from '@/hooks/useTranslation';
+import { Grid, TextInput } from '@mantine/core';
+import type { UseFormReturnType } from '@mantine/form';
+import { useEffect } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import i18n from '@/lib/i18n';
-import {getLocaleConfig} from '@/config/localeConfig';
+import { getLocaleConfig } from '@/config/localeConfig';
 
-export function FirstNameAndLastNameInForm<
-  T extends {firstName: string; lastName: string},
->({
+export function FirstNameAndLastNameInForm<T extends { firstName: string; lastName: string }>({
   form,
   isLoading,
   setShowAlert,
@@ -16,7 +14,7 @@ export function FirstNameAndLastNameInForm<
   readonly form: UseFormReturnType<T>;
   readonly setShowAlert: (show: boolean) => void;
 }) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   // Focus first name field (based on locale order) on mount and trigger mount animation
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -25,8 +23,7 @@ export function FirstNameAndLastNameInForm<
         localeConfig.nameOrder === 'family-first'
           ? 'input[name="lastName"]'
           : 'input[name="firstName"]';
-      const inputElement =
-        document.querySelector<HTMLInputElement>(fieldToFocus);
+      const inputElement = document.querySelector<HTMLInputElement>(fieldToFocus);
       inputElement?.focus();
     }, 300);
     return () => {
@@ -39,7 +36,7 @@ export function FirstNameAndLastNameInForm<
       {(() => {
         const localeConfig = getLocaleConfig(i18n.language);
         const firstNameField = (
-          <Grid.Col key="firstName" span={{base: 12, sm: 6}}>
+          <Grid.Col key="firstName" span={{ base: 12, sm: 6 }}>
             <TextInput
               required
               autoComplete="given-name"
@@ -55,7 +52,7 @@ export function FirstNameAndLastNameInForm<
         );
 
         const lastNameField = (
-          <Grid.Col key="lastName" span={{base: 12, sm: 6}}>
+          <Grid.Col key="lastName" span={{ base: 12, sm: 6 }}>
             <TextInput
               required
               autoComplete="family-name"

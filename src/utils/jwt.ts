@@ -1,4 +1,4 @@
-import {JWTPayloadSchema, type JWTPayload} from '@/lib/api';
+import { JWTPayloadSchema, type JWTPayload } from '@/lib/api';
 
 function base64UrlDecode(str: string): string {
   // Base64url to base64

@@ -1,22 +1,22 @@
-import {useEffect, useState} from 'react';
-import {useNavigate, useSearchParams} from 'react-router';
-import {Stack, Space, Button, Text, Alert, TextInput, Group} from '@mantine/core';
-import {IconX, IconCheck, IconQrcode, IconForms} from '@tabler/icons-react';
-import {useAppStore} from '@/stores/useAppStore';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAction} from '@/hooks/useAction';
-import {GuestLayout} from '@/components/layouts/GuestLayout';
-import {FormContainer} from '@/components/form/FormContainer';
-import {AuthHeader, QrScannerModal} from '@/components/auth';
-import {ROUTERS} from '@/config/routeConfig';
-import {authService} from '@/services/auth';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
+import { Stack, Space, Button, Text, Alert, TextInput, Group } from '@mantine/core';
+import { IconX, IconCheck, IconQrcode, IconForms } from '@tabler/icons-react';
+import { useAppStore } from '@/stores/useAppStore';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAction } from '@/hooks/useAction';
+import { GuestLayout } from '@/components/layouts/GuestLayout';
+import { FormContainer } from '@/components/form/FormContainer';
+import { AuthHeader, QrScannerModal } from '@/components/auth';
+import { ROUTERS } from '@/config/routeConfig';
+import { authService } from '@/services/auth';
 
 const MAGIC_LINK_STORAGE_KEY = 'magicLinkParams';
 
 export function MagicLinkLoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const {setUser} = useAppStore();
+  const { setUser } = useAppStore();
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -24,7 +24,7 @@ export function MagicLinkLoginPage() {
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [manualCode, setManualCode] = useState('');
   const [showOptions, setShowOptions] = useState(false);
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     setMounted(true);
@@ -50,7 +50,7 @@ export function MagicLinkLoginPage() {
         }),
       );
       // Redirect to clean URL (remove query params)
-      navigate(ROUTERS.MAGIC_LINK, {replace: true});
+      navigate(ROUTERS.MAGIC_LINK, { replace: true });
     }
   }, [mounted, searchParams, navigate]);
 
@@ -67,7 +67,7 @@ export function MagicLinkLoginPage() {
         throw new Error(t('auth.magicLink.invalidLink'));
       }
 
-      const {token, clientCode} = JSON.parse(storedParams) as {
+      const { token, clientCode } = JSON.parse(storedParams) as {
         token: string;
         clientCode: string;
       };
@@ -79,7 +79,7 @@ export function MagicLinkLoginPage() {
       }
 
       setIsLoading(true);
-      const {user} = await authService.loginWithMagicToken(clientCode, token);
+      const { user } = await authService.loginWithMagicToken(clientCode, token);
 
       setUser(user);
       setError(undefined);
@@ -102,8 +102,7 @@ export function MagicLinkLoginPage() {
     }
 
     // Check if we have params in URL (means we haven't redirected yet)
-    const hasUrlParams =
-      searchParams.has('token') || searchParams.has('clientCode');
+    const hasUrlParams = searchParams.has('token') || searchParams.has('clientCode');
     if (hasUrlParams) {
       // Wait for redirect to happen
       return;
@@ -128,7 +127,7 @@ export function MagicLinkLoginPage() {
   const handleQrScan = (data: string) => {
     try {
       const trimmedData = data.trim();
-      
+
       // Try to parse as URL first
       if (trimmedData.includes('?') || trimmedData.startsWith('http')) {
         const url = new URL(trimmedData);
@@ -137,10 +136,7 @@ export function MagicLinkLoginPage() {
 
         if (token && clientCode) {
           // Store params and trigger verification
-          sessionStorage.setItem(
-            MAGIC_LINK_STORAGE_KEY,
-            JSON.stringify({ token, clientCode }),
-          );
+          sessionStorage.setItem(MAGIC_LINK_STORAGE_KEY, JSON.stringify({ token, clientCode }));
           void verifyMagicLink();
         } else {
           setError(t('auth.magicLink.invalidQrCode'));
@@ -148,7 +144,7 @@ export function MagicLinkLoginPage() {
       } else {
         // Treat as token-only and use clientCode from localStorage
         const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
-        
+
         sessionStorage.setItem(
           MAGIC_LINK_STORAGE_KEY,
           JSON.stringify({ token: trimmedData, clientCode }),
@@ -164,14 +160,14 @@ export function MagicLinkLoginPage() {
   const handleManualCodeSubmit = () => {
     try {
       const trimmedCode = manualCode.trim();
-      
+
       // If it looks like a URL, try parsing it
       if (trimmedCode.includes('?') || trimmedCode.startsWith('http')) {
         handleQrScan(trimmedCode);
       } else {
         // Treat as token-only input and use clientCode from localStorage
         const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
-        
+
         sessionStorage.setItem(
           MAGIC_LINK_STORAGE_KEY,
           JSON.stringify({ token: trimmedCode, clientCode }),
@@ -211,15 +207,8 @@ export function MagicLinkLoginPage() {
 
           {!isLoading && (error || showOptions) ? (
             <>
-
               {error && (
-                <Alert
-                  w="100%"
-                  mb="xl"
-                  icon={<IconX size={20} />}
-                  color="red"
-                  variant="light"
-                >
+                <Alert w="100%" mb="xl" icon={<IconX size={20} />} color="red" variant="light">
                   {error}
                 </Alert>
               )}
@@ -248,12 +237,7 @@ export function MagicLinkLoginPage() {
                     {t('auth.magicLink.enterCodeManually')}
                   </Button>
 
-                  <Button
-                    fullWidth
-                    variant="subtle"
-                    onClick={handleRetryLogin}
-                    mt="md"
-                  >
+                  <Button fullWidth variant="subtle" onClick={handleRetryLogin} mt="md">
                     {t('auth.magicLink.tryAgain')}
                   </Button>
                 </Stack>

@@ -1,15 +1,11 @@
-import {
-  ActionIcon,
-  useMantineColorScheme,
-  useComputedColorScheme,
-} from '@mantine/core';
-import {IconSun, IconMoon} from '@tabler/icons-react';
-import {useAppStore} from '@/stores/useAppStore';
-import {isDevelopment} from '@/utils/env';
+import { ActionIcon, useMantineColorScheme, useComputedColorScheme } from '@mantine/core';
+import { IconSun, IconMoon } from '@tabler/icons-react';
+import { useAppStore } from '@/stores/useAppStore';
+import { isDevelopment } from '@/utils/env';
 
 export function ColorSchemeToggle() {
-  const {publicClientConfig} = useAppStore();
-  const {setColorScheme} = useMantineColorScheme();
+  const { publicClientConfig } = useAppStore();
+  const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light', {
     getInitialValueInEffect: true,
   });
@@ -23,15 +19,9 @@ export function ColorSchemeToggle() {
       variant="default"
       size="lg"
       aria-label="Toggle color scheme"
-      onClick={() =>
-        setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')
-      }
+      onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
     >
-      {computedColorScheme === 'light' ? (
-        <IconMoon stroke={1.5} />
-      ) : (
-        <IconSun stroke={1.5} />
-      )}
+      {computedColorScheme === 'light' ? <IconMoon stroke={1.5} /> : <IconSun stroke={1.5} />}
     </ActionIcon>
   );
 }

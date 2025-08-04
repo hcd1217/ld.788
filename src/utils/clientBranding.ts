@@ -1,4 +1,4 @@
-import type {ClientPublicConfigResponse} from '@/lib/api';
+import type { ClientPublicConfigResponse } from '@/lib/api';
 
 /**
  * Updates the browser favicon with the client's logo
@@ -33,9 +33,7 @@ export const updateDocumentTitle = (clientName: string | undefined): void => {
     document.title = clientName;
 
     // Also update apple-mobile-web-app-title for iOS devices
-    const appleTitleMeta = document.querySelector(
-      'meta[name="apple-mobile-web-app-title"]',
-    );
+    const appleTitleMeta = document.querySelector('meta[name="apple-mobile-web-app-title"]');
     if (appleTitleMeta) {
       appleTitleMeta.setAttribute('content', clientName);
     }
@@ -46,9 +44,7 @@ export const updateDocumentTitle = (clientName: string | undefined): void => {
  * Updates both favicon and title based on client config
  * @param config - Client public configuration
  */
-export const updateClientBranding = (
-  config: ClientPublicConfigResponse | undefined,
-): void => {
+export const updateClientBranding = (config: ClientPublicConfigResponse | undefined): void => {
   if (!config) return;
 
   updateFavicon(config.logoUrl);

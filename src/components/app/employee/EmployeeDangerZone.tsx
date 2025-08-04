@@ -1,23 +1,8 @@
-import {
-  Card,
-  Stack,
-  Group,
-  Title,
-  Divider,
-  Paper,
-  Box,
-  Text,
-  Button,
-} from '@mantine/core';
-import {
-  IconAlertTriangle,
-  IconUserOff,
-  IconUserCheck,
-  IconTrash,
-} from '@tabler/icons-react';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
-import type {Employee} from '@/services/hr/employee';
+import { Card, Stack, Group, Title, Divider, Paper, Box, Text, Button } from '@mantine/core';
+import { IconAlertTriangle, IconUserOff, IconUserCheck, IconTrash } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
+import type { Employee } from '@/services/hr/employee';
 
 type EmployeeDangerZoneProps = {
   readonly employee: Employee;
@@ -30,7 +15,7 @@ export function EmployeeDangerZone({
   onActivate,
   onDeactivate,
 }: EmployeeDangerZoneProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const isDesktop = useIsDesktop();
 
   return (
@@ -39,7 +24,7 @@ export function EmployeeDangerZone({
       shadow="sm"
       padding="xl"
       radius="md"
-      style={{borderColor: 'var(--mantine-color-red-6)'}}
+      style={{ borderColor: 'var(--mantine-color-red-6)' }}
     >
       <Stack gap="lg">
         <Group>

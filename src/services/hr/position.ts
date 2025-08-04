@@ -1,5 +1,5 @@
-import {unitService} from './unit';
-import {hrApi} from '@/lib/api';
+import { unitService } from './unit';
+import { hrApi } from '@/lib/api';
 
 export type Position = {
   id: string;

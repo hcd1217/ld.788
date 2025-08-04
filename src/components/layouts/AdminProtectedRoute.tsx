@@ -1,16 +1,12 @@
-import {AppShell, Group} from '@mantine/core';
-import {Outlet, Navigate} from 'react-router';
-import {type ReactNode} from 'react';
-import {
-  ColorSchemeToggle,
-  LanguageSwitcher,
-  AppLogo,
-} from '@/components/common';
-import {useAppStore} from '@/stores/useAppStore';
-import {AdminLoadingOverlay} from '@/components/admin/AdminLoadingOverlay';
+import { AppShell, Group } from '@mantine/core';
+import { Outlet, Navigate } from 'react-router';
+import { type ReactNode } from 'react';
+import { ColorSchemeToggle, LanguageSwitcher, AppLogo } from '@/components/common';
+import { useAppStore } from '@/stores/useAppStore';
+import { AdminLoadingOverlay } from '@/components/admin/AdminLoadingOverlay';
 
 export function AdminProtectedRoute(): ReactNode {
-  const {adminAuthenticated} = useAppStore();
+  const { adminAuthenticated } = useAppStore();
 
   if (!adminAuthenticated) {
     return <Navigate replace to="/admin/login" />;
@@ -18,7 +14,7 @@ export function AdminProtectedRoute(): ReactNode {
 
   return (
     <>
-      <AppShell header={{height: 60}} padding="md">
+      <AppShell header={{ height: 60 }} padding="md">
         <AppShell.Header>
           <Group h="100%" px="md" justify="space-between">
             <AppLogo link="/admin/dashboard" />

@@ -1,13 +1,12 @@
-import {AuthApi} from './services/auth.service';
-import {ClientApi} from './services/client.service';
-import {UserApi} from './services/user.service';
-import {AdminApi} from './services/admin.service';
-import {StoreApi} from './services/store.service';
-import {HrApi} from './services/hr.service';
+import { AuthApi } from './services/auth.service';
+import { ClientApi } from './services/client.service';
+import { UserApi } from './services/user.service';
+import { AdminApi } from './services/admin.service';
+import { StoreApi } from './services/store.service';
+import { HrApi } from './services/hr.service';
 
 const API_BASE_URL =
-  (import.meta.env.VITE_API_URL as string | undefined) ??
-  'http://localhost:3000';
+  (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:3000';
 
 // Create API client instances
 export const authApi = new AuthApi({
@@ -38,11 +37,11 @@ export const hrApi = new HrApi({
 export * from './schemas';
 
 // Export service classes
-export {AuthApi} from './services/auth.service';
-export {ClientApi} from './services/client.service';
-export {UserApi} from './services/user.service';
-export {AdminApi} from './services/admin.service';
-export {StoreApi} from './services/store.service';
-export {HrApi} from './services/hr.service';
+export { AuthApi } from './services/auth.service';
+export { ClientApi } from './services/client.service';
+export { UserApi } from './services/user.service';
+export { AdminApi } from './services/admin.service';
+export { StoreApi } from './services/store.service';
+export { HrApi } from './services/hr.service';
 
-export {ApiError} from './base';
+export { ApiError } from './base';

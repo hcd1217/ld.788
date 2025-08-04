@@ -1,4 +1,4 @@
-import {adminApi} from '@/lib/api';
+import { adminApi } from '@/lib/api';
 
 const STORAGE_KEY = 'admin_access_key';
 const AUTH_FLAG_KEY = 'admin_authenticated';

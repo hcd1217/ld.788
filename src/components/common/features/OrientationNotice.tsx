@@ -1,11 +1,11 @@
-import {Modal, Stack, Text, ThemeIcon} from '@mantine/core';
-import {IconRotate2} from '@tabler/icons-react';
-import {useTranslation} from 'react-i18next';
-import {useOrientation} from '@/hooks/useOrientation';
+import { Modal, Stack, Text, ThemeIcon } from '@mantine/core';
+import { IconRotate2 } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { useOrientation } from '@/hooks/useOrientation';
 
 export function OrientationNotice() {
-  const {t} = useTranslation();
-  const {isLandscape, isMobile} = useOrientation();
+  const { t } = useTranslation();
+  const { isLandscape, isMobile } = useOrientation();
 
   if (!isMobile) {
     return null;

@@ -1,15 +1,12 @@
 import { Stack, Skeleton, Table, Group, SimpleGrid } from '@mantine/core';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 
 interface EmployeeListSkeletonProps {
   readonly viewMode?: 'table' | 'grid';
   readonly count?: number;
 }
 
-export function EmployeeListSkeleton({
-  viewMode = 'table',
-  count = 5
-}: EmployeeListSkeletonProps) {
+export function EmployeeListSkeleton({ viewMode = 'table', count = 5 }: EmployeeListSkeletonProps) {
   const isDesktop = useIsDesktop();
 
   // Mobile skeleton (card view)
@@ -17,7 +14,11 @@ export function EmployeeListSkeleton({
     return (
       <Stack gap="sm" px="sm">
         {Array.from({ length: count }).map((_, index) => (
-          <Stack key={index} p="md" style={{ border: '1px solid var(--mantine-color-gray-3)', borderRadius: 8 }}>
+          <Stack
+            key={index}
+            p="md"
+            style={{ border: '1px solid var(--mantine-color-gray-3)', borderRadius: 8 }}
+          >
             <Group justify="space-between">
               <Skeleton height={24} width="60%" />
               <Skeleton height={20} width={60} radius="xl" />
@@ -38,7 +39,11 @@ export function EmployeeListSkeleton({
     return (
       <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
         {Array.from({ length: count }).map((_, index) => (
-          <Stack key={index} p="lg" style={{ border: '1px solid var(--mantine-color-gray-3)', borderRadius: 8 }}>
+          <Stack
+            key={index}
+            p="lg"
+            style={{ border: '1px solid var(--mantine-color-gray-3)', borderRadius: 8 }}
+          >
             <Group justify="space-between">
               <Skeleton height={24} width="70%" />
               <Skeleton height={24} width={24} circle />
@@ -64,15 +69,33 @@ export function EmployeeListSkeleton({
     <Table striped highlightOnHover>
       <Table.Thead>
         <Table.Tr>
-          <Table.Th><Skeleton height={16} width={60} /></Table.Th>
-          <Table.Th><Skeleton height={16} width={40} /></Table.Th>
-          <Table.Th><Skeleton height={16} width={50} /></Table.Th>
-          <Table.Th><Skeleton height={16} width={50} /></Table.Th>
-          <Table.Th><Skeleton height={16} width={70} /></Table.Th>
-          <Table.Th><Skeleton height={16} width={70} /></Table.Th>
-          <Table.Th><Skeleton height={16} width={60} /></Table.Th>
-          <Table.Th><Skeleton height={16} width={50} /></Table.Th>
-          <Table.Th style={{ width: 100 }}><Skeleton height={16} width={60} /></Table.Th>
+          <Table.Th>
+            <Skeleton height={16} width={60} />
+          </Table.Th>
+          <Table.Th>
+            <Skeleton height={16} width={40} />
+          </Table.Th>
+          <Table.Th>
+            <Skeleton height={16} width={50} />
+          </Table.Th>
+          <Table.Th>
+            <Skeleton height={16} width={50} />
+          </Table.Th>
+          <Table.Th>
+            <Skeleton height={16} width={70} />
+          </Table.Th>
+          <Table.Th>
+            <Skeleton height={16} width={70} />
+          </Table.Th>
+          <Table.Th>
+            <Skeleton height={16} width={60} />
+          </Table.Th>
+          <Table.Th>
+            <Skeleton height={16} width={50} />
+          </Table.Th>
+          <Table.Th style={{ width: 100 }}>
+            <Skeleton height={16} width={60} />
+          </Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
@@ -83,13 +106,27 @@ export function EmployeeListSkeleton({
                 <Skeleton height={20} width="80%" />
               </Group>
             </Table.Td>
-            <Table.Td><Skeleton height={16} width="60%" /></Table.Td>
-            <Table.Td><Skeleton height={16} width="70%" /></Table.Td>
-            <Table.Td><Skeleton height={16} width="60%" /></Table.Td>
-            <Table.Td><Skeleton height={20} width={80} radius="xl" /></Table.Td>
-            <Table.Td><Skeleton height={16} width="50%" /></Table.Td>
-            <Table.Td><Skeleton height={16} width="40%" /></Table.Td>
-            <Table.Td><Skeleton height={20} width={60} radius="xl" /></Table.Td>
+            <Table.Td>
+              <Skeleton height={16} width="60%" />
+            </Table.Td>
+            <Table.Td>
+              <Skeleton height={16} width="70%" />
+            </Table.Td>
+            <Table.Td>
+              <Skeleton height={16} width="60%" />
+            </Table.Td>
+            <Table.Td>
+              <Skeleton height={20} width={80} radius="xl" />
+            </Table.Td>
+            <Table.Td>
+              <Skeleton height={16} width="50%" />
+            </Table.Td>
+            <Table.Td>
+              <Skeleton height={16} width="40%" />
+            </Table.Td>
+            <Table.Td>
+              <Skeleton height={20} width={60} radius="xl" />
+            </Table.Td>
             <Table.Td>
               <Group gap="xs">
                 <Skeleton height={28} width={28} radius="sm" />

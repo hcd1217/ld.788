@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {useNavigate, useSearchParams} from 'react-router';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
 import {
   Group,
   Anchor,
@@ -11,19 +11,19 @@ import {
   Divider,
   Text,
 } from '@mantine/core';
-import {IconQrcode} from '@tabler/icons-react';
-import {useForm} from '@mantine/form';
-import {useAppStore} from '@/stores/useAppStore';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAuthForm} from '@/hooks/useAuthForm';
-import {GuestLayout} from '@/components/layouts/GuestLayout';
-import {getFormValidators} from '@/utils/validation';
-import {FormContainer} from '@/components/form/FormContainer';
-import {AuthHeader, AuthAlert, AuthFormLink} from '@/components/auth';
-import {useClientCode} from '@/hooks/useClientCode';
-import {isDevelopment} from '@/utils/env';
-import {ROUTERS} from '@/config/routeConfig';
-import {useOnce} from '@/hooks/useOnce';
+import { IconQrcode } from '@tabler/icons-react';
+import { useForm } from '@mantine/form';
+import { useAppStore } from '@/stores/useAppStore';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAuthForm } from '@/hooks/useAuthForm';
+import { GuestLayout } from '@/components/layouts/GuestLayout';
+import { getFormValidators } from '@/utils/validation';
+import { FormContainer } from '@/components/form/FormContainer';
+import { AuthHeader, AuthAlert, AuthFormLink } from '@/components/auth';
+import { useClientCode } from '@/hooks/useClientCode';
+import { isDevelopment } from '@/utils/env';
+import { ROUTERS } from '@/config/routeConfig';
+import { useOnce } from '@/hooks/useOnce';
 
 type LoginFormValues = {
   identifier: string;
@@ -34,9 +34,9 @@ type LoginFormValues = {
 export function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const {login} = useAppStore();
+  const { login } = useAppStore();
   const [mounted, setMounted] = useState(false);
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const clientCode = useClientCode();
 
   // Update localStorage if client-code is provided in URL
@@ -52,25 +52,21 @@ export function LoginPage() {
 
     if (clientCodeFromUrl) {
       // Reload the page without search params
-      navigate(ROUTERS.LOGIN, {replace: true});
+      navigate(ROUTERS.LOGIN, { replace: true });
     }
   });
 
   const form = useForm<LoginFormValues>({
     initialValues: {
       identifier:
-        (isDevelopment ? 'admin' : '') ||
-        localStorage.getItem('rememberedIdentifier') ||
-        '',
-      password: isDevelopment
-        ? (localStorage.getItem('__PASSWORD__') ?? '')
-        : '',
+        (isDevelopment ? 'admin' : '') || localStorage.getItem('rememberedIdentifier') || '',
+      password: isDevelopment ? (localStorage.getItem('__PASSWORD__') ?? '') : '',
       clientCode,
     },
     validate: getFormValidators(t, ['identifier', 'password', 'clientCode']),
   });
 
-  const {isLoading, showAlert, clearErrors, handleSubmit} = useAuthForm(form, {
+  const { isLoading, showAlert, clearErrors, handleSubmit } = useAuthForm(form, {
     successTitle: t('notifications.loginSuccess'),
     successMessage: t('notifications.loginSuccessMessage'),
     errorTitle: t('notifications.loginFailed'),
@@ -81,9 +77,7 @@ export function LoginPage() {
   useEffect(() => {
     setMounted(true);
     const timer = setTimeout(() => {
-      const emailInput = document.querySelector<HTMLInputElement>(
-        'input[name="identifier"]',
-      );
+      const emailInput = document.querySelector<HTMLInputElement>('input[name="identifier"]');
       emailInput?.focus();
     }, 300);
     return () => {
@@ -129,11 +123,7 @@ export function LoginPage() {
             />
 
             <AuthAlert
-              show={
-                showAlert
-                  ? Boolean(form.errors.identifier && form.errors.password)
-                  : false
-              }
+              show={showAlert ? Boolean(form.errors.identifier && form.errors.password) : false}
               message={t('notifications.invalidCredentials')}
               onClose={clearErrors}
             />

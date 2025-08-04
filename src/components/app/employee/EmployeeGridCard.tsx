@@ -1,20 +1,20 @@
-import {Stack, Group, Text} from '@mantine/core';
-import {useNavigate} from 'react-router';
-import {useTranslation} from 'react-i18next';
-import type {Employee} from '@/services/hr/employee';
-import {SelectableCard} from '@/components/common';
-import {getEmployeeDetailRoute} from '@/config/routeConfig';
-import {StatusBadge} from './StatusBadge';
-import {getEndDateHighlightStyles} from '@/utils/time';
+import { Stack, Group, Text } from '@mantine/core';
+import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
+import type { Employee } from '@/services/hr/employee';
+import { SelectableCard } from '@/components/common';
+import { getEmployeeDetailRoute } from '@/config/routeConfig';
+import { StatusBadge } from './StatusBadge';
+import { getEndDateHighlightStyles } from '@/utils/time';
 
 type EmployeeGridCardProps = {
   readonly employee: Employee;
 };
 
-export function EmployeeGridCard({employee}: EmployeeGridCardProps) {
-  const {t} = useTranslation();
+export function EmployeeGridCard({ employee }: EmployeeGridCardProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
-  
+
   const highlightStyles = getEndDateHighlightStyles(employee.endDate, employee.isActive);
 
   return (
@@ -32,15 +32,21 @@ export function EmployeeGridCard({employee}: EmployeeGridCardProps) {
       })}
       onClick={() => navigate(getEmployeeDetailRoute(employee.id))}
     >
-      <Stack gap="sm" style={{
-        position: 'relative'
-      }}>
+      <Stack
+        gap="sm"
+        style={{
+          position: 'relative',
+        }}
+      >
         <Group justify="space-between" align="flex-start">
           <div>
             <Group gap="sm" justify="start">
               <Text fw={400}>{employee.fullName}</Text>
               {employee?.position ? (
-                <Text c="dimmed" size='sm'> ({employee?.position})</Text>
+                <Text c="dimmed" size="sm">
+                  {' '}
+                  ({employee?.position})
+                </Text>
               ) : null}
             </Group>
             {employee.unitId ? (
@@ -59,11 +65,13 @@ export function EmployeeGridCard({employee}: EmployeeGridCardProps) {
               </Text>
             ) : null}
           </div>
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-          }}>
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+            }}
+          >
             <StatusBadge isActive={employee.isActive} />
           </div>
         </Group>

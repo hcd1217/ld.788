@@ -12,23 +12,21 @@ import {
   LoadingOverlay,
   Transition,
 } from '@mantine/core';
-import {useNavigate} from 'react-router';
-import {useState} from 'react';
-import {IconAlertCircle} from '@tabler/icons-react';
-import {useAppStore} from '@/stores/useAppStore';
-import {useTranslation} from '@/hooks/useTranslation';
-import {authApi, type GetMeResponse} from '@/lib/api';
-import {GoBack} from '@/components/common';
-import {ROUTERS} from '@/config/routeConfig';
-import {useOnce} from '@/hooks/useOnce';
+import { useNavigate } from 'react-router';
+import { useState } from 'react';
+import { IconAlertCircle } from '@tabler/icons-react';
+import { useAppStore } from '@/stores/useAppStore';
+import { useTranslation } from '@/hooks/useTranslation';
+import { authApi, type GetMeResponse } from '@/lib/api';
+import { GoBack } from '@/components/common';
+import { ROUTERS } from '@/config/routeConfig';
+import { useOnce } from '@/hooks/useOnce';
 
 export function ProfilePage() {
   const navigate = useNavigate();
-  const {t} = useTranslation();
-  const {isAuthenticated, logout} = useAppStore();
-  const [userData, setUserData] = useState<GetMeResponse | undefined>(
-    undefined,
-  );
+  const { t } = useTranslation();
+  const { isAuthenticated, logout } = useAppStore();
+  const [userData, setUserData] = useState<GetMeResponse | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
   const [showAlert, setShowAlert] = useState(false);
@@ -87,14 +85,11 @@ export function ProfilePage() {
         <Box pos="relative">
           <LoadingOverlay
             visible={isLoading}
-            overlayProps={{blur: 2}}
-            transitionProps={{duration: 300}}
+            overlayProps={{ blur: 2 }}
+            transitionProps={{ duration: 300 }}
           />
 
-          <Transition
-            mounted={showAlert ? Boolean(error) : false}
-            transition="fade"
-          >
+          <Transition mounted={showAlert ? Boolean(error) : false} transition="fade">
             {(styles) => (
               <Alert
                 withCloseButton

@@ -1,8 +1,5 @@
-import {useNavigate} from 'react-router';
-import {
-  showErrorNotification,
-  showSuccessNotification,
-} from '@/utils/notifications';
+import { useNavigate } from 'react-router';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
 
 type UseActionOptions = {
   readonly successTitle?: string;

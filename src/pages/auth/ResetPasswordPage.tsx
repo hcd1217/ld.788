@@ -1,17 +1,17 @@
-import {useState, useEffect} from 'react';
-import {useNavigate, useSearchParams} from 'react-router';
-import {Stack, Text, Space, Button, PasswordInput} from '@mantine/core';
-import {useForm} from '@mantine/form';
-import {IconAlertCircle, IconCheck} from '@tabler/icons-react';
-import {showErrorNotification} from '@/utils/notifications';
-import {useTranslation} from '@/hooks/useTranslation';
-import {useAuthForm} from '@/hooks/useAuthForm';
-import {GuestLayout} from '@/components/layouts/GuestLayout';
-import {authService} from '@/services/auth';
-import {getFormValidators} from '@/utils/validation';
-import {FormContainer} from '@/components/form/FormContainer';
-import {AuthHeader, AuthFormLink, AuthSuccessState} from '@/components/auth';
-import {ROUTERS} from '@/config/routeConfig';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
+import { Stack, Text, Space, Button, PasswordInput } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { IconAlertCircle, IconCheck } from '@tabler/icons-react';
+import { showErrorNotification } from '@/utils/notifications';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAuthForm } from '@/hooks/useAuthForm';
+import { GuestLayout } from '@/components/layouts/GuestLayout';
+import { authService } from '@/services/auth';
+import { getFormValidators } from '@/utils/validation';
+import { FormContainer } from '@/components/form/FormContainer';
+import { AuthHeader, AuthFormLink, AuthSuccessState } from '@/components/auth';
+import { ROUTERS } from '@/config/routeConfig';
 
 type ResetPasswordFormValues = {
   password: string;
@@ -21,7 +21,7 @@ type ResetPasswordFormValues = {
 export function ResetPasswordPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isValidToken, setIsValidToken] = useState(true);
 
@@ -32,10 +32,7 @@ export function ResetPasswordPage() {
     // Validate that we have both email and token
     if (!email || !token) {
       setIsValidToken(false);
-      showErrorNotification(
-        t('auth.invalidResetLink'),
-        t('auth.invalidResetLinkDescription'),
-      );
+      showErrorNotification(t('auth.invalidResetLink'), t('auth.invalidResetLinkDescription'));
     }
   }, [email, token, t]);
 
@@ -47,7 +44,7 @@ export function ResetPasswordPage() {
     validate: getFormValidators(t, ['password', 'confirmPassword']),
   });
 
-  const {isLoading, handleSubmit} = useAuthForm(form, {
+  const { isLoading, handleSubmit } = useAuthForm(form, {
     successTitle: t('auth.passwordResetSuccess'),
     successMessage: t('auth.passwordResetSuccessDescription'),
     errorTitle: t('auth.passwordResetFailed'),
@@ -74,9 +71,7 @@ export function ResetPasswordPage() {
       <GuestLayout>
         <FormContainer mounted isLoading={false}>
           <AuthSuccessState
-            icon={
-              <IconAlertCircle size={48} color="var(--mantine-color-red-6)" />
-            }
+            icon={<IconAlertCircle size={48} color="var(--mantine-color-red-6)" />}
             title={t('auth.invalidResetLink')}
             description={t('auth.invalidResetLinkDescription')}
             buttonText={t('auth.requestNewLink')}

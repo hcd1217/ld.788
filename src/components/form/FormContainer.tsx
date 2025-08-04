@@ -1,6 +1,6 @@
-import {type ReactNode} from 'react';
-import {Paper, LoadingOverlay, Transition, Stack} from '@mantine/core';
-import {useIsDesktop} from '@/hooks/useIsDesktop';
+import { type ReactNode } from 'react';
+import { Paper, LoadingOverlay, Transition, Stack } from '@mantine/core';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 
 type FormContainerProps = {
   readonly children: ReactNode;
@@ -8,21 +8,12 @@ type FormContainerProps = {
   readonly mounted?: boolean;
 };
 
-export function FormContainer({
-  children,
-  isLoading = false,
-  mounted = true,
-}: FormContainerProps) {
+export function FormContainer({ children, isLoading = false, mounted = true }: FormContainerProps) {
   const isDesktop = useIsDesktop();
 
   return (
     <Stack gap="xl">
-      <Transition
-        mounted={mounted}
-        transition="slide-up"
-        duration={400}
-        timingFunction="ease"
-      >
+      <Transition mounted={mounted} transition="slide-up" duration={400} timingFunction="ease">
         {(styles) => (
           <Paper
             withBorder={isDesktop}
@@ -38,8 +29,8 @@ export function FormContainer({
           >
             <LoadingOverlay
               visible={isLoading}
-              overlayProps={{blur: 2}}
-              transitionProps={{duration: 300}}
+              overlayProps={{ blur: 2 }}
+              transitionProps={{ duration: 300 }}
             />
             {children}
           </Paper>
