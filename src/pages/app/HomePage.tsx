@@ -21,6 +21,7 @@ export function HomePage() {
               <Title order={1}>Home</Title>
               <Text mt="md" size="lg">
                 Welcome to the home page
+                This version of application is build at {import.meta.env.VITE_APP_BUILD}
               </Text>
             </Card>
           </Box>
