@@ -20,6 +20,16 @@ const isStandalone = () => {
     || (window.navigator as any).standalone === true;
 };
 
+// Safari cache clearing utility
+const clearSafariCaches = async () => {
+  if ('caches' in window) {
+    const cacheNames = await caches.keys();
+    await Promise.all(
+      cacheNames.map(cacheName => caches.delete(cacheName))
+    );
+  }
+};
+
 export function usePWA() {
   const updateCheckInterval = useRef<number | undefined>(undefined);
   const [autoUpdate, setAutoUpdate] = useLocalStorage({
@@ -51,18 +61,22 @@ export function usePWA() {
   const checkForUpdates = useCallback(async () => {
     try {
       const currentBuild = import.meta.env.VITE_APP_BUILD as string;
-      const response = await fetch('/version.json?t=' + Date.now());
+      // Enhanced cache-busting for version requests
+      const response = await fetch(`/version.json?t=${Date.now()}&v=${Math.random()}`);
       const serverVersion = await response.json();
       
       if (serverVersion.build && serverVersion.build !== currentBuild) {
         console.log('New version detected:', serverVersion.build);
         
         if (isSafari() && isStandalone()) {
-          // Safari in standalone mode - requires manual restart
+          // Clear all caches first for Safari
+          await clearSafariCaches();
+          
+          // Safari in standalone mode - requires complete app restart
           notifications.show({
             id: 'safari-update',
             title: 'New Version Available',
-            message: 'Please close and reopen the app to update.',
+            message: 'Close Safari completely (swipe up → swipe app away), then reopen from home screen.',
             color: 'blue',
             autoClose: false,
             withCloseButton: true,

@@ -11,15 +11,19 @@ export function SafariUpdateGuide() {
   }
   
   return (
-    <Alert icon={<IconInfoCircle />} title="How to Update" color="blue">
+    <Alert icon={<IconInfoCircle />} title="How to Update Safari PWA" color="blue">
       <Text size="sm" mb="xs">
-        To update the app on Safari:
+        To update the app on Safari, you must completely close the app:
       </Text>
       <List size="sm">
-        <List.Item>Swipe up from the bottom of the screen</List.Item>
-        <List.Item>Swipe the app preview up to close it</List.Item>
-        <List.Item>Tap the app icon to reopen with the latest version</List.Item>
+        <List.Item>Double-tap home button or swipe up from bottom</List.Item>
+        <List.Item>Find this app and swipe UP to close completely</List.Item>
+        <List.Item>Wait 2-3 seconds for Safari to fully close</List.Item>
+        <List.Item>Tap the app icon on home screen to reopen</List.Item>
       </List>
+      <Text size="xs" c="dimmed" mt="xs">
+        Note: Simply switching between apps won't update Safari PWAs. A complete restart is required.
+      </Text>
     </Alert>
   );
 }
