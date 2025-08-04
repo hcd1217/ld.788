@@ -22,6 +22,7 @@ export default defineConfig({
     },
   },
   build: {
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     rollupOptions: {
       output: {
         manualChunks: {
@@ -70,7 +71,7 @@ export default defineConfig({
         name: 'Credo App',
         short_name: 'Credo',
         description: 'Credo Progressive Web Application',
-        theme_color: '#3F60A0',
+        theme_color: '#324e71',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',

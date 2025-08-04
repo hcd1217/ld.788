@@ -1,4 +1,4 @@
-import {Group, Text, UnstyledButton, Stack} from '@mantine/core';
+import {Grid, Text, UnstyledButton, Stack} from '@mantine/core';
 import {useNavigate} from 'react-router';
 import {
   IconAddressBook,
@@ -36,31 +36,36 @@ export function CommonMobileFooter() {
     },
   ];
 
+  // Limit to maximum 4 items
+  const displayItems = navigationItems.slice(0, 4);
+
   return (
-    <Group px="xs" justify="space-around">
-      {navigationItems.map((item) => {
+    <Grid px={0} gutter={0}>
+      {displayItems.map((item) => {
         const Icon = item.icon;
         const isActive = location.pathname === item.path;
 
         return (
-          <UnstyledButton
-            key={item.path}
-            className={`${classes.navItem} ${isActive ? classes.navItemActive : ''}`}
-            onClick={() => navigate(item.path)}
-          >
-            <Stack gap={4} align="center">
-              <Icon
-                size={24}
-                stroke={isActive ? 2.5 : 1.5}
-                className={classes.navIcon}
-              />
-              <Text size="xs" fw={isActive ? 600 : 400}>
-                {item.label}
-              </Text>
-            </Stack>
-          </UnstyledButton>
+          <Grid.Col key={item.path} span={3}>
+            <UnstyledButton
+              className={`${classes.navItem} ${isActive ? classes.navItemActive : ''}`}
+              onClick={() => navigate(item.path)}
+              w="100%"
+            >
+              <Stack gap={4} align="center">
+                <Icon
+                  size={24}
+                  stroke={isActive ? 2.5 : 1.5}
+                  className={classes.navIcon}
+                />
+                <Text size="xs" fw={isActive ? 600 : 400}>
+                  {item.label}
+                </Text>
+              </Stack>
+            </UnstyledButton>
+          </Grid.Col>
         );
       })}
-    </Group>
+    </Grid>
   );
 }
