@@ -88,3 +88,13 @@ export const getStoreEditRoute = (storeId: string) => `/stores/edit/${storeId}`;
 export const getStaffEditRoute = (staffId: string) => `/staff/edit/${staffId}`;
 export const getUserDetailRoute = (userId: string) => `/user/${userId}`;
 export const getAdminClientDetailRoute = (clientCode: string) => `/admin/clients/${clientCode}`;
+
+// Customer management helper functions
+export const getCustomerDetailRoute = (customerId: string) =>
+  ROUTERS.CUSTOMER_DETAIL.replace(':customerId', customerId);
+export const getCustomerEditRoute = (customerId: string) =>
+  ROUTERS.CUSTOMER_EDIT.replace(':customerId', customerId);
+
+// PO management helper functions
+export const getPODetailRoute = (poId: string) => ROUTERS.PO_DETAIL.replace(':poId', poId);
+export const getPOEditRoute = (poId: string) => ROUTERS.PO_EDIT.replace(':poId', poId);

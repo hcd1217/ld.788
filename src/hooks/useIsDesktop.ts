@@ -23,3 +23,4 @@ export function useIsDesktop() {
   // }, []);
   return isDesktop;
 }
+export default useIsDesktop;

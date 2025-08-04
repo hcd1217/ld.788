@@ -135,6 +135,26 @@ const EditStaffPage = lazy(async () => {
   return { default: module.EditStaffPage };
 });
 
+const POListPage = lazy(async () => {
+  const module = await import('@/pages/app/po/POListPage');
+  return { default: module.POListPage };
+});
+
+const POCreatePage = lazy(async () => {
+  const module = await import('@/pages/app/po/POCreatePage');
+  return { default: module.POCreatePage };
+});
+
+const PODetailPage = lazy(async () => {
+  const module = await import('@/pages/app/po/PODetailPage');
+  return { default: module.PODetailPage };
+});
+
+const EditPOPage = lazy(async () => {
+  const module = await import('@/pages/app/po/EditPOPage');
+  return { default: module.EditPOPage };
+});
+
 const LoginPage = lazy(async () => {
   const module = await import('@/pages/auth/LoginPage');
   return { default: module.LoginPage };
@@ -244,10 +264,10 @@ const routeObjects: RouteObject[] = [
       { path: ROUTERS.CUSTOMER_DETAIL, Component: BlankPage },
       { path: ROUTERS.CUSTOMER_ADD, Component: BlankPage },
       { path: ROUTERS.CUSTOMER_EDIT, Component: BlankPage },
-      { path: ROUTERS.PO_MANAGEMENT, Component: BlankPage },
-      { path: ROUTERS.PO_DETAIL, Component: BlankPage },
-      { path: ROUTERS.PO_ADD, Component: BlankPage },
-      { path: ROUTERS.PO_EDIT, Component: BlankPage },
+      { path: ROUTERS.PO_MANAGEMENT, Component: POListPage },
+      { path: ROUTERS.PO_DETAIL, Component: PODetailPage },
+      { path: ROUTERS.PO_ADD, Component: POCreatePage },
+      { path: ROUTERS.PO_EDIT, Component: EditPOPage },
     ],
   },
   // Old APP routes
