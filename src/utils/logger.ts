@@ -10,17 +10,10 @@ console.ignore = () => {
 };
 
 export function registerLogger() {
-  const debug = true;
-  if (debug) {
+  const debug = false;
+  if (!debug && isDevelopment) {
     return;
   }
-
-  const originalConsoleLog = console.log;
-  console.log = log.bind(null, 'info');
-  console.warn = log.bind(null, 'warn');
-  console.error = log.bind(null, 'error');
-  console.info = log.bind(null, 'info');
-
   const colorMap = {
     info: 'blue',
     warn: '#f27a02',
@@ -32,11 +25,13 @@ export function registerLogger() {
     error: '36px',
   };
 
-  function log(level: 'info' | 'warn' | 'error', message: unknown, ...args: unknown[]) {
-    if (!isDevelopment) {
-      return;
-    }
+  const originalConsoleLog = console.log;
+  console.log = isDevelopment ? log.bind(null, 'info') : productionLog;
+  console.warn = isDevelopment ? log.bind(null, 'warn') : productionLog;
+  console.error = isDevelopment ? log.bind(null, 'error') : productionLog;
+  console.info = isDevelopment ? log.bind(null, 'info') : productionLog;
 
+  function log(level: 'info' | 'warn' | 'error', message: unknown, ...args: unknown[]) {
     const message_: string = [message, ...args]
       .map((arg) => {
         if (typeof arg === 'object' && arg !== null) {
@@ -80,4 +75,8 @@ export function registerLogger() {
       }
     }
   }
+}
+
+function productionLog() {
+  // ignore all log
 }

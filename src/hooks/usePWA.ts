@@ -303,8 +303,8 @@ export function usePWA() {
   return {
     offlineReady,
     needRefresh,
-    updateServiceWorker,
     autoUpdate,
+    updateServiceWorker,
     setAutoUpdate,
     checkForUpdates,
     isStandalone: isStandalone(),
