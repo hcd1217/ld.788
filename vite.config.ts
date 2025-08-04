@@ -103,6 +103,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Enable immediate activation and control of existing tabs
+        skipWaiting: true,
+        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         navigateFallback: null,
         // Exclude large lazy-loaded chunks from precaching

@@ -878,5 +878,11 @@
       "permissionDeleted": "Permission Deleted",
       "permissionDeletedMessage": "The permission has been permanently deleted"
     }
+  },
+  "settings": {
+    "autoUpdate": {
+      "title": "Auto-Update",
+      "description": "Automatically reload when new version is available"
+    }
   }
 }

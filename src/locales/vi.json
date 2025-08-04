@@ -878,5 +878,11 @@
       "permissionDeleted": "Đã Xóa Quyền",
       "permissionDeletedMessage": "Quyền đã được xóa vĩnh viễn"
     }
+  },
+  "settings": {
+    "autoUpdate": {
+      "title": "Tự động cập nhật",
+      "description": "Tự động tải lại khi có phiên bản mới"
+    }
   }
 }
