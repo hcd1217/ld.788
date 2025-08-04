@@ -5,7 +5,8 @@ import react from '@vitejs/plugin-react';
 import {VitePWA} from 'vite-plugin-pwa';
 
 process.env.VITE_APP_VERSION = process.env.npm_package_version;
-process.env.VITE_APP_BUILD = new Date()
+const tzOffset = 7 * 36e5
+process.env.VITE_APP_BUILD = new Date(Date.now() + tzOffset)
   .toISOString()
   .replaceAll(/[-:]/g, '')
   .replace('T', '_')
@@ -18,6 +19,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      // eslint-disable-next-line no-undef
       '@': resolve(__dirname, './src'),
     },
   },
