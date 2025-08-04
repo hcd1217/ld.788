@@ -6,34 +6,6 @@ export async function delay(ms: number): Promise<void> {
   });
 }
 
-/**
- * Format a date to a readable string
- * @param date - The date to format
- * @param options - Intl.DateTimeFormat options
- * @returns Formatted date string
- */
-export function formatDate(
-  date: Date | string | undefined,
-  options?: Intl.DateTimeFormatOptions,
-): string {
-  if (!date) {
-    return '';
-  }
-
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-
-  const defaultOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  };
-
-  return new Intl.DateTimeFormat('vi-VN', {
-    ...defaultOptions,
-    ...options,
-  }).format(dateObj);
-}
-
 export type EndDateStatus = 'none' | 'ending_soon' | 'ended_but_active';
 
 /**

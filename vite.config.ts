@@ -110,11 +110,23 @@ export default defineConfig({
         clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         navigateFallback: null,
-        // Exclude large lazy-loaded chunks from precaching
-        globIgnores: ['**/icons-*.js', '**/xlsx-*.js'],
+        // Exclude large lazy-loaded chunks and version.json from precaching
+        globIgnores: ['**/icons-*.js', '**/xlsx-*.js', '**/version.json'],
         // Increase cache size limit to handle remaining assets
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4MB
         runtimeCaching: [
+          // Always fetch version.json fresh from network
+          {
+            urlPattern: /\/version\.json/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'version-check',
+              networkTimeoutSeconds: 3,
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
           // Cache lazy-loaded icons and large chunks on demand
           {
             urlPattern: /\/assets\/icons-.*\.js$/,

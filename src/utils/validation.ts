@@ -112,17 +112,3 @@ export function getFormValidators<T extends keyof ReturnType<typeof createAuthVa
 
   return result as Pick<ReturnType<typeof createAuthValidation>, T>;
 }
-
-// Simple validation helpers for basic forms
-export function getBasicValidators(): {
-  required: (message: string) => (value: string) => string | null;
-} {
-  return {
-    required: (message: string) => (value: string) => {
-      if (!value || value.trim() === '') {
-        return message;
-      }
-      return null;
-    },
-  };
-}

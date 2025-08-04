@@ -68,10 +68,46 @@ export function usePWA() {
     },
   });
 
+  // Fetch version from version.json with retry logic
+  const fetchVersionWithRetry = async (retries = 3): Promise<string | null> => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        // Fetch with cache-busting query parameter and no-cache headers
+        const response = await fetch(`/version.json?t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch version: ${response.status}`);
+        }
+
+        const versionData = await response.json();
+        return versionData.build;
+      } catch (error) {
+        console.error(`Failed to fetch version (attempt ${i + 1}/${retries}):`, error);
+        if (i === retries - 1) {
+          return null; // Return null after all retries failed
+        }
+        // Wait before retry (exponential backoff)
+        await new Promise((resolve) => setTimeout(resolve, 1000 * Math.pow(2, i)));
+      }
+    }
+    return null;
+  };
+
   // LocalStorage-based version checking
   const checkForUpdates = useCallback(async () => {
     try {
-      const currentBuild = import.meta.env.VITE_APP_BUILD as string;
+      // Fetch current build from version.json
+      const currentBuild = await fetchVersionWithRetry();
+
+      if (!currentBuild) {
+        console.error('Could not fetch current version, skipping update check');
+        return;
+      }
 
       // Initialize stored version if empty
       if (!storedVersion) {
@@ -81,7 +117,7 @@ export function usePWA() {
       }
 
       // Check if current build differs from stored version
-      if (currentBuild && currentBuild !== storedVersion) {
+      if (currentBuild !== storedVersion) {
         console.log('New version detected:', currentBuild, '(previous:', storedVersion, ')');
 
         // Prevent duplicate notifications
@@ -193,10 +229,12 @@ export function usePWA() {
       if (isChromium()) {
         if (autoUpdate) {
           // Auto-update after delay
-          setTimeout(() => {
-            // Update stored version before reload
-            const currentBuild = import.meta.env.VITE_APP_BUILD as string;
-            setStoredVersion(currentBuild);
+          setTimeout(async () => {
+            // Fetch and update stored version before reload
+            const currentBuild = await fetchVersionWithRetry();
+            if (currentBuild) {
+              setStoredVersion(currentBuild);
+            }
             updateServiceWorker(true);
             window.location.reload();
           }, 3000);
@@ -216,10 +254,12 @@ export function usePWA() {
             message: t('common.pwa.update.clickToUpdateShort'),
             color: 'blue',
             autoClose: false,
-            onClick() {
-              // Update stored version before reload
-              const currentBuild = import.meta.env.VITE_APP_BUILD as string;
-              setStoredVersion(currentBuild);
+            onClick: async () => {
+              // Fetch and update stored version before reload
+              const currentBuild = await fetchVersionWithRetry();
+              if (currentBuild) {
+                setStoredVersion(currentBuild);
+              }
               updateServiceWorker(true);
               window.location.reload();
             },
@@ -233,10 +273,12 @@ export function usePWA() {
           message: t('common.pwa.update.newVersionOfApp'),
           color: 'blue',
           autoClose: false,
-          onClick() {
-            // Update stored version before reload
-            const currentBuild = import.meta.env.VITE_APP_BUILD as string;
-            setStoredVersion(currentBuild);
+          onClick: async () => {
+            // Fetch and update stored version before reload
+            const currentBuild = await fetchVersionWithRetry();
+            if (currentBuild) {
+              setStoredVersion(currentBuild);
+            }
             updateServiceWorker(true);
             window.location.reload();
           },
