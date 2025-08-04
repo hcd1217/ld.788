@@ -14,8 +14,8 @@
         "reloadIn3Seconds": "The app will reload in 3 seconds.",
         "reloadAutomatically": "The app will reload automatically.",
         "offlineReady": "Ready to work offline",
-        "appAvailableOffline": "Credo App is now available offline!",
-        "newVersionOfApp": "A new version of Credo App is available. Click to update.",
+        "appAvailableOffline": "{{appName}} App is now available offline!",
+        "newVersionOfApp": "A new version of {{appName}} App is available. Click to update.",
         "safari": {
           "closeCompletelyInstructions": "Close Safari completely (swipe up → swipe app away), then reopen from home screen.",
           "updateGuideTitle": "How to Update Safari PWA",

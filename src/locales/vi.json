@@ -14,8 +14,8 @@
         "reloadIn3Seconds": "Ứng dụng sẽ tải lại trong 3 giây.",
         "reloadAutomatically": "Ứng dụng sẽ tải lại tự động.",
         "offlineReady": "Sẵn sàng hoạt động ngoại tuyến",
-        "appAvailableOffline": "Ứng dụng Credo đã sẵn sàng hoạt động ngoại tuyến!",
-        "newVersionOfApp": "Phiên bản mới của ứng dụng Credo có sẵn. Nhấn để cập nhật.",
+        "appAvailableOffline": "Ứng dụng {{appName}} đã sẵn sàng hoạt động ngoại tuyến!",
+        "newVersionOfApp": "Phiên bản mới của ứng dụng {{appName}} có sẵn. Nhấn để cập nhật.",
         "safari": {
           "closeCompletelyInstructions": "Đóng Safari hoàn toàn (vuốt lên → vuốt ứng dụng đi), sau đó mở lại từ màn hình chính.",
           "updateGuideTitle": "Cách Cập Nhật Safari PWA",

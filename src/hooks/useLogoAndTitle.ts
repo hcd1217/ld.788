@@ -3,7 +3,9 @@ import { useAppStore } from '@/stores/useAppStore';
 
 export function useLogoAndTitle(options?: { color?: boolean }) {
   const { publicClientConfig } = useAppStore();
-  const [title, setTitle] = useState('Credo');
+  // Use environment variable as default, fallback to 'Credo' if not set
+  const defaultAppName = import.meta.env.VITE_APP_NAME || 'Credo';
+  const [title, setTitle] = useState(defaultAppName);
   const [logoUrl, setLogoUrl] = useState(
     options?.color ? '/logo.svg' : '/icons/logo-black-and-white.svg',
   );

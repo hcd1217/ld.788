@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/generate-version.js",
-    "build": "node scripts/generate-version.js && tsc -b && vite build",
+    "build": "node scripts/generate-version.js && node scripts/generate-pwa-assets.js && tsc -b && vite build",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,css}\" \"*.{js,ts,json}\"",

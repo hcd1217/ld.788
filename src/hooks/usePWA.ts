@@ -68,36 +68,6 @@ export function usePWA() {
     },
   });
 
-  // Fetch version from version.json with retry logic
-  const fetchVersionWithRetry = async (retries = 3): Promise<string | null> => {
-    for (let i = 0; i < retries; i++) {
-      try {
-        // Fetch with cache-busting query parameter and no-cache headers
-        const response = await fetch(`/version.json?t=${Date.now()}`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch version: ${response.status}`);
-        }
-
-        const versionData = await response.json();
-        return versionData.build;
-      } catch (error) {
-        console.error(`Failed to fetch version (attempt ${i + 1}/${retries}):`, error);
-        if (i === retries - 1) {
-          return null; // Return null after all retries failed
-        }
-        // Wait before retry (exponential backoff)
-        await new Promise((resolve) => setTimeout(resolve, 1000 * Math.pow(2, i)));
-      }
-    }
-    return null;
-  };
-
   // LocalStorage-based version checking
   const checkForUpdates = useCallback(async () => {
     try {
@@ -270,7 +240,9 @@ export function usePWA() {
         notifications.show({
           id: 'pwa-update-sw',
           title: t('common.pwa.update.newVersionAvailableForBrowser'),
-          message: t('common.pwa.update.newVersionOfApp'),
+          message: t('common.pwa.update.newVersionOfApp', {
+            appName: import.meta.env.VITE_APP_NAME || 'Credo',
+          }),
           color: 'blue',
           autoClose: false,
           onClick: async () => {
@@ -295,7 +267,9 @@ export function usePWA() {
     if (offlineReady) {
       showSuccessNotification(
         t('common.pwa.update.offlineReady'),
-        t('common.pwa.update.appAvailableOffline'),
+        t('common.pwa.update.appAvailableOffline', {
+          appName: import.meta.env.VITE_APP_NAME || 'Credo',
+        }),
       );
     }
   }, [offlineReady, t]);
@@ -311,4 +285,34 @@ export function usePWA() {
     isSafari: isSafari(),
     isChromium: isChromium(),
   };
+}
+
+// Fetch version from version.json with retry logic
+async function fetchVersionWithRetry(retries = 3): Promise<string | null> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      // Fetch with cache-busting query parameter and no-cache headers
+      const response = await fetch(`/version.json?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch version: ${response.status}`);
+      }
+
+      const versionData = await response.json();
+      return versionData.build;
+    } catch (error) {
+      console.error(`Failed to fetch version (attempt ${i + 1}/${retries}):`, error);
+      if (i === retries - 1) {
+        return null; // Return null after all retries failed
+      }
+      // Wait before retry (exponential backoff)
+      await new Promise((resolve) => setTimeout(resolve, 1000 * Math.pow(2, i)));
+    }
+  }
+  return null;
 }

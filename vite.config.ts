@@ -3,6 +3,7 @@ import process from 'node:process';
 import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
 import {VitePWA} from 'vite-plugin-pwa';
+import {htmlTransformPlugin} from './vite-plugins/html-transform';
 
 process.env.VITE_APP_VERSION = process.env.npm_package_version;
 const tzOffset = 7 * 36e5
@@ -11,6 +12,12 @@ process.env.VITE_APP_BUILD = new Date(Date.now() + tzOffset)
   .replaceAll(/[-:]/g, '')
   .replace('T', '_')
   .slice(0, -7);
+
+// Default app branding values (can be overridden by .env file)
+const APP_NAME = process.env.VITE_APP_NAME || 'Credo';
+const APP_SHORT_NAME = process.env.VITE_APP_SHORT_NAME || 'Credo';
+const APP_DESCRIPTION = process.env.VITE_APP_DESCRIPTION || 'Credo Progressive Web Application';
+const THEME_COLOR = process.env.VITE_THEME_COLOR || '#324e71';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -66,14 +73,15 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    htmlTransformPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'Credo App',
-        short_name: 'Credo',
-        description: 'Credo Progressive Web Application',
-        theme_color: '#324e71',
+        name: `${APP_NAME} App`,
+        short_name: APP_SHORT_NAME,
+        description: APP_DESCRIPTION,
+        theme_color: THEME_COLOR,
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
