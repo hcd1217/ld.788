@@ -3,6 +3,7 @@ import {useEffect, useRef, useCallback} from 'react';
 import {notifications} from '@mantine/notifications';
 import {useLocalStorage} from '@mantine/hooks';
 import {showSuccessNotification} from '@/utils/notifications';
+import {useTranslation} from '@/hooks/useTranslation';
 
 // Browser detection utilities
 const isChromium = () => {
@@ -31,10 +32,17 @@ const clearSafariCaches = async () => {
 };
 
 export function usePWA() {
+  const {t} = useTranslation();
   const updateCheckInterval = useRef<number | undefined>(undefined);
+  const lastNotificationTime = useRef<number>(0);
+  const lastDetectedVersion = useRef<string>('');
   const [autoUpdate, setAutoUpdate] = useLocalStorage({
     key: 'pwa-auto-update',
     defaultValue: true,
+  });
+  const [storedVersion, setStoredVersion] = useLocalStorage({
+    key: 'pwa-current-version',
+    defaultValue: '',
   });
   
   const {
@@ -57,16 +65,36 @@ export function usePWA() {
     },
   });
 
-  // Application-level version checking
+  // LocalStorage-based version checking
   const checkForUpdates = useCallback(async () => {
     try {
       const currentBuild = import.meta.env.VITE_APP_BUILD as string;
-      // Enhanced cache-busting for version requests
-      const response = await fetch(`/version.json?t=${Date.now()}&v=${Math.random()}`);
-      const serverVersion = await response.json();
       
-      if (serverVersion.build && serverVersion.build !== currentBuild) {
-        console.log('New version detected:', serverVersion.build);
+      // Initialize stored version if empty
+      if (!storedVersion) {
+        setStoredVersion(currentBuild);
+        console.log('Initialized PWA version:', currentBuild);
+        return;
+      }
+      
+      // Check if current build differs from stored version
+      if (currentBuild && currentBuild !== storedVersion) {
+        console.log('New version detected:', currentBuild, '(previous:', storedVersion, ')');
+        
+        // Prevent duplicate notifications
+        const now = Date.now();
+        const timeSinceLastNotification = now - lastNotificationTime.current;
+        const isSameVersion = lastDetectedVersion.current === currentBuild;
+        
+        // Skip if same version was already notified within last 10 minutes
+        if (isSameVersion && timeSinceLastNotification < 10 * 60 * 1000) {
+          console.log('Skipping duplicate notification for version:', currentBuild);
+          return;
+        }
+        
+        // Update tracking refs
+        lastNotificationTime.current = now;
+        lastDetectedVersion.current = currentBuild;
         
         if (isSafari() && isStandalone()) {
           // Clear all caches first for Safari
@@ -75,23 +103,29 @@ export function usePWA() {
           // Safari in standalone mode - requires complete app restart
           notifications.show({
             id: 'safari-update',
-            title: 'New Version Available',
-            message: 'Close Safari completely (swipe up → swipe app away), then reopen from home screen.',
+            title: t('common.pwa.update.newVersionAvailable'),
+            message: t('common.pwa.update.safari.closeCompletelyInstructions'),
             color: 'blue',
             autoClose: false,
             withCloseButton: true,
+            onClose() {
+              // Update stored version when user acknowledges update
+              setStoredVersion(currentBuild);
+            },
           });
         } else if (isChromium() && autoUpdate) {
           // Chrome with auto-update enabled
           notifications.show({
             id: 'auto-update',
-            title: 'Updating...',
-            message: 'The app will reload in 3 seconds.',
+            title: t('common.pwa.update.updating'),
+            message: t('common.pwa.update.reloadIn3Seconds'),
             color: 'blue',
             autoClose: 3000,
           });
           
           setTimeout(() => {
+            // Update stored version before reload
+            setStoredVersion(currentBuild);
             updateServiceWorker(true);
             window.location.reload();
           }, 3000);
@@ -99,11 +133,13 @@ export function usePWA() {
           // Manual update for other cases
           notifications.show({
             id: 'manual-update',
-            title: 'New Version Available',
-            message: 'Click here to update now.',
+            title: t('common.pwa.update.newVersionAvailable'),
+            message: t('common.pwa.update.clickToUpdate'),
             color: 'blue',
             autoClose: false,
             onClick() {
+              // Update stored version before reload
+              setStoredVersion(currentBuild);
               updateServiceWorker(true);
               window.location.reload();
             },
@@ -113,16 +149,12 @@ export function usePWA() {
     } catch (error) {
       console.error('Failed to check for updates:', error);
     }
-  }, [autoUpdate, updateServiceWorker]);
+  }, [autoUpdate, updateServiceWorker, storedVersion, setStoredVersion, t]);
 
-  // Setup periodic version checking
+  // Setup localStorage-based version checking
   useEffect(() => {
-    // Initial check after 30 seconds
-    const initialCheck = setTimeout(checkForUpdates, 30000);
-    
-    // Periodic checks every 5 minutes for Chrome, 10 minutes for Safari
-    const interval = isSafari() ? 10 * 60 * 1000 : 5 * 60 * 1000;
-    updateCheckInterval.current = window.setInterval(checkForUpdates, interval);
+    // Initial check immediately on mount
+    void checkForUpdates();
     
     // Check on visibility change (app comes to foreground)
     const handleVisibilityChange = () => {
@@ -132,8 +164,10 @@ export function usePWA() {
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
     
+    // Optional periodic check every 30 minutes as fallback
+    updateCheckInterval.current = window.setInterval(checkForUpdates, 30 * 60 * 1000);
+    
     return () => {
-      clearTimeout(initialCheck);
       if (updateCheckInterval.current) {
         window.clearInterval(updateCheckInterval.current);
       }
@@ -141,62 +175,85 @@ export function usePWA() {
     };
   }, [checkForUpdates]);
 
-  // Handle needRefresh for Chromium browsers
+  // Handle needRefresh for service worker updates (only for cases not handled by app-level checking)
   useEffect(() => {
-    if (needRefresh && isChromium()) {
-      if (autoUpdate) {
-        // Auto-update after delay
-        setTimeout(() => {
-          updateServiceWorker(true);
-          window.location.reload();
-        }, 3000);
-        
-        notifications.show({
-          id: 'pwa-updating',
-          title: 'Updating...',
-          message: 'The app will reload automatically.',
-          color: 'blue',
-          autoClose: 3000,
-        });
+    if (needRefresh) {
+      // Check if we already handled this through app-level version checking
+      const now = Date.now();
+      const recentlyNotified = (now - lastNotificationTime.current) < 5 * 60 * 1000; // 5 minutes
+      
+      if (recentlyNotified) {
+        console.log('Skipping service worker notification - already handled by app-level check');
+        return;
+      }
+      
+      if (isChromium()) {
+        if (autoUpdate) {
+          // Auto-update after delay
+          setTimeout(() => {
+            // Update stored version before reload
+            const currentBuild = import.meta.env.VITE_APP_BUILD as string;
+            setStoredVersion(currentBuild);
+            updateServiceWorker(true);
+            window.location.reload();
+          }, 3000);
+          
+          notifications.show({
+            id: 'pwa-updating',
+            title: t('common.pwa.update.updating'),
+            message: t('common.pwa.update.reloadAutomatically'),
+            color: 'blue',
+            autoClose: 3000,
+          });
+        } else {
+          // Manual update prompt
+          notifications.show({
+            id: 'pwa-update-sw',
+            title: t('common.pwa.update.newVersionAvailableForBrowser'),
+            message: t('common.pwa.update.clickToUpdateShort'),
+            color: 'blue',
+            autoClose: false,
+            onClick() {
+              // Update stored version before reload
+              const currentBuild = import.meta.env.VITE_APP_BUILD as string;
+              setStoredVersion(currentBuild);
+              updateServiceWorker(true);
+              window.location.reload();
+            },
+          });
+        }
       } else {
-        // Manual update prompt
+        // For non-Chromium browsers
         notifications.show({
-          id: 'pwa-update',
-          title: 'New version available',
-          message: 'Click to update now.',
+          id: 'pwa-update-sw',
+          title: t('common.pwa.update.newVersionAvailableForBrowser'),
+          message: t('common.pwa.update.newVersionOfApp'),
           color: 'blue',
           autoClose: false,
           onClick() {
+            // Update stored version before reload
+            const currentBuild = import.meta.env.VITE_APP_BUILD as string;
+            setStoredVersion(currentBuild);
             updateServiceWorker(true);
             window.location.reload();
           },
         });
       }
-    } else if (needRefresh && !isChromium()) {
-      // For non-Chromium browsers
-      notifications.show({
-        id: 'pwa-update',
-        title: 'New version available',
-        message: 'A new version of Credo App is available. Click to update.',
-        color: 'blue',
-        autoClose: false,
-        onClick() {
-          updateServiceWorker(true);
-          window.location.reload();
-        },
-      });
+      
+      // Update tracking to prevent duplicate app-level notifications
+      lastNotificationTime.current = now;
     }
-  }, [needRefresh, autoUpdate, updateServiceWorker]);
+  }, [needRefresh, autoUpdate, updateServiceWorker, setStoredVersion, t]);
 
   // Show offline ready notification
   useEffect(() => {
     if (offlineReady) {
       showSuccessNotification(
-        'Ready to work offline',
-        'Credo App is now available offline!',
+        t('common.pwa.update.offlineReady'),
+        t('common.pwa.update.appAvailableOffline'),
       );
     }
-  }, [offlineReady]);
+  }, [offlineReady, t]);
 
   return {
     offlineReady,

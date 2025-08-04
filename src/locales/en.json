@@ -3,6 +3,37 @@
     "pages": {
       "blank": "This page is blank page, if you see this page, it means that the route in under construction, please just ignore this"
     },
+    "pwa": {
+      "update": {
+        "newVersionAvailable": "New Version Available",
+        "newVersionAvailableForBrowser": "New version available",
+        "updating": "Updating...",
+        "updateReady": "Update ready",
+        "clickToUpdate": "Click here to update now.",
+        "clickToUpdateShort": "Click to update now.",
+        "reloadIn3Seconds": "The app will reload in 3 seconds.",
+        "reloadAutomatically": "The app will reload automatically.",
+        "offlineReady": "Ready to work offline",
+        "appAvailableOffline": "Credo App is now available offline!",
+        "newVersionOfApp": "A new version of Credo App is available. Click to update.",
+        "safari": {
+          "closeCompletelyInstructions": "Close Safari completely (swipe up → swipe app away), then reopen from home screen.",
+          "updateGuideTitle": "How to Update Safari PWA",
+          "updateInstructions": "To update the app on Safari, you must completely close the app:",
+          "step1": "Double-tap home button or swipe up from bottom",
+          "step2": "Find this app and swipe UP to close completely",
+          "step3": "Wait 2-3 seconds for Safari to fully close",
+          "step4": "Tap the app icon on home screen to reopen",
+          "restartNote": "Note: Simply switching between apps won't update Safari PWAs. A complete restart is required."
+        }
+      },
+      "settings": {
+        "autoUpdate": {
+          "title": "Auto Update",
+          "description": "Automatically update the app when new versions are available (Chrome/Edge only)"
+        }
+      }
+    },
     "filter": "Filter",
     "applyFilter": "Apply Filters",
     "firstName": "First name",

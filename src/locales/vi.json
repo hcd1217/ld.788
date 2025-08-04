@@ -3,6 +3,37 @@
     "pages": {
       "blank": "Trang này là đang được phát triên, nếu bạn thấy trang này, có nghĩa là nó đang được xây dựng, vui lòng bỏ qua"
     },
+    "pwa": {
+      "update": {
+        "newVersionAvailable": "Phiên Bản Mới Có Sẵn",
+        "newVersionAvailableForBrowser": "Phiên bản mới có sẵn",
+        "updating": "Đang cập nhật...",
+        "updateReady": "Sẵn sàng cập nhật",
+        "clickToUpdate": "Nhấn vào đây để cập nhật ngay.",
+        "clickToUpdateShort": "Nhấn để cập nhật ngay.",
+        "reloadIn3Seconds": "Ứng dụng sẽ tải lại trong 3 giây.",
+        "reloadAutomatically": "Ứng dụng sẽ tải lại tự động.",
+        "offlineReady": "Sẵn sàng hoạt động ngoại tuyến",
+        "appAvailableOffline": "Ứng dụng Credo đã sẵn sàng hoạt động ngoại tuyến!",
+        "newVersionOfApp": "Phiên bản mới của ứng dụng Credo có sẵn. Nhấn để cập nhật.",
+        "safari": {
+          "closeCompletelyInstructions": "Đóng Safari hoàn toàn (vuốt lên → vuốt ứng dụng đi), sau đó mở lại từ màn hình chính.",
+          "updateGuideTitle": "Cách Cập Nhật Safari PWA",
+          "updateInstructions": "Để cập nhật ứng dụng trên Safari, bạn phải đóng hoàn toàn ứng dụng:",
+          "step1": "Nhấn đôi nút home hoặc vuốt lên từ dưới cùng",
+          "step2": "Tìm ứng dụng này và vuốt LÊN để đóng hoàn toàn",
+          "step3": "Đợi 2-3 giây để Safari đóng hoàn toàn",
+          "step4": "Nhấn vào biểu tượng ứng dụng trên màn hình chính để mở lại",
+          "restartNote": "Lưu ý: Chỉ chuyển đổi giữa các ứng dụng sẽ không cập nhật Safari PWA. Cần khởi động lại hoàn toàn."
+        }
+      },
+      "settings": {
+        "autoUpdate": {
+          "title": "Tự Động Cập Nhật",
+          "description": "Tự động cập nhật ứng dụng khi có phiên bản mới (chỉ Chrome/Edge)"
+        }
+      }
+    },
     "filter": "Lọc",
     "applyFilter": "Lọc",
     "firstName": "Tên",
