@@ -11,6 +11,7 @@
       "productManagement": "Product Management",
       "employeeConfig": "Employee Config",
       "productConfig": "Product Config",
+      "roleConfig": "Role Config",
       "customerConfig": "Customer Config",
       "poManagement": "PO Management",
       "poManagementMobile": "PO",

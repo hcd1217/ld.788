@@ -10,7 +10,7 @@ import customPlugin from './eslint-rules/index.js';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'node_modules', 'coverage', 'scripts', 'eslint.config.js'],
+    ignores: ['dist', 'node_modules', 'coverage', 'eslint.config.js'],
   },
   {
     files: ['**/*.{ts,tsx,js,jsx}'],
@@ -125,6 +125,43 @@ export default tseslint.config(
           ignoreRestSiblings: true,
         },
       ],
+    },
+  },
+  {
+    files: ['scripts/**/*.{ts,tsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+      },
+      parser: tseslint.parser,
+      parserOptions: {
+        project: './tsconfig.node.json',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+      prettier: prettier,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...tseslint.configs.recommended.rules,
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      'prettier/prettier': 'error',
+      ...prettierConfig.rules,
     },
   },
 );
