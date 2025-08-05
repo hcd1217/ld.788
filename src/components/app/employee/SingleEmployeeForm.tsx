@@ -94,13 +94,11 @@ export function SingleEmployeeForm({
                 </Alert>
               )}
             </Transition>
-
             <FirstNameAndLastNameInForm
               form={form}
               isLoading={isLoading}
               setShowAlert={setShowAlert}
             />
-
             <Select
               searchable
               clearable
@@ -109,21 +107,18 @@ export function SingleEmployeeForm({
               data={unitOptions}
               {...form.getInputProps('unitId')}
             />
-
             <TextInput
               label={t('employee.email')}
               placeholder="john.doe@example.com"
               leftSection={<IconMail size={16} />}
               {...form.getInputProps('email')}
             />
-
             <TextInput
               label={t('employee.phone')}
               placeholder="0901-234-567"
               leftSection={<IconPhone size={16} />}
               {...form.getInputProps('phone')}
             />
-
             <Stack gap="xs">
               <Text size="sm" fw={500}>
                 {t('employee.workType')}
@@ -147,7 +142,6 @@ export function SingleEmployeeForm({
                 {...form.getInputProps('monthlySalary')}
               />
             )}
-
             {form.values.workType === 'PART_TIME' && (
               <NumberInput
                 label={t('employee.hourlyRate')}
@@ -158,7 +152,6 @@ export function SingleEmployeeForm({
                 {...form.getInputProps('hourlyRate')}
               />
             )}
-
             <DateInput
               label={t('employee.startDate')}
               placeholder={t('employee.startDatePlaceholder')}
@@ -166,7 +159,6 @@ export function SingleEmployeeForm({
               valueFormat={valueFormat}
               {...form.getInputProps('startDate')}
             />
-
             {isEditMode && (
               <Switch
                 label={t('employee.updateEndDate')}
@@ -174,7 +166,6 @@ export function SingleEmployeeForm({
                 {...form.getInputProps('isEndDateEnabled', { type: 'checkbox' })}
               />
             )}
-
             {isEditMode && form.values.isEndDateEnabled && (
               <DateInput
                 label={t('employee.endDate')}
@@ -184,7 +175,6 @@ export function SingleEmployeeForm({
                 {...form.getInputProps('endDate')}
               />
             )}
-
             <Group justify="flex-end">
               <Button variant="light" disabled={isLoading} onClick={onCancel}>
                 {t('common.cancel')}

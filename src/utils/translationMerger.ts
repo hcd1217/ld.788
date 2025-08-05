@@ -1,4 +1,4 @@
-import type { ClientConfig } from '@/lib/api/schemas/auth.schemas';
+import type { ClientConfig } from '@/lib/api/schemas/clientConfig.schemas';
 import type { Dictionary } from '@/types/dictionary';
 
 /**

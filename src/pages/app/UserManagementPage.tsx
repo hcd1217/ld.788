@@ -220,7 +220,7 @@ export function UserManagementPage() {
               visibleFrom="sm"
               onClick={() => navigate(ROUTERS.IMPORT_USERS)}
             >
-              {t('common.importUsers')}
+              {t('common.pages.importUsers')}
             </Button>
             <Button
               leftSection={<IconUserPlus size={16} />}
@@ -232,7 +232,7 @@ export function UserManagementPage() {
         </Group>
 
         <Title order={1} ta="center">
-          {t('common.userManagement')}
+          {t('common.pages.userManagement')}
         </Title>
 
         <Paper withBorder shadow="md" p="md" radius="md">

@@ -47,23 +47,23 @@ export function MobileUserMenu() {
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Label>{t('common.account')}</Menu.Label>
+        <Menu.Label>{t('common.pages.account')}</Menu.Label>
         <Menu.Item
           leftSection={<IconUser style={{ width: rem(14), height: rem(14) }} />}
           onClick={() => navigate(ROUTERS.PROFILE)}
         >
-          {t('common.profile')}
+          {t('common.pages.profile')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}
           onClick={() => navigate(ROUTERS.SETTINGS)}
         >
-          {t('common.settings')}
+          {t('common.pages.settings')}
         </Menu.Item>
 
         <Menu.Divider />
 
-        <Menu.Label>{t('common.preferences')}</Menu.Label>
+        <Menu.Label>{t('common.pages.preferences')}</Menu.Label>
         <Menu.Item closeMenuOnClick={false}>
           <Group justify="space-between">
             <Group gap="xs">

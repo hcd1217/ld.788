@@ -4,7 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en from '@/locales/en.json';
 import vi from '@/locales/vi.json';
 import { isDevelopment } from '@/utils/env';
-import type { ClientConfig } from '@/lib/api/schemas/auth.schemas';
+import type { ClientConfig } from '@/lib/api/schemas/clientConfig.schemas';
 import type { Dictionary } from '@/types/dictionary';
 
 const baseResources = {
@@ -90,16 +90,16 @@ function unFlattenTranslations(flatTranslations: string | Dictionary): Dictionar
     const parts = key.split('.');
     let current = result;
 
-    for (const [index, part] of parts.entries()) {
-      if (index === parts.length - 1) {
-        current[part] = value;
-      } else {
-        current[part] ||= {};
-        if (typeof current[part] !== 'string') {
-          current = current[part];
-        }
+    for (let i = 0; i < parts.length - 1; i++) {
+      const part = parts[i];
+      // If the path is not an object, create it. This overwrites any conflicting primitive values.
+      if (typeof current[part] !== 'object' || current[part] === null) {
+        current[part] = {};
       }
+      current = current[part] as Dictionary;
     }
+
+    current[parts[parts.length - 1]] = value;
   }
 
   return result;

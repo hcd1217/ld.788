@@ -12,6 +12,7 @@ import {
 import { authApi, clientApi, type ClientPublicConfigResponse } from '@/lib/api';
 import { updateClientTranslations, clearClientTranslations } from '@/lib/i18n';
 import type { GetMeResponse } from '@/lib/api/schemas/auth.schemas';
+import { cacheNavigationConfig, clearNavigationCache } from '@/utils/navigationCache';
 
 type User = {
   id: string;
@@ -110,6 +111,11 @@ export const useAppStore = create<AppState>()(
             const profile = await authApi.getMe();
             set({ userProfile: profile });
 
+            // Cache navigation config if available
+            if (profile.clientConfig?.navigation?.length) {
+              cacheNavigationConfig(profile?.clientConfig?.navigation);
+            }
+
             // Apply client-specific translations if available
             if (profile.clientConfig?.translations) {
               // Clear old client translation before add new one
@@ -167,6 +173,7 @@ export const useAppStore = create<AppState>()(
         },
         logout() {
           authService.logout();
+          clearNavigationCache(); // Clear cached navigation on logout
           set({
             user: undefined,
             userProfile: undefined,

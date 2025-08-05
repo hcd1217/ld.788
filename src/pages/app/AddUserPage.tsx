@@ -138,7 +138,7 @@ export function AddUserPage() {
               visibleFrom="sm"
               onClick={() => navigate(ROUTERS.IMPORT_USERS)}
             >
-              {t('common.importUsers')}
+              {t('common.pages.importUsers')}
             </Button>
           </Group>
         </Container>

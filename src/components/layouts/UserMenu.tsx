@@ -55,7 +55,7 @@ export function UserMenu({ c }: UserMenuProps) {
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Label>{t('common.account')}</Menu.Label>
+        <Menu.Label>{t('common.pages.account')}</Menu.Label>
         <Menu.Item
           leftSection={
             <IconUser
@@ -68,7 +68,7 @@ export function UserMenu({ c }: UserMenuProps) {
           }
           onClick={() => navigate(ROUTERS.PROFILE)}
         >
-          {t('common.profile')}
+          {t('common.pages.profile')}
         </Menu.Item>
         <Menu.Item
           leftSection={
@@ -82,7 +82,7 @@ export function UserMenu({ c }: UserMenuProps) {
           }
           onClick={() => navigate(ROUTERS.SETTINGS)}
         >
-          {t('common.settings')}
+          {t('common.pages.settings')}
         </Menu.Item>
 
         <Menu.Divider />

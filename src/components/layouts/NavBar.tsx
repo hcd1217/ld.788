@@ -6,78 +6,13 @@ import { useLocation, useNavigate } from 'react-router';
 import classes from './AuthLayout.module.css';
 import type { NavigationItem } from './types';
 import { LAYOUT_CONFIG } from '@/config/layoutConfig';
-import { NAVIGATION_STRUCTURE } from '@/config/navigationConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/stores/useAppStore';
 import { isNavigationItemActive } from '@/utils/navigationUtils';
+import { getNavigationItems } from '@/services/navigationService';
 
-// Transform static navigation structure to NavigationItem format with translations
-function transformNavigationItem(
-  item: (typeof NAVIGATION_STRUCTURE)[number],
-  t: any, // Temporarily use any to bypass type depth issue
-): NavigationItem {
-  const base: NavigationItem = {
-    id: item.id,
-    label: t(item.translationKey),
-    icon: item.icon,
-  };
-
-  // Add optional properties if they exist
-  if ('path' in item) base.path = item.path;
-  if ('hidden' in item) base.hidden = item.hidden;
-  if ('dummy' in item) base.dummy = item.dummy;
-  if ('activePaths' in item) base.activePaths = [...item.activePaths];
-
-  if ('subs' in item && item.subs) {
-    base.subs = item.subs.map((sub) => {
-      const subItem: NavigationItem = {
-        id: sub.id,
-        label: t(sub.translationKey),
-        icon: sub.icon,
-      };
-
-      // Add optional properties if they exist
-      if ('path' in sub) subItem.path = sub.path;
-      if ('hidden' in sub && typeof sub.hidden === 'boolean') subItem.hidden = sub.hidden;
-      if ('activePaths' in sub) subItem.activePaths = [...sub.activePaths];
-
-      return subItem;
-    });
-  }
-
-  return base;
-}
-
-// Filter navigation items based on route config
-function filterNavigationItem(
-  item: NavigationItem,
-  routeConfig?: Record<string, boolean>,
-): NavigationItem | undefined {
-  if (item.hidden) {
-    return undefined;
-  }
-
-  if (item.path && !routeConfig?.[item.path]) {
-    return undefined;
-  }
-
-  if (item.subs) {
-    const filteredSubs = item.subs
-      .map((sub) => filterNavigationItem(sub, routeConfig))
-      .filter((sub): sub is NavigationItem => sub !== undefined);
-
-    if (filteredSubs.length === 0 && !item.path) {
-      return undefined;
-    }
-
-    return {
-      ...item,
-      subs: filteredSubs,
-    };
-  }
-
-  return item;
-}
+// Note: Navigation transformation logic has been moved to navigationService.ts
+// This component now uses getNavigationItems() for backend-driven navigation with static fallback
 
 // Persist expanded menu state
 const EXPANDED_MENU_KEY = 'auth-layout-expanded-menu';
@@ -245,25 +180,24 @@ export function NavBar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Use selector to only subscribe to routeConfig changes
-  const routeConfig = useAppStore((state) => state.userProfile?.routeConfig || EMPTY_ROUTE_CONFIG);
+  // Use selector to only subscribe to userProfile changes (includes routeConfig and navigation in clientConfig)
+  const userProfile = useAppStore((state) => state.userProfile);
+  const routeConfig = userProfile?.routeConfig || EMPTY_ROUTE_CONFIG;
 
   const { t } = useTranslation();
   const [expandedMenuId, setExpandedMenuId] = useState<string | undefined>(
     getPersistedExpandedMenuId(),
   );
 
-  // Transform and filter navigation items
-  // This is now more efficient as NAVIGATION_STRUCTURE is static
+  // Get navigation items from backend or static fallback
+  // Backend navigation takes priority if available
   const navigationItems = useMemo(() => {
-    const transformed = NAVIGATION_STRUCTURE.map((item) => transformNavigationItem(item, t));
-    return transformed
-      .map((item) => filterNavigationItem(item, routeConfig))
-      .filter((item): item is NavigationItem => item !== undefined);
-  }, [t, routeConfig]);
+    return getNavigationItems(userProfile?.clientConfig?.navigation, t, routeConfig);
+  }, [userProfile, t, routeConfig]);
 
   // Auto-expand menus that have active submenus
   useEffect(() => {
+    console.log('navigationItems', navigationItems);
     const itemsWithActiveSubs = navigationItems.filter((item) =>
       item.subs?.some((sub) => isNavigationItemActive(sub, location.pathname)),
     );

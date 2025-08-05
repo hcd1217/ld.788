@@ -10,22 +10,22 @@ export function CommonMobileFooter() {
   const { t } = useTranslation();
   const navigationItems = [
     {
-      label: t('common.home'),
+      label: t('common.pages.home'),
       icon: IconHome,
       path: ROUTERS.HOME,
     },
     {
-      label: t('common.employeeManagementMobile'),
+      label: t('common.pages.employeeManagementMobile'),
       icon: IconAddressBook,
       path: ROUTERS.EMPLOYEE_MANAGEMENT,
     },
     {
-      label: t('common.poManagementMobile'),
+      label: t('common.pages.poManagementMobile'),
       icon: IconShoppingCart,
       path: ROUTERS.PO_MANAGEMENT,
     },
     {
-      label: t('common.more'),
+      label: t('common.pages.more'),
       icon: IconDots,
       path: ROUTERS.MORE,
     },

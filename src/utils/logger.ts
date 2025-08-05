@@ -11,7 +11,7 @@ console.ignore = () => {
 
 export function registerLogger() {
   const debug = false;
-  if (!debug && isDevelopment) {
+  if (!debug && !isDevelopment) {
     return;
   }
   const colorMap = {
@@ -34,6 +34,12 @@ export function registerLogger() {
   function log(level: 'info' | 'warn' | 'error', message: unknown, ...args: unknown[]) {
     const message_: string = [message, ...args]
       .map((arg) => {
+        if (typeof arg == 'string') {
+          return arg;
+        }
+        if (arg instanceof Error) {
+          return [arg.message, arg.stack || 'No stack trace'].join('\n');
+        }
         if (typeof arg === 'object' && arg !== null) {
           try {
             return JSON.stringify(arg, null, 2);

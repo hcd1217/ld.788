@@ -275,7 +275,7 @@ export function RoleManagementPage() {
         </Group>
 
         <Title order={1} ta="center">
-          {t('common.roleManagement')}
+          {t('common.pages.roleManagement')}
         </Title>
 
         <Paper withBorder shadow="md" p="md" radius="md">

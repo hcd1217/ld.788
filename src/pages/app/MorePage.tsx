@@ -43,7 +43,7 @@ export function MorePage() {
 
   const menuItems = [
     {
-      title: t('common.dashboard'),
+      title: t('common.pages.dashboard'),
       description: 'Main dashboard overview',
       icon: IconHome,
       onClick: () => navigate(ROUTERS.HOME),
@@ -64,21 +64,21 @@ export function MorePage() {
       color: 'violet',
     },
     {
-      title: t('common.explore'),
+      title: t('common.pages.explore'),
       description: 'Discover new content',
       icon: IconSearch,
       onClick: () => navigate(ROUTERS.EXPLORE),
       color: 'teal',
     },
     {
-      title: t('common.notifications'),
+      title: t('common.pages.notifications'),
       description: 'Your notifications and alerts',
       icon: IconBell,
       onClick: () => navigate(ROUTERS.NOTIFICATIONS),
       color: 'orange',
     },
     {
-      title: t('common.profile'),
+      title: t('common.pages.profile'),
       description: 'Manage your profile',
       icon: IconUser,
       onClick: () => navigate(ROUTERS.PROFILE),
@@ -88,7 +88,7 @@ export function MorePage() {
 
   const utilityItems = [
     {
-      title: t('common.addUser'),
+      title: t('common.pages.addUser'),
       description: 'Add new users to the system',
       icon: IconUserPlus,
       onClick: () => navigate(ROUTERS.ADD_USER),
@@ -104,7 +104,7 @@ export function MorePage() {
       devOnly: true,
     },
     {
-      title: t('common.about'),
+      title: t('common.pages.about'),
       description: 'About this application',
       icon: IconInfoCircle,
       onClick: () => navigate(ROUTERS.ROOT),
@@ -130,7 +130,7 @@ export function MorePage() {
           <Box style={{ maxWidth: '600px', width: '100%' }}>
             <Card shadow="sm" padding="lg" radius="md">
               <Title order={1} mb="lg">
-                {t('common.more')}
+                {t('common.pages.more')}
               </Title>
 
               <Card withBorder p="md" mb="lg" bg={isDarkMode ? 'dark.6' : 'gray.0'}>
@@ -139,7 +139,7 @@ export function MorePage() {
                   <div>
                     <Text fw={500}>{user.email}</Text>
                     <Text size="sm" c="dimmed">
-                      {t('common.account')}
+                      {t('common.pages.account')}
                     </Text>
                   </div>
                 </Group>

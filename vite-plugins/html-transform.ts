@@ -10,7 +10,6 @@ export function htmlTransformPlugin(): Plugin {
     transformIndexHtml(html) {
       const appName = process.env.VITE_APP_NAME || 'Credo';
       const appDescription = process.env.VITE_APP_DESCRIPTION || 'Credo Progressive Web Application';
-      const themeColor = process.env.VITE_THEME_COLOR || '#324e71';
       
       return html
         // Replace title
@@ -50,16 +49,6 @@ export function htmlTransformPlugin(): Plugin {
         .replace(
           /<meta name="apple-mobile-web-app-title" content=".*?"/,
           `<meta name="apple-mobile-web-app-title" content="${appName}"`
-        )
-        // Replace theme-color meta tag
-        .replace(
-          /<meta name="theme-color" content=".*?"/,
-          `<meta name="theme-color" content="${themeColor}"`
-        )
-        // Replace mask-icon color
-        .replace(
-          /<link rel="mask-icon" href="\/mask-icon.svg" color=".*?"/,
-          `<link rel="mask-icon" href="/mask-icon.svg" color="${themeColor}"`
         );
     }
   };
