@@ -33,7 +33,7 @@ initializeOrientationLock();
 
 createRoot(document.querySelector('#root')!).render(
   <StrictMode>
-    <MantineProvider theme={theme} defaultColorScheme="auto" cssVariablesResolver={resolver}>
+    <MantineProvider theme={theme} defaultColorScheme="light" cssVariablesResolver={resolver}>
       <Suspense fallback={<AppLoader />}>
         <Notifications />
         <ModalsProvider>

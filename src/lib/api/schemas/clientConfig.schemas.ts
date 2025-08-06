@@ -14,6 +14,38 @@ import type { RouteIdentifier } from '@/config/routeConfig';
 import { hasIcon, IconIdentifiers } from '@/utils/iconRegistry';
 import type { IconIdentifier } from '@/utils/iconRegistry';
 
+// Default mobile navigation configuration for backend reference
+const DEFAULT_MOBILE_NAVIGATION_CONFIG: NavigationItem[] = [
+  {
+    id: 'mobile-nav-home',
+    translationKey: 'common.pages.home',
+    icon: IconIdentifiers.HOME,
+    path: RouteIdentifiers.HOME,
+    order: 1,
+  },
+  {
+    id: 'mobile-nav-employees',
+    translationKey: 'common.pages.employeeManagementMobile',
+    icon: IconIdentifiers.ADDRESS_BOOK,
+    path: RouteIdentifiers.EMPLOYEE_MANAGEMENT,
+    order: 2,
+  },
+  {
+    id: 'mobile-nav-po',
+    translationKey: 'common.pages.poManagementMobile',
+    icon: IconIdentifiers.SHOPPING_CART,
+    path: RouteIdentifiers.PO_MANAGEMENT,
+    order: 3,
+  },
+  {
+    id: 'mobile-nav-more',
+    translationKey: 'common.pages.more',
+    icon: IconIdentifiers.DOTS,
+    path: RouteIdentifiers.MORE,
+    order: 4,
+  },
+];
+
 // Default navigation configuration for backend reference
 const DEFAULT_NAVIGATION_CONFIG: NavigationItem[] = [
   {
@@ -183,6 +215,10 @@ export const ClientConfigSchema = z.object({
   allowSelfRegistration: booleanSchema.optional(),
   translations: dictionarySchema.optional(),
   navigation: z.array(NavigationItemSchema).optional().default(DEFAULT_NAVIGATION_CONFIG), // Backend-driven navigation
+  mobileNavigation: z
+    .array(NavigationItemSchema)
+    .optional()
+    .default(DEFAULT_MOBILE_NAVIGATION_CONFIG), // Backend-driven mobile navigation
   ...ClientPublicConfigSchema.shape,
 });
 

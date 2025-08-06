@@ -76,9 +76,8 @@ export const employeeService = {
         position,
         unitId: employee.departmentId,
         unit: unitMap.get(employee.departmentId ?? ''),
-        // email?: string;
-        phone: `0901-${Math.floor(Math.random() * 1e3)}-${Math.floor(Math.random() * 1e3)}`,
         workType,
+        phone: employee.phoneNumber,
         monthlySalary: employee.metadata?.monthlySalary,
         hourlyRate: employee.metadata?.hourRate,
         endDate: employee.terminationDate,
@@ -102,6 +101,7 @@ export const employeeService = {
       firstName: employee.firstName,
       lastName: employee.lastName,
       departmentId: employee.unitId,
+      phoneNumber: employee.phone,
       employmentType: employee.workType ?? 'FULL_TIME',
       metadata: {
         hourRate: employee.workType === 'FULL_TIME' ? undefined : employee.hourlyRate,
@@ -115,6 +115,7 @@ export const employeeService = {
     employees: Array<{
       firstName: string;
       lastName: string;
+      phone?: string;
       unitId?: string | undefined;
       workType?: WorkType;
       monthlySalary?: number;
@@ -125,6 +126,7 @@ export const employeeService = {
       employees: employees.map((employee) => ({
         firstName: employee.firstName,
         lastName: employee.lastName,
+        phoneNumber: employee.phone,
         departmentId: employee.unitId,
         employmentType: employee.workType ?? 'FULL_TIME',
         metadata: {
@@ -169,6 +171,7 @@ export const employeeService = {
       lastName: employee.lastName,
       departmentId: employee.unitId,
       employmentType: employee.workType,
+      phoneNumber: employee.phone,
       hireDate: new Date(employee.startDate).toISOString(),
       terminationDate: employee.endDate ? new Date(employee.endDate).toISOString() : undefined,
       metadata: {

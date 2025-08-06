@@ -31,7 +31,7 @@ export function EmployeeDetailTabs({
       <ScrollArea offsetScrollbars scrollbarSize={4}>
         <Tabs.List>
           <Tabs.Tab value="info" leftSection={<IconInfoCircle size={16} />}>
-            {t('employee.detailInformation')}
+            {t('employee.basicInformation')}
           </Tabs.Tab>
           <Tabs.Tab value="timesheet" leftSection={<IconClock size={16} />}>
             {t('employee.timesheet')}

@@ -43,7 +43,9 @@ export function LoginPage() {
   useOnce(() => {
     // Extract client-code from URL query params
     const clientCodeFromUrl = searchParams.get('client-code');
-    console.log('clientCodeFromUrl', clientCodeFromUrl);
+    if (isDevelopment) {
+      console.log('clientCodeFromUrl', clientCodeFromUrl);
+    }
 
     // Use client code from URL if available
     if (clientCodeFromUrl && clientCodeFromUrl !== clientCode) {

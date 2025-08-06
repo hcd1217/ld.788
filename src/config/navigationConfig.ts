@@ -9,6 +9,8 @@ import {
   IconUserCircle,
   IconUsers,
   IconUsersGroup,
+  IconHome,
+  IconDots,
 } from '@tabler/icons-react';
 import { ROUTERS } from './routeConfig';
 
@@ -92,5 +94,34 @@ export const NAVIGATION_STRUCTURE = [
     translationKey: 'common.pages.profile',
     icon: IconUserCircle,
     path: ROUTERS.PROFILE,
+  },
+] as const;
+
+// Mobile navigation structure for bottom navigation
+// Limited to 4 items for optimal mobile UX
+export const MOBILE_NAVIGATION_STRUCTURE = [
+  {
+    id: 'mobile-nav-home',
+    translationKey: 'common.pages.home',
+    icon: IconHome,
+    path: ROUTERS.HOME,
+  },
+  {
+    id: 'mobile-nav-employees',
+    translationKey: 'common.pages.employeeManagementMobile',
+    icon: IconAddressBook,
+    path: ROUTERS.EMPLOYEE_MANAGEMENT,
+  },
+  {
+    id: 'mobile-nav-po',
+    translationKey: 'common.pages.poManagementMobile',
+    icon: IconShoppingCart,
+    path: ROUTERS.PO_MANAGEMENT,
+  },
+  {
+    id: 'mobile-nav-more',
+    translationKey: 'common.pages.more',
+    icon: IconDots,
+    path: ROUTERS.MORE,
   },
 ] as const;

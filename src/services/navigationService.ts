@@ -2,7 +2,7 @@ import type { NavigationItemType as BackendNavigationItem } from '@/lib/api/sche
 import type { NavigationItem as FrontendNavigationItem } from '@/components/layouts/types';
 import { getIcon } from '@/utils/iconRegistry';
 import { getRoute } from '@/config/routeConfig';
-import { NAVIGATION_STRUCTURE } from '@/config/navigationConfig';
+import { NAVIGATION_STRUCTURE, MOBILE_NAVIGATION_STRUCTURE } from '@/config/navigationConfig';
 // Translation function type is 'any' to match existing NavBar.tsx pattern
 
 /**
@@ -53,6 +53,13 @@ function transformBackendNavigation(
   return sortedItems.map((item) => transformBackendItem(item, t));
 }
 
+interface StaticNavigationItem {
+  hidden?: boolean;
+  path?: string;
+  activePaths?: readonly string[];
+  id: string;
+  subs?: readonly StaticNavigationItem[];
+}
 /**
  * Transforms static navigation structure to frontend format
  * Used as fallback when backend navigation is not available
@@ -62,12 +69,12 @@ function transformBackendNavigation(
  * @returns Array of frontend navigation items
  */
 export function transformStaticNavigation(
-  staticNav: typeof NAVIGATION_STRUCTURE,
+  staticNav: readonly StaticNavigationItem[],
   t: any,
   routeConfig?: Record<string, boolean>,
 ): FrontendNavigationItem[] {
   return staticNav
-    .filter((item: any) => {
+    .filter((item: StaticNavigationItem) => {
       // Filter out hidden items
       if ('hidden' in item && item.hidden) {
         return false;
@@ -239,4 +246,25 @@ export function filterNavigationByFeatureFlags(
       return item;
     })
     .filter((item): item is BackendNavigationItem => item !== null);
+}
+
+/**
+ * Gets mobile navigation items with backend priority and static fallback
+ * @param backendMobileNav Optional backend mobile navigation configuration
+ * @param t Translation function
+ * @param routeConfig Optional route permissions for static navigation
+ * @returns Array of frontend navigation items ready for mobile navigation
+ */
+export function getMobileNavigationItems(
+  backendMobileNav: BackendNavigationItem[] | undefined,
+  t: any,
+  routeConfig?: Record<string, boolean>,
+): FrontendNavigationItem[] {
+  // Use backend mobile navigation if available
+  if (backendMobileNav?.length) {
+    return transformBackendNavigation(backendMobileNav, t);
+  }
+
+  // Fallback to static mobile navigation
+  return transformStaticNavigation(MOBILE_NAVIGATION_STRUCTURE, t, routeConfig);
 }

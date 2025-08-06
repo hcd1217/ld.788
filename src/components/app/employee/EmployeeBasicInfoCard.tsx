@@ -58,10 +58,12 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
 
   return (
     <>
-      <Card shadow="sm" padding="xl" radius="md">
+      <Card shadow="sm" p={{ base: 'sm', md: 'xl' }} radius="md">
         <Stack gap="lg">
           <Group justify="space-between" align="flex-start">
-            <Title order={3}>{t('employee.basicInformation')}</Title>
+            <Title visibleFrom="md" order={3}>
+              {t('employee.basicInformation')}
+            </Title>
             <Group gap="xs">
               {employee.userId ? (
                 <Tooltip label={t('employee.getMagicLink')}>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { isDevelopment } from '@/utils/env';
 import {
   Badge,
   Group,
@@ -604,7 +605,9 @@ export const ClientFeatureFlagsSection = React.memo(function ({
       showSuccessNotification(t('common.success'), t('admin.clients.featureFlagUpdated'));
       onUpdate?.();
     } catch (error) {
-      console.log(error);
+      if (isDevelopment) {
+        console.error('Failed to update:', error);
+      }
       showErrorNotification(t('common.error'), t('admin.clients.featureFlagUpdateFailed'));
     } finally {
       setUpdating((prev) => {
@@ -636,7 +639,9 @@ export const ClientFeatureFlagsSection = React.memo(function ({
       showSuccessNotification(t('common.success'), t('admin.clients.featureFlagValueUpdated'));
       onUpdate?.();
     } catch (error) {
-      console.log(error);
+      if (isDevelopment) {
+        console.error('Failed to update:', error);
+      }
       showErrorNotification(t('common.error'), t('admin.clients.featureFlagUpdateFailed'));
     } finally {
       setUpdating((prev) => {

@@ -197,7 +197,7 @@ export function NavBar() {
 
   // Auto-expand menus that have active submenus
   useEffect(() => {
-    console.log('navigationItems', navigationItems);
+    // Remove debug log
     const itemsWithActiveSubs = navigationItems.filter((item) =>
       item.subs?.some((sub) => isNavigationItemActive(sub, location.pathname)),
     );

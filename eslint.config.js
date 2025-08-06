@@ -57,10 +57,7 @@ export default tseslint.config(
       'react-hooks/exhaustive-deps': 'warn',
 
       // React refresh
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
 
       'no-unused-vars': 'off',
 
@@ -93,18 +90,18 @@ export default tseslint.config(
       'no-await-in-loop': 'off',
       'no-control-regex': 'off',
       'no-new': 'off',
-      'complexity': 'off',
+      complexity: 'off',
       'max-depth': 'off',
 
       // Prettier integration
       'prettier/prettier': 'error',
-      
+
       // Disable conflicting rules
       ...prettierConfig.rules,
     },
   },
   {
-    files: ['vite.config.ts'],
+    files: ['vite.config.ts', 'vite-plugins/**/*.ts'],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {

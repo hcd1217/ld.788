@@ -38,18 +38,14 @@ export const userService = {
 
     return magicLinks[userId];
   },
-  async updatePassword({
-    userId,
-    password,
-    currentPassword,
-  }: {
+  async updatePassword(_params: {
     userId: string;
     password: string;
     confirmPassword: string;
     currentPassword: string;
   }) {
     await delay(100);
-    console.log('updatePassword', userId, password, currentPassword);
+    // Remove sensitive password logging
     return { success: true };
   },
 };

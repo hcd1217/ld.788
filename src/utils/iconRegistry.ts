@@ -11,6 +11,8 @@ import {
   IconBox,
   IconCheckupList,
   IconUsersGroup,
+  IconHome,
+  IconDots,
   type Icon,
 } from '@tabler/icons-react';
 
@@ -30,6 +32,8 @@ export const IconIdentifiers = {
   BOX: 'box',
   CHECKLIST: 'checklist',
   USERS_GROUP: 'users-group',
+  HOME: 'home',
+  DOTS: 'dots',
 } as const;
 
 export type IconIdentifier = (typeof IconIdentifiers)[keyof typeof IconIdentifiers];
@@ -47,6 +51,8 @@ const iconRegistry: Record<IconIdentifier, TablerIconComponent> = {
   [IconIdentifiers.BOX]: IconBox,
   [IconIdentifiers.CHECKLIST]: IconCheckupList,
   [IconIdentifiers.USERS_GROUP]: IconUsersGroup,
+  [IconIdentifiers.HOME]: IconHome,
+  [IconIdentifiers.DOTS]: IconDots,
 };
 
 // Default fallback icon

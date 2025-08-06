@@ -30,7 +30,7 @@ export function EmployeeDetailAccordion({
     <Accordion defaultValue="info" chevronPosition="right" p={0}>
       <Accordion.Item value="info">
         <Accordion.Control icon={<IconInfoCircle size={20} />}>
-          <Text fw={600}>{t('employee.detailInformation')}</Text>
+          <Text fw={600}>{t('employee.basicInformation')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap="xl" pt="md">

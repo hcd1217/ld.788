@@ -31,7 +31,6 @@ type GoogleMapDisplayProps = {
 
 export function GoogleMapDisplay({ location, address, zoom = 15 }: GoogleMapDisplayProps) {
   const { t } = useTranslation();
-  // Const [mapError] = useState<string | undefined>(undefined);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
@@ -77,19 +76,6 @@ export function GoogleMapDisplay({ location, address, zoom = 15 }: GoogleMapDisp
       </Alert>
     );
   }
-
-  // If (mapError) {
-  //   return (
-  //     <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
-  //       {/* {mapError} */}
-  //       {address ? (
-  //         <Text size="sm" mt="xs">
-  //           {t('store.selectedAddress')}: {address}
-  //         </Text>
-  //       ) : null}
-  //     </Alert>
-  //   );
-  // }
 
   return (
     <Box>
