@@ -7,19 +7,9 @@ import {
   paginationSchema,
   stringSchema,
   timestampSchema,
+  backendPhoneNumberSchema,
+  phoneNumberSchema,
 } from './common.schemas';
-
-const phoneNumberSchema = optionalStringSchema
-  .transform((val) => {
-    // remove non-numeric and convert 09012345678 / 090123456789 to 0901-234-5678 / 0901-234-56789
-    return val?.replace(/[^0-9]/g, '').replace(/(\d{4})(\d{3})(\d+)/, '$1-$2-$3');
-  })
-  .optional();
-const backendPhoneNumberSchema = optionalStringSchema
-  .transform((val) => {
-    return val?.replace(/[^0-9]/g, '');
-  })
-  .optional();
 
 // Department schema
 export const UnitSchema = z.object({

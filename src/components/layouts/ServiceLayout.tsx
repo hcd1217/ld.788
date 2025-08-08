@@ -6,7 +6,7 @@ import { PWAInstallPrompt, SafariPWAGuide } from '@/components/common';
 
 export function ServiceLayout() {
   const [ready, setReady] = useState(false);
-  const { checkAuth } = useAppStore();
+  const { checkAuth, authInitialized } = useAppStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export function ServiceLayout() {
     }
   }, [checkAuth, navigate]);
 
-  if (!ready) {
+  if (!ready || !authInitialized) {
     return (
       <Center h="100vh">
         <Loader size="lg" />

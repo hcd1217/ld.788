@@ -59,9 +59,9 @@ export const themeConfig: Record<string, CustomThemeConfig> = {
       },
       inputBorderColor: '#e2b781',
       borderColor: '#CD872F',
-      activeColor: '#36B37E',
       dangerColor: '#FF5630',
-      inActiveColor: 'gray',
+      activeColor: '#2b8a3e',
+      inActiveColor: '#2e2e2e',
     },
   },
   elegant: {
@@ -95,9 +95,9 @@ export const themeConfig: Record<string, CustomThemeConfig> = {
       },
       inputBorderColor: '#9bc1e7',
       borderColor: '#3e618c',
-      activeColor: '#36B37E',
       dangerColor: '#FF5630',
-      inActiveColor: 'gray',
+      activeColor: '#2b8a3e',
+      inActiveColor: '#2e2e2e',
     },
   },
   origin: {

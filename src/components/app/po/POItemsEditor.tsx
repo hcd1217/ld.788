@@ -48,6 +48,7 @@ export function POItemsEditor({ items, onChange, disabled = false }: POItemsEdit
 
     const item: POItem = {
       id: `item-${Date.now()}-${Math.random()}`,
+      purchaseOrderId: '', // Will be set when the PO is created
       productCode: newItem.productCode,
       description: newItem.description,
       quantity,
@@ -55,6 +56,8 @@ export function POItemsEditor({ items, onChange, disabled = false }: POItemsEdit
       totalPrice: Math.round(totalPrice * 100) / 100,
       discount: discount > 0 ? discount : undefined,
       category: newItem.category,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     onChange([...items, item]);

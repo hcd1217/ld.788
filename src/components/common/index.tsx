@@ -8,6 +8,7 @@ export {
   CommonMobileHeader,
   DataTable,
   Drawer,
+  PCOnlyAlert,
   SearchBar,
   SelectableCard,
   SwitchView,

@@ -10,7 +10,7 @@ import customPlugin from './eslint-rules/index.js';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'node_modules', 'coverage', 'eslint.config.js'],
+    ignores: ['dist', 'node_modules', 'coverage', 'eslint.config.js', '*.local'],
   },
   {
     files: ['**/*.{ts,tsx,js,jsx}'],

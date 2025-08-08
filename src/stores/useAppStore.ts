@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { authService } from '@/services/auth';
 import { adminService } from '@/services/admin';
-import { delay } from '@/utils/time';
 import {
   storeAdminSession,
   clearAdminSession,
@@ -29,6 +28,7 @@ type AppState = {
   user: User | undefined;
   userProfile: UserProfile | undefined;
   isAuthenticated: boolean;
+  authInitialized: boolean;
   adminAuthenticated: boolean;
   isLoading: boolean;
   adminApiLoading: boolean;
@@ -82,6 +82,7 @@ export const useAppStore = create<AppState>()(
         user: authService.getCurrentUser() ?? undefined,
         userProfile: undefined,
         isAuthenticated: Boolean(authService.getCurrentUser()),
+        authInitialized: false,
         adminAuthenticated: isAdminAuthenticated(),
         isLoading: false,
         adminApiLoading: false,
@@ -185,9 +186,9 @@ export const useAppStore = create<AppState>()(
           // clearClientTranslations();
         },
         async checkAuth() {
+          set({ authInitialized: false });
           const isAuthenticated = await authService.isAuthenticated();
           if (isAuthenticated) {
-            await delay(100);
             const user = authService.getCurrentUser();
             set({ isAuthenticated, user: user ?? undefined });
             // Fetch user profile when checking auth
@@ -199,7 +200,7 @@ export const useAppStore = create<AppState>()(
               isAuthenticated: false,
             });
           }
-
+          set({ authInitialized: true });
           return isAuthenticated;
         },
         async adminLogin(accessKey: string) {

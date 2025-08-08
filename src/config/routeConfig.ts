@@ -19,6 +19,10 @@ export const RouteIdentifiers = {
   SETTINGS: 'settings',
   NOTIFICATIONS: 'notifications',
 
+  // Config routes
+  CUSTOMER_CONFIG: 'customer-config',
+  PRODUCT_CONFIG: 'product-config',
+
   // Store management
   STORES: 'stores',
   STORE_CONFIG: 'store-config',
@@ -105,6 +109,10 @@ export const ROUTERS = {
   SETTINGS: '/settings',
   NOTIFICATIONS: '/notifications',
 
+  // Config routes
+  CUSTOMER_CONFIG: '/customer-config',
+  PRODUCT_CONFIG: '/product-config',
+
   // Store management
   STORES: '/stores',
   STORE_CONFIG: '/store-config',
@@ -184,6 +192,8 @@ const routeRegistry: Record<RouteIdentifier, string> = {
   [RouteIdentifiers.PROFILE]: ROUTERS.PROFILE,
   [RouteIdentifiers.SETTINGS]: ROUTERS.SETTINGS,
   [RouteIdentifiers.NOTIFICATIONS]: ROUTERS.NOTIFICATIONS,
+  [RouteIdentifiers.CUSTOMER_CONFIG]: ROUTERS.CUSTOMER_CONFIG,
+  [RouteIdentifiers.PRODUCT_CONFIG]: ROUTERS.PRODUCT_CONFIG,
   [RouteIdentifiers.STORES]: ROUTERS.STORES,
   [RouteIdentifiers.STORE_CONFIG]: ROUTERS.STORE_CONFIG,
   [RouteIdentifiers.STORE_MANAGEMENT]: ROUTERS.STORE_MANAGEMENT,

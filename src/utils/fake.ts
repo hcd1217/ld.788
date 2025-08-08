@@ -1,3 +1,5 @@
+import { normalizeVietnameseChars } from './string';
+
 // Cspell:disable
 const lastNames = [
   'Bùi',
@@ -286,4 +288,11 @@ export function nameAndGender() {
     name: `${lastName()} ${firstName}`,
     gender,
   };
+}
+
+export function fakeEmail(name: string) {
+  const domains = ['gmail.com', 'yahoo.com', 'company.com', 'business.com', 'corp.com'];
+  return (
+    normalizeVietnameseChars(name).toLowerCase().replace(/\s+/g, '.') + '@' + randomElement(domains)
+  );
 }

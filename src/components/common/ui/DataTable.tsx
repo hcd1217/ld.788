@@ -8,6 +8,7 @@ type DataTableColumn<T> = {
   header: string;
   render?: (item: T) => React.ReactNode;
   accessor?: keyof T;
+  width?: string | number;
 };
 
 type DataTableProps<T> = {
@@ -16,6 +17,8 @@ type DataTableProps<T> = {
   readonly isLoading?: boolean;
   readonly emptyMessage?: string;
   readonly renderActions?: (item: T) => React.ReactNode;
+  readonly onRowClick?: (item: T) => void;
+  readonly ariaLabel?: string;
 };
 
 export function DataTable<T extends Record<string, unknown> & { id: string }>({
@@ -24,6 +27,8 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
   isLoading = false,
   emptyMessage,
   renderActions,
+  onRowClick,
+  ariaLabel,
 }: DataTableProps<T>) {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
@@ -44,20 +49,34 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
 
       <Box visibleFrom="md">
         <ScrollArea>
-          <Table striped highlightOnHover>
+          <Table striped highlightOnHover aria-label={ariaLabel}>
             <Table.Thead>
               <Table.Tr>
                 {columns.map((column) => (
-                  <Table.Th key={column.key}>{column.header}</Table.Th>
+                  <Table.Th
+                    key={column.key}
+                    style={column.width ? { width: column.width } : undefined}
+                  >
+                    {column.header}
+                  </Table.Th>
                 ))}
                 {renderActions ? <Table.Th>{t('common.actions')}</Table.Th> : null}
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {data.map((item) => (
-                <Table.Tr key={item.id}>
+                <Table.Tr
+                  key={item.id}
+                  onClick={() => onRowClick?.(item)}
+                  style={onRowClick ? { cursor: 'pointer' } : undefined}
+                >
                   {columns.map((column) => (
-                    <Table.Td key={column.key}>{renderCellContent(item, column)}</Table.Td>
+                    <Table.Td
+                      key={column.key}
+                      style={column.width ? { width: column.width } : undefined}
+                    >
+                      {renderCellContent(item, column)}
+                    </Table.Td>
                   ))}
                   {renderActions ? <Table.Td>{renderActions(item)}</Table.Td> : null}
                 </Table.Tr>

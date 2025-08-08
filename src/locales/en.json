@@ -36,7 +36,6 @@
         "newVersionAvailable": "New Version Available",
         "newVersionAvailableForBrowser": "New version available",
         "updating": "Updating...",
-        "updateReady": "Update ready",
         "clickToUpdate": "Click here to update now.",
         "clickToUpdateShort": "Click to update now.",
         "reloadIn3Seconds": "The app will reload in 3 seconds.",
@@ -56,14 +55,9 @@
         }
       },
       "settings": {
-        "autoUpdate": {
-          "title": "Auto Update",
-          "description": "Automatically update the app when new versions are available (Chrome/Edge only)"
-        }
+        "autoUpdate": {}
       }
     },
-    "filter": "Filter",
-    "applyFilter": "Apply Filters",
     "firstName": "First name",
     "lastName": "Last name",
     "logout": "Logout",
@@ -137,7 +131,11 @@
     "clear": "Clear",
     "apply": "Apply",
     "userMenu": "User Menu",
-    "mainNavigation": "Main Navigation"
+    "mainNavigation": "Main Navigation",
+    "active": "Active",
+    "status": "Status",
+    "email": "Email",
+    "phone": "Phone"
   },
   "settings": {
     "autoUpdate": {
@@ -425,25 +423,20 @@
       "tryAgain": "Go to Login",
       "scanQrCode": "Scan QR Code",
       "enterCodeManually": "Enter Code Manually",
-      "scanQrCodeDescription": "Use your camera to scan the magic link QR code",
       "enterCodeDescription": "Enter the magic link code you received",
       "magicLinkCode": "Magic Link Code",
       "verifyCode": "Verify Code",
-      "openQrScanner": "Open QR Scanner",
       "scanningQrCode": "Scanning for QR code...",
       "cameraPermissionDenied": "Camera permission denied. Please allow camera access to scan QR codes.",
-      "closeScanner": "Close Scanner",
       "invalidQrCode": "Invalid QR code. Please scan a valid magic link QR code.",
       "or": "or",
       "useMagicLink": "Use Magic Link",
       "uploadQrImage": "Upload QR Image",
       "pasteFromClipboard": "Paste from Clipboard",
-      "dragDropImage": "Drag and drop an image here",
       "clickToUpload": "or click to upload",
       "processingImage": "Processing image...",
       "invalidImageFormat": "Invalid image format. Please upload a valid image file.",
-      "noQrCodeFound": "No QR code found in the image. Please try another image.",
-      "uploadNotSupported": "QR code upload is not supported yet. Please use camera scanning or manual code entry."
+      "noQrCodeFound": "No QR code found in the image. Please try another image."
     },
     "successfulImports": "Successful Imports",
     "failedImports": "Failed Imports",
@@ -741,6 +734,72 @@
       "carryOverLimit": "Carry-over Limit:",
       "availableToTake": "Available to Take:"
     }
+  },
+  "customer": {
+    "contact": "Contact",
+    "company": "Company",
+    "address": "Address",
+    "searchPlaceholder": "Search customers by name, company, email, or phone...",
+    "namePlaceholder": "Customer Name",
+    "companyPlaceholder": "Company Name",
+    "emailPlaceholder": "customer@example.com",
+    "phonePlaceholder": "+84901234567",
+    "addressPlaceholder": "Address",
+    "created": "Customer Created",
+    "createdMessage": "Customer '{{name}}' has been successfully created",
+    "updated": "Customer Updated",
+    "updatedMessage": "Customer '{{name}}' has been successfully updated",
+    "deleted": "Customer Deleted",
+    "deletedMessage": "Customer '{{name}}' has been successfully deleted",
+    "tableAriaLabel": "Customer list table"
+  },
+  "product": {
+    "addProduct": "Add Product",
+    "editProduct": "Edit Product",
+    "productCode": "Product Code",
+    "productCodePlaceholder": "Enter product code",
+    "namePlaceholder": "Enter product name",
+    "descriptionPlaceholder": "Enter product description",
+    "category": "Category",
+    "categoryPlaceholder": "Enter product category",
+    "unitPrice": "Unit Price",
+    "unitPricePlaceholder": "0.00",
+    "costPrice": "Cost Price",
+    "costPricePlaceholder": "0.00",
+    "stockLevel": "Stock Level",
+    "stockLevelPlaceholder": "0",
+    "stock": "Stock",
+    "unit": "Unit",
+    "unitPlaceholder": "pcs, kg, etc.",
+    "minStock": "Min Stock",
+    "minStockPlaceholder": "Minimum stock level",
+    "maxStock": "Max Stock",
+    "maxStockPlaceholder": "Maximum stock level",
+    "sku": "SKU",
+    "skuPlaceholder": "Stock Keeping Unit",
+    "barcode": "Barcode",
+    "barcodePlaceholder": "Product barcode",
+    "statusPlaceholder": "Select status",
+    "searchPlaceholder": "Search products by name, code, category, SKU, or barcode...",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "discontinued": "Discontinued",
+      "outOfStock": "Out of Stock",
+      "lowStock": "Low Stock",
+      "inStock": "In Stock"
+    },
+    "priceCannotBeNegative": "Price cannot be negative",
+    "stockCannotBeNegative": "Stock cannot be negative",
+    "minStockCannotExceedMax": "Minimum stock cannot exceed maximum stock",
+    "maxStockCannotBeLessThanMin": "Maximum stock cannot be less than minimum stock",
+    "created": "Product Created",
+    "createdMessage": "Product '{{name}}' has been successfully created",
+    "updated": "Product Updated",
+    "updatedMessage": "Product '{{name}}' has been successfully updated",
+    "deleted": "Product Deleted",
+    "deletedMessage": "Product '{{name}}' has been successfully deleted",
+    "tableAriaLabel": "Product list table"
   },
   "orientation": {
     "title": "Rotate Your Device",

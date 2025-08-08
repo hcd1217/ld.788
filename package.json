@@ -16,8 +16,8 @@
     "generate-pwa-assets": "node scripts/generate-pwa-assets.js",
     "sync:translation": "node scripts/i18n/sync-translation.cjs",
     "detect:hardcoded-strings": "node scripts/detect-hardcoded-strings.cjs",
-    "analyze:i18n": "node scripts/analyze-i18n.cjs",
-    "cleanup:i18n": "node scripts/cleanup-i18n.cjs"
+    "analyze:i18n": "node scripts/i18n/analyze-i18n.cjs",
+    "cleanup:i18n": "node scripts/i18n/cleanup-unused-i18n.cjs"
   },
   "dependencies": {
     "@mantine/core": "^8.1.2",

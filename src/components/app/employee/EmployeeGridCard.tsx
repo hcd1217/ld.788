@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { Employee } from '@/services/hr/employee';
 import { SelectableCard } from '@/components/common';
 import { getEmployeeDetailRoute } from '@/config/routeConfig';
-import { StatusBadge } from './StatusBadge';
+import { ActiveBadge } from '@/components/common/ui';
 import { getEndDateHighlightStyles } from '@/utils/time';
 
 type EmployeeGridCardProps = {
@@ -72,7 +72,7 @@ export function EmployeeGridCard({ employee }: EmployeeGridCardProps) {
               right: 0,
             }}
           >
-            <StatusBadge isActive={employee.isActive} />
+            <ActiveBadge isActive={employee.isActive} />
           </div>
         </Group>
       </Stack>

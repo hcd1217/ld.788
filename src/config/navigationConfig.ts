@@ -51,21 +51,23 @@ export const NAVIGATION_STRUCTURE = [
     icon: IconSettingsFilled,
     subs: [
       {
-        id: 'nav-employee-management',
+        id: 'nav-employee-config',
         translationKey: 'common.pages.employeeConfig',
         icon: IconUsers,
         path: ROUTERS.EMPLOYEE_MANAGEMENT,
         activePaths: [ROUTERS.EMPLOYEE_MANAGEMENT, ROUTERS.EMPLOYEES_ADD, ROUTERS.EMPLOYEE_EDIT],
       },
       {
-        id: 'nav-customer-management',
+        id: 'nav-customer-config',
         translationKey: 'common.pages.customerConfig',
         icon: IconAddressBook,
+        path: ROUTERS.CUSTOMER_CONFIG,
       },
       {
-        id: 'nav-product-management',
+        id: 'nav-product-config',
         translationKey: 'common.pages.productConfig',
         icon: IconBox,
+        path: ROUTERS.PRODUCT_CONFIG,
       },
       {
         id: 'nav-role-management',

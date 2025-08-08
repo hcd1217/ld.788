@@ -5,7 +5,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
 import { getEmployeeDetailRoute } from '@/config/routeConfig';
 import { formatDate } from '@/utils/string';
-import { StatusBadge } from './StatusBadge';
+import { ActiveBadge } from '@/components/common/ui';
 import { WorkTypeBadge } from './WorkTypeBadge';
 import { getEndDateHighlightStyles } from '@/utils/time';
 
@@ -73,7 +73,7 @@ export function EmployeeDataTable({
                   {employee.endDate ? formatDate(employee.endDate.toString()) : '-'}
                 </Table.Td>
                 <Table.Td>
-                  <StatusBadge isActive={employee.isActive} />
+                  <ActiveBadge isActive={employee.isActive} />
                 </Table.Td>
                 {noAction ? null : (
                   <Table.Td onClick={(e) => e.stopPropagation()}>

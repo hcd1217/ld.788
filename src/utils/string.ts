@@ -7,8 +7,8 @@ export function generateRandomString(length: number): string {
     .slice(2, 2 + length);
 }
 
-export function salaryFormat(salary: number) {
-  return salary.toLocaleString('vi-VN', {
+export function formatCurrency(value: number) {
+  return value.toLocaleString('vi-VN', {
     style: 'currency',
     currency: 'VND',
   });
@@ -36,7 +36,7 @@ export function convertCamelCaseToText(text: string) {
 /**
  * Normalizes Vietnamese characters to their English equivalents
  */
-function normalizeVietnameseChars(text: string): string {
+export function normalizeVietnameseChars(text: string): string {
   const vietnameseMap: Record<string, string> = {
     à: 'a',
     á: 'a',

@@ -6,11 +6,11 @@ import { EmployeeMagicLinkModal } from './EmployeeMagicLinkModal';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAction } from '@/hooks/useAction';
 import type { Employee } from '@/services/hr/employee';
-import { renderFullName, formatDate, salaryFormat } from '@/utils/string';
+import { renderFullName, formatDate, formatCurrency } from '@/utils/string';
 import { userService } from '@/services/user/user';
 import { generateQRCodeWithLogo } from '@/utils/qr';
 import { useClientCode } from '@/hooks/useClientCode';
-import { StatusBadge } from './StatusBadge';
+import { ActiveBadge } from '@/components/common/ui';
 import { WorkTypeBadge } from './WorkTypeBadge';
 
 type EmployeeBasicInfoCardProps = {
@@ -117,7 +117,7 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
                 <Text c="dimmed" size="sm">
                   {t('employee.status')}
                 </Text>
-                <StatusBadge isActive={employee.isActive} />
+                <ActiveBadge isActive={employee.isActive} />
               </Stack>
             </Grid.Col>
 
@@ -182,7 +182,7 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
                   <Text c="dimmed" size="sm">
                     {t('employee.monthlySalary')}
                   </Text>
-                  <Text fw={500}>{salaryFormat(employee.monthlySalary)}</Text>
+                  <Text fw={500}>{formatCurrency(employee.monthlySalary)}</Text>
                 </Stack>
               </Grid.Col>
             ) : null}
@@ -193,7 +193,7 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
                   <Text c="dimmed" size="sm">
                     {t('employee.hourlyRate')}
                   </Text>
-                  <Text fw={500}>{salaryFormat(employee.hourlyRate)}</Text>
+                  <Text fw={500}>{formatCurrency(employee.hourlyRate)}</Text>
                 </Stack>
               </Grid.Col>
             ) : null}

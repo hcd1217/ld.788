@@ -62,7 +62,7 @@ export const usePOStore = create<POState>()(
           const customers = await customerService.getAllCustomers();
           set({
             customers,
-            customerMap: new Map(customers.map((customer) => [customer.id, customer])),
+            customerMap: new Map(customers.map((customer: Customer) => [customer.id, customer])),
           });
         } catch (error) {
           set({
@@ -87,7 +87,7 @@ export const usePOStore = create<POState>()(
             isLoading: false,
             purchaseOrders,
             customers,
-            customerMap: new Map(customers.map((customer) => [customer.id, customer])),
+            customerMap: new Map(customers.map((customer: Customer) => [customer.id, customer])),
           });
         } catch (error) {
           set({

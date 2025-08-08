@@ -67,12 +67,12 @@ export function POForm({
   const creditStatus = useMemo(() => {
     if (!selectedCustomer || !selectedCustomer.creditLimit) return undefined;
 
-    const availableCredit = selectedCustomer.creditLimit - (selectedCustomer.currentBalance || 0);
+    const availableCredit = selectedCustomer.creditLimit - selectedCustomer.creditUsed;
     const afterOrderCredit = availableCredit - totalAmount;
 
     return {
       limit: selectedCustomer.creditLimit,
-      current: selectedCustomer.currentBalance || 0,
+      current: selectedCustomer.creditUsed,
       available: availableCredit,
       afterOrder: afterOrderCredit,
       exceeds: afterOrderCredit < 0,

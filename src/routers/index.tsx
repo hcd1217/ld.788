@@ -1,214 +1,54 @@
-import { lazy } from 'react';
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 import { ResponsiveAuthLayout } from '@/components/layouts/ResponsiveAuthLayout';
 import { AppLayout } from '@/components/layouts/AppLayout';
 import { ProtectedRoute } from '@/components/layouts/ProtectedRoute';
 import { AdminProtectedRoute } from '@/components/layouts/AdminProtectedRoute';
 import { ROUTERS } from '@/config/routeConfig';
-
-const ServiceLayout = lazy(async () => {
-  const module = await import('@/components/layouts/ServiceLayout');
-  return { default: module.ServiceLayout };
-});
-
-const RootUserLayout = lazy(async () => {
-  const module = await import('@/components/layouts/RootUserLayout');
-  return { default: module.RootUserLayout };
-});
-
-const PCOnlyLayout = lazy(async () => {
-  const module = await import('@/components/layouts/PCOnlyLayout');
-  return { default: module.PCOnlyLayout };
-});
-
-const NotFound = lazy(async () => {
-  const module = await import('@/pages/errors/NotFound');
-  return { default: module.NotFound };
-});
-
-const ProfilePage = lazy(async () => {
-  const module = await import('@/pages/app/ProfilePage');
-  return { default: module.ProfilePage };
-});
-
-const BlankPage = lazy(async () => {
-  const module = await import('@/pages/app/BlankPage');
-  return { default: module.BlankPage };
-});
-
-const EmployeeListPage = lazy(async () => {
-  const module = await import('@/pages/app/employee/EmployeeListPage');
-  return { default: module.EmployeeListPage };
-});
-
-const EmployeeCreatePage = lazy(async () => {
-  const module = await import('@/pages/app/employee/EmployeeCreatePage');
-  return { default: module.EmployeeCreatePage };
-});
-
-const EmployeeDetailPage = lazy(async () => {
-  const module = await import('@/pages/app/employee/EmployeeDetailPage');
-  return { default: module.EmployeeDetailPage };
-});
-const EditEmployeePage = lazy(async () => {
-  const module = await import('@/pages/app/employee/EditEmployeePage');
-  return { default: module.EditEmployeePage };
-});
-
-const HomePage = lazy(async () => {
-  const module = await import('@/pages/app/HomePage');
-  return { default: module.HomePage };
-});
-
-const ExplorePage = lazy(async () => {
-  const module = await import('@/pages/app/ExplorePage');
-  return { default: module.ExplorePage };
-});
-
-const NotificationsPage = lazy(async () => {
-  const module = await import('@/pages/app/NotificationPage');
-  return { default: module.NotificationsPage };
-});
-
-const MorePage = lazy(async () => {
-  const module = await import('@/pages/app/MorePage');
-  return { default: module.MorePage };
-});
-
-const UserManagementPage = lazy(async () => {
-  const module = await import('@/pages/app/UserManagementPage');
-  return { default: module.UserManagementPage };
-});
-
-const AddUserPage = lazy(async () => {
-  const module = await import('@/pages/app/AddUserPage');
-  return { default: module.AddUserPage };
-});
-
-const ImportUsersPage = lazy(async () => {
-  const module = await import('@/pages/app/ImportUsersPage');
-  return { default: module.ImportUsersPage };
-});
-
-const UserDetailPage = lazy(async () => {
-  const module = await import('@/pages/app/UserDetailPage');
-  return { default: module.UserDetailPage };
-});
-
-const RoleManagementPage = lazy(async () => {
-  const module = await import('@/pages/app/RoleManagementPage');
-  return { default: module.RoleManagementPage };
-});
-
-const PermissionManagementPage = lazy(async () => {
-  const module = await import('@/pages/app/PermissionManagementPage');
-  return { default: module.PermissionManagementPage };
-});
-
-const StoreListPage = lazy(async () => {
-  const module = await import('@/pages/app/StoreListPage');
-  return { default: module.StoreListPage };
-});
-
-const StoreConfigPage = lazy(async () => {
-  const module = await import('@/pages/app/StoreConfigPage');
-  return { default: module.StoreConfigPage };
-});
-
-const StoreEditPage = lazy(async () => {
-  const module = await import('@/pages/app/StoreEditPage');
-  return { default: module.StoreEditPage };
-});
-
-const StaffListPage = lazy(async () => {
-  const module = await import('@/pages/app/StaffListPage');
-  return { default: module.StaffListPage };
-});
-
-const AddStaffPage = lazy(async () => {
-  const module = await import('@/pages/app/AddStaffPage');
-  return { default: module.AddStaffPage };
-});
-
-const EditStaffPage = lazy(async () => {
-  const module = await import('@/pages/app/EditStaffPage');
-  return { default: module.EditStaffPage };
-});
-
-const POListPage = lazy(async () => {
-  const module = await import('@/pages/app/po/POListPage');
-  return { default: module.POListPage };
-});
-
-const POCreatePage = lazy(async () => {
-  const module = await import('@/pages/app/po/POCreatePage');
-  return { default: module.POCreatePage };
-});
-
-const PODetailPage = lazy(async () => {
-  const module = await import('@/pages/app/po/PODetailPage');
-  return { default: module.PODetailPage };
-});
-
-const EditPOPage = lazy(async () => {
-  const module = await import('@/pages/app/po/EditPOPage');
-  return { default: module.EditPOPage };
-});
-
-const LoginPage = lazy(async () => {
-  const module = await import('@/pages/auth/LoginPage');
-  return { default: module.LoginPage };
-});
-
-const ForgotPasswordPage = lazy(async () => {
-  const module = await import('@/pages/auth/ForgotPasswordPage');
-  return { default: module.ForgotPasswordPage };
-});
-
-const ResetPasswordPage = lazy(async () => {
-  const module = await import('@/pages/auth/ResetPasswordPage');
-  return { default: module.ResetPasswordPage };
-});
-
-const RegisterPage = lazy(async () => {
-  const module = await import('@/pages/auth/RegisterPage');
-  return { default: module.RegisterPage };
-});
-
-const MagicLinkLoginPage = lazy(async () => {
-  const module = await import('@/pages/auth/MagicLinkLoginPage');
-  return { default: module.MagicLinkLoginPage };
-});
-
-const AdminLoginPage = lazy(async () => {
-  const module = await import('@/pages/admin/AdminLoginPage');
-  return { default: module.AdminLoginPage };
-});
-
-const AdminDashboardPage = lazy(async () => {
-  const module = await import('@/pages/admin/AdminDashboardPage');
-  return { default: module.AdminDashboardPage };
-});
-
-const ClientListPage = lazy(async () => {
-  const module = await import('@/pages/admin/ClientListPage');
-  return { default: module.ClientListPage };
-});
-
-const ClientCreatePage = lazy(async () => {
-  const module = await import('@/pages/admin/ClientCreatePage');
-  return { default: module.ClientCreatePage };
-});
-
-const ClientDetailPage = lazy(async () => {
-  const module = await import('@/pages/admin/ClientDetailPage');
-  return { default: module.ClientDetailPage };
-});
-
-const AdminPermissionManagementPage = lazy(async () => {
-  const module = await import('@/pages/admin/PermissionManagementPage');
-  return { default: module.PermissionManagementPage };
-});
+import {
+  ServiceLayout,
+  RootUserLayout,
+  PCOnlyLayout,
+  NotFound,
+  ProfilePage,
+  BlankPage,
+  CustomerConfigPage,
+  ProductConfigPage,
+  EmployeeListPage,
+  EmployeeCreatePage,
+  EmployeeDetailPage,
+  EditEmployeePage,
+  HomePage,
+  ExplorePage,
+  NotificationsPage,
+  MorePage,
+  UserManagementPage,
+  AddUserPage,
+  ImportUsersPage,
+  UserDetailPage,
+  // RoleManagementPage,
+  // PermissionManagementPage,
+  StoreListPage,
+  StoreConfigPage,
+  StoreEditPage,
+  StaffListPage,
+  AddStaffPage,
+  EditStaffPage,
+  POListPage,
+  POCreatePage,
+  PODetailPage,
+  EditPOPage,
+  LoginPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+  RegisterPage,
+  MagicLinkLoginPage,
+  AdminLoginPage,
+  AdminDashboardPage,
+  ClientListPage,
+  ClientCreatePage,
+  ClientDetailPage,
+  AdminPermissionManagementPage,
+} from './components';
 
 const routeObjects: RouteObject[] = [
   // Root route
@@ -256,6 +96,9 @@ const routeObjects: RouteObject[] = [
     ),
     children: [
       { path: ROUTERS.HOME, Component: HomePage },
+      // CONFIG routes
+      { path: ROUTERS.CUSTOMER_CONFIG, Component: CustomerConfigPage },
+      { path: ROUTERS.PRODUCT_CONFIG, Component: ProductConfigPage },
       { path: ROUTERS.EMPLOYEE_MANAGEMENT, Component: EmployeeListPage },
       { path: ROUTERS.EMPLOYEE_DETAIL, Component: EmployeeDetailPage },
       { path: ROUTERS.EMPLOYEE_EDIT, Component: EditEmployeePage },
@@ -305,14 +148,16 @@ const routeObjects: RouteObject[] = [
             Component: PCOnlyLayout,
             children: [
               { path: ROUTERS.IMPORT_USERS, Component: ImportUsersPage },
-              { path: ROUTERS.ROLE_MANAGEMENT, Component: RoleManagementPage },
+              // { path: ROUTERS.ROLE_MANAGEMENT, Component: RoleManagementPage },
+              { path: ROUTERS.ROLE_MANAGEMENT, Component: BlankPage },
               { path: ROUTERS.STORE_CONFIG, Component: StoreConfigPage },
               { path: ROUTERS.STORE_EDIT, Component: StoreEditPage },
               { path: ROUTERS.STAFF_ADD, Component: AddStaffPage },
               { path: ROUTERS.STAFF_EDIT, Component: EditStaffPage },
               {
                 path: ROUTERS.PERMISSION_MANAGEMENT,
-                Component: PermissionManagementPage,
+                // Component: PermissionManagementPage,
+                Component: BlankPage,
               },
             ],
           },

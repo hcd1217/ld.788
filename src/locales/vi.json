@@ -36,7 +36,6 @@
         "newVersionAvailable": "Phiên Bản Mới Có Sẵn",
         "newVersionAvailableForBrowser": "Phiên bản mới có sẵn",
         "updating": "Đang cập nhật...",
-        "updateReady": "Sẵn sàng cập nhật",
         "clickToUpdate": "Nhấn vào đây để cập nhật ngay.",
         "clickToUpdateShort": "Nhấn để cập nhật ngay.",
         "reloadIn3Seconds": "Ứng dụng sẽ tải lại trong 3 giây.",
@@ -56,14 +55,9 @@
         }
       },
       "settings": {
-        "autoUpdate": {
-          "title": "Tự Động Cập Nhật",
-          "description": "Tự động cập nhật ứng dụng khi có phiên bản mới (chỉ Chrome/Edge)"
-        }
+        "autoUpdate": {}
       }
     },
-    "filter": "Lọc",
-    "applyFilter": "Lọc",
     "firstName": "Tên",
     "lastName": "Họ",
     "logout": "Đăng xuất",
@@ -137,7 +131,11 @@
     "clear": "Xóa",
     "userMenu": "Menu Người Dùng",
     "mainNavigation": "Điều Hướng Chính",
-    "apply": "Áp dụng"
+    "apply": "Áp dụng",
+    "active": "Hoạt động",
+    "status": "Trạng thái",
+    "email": "Email",
+    "phone": "Điện thoại"
   },
   "settings": {
     "autoUpdate": {
@@ -425,25 +423,20 @@
       "tryAgain": "Quay Lại Đăng Nhập",
       "scanQrCode": "Quét Mã QR",
       "enterCodeManually": "Nhập Mã Thủ Công",
-      "scanQrCodeDescription": "Sử dụng camera để quét mã QR đăng nhập",
       "enterCodeDescription": "Nhập mã đăng nhập bạn đã nhận được",
       "magicLinkCode": "Mã Đăng Nhập",
       "verifyCode": "Xác Thực Mã",
-      "openQrScanner": "Mở Máy Quét QR",
       "scanningQrCode": "Đang quét mã QR...",
       "cameraPermissionDenied": "Quyền truy cập camera bị từ chối. Vui lòng cho phép truy cập camera để quét mã QR.",
-      "closeScanner": "Đóng Máy Quét",
       "invalidQrCode": "Mã QR không hợp lệ. Vui lòng quét mã QR đăng nhập hợp lệ.",
       "or": "hoặc",
       "useMagicLink": "Sử Dụng Liên Kết Đăng Nhập",
       "uploadQrImage": "Tải Lên Hình QR",
       "pasteFromClipboard": "Dán Từ Clipboard",
-      "dragDropImage": "Kéo thả hình ảnh vào đây",
       "clickToUpload": "hoặc nhấn để tải lên",
       "processingImage": "Đang xử lý hình ảnh...",
       "invalidImageFormat": "Định dạng hình ảnh không hợp lệ. Vui lòng tải lên file hình ảnh hợp lệ.",
-      "noQrCodeFound": "Không tìm thấy mã QR trong hình ảnh. Vui lòng thử hình ảnh khác.",
-      "uploadNotSupported": "Tính năng tải lên mã QR chưa được hỗ trợ. Vui lòng sử dụng quét camera hoặc nhập mã thủ công."
+      "noQrCodeFound": "Không tìm thấy mã QR trong hình ảnh. Vui lòng thử hình ảnh khác."
     },
     "successfulImports": "Nhập Thành Công",
     "failedImports": "Nhập Thất Bại",
@@ -741,6 +734,72 @@
       "carryOverLimit": "Giới Hạn Chuyển Tiếp:",
       "availableToTake": "Có Thể Sử Dụng:"
     }
+  },
+  "customer": {
+    "contact": "Liên Hệ",
+    "company": "Công Ty",
+    "address": "Địa Chỉ",
+    "searchPlaceholder": "Tìm khách hàng theo tên, công ty, email hoặc điện thoại...",
+    "namePlaceholder": "Tên khách hàng",
+    "companyPlaceholder": "Tên công ty",
+    "emailPlaceholder": "khachhang@example.com",
+    "phonePlaceholder": "+84901234567",
+    "addressPlaceholder": "Địa chỉ",
+    "created": "Đã Tạo Khách Hàng",
+    "createdMessage": "Khách hàng '{{name}}' đã được tạo thành công",
+    "updated": "Đã Cập Nhật Khách Hàng",
+    "updatedMessage": "Khách hàng '{{name}}' đã được cập nhật thành công",
+    "deleted": "Đã Xóa Khách Hàng",
+    "deletedMessage": "Khách hàng '{{name}}' đã được xóa thành công",
+    "tableAriaLabel": "Bảng danh sách khách hàng"
+  },
+  "product": {
+    "addProduct": "Thêm Sản Phẩm",
+    "editProduct": "Sửa Sản Phẩm",
+    "productCode": "Mã Sản Phẩm",
+    "productCodePlaceholder": "Nhập mã sản phẩm",
+    "namePlaceholder": "Nhập tên sản phẩm",
+    "descriptionPlaceholder": "Nhập mô tả sản phẩm",
+    "category": "Danh Mục",
+    "categoryPlaceholder": "Nhập danh mục sản phẩm",
+    "unitPrice": "Giá Bán",
+    "unitPricePlaceholder": "0.00",
+    "costPrice": "Giá Nhập",
+    "costPricePlaceholder": "0.00",
+    "stockLevel": "Số Lượng Tồn",
+    "stockLevelPlaceholder": "0",
+    "stock": "Tồn Kho",
+    "unit": "Đơn Vị",
+    "unitPlaceholder": "cái, kg, v.v.",
+    "minStock": "Tồn Tối Thiểu",
+    "minStockPlaceholder": "Số lượng tồn kho tối thiểu",
+    "maxStock": "Tồn Tối Đa",
+    "maxStockPlaceholder": "Số lượng tồn kho tối đa",
+    "sku": "SKU",
+    "skuPlaceholder": "Mã quản lý kho",
+    "barcode": "Mã Vạch",
+    "barcodePlaceholder": "Mã vạch sản phẩm",
+    "statusPlaceholder": "Chọn trạng thái",
+    "searchPlaceholder": "Tìm sản phẩm theo tên, mã, danh mục, SKU hoặc mã vạch...",
+    "status": {
+      "active": "Đang Kinh Doanh",
+      "inactive": "Ngừng Kinh Doanh",
+      "discontinued": "Đã Ngừng Sản Xuất",
+      "outOfStock": "Hết Hàng",
+      "lowStock": "Sắp Hết Hàng",
+      "inStock": "Còn Hàng"
+    },
+    "priceCannotBeNegative": "Giá không thể âm",
+    "stockCannotBeNegative": "Số lượng tồn kho không thể âm",
+    "minStockCannotExceedMax": "Tồn kho tối thiểu không thể lớn hơn tối đa",
+    "maxStockCannotBeLessThanMin": "Tồn kho tối đa không thể nhỏ hơn tối thiểu",
+    "created": "Đã Tạo Sản Phẩm",
+    "createdMessage": "Sản phẩm '{{name}}' đã được tạo thành công",
+    "updated": "Đã Cập Nhật Sản Phẩm",
+    "updatedMessage": "Sản phẩm '{{name}}' đã được cập nhật thành công",
+    "deleted": "Đã Xóa Sản Phẩm",
+    "deletedMessage": "Sản phẩm '{{name}}' đã được xóa thành công",
+    "tableAriaLabel": "Bảng danh sách sản phẩm"
   },
   "orientation": {
     "title": "Xoay Thiết Bị",
