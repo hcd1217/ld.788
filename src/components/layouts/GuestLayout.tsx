@@ -9,6 +9,15 @@ type GuestLayoutProps = {
   readonly children: ReactNode;
 };
 
+/**
+ * Layout for guest-only (public) pages such as login or password reset.
+ *
+ * - Redirects authenticated users to "/home".
+ * - Fills the viewport and centers `children` within a constrained container.
+ * - Displays `ColorSchemeToggle`, `LanguageSwitcher`, and `VersionInformation`.
+ *
+ * @param children Content to render for unauthenticated users.
+ */
 export function GuestLayout({ children }: GuestLayoutProps) {
   const { isAuthenticated } = useAppStore();
 

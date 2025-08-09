@@ -4,9 +4,14 @@
   align-items: center;
   justify-content: center;
   padding: 8px;
-  min-width: 64px;
   color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-gray-5));
   transition: all 0.2s ease;
+  border-radius: 8px;
+  height: 100%;
+}
+
+.navItem:hover {
+  background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8));
 }
 
 .navItem:active {
@@ -15,6 +20,7 @@
 
 .navItemActive {
   color: var(--mantine-color-brand-filled);
+  background-color: light-dark(var(--mantine-color-brand-0), var(--mantine-color-dark-7));
 }
 
 .navIcon {
@@ -23,10 +29,4 @@
 
 .navItemActive .navIcon {
   color: var(--mantine-color-brand-filled);
-}
-
-@media (min-width: 768px) {
-  .mobileLayout {
-    display: none;
-  }
 }

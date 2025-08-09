@@ -1,5 +1,5 @@
 import { Stack, TextInput, Switch, Group, Button, LoadingOverlay, Box } from '@mantine/core';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/hooks/useTranslation';
 import { ModalOrDrawer } from '@/components/common';
 import type { UseFormReturnType } from '@mantine/form';
 

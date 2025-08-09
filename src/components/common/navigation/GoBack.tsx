@@ -1,7 +1,7 @@
 import { ActionIcon, Anchor, Box, Center, rem } from '@mantine/core';
 import { IconArrowLeft, IconChevronLeft } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type GoBackProps = {
   readonly variant?: 'anchor' | 'mobile-header';

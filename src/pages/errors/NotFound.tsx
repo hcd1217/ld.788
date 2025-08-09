@@ -1,9 +1,14 @@
 import { Button, Container, Group, Text, Title, Stack, Paper } from '@mantine/core';
 import { useNavigate } from 'react-router';
-import { IconError404, IconArrowLeft, IconHome } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useIsDarkMode } from '@/hooks/useIsDarkMode';
 import { ROUTERS } from '@/config/routeConfig';
+import { IconIdentifiers } from '@/utils/iconRegistry';
+import { getIcon } from '@/utils/iconRegistry';
+
+const IconArrowLeft = getIcon(IconIdentifiers.ARROW_LEFT);
+const IconError404 = getIcon(IconIdentifiers.ERROR_404);
+const IconHome = getIcon(IconIdentifiers.HOME);
 
 export function NotFound() {
   const { t } = useTranslation();

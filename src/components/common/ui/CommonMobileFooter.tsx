@@ -1,7 +1,6 @@
-import { Grid, Text, UnstyledButton, Stack } from '@mantine/core';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { useMemo } from 'react';
-import classes from './CommonMobileFooter.module.css';
+import { BaseMobileFooter, type BaseMobileFooterItem } from './BaseMobileFooter';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getMobileNavigationItems } from '@/services/navigationService';
 import { useAppStore } from '@/stores/useAppStore';
@@ -11,6 +10,7 @@ const EMPTY_ROUTE_CONFIG = {};
 
 export function CommonMobileFooter() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
 
   // Use selector to only subscribe to userProfile changes (includes routeConfig and mobileNavigation in clientConfig)
@@ -20,39 +20,39 @@ export function CommonMobileFooter() {
   // Get mobile navigation items from backend or static fallback
   // Backend mobile navigation takes priority if available
   const navigationItems = useMemo(() => {
-    return getMobileNavigationItems(userProfile?.clientConfig?.mobileNavigation, t, routeConfig);
+    const items = getMobileNavigationItems(
+      userProfile?.clientConfig?.mobileNavigation,
+      t,
+      routeConfig,
+    );
+    return items.map(
+      (item) =>
+        ({
+          id: item.id,
+          icon: item.icon,
+          label: item.label,
+          path: item.path,
+        }) as BaseMobileFooterItem,
+    );
   }, [userProfile, t, routeConfig]);
 
-  // Limit to maximum 4 items for mobile UI
-  const displayItems = navigationItems.slice(0, 4);
+  // Determine active item based on current path
+  const activeItemId = useMemo(() => {
+    const activeItem = navigationItems.find((item) => item.path === location.pathname);
+    return activeItem?.id;
+  }, [navigationItems, location.pathname]);
+
+  const handleItemClick = (item: BaseMobileFooterItem) => {
+    if (item.path) {
+      navigate(item.path);
+    }
+  };
 
   return (
-    <Grid px={0} gutter={0}>
-      {displayItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = location.pathname === item.path;
-
-        return (
-          <Grid.Col key={item.id} span={3}>
-            <UnstyledButton
-              className={`${classes.navItem} ${isActive ? classes.navItemActive : ''}`}
-              onClick={() => {
-                if (item.path) {
-                  navigate(item.path);
-                }
-              }}
-              w="100%"
-            >
-              <Stack gap={4} align="center">
-                <Icon size={24} stroke={isActive ? 2.5 : 1.5} className={classes.navIcon} />
-                <Text size="xs" fw={isActive ? 600 : 400}>
-                  {item.label}
-                </Text>
-              </Stack>
-            </UnstyledButton>
-          </Grid.Col>
-        );
-      })}
-    </Grid>
+    <BaseMobileFooter
+      items={navigationItems}
+      activeItemId={activeItemId}
+      onItemClick={handleItemClick}
+    />
   );
 }

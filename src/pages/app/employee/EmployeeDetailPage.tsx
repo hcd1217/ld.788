@@ -5,12 +5,10 @@ import { LoadingOverlay, Stack } from '@mantine/core';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useEmployeeList, useHrActions, useHrLoading } from '@/stores/useHrStore';
-import {
-  ResourceNotFound,
-  DetailPageLayout,
-  AppPageTitle,
-  AppMobileLayout,
-} from '@/components/common';
+import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
+import { DetailPageLayout } from '@/components/common/layouts/DetailPageLayout';
+import { AppPageTitle } from '@/components/common';
+import { AppMobileLayout } from '@/components/common';
 import {
   EmployeeDeactivateModal,
   EmployeeActivateModal,

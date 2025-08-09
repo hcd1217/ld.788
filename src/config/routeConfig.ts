@@ -1,241 +1,115 @@
-// Type for route identifiers - ensures type safety
-export const RouteIdentifiers = {
+// Unified route definitions - single source of truth
+const ROUTE_DEFINITIONS = {
   // Root
-  ROOT: 'root',
+  ROOT: { id: 'root', path: '/' },
 
   // Auth routes
-  LOGIN: 'login',
-  MAGIC_LINK: 'magic-link',
-  CLIENT_LOGIN: 'client-login',
-  FORGOT_PASSWORD: 'forgot-password',
-  RESET_PASSWORD: 'reset-password',
-  REGISTER: 'register',
+  LOGIN: { id: 'login', path: '/login' },
+  MAGIC_LINK: { id: 'magic-link', path: '/magic-link' },
+  CLIENT_LOGIN: { id: 'client-login', path: '/:clientCode/login' },
+  FORGOT_PASSWORD: { id: 'forgot-password', path: '/forgot-password' },
+  RESET_PASSWORD: { id: 'reset-password', path: '/reset-password' },
+  REGISTER: { id: 'register', path: '/register' },
+
+  // Time keeper routes
+  TIME_KEEPER_DASHBOARD: { id: 'time-keeper/dashboard', path: '/time-keeper/dashboard' },
 
   // App routes
-  HOME: 'home',
-  EXPLORE: 'explore',
-  MORE: 'more',
-  PROFILE: 'profile',
-  SETTINGS: 'settings',
-  NOTIFICATIONS: 'notifications',
+  HOME: { id: 'home', path: '/home' },
+  EXPLORE: { id: 'explore', path: '/explore' },
+  MORE: { id: 'more', path: '/more' },
+  PROFILE: { id: 'profile', path: '/profile' },
+  SETTINGS: { id: 'settings', path: '/settings' },
+  NOTIFICATIONS: { id: 'notifications', path: '/notifications' },
 
   // Config routes
-  CUSTOMER_CONFIG: 'customer-config',
-  PRODUCT_CONFIG: 'product-config',
+  CUSTOMER_CONFIG: { id: 'customer-config', path: '/customer-config' },
+  PRODUCT_CONFIG: { id: 'product-config', path: '/product-config' },
 
   // Store management
-  STORES: 'stores',
-  STORE_CONFIG: 'store-config',
-  STORE_MANAGEMENT: 'store-management',
-  STORE_EDIT: 'store-edit',
+  STORES: { id: 'stores', path: '/stores' },
+  STORE_CONFIG: { id: 'store-config', path: '/store-config' },
+  STORE_MANAGEMENT: { id: 'store-management', path: '/store-management' },
+  STORE_EDIT: { id: 'store-edit', path: '/stores/edit/:storeId' },
 
   // Employee management
-  EMPLOYEE_MANAGEMENT: 'employee-management',
-  EMPLOYEE_DETAIL: 'employee-detail',
-  EMPLOYEES_ADD: 'employees-add',
-  EMPLOYEE_EDIT: 'employee-edit',
+  EMPLOYEE_MANAGEMENT: { id: 'employee-management', path: '/employee-management' },
+  EMPLOYEE_DETAIL: { id: 'employee-detail', path: '/employees/:employeeId' },
+  EMPLOYEES_ADD: { id: 'employees-add', path: '/employees/add' },
+  EMPLOYEE_EDIT: { id: 'employee-edit', path: '/employees/edit/:employeeId' },
 
   // Customer management
-  CUSTOMER_MANAGEMENT: 'customer-management',
-  CUSTOMER_DETAIL: 'customer-detail',
-  CUSTOMER_ADD: 'customer-add',
-  CUSTOMER_EDIT: 'customer-edit',
+  CUSTOMER_MANAGEMENT: { id: 'customer-management', path: '/customer-management' },
+  CUSTOMER_DETAIL: { id: 'customer-detail', path: '/customers/:customerId' },
+  CUSTOMER_ADD: { id: 'customer-add', path: '/customers/add' },
+  CUSTOMER_EDIT: { id: 'customer-edit', path: '/customers/edit/:customerId' },
 
   // Product management
-  PRODUCT_MANAGEMENT: 'product-management',
-  PRODUCT_DETAIL: 'product-detail',
-  PRODUCT_ADD: 'product-add',
-  PRODUCT_EDIT: 'product-edit',
+  PRODUCT_MANAGEMENT: { id: 'product-management', path: '/product-management' },
+  PRODUCT_DETAIL: { id: 'product-detail', path: '/product/:productId' }, // Fixed: was :customerId
+  PRODUCT_ADD: { id: 'product-add', path: '/product/add' },
+  PRODUCT_EDIT: { id: 'product-edit', path: '/product/edit/:productId' }, // Fixed: was :customerId
 
   // PO management
-  PO_MANAGEMENT: 'po-management',
-  PO_DETAIL: 'po-detail',
-  PO_ADD: 'po-add',
-  PO_EDIT: 'po-edit',
+  PO_MANAGEMENT: { id: 'po-management', path: '/po-management' },
+  PO_DETAIL: { id: 'po-detail', path: '/po/:poId' },
+  PO_ADD: { id: 'po-add', path: '/po/add' },
+  PO_EDIT: { id: 'po-edit', path: '/po/edit/:poId' },
 
   // Staff management
-  STAFF: 'staff',
-  STAFF_ADD: 'staff-add',
-  STAFF_EDIT: 'staff-edit',
+  STAFF: { id: 'staff', path: '/staff' },
+  STAFF_ADD: { id: 'staff-add', path: '/staff/add' },
+  STAFF_EDIT: { id: 'staff-edit', path: '/staff/edit/:staffId' },
 
   // User management
-  USER_MANAGEMENT: 'user-management',
-  USER_DETAIL: 'user-detail',
-  ADD_USER: 'add-user',
-  IMPORT_USERS: 'import-users',
+  USER_MANAGEMENT: { id: 'user-management', path: '/user-management' },
+  USER_DETAIL: { id: 'user-detail', path: '/user/:userId' },
+  ADD_USER: { id: 'add-user', path: '/add-user' },
+  IMPORT_USERS: { id: 'import-users', path: '/import-users' },
 
   // Configuration
-  CONFIGURATION: 'configuration',
-  SALARY_MANAGEMENT: 'salary-management',
+  CONFIGURATION: { id: 'configuration', path: '/configuration' },
+  SALARY_MANAGEMENT: { id: 'salary-management', path: '/salary-management' },
 
   // Admin management
-  ROLE_MANAGEMENT: 'role-management',
-  PERMISSION_MANAGEMENT: 'permission-management',
+  ROLE_MANAGEMENT: { id: 'role-management', path: '/role-management' },
+  PERMISSION_MANAGEMENT: { id: 'permission-management', path: '/permission-management' },
 
   // Admin routes
-  ADMIN_LOGIN: 'admin-login',
-  ADMIN_DASHBOARD: 'admin-dashboard',
-  ADMIN_CLIENTS: 'admin-clients',
-  ADMIN_CLIENTS_NEW: 'admin-clients-new',
-  ADMIN_CLIENT_DETAIL: 'admin-client-detail',
-  ADMIN_PERMISSIONS: 'admin-permissions',
-  ADMIN_STORES: 'admin-stores',
-  ADMIN_MONITORING: 'admin-monitoring',
-  ADMIN_SETTINGS: 'admin-settings',
+  ADMIN_LOGIN: { id: 'admin-login', path: '/admin/login' },
+  ADMIN_DASHBOARD: { id: 'admin-dashboard', path: '/admin/dashboard' },
+  ADMIN_CLIENTS: { id: 'admin-clients', path: '/admin/clients' },
+  ADMIN_CLIENTS_NEW: { id: 'admin-clients-new', path: '/admin/clients/new' },
+  ADMIN_CLIENT_DETAIL: { id: 'admin-client-detail', path: '/admin/clients/:clientCode' },
+  ADMIN_PERMISSIONS: { id: 'admin-permissions', path: '/admin/permissions' },
+  ADMIN_STORES: { id: 'admin-stores', path: '/admin/stores' },
+  ADMIN_MONITORING: { id: 'admin-monitoring', path: '/admin/monitoring' },
+  ADMIN_SETTINGS: { id: 'admin-settings', path: '/admin/settings' },
 
   // Sample/Error routes
-  SAMPLE_ERRORS: 'sample-errors',
+  SAMPLE_ERRORS: { id: 'sample-errors', path: '/sample/errors' },
 } as const;
 
-export type RouteIdentifier = (typeof RouteIdentifiers)[keyof typeof RouteIdentifiers];
+// Type helper to extract keys
+type RouteDefinitionKeys = keyof typeof ROUTE_DEFINITIONS;
 
-export const ROUTERS = {
-  // Root
-  ROOT: '/',
+// Generate RouteIdentifiers for backward compatibility
+export const RouteIdentifiers = Object.fromEntries(
+  Object.entries(ROUTE_DEFINITIONS).map(([key, value]) => [key, value.id]),
+) as Record<RouteDefinitionKeys, (typeof ROUTE_DEFINITIONS)[RouteDefinitionKeys]['id']>;
 
-  // Auth routes
-  LOGIN: '/login',
-  MAGIC_LINK: '/magic-link',
-  CLIENT_LOGIN: '/:clientCode/login',
-  FORGOT_PASSWORD: '/forgot-password',
-  RESET_PASSWORD: '/reset-password',
-  REGISTER: '/register',
+// Generate ROUTERS for backward compatibility
+export const ROUTERS = Object.fromEntries(
+  Object.entries(ROUTE_DEFINITIONS).map(([key, value]) => [key, value.path]),
+) as Record<RouteDefinitionKeys, (typeof ROUTE_DEFINITIONS)[RouteDefinitionKeys]['path']>;
 
-  // App routes
-  HOME: '/home',
-  EXPLORE: '/explore',
-  MORE: '/more',
-  PROFILE: '/profile',
-  SETTINGS: '/settings',
-  NOTIFICATIONS: '/notifications',
+// Type for route identifiers
+export type RouteIdentifier = (typeof ROUTE_DEFINITIONS)[RouteDefinitionKeys]['id'];
 
-  // Config routes
-  CUSTOMER_CONFIG: '/customer-config',
-  PRODUCT_CONFIG: '/product-config',
-
-  // Store management
-  STORES: '/stores',
-  STORE_CONFIG: '/store-config',
-  STORE_MANAGEMENT: '/store-management',
-  STORE_EDIT: '/stores/edit/:storeId',
-
-  // Employee management
-  EMPLOYEE_MANAGEMENT: '/employee-management',
-  EMPLOYEE_DETAIL: '/employees/:employeeId',
-  EMPLOYEES_ADD: '/employees/add',
-  EMPLOYEE_EDIT: '/employees/edit/:employeeId',
-
-  // Customer management
-  CUSTOMER_MANAGEMENT: '/customer-management',
-  CUSTOMER_DETAIL: '/customers/:customerId',
-  CUSTOMER_ADD: '/customers/add',
-  CUSTOMER_EDIT: '/customers/edit/:customerId',
-
-  // Product management
-  PRODUCT_MANAGEMENT: '/product-management',
-  PRODUCT_DETAIL: '/product/:customerId',
-  PRODUCT_ADD: '/product/add',
-  PRODUCT_EDIT: '/product/edit/:customerId',
-
-  // PO management
-  PO_MANAGEMENT: '/po-management',
-  PO_DETAIL: '/po/:poId',
-  PO_ADD: '/po/add',
-  PO_EDIT: '/po/edit/:poId',
-
-  // Staff management
-  STAFF: '/staff',
-  STAFF_ADD: '/staff/add',
-  STAFF_EDIT: '/staff/edit/:staffId',
-
-  // User management
-  USER_MANAGEMENT: '/user-management',
-  USER_DETAIL: '/user/:userId',
-  ADD_USER: '/add-user',
-  IMPORT_USERS: '/import-users',
-
-  // Configuration
-  CONFIGURATION: '/configuration',
-  SALARY_MANAGEMENT: '/salary-management',
-
-  // Admin management
-  ROLE_MANAGEMENT: '/role-management',
-  PERMISSION_MANAGEMENT: '/permission-management',
-
-  // Admin routes
-  ADMIN_LOGIN: '/admin/login',
-  ADMIN_DASHBOARD: '/admin/dashboard',
-  ADMIN_CLIENTS: '/admin/clients',
-  ADMIN_CLIENTS_NEW: '/admin/clients/new',
-  ADMIN_CLIENT_DETAIL: '/admin/clients/:clientCode',
-  ADMIN_PERMISSIONS: '/admin/permissions',
-  ADMIN_STORES: '/admin/stores',
-  ADMIN_MONITORING: '/admin/monitoring',
-  ADMIN_SETTINGS: '/admin/settings',
-
-  // Sample/Error routes
-  SAMPLE_ERRORS: '/sample/errors',
-} as const;
-
-// Route registry with all navigation routes
-const routeRegistry: Record<RouteIdentifier, string> = {
-  [RouteIdentifiers.ROOT]: ROUTERS.ROOT,
-  [RouteIdentifiers.LOGIN]: ROUTERS.LOGIN,
-  [RouteIdentifiers.MAGIC_LINK]: ROUTERS.MAGIC_LINK,
-  [RouteIdentifiers.CLIENT_LOGIN]: ROUTERS.CLIENT_LOGIN,
-  [RouteIdentifiers.FORGOT_PASSWORD]: ROUTERS.FORGOT_PASSWORD,
-  [RouteIdentifiers.RESET_PASSWORD]: ROUTERS.RESET_PASSWORD,
-  [RouteIdentifiers.REGISTER]: ROUTERS.REGISTER,
-  [RouteIdentifiers.HOME]: ROUTERS.HOME,
-  [RouteIdentifiers.EXPLORE]: ROUTERS.EXPLORE,
-  [RouteIdentifiers.MORE]: ROUTERS.MORE,
-  [RouteIdentifiers.PROFILE]: ROUTERS.PROFILE,
-  [RouteIdentifiers.SETTINGS]: ROUTERS.SETTINGS,
-  [RouteIdentifiers.NOTIFICATIONS]: ROUTERS.NOTIFICATIONS,
-  [RouteIdentifiers.CUSTOMER_CONFIG]: ROUTERS.CUSTOMER_CONFIG,
-  [RouteIdentifiers.PRODUCT_CONFIG]: ROUTERS.PRODUCT_CONFIG,
-  [RouteIdentifiers.STORES]: ROUTERS.STORES,
-  [RouteIdentifiers.STORE_CONFIG]: ROUTERS.STORE_CONFIG,
-  [RouteIdentifiers.STORE_MANAGEMENT]: ROUTERS.STORE_MANAGEMENT,
-  [RouteIdentifiers.STORE_EDIT]: ROUTERS.STORE_EDIT,
-  [RouteIdentifiers.EMPLOYEE_MANAGEMENT]: ROUTERS.EMPLOYEE_MANAGEMENT,
-  [RouteIdentifiers.EMPLOYEE_DETAIL]: ROUTERS.EMPLOYEE_DETAIL,
-  [RouteIdentifiers.EMPLOYEES_ADD]: ROUTERS.EMPLOYEES_ADD,
-  [RouteIdentifiers.EMPLOYEE_EDIT]: ROUTERS.EMPLOYEE_EDIT,
-  [RouteIdentifiers.CUSTOMER_MANAGEMENT]: ROUTERS.CUSTOMER_MANAGEMENT,
-  [RouteIdentifiers.CUSTOMER_DETAIL]: ROUTERS.CUSTOMER_DETAIL,
-  [RouteIdentifiers.CUSTOMER_ADD]: ROUTERS.CUSTOMER_ADD,
-  [RouteIdentifiers.CUSTOMER_EDIT]: ROUTERS.CUSTOMER_EDIT,
-  [RouteIdentifiers.PRODUCT_MANAGEMENT]: ROUTERS.PRODUCT_MANAGEMENT,
-  [RouteIdentifiers.PRODUCT_DETAIL]: ROUTERS.PRODUCT_DETAIL,
-  [RouteIdentifiers.PRODUCT_ADD]: ROUTERS.PRODUCT_ADD,
-  [RouteIdentifiers.PRODUCT_EDIT]: ROUTERS.PRODUCT_EDIT,
-  [RouteIdentifiers.PO_MANAGEMENT]: ROUTERS.PO_MANAGEMENT,
-  [RouteIdentifiers.PO_DETAIL]: ROUTERS.PO_DETAIL,
-  [RouteIdentifiers.PO_ADD]: ROUTERS.PO_ADD,
-  [RouteIdentifiers.PO_EDIT]: ROUTERS.PO_EDIT,
-  [RouteIdentifiers.STAFF]: ROUTERS.STAFF,
-  [RouteIdentifiers.STAFF_ADD]: ROUTERS.STAFF_ADD,
-  [RouteIdentifiers.STAFF_EDIT]: ROUTERS.STAFF_EDIT,
-  [RouteIdentifiers.USER_MANAGEMENT]: ROUTERS.USER_MANAGEMENT,
-  [RouteIdentifiers.USER_DETAIL]: ROUTERS.USER_DETAIL,
-  [RouteIdentifiers.ADD_USER]: ROUTERS.ADD_USER,
-  [RouteIdentifiers.IMPORT_USERS]: ROUTERS.IMPORT_USERS,
-  [RouteIdentifiers.CONFIGURATION]: ROUTERS.CONFIGURATION,
-  [RouteIdentifiers.SALARY_MANAGEMENT]: ROUTERS.SALARY_MANAGEMENT,
-  [RouteIdentifiers.ROLE_MANAGEMENT]: ROUTERS.ROLE_MANAGEMENT,
-  [RouteIdentifiers.PERMISSION_MANAGEMENT]: ROUTERS.PERMISSION_MANAGEMENT,
-  [RouteIdentifiers.ADMIN_LOGIN]: ROUTERS.ADMIN_LOGIN,
-  [RouteIdentifiers.ADMIN_DASHBOARD]: ROUTERS.ADMIN_DASHBOARD,
-  [RouteIdentifiers.ADMIN_CLIENTS]: ROUTERS.ADMIN_CLIENTS,
-  [RouteIdentifiers.ADMIN_CLIENTS_NEW]: ROUTERS.ADMIN_CLIENTS_NEW,
-  [RouteIdentifiers.ADMIN_CLIENT_DETAIL]: ROUTERS.ADMIN_CLIENT_DETAIL,
-  [RouteIdentifiers.ADMIN_PERMISSIONS]: ROUTERS.ADMIN_PERMISSIONS,
-  [RouteIdentifiers.ADMIN_STORES]: ROUTERS.ADMIN_STORES,
-  [RouteIdentifiers.ADMIN_MONITORING]: ROUTERS.ADMIN_MONITORING,
-  [RouteIdentifiers.ADMIN_SETTINGS]: ROUTERS.ADMIN_SETTINGS,
-  [RouteIdentifiers.SAMPLE_ERRORS]: ROUTERS.SAMPLE_ERRORS,
-};
+// Automatically generate route registry
+const routeRegistry: Record<RouteIdentifier, string> = Object.fromEntries(
+  Object.values(ROUTE_DEFINITIONS).map(({ id, path }) => [id, path]),
+) as Record<RouteIdentifier, string>;
 
 /**
  * Retrieves a route path by its identifier
@@ -257,23 +131,52 @@ export function hasRoute(identifier: string): boolean {
 
 export type RouteConfig = Partial<Record<keyof typeof ROUTERS, boolean>>;
 
+// Generic helper for parameterized routes
+function replaceRouteParams(path: string, params: Record<string, string>): string {
+  let result = path;
+  for (const [key, value] of Object.entries(params)) {
+    result = result.replace(`:${key}`, value);
+  }
+  return result;
+}
+
 // Helper functions for parameterized routes
 export const getEmployeeDetailRoute = (employeeId: string) =>
-  ROUTERS.EMPLOYEE_DETAIL.replace(':employeeId', employeeId);
+  replaceRouteParams(ROUTERS.EMPLOYEE_DETAIL, { employeeId });
+
 export const getEmployeeEditRoute = (employeeId: string) =>
-  ROUTERS.EMPLOYEE_EDIT.replace(':employeeId', employeeId);
-export const getClientLoginRoute = (clientCode: string) => `/${clientCode}/login`;
-export const getStoreEditRoute = (storeId: string) => `/stores/edit/${storeId}`;
-export const getStaffEditRoute = (staffId: string) => `/staff/edit/${staffId}`;
-export const getUserDetailRoute = (userId: string) => `/user/${userId}`;
-export const getAdminClientDetailRoute = (clientCode: string) => `/admin/clients/${clientCode}`;
+  replaceRouteParams(ROUTERS.EMPLOYEE_EDIT, { employeeId });
+
+export const getClientLoginRoute = (clientCode: string) =>
+  replaceRouteParams(ROUTERS.CLIENT_LOGIN, { clientCode });
+
+export const getStoreEditRoute = (storeId: string) =>
+  replaceRouteParams(ROUTERS.STORE_EDIT, { storeId });
+
+export const getStaffEditRoute = (staffId: string) =>
+  replaceRouteParams(ROUTERS.STAFF_EDIT, { staffId });
+
+export const getUserDetailRoute = (userId: string) =>
+  replaceRouteParams(ROUTERS.USER_DETAIL, { userId });
+
+export const getAdminClientDetailRoute = (clientCode: string) =>
+  replaceRouteParams(ROUTERS.ADMIN_CLIENT_DETAIL, { clientCode });
 
 // Customer management helper functions
 export const getCustomerDetailRoute = (customerId: string) =>
-  ROUTERS.CUSTOMER_DETAIL.replace(':customerId', customerId);
+  replaceRouteParams(ROUTERS.CUSTOMER_DETAIL, { customerId });
+
 export const getCustomerEditRoute = (customerId: string) =>
-  ROUTERS.CUSTOMER_EDIT.replace(':customerId', customerId);
+  replaceRouteParams(ROUTERS.CUSTOMER_EDIT, { customerId });
+
+// Product management helper functions (fixed parameter names)
+export const getProductDetailRoute = (productId: string) =>
+  replaceRouteParams(ROUTERS.PRODUCT_DETAIL, { productId });
+
+export const getProductEditRoute = (productId: string) =>
+  replaceRouteParams(ROUTERS.PRODUCT_EDIT, { productId });
 
 // PO management helper functions
-export const getPODetailRoute = (poId: string) => ROUTERS.PO_DETAIL.replace(':poId', poId);
-export const getPOEditRoute = (poId: string) => ROUTERS.PO_EDIT.replace(':poId', poId);
+export const getPODetailRoute = (poId: string) => replaceRouteParams(ROUTERS.PO_DETAIL, { poId });
+
+export const getPOEditRoute = (poId: string) => replaceRouteParams(ROUTERS.PO_EDIT, { poId });

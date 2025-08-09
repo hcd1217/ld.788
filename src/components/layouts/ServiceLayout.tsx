@@ -1,21 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router';
+import { useState } from 'react';
+import { Outlet } from 'react-router';
 import { Center, Loader } from '@mantine/core';
 import { useAppStore } from '@/stores/useAppStore';
 import { PWAInstallPrompt, SafariPWAGuide } from '@/components/common';
+import { RouteChangeProvider } from '@/components/providers/RouteChangeProvider';
+import { useOnce } from '@/hooks/useOnce';
 
 export function ServiceLayout() {
   const [ready, setReady] = useState(false);
   const { checkAuth, authInitialized } = useAppStore();
-  const navigate = useNavigate();
 
-  useEffect(() => {
+  useOnce(() => {
     run();
     async function run() {
       await checkAuth();
       setReady(true);
     }
-  }, [checkAuth, navigate]);
+  });
 
   if (!ready || !authInitialized) {
     return (
@@ -26,10 +27,10 @@ export function ServiceLayout() {
   }
 
   return (
-    <>
+    <RouteChangeProvider>
       <Outlet />
       <PWAInstallPrompt />
       <SafariPWAGuide />
-    </>
+    </RouteChangeProvider>
   );
 }

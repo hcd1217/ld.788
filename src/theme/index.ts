@@ -6,84 +6,106 @@ import {
   TextInput,
   type CSSVariablesResolver,
 } from '@mantine/core';
-import { defaultConfig, type CustomColors } from './customTheme';
+import { themeConfig, type CustomColors } from './customTheme';
 
-export const theme = createTheme({
-  primaryColor: 'brand',
-  colors: {
-    brand: defaultConfig.brandColors,
-  },
-  // Cspell:words Noto Consolas
-  fontFamily:
-    '"Noto Sans", Consolas, Monaco, "Courier New", monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
-  headings: {
+/**
+ * Get Mantine theme configuration for a specific theme
+ * @param themeName The name of the theme to load
+ * @returns Mantine theme object
+ */
+export function getMantineTheme(themeName: string) {
+  const config = themeConfig[themeName] ?? themeConfig.elegant;
+  return createTheme({
+    primaryColor: 'brand',
+    colors: {
+      brand: config.brandColors,
+    },
+    // Cspell:words Noto Consolas
     fontFamily:
       '"Noto Sans", Consolas, Monaco, "Courier New", monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
-  },
-  defaultRadius: 'md',
-  cursorType: 'pointer',
-  components: {
-    PasswordInput: PasswordInput.extend({
-      styles(_theme, props) {
-        const styles = {
-          input: {
-            border: 'none',
-            borderBottom: '1px solid var(--input-border-color)',
-            borderRadius: 0,
-            padding: '0',
-          },
-          innerInput: {
-            padding: '0',
-          },
-        };
-        if (props.leftSection) {
-          styles.innerInput.padding = '0.5rem 2rem';
-        }
-
-        return styles;
-      },
-    }),
-    TextInput: TextInput.extend({
-      styles(_theme, props) {
-        const styles = {
-          input: {
-            border: 'none',
-            borderBottom: '1px solid var(--input-border-color)',
-            borderRadius: 0,
-            padding: '0',
-          },
-        };
-        if (props.leftSection) {
-          styles.input.padding = '.5rem 2rem';
-        }
-
-        return styles;
-      },
-    }),
-    Button: Button.extend({
-      styles(_theme, props) {
-        if (props.variant === 'auth-form') {
-          return {
-            root: {
-              transition: 'all 0.2s ease',
-              height: rem(55),
-              fontSize: 'h4',
-              fontWeight: '400',
+    headings: {
+      fontFamily:
+        '"Noto Sans", Consolas, Monaco, "Courier New", monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+    },
+    defaultRadius: 'md',
+    cursorType: 'pointer',
+    components: {
+      PasswordInput: PasswordInput.extend({
+        styles(_theme, props) {
+          const styles = {
+            input: {
+              border: 'none',
+              borderBottom: '1px solid var(--input-border-color)',
+              borderRadius: 0,
+              padding: '0',
+            },
+            innerInput: {
+              padding: '0',
             },
           };
-        }
+          if (props.leftSection) {
+            styles.innerInput.padding = '0.5rem 2rem';
+          }
 
-        return {};
-      },
-    }),
-  },
-});
+          return styles;
+        },
+      }),
+      TextInput: TextInput.extend({
+        styles(_theme, props) {
+          const styles = {
+            input: {
+              border: 'none',
+              borderBottom: '1px solid var(--input-border-color)',
+              borderRadius: 0,
+              padding: '0',
+            },
+          };
+          if (props.leftSection) {
+            styles.input.padding = '.5rem 2rem';
+          }
 
-export const resolver: CSSVariablesResolver = () => ({
-  variables: _build(defaultConfig.default),
-  light: _build(defaultConfig.light ?? defaultConfig.default, defaultConfig.default),
-  dark: _build(defaultConfig.dark ?? defaultConfig.default, defaultConfig.default),
-});
+          return styles;
+        },
+      }),
+      Button: Button.extend({
+        styles(_theme, props) {
+          if (props.variant === 'auth-form') {
+            return {
+              root: {
+                transition: 'all 0.2s ease',
+                height: rem(55),
+                fontSize: 'h4',
+                fontWeight: '400',
+              },
+            };
+          }
+
+          return {};
+        },
+      }),
+    },
+  });
+}
+
+/**
+ * Get CSS variables resolver for a specific theme
+ * @param themeName The name of the theme to load
+ * @returns CSS variables resolver function
+ */
+export function getResolver(themeName: string): CSSVariablesResolver {
+  const config = themeConfig[themeName] ?? themeConfig.elegant;
+  return () => ({
+    variables: _build(config.default),
+    light: _build(config.light ?? config.default, config.default),
+    dark: _build(config.dark ?? config.default, config.default),
+  });
+}
+
+// @deprecated These static exports are deprecated and should not be used.
+// Use getMantineTheme() and getResolver() functions directly in components.
+// Only kept for backward compatibility during migration.
+export const theme = getMantineTheme('elegant');
+export const resolver = getResolver('elegant');
 
 function _build(colors: CustomColors, defaultColors?: CustomColors) {
   return {

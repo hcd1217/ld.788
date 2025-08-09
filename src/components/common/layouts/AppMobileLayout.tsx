@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppShell, Group, LoadingOverlay } from '@mantine/core';
-import { CommonMobileHeader, CommonMobileFooter } from '../ui';
+import { CommonMobileHeader } from '../ui/CommonMobileHeader';
+import { CommonMobileFooter } from '../ui';
 import { AppLogo, GoBack } from '../navigation';
 import { ErrorAlert } from '../feedback';
 import classes from './AppLayoutMobile.module.css';
@@ -15,6 +16,7 @@ type AppMobileLayoutProps = {
   readonly noFooter?: boolean;
   readonly noHeader?: boolean;
   readonly error?: string;
+  readonly scrollable?: boolean;
   readonly clearError?: () => void;
 };
 export function AppMobileLayout({
@@ -22,12 +24,13 @@ export function AppMobileLayout({
   header,
   footer,
   error,
-  clearError,
   withGoBack = false,
   isLoading = false,
   showLogo = false,
   noHeader = false,
   noFooter = false,
+  scrollable = true,
+  clearError,
 }: AppMobileLayoutProps) {
   const isDefaultHeader = !header && !noHeader;
   return (
@@ -37,7 +40,9 @@ export function AppMobileLayout({
       padding={0}
       className={classes.mobileLayout}
     >
-      {noHeader ? null : (
+      {noHeader ? (
+        <AppShell.Header h={0}></AppShell.Header>
+      ) : (
         <AppShell.Header className={classes.header}>
           {isDefaultHeader ? (
             <CommonMobileHeader />
@@ -51,7 +56,11 @@ export function AppMobileLayout({
         </AppShell.Header>
       )}
 
-      <AppShell.Main className={classes.main} my="sm">
+      <AppShell.Main
+        my={noHeader ? 0 : 'sm'}
+        pt={noHeader ? 0 : undefined}
+        className={scrollable ? classes.main : classes.mainNoScroll}
+      >
         <LoadingOverlay
           visible={isLoading}
           overlayProps={{ blur: 2 }}

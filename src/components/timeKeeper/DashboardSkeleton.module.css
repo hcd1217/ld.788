@@ -1,0 +1,21 @@
+/* Dashboard Skeleton Container */
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--mantine-color-gray-0);
+}
+
+/* Dashboard Content */
+.dashboardContent {
+  padding: 0 16px 90px;
+  flex: 1;
+}
+
+/* Overlapping Timesheet Card */
+.overlappingTimesheet {
+  margin-top: -40px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}

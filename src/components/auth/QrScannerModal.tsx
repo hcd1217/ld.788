@@ -13,7 +13,7 @@ import {
 import { IconAlertCircle, IconUpload, IconClipboard, IconCamera } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Scanner, type IDetectedBarcode } from '@yudiel/react-qr-scanner';
-import jsQR from 'jsqr';
+// Dynamic import for jsQR to reduce bundle size
 import { useTranslation } from '@/hooks/useTranslation';
 
 type QrScannerModalProps = {
@@ -96,6 +96,9 @@ export function QrScannerModal({ opened, onClose, onScan }: QrScannerModalProps)
 
       // Get the image data
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+      // Dynamically import jsQR to reduce initial bundle size
+      const jsQR = (await import('jsqr')).default;
 
       // Decode QR code using jsQR
       const code = jsQR(imageData.data, imageData.width, imageData.height);

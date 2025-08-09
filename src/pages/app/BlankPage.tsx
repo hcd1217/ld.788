@@ -1,5 +1,5 @@
 import { Title, Text, Container, Card, Box, Stack } from '@mantine/core';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/hooks/useTranslation';
 import { GoBack } from '@/components/common';
 
 export function BlankPage() {

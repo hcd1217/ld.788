@@ -31,41 +31,73 @@ export default defineConfig({
   },
   build: {
     target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
+    chunkSizeWarningLimit: 500,
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Core React libraries
-          react: ['react', 'react-dom'],
-          // Router
-          router: ['react-router'],
-          // Mantine Core (most commonly used)
-          'mantine-core': ['@mantine/core'],
-          // Mantine Hooks (lightweight, commonly used)
-          'mantine-hooks': ['@mantine/hooks'],
-          // Mantine Form (auth-specific)
-          'mantine-form': ['@mantine/form'],
-          // Mantine Notifications (smaller, auth-specific)
-          'mantine-notifications': ['@mantine/notifications'],
-          // Mantine Modals (less commonly used)
-          'mantine-modals': ['@mantine/modals'],
-          // Mantine Dates (heavy, less commonly used)
-          'mantine-dates': ['@mantine/dates'],
-          // Icons (large dependency)
-          icons: ['@tabler/icons-react'],
+        manualChunks: (id) => {
+          // Core vendor libraries
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'react';
+          }
+          if (id.includes('node_modules/react-router')) {
+            return 'router';
+          }
+          // Mantine UI library splitting
+          if (id.includes('@mantine/core')) {
+            return 'mantine-core';
+          }
+          if (id.includes('@mantine/hooks')) {
+            return 'mantine-hooks';
+          }
+          if (id.includes('@mantine/form')) {
+            return 'mantine-form';
+          }
+          if (id.includes('@mantine/notifications')) {
+            return 'mantine-notifications';
+          }
+          if (id.includes('@mantine/modals')) {
+            return 'mantine-modals';
+          }
+          if (id.includes('@mantine/dates')) {
+            return 'mantine-dates';
+          }
+          // Icons (large)
+          if (id.includes('@tabler/icons-react')) {
+            return 'icons';
+          }
           // I18n
-          i18n: [
-            'i18next',
-            'react-i18next',
-            'i18next-browser-languagedetector',
-          ],
+          if (id.includes('i18next') || id.includes('react-i18next')) {
+            return 'i18n';
+          }
           // State management
-          zustand: ['zustand'],
+          if (id.includes('zustand')) {
+            return 'zustand';
+          }
           // Validation
-          zod: ['zod'],
+          if (id.includes('zod')) {
+            return 'zod';
+          }
           // Date utilities
-          dayjs: ['dayjs'],
-          // Large utilities
-          xlsx: ['xlsx'],
+          if (id.includes('dayjs')) {
+            return 'dayjs';
+          }
+          // Large utilities (Excel export)
+          if (id.includes('xlsx')) {
+            return 'xlsx';
+          }
+          // QR code library
+          if (id.includes('jsQR') || id.includes('qr-scanner')) {
+            return 'qr';
+          }
+          // Additional vendor splitting for common libraries
+          if (id.includes('node_modules/')) {
+            // Group other smaller vendor libraries
+            if (id.includes('uuid') || id.includes('clsx') || id.includes('immer')) {
+              return 'vendor-utils';
+            }
+            // Default vendor chunk for remaining node_modules
+            return 'vendor';
+          }
         },
       },
     },

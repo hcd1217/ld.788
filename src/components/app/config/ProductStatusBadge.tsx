@@ -1,5 +1,5 @@
 import { Badge } from '@mantine/core';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface ProductStatusBadgeProps {
   readonly status: string;

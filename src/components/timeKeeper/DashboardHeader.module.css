@@ -1,0 +1,34 @@
+/* Dashboard Header */
+.dashboardHeader {
+  color: white;
+  padding: 24px 0 60px;
+  position: relative;
+  height: 25vh;
+  background: linear-gradient(
+    135deg,
+    var(--mantine-color-brand-7) 0%,
+    var(--mantine-color-brand-8) 100%
+  );
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.headerContent {
+  position: relative;
+  padding: 0 16px;
+}
+
+/* Mobile Specific Header Styles */
+.mobileTimeStatsBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 2px dotted rgba(255, 255, 255, 0.4);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  justify-content: center;
+  width: 30vw;
+  height: 30vw;
+  margin: auto;
+}

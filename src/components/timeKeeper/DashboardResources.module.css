@@ -1,0 +1,11 @@
+.resourceCard {
+  background: white;
+  border: 1px solid var(--mantine-color-gray-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resourceCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: var(--mantine-color-brand-5);
+}

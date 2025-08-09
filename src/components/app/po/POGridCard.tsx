@@ -1,6 +1,6 @@
 import { Stack, Group, Text } from '@mantine/core';
 import { useNavigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { SelectableCard } from '@/components/common';
 import { getPODetailRoute } from '@/config/routeConfig';

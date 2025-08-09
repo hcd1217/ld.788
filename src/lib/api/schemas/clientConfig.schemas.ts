@@ -229,7 +229,8 @@ export const RouteConfigSchema = z.object({
   [ROUTERS.FORGOT_PASSWORD]: optionalBooleanSchema,
   [ROUTERS.RESET_PASSWORD]: optionalBooleanSchema,
   [ROUTERS.REGISTER]: falseBooleanSchema,
-  [ROUTERS.HOME]: optionalBooleanSchema, // TrueBooleanSchema
+  [ROUTERS.TIME_KEEPER_DASHBOARD]: trueBooleanSchema,
+  [ROUTERS.HOME]: optionalBooleanSchema,
   [ROUTERS.EXPLORE]: trueBooleanSchema,
   [ROUTERS.MORE]: trueBooleanSchema,
   [ROUTERS.PROFILE]: trueBooleanSchema,

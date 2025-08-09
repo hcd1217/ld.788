@@ -15,11 +15,13 @@ export function registerLogger() {
     return;
   }
   const colorMap = {
+    debug: 'green',
     info: 'blue',
     warn: '#f27a02',
     error: 'red',
   };
   const fontSizeMap = {
+    debug: '15px',
     info: '15px',
     warn: '20px',
     error: '36px',
@@ -30,8 +32,15 @@ export function registerLogger() {
   console.warn = isDevelopment ? log.bind(null, 'warn') : productionLog;
   console.error = isDevelopment ? log.bind(null, 'error') : productionLog;
   console.info = isDevelopment ? log.bind(null, 'info') : productionLog;
+  console.debug = isDevelopment ? log.bind(null, 'debug') : productionLog;
 
-  function log(level: 'info' | 'warn' | 'error', message: unknown, ...args: unknown[]) {
+  function log(level: 'info' | 'warn' | 'error' | 'debug', message: unknown, ...args: unknown[]) {
+    if (level === 'debug') {
+      return;
+    }
+    if (level === 'info') {
+      // return;
+    }
     const message_: string = [message, ...args]
       .map((arg) => {
         if (typeof arg == 'string') {

@@ -1,5 +1,5 @@
 import { Stack, Text } from '@mantine/core';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/hooks/useTranslation';
 import { type Product } from '@/services/sales/product';
 
 interface ProductStockInfoProps {

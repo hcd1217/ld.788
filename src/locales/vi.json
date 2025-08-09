@@ -1,7 +1,7 @@
 {
   "common": {
     "pages": {
-      "blank": "Trang này là đang được phát triên, nếu bạn thấy trang này, có nghĩa là nó đang được xây dựng, vui lòng bỏ qua",
+      "blank": "Trang này là đang được phát triển, nếu bạn thấy trang này, có nghĩa là nó đang được xây dựng, vui lòng bỏ qua",
       "home": "Trang chủ",
       "storeManagement": "Quản Lý Cửa Hàng",
       "salaryManagement": "Quản Lý Lương",
@@ -1150,5 +1150,46 @@
     "selectEndDate": "Chọn ngày kết thúc",
     "selectStartDate": "Chọn ngày bắt đầu",
     "dateRange": "Khoảng thời gian"
+  },
+  "timekeeper": {
+    "greeting": {
+      "morning": "Chào buổi sáng",
+      "afternoon": "Chào buổi chiều",
+      "evening": "Chào buổi tối"
+    },
+    "clockedInAt": "Đã chấm công lúc {{time}}",
+    "clockedInAgo": "({{minutes}} phút trước)",
+    "todayHours": "Hôm nay",
+    "resources": "Tài nguyên",
+    "myTimesheet": {
+      "title": "Bảng chấm công của tôi",
+      "description": "Kiểm tra số giờ bạn đã làm việc trong tuần này"
+    },
+    "myShifts": {
+      "title": "Ca làm của tôi",
+      "description": "Kiểm tra ca làm việc sắp tới của bạn"
+    },
+    "myJobSchedule": {
+      "title": "Lịch công việc của tôi",
+      "description": "Xem lịch công việc sắp tới của bạn"
+    },
+    "myLeave": {
+      "title": "Nghỉ phép của tôi",
+      "description": "Xem nghỉ phép và yêu cầu nghỉ phép của bạn"
+    },
+    "requestLeave": {
+      "title": "Yêu cầu nghỉ phép",
+      "description": "Tạo yêu cầu nghỉ phép"
+    },
+    "documents": {
+      "title": "Tài liệu",
+      "description": "Xem tài liệu cá nhân và công ty của bạn"
+    },
+    "nav": {
+      "home": "Trang chủ",
+      "clock": "Chấm công",
+      "jobs": "Công việc",
+      "services": "Dịch vụ"
+    }
   }
 }

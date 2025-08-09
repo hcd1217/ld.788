@@ -7,6 +7,7 @@ import {
   type ResetPasswordResponse,
 } from '@/lib/api';
 import { decodeJWT, isTokenExpired } from '@/utils/jwt';
+import { delay } from '@/utils/time';
 
 export type User = {
   id: string;
@@ -56,6 +57,7 @@ export const authService = {
   },
 
   async isAuthenticated() {
+    await delay(100);
     const token = this.getAccessToken();
 
     // Renew token if it is expired

@@ -33,7 +33,7 @@ export async function lockToPortrait(): Promise<boolean> {
       (globalThis.navigator as { standalone?: boolean }).standalone === true; // IOS specific
 
     if (!isStandalone) {
-      console.info('Orientation lock only works in PWA standalone mode');
+      console.debug('Orientation lock only works in PWA standalone mode');
       return false;
     }
 

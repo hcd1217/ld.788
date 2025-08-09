@@ -4,7 +4,7 @@ import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { IconPlus } from '@tabler/icons-react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   DataTable,
   PCOnlyAlert,

@@ -1,0 +1,12 @@
+.primaryCard {
+  background: white;
+  border: 1px solid var(--mantine-color-gray-2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.primaryCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-color: var(--mantine-color-brand-4);
+}

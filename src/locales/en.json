@@ -1150,5 +1150,46 @@
     "printInitiated": "Print dialog opened",
     "exportPDFComingSoon": "PDF export feature coming soon",
     "exportExcelComingSoon": "Excel export feature coming soon"
+  },
+  "timekeeper": {
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "clockedInAt": "Clocked in at {{time}}",
+    "clockedInAgo": "({{minutes}} minutes ago)",
+    "todayHours": "Today",
+    "resources": "Resources",
+    "myTimesheet": {
+      "title": "My Timesheet",
+      "description": "Check how many hours you've worked this week"
+    },
+    "myShifts": {
+      "title": "My Shifts",
+      "description": "Check your upcoming shifts"
+    },
+    "myJobSchedule": {
+      "title": "My Job Schedule",
+      "description": "View your upcoming scheduled jobs"
+    },
+    "myLeave": {
+      "title": "My Leave",
+      "description": "View your leave and leave requests"
+    },
+    "requestLeave": {
+      "title": "Request Leave",
+      "description": "Make a request for time off"
+    },
+    "documents": {
+      "title": "Documents",
+      "description": "View your personal and company documents"
+    },
+    "nav": {
+      "home": "Home",
+      "clock": "Clock",
+      "jobs": "Jobs",
+      "services": "Services"
+    }
   }
 }

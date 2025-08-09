@@ -2,213 +2,72 @@ import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 import { ResponsiveAuthLayout } from '@/components/layouts/ResponsiveAuthLayout';
 import { AppLayout } from '@/components/layouts/AppLayout';
 import { ProtectedRoute } from '@/components/layouts/ProtectedRoute';
-import { AdminProtectedRoute } from '@/components/layouts/AdminProtectedRoute';
 import { ROUTERS } from '@/config/routeConfig';
-import {
-  ServiceLayout,
-  RootUserLayout,
-  PCOnlyLayout,
-  NotFound,
-  ProfilePage,
-  BlankPage,
-  CustomerConfigPage,
-  ProductConfigPage,
-  EmployeeListPage,
-  EmployeeCreatePage,
-  EmployeeDetailPage,
-  EditEmployeePage,
-  HomePage,
-  ExplorePage,
-  NotificationsPage,
-  MorePage,
-  UserManagementPage,
-  AddUserPage,
-  ImportUsersPage,
-  UserDetailPage,
-  // RoleManagementPage,
-  // PermissionManagementPage,
-  StoreListPage,
-  StoreConfigPage,
-  StoreEditPage,
-  StaffListPage,
-  AddStaffPage,
-  EditStaffPage,
-  POListPage,
-  POCreatePage,
-  PODetailPage,
-  EditPOPage,
-  LoginPage,
-  ForgotPasswordPage,
-  ResetPasswordPage,
-  RegisterPage,
-  MagicLinkLoginPage,
-  AdminLoginPage,
-  AdminDashboardPage,
-  ClientListPage,
-  ClientCreatePage,
-  ClientDetailPage,
-  AdminPermissionManagementPage,
-} from './components';
+import { TimekeeperDashboardPage, ServiceLayout, RootUserLayout, NotFound } from './components';
+import { authRouteObjects } from './auth';
+import { adminRouteObjects } from './admin';
+import { configRouteObjects } from './config';
+import { salesRouteObjects } from './sales';
+import { appRouteObjects } from './app';
+import { userRouteObjects } from './user';
+import { storeRouteObjects } from './store';
 
-const routeObjects: RouteObject[] = [
+// Type for route with theme metadata
+export type ThemeRouteObject = RouteObject & {
+  theme?: string;
+  children?: ThemeRouteObject[];
+};
+
+export const routeObjects: ThemeRouteObject[] = [
   // Root route
   {
     path: ROUTERS.ROOT,
     Component: () => <Navigate to={ROUTERS.LOGIN} />,
   },
-  // AUTH routes
+  // Timekeeper routes with timeKeeper theme
   {
     path: '',
+    theme: 'timeKeeper', // Green theme for time-keeper routes
     children: [
       {
-        path: ROUTERS.LOGIN,
-        Component: LoginPage,
-      },
-      {
-        path: ROUTERS.MAGIC_LINK,
-        Component: MagicLinkLoginPage,
-      },
-      {
-        path: ROUTERS.CLIENT_LOGIN,
-        Component: LoginPage,
-      },
-      {
-        path: ROUTERS.FORGOT_PASSWORD,
-        Component: ForgotPasswordPage,
-      },
-      {
-        path: ROUTERS.RESET_PASSWORD,
-        Component: ResetPasswordPage,
-      },
-      {
-        path: ROUTERS.REGISTER,
-        Component: RegisterPage,
+        path: ROUTERS.TIME_KEEPER_DASHBOARD,
+        Component: TimekeeperDashboardPage,
       },
     ],
   },
-  // APP routes
+  // AUTH routes (default elegant theme)
+  ...authRouteObjects,
+  // APP routes (with AppLayout) - elegant theme
   {
     path: '',
+    theme: 'elegant', // Explicitly set elegant theme
     element: (
       <ProtectedRoute>
         <AppLayout />
       </ProtectedRoute>
     ),
-    children: [
-      { path: ROUTERS.HOME, Component: HomePage },
-      // CONFIG routes
-      { path: ROUTERS.CUSTOMER_CONFIG, Component: CustomerConfigPage },
-      { path: ROUTERS.PRODUCT_CONFIG, Component: ProductConfigPage },
-      { path: ROUTERS.EMPLOYEE_MANAGEMENT, Component: EmployeeListPage },
-      { path: ROUTERS.EMPLOYEE_DETAIL, Component: EmployeeDetailPage },
-      { path: ROUTERS.EMPLOYEE_EDIT, Component: EditEmployeePage },
-      { path: ROUTERS.EMPLOYEES_ADD, Component: EmployeeCreatePage },
-      { path: ROUTERS.CUSTOMER_MANAGEMENT, Component: BlankPage },
-      { path: ROUTERS.CUSTOMER_DETAIL, Component: BlankPage },
-      { path: ROUTERS.CUSTOMER_ADD, Component: BlankPage },
-      { path: ROUTERS.CUSTOMER_EDIT, Component: BlankPage },
-      { path: ROUTERS.PRODUCT_MANAGEMENT, Component: BlankPage },
-      { path: ROUTERS.PRODUCT_DETAIL, Component: BlankPage },
-      { path: ROUTERS.PRODUCT_ADD, Component: BlankPage },
-      { path: ROUTERS.PRODUCT_EDIT, Component: BlankPage },
-      { path: ROUTERS.PO_MANAGEMENT, Component: POListPage },
-      { path: ROUTERS.PO_DETAIL, Component: PODetailPage },
-      { path: ROUTERS.PO_ADD, Component: POCreatePage },
-      { path: ROUTERS.PO_EDIT, Component: EditPOPage },
-    ],
+    children: [...configRouteObjects, ...salesRouteObjects],
   },
-  // Old APP routes
+  // Old APP routes (with ResponsiveAuthLayout) - elegant theme
   {
     path: '',
+    theme: 'elegant', // Explicitly set elegant theme
     element: (
       <ProtectedRoute>
         <ResponsiveAuthLayout />
       </ProtectedRoute>
     ),
     children: [
-      { path: ROUTERS.PROFILE, Component: ProfilePage },
-      { path: ROUTERS.ADD_USER, Component: AddUserPage },
-      { path: ROUTERS.EXPLORE, Component: ExplorePage },
-      { path: ROUTERS.NOTIFICATIONS, Component: NotificationsPage },
-      { path: ROUTERS.MORE, Component: MorePage },
+      ...appRouteObjects,
       {
         path: '',
         Component: RootUserLayout,
-        children: [
-          // {path: 'employee-management', Component: EmployeeListPage},
-          // {path: 'employees/:employeeId', Component: EmployeeDetailPage},
-          { path: ROUTERS.STORE_MANAGEMENT, Component: BlankPage },
-          { path: ROUTERS.SALARY_MANAGEMENT, Component: BlankPage },
-          { path: ROUTERS.STORES, Component: StoreListPage },
-          { path: ROUTERS.STAFF, Component: StaffListPage },
-          { path: ROUTERS.USER_MANAGEMENT, Component: UserManagementPage },
-          { path: ROUTERS.USER_DETAIL, Component: UserDetailPage },
-          {
-            path: '',
-            Component: PCOnlyLayout,
-            children: [
-              { path: ROUTERS.IMPORT_USERS, Component: ImportUsersPage },
-              // { path: ROUTERS.ROLE_MANAGEMENT, Component: RoleManagementPage },
-              { path: ROUTERS.ROLE_MANAGEMENT, Component: BlankPage },
-              { path: ROUTERS.STORE_CONFIG, Component: StoreConfigPage },
-              { path: ROUTERS.STORE_EDIT, Component: StoreEditPage },
-              { path: ROUTERS.STAFF_ADD, Component: AddStaffPage },
-              { path: ROUTERS.STAFF_EDIT, Component: EditStaffPage },
-              {
-                path: ROUTERS.PERMISSION_MANAGEMENT,
-                // Component: PermissionManagementPage,
-                Component: BlankPage,
-              },
-            ],
-          },
-        ],
+        children: [...storeRouteObjects, ...userRouteObjects],
       },
     ],
   },
-  // ADMIN routes
-  {
-    path: '',
-    Component: PCOnlyLayout,
-    children: [
-      {
-        path: ROUTERS.ADMIN_LOGIN,
-        Component: AdminLoginPage,
-      },
-      {
-        path: '',
-        Component: AdminProtectedRoute,
-        children: [
-          {
-            path: ROUTERS.ADMIN_DASHBOARD,
-            Component: AdminDashboardPage,
-          },
-          { path: ROUTERS.ADMIN_CLIENTS, Component: ClientListPage },
-          {
-            path: ROUTERS.ADMIN_CLIENTS_NEW,
-            Component: ClientCreatePage,
-          },
-          {
-            path: ROUTERS.ADMIN_CLIENT_DETAIL,
-            Component: ClientDetailPage,
-          },
-          {
-            path: ROUTERS.ADMIN_PERMISSIONS,
-            Component: AdminPermissionManagementPage,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    path: '/sample',
-    Component: PCOnlyLayout,
-    children: [
-      {
-        path: 'blank-page',
-        Component: BlankPage,
-      },
-    ],
-  },
+  // ADMIN routes (default elegant theme)
+  ...adminRouteObjects,
 ];
 
 export const router = createBrowserRouter([

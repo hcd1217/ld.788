@@ -9,7 +9,7 @@ import {
   LoadingOverlay,
   Box,
 } from '@mantine/core';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/hooks/useTranslation';
 import { ModalOrDrawer } from '@/components/common';
 import type { UseFormReturnType } from '@mantine/form';
 import type { ProductStatus } from '@/services/sales/product';
