@@ -113,11 +113,9 @@ export function DashboardQuickActions({
                 )}
               </Group>
               <Text size="sm" fw={600} mb={4}>
-                {}
                 {t(action.titleKey as any)}
               </Text>
               <Text size="xs" c="dimmed">
-                {}
                 {t(action.descriptionKey as any)}
               </Text>
             </Card>

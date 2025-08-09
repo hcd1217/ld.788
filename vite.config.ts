@@ -34,70 +34,20 @@ export default defineConfig({
     chunkSizeWarningLimit: 500,
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // Core vendor libraries
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            return 'react';
-          }
-          if (id.includes('node_modules/react-router')) {
-            return 'router';
-          }
-          // Mantine UI library splitting
-          if (id.includes('@mantine/core')) {
-            return 'mantine-core';
-          }
-          if (id.includes('@mantine/hooks')) {
-            return 'mantine-hooks';
-          }
-          if (id.includes('@mantine/form')) {
-            return 'mantine-form';
-          }
-          if (id.includes('@mantine/notifications')) {
-            return 'mantine-notifications';
-          }
-          if (id.includes('@mantine/modals')) {
-            return 'mantine-modals';
-          }
-          if (id.includes('@mantine/dates')) {
-            return 'mantine-dates';
-          }
-          // Icons (large)
-          if (id.includes('@tabler/icons-react')) {
-            return 'icons';
-          }
-          // I18n
-          if (id.includes('i18next') || id.includes('react-i18next')) {
-            return 'i18n';
-          }
-          // State management
-          if (id.includes('zustand')) {
-            return 'zustand';
-          }
-          // Validation
-          if (id.includes('zod')) {
-            return 'zod';
-          }
-          // Date utilities
-          if (id.includes('dayjs')) {
-            return 'dayjs';
-          }
-          // Large utilities (Excel export)
-          if (id.includes('xlsx')) {
-            return 'xlsx';
-          }
-          // QR code library
-          if (id.includes('jsQR') || id.includes('qr-scanner')) {
-            return 'qr';
-          }
-          // Additional vendor splitting for common libraries
-          if (id.includes('node_modules/')) {
-            // Group other smaller vendor libraries
-            if (id.includes('uuid') || id.includes('clsx') || id.includes('immer')) {
-              return 'vendor-utils';
-            }
-            // Default vendor chunk for remaining node_modules
-            return 'vendor';
-          }
+        manualChunks: {
+          // Only split the largest, most independent libraries
+          // React ecosystem
+          'react': ['react', 'react-dom'],
+          'router': ['react-router'],
+          // Mantine UI - keep core together for stability
+          'mantine-core': ['@mantine/core', '@mantine/hooks'],
+          'mantine-extras': ['@mantine/form', '@mantine/notifications', '@mantine/modals'],
+          'mantine-dates': ['@mantine/dates'],
+          // Large independent libraries
+          'icons': ['@tabler/icons-react'],
+          'xlsx': ['xlsx'],
+          // i18n
+          'i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
         },
       },
     },
