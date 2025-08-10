@@ -1160,7 +1160,24 @@
     "clockedInAt": "Đã chấm công lúc {{time}}",
     "clockedInAgo": "({{minutes}} phút trước)",
     "todayHours": "Hôm nay",
-    "resources": "Tài nguyên",
+    "weeklyHours": "Tuần này",
+    "remaining": "Còn lại",
+    "upcomingShifts": "Ca làm sắp tới",
+    "pendingRequests": "Yêu cầu đang chờ",
+    "noUpcomingShifts": "Không có ca làm sắp tới",
+    "noPendingRequests": "Không có yêu cầu đang chờ",
+    "quickLinks": "Liên kết nhanh",
+    "resourcesTitle": "Tài nguyên",
+    "resources": {
+      "handbook": "Sổ tay nhân viên",
+      "handbookDesc": "Chính sách và hướng dẫn của công ty",
+      "policies": "Chính sách",
+      "policiesDesc": "Chính sách nhân sự và nơi làm việc",
+      "directory": "Danh bạ",
+      "directoryDesc": "Thông tin liên hệ của các thành viên",
+      "support": "Hỗ trợ",
+      "supportDesc": "Nhận trợ giúp từ HR hoặc IT"
+    },
     "myTimesheet": {
       "title": "Bảng chấm công của tôi",
       "description": "Kiểm tra số giờ bạn đã làm việc trong tuần này"

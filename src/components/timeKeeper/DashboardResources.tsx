@@ -9,7 +9,7 @@ export function DashboardResources() {
   return (
     <Box>
       <Title order={4} size="h5" mb="sm" c="dimmed">
-        {t('timekeeper.resources')}
+        {t('timekeeper.resourcesTitle')}
       </Title>
       <Card className={classes.resourceCard} shadow="xs" radius="md">
         <Group gap="md" wrap="nowrap">

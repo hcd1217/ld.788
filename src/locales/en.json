@@ -1160,7 +1160,24 @@
     "clockedInAt": "Clocked in at {{time}}",
     "clockedInAgo": "({{minutes}} minutes ago)",
     "todayHours": "Today",
-    "resources": "Resources",
+    "weeklyHours": "This Week",
+    "remaining": "Remaining",
+    "upcomingShifts": "Upcoming Shifts",
+    "pendingRequests": "Pending Requests",
+    "noUpcomingShifts": "No upcoming shifts",
+    "noPendingRequests": "No pending requests",
+    "quickLinks": "Quick Links",
+    "resourcesTitle": "Resources",
+    "resources": {
+      "handbook": "Employee Handbook",
+      "handbookDesc": "Company policies and guidelines",
+      "policies": "Policies",
+      "policiesDesc": "HR and workplace policies",
+      "directory": "Directory",
+      "directoryDesc": "Contact information for team members",
+      "support": "Support",
+      "supportDesc": "Get help from HR or IT"
+    },
     "myTimesheet": {
       "title": "My Timesheet",
       "description": "Check how many hours you've worked this week"

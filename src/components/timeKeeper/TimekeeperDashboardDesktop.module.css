@@ -1,0 +1,28 @@
+/* Desktop Dashboard Container */
+.container {
+  min-height: calc(100vh - 60px);
+  background-color: var(--mantine-color-gray-0);
+}
+
+/* Action Cards */
+.actionCard {
+  height: 100%;
+  transition: all 0.2s ease;
+}
+
+.actionCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mantine-shadow-md);
+}
+
+/* Resource Cards */
+.resourceCard {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resourceCard:hover {
+  background-color: var(--mantine-color-gray-0);
+  transform: translateX(4px);
+  box-shadow: var(--mantine-shadow-sm);
+}

@@ -1,0 +1,31 @@
+/* Desktop Dashboard Header */
+.headerCard {
+  color: white;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.headerCard::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 60%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.05);
+  transform: rotate(-35deg);
+  pointer-events: none;
+}
+
+.statBox {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  min-width: 120px;
+  transition: all 0.2s ease;
+}
+
+.statBox:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mantine-shadow-md);
+}
