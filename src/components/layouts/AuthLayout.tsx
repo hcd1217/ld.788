@@ -5,13 +5,13 @@ import { NavBar } from './NavBar';
 import { UserMenu } from './UserMenu';
 import { ColorSchemeToggle, LanguageSwitcher, AppLogo } from '@/components/common';
 import { LAYOUT_CONFIG } from '@/config/layoutConfig';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 
 export function AuthLayout() {
   const [isMenuOpen, { toggle: toggleMenu }] = useDisclosure(true);
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useDeviceType();
 
-  if (!isDesktop) {
+  if (isMobile) {
     return <Outlet />;
   }
 

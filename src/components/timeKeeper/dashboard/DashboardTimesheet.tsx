@@ -9,16 +9,14 @@ export function DashboardTimesheet() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    navigate(ROUTERS.TIME_KEEPER_MY_TIMESHEET);
-  };
-
   return (
     <Card
       className={classes.primaryCard}
       shadow="md"
       radius="md"
-      onClick={handleClick}
+      onClick={() => {
+        navigate(ROUTERS.TIME_KEEPER_MY_TIMESHEET);
+      }}
       style={{ cursor: 'pointer' }}
     >
       <Group gap="md" wrap="nowrap">

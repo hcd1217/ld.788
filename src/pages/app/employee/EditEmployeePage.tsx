@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router';
 import { Container, Group, Loader, Center } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { getFormValidators } from '@/utils/validation';
 import { AppPageTitle, AppMobileLayout, AppDesktopLayout, GoBack } from '@/components/common';
 import { SingleEmployeeForm } from '@/components/app/employee';
@@ -33,7 +33,7 @@ export function EditEmployeePage() {
   const { employeeId: id } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useDeviceType();
   const units = useUnitList();
   const isLoading = useHrLoading();
   const error = useHrError();
@@ -175,7 +175,7 @@ export function EditEmployeePage() {
     );
   }
 
-  if (!isDesktop) {
+  if (isMobile) {
     return (
       <AppMobileLayout
         withGoBack

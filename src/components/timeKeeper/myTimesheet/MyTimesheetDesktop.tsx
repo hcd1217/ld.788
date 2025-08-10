@@ -1,30 +1,12 @@
-import {
-  Container,
-  Stack,
-  Title,
-  Box,
-  Paper,
-  Grid,
-  Group,
-  ActionIcon,
-  Button,
-  Badge,
-  Text,
-  Card,
-} from '@mantine/core';
-import {
-  IconChevronLeft,
-  IconChevronRight,
-  IconCalendar,
-  IconClock,
-  IconCalendarStats,
-} from '@tabler/icons-react';
-import { useTranslation } from 'react-i18next';
-import { useMemo } from 'react';
+import { Container, Stack, Title, Box, Paper, Grid, Group, Badge, Text } from '@mantine/core';
+import { IconClock, IconCalendarStats } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { TimesheetEntry } from '@/types/timekeeper';
 import { MyTimesheetWeekSummary } from './MyTimesheetWeekSummary';
-import { MyTimesheetDayCard } from './MyTimesheetDayCard';
-import { getWeekRange, formatDateRange, formatHoursMinutes } from '@/utils/timekeeper.utils';
+import { formatHoursMinutes } from '@/utils/timekeeper.utils';
+import { useTimesheetWeekLogic } from '@/hooks/useTimesheetWeekLogic';
+import { TimesheetWeekNavigation } from './TimesheetWeekNavigation';
+import { TimesheetDayCardsList } from './TimesheetDayCardsList';
 
 interface MyTimesheetDesktopProps {
   readonly currentWeek: Date;
@@ -52,15 +34,11 @@ export function MyTimesheetDesktop({
 }: MyTimesheetDesktopProps) {
   const { t } = useTranslation();
 
-  // Calculate week range
-  const weekRange = useMemo(() => getWeekRange(currentWeek), [currentWeek]);
-
-  // Check if current week
-  const isCurrentWeek = useMemo(() => {
-    const today = new Date();
-    const todayStr = today.toDateString();
-    return weekDays.some((day) => day.toDateString() === todayStr);
-  }, [weekDays]);
+  // Use shared hook for week logic
+  const { weekRange, isCurrentWeek } = useTimesheetWeekLogic({
+    currentWeek,
+    weekDays,
+  });
 
   return (
     <Container fluid px="xl" py="lg">
@@ -88,49 +66,14 @@ export function MyTimesheetDesktop({
 
         {/* Navigation Section */}
         <Paper shadow="sm" radius="md" p="lg">
-          <Grid align="center">
-            <Grid.Col span={8}>
-              <Group gap="md">
-                <ActionIcon
-                  variant="subtle"
-                  size="lg"
-                  onClick={onPreviousWeek}
-                  aria-label="Previous week"
-                >
-                  <IconChevronLeft size={20} />
-                </ActionIcon>
-
-                <Card
-                  shadow="xs"
-                  radius="lg"
-                  px="xl"
-                  py="sm"
-                  bg={isCurrentWeek ? 'dark' : 'gray.1'}
-                >
-                  <Text size="md" fw={600} c={isCurrentWeek ? 'white' : 'dark'}>
-                    {formatDateRange(weekRange.start, weekRange.end)}
-                  </Text>
-                </Card>
-
-                <ActionIcon variant="subtle" size="lg" onClick={onNextWeek} aria-label="Next week">
-                  <IconChevronRight size={20} />
-                </ActionIcon>
-              </Group>
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <Group justify="flex-end">
-                <Button
-                  disabled={isCurrentWeek}
-                  variant="light"
-                  color="dark"
-                  onClick={onCurrentWeek}
-                  leftSection={<IconCalendar size={16} />}
-                >
-                  {t('timekeeper.thisWeek')}
-                </Button>
-              </Group>
-            </Grid.Col>
-          </Grid>
+          <TimesheetWeekNavigation
+            weekRange={weekRange}
+            isCurrentWeek={isCurrentWeek}
+            onPreviousWeek={onPreviousWeek}
+            onNextWeek={onNextWeek}
+            onCurrentWeek={onCurrentWeek}
+            variant="desktop"
+          />
         </Paper>
 
         {/* Week Summary Stats */}
@@ -193,16 +136,11 @@ export function MyTimesheetDesktop({
           <Title order={4} mb="md">
             {t('timekeeper.myTimesheet.title')}
           </Title>
-          <Grid gutter="md">
-            {weekDays.map((day) => {
-              const entry = entriesByDate.get(day.toDateString());
-              return (
-                <Grid.Col key={day.toISOString()} span={6}>
-                  <MyTimesheetDayCard date={day} entry={entry} />
-                </Grid.Col>
-              );
-            })}
-          </Grid>
+          <TimesheetDayCardsList
+            weekDays={weekDays}
+            entriesByDate={entriesByDate}
+            variant="desktop"
+          />
         </Box>
       </Stack>
     </Container>

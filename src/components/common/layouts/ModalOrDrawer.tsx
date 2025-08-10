@@ -1,6 +1,6 @@
 import { Modal, rem, type MantineSize } from '@mantine/core';
 import type { ReactNode } from 'react';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { Drawer } from '@/components/common/ui';
 
 type ModalOrDrawerProps = {
@@ -17,7 +17,7 @@ export function ModalOrDrawer({
   onClose,
   children,
 }: ModalOrDrawerProps) {
-  const isDesktop = useIsDesktop();
+  const { isDesktop } = useDeviceType();
   if (isDesktop) {
     return (
       <Modal centered opened={opened} title={title} onClose={onClose}>

@@ -12,7 +12,7 @@ import {
   DashboardResources,
   DashboardSkeleton,
 } from '@/components/timeKeeper';
-import { TimekeeperDashboardDesktop } from '@/components/timeKeeper/TimekeeperDashboardDesktop';
+import { TimekeeperDashboardDesktop } from '@/components/timeKeeper';
 import {
   useTimekeeperDashboard,
   useTimekeeperError,

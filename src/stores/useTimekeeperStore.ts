@@ -11,6 +11,21 @@ import type {
 } from '@/types/timekeeper';
 import { getErrorMessage } from '@/utils/errorUtils';
 
+interface PhotoData {
+  base64: string;
+  timestamp: Date;
+  metadata: {
+    deviceId?: string;
+    compression: number;
+    originalSize: number;
+  };
+}
+
+interface ClockActionPayload {
+  location?: { latitude: number; longitude: number };
+  photo?: PhotoData;
+}
+
 type TimekeeperState = {
   // Dashboard data
   dashboard: DashboardData | undefined;
@@ -20,23 +35,29 @@ type TimekeeperState = {
   upcomingShifts: Shift[];
   leaveRequests: LeaveRequest[];
   timesheetEntries: TimesheetEntry[];
+  todayClockEntries: ClockEntry[];
+  clockPhotos: Record<string, string>; // clockId -> base64 image
 
   // UI state
   isLoading: boolean;
   isDashboardLoading: boolean;
   isClockActionLoading: boolean;
+  isPhotoUploading: boolean;
   error: string | undefined;
 
   // Actions - Dashboard
   fetchDashboard: () => Promise<void>;
   refreshDashboard: () => Promise<void>;
 
-  // Actions - Clock
-  clockIn: (location?: { latitude: number; longitude: number }) => Promise<void>;
-  clockOut: (location?: { latitude: number; longitude: number }) => Promise<void>;
+  // Actions - Clock with photo support
+  clockIn: (payload?: ClockActionPayload) => Promise<void>;
+  clockOut: (payload?: ClockActionPayload) => Promise<void>;
   startBreak: () => Promise<void>;
   endBreak: () => Promise<void>;
   getCurrentClockStatus: () => Promise<void>;
+  fetchTodayClockEntries: () => Promise<void>;
+  uploadClockPhoto: (clockId: string, photo: PhotoData) => Promise<string>;
+  retryFailedPhotoUploads: () => Promise<void>;
 
   // Actions - Timesheet
   fetchTimesheet: (startDate: Date, endDate: Date) => Promise<void>;
@@ -64,9 +85,12 @@ const initialState = {
   upcomingShifts: [],
   leaveRequests: [],
   timesheetEntries: [],
+  todayClockEntries: [],
+  clockPhotos: {},
   isLoading: false,
   isDashboardLoading: false,
   isClockActionLoading: false,
+  isPhotoUploading: false,
   error: undefined,
 };
 
@@ -112,17 +136,31 @@ export const useTimekeeperStore = create<TimekeeperState>()(
         await get().fetchDashboard();
       },
 
-      // Actions - Clock
-      async clockIn(location) {
+      // Actions - Clock with photo support
+      async clockIn(payload) {
         set({ isClockActionLoading: true, error: undefined });
         try {
-          const response = await timekeeperService.clockIn(location);
+          // Store photo locally if provided (Phase 1: Mock implementation)
+          if (payload?.photo) {
+            // In real implementation, upload to S3 here
+            const mockClockId = `clock_${Date.now()}`;
+            localStorage.setItem(`clock_photo_${mockClockId}`, payload.photo.base64);
+            set((state) => ({
+              clockPhotos: {
+                ...state.clockPhotos,
+                [mockClockId]: payload.photo!.base64,
+              },
+            }));
+          }
+
+          const response = await timekeeperService.clockIn(payload?.location);
           set({
             isClockActionLoading: false,
             currentClock: response.clockEntry,
           });
           // Refresh dashboard to get updated stats
           await get().refreshDashboard();
+          await get().fetchTodayClockEntries();
         } catch (error) {
           set({
             isClockActionLoading: false,
@@ -131,18 +169,32 @@ export const useTimekeeperStore = create<TimekeeperState>()(
         }
       },
 
-      async clockOut(location) {
+      async clockOut(payload) {
         set({ isClockActionLoading: true, error: undefined });
         try {
-          await timekeeperService.clockOut(location);
+          // Store photo locally if provided (Phase 1: Mock implementation)
+          if (payload?.photo) {
+            // In real implementation, upload to S3 here
+            const mockClockId = `clock_${Date.now()}`;
+            localStorage.setItem(`clock_photo_${mockClockId}`, payload.photo.base64);
+            set((state) => ({
+              clockPhotos: {
+                ...state.clockPhotos,
+                [mockClockId]: payload.photo!.base64,
+              },
+            }));
+          }
+
+          await timekeeperService.clockOut(payload?.location);
           // TODO: Use response when API is available
-          // const response = await timekeeperService.clockOut(location);
+          // const response = await timekeeperService.clockOut(payload?.location);
           set({
             isClockActionLoading: false,
             currentClock: null,
           });
           // Refresh dashboard to get updated stats
           await get().refreshDashboard();
+          await get().fetchTodayClockEntries();
         } catch (error) {
           set({
             isClockActionLoading: false,
@@ -261,6 +313,87 @@ export const useTimekeeperStore = create<TimekeeperState>()(
             error: getErrorMessage(error, 'Failed to submit leave request'),
           });
         }
+      },
+
+      // New clock photo actions
+      async fetchTodayClockEntries() {
+        try {
+          // Mock implementation - in real app, fetch from API
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          // Generate mock entries for demo
+          const mockEntries: ClockEntry[] = [
+            {
+              id: 'clock_1',
+              employeeId: 'emp_1',
+              clockInTime: new Date(today.getTime() + 9 * 60 * 60 * 1000), // 9 AM
+              clockOutTime: new Date(today.getTime() + 12 * 60 * 60 * 1000), // 12 PM
+              status: 'CLOCKED_OUT',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+            {
+              id: 'clock_2',
+              employeeId: 'emp_1',
+              clockInTime: new Date(today.getTime() + 13 * 60 * 60 * 1000), // 1 PM
+              status: 'CLOCKED_IN',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+          ];
+
+          // Load photos from localStorage
+          const photos: Record<string, string> = {};
+          mockEntries.forEach((entry) => {
+            const photoKey = `clock_photo_${entry.id}`;
+            const photo = localStorage.getItem(photoKey);
+            if (photo) {
+              photos[entry.id] = photo;
+            }
+          });
+
+          set({
+            todayClockEntries: mockEntries,
+            clockPhotos: photos,
+          });
+        } catch (error) {
+          console.error('Failed to fetch today clock entries:', error);
+        }
+      },
+
+      async uploadClockPhoto(clockId, photo) {
+        set({ isPhotoUploading: true });
+        try {
+          // Phase 1: Mock implementation - store in localStorage
+          const photoKey = `clock_photo_${clockId}`;
+          localStorage.setItem(photoKey, photo.base64);
+
+          // Mock S3 URL
+          const mockS3Url = `https://mock-s3.example.com/photos/${clockId}.jpg`;
+
+          set((state) => ({
+            isPhotoUploading: false,
+            clockPhotos: {
+              ...state.clockPhotos,
+              [clockId]: photo.base64,
+            },
+          }));
+
+          return mockS3Url;
+        } catch (error) {
+          set({
+            isPhotoUploading: false,
+            error: getErrorMessage(error, 'Failed to upload photo'),
+          });
+          throw error;
+        }
+      },
+
+      async retryFailedPhotoUploads() {
+        // Phase 1: Mock implementation
+        // In real implementation, check for queued uploads and retry
+        console.log('Retrying failed photo uploads...');
       },
 
       // UI Actions

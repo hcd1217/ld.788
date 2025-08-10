@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useIsDesktop } from './useIsDesktop';
+import { useDeviceType } from './useDeviceType';
 import { useAppStore } from '@/stores/useAppStore';
 // Ref: https://stackoverflow.com/a/78696557
 
@@ -33,7 +33,7 @@ export function useClientSidePagination<T, TFilters = { searchQuery?: string }>(
   filters,
 }: PaginationOptions<T, TFilters>): [readonly T[], PaginationState, PaginationHandlers] {
   const { config } = useAppStore();
-  const isDesktop = useIsDesktop();
+  const { isDesktop } = useDeviceType();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSizeState] = React.useState((defaultPageSize ?? 1e3).toString());
 

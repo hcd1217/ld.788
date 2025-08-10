@@ -1,5 +1,29 @@
 // Timekeeper utility functions
 
+// Helper function to format time
+export const formatTime = (date: Date | undefined, second = false): string => {
+  if (!date) return '--:--';
+  return new Date(date).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: second ? '2-digit' : undefined,
+    hour12: true,
+  });
+};
+
+// Helper function to format duration
+export const formatDuration = (minutes: number): string => {
+  if (minutes === 0) {
+    return '--';
+  }
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  if (hours < 1) {
+    return `${mins}m`;
+  }
+  return `${hours}h ${mins}m`;
+};
+
 // Helper function to get week range
 export const getWeekRange = (date: Date) => {
   const start = new Date(date);

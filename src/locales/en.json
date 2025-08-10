@@ -1144,6 +1144,8 @@
     "exportExcelComingSoon": "Excel export feature coming soon"
   },
   "timekeeper": {
+    "checkIn": "Check In",
+    "checkOut": "Check Out",
     "greeting": {
       "morning": "Good morning",
       "afternoon": "Good afternoon",
@@ -1216,6 +1218,40 @@
       "clock": "Clock",
       "jobs": "Jobs",
       "services": "Services"
+    },
+    "clock": {
+      "title": "Clock Management",
+      "clockIn": "Clock In",
+      "clockOut": "Clock Out",
+      "startBreak": "Start Break",
+      "endBreak": "End Break",
+      "photoRequired": "Photo Required",
+      "noEntriesYet": "No clock entries yet today",
+      "todayTimeline": "Today's Timeline",
+      "clockedOutAt": "Clocked out",
+      "breakAt": "Break",
+      "duration": "Duration",
+      "status": {
+        "clocked_in": "Clocked In",
+        "clocked_out": "Clocked Out",
+        "on_break": "On Break"
+      },
+      "location": {
+        "error": "Unable to get your location",
+        "notSupported": "Location services not supported"
+      },
+      "camera": {
+        "title": "Take Photo",
+        "capture": "Capture Photo",
+        "retake": "Retake",
+        "confirm": "Use This Photo",
+        "useThisPhoto": "Use this photo?",
+        "getReady": "Get Ready!",
+        "error": "Camera Error",
+        "permissionDenied": "Camera permission denied. Please enable camera access in your device settings.",
+        "permissionRequired": "Camera access is required for photo verification",
+        "requestPermission": "Request Camera Access"
+      }
     }
   }
 }

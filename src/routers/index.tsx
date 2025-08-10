@@ -53,6 +53,13 @@ export const routeObjects: ThemeRouteObject[] = [
             return { Component: module.MyTimesheetPage };
           }),
       },
+      {
+        path: ROUTERS.TIME_KEEPER_CLOCK,
+        lazy: () =>
+          import('@/pages/timeKeeper/ClockManagementPage').then((module) => {
+            return { Component: module.ClockManagementPage };
+          }),
+      },
     ],
   },
   // AUTH routes (default elegant theme)

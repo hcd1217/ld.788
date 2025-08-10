@@ -1,0 +1,18 @@
+.dateBox {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--mantine-radius-md);
+  overflow: hidden;
+  min-width: 60px;
+}
+
+.dateHeader {
+  background-color: var(--mantine-color-brand-6);
+  padding: 4px 8px;
+}
+
+.dateBody {
+  background-color: var(--mantine-color-gray-0);
+  padding: 8px;
+  flex: 1;
+}

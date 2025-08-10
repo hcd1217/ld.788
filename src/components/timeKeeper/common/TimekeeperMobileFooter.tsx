@@ -22,7 +22,7 @@ export function TimekeeperMobileFooter() {
         id: 'clock',
         icon: IconClock,
         label: t('timekeeper.nav.clock'),
-        path: ROUTERS.TIME_KEEPER_DASHBOARD, // TODO: Update when clock page is available
+        path: ROUTERS.TIME_KEEPER_CLOCK,
       },
       {
         id: 'jobs',

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { useDisclosure } from '@mantine/hooks';
 import { LoadingOverlay, Stack } from '@mantine/core';
 import { useTranslation } from '@/hooks/useTranslation';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { usePurchaseOrderList, usePOActions, usePOLoading } from '@/stores/usePOStore';
 import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
 import { DetailPageLayout } from '@/components/common/layouts/DetailPageLayout';
@@ -30,7 +30,7 @@ export function PODetailPage() {
   const { poId } = useParams<{ poId: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useDeviceType();
   const purchaseOrders = usePurchaseOrderList();
   const isLoading = usePOLoading();
   const {
@@ -287,7 +287,7 @@ export function PODetailPage() {
 
   const title = purchaseOrder ? purchaseOrder.poNumber : t('po.poDetails');
 
-  if (!isDesktop) {
+  if (isMobile) {
     if (isLoading || !purchaseOrder) {
       return (
         <AppMobileLayout showLogo isLoading={isLoading} header={<AppPageTitle title={title} />}>

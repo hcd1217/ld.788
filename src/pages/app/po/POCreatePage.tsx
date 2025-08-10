@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router';
 import { Container } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslation } from '@/hooks/useTranslation';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { getBasicValidators } from '@/utils/validation';
 import { AppPageTitle, AppMobileLayout, AppDesktopLayout, GoBack } from '@/components/common';
 import { POForm } from '@/components/app/po/POForm';
@@ -37,7 +37,7 @@ type POFormValues = {
 export function POCreatePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useDeviceType();
   const customers = useCustomerList();
   const isLoading = usePOLoading();
   const error = usePOError();
@@ -142,7 +142,7 @@ export function POCreatePage() {
     </Container>
   );
 
-  if (!isDesktop) {
+  if (isMobile) {
     return (
       <AppMobileLayout
         showLogo

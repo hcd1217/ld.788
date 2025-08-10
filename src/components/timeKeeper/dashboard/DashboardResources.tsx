@@ -1,7 +1,6 @@
 import { Card, Group, Box, Text, Title } from '@mantine/core';
 import { IconClipboardText } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import classes from './DashboardResources.module.css';
 
 export function DashboardResources() {
   const { t } = useTranslation();
@@ -11,7 +10,15 @@ export function DashboardResources() {
       <Title order={4} size="h5" mb="sm" c="dimmed">
         {t('timekeeper.resourcesTitle')}
       </Title>
-      <Card className={classes.resourceCard} shadow="xs" radius="md">
+      <Card
+        style={{
+          background: 'white',
+          border: '1px solid var(--mantine-color-gray-2)',
+          cursor: 'pointer',
+        }}
+        shadow="xs"
+        radius="md"
+      >
         <Group gap="md" wrap="nowrap">
           <IconClipboardText color="var(--mantine-color-gray-7)" size={46} stroke={1.5} />
           <Box style={{ flex: 1 }}>

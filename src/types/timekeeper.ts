@@ -2,6 +2,17 @@
 
 export type ClockStatus = 'CLOCKED_IN' | 'CLOCKED_OUT' | 'ON_BREAK';
 
+// Shared header data interface for dashboard headers
+export interface DashboardHeaderData {
+  readonly userName: string;
+  readonly clockInTime: string;
+  readonly minutesAgo: number;
+  readonly hoursAgo: number;
+  readonly workedHours: string;
+  readonly weeklyHours: string;
+  readonly remainingHours: string;
+}
+
 export type ShiftStatus = 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 
 export type LeaveRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';

@@ -24,7 +24,7 @@ import {
 import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
 import { validateEmail } from '@/utils/validation';
 import { isDevelopment } from '@/utils/env';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 
 export type CustomerFormValues = {
@@ -61,7 +61,7 @@ const renderContactInfo = (customer: Customer) => {
 
 export function CustomerConfigPage() {
   const { t } = useTranslation();
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useDeviceType();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -239,7 +239,7 @@ export function CustomerConfigPage() {
   };
 
   // PC-only check at the beginning
-  if (!isDesktop) {
+  if (isMobile) {
     return <PCOnlyAlert />;
   }
 

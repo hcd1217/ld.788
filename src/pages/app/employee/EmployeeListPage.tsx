@@ -31,14 +31,14 @@ import {
   EmployeeUnitDrawer,
   EmployeeStatusDrawer,
 } from '@/components/app/employee';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { ROUTERS } from '@/config/routeConfig';
 import { EMPLOYEE_STATUS, VIEW_MODE, type ViewModeType } from '@/constants/employee';
 import { useDisclosure } from '@mantine/hooks';
 
 export function EmployeeListPage() {
   const navigate = useNavigate();
-  const isDesktop = useIsDesktop();
+  const { isMobile, isDesktop } = useDeviceType();
   const { t } = useTranslation();
   const employees = useEmployeeList();
   const units = useUnitList();
@@ -91,7 +91,7 @@ export function EmployeeListPage() {
     filterHandlers.setStatus(EMPLOYEE_STATUS.ALL);
   };
 
-  if (!isDesktop) {
+  if (isMobile) {
     return (
       <AppMobileLayout
         showLogo

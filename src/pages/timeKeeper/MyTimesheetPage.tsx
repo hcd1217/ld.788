@@ -1,20 +1,21 @@
-import { useState, useMemo, useEffect } from 'react';
 import { Alert } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
-import { IconAlertCircle } from '@tabler/icons-react';
-import { useTranslation } from 'react-i18next';
 import { AppMobileLayout, AppDesktopLayout, AppPageTitle } from '@/components/common';
+import { getWeekRange, getDaysOfWeek } from '@/utils/timekeeper.utils';
+import { IconAlertCircle } from '@tabler/icons-react';
 import { MyTimesheetDesktop, MyTimesheetMobile } from '@/components/timeKeeper';
+import { ROUTERS } from '@/config/routeConfig';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   useTimekeeperStore,
   useTimekeeperError,
   useTimekeeperActions,
 } from '@/stores/useTimekeeperStore';
-import { getWeekRange, getDaysOfWeek } from '@/utils/timekeeper.utils';
 
 export function MyTimesheetPage() {
   const { t } = useTranslation();
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const { isMobile } = useDeviceType();
 
   // Store hooks
   const timesheetEntries = useTimekeeperStore((state) => state.timesheetEntries);
@@ -94,7 +95,7 @@ export function MyTimesheetPage() {
   if (isMobile) {
     return (
       <AppMobileLayout
-        scrollable={false}
+        goBackRoute={ROUTERS.TIME_KEEPER_DASHBOARD}
         header={<AppPageTitle fz="h4" title={t('timekeeper.myTimesheet.title')} />}
         noFooter
         withGoBack

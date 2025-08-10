@@ -32,14 +32,14 @@ import {
   POStatusDrawer,
   PODateDrawer,
 } from '@/components/app/po';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { ROUTERS } from '@/config/routeConfig';
 import { PO_STATUS, VIEW_MODE, type ViewModeType } from '@/constants/purchaseOrder';
 import { useDisclosure } from '@mantine/hooks';
 
 export function POListPage() {
   const navigate = useNavigate();
-  const isDesktop = useIsDesktop();
+  const { isMobile, isDesktop } = useDeviceType();
   const { t } = useTranslation();
   const purchaseOrders = usePurchaseOrderList();
   const customers = useCustomerList();
@@ -110,7 +110,7 @@ export function POListPage() {
     filterHandlers.setDateRange(undefined, undefined);
   };
 
-  if (!isDesktop) {
+  if (isMobile) {
     return (
       <AppMobileLayout
         showLogo

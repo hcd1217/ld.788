@@ -1,0 +1,12 @@
+.actionCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 140px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.actionCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mantine-shadow-md);
+}

@@ -4,8 +4,13 @@ function checkIsDesktop() {
   return Math.min(window.innerWidth, window.innerHeight) > 500;
 }
 
-export function useIsDesktop() {
+function checkSmallMobile() {
+  return Math.min(window.innerWidth, window.innerHeight) < 376;
+}
+
+export function useDeviceType() {
   const [isDesktop] = useState(checkIsDesktop());
+  const [isSmallMobile] = useState(checkSmallMobile());
   // useEffect(() => {
   //   if (globalThis.window === undefined) {
   //     return;
@@ -21,6 +26,5 @@ export function useIsDesktop() {
   //     window.removeEventListener('resize', handleResize);
   //   };
   // }, []);
-  return isDesktop;
+  return { isDesktop, isMobile: !isDesktop, isSmallMobile };
 }
-export default useIsDesktop;

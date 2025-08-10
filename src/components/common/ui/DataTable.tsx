@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, LoadingOverlay, Box, Center, Text, ScrollArea } from '@mantine/core';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 
 type DataTableColumn<T> = {
   key: string;
@@ -31,11 +31,11 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
   ariaLabel,
 }: DataTableProps<T>) {
   const { t } = useTranslation();
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useDeviceType();
 
   const defaultEmptyMessage = emptyMessage || t('common.noDataFound');
 
-  if (!isDesktop) {
+  if (isMobile) {
     return null;
   }
 

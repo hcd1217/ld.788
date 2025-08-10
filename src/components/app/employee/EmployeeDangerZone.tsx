@@ -1,7 +1,7 @@
 import { Card, Stack, Group, Title, Divider, Paper, Box, Text, Button } from '@mantine/core';
 import { IconAlertTriangle, IconUserOff, IconUserCheck, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import type { Employee } from '@/services/hr/employee';
 
 type EmployeeDangerZoneProps = {
@@ -16,7 +16,7 @@ export function EmployeeDangerZone({
   onDeactivate,
 }: EmployeeDangerZoneProps) {
   const { t } = useTranslation();
-  const isDesktop = useIsDesktop();
+  const { isDesktop } = useDeviceType();
 
   return (
     <Card

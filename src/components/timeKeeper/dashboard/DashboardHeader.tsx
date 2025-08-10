@@ -1,18 +1,11 @@
-import { useMemo } from 'react';
 import { Box, Container, Text, Flex, Center, Stack, useMantineTheme } from '@mantine/core';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useGreeting } from '@/hooks/useGreeting';
+import type { DashboardHeaderData } from '@/types/timekeeper';
 import classes from './DashboardHeader.module.css';
 import { IconHandStop } from '@tabler/icons-react';
 
-interface DashboardHeaderProps {
-  readonly userName: string;
-  readonly clockInTime: string;
-  readonly minutesAgo: number;
-  readonly hoursAgo: number;
-  readonly workedHours: string;
-  readonly weeklyHours: string;
-  readonly remainingHours: string;
-}
+type DashboardHeaderProps = DashboardHeaderData;
 
 export function DashboardHeader({
   userName,
@@ -23,13 +16,7 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   const { t } = useTranslation();
   const theme = useMantineTheme();
-
-  const greeting = useMemo(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return t('timekeeper.greeting.morning');
-    if (hour < 17) return t('timekeeper.greeting.afternoon');
-    return t('timekeeper.greeting.evening');
-  }, [t]);
+  const greeting = useGreeting();
 
   return (
     <Box className={classes.dashboardHeader} style={{ backgroundColor: theme.colors.brand[7] }}>

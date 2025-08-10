@@ -22,7 +22,7 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 
 type ImportResult = {
   summary: {
@@ -59,7 +59,7 @@ export function BulkImportForm({
   validateFileType,
 }: BulkImportFormProps) {
   const { t } = useTranslation();
-  const isDesktop = useIsDesktop();
+  const { isDesktop } = useDeviceType();
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [mounted] = useDisclosure(true);

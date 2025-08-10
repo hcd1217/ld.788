@@ -1,5 +1,5 @@
 import { Stack, Skeleton, Table, Group, SimpleGrid } from '@mantine/core';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 
 interface EmployeeListSkeletonProps {
   readonly viewMode?: 'table' | 'grid';
@@ -7,10 +7,10 @@ interface EmployeeListSkeletonProps {
 }
 
 export function EmployeeListSkeleton({ viewMode = 'table', count = 5 }: EmployeeListSkeletonProps) {
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useDeviceType();
 
   // Mobile skeleton (card view)
-  if (!isDesktop) {
+  if (isMobile) {
     return (
       <Stack gap="sm" px="sm">
         {Array.from({ length: count }).map((_, index) => (

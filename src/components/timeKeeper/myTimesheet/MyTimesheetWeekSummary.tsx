@@ -1,20 +1,13 @@
 import { Box, Text, Grid } from '@mantine/core';
 import { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/hooks/useTranslation';
 import classes from './MyTimesheetWeekSummary.module.css';
+import { formatDuration } from '@/utils/timekeeper.utils';
 
 interface MyTimesheetWeekSummaryProps {
   readonly regularHours: number;
   readonly overtimeHours: number;
 }
-
-// Helper function to format duration
-const formatDuration = (minutes: number): string => {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return `${hours}h ${mins}m`;
-};
-
 export function MyTimesheetWeekSummary({
   regularHours,
   overtimeHours,

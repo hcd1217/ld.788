@@ -13,16 +13,16 @@ import {
 import { IconArrowLeft, IconDeviceDesktop } from '@tabler/icons-react';
 import { Outlet, useNavigate } from 'react-router';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useIsDarkMode } from '@/hooks/useIsDarkMode';
 
 export function PCOnlyLayout() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const isDarkMode = useIsDarkMode();
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useDeviceType();
 
-  if (!isDesktop) {
+  if (isMobile) {
     return (
       <Container size="sm" mt="xl">
         <Stack gap="xl">

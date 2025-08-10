@@ -1,18 +1,11 @@
-import { useMemo } from 'react';
 import { Paper, Text, Group, Stack, Grid, Badge, useMantineTheme } from '@mantine/core';
 import { IconHandStop, IconClock, IconCalendarWeek } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useGreeting } from '@/hooks/useGreeting';
+import type { DashboardHeaderData } from '@/types/timekeeper';
 import classes from './DashboardHeaderDesktop.module.css';
 
-interface DashboardHeaderDesktopProps {
-  readonly userName: string;
-  readonly clockInTime: string;
-  readonly minutesAgo: number;
-  readonly hoursAgo: number;
-  readonly workedHours: string;
-  readonly weeklyHours: string;
-  readonly remainingHours: string;
-}
+type DashboardHeaderDesktopProps = DashboardHeaderData;
 
 export function DashboardHeaderDesktop({
   userName,
@@ -25,13 +18,7 @@ export function DashboardHeaderDesktop({
 }: DashboardHeaderDesktopProps) {
   const { t } = useTranslation();
   const theme = useMantineTheme();
-
-  const greeting = useMemo(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return t('timekeeper.greeting.morning');
-    if (hour < 17) return t('timekeeper.greeting.afternoon');
-    return t('timekeeper.greeting.evening');
-  }, [t]);
+  const greeting = useGreeting();
 
   return (
     <Paper

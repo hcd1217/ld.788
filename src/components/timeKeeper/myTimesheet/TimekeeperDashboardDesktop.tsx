@@ -6,17 +6,13 @@ import {
   IconFileText,
   IconUsers,
   IconHeadset,
-  IconCalendarCheck,
-  IconCalendarWeek,
-  IconBeach,
-  IconUserMinus,
   IconClipboardText,
 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
-import { DashboardHeaderDesktop } from './DashboardHeaderDesktop';
-import { DashboardTimesheet } from './DashboardTimesheet';
+import { DashboardHeaderDesktop } from '../dashboard/DashboardHeaderDesktop';
+import { DashboardTimesheet } from '../dashboard/DashboardTimesheet';
 import { useTranslation } from '@/hooks/useTranslation';
-import { ROUTERS } from '@/config/routeConfig';
+import { QUICK_ACTIONS_CONFIG } from '@/config/timekeeper.config';
 import classes from './TimekeeperDashboardDesktop.module.css';
 
 interface TimekeeperDashboardDesktopProps {
@@ -41,53 +37,27 @@ export function TimekeeperDashboardDesktop({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  // Quick actions configuration - same as mobile
-  const quickActions = [
-    {
-      id: 'shifts',
-      icon: IconCalendarCheck,
-      titleKey: 'timekeeper.myShifts.title',
-      descriptionKey: 'timekeeper.myShifts.description',
-      route: ROUTERS.TIME_KEEPER_DASHBOARD, // TODO: Update to ROUTERS.TIME_KEEPER_SHIFTS when available
-      badge:
-        upcomingShifts > 0
-          ? {
-              value: upcomingShifts,
-              variant: 'filled' as const,
-              color: 'red',
-            }
-          : undefined,
-    },
-    {
-      id: 'schedule',
-      icon: IconCalendarWeek,
-      titleKey: 'timekeeper.myJobSchedule.title',
-      descriptionKey: 'timekeeper.myJobSchedule.description',
-      route: ROUTERS.TIME_KEEPER_DASHBOARD, // TODO: Update to ROUTERS.TIME_KEEPER_SCHEDULE when available
-    },
-    {
-      id: 'leave',
-      icon: IconUserMinus,
-      titleKey: 'timekeeper.myLeave.title',
-      descriptionKey: 'timekeeper.myLeave.description',
-      route: ROUTERS.TIME_KEEPER_DASHBOARD, // TODO: Update to ROUTERS.TIME_KEEPER_LEAVE when available
-      badge:
-        pendingRequests > 0
-          ? {
-              value: pendingRequests,
-              variant: 'dot' as const,
-              color: 'orange',
-            }
-          : undefined,
-    },
-    {
-      id: 'request',
-      icon: IconBeach,
-      titleKey: 'timekeeper.requestLeave.title',
-      descriptionKey: 'timekeeper.requestLeave.description',
-      route: ROUTERS.TIME_KEEPER_DASHBOARD, // TODO: Update to ROUTERS.TIME_KEEPER_LEAVE_REQUEST when available
-    },
-  ];
+  // Quick actions with dynamic badge data
+  const quickActions = QUICK_ACTIONS_CONFIG.map((config) => ({
+    ...config,
+    badge: (() => {
+      if (config.id === 'shifts' && upcomingShifts > 0) {
+        return {
+          value: upcomingShifts,
+          variant: 'filled' as const,
+          color: 'red',
+        };
+      }
+      if (config.id === 'leave' && pendingRequests > 0) {
+        return {
+          value: pendingRequests,
+          variant: 'dot' as const,
+          color: 'orange',
+        };
+      }
+      return undefined;
+    })(),
+  }));
 
   const resources = [
     {

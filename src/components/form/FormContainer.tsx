@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import { Paper, LoadingOverlay, Transition, Stack } from '@mantine/core';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 
 type FormContainerProps = {
   readonly children: ReactNode;
@@ -9,7 +9,7 @@ type FormContainerProps = {
 };
 
 export function FormContainer({ children, isLoading = false, mounted = true }: FormContainerProps) {
-  const isDesktop = useIsDesktop();
+  const { isDesktop } = useDeviceType();
 
   return (
     <Stack gap="xl">

@@ -1,5 +1,5 @@
 import { Stack, Group, Pagination as MantinePagination, Select } from '@mantine/core';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useAppStore } from '@/stores/useAppStore';
 
 type PaginationProps = {
@@ -20,7 +20,7 @@ export function Pagination({
   onPageChange,
 }: PaginationProps) {
   const { config } = useAppStore();
-  const isDesktop = useIsDesktop();
+  const { isDesktop } = useDeviceType();
   if (hidden) {
     return null;
   }

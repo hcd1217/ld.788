@@ -14,6 +14,14 @@ const ROUTE_DEFINITIONS = {
   // Time keeper routes
   TIME_KEEPER_DASHBOARD: { id: 'time-keeper/dashboard', path: '/time-keeper/dashboard' },
   TIME_KEEPER_MY_TIMESHEET: { id: 'time-keeper/my-timesheet', path: '/time-keeper/my-timesheet' },
+  TIME_KEEPER_CLOCK: { id: 'time-keeper/clock', path: '/time-keeper/clock' },
+  TIME_KEEPER_JOBS: { id: 'time-keeper/jobs', path: '/time-keeper/jobs' },
+  TIME_KEEPER_SERVICES: { id: 'time-keeper/services', path: '/time-keeper/services' },
+  TIME_KEEPER_LEAVE_REQUEST: {
+    id: 'time-keeper/leave-request',
+    path: '/time-keeper/leave-request/:id',
+  },
+  TIME_KEEPER_SHIFT: { id: 'time-keeper/shift', path: '/time-keeper/shift/:id' },
 
   // App routes
   HOME: { id: 'home', path: '/home' },

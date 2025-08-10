@@ -4,7 +4,7 @@ import { Container, Loader, Center, Alert } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import useIsDesktop from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { getBasicValidators } from '@/utils/validation';
 import { AppPageTitle, AppMobileLayout, AppDesktopLayout, GoBack } from '@/components/common';
 import { POForm } from '@/components/app/po';
@@ -41,7 +41,7 @@ export function EditPOPage() {
   const { poId: id } = useParams<{ poId: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useDeviceType();
   const customers = useCustomerList();
   const isLoading = usePOLoading();
   const error = usePOError();
@@ -207,7 +207,7 @@ export function EditPOPage() {
     </Container>
   );
 
-  if (!isDesktop) {
+  if (isMobile) {
     return (
       <AppMobileLayout
         showLogo

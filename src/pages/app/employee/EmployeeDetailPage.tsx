@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { useDisclosure } from '@mantine/hooks';
 import { LoadingOverlay, Stack } from '@mantine/core';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useEmployeeList, useHrActions, useHrLoading } from '@/stores/useHrStore';
 import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
 import { DetailPageLayout } from '@/components/common/layouts/DetailPageLayout';
@@ -25,7 +25,7 @@ export function EmployeeDetailPage() {
   const { employeeId } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useDeviceType();
   const employees = useEmployeeList();
   const isLoading = useHrLoading();
   const { loadEmployees, deactivateEmployee, activateEmployee } = useHrActions();
@@ -122,7 +122,7 @@ export function EmployeeDetailPage() {
   );
   const title = employee ? employee.fullName : t('employee.employeeDetails');
 
-  if (!isDesktop) {
+  if (isMobile) {
     if (isLoading || !employee) {
       return (
         <AppMobileLayout showLogo isLoading={isLoading} header={<AppPageTitle title={title} />}>

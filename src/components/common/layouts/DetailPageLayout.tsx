@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Container, Stack, Group, Title, LoadingOverlay, type MantineSize } from '@mantine/core';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { GoBack } from '@/components/common';
 
 interface DetailPageLayoutProps {
@@ -22,7 +22,7 @@ export function DetailPageLayout({
   titleAlign = 'center',
   withGoBack = true,
 }: DetailPageLayoutProps) {
-  const isDesktop = useIsDesktop();
+  const { isDesktop } = useDeviceType();
 
   const containerProps = containerFluid
     ? { fluid: true, px: isDesktop ? 'xl' : 'md' }

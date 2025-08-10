@@ -1144,6 +1144,8 @@
     "dateRange": "Khoảng thời gian"
   },
   "timekeeper": {
+    "checkIn": "Vào ca",
+    "checkOut": "Tan ca",
     "greeting": {
       "morning": "Chào buổi sáng",
       "afternoon": "Chào buổi chiều",
@@ -1216,6 +1218,40 @@
       "clock": "Chấm công",
       "jobs": "Công việc",
       "services": "Dịch vụ"
+    },
+    "clock": {
+      "title": "Quản lý chấm công",
+      "clockIn": "Vào ca",
+      "clockOut": "Tan ca",
+      "startBreak": "Bắt đầu nghỉ",
+      "endBreak": "Kết thúc nghỉ",
+      "photoRequired": "Yêu cầu chụp ảnh",
+      "noEntriesYet": "Chưa có lịch sử chấm công hôm nay",
+      "todayTimeline": "Lịch sử hôm nay",
+      "clockedOutAt": "Đã tan ca",
+      "breakAt": "Nghỉ giải lao",
+      "duration": "Thời gian",
+      "status": {
+        "clocked_in": "Đã vào ca",
+        "clocked_out": "Đã tan ca",
+        "on_break": "Đang nghỉ"
+      },
+      "location": {
+        "error": "Không thể lấy vị trí của bạn",
+        "notSupported": "Dịch vụ định vị không được hỗ trợ"
+      },
+      "camera": {
+        "title": "Chụp ảnh",
+        "capture": "Chụp ảnh",
+        "retake": "Chụp lại",
+        "confirm": "Sử dụng ảnh này",
+        "useThisPhoto": "Sử dụng ảnh này?",
+        "getReady": "Chuẩn bị!",
+        "error": "Lỗi camera",
+        "permissionDenied": "Quyền truy cập camera bị từ chối. Vui lòng cho phép truy cập camera trong cài đặt thiết bị.",
+        "permissionRequired": "Cần quyền truy cập camera để xác thực bằng ảnh",
+        "requestPermission": "Yêu cầu quyền truy cập camera"
+      }
     }
   }
 }

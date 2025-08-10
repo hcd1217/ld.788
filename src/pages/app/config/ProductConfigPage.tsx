@@ -28,12 +28,12 @@ import {
 import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
 import { formatCurrency } from '@/utils/string';
 import { isDevelopment } from '@/utils/env';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 
 export function ProductConfigPage() {
   const { t } = useTranslation();
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useDeviceType();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -265,7 +265,7 @@ export function ProductConfigPage() {
     openCreate();
   };
 
-  if (!isDesktop) {
+  if (isMobile) {
     return <PCOnlyAlert />;
   }
 

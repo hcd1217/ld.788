@@ -11,7 +11,7 @@ import {
   showInfoNotification,
 } from '@/utils/notifications';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { getFormValidators } from '@/utils/validation';
 import { AppPageTitle, AppMobileLayout, AppDesktopLayout, GoBack, Tabs } from '@/components/common';
 import { SingleEmployeeForm, BulkImportForm } from '@/components/app/employee';
@@ -56,7 +56,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export function EmployeeCreatePage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useDeviceType();
   const units = useUnitList();
   const isLoading = useHrLoading();
   const error = useHrError();
@@ -282,7 +282,7 @@ export function EmployeeCreatePage() {
 
   const iconStyle = { width: rem(12), height: rem(12) };
 
-  if (!isDesktop) {
+  if (isMobile) {
     return (
       <AppMobileLayout
         showLogo
