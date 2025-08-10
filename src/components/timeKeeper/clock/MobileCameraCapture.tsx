@@ -88,9 +88,28 @@ export function MobileCameraCapture({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas dimensions
-    canvas.width = PHOTO_CONFIG.maxWidth;
-    canvas.height = PHOTO_CONFIG.maxHeight;
+    // Calculate dimensions maintaining aspect ratio
+    const videoWidth = video.videoWidth;
+    const videoHeight = video.videoHeight;
+    const aspectRatio = videoWidth / videoHeight;
+
+    let canvasWidth = videoWidth;
+    let canvasHeight = videoHeight;
+
+    // Scale down if needed while maintaining aspect ratio
+    if (videoWidth > PHOTO_CONFIG.maxWidth) {
+      canvasWidth = PHOTO_CONFIG.maxWidth;
+      canvasHeight = canvasWidth / aspectRatio;
+    }
+
+    if (canvasHeight > PHOTO_CONFIG.maxHeight) {
+      canvasHeight = PHOTO_CONFIG.maxHeight;
+      canvasWidth = canvasHeight * aspectRatio;
+    }
+
+    // Set canvas dimensions to match video aspect ratio
+    canvas.width = Math.round(canvasWidth);
+    canvas.height = Math.round(canvasHeight);
 
     // Draw video frame to canvas
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -272,12 +291,7 @@ export function MobileCameraCapture({
       )}
 
       {/* Hidden canvas for photo capture */}
-      <canvas
-        ref={canvasRef}
-        style={{ display: 'none' }}
-        width={PHOTO_CONFIG.maxWidth}
-        height={PHOTO_CONFIG.maxHeight}
-      />
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
     </Box>
   );
 }

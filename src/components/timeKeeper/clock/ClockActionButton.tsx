@@ -119,7 +119,7 @@ export function ClockActionButton({
   const getButtonConfig = () => {
     if (!status || status === 'CLOCKED_OUT') {
       return {
-        color: 'green',
+        color: 'brand',
         icon: <IconClock size={24} />,
         text: t('timekeeper.clock.clockIn'),
         action: handleClockIn,

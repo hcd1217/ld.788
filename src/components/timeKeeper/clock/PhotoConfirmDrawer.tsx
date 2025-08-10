@@ -1,4 +1,4 @@
-import { Drawer, Image, Stack, Button, Group, Text } from '@mantine/core';
+import { Drawer, Image, Stack, Button, Group, Text, Box } from '@mantine/core';
 import { IconCheck, IconRefresh } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
@@ -34,7 +34,16 @@ export function PhotoConfirmDrawer({
     >
       <Stack gap={0}>
         {/* Photo preview */}
-        {photo && <Image src={photo} alt="Captured photo" height={300} fit="cover" />}
+        {photo && (
+          <Box style={{ maxHeight: '60vh', display: 'flex', justifyContent: 'center' }}>
+            <Image
+              src={photo}
+              alt="Captured photo"
+              fit="contain"
+              style={{ maxWidth: '100%', maxHeight: '60vh' }}
+            />
+          </Box>
+        )}
 
         {/* Actions */}
         <Stack p="md" gap="md">

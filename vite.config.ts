@@ -21,7 +21,7 @@ const APP_DESCRIPTION = process.env.VITE_APP_DESCRIPTION || 'Credo Progressive W
 // https://vite.dev/config/
 export default defineConfig({
   server: {
-    allowedHosts: ['88c3864de8af.ngrok-free.app'],
+    allowedHosts: ['4c88209d91b9.ngrok-free.app'],
   },
   resolve: {
     alias: {
@@ -31,7 +31,7 @@ export default defineConfig({
   },
   build: {
     target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
-    chunkSizeWarningLimit: 500,
+    chunkSizeWarningLimit: 800,
     rollupOptions: {
       output: {
         manualChunks: {
