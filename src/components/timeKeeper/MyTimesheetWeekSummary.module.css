@@ -1,0 +1,4 @@
+.summaryCard {
+  background: linear-gradient(135deg, var(--mantine-color-brand-0) 0%, var(--mantine-color-brand-1) 100%);
+  border: 1px solid var(--mantine-color-brand-2);
+}

@@ -47,7 +47,7 @@ export function AppMobileLayout({
           {isDefaultHeader ? (
             <CommonMobileHeader />
           ) : (
-            <Group my="auto" h="100%" px="sm">
+            <Group my="auto" h="100%" px="xs">
               {withGoBack ? <GoBack variant="mobile-header" /> : null}
               {showLogo ? <AppLogo noTitle /> : null}
               {header}

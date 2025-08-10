@@ -44,7 +44,7 @@ export function TimekeeperDashboardDesktop({
       icon: IconFileText,
       title: t('timekeeper.resources.policies'),
       description: t('timekeeper.resources.policiesDesc'),
-      color: 'green',
+      color: 'brand',
     },
     {
       icon: IconUsers,

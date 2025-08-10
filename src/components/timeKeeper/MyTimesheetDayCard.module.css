@@ -1,0 +1,38 @@
+.dayCard {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dayCard:hover {
+  transform: translateX(4px);
+  box-shadow: var(--mantine-shadow-md);
+}
+
+.dateBox {
+  height: 4.5rem;
+  width: 4.5rem;
+  border: 2px solid var(--mantine-color-brand-6);
+  border-radius: var(--mantine-radius-md);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.dateHeader {
+  background: var(--mantine-color-brand-6);
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dateBody {
+  background: white;
+  padding: 8px 4px;
+  min-height: 50px;
+}
+
+@media (max-width: 768px) {
+  .dateBody {
+    min-height: 45px;
+  }
+}

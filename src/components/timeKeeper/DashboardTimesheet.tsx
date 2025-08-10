@@ -10,9 +10,7 @@ export function DashboardTimesheet() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    // TODO: Update route when timesheet page is available
-    // navigate(ROUTERS.TIME_KEEPER_TIMESHEET);
-    navigate(ROUTERS.TIME_KEEPER_DASHBOARD);
+    navigate(ROUTERS.TIME_KEEPER_MY_TIMESHEET);
   };
 
   return (

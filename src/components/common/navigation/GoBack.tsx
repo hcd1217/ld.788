@@ -12,7 +12,7 @@ export function GoBack({ label, variant = 'anchor' }: GoBackProps) {
   const { t } = useTranslation();
 
   if (variant === 'mobile-header') {
-    const size = rem(50);
+    const size = rem(40);
     return (
       <ActionIcon size={size} variant="transparent" onClick={() => navigate(-1)}>
         <IconChevronLeft style={{ width: size, height: size }} stroke={2} />

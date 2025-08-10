@@ -11,6 +11,7 @@ import { salesRouteObjects } from './sales';
 import { appRouteObjects } from './app';
 import { userRouteObjects } from './user';
 import { storeRouteObjects } from './store';
+import { Sample } from '@/pages/Sample';
 
 // Type for route with theme metadata
 export type ThemeRouteObject = RouteObject & {
@@ -19,6 +20,11 @@ export type ThemeRouteObject = RouteObject & {
 };
 
 export const routeObjects: ThemeRouteObject[] = [
+  // Sample route
+  {
+    path: '/sample',
+    Component: Sample,
+  },
   // Root route
   {
     path: ROUTERS.ROOT,
@@ -32,6 +38,13 @@ export const routeObjects: ThemeRouteObject[] = [
       {
         path: ROUTERS.TIME_KEEPER_DASHBOARD,
         Component: TimekeeperDashboardPage,
+      },
+      {
+        path: ROUTERS.TIME_KEEPER_MY_TIMESHEET,
+        lazy: () =>
+          import('@/pages/timeKeeper/MyTimesheetPage').then((module) => {
+            return { Component: module.MyTimesheetPage };
+          }),
       },
     ],
   },

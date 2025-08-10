@@ -13,6 +13,7 @@ const ROUTE_DEFINITIONS = {
 
   // Time keeper routes
   TIME_KEEPER_DASHBOARD: { id: 'time-keeper/dashboard', path: '/time-keeper/dashboard' },
+  TIME_KEEPER_MY_TIMESHEET: { id: 'time-keeper/my-timesheet', path: '/time-keeper/my-timesheet' },
 
   // App routes
   HOME: { id: 'home', path: '/home' },
