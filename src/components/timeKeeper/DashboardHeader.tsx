@@ -8,6 +8,7 @@ interface DashboardHeaderProps {
   readonly userName: string;
   readonly clockInTime: string;
   readonly minutesAgo: number;
+  readonly hoursAgo: number;
   readonly workedHours: string;
   readonly weeklyHours: string;
   readonly remainingHours: string;
@@ -17,6 +18,7 @@ export function DashboardHeader({
   userName,
   clockInTime,
   minutesAgo,
+  hoursAgo,
   workedHours,
 }: DashboardHeaderProps) {
   const { t } = useTranslation();
@@ -39,13 +41,15 @@ export function DashboardHeader({
                 size={56}
                 style={{ transform: 'scaleX(-1) rotate(45deg)' }}
                 aria-hidden="true"
+                stroke={1.5}
               />
               <Text c="white" size="md" fw={600} lh={1.3}>
                 {greeting}, {userName}
               </Text>
               <Text size="xs" c="white" opacity={0.85}>
-                {t('timekeeper.clockedInAt', { time: clockInTime })}{' '}
-                {t('timekeeper.clockedInAgo', { minutes: minutesAgo })}
+                {t('timekeeper.clockedInAt', { time: clockInTime })}
+                <br /> ({t('timekeeper.clockedInHourAgo', { hours: hoursAgo })}{' '}
+                {t('timekeeper.clockedInMinuteAgo', { minutes: minutesAgo })})
               </Text>
             </Stack>
           </Box>

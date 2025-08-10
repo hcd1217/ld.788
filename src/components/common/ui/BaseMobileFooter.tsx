@@ -13,21 +13,23 @@ export interface BaseMobileFooterItem {
 export interface BaseMobileFooterProps {
   readonly items: readonly BaseMobileFooterItem[];
   readonly activeItemId?: string;
-  readonly onItemClick?: (item: BaseMobileFooterItem) => void;
   readonly iconSize?: number;
   readonly className?: string;
   readonly itemClassName?: string;
   readonly activeItemClassName?: string;
+  readonly noActiveBg?: boolean;
+  readonly onItemClick?: (item: BaseMobileFooterItem) => void;
 }
 
 export function BaseMobileFooter({
   items,
   activeItemId,
-  onItemClick,
   iconSize = 24,
   className,
   itemClassName,
+  noActiveBg,
   activeItemClassName,
+  onItemClick,
 }: BaseMobileFooterProps) {
   // Limit to maximum 4 items for mobile UI
   const displayItems = items.slice(0, 4);
@@ -43,7 +45,7 @@ export function BaseMobileFooter({
             <UnstyledButton
               className={`${classes.navItem} ${itemClassName || ''} ${
                 isActive ? `${classes.navItemActive} ${activeItemClassName || ''}` : ''
-              }`}
+              } ${isActive && !noActiveBg ? classes.navItemActiveBg : ''}`}
               onClick={() => onItemClick?.(item)}
               w="100%"
               h="100%"

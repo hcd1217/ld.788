@@ -8,6 +8,7 @@ interface DashboardHeaderDesktopProps {
   readonly userName: string;
   readonly clockInTime: string;
   readonly minutesAgo: number;
+  readonly hoursAgo: number;
   readonly workedHours: string;
   readonly weeklyHours: string;
   readonly remainingHours: string;
@@ -17,6 +18,7 @@ export function DashboardHeaderDesktop({
   userName,
   clockInTime,
   minutesAgo,
+  hoursAgo,
   workedHours,
   weeklyHours,
   remainingHours,
@@ -59,7 +61,8 @@ export function DashboardHeaderDesktop({
                   {t('timekeeper.clockedInAt', { time: clockInTime })}
                 </Badge>
                 <Text size="sm" c="white" opacity={0.85}>
-                  {t('timekeeper.clockedInAgo', { minutes: minutesAgo })}
+                  {t('timekeeper.clockedInHourAgo', { hours: hoursAgo })}{' '}
+                  {t('timekeeper.clockedInMinuteAgo', { minutes: minutesAgo })}
                 </Text>
               </Group>
             </Stack>

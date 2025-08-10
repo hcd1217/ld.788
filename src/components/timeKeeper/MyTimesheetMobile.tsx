@@ -87,6 +87,7 @@ export function MyTimesheetMobile({
                 variant="subtle"
                 size="lg"
                 onClick={onPreviousWeek}
+                c="var(--mantine-color-dark-3)"
                 aria-label="Previous week"
               >
                 <IconChevronLeft size={20} />
@@ -94,6 +95,8 @@ export function MyTimesheetMobile({
 
               <Button
                 variant={isCurrentWeek ? 'filled' : 'light'}
+                color="var(--mantine-color-white)"
+                bg="var(--mantine-color-dark-3)"
                 size="sm"
                 radius="xl"
                 p={0}
@@ -108,6 +111,7 @@ export function MyTimesheetMobile({
                 m={0}
                 variant="subtle"
                 size="lg"
+                c="var(--mantine-color-dark-3)"
                 onClick={onNextWeek}
                 aria-label="Next week"
               >
@@ -120,6 +124,7 @@ export function MyTimesheetMobile({
               <Button
                 disabled={isCurrentWeek}
                 variant="light"
+                color="dark"
                 size="compact-sm"
                 onClick={onCurrentWeek}
                 leftSection={<IconCalendar size={16} />}
@@ -132,10 +137,8 @@ export function MyTimesheetMobile({
         {/* Week Summary */}
         <Box mt="lg">
           <MyTimesheetWeekSummary
-            totalWorked={weekTotals.totalWorked}
-            totalBreak={weekTotals.totalBreak}
-            totalOvertime={weekTotals.totalOvertime}
-            daysWorked={weekTotals.daysWorked}
+            regularHours={weekTotals.totalWorked}
+            overtimeHours={weekTotals.totalOvertime}
           />
         </Box>
       </Box>

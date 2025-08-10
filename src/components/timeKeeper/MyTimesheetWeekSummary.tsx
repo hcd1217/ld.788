@@ -1,12 +1,11 @@
-import { Card, Group, Text, Badge, Box } from '@mantine/core';
+import { Box, Text, Grid } from '@mantine/core';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import classes from './MyTimesheetWeekSummary.module.css';
 
 interface MyTimesheetWeekSummaryProps {
-  readonly totalWorked: number;
-  readonly totalBreak: number;
-  readonly totalOvertime: number;
-  readonly daysWorked: number;
+  readonly regularHours: number;
+  readonly overtimeHours: number;
 }
 
 // Helper function to format duration
@@ -17,53 +16,51 @@ const formatDuration = (minutes: number): string => {
 };
 
 export function MyTimesheetWeekSummary({
-  totalWorked,
-  totalBreak,
-  totalOvertime,
-  daysWorked,
+  regularHours,
+  overtimeHours,
 }: MyTimesheetWeekSummaryProps) {
   const { t } = useTranslation();
+  const totalHours = useMemo(() => regularHours + overtimeHours, [regularHours, overtimeHours]);
 
   return (
-    <Card shadow="xs" padding="md" radius="md" className={classes.summaryCard}>
-      <Group justify="space-between" mb="xs">
-        <Text size="sm" fw={600} c="dimmed">
-          {t('timekeeper.weekSummary')}
-        </Text>
-        <Badge variant="light" size="sm">
-          {daysWorked} {t('timekeeper.daysWorked')}
-        </Badge>
-      </Group>
-      <Group gap="xl">
-        <Box>
-          <Text size="xs" c="dimmed">
-            {t('timekeeper.totalWorked')}
-          </Text>
-          <Text size="lg" fw={700} c="brand">
-            {formatDuration(totalWorked)}
-          </Text>
-        </Box>
-        {totalBreak > 0 && (
-          <Box>
-            <Text size="xs" c="dimmed">
-              {t('timekeeper.totalBreak')}
+    <Box className={classes.summaryBar}>
+      <Grid gutter={0} align="stretch">
+        {/* Regular Hours */}
+        <Grid.Col span={4} className={classes.gridColumn}>
+          <Box className={classes.summarySection}>
+            <Text size="xs" className={classes.label}>
+              {t('timekeeper.summary.regular' as any)}:
             </Text>
-            <Text size="lg" fw={700}>
-              {formatDuration(totalBreak)}
+            <Text size="lg" fw={600} className={classes.value}>
+              {formatDuration(regularHours)}
             </Text>
           </Box>
-        )}
-        {totalOvertime > 0 && (
-          <Box>
-            <Text size="xs" c="dimmed">
-              {t('timekeeper.overtime')}
+        </Grid.Col>
+
+        {/* Overtime Hours */}
+        <Grid.Col span={4} className={classes.gridColumn}>
+          <Box className={classes.summarySection}>
+            <Text size="xs" className={classes.label}>
+              {t('timekeeper.summary.overtime' as any)}:
             </Text>
-            <Text size="lg" fw={700} c="brand">
-              +{formatDuration(totalOvertime)}
+            <Text size="lg" fw={600} className={classes.value}>
+              {formatDuration(overtimeHours)}
             </Text>
           </Box>
-        )}
-      </Group>
-    </Card>
+        </Grid.Col>
+
+        {/* Total Hours */}
+        <Grid.Col span={4} className={classes.gridColumn}>
+          <Box className={classes.summarySection}>
+            <Text size="xs" className={classes.label}>
+              {t('timekeeper.summary.total' as any)}:
+            </Text>
+            <Text size="lg" fw={600} className={classes.value}>
+              {formatDuration(totalHours)}
+            </Text>
+          </Box>
+        </Grid.Col>
+      </Grid>
+    </Box>
   );
 }

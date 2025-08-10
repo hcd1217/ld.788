@@ -22,6 +22,7 @@ import {
   IconUserPlus,
   IconBuildingStore,
   IconUsersGroup,
+  IconClock,
 } from '@tabler/icons-react';
 import { Navigate, useNavigate } from 'react-router';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -48,6 +49,13 @@ export function MorePage() {
       icon: IconHome,
       onClick: () => navigate(ROUTERS.HOME),
       color: 'blue',
+    },
+    {
+      title: 'Timekeeper',
+      description: 'Manage timekeeping and attendance',
+      icon: IconClock,
+      onClick: () => navigate(ROUTERS.TIME_KEEPER_DASHBOARD),
+      color: 'green',
     },
     {
       title: 'Store Management',

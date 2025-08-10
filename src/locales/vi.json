@@ -1158,7 +1158,8 @@
       "evening": "Chào buổi tối"
     },
     "clockedInAt": "Đã chấm công lúc {{time}}",
-    "clockedInAgo": "({{minutes}} phút trước)",
+    "clockedInMinuteAgo": "{{minutes}} phút trước",
+    "clockedInHourAgo": "{{hours}} giờ",
     "todayHours": "Hôm nay",
     "weeklyHours": "Tuần này",
     "remaining": "Còn lại",
@@ -1178,7 +1179,6 @@
       "support": "Hỗ trợ",
       "supportDesc": "Nhận trợ giúp từ HR hoặc IT"
     },
-    "myTimesheet": "Bảng chấm công của tôi",
     "date": "Ngày",
     "checkIn": "Giờ vào",
     "checkOut": "Giờ ra",
@@ -1198,6 +1198,11 @@
     "thisWeek": "Tuần này",
     "weekSummary": "Tổng kết tuần",
     "daysWorked": "ngày làm việc",
+    "summary": {
+      "regular": "Giờ thường",
+      "overtime": "Làm thêm",
+      "total": "Tổng cộng"
+    },
     "leaveRequests": "Yêu cầu nghỉ phép",
     "leaveTypeLabel": "Loại nghỉ phép",
     "startDate": "Ngày bắt đầu",

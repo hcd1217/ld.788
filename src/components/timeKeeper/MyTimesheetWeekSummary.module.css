@@ -1,4 +1,48 @@
-.summaryCard {
-  background: linear-gradient(135deg, var(--mantine-color-brand-0) 0%, var(--mantine-color-brand-1) 100%);
-  border: 1px solid var(--mantine-color-brand-2);
+.summaryBar {
+  background: #52a373;
+  border-radius: 8px;
+  padding: 12px 0;
+  color: white;
+  min-height: 70px;
+}
+
+.gridColumn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gridColumn:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 30px;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.summarySection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px 16px;
+  width: 100%;
+}
+
+.label {
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.value {
+  color: white;
+  white-space: nowrap;
+  line-height: 1.2;
 }

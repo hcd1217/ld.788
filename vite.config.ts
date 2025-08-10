@@ -1,12 +1,12 @@
-import {resolve} from 'node:path';
+import { resolve } from 'node:path';
 import process from 'node:process';
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import {VitePWA} from 'vite-plugin-pwa';
-import {htmlTransformPlugin} from './vite-plugins/html-transform';
+import { VitePWA } from 'vite-plugin-pwa';
+import { htmlTransformPlugin } from './vite-plugins/html-transform';
 
 process.env.VITE_APP_VERSION = process.env.npm_package_version;
-const tzOffset = 7 * 36e5
+const tzOffset = 7 * 36e5;
 process.env.VITE_APP_BUILD = new Date(Date.now() + tzOffset)
   .toISOString()
   .replaceAll(/[-:]/g, '')
@@ -21,7 +21,7 @@ const APP_DESCRIPTION = process.env.VITE_APP_DESCRIPTION || 'Credo Progressive W
 // https://vite.dev/config/
 export default defineConfig({
   server: {
-    allowedHosts: ['b1a271709375.ngrok-free.app'],
+    allowedHosts: ['88c3864de8af.ngrok-free.app'],
   },
   resolve: {
     alias: {
@@ -37,17 +37,17 @@ export default defineConfig({
         manualChunks: {
           // Only split the largest, most independent libraries
           // React ecosystem
-          'react': ['react', 'react-dom'],
-          'router': ['react-router'],
+          react: ['react', 'react-dom'],
+          router: ['react-router'],
           // Mantine UI - keep core together for stability
           'mantine-core': ['@mantine/core', '@mantine/hooks'],
           'mantine-extras': ['@mantine/form', '@mantine/notifications', '@mantine/modals'],
           'mantine-dates': ['@mantine/dates'],
           // Large independent libraries
-          'icons': ['@tabler/icons-react'],
-          'xlsx': ['xlsx'],
+          icons: ['@tabler/icons-react'],
+          xlsx: ['xlsx'],
           // i18n
-          'i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
+          i18n: ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
         },
       },
     },
@@ -146,7 +146,7 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: ({request}) => request.mode === 'navigate',
+            urlPattern: ({ request }) => request.mode === 'navigate',
             handler: 'NetworkFirst',
             options: {
               cacheName: 'pages',

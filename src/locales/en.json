@@ -1158,7 +1158,8 @@
       "evening": "Good evening"
     },
     "clockedInAt": "Clocked in at {{time}}",
-    "clockedInAgo": "({{minutes}} minutes ago)",
+    "clockedInMinuteAgo": "{{minutes}} minutes ago",
+    "clockedInHourAgo": "{{hours}} hour",
     "todayHours": "Today",
     "weeklyHours": "This Week",
     "remaining": "Remaining",
@@ -1178,10 +1179,9 @@
       "support": "Support",
       "supportDesc": "Get help from HR or IT"
     },
-    "myTimesheet": "My Timesheet",
     "date": "Date",
     "checkIn": "Check In",
-    "checkOut": "Check Out", 
+    "checkOut": "Check Out",
     "workingTime": "Working Time",
     "breakTime": "Break Time",
     "overtime": "Overtime",
@@ -1198,6 +1198,11 @@
     "thisWeek": "This Week",
     "weekSummary": "Week Summary",
     "daysWorked": "days worked",
+    "summary": {
+      "regular": "Regular",
+      "overtime": "Overtime",
+      "total": "Total"
+    },
     "leaveRequests": "Leave Requests",
     "leaveTypeLabel": "Leave Type",
     "startDate": "Start Date",

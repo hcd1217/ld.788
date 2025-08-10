@@ -14,8 +14,8 @@ export function GoBack({ label, variant = 'anchor' }: GoBackProps) {
   if (variant === 'mobile-header') {
     const size = rem(40);
     return (
-      <ActionIcon size={size} variant="transparent" onClick={() => navigate(-1)}>
-        <IconChevronLeft style={{ width: size, height: size }} stroke={2} />
+      <ActionIcon c="gray" size={size} variant="transparent" onClick={() => navigate(-1)}>
+        <IconChevronLeft style={{ width: size, height: size }} stroke={1} />
       </ActionIcon>
     );
   }

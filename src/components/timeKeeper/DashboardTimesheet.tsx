@@ -22,7 +22,12 @@ export function DashboardTimesheet() {
       style={{ cursor: 'pointer' }}
     >
       <Group gap="md" wrap="nowrap">
-        <IconClockHour3 color="var(--mantine-color-gray-7)" size={46} aria-hidden="true" />
+        <IconClockHour3
+          color="var(--mantine-color-gray-7)"
+          size={46}
+          aria-hidden="true"
+          stroke={1.5}
+        />
         <Box style={{ flex: 1 }}>
           <Group justify="space-between" align="center">
             <Box>

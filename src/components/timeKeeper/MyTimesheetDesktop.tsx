@@ -47,10 +47,8 @@ export function MyTimesheetDesktop({
 
         {/* Week Summary */}
         <MyTimesheetWeekSummary
-          totalWorked={weekTotals.totalWorked}
-          totalBreak={weekTotals.totalBreak}
-          totalOvertime={weekTotals.totalOvertime}
-          daysWorked={weekTotals.daysWorked}
+          regularHours={weekTotals.totalWorked}
+          overtimeHours={weekTotals.totalOvertime}
         />
 
         {/* Daily entries */}

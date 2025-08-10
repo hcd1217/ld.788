@@ -66,7 +66,8 @@ export function TimekeeperDashboardPage() {
     return {
       userName: dashboard.employee.fullName,
       clockInTime: clockInTime || '',
-      minutesAgo,
+      hoursAgo: Math.floor(minutesAgo / 60) || 0,
+      minutesAgo: minutesAgo % 60 || 0,
       workedHours: formatHours(dashboard.todayStats.totalWorkedMinutes),
       weeklyHours: (dashboard.weekStats.totalWorkedMinutes / 60).toFixed(1),
       remainingHours: (dashboard.weekStats.remainingMinutes / 60).toFixed(1),
@@ -148,9 +149,8 @@ export function TimekeeperDashboardPage() {
               upcomingShifts={dashboard.upcomingShifts}
               pendingRequests={dashboard.pendingLeaveRequests}
             />
-            <Box mt="lg">
-              <DashboardResources />
-            </Box>
+            <DashboardResources />
+            <div style={{ height: '1rem' }}></div>
           </Container>
         </Box>
       </AppMobileLayout>
