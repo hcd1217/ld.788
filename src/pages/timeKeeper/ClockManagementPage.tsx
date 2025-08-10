@@ -1,39 +1,23 @@
 import { useEffect, useState } from 'react';
-import { Container, Grid, Stack, Title, Alert, Paper } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { IconAlertCircle } from '@tabler/icons-react';
-import { ClockDisplay } from '@/components/timeKeeper/clock/ClockDisplay';
-import { ClockActionButton } from '@/components/timeKeeper/clock/ClockActionButton';
-import { ClockTimeline } from '@/components/timeKeeper/clock/ClockTimeline';
+import { useNavigate } from 'react-router';
+import { MobileCameraCapture } from '@/components/timeKeeper/clock/MobileCameraCapture';
 import { useTimekeeperStore } from '@/stores/useTimekeeperStore';
-import { AppMobileLayout } from '@/components/common/layouts/AppMobileLayout';
-import { AppDesktopLayout } from '@/components/common/layouts/AppDesktopLayout';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { AppPageTitle } from '@/components/common';
-import { TimekeeperMobileFooter } from '@/components/timeKeeper';
+import { ROUTERS } from '@/config/routeConfig';
 
 export function ClockManagementPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { isMobile } = useDeviceType();
   const [userLocation, setUserLocation] = useState<
     { latitude: number; longitude: number } | undefined
   >();
-  const [locationError, setLocationError] = useState<string | null>(null);
+  const [_locationError, setLocationError] = useState<string | null>(null);
+  const [showCamera, setShowCamera] = useState(false);
 
-  const {
-    currentClock,
-    todayClockEntries,
-    clockPhotos,
-    isClockActionLoading,
-    error,
-    clockIn,
-    clockOut,
-    startBreak,
-    endBreak,
-    fetchTodayClockEntries,
-    getCurrentClockStatus,
-    clearError,
-  } = useTimekeeperStore();
+  const { currentClock, clockIn, clockOut, fetchTodayClockEntries, getCurrentClockStatus } =
+    useTimekeeperStore();
 
   // Get user location
   useEffect(() => {
@@ -55,14 +39,19 @@ export function ClockManagementPage() {
     }
   }, [t]);
 
-  // Fetch initial data
+  // Fetch initial data and show camera immediately on mobile
   useEffect(() => {
     getCurrentClockStatus();
     fetchTodayClockEntries();
-  }, [getCurrentClockStatus, fetchTodayClockEntries]);
 
-  // Handle clock actions with photo
-  const handleClockIn = async (photo?: {
+    // Show camera immediately on mobile
+    if (isMobile) {
+      setShowCamera(true);
+    }
+  }, [getCurrentClockStatus, fetchTodayClockEntries, isMobile]);
+
+  // Handle camera capture
+  const handleCameraCapture = async (photo: {
     base64: string;
     timestamp: Date;
     metadata: {
@@ -71,93 +60,31 @@ export function ClockManagementPage() {
       originalSize: number;
     };
   }) => {
-    await clockIn({
-      location: userLocation,
-      photo,
-    });
+    // Determine action based on current clock status
+    if (currentClock?.status === 'CLOCKED_IN') {
+      await clockOut({
+        location: userLocation,
+        photo,
+      });
+    } else {
+      await clockIn({
+        location: userLocation,
+        photo,
+      });
+    }
+    navigate(ROUTERS.TIME_KEEPER_MY_TIMESHEET);
   };
 
-  const handleClockOut = async (photo?: {
-    base64: string;
-    timestamp: Date;
-    metadata: {
-      deviceId?: string;
-      compression: number;
-      originalSize: number;
-    };
-  }) => {
-    await clockOut({
-      location: userLocation,
-      photo,
-    });
+  // Handle camera close (reject photo)
+  const handleCameraClose = () => {
+    navigate(ROUTERS.TIME_KEEPER_MY_TIMESHEET);
   };
-
-  const content = (
-    <Container size="xl" py="lg">
-      <Stack gap="lg">
-        <Title visibleFrom="sm" order={2}>
-          {t('timekeeper.clock.title')}
-        </Title>
-
-        {error && (
-          <Alert
-            icon={<IconAlertCircle size={16} />}
-            color="red"
-            onClose={clearError}
-            withCloseButton
-          >
-            {error}
-          </Alert>
-        )}
-
-        {locationError && (
-          <Alert icon={<IconAlertCircle size={16} />} color="yellow">
-            {locationError}
-          </Alert>
-        )}
-
-        <Grid>
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <Stack gap="lg" h="100%">
-              <ClockDisplay />
-
-              <Paper p="lg" radius="md" withBorder style={{ flex: 1 }}>
-                <Stack align="center" justify="center" h="100%">
-                  <ClockActionButton
-                    status={currentClock?.status || null}
-                    isLoading={isClockActionLoading}
-                    onClockIn={handleClockIn}
-                    onClockOut={handleClockOut}
-                    onStartBreak={startBreak}
-                    onEndBreak={endBreak}
-                    requirePhoto={true}
-                    location={userLocation}
-                  />
-                </Stack>
-              </Paper>
-            </Stack>
-          </Grid.Col>
-
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <ClockTimeline entries={todayClockEntries} photos={clockPhotos} />
-          </Grid.Col>
-        </Grid>
-      </Stack>
-    </Container>
+  return (
+    <MobileCameraCapture
+      opened={showCamera}
+      onClose={handleCameraClose}
+      onCapture={handleCameraCapture}
+      location={userLocation}
+    />
   );
-
-  if (isMobile) {
-    return (
-      <AppMobileLayout
-        error={error}
-        clearError={clearError}
-        footer={<TimekeeperMobileFooter />}
-        header={<AppPageTitle fz="h4" title={t('timekeeper.checkIn')} />}
-      >
-        {content}
-      </AppMobileLayout>
-    );
-  }
-
-  return <AppDesktopLayout>{content}</AppDesktopLayout>;
 }

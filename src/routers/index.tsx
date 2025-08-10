@@ -9,6 +9,7 @@ import {
   RootUserLayout,
   NotFound,
   HomePage,
+  MobileOnlyLayout,
 } from './components';
 import { authRouteObjects } from './auth';
 import { adminRouteObjects } from './admin';
@@ -41,6 +42,7 @@ export const routeObjects: ThemeRouteObject[] = [
   {
     path: '',
     theme: 'timeKeeper', // Green theme for time-keeper routes
+    element: <MobileOnlyLayout />,
     children: [
       {
         path: ROUTERS.TIME_KEEPER_DASHBOARD,

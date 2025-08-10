@@ -147,6 +147,10 @@
     "title": "Tính Năng Máy Tính",
     "description": "Tính năng này yêu cầu máy tính để bàn hoặc laptop để hoạt động tốt. Quản lý file và các tính năng nâng cao hoạt động tốt nhất trên màn hình lớn."
   },
+  "mobileOnly": {
+    "title": "Tính Năng Di Động",
+    "description": "Tính năng này được tối ưu cho thiết bị di động. Vui lòng truy cập từ điện thoại thông minh hoặc máy tính bảng để có trải nghiệm tốt nhất."
+  },
   "pwa": {
     "installTitle": "Cài đặt Credo App",
     "installDescription": "Cài đặt ứng dụng này trên thiết bị của bạn để có trải nghiệm tốt hơn",
@@ -1250,7 +1254,8 @@
         "error": "Lỗi camera",
         "permissionDenied": "Quyền truy cập camera bị từ chối. Vui lòng cho phép truy cập camera trong cài đặt thiết bị.",
         "permissionRequired": "Cần quyền truy cập camera để xác thực bằng ảnh",
-        "requestPermission": "Yêu cầu quyền truy cập camera"
+        "requestPermission": "Yêu cầu quyền truy cập camera",
+        "autoConfirm": "Tự động xác nhận sau {{seconds}}s"
       }
     }
   }

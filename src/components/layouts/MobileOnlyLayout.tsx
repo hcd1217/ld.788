@@ -10,19 +10,19 @@ import {
   Title,
   Text,
 } from '@mantine/core';
-import { IconArrowLeft, IconDeviceDesktop } from '@tabler/icons-react';
+import { IconArrowLeft, IconDeviceMobile } from '@tabler/icons-react';
 import { Outlet, useNavigate } from 'react-router';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useIsDarkMode } from '@/hooks/useIsDarkMode';
 
-export function PCOnlyLayout() {
+export function MobileOnlyLayout() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const isDarkMode = useIsDarkMode();
   const { isMobile } = useDeviceType();
 
-  if (isMobile) {
+  if (!isMobile) {
     return (
       <Container size="sm" mt="xl">
         <Stack gap="xl">
@@ -48,12 +48,12 @@ export function PCOnlyLayout() {
             }}
           >
             <Stack gap="lg" align="center">
-              <IconDeviceDesktop size={64} color="var(--mantine-color-brand-6)" />
+              <IconDeviceMobile size={64} color="var(--mantine-color-brand-6)" />
 
-              <Title order={2}>{t('pcOnly.title')}</Title>
+              <Title order={2}>{t('mobileOnly.title')}</Title>
 
               <Text c="dimmed" ta="center" maw={400}>
-                {t('pcOnly.description')}
+                {t('mobileOnly.description')}
               </Text>
             </Stack>
           </Paper>

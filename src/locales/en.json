@@ -147,6 +147,10 @@
     "title": "Desktop Feature",
     "description": "This feature requires a desktop or laptop computer to work properly. File management and advanced features work best on larger screens."
   },
+  "mobileOnly": {
+    "title": "Mobile Feature",
+    "description": "This feature is optimized for mobile devices. Please access it from your smartphone or tablet for the best experience."
+  },
   "pwa": {
     "installTitle": "Install Credo App",
     "installDescription": "Install this app on your device for a better experience",
@@ -1250,7 +1254,8 @@
         "error": "Camera Error",
         "permissionDenied": "Camera permission denied. Please enable camera access in your device settings.",
         "permissionRequired": "Camera access is required for photo verification",
-        "requestPermission": "Request Camera Access"
+        "requestPermission": "Request Camera Access",
+        "autoConfirm": "Auto-confirming in {{seconds}}s"
       }
     }
   }

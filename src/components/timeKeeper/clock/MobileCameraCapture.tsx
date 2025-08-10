@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
-import { Box, Text, Stack, Button, Group } from '@mantine/core';
-import { IconX } from '@tabler/icons-react';
+import { createPortal } from 'react-dom';
+import { Box, Text, Stack, Button, Group, ActionIcon, Progress, Image } from '@mantine/core';
+import { IconX, IconCamera, IconCheck, IconRefresh } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
 interface MobileCameraCaptureProps {
@@ -25,7 +26,7 @@ const PHOTO_CONFIG = {
   format: 'jpeg',
 } as const;
 
-const COUNTDOWN_SECONDS = 3;
+const AUTO_CONFIRM_SECONDS = 5;
 
 export function MobileCameraCapture({
   opened,
@@ -39,7 +40,8 @@ export function MobileCameraCapture({
   const streamRef = useRef<MediaStream | null>(null);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const [countdown, setCountdown] = useState<number | null>(null);
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [autoConfirmCountdown, setAutoConfirmCountdown] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Start camera
@@ -79,7 +81,7 @@ export function MobileCameraCapture({
     }
   }, []);
 
-  // Capture photo
+  // Capture photo and show preview
   const capturePhoto = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
 
@@ -135,68 +137,97 @@ export function MobileCameraCapture({
     const base64 = canvas.toDataURL('image/jpeg', PHOTO_CONFIG.quality);
     const originalSize = Math.round((base64.length * 3) / 4);
 
-    // Stop camera and send photo
-    stopCamera();
+    // Show preview and start auto-confirm timer
+    setCapturedPhoto(base64);
+    setAutoConfirmCountdown(AUTO_CONFIRM_SECONDS);
 
-    onCapture({
+    // Store photo data for later
+    (window as any).__tempPhotoData = {
       base64,
       timestamp,
       metadata: {
         compression: PHOTO_CONFIG.quality,
         originalSize,
       },
-    });
-  }, [location, stopCamera, onCapture]);
+    };
+  }, [location]);
 
-  // Start countdown
-  const startCountdown = useCallback(() => {
-    let seconds = COUNTDOWN_SECONDS;
-    setCountdown(seconds);
+  // Handle photo confirmation
+  const confirmPhoto = useCallback(() => {
+    const photoData = (window as any).__tempPhotoData;
+    if (photoData) {
+      stopCamera();
+      onCapture(photoData);
+      delete (window as any).__tempPhotoData;
+    }
+  }, [stopCamera, onCapture]);
 
-    countdownRef.current = setInterval(() => {
-      seconds -= 1;
-      setCountdown(seconds);
-
-      if (seconds <= 0) {
-        if (countdownRef.current) {
-          clearInterval(countdownRef.current);
-          countdownRef.current = null;
-        }
-        setCountdown(null);
-        capturePhoto();
-      }
-    }, 1000);
-  }, [capturePhoto]);
+  // Handle photo retake
+  const retakePhoto = useCallback(() => {
+    setCapturedPhoto(null);
+    setAutoConfirmCountdown(null);
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    delete (window as any).__tempPhotoData;
+  }, []);
 
   // Handle close
   const handleClose = useCallback(() => {
     stopCamera();
-    setCountdown(null);
+    setCapturedPhoto(null);
+    setAutoConfirmCountdown(null);
     setError(null);
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    delete (window as any).__tempPhotoData;
     onClose();
   }, [stopCamera, onClose]);
 
-  // Start camera and countdown when opened
+  // Start camera when opened
   useEffect(() => {
     if (opened) {
-      startCamera().then(() => {
-        // Give user a moment to position themselves
-        setTimeout(() => {
-          startCountdown();
-        }, 1000);
-      });
+      startCamera();
     }
 
     return () => {
       if (!opened) {
         stopCamera();
+        setCapturedPhoto(null);
+        setAutoConfirmCountdown(null);
       }
     };
-  }, [opened, startCamera, startCountdown, stopCamera]);
+  }, [opened, startCamera, stopCamera]);
+
+  // Auto-confirm timer
+  useEffect(() => {
+    if (autoConfirmCountdown !== null && autoConfirmCountdown > 0) {
+      countdownRef.current = setInterval(() => {
+        setAutoConfirmCountdown((prev) => {
+          if (prev === null || prev <= 1) {
+            confirmPhoto();
+            return null;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => {
+        if (countdownRef.current) {
+          clearInterval(countdownRef.current);
+          countdownRef.current = null;
+        }
+      };
+    }
+  }, [autoConfirmCountdown, confirmPhoto]);
 
   if (!opened) return null;
 
-  return (
+  // Render camera UI in a portal outside of AppShell
+  return createPortal(
     <Box
       style={{
         position: 'fixed',
@@ -223,52 +254,118 @@ export function MobileCameraCapture({
         <IconX size={24} />
       </Button>
 
-      {/* Camera view */}
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-        }}
-      />
+      {/* Camera view or captured photo */}
+      {!capturedPhoto ? (
+        <>
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
 
-      {/* Countdown overlay */}
-      {countdown !== null && (
-        <Box
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 10000,
-          }}
-        >
-          <Stack align="center" gap="lg">
-            <Text
-              size="6rem"
-              fw={700}
-              c="white"
+          {/* Capture button */}
+          <Box
+            style={{
+              position: 'absolute',
+              bottom: 'var(--mantine-spacing-xl)',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 10000,
+            }}
+          >
+            <ActionIcon
+              size={80}
+              radius="xl"
+              variant="filled"
+              color="white"
+              onClick={capturePhoto}
               style={{
-                textShadow: '0 0 20px rgba(0,0,0,0.8)',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
               }}
             >
-              {countdown}
-            </Text>
-            <Text
-              size="xl"
-              c="white"
+              <IconCamera size={40} color="black" />
+            </ActionIcon>
+          </Box>
+        </>
+      ) : (
+        <>
+          {/* Captured photo preview */}
+          <Image
+            src={capturedPhoto}
+            alt="Captured photo"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+            }}
+          />
+
+          {/* Auto-confirm progress */}
+          {autoConfirmCountdown !== null && (
+            <Box
               style={{
-                textShadow: '0 0 10px rgba(0,0,0,0.8)',
+                position: 'absolute',
+                top: 'var(--mantine-spacing-md)',
+                left: 'var(--mantine-spacing-md)',
+                right: 'var(--mantine-spacing-md)',
+                zIndex: 10000,
               }}
             >
-              {t('timekeeper.clock.camera.getReady')}
-            </Text>
-          </Stack>
-        </Box>
+              <Stack gap="xs">
+                <Text c="white" ta="center" size="sm">
+                  {t('timekeeper.clock.camera.autoConfirm', { seconds: autoConfirmCountdown })}
+                </Text>
+                <Progress
+                  value={(1 - autoConfirmCountdown / AUTO_CONFIRM_SECONDS) * 100}
+                  color="green"
+                  size="sm"
+                  animated
+                />
+              </Stack>
+            </Box>
+          )}
+
+          {/* Confirm/Retake buttons */}
+          <Box
+            style={{
+              position: 'absolute',
+              bottom: 'var(--mantine-spacing-xl)',
+              left: 'var(--mantine-spacing-md)',
+              right: 'var(--mantine-spacing-md)',
+              zIndex: 10000,
+            }}
+          >
+            <Group grow>
+              <Button
+                size="lg"
+                variant="outline"
+                color="white"
+                leftSection={<IconRefresh size={20} />}
+                onClick={retakePhoto}
+                style={{
+                  borderColor: 'white',
+                  color: 'white',
+                }}
+              >
+                {t('timekeeper.clock.camera.retake')}
+              </Button>
+              <Button
+                size="lg"
+                color="brand"
+                leftSection={<IconCheck size={20} />}
+                onClick={confirmPhoto}
+              >
+                {t('timekeeper.clock.camera.confirm')}
+              </Button>
+            </Group>
+          </Box>
+        </>
       )}
 
       {/* Error message */}
@@ -292,6 +389,7 @@ export function MobileCameraCapture({
 
       {/* Hidden canvas for photo capture */}
       <canvas ref={canvasRef} style={{ display: 'none' }} />
-    </Box>
+    </Box>,
+    document.body,
   );
 }

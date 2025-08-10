@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { Box, Container } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 import { useOnce } from '@/hooks/useOnce';
 import { AppMobileLayout, AppDesktopLayout } from '@/components/common';
 import { formatHours } from '@/utils/timekeeper.utils';
@@ -20,13 +19,14 @@ import {
   useTimekeeperStore,
 } from '@/stores/useTimekeeperStore';
 import classes from './TimekeeperDashboardPage.module.css';
+import { useDeviceType } from '@/hooks/useDeviceType';
 
 export function TimekeeperDashboardPage() {
   const dashboard = useTimekeeperDashboard();
   const { isLoading } = useTimekeeperStore();
   const error = useTimekeeperError();
   const { fetchDashboard, clearError } = useTimekeeperActions();
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const { isMobile } = useDeviceType();
 
   // Get the counts from dashboard data
   const upcomingShifts = dashboard?.upcomingShifts || 0;

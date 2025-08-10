@@ -10,6 +10,11 @@ export const RootUserLayout = lazy(async () => {
   return { default: module.RootUserLayout };
 });
 
+export const MobileOnlyLayout = lazy(async () => {
+  const module = await import('@/components/layouts/MobileOnlyLayout');
+  return { default: module.MobileOnlyLayout };
+});
+
 export const PCOnlyLayout = lazy(async () => {
   const module = await import('@/components/layouts/PCOnlyLayout');
   return { default: module.PCOnlyLayout };
