@@ -1,5 +1,5 @@
-import { Card, Group, Text, Badge, Box, Stack, ThemeIcon, ActionIcon } from '@mantine/core';
-import { IconClock, IconChevronRight } from '@tabler/icons-react';
+import { Card, Group, Text, Badge, Box, Stack, ActionIcon } from '@mantine/core';
+import { IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { TimesheetEntry } from '@/types/timekeeper';
 import classes from './MyTimesheetDayCard.module.css';
@@ -69,9 +69,6 @@ export function MyTimesheetDayCard({ date, entry }: MyTimesheetDayCardProps) {
             {hasData ? (
               <Box>
                 <Group gap="xs">
-                  <ThemeIcon size="sm" variant="light" color="brand">
-                    <IconClock size={14} />
-                  </ThemeIcon>
                   <Text size="sm" fw={600}>
                     {formatTime(primaryClock?.clockInTime)} -{' '}
                     {formatTime(primaryClock?.clockOutTime)}
