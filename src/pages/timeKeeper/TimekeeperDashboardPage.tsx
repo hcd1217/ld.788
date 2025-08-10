@@ -3,6 +3,7 @@ import { Box, Container } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { useOnce } from '@/hooks/useOnce';
 import { AppMobileLayout, AppDesktopLayout } from '@/components/common';
+import { formatHours } from '@/utils/timekeeper.utils';
 import {
   TimekeeperMobileFooter,
   DashboardHeader,
@@ -27,10 +28,9 @@ export function TimekeeperDashboardPage() {
   const { fetchDashboard, clearError } = useTimekeeperActions();
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  // Get the arrays from store (for now, using empty arrays as placeholders)
-  // TODO: Add proper selectors for upcomingShifts and leaveRequests
-  const upcomingShifts: any[] = [];
-  const pendingRequests: any[] = [];
+  // Get the counts from dashboard data
+  const upcomingShifts = dashboard?.upcomingShifts || 0;
+  const pendingRequests = dashboard?.pendingLeaveRequests || 0;
 
   // Fetch dashboard data on mount
   useOnce(() => {
@@ -56,12 +56,6 @@ export function TimekeeperDashboardPage() {
           (Date.now() - new Date(dashboard.currentClock.clockInTime).getTime()) / (1000 * 60),
         )
       : 0;
-
-    const formatHours = (minutes: number): string => {
-      const hours = Math.floor(minutes / 60);
-      const mins = minutes % 60;
-      return `${hours}:${mins.toString().padStart(2, '0')}`;
-    };
 
     return {
       userName: dashboard.employee.fullName,
@@ -150,7 +144,7 @@ export function TimekeeperDashboardPage() {
               pendingRequests={dashboard.pendingLeaveRequests}
             />
             <DashboardResources />
-            <div style={{ height: '1rem' }}></div>
+            <Box h="1rem" />
           </Container>
         </Box>
       </AppMobileLayout>

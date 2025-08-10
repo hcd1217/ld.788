@@ -10,26 +10,7 @@ import {
   useTimekeeperError,
   useTimekeeperActions,
 } from '@/stores/useTimekeeperStore';
-
-// Helper function to get week range
-const getWeekRange = (date: Date) => {
-  const start = new Date(date);
-  start.setDate(start.getDate() - start.getDay()); // Start of week (Sunday)
-  const end = new Date(start);
-  end.setDate(end.getDate() + 6); // End of week (Saturday)
-  return { start, end };
-};
-
-// Helper function to get days of week
-const getDaysOfWeek = (weekStart: Date): Date[] => {
-  const days = [];
-  for (let i = 0; i < 7; i++) {
-    const day = new Date(weekStart);
-    day.setDate(weekStart.getDate() + i);
-    days.push(day);
-  }
-  return days;
-};
+import { getWeekRange, getDaysOfWeek } from '@/utils/timekeeper.utils';
 
 export function MyTimesheetPage() {
   const { t } = useTranslation();

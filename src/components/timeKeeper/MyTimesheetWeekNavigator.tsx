@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Group, Button, ActionIcon } from '@mantine/core';
 import { IconChevronLeft, IconChevronRight, IconCalendar } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { getWeekRange, getDaysOfWeek, formatDateRange } from '@/utils/timekeeper.utils';
 
 interface MyTimesheetWeekNavigatorProps {
   readonly currentWeek: Date;
@@ -9,40 +10,6 @@ interface MyTimesheetWeekNavigatorProps {
   readonly onNextWeek: () => void;
   readonly onCurrentWeek: () => void;
 }
-
-// Helper function to get week range
-const getWeekRange = (date: Date) => {
-  const start = new Date(date);
-  start.setDate(start.getDate() - start.getDay()); // Start of week (Sunday)
-  const end = new Date(start);
-  end.setDate(end.getDate() + 6); // End of week (Saturday)
-  return { start, end };
-};
-
-// Helper function to format date range
-const formatDateRange = (start: Date, end: Date): string => {
-  const startMonth = start.toLocaleDateString('en-US', { month: 'short' });
-  const endMonth = end.toLocaleDateString('en-US', { month: 'short' });
-  const startDay = start.getDate();
-  const endDay = end.getDate();
-  const year = end.getFullYear();
-
-  if (startMonth === endMonth) {
-    return `${startDay} - ${endDay} ${startMonth}, ${year}`;
-  }
-  return `${startDay} ${startMonth} - ${endDay} ${endMonth}, ${year}`;
-};
-
-// Helper function to get days of week
-const getDaysOfWeek = (weekStart: Date): Date[] => {
-  const days = [];
-  for (let i = 0; i < 7; i++) {
-    const day = new Date(weekStart);
-    day.setDate(weekStart.getDate() + i);
-    days.push(day);
-  }
-  return days;
-};
 
 export function MyTimesheetWeekNavigator({
   currentWeek,

@@ -2,21 +2,8 @@
   "common": {
     "pages": {
       "blank": "Trang này là đang được phát triển, nếu bạn thấy trang này, có nghĩa là nó đang được xây dựng, vui lòng bỏ qua",
-      "home": "Trang chủ",
-      "storeManagement": "Quản Lý Cửa Hàng",
-      "salaryManagement": "Quản Lý Lương",
-      "employeeManagement": "Quản Lý Nhân Viên",
-      "employeeManagementMobile": "Nhân Viên",
-      "poManagement": "Quản Lý Đơn Đặt Hàng",
-      "poManagementMobile": "Đơn Hàng",
       "customerManagement": "Quản Lý Khách Hàng",
       "productManagement": "Quản Lý Sản phẩm",
-      "employeeConfig": "Cấu Hình Nhân Viên",
-      "productConfig": "Cấu Hình Sản Phẩm",
-      "roleConfig": "Cấu Hình Phân Quyền",
-      "customerConfig": "Cấu Hình Khách Hàng",
-      "configuration": "Thiết lập hệ thống",
-      "staffManagement": "Quản Lý Nhân Viên",
       "dashboard": "Bảng điều khiển",
       "explore": "Khám phá",
       "notifications": "Thông báo",
@@ -786,8 +773,7 @@
       "inactive": "Ngừng Kinh Doanh",
       "discontinued": "Đã Ngừng Sản Xuất",
       "outOfStock": "Hết Hàng",
-      "lowStock": "Sắp Hết Hàng",
-      "inStock": "Còn Hàng"
+      "lowStock": "Sắp Hết Hàng"
     },
     "priceCannotBeNegative": "Giá không thể âm",
     "stockCannotBeNegative": "Số lượng tồn kho không thể âm",
@@ -1179,68 +1165,25 @@
       "support": "Hỗ trợ",
       "supportDesc": "Nhận trợ giúp từ HR hoặc IT"
     },
-    "date": "Ngày",
-    "checkIn": "Giờ vào",
-    "checkOut": "Giờ ra",
-    "workingTime": "Thời gian làm việc",
     "breakTime": "Thời gian nghỉ",
     "overtime": "Làm thêm giờ",
     "totalWorked": "Tổng giờ làm",
-    "totalBreak": "Tổng giờ nghỉ",
-    "avgDaily": "Trung bình/ngày",
-    "daily": "Hàng ngày",
-    "weekly": "Hàng tuần",
-    "monthly": "Hàng tháng",
-    "noTimesheetData": "Không có dữ liệu chấm công",
     "worked": "Đã làm",
     "break": "Nghỉ",
     "noEntry": "Không có dữ liệu",
     "thisWeek": "Tuần này",
-    "weekSummary": "Tổng kết tuần",
     "daysWorked": "ngày làm việc",
-    "summary": {
-      "regular": "Giờ thường",
-      "overtime": "Làm thêm",
-      "total": "Tổng cộng"
-    },
-    "leaveRequests": "Yêu cầu nghỉ phép",
-    "leaveTypeLabel": "Loại nghỉ phép",
-    "startDate": "Ngày bắt đầu",
-    "endDate": "Ngày kết thúc",
-    "statusLabel": "Trạng thái",
-    "reason": "Lý do",
-    "leaveTypes": {
-      "annual": "Nghỉ phép năm",
-      "sick": "Nghỉ ốm",
-      "personal": "Việc riêng",
-      "other": "Khác"
-    },
-    "statuses": {
-      "pending": "Đang chờ",
-      "approved": "Đã duyệt",
-      "rejected": "Đã từ chối",
-      "cancelled": "Đã hủy"
-    },
+    "summary": {},
+    "leaveTypes": {},
+    "statuses": {},
     "myTimesheet": {
       "title": "Bảng chấm công của tôi",
       "description": "Kiểm tra số giờ bạn đã làm việc trong tuần này"
     },
-    "myShifts": {
-      "title": "Ca làm của tôi",
-      "description": "Kiểm tra ca làm việc sắp tới của bạn"
-    },
-    "myJobSchedule": {
-      "title": "Lịch công việc của tôi",
-      "description": "Xem lịch công việc sắp tới của bạn"
-    },
-    "myLeave": {
-      "title": "Nghỉ phép của tôi",
-      "description": "Xem nghỉ phép và yêu cầu nghỉ phép của bạn"
-    },
-    "requestLeave": {
-      "title": "Yêu cầu nghỉ phép",
-      "description": "Tạo yêu cầu nghỉ phép"
-    },
+    "myShifts": {},
+    "myJobSchedule": {},
+    "myLeave": {},
+    "requestLeave": {},
     "documents": {
       "title": "Tài liệu",
       "description": "Xem tài liệu cá nhân và công ty của bạn"

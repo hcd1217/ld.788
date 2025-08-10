@@ -2,21 +2,8 @@
   "common": {
     "pages": {
       "blank": "This page is blank page, if you see this page, it means that the route in under construction, please just ignore this",
-      "home": "Home",
-      "storeManagement": "Store Management",
-      "salaryManagement": "Salary Management",
-      "employeeManagement": "Employee Management",
-      "employeeManagementMobile": "Employee",
       "customerManagement": "Customer Management",
       "productManagement": "Product Management",
-      "employeeConfig": "Employee Config",
-      "productConfig": "Product Config",
-      "roleConfig": "Role Config",
-      "customerConfig": "Customer Config",
-      "poManagement": "PO Management",
-      "poManagementMobile": "PO",
-      "configuration": "Configuration",
-      "staffManagement": "Staff Management",
       "dashboard": "Dashboard",
       "explore": "Explore",
       "notifications": "Notifications",
@@ -786,8 +773,7 @@
       "inactive": "Inactive",
       "discontinued": "Discontinued",
       "outOfStock": "Out of Stock",
-      "lowStock": "Low Stock",
-      "inStock": "In Stock"
+      "lowStock": "Low Stock"
     },
     "priceCannotBeNegative": "Price cannot be negative",
     "stockCannotBeNegative": "Stock cannot be negative",
@@ -1179,68 +1165,25 @@
       "support": "Support",
       "supportDesc": "Get help from HR or IT"
     },
-    "date": "Date",
-    "checkIn": "Check In",
-    "checkOut": "Check Out",
-    "workingTime": "Working Time",
     "breakTime": "Break Time",
     "overtime": "Overtime",
     "totalWorked": "Total Worked",
-    "totalBreak": "Total Break",
-    "avgDaily": "Avg Daily",
-    "daily": "Daily",
-    "weekly": "Weekly",
-    "monthly": "Monthly",
-    "noTimesheetData": "No timesheet data available",
     "worked": "Worked",
     "break": "Break",
     "noEntry": "No timesheet entry",
     "thisWeek": "This Week",
-    "weekSummary": "Week Summary",
     "daysWorked": "days worked",
-    "summary": {
-      "regular": "Regular",
-      "overtime": "Overtime",
-      "total": "Total"
-    },
-    "leaveRequests": "Leave Requests",
-    "leaveTypeLabel": "Leave Type",
-    "startDate": "Start Date",
-    "endDate": "End Date",
-    "statusLabel": "Status",
-    "reason": "Reason",
-    "leaveTypes": {
-      "annual": "Annual",
-      "sick": "Sick",
-      "personal": "Personal",
-      "other": "Other"
-    },
-    "statuses": {
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "cancelled": "Cancelled"
-    },
+    "summary": {},
+    "leaveTypes": {},
+    "statuses": {},
     "myTimesheet": {
       "title": "My Timesheet",
       "description": "Check how many hours you've worked this week"
     },
-    "myShifts": {
-      "title": "My Shifts",
-      "description": "Check your upcoming shifts"
-    },
-    "myJobSchedule": {
-      "title": "My Job Schedule",
-      "description": "View your upcoming scheduled jobs"
-    },
-    "myLeave": {
-      "title": "My Leave",
-      "description": "View your leave and leave requests"
-    },
-    "requestLeave": {
-      "title": "Request Leave",
-      "description": "Make a request for time off"
-    },
+    "myShifts": {},
+    "myJobSchedule": {},
+    "myLeave": {},
+    "requestLeave": {},
     "documents": {
       "title": "Documents",
       "description": "View your personal and company documents"

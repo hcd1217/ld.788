@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import type { TimesheetEntry } from '@/types/timekeeper';
 import { MyTimesheetWeekSummary } from './MyTimesheetWeekSummary';
 import { MyTimesheetDayCard } from './MyTimesheetDayCard';
+import { getWeekRange, formatDateRange } from '@/utils/timekeeper.utils';
 
 interface MyTimesheetMobileProps {
   readonly currentWeek: Date;
@@ -20,29 +21,6 @@ interface MyTimesheetMobileProps {
   readonly onNextWeek: () => void;
   readonly onCurrentWeek: () => void;
 }
-
-// Helper function to get week range
-const getWeekRange = (date: Date) => {
-  const start = new Date(date);
-  start.setDate(start.getDate() - start.getDay()); // Start of week (Sunday)
-  const end = new Date(start);
-  end.setDate(end.getDate() + 6); // End of week (Saturday)
-  return { start, end };
-};
-
-// Helper function to format date range
-const formatDateRange = (start: Date, end: Date): string => {
-  const startMonth = start.toLocaleDateString('en-US', { month: 'short' });
-  const endMonth = end.toLocaleDateString('en-US', { month: 'short' });
-  const startDay = start.getDate();
-  const endDay = end.getDate();
-  const year = end.getFullYear();
-
-  if (startMonth === endMonth) {
-    return `${startDay} - ${endDay} ${startMonth}, ${year}`;
-  }
-  return `${startDay} ${startMonth} - ${endDay} ${endMonth}, ${year}`;
-};
 
 export function MyTimesheetMobile({
   currentWeek,
