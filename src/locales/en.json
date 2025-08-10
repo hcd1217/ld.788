@@ -2,8 +2,21 @@
   "common": {
     "pages": {
       "blank": "This page is blank page, if you see this page, it means that the route in under construction, please just ignore this",
+      "home": "Home",
+      "storeManagement": "Store Management",
+      "salaryManagement": "Salary Management",
+      "employeeManagement": "Employee Management",
+      "employeeManagementMobile": "Employee",
       "customerManagement": "Customer Management",
       "productManagement": "Product Management",
+      "employeeConfig": "Employee Config",
+      "productConfig": "Product Config",
+      "roleConfig": "Role Config",
+      "customerConfig": "Customer Config",
+      "poManagement": "PO Management",
+      "poManagementMobile": "PO",
+      "configuration": "Configuration",
+      "staffManagement": "Staff Management",
       "dashboard": "Dashboard",
       "explore": "Explore",
       "notifications": "Notifications",
@@ -508,14 +521,7 @@
     "clientCode": "Client Code",
     "rootUser": "Root User",
     "roles": "Roles",
-    "level": "Level",
-    "features": {
-      "role-management.customRoles": "Custom Roles",
-      "role-management.roleHierarchy": "Role Hierarchy",
-      "user-management.bulkImport": "Bulk Import",
-      "user-management.userInvitations": "User Invitations",
-      "user-management.createUserWithDepartment": "Create User with Department"
-    }
+    "level": "Level"
   },
   "staff": {
     "title": "Staff Management",
@@ -1146,7 +1152,6 @@
     "clockedInAt": "Clocked in at {{time}}",
     "clockedInMinuteAgo": "{{minutes}} minutes ago",
     "clockedInHourAgo": "{{hours}} hour",
-    "todayHours": "Today",
     "youHaveWorked": "You have worked",
     "today": "today",
     "weeklyHours": "This Week",
@@ -1175,7 +1180,11 @@
     "noEntry": "No timesheet entry",
     "thisWeek": "This Week",
     "daysWorked": "days worked",
-    "summary": {},
+    "summary": {
+      "total": "Total",
+      "regular": "Regular",
+      "overtime": "Overtime"
+    },
     "leaveTypes": {},
     "statuses": {},
     "myTimesheet": {

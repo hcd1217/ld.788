@@ -1,6 +1,7 @@
 import type { ElementType } from 'react';
 import { useMemo } from 'react';
 import { SimpleGrid, Card, Group, Text, Badge, Box } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconCalendarCheck, IconCalendarWeek, IconBeach, IconUserMinus } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -33,6 +34,11 @@ export function DashboardQuickActions({
 }: DashboardQuickActionsProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  // Responsive icon size: 32px for small mobile (iPhone SE), 48px for normal
+  const isSmallMobile = useMediaQuery('(max-width: 375px)');
+  const iconSize = isSmallMobile ? 32 : 48;
+  const spacing = isSmallMobile ? 'sm' : 'lg';
 
   const quickActions = useMemo<QuickActionItem[]>(
     () => [
@@ -92,7 +98,7 @@ export function DashboardQuickActions({
 
   return (
     <Box>
-      <SimpleGrid cols={2} spacing="lg">
+      <SimpleGrid cols={2} spacing={spacing}>
         {quickActions.map((action) => {
           const Icon = action.icon;
           return (
@@ -107,7 +113,7 @@ export function DashboardQuickActions({
               <Group justify="space-between" align="flex-start" mb="xs">
                 <Icon
                   color="var(--mantine-color-gray-7)"
-                  size={48}
+                  size={iconSize}
                   aria-hidden="true"
                   stroke={1.5}
                 />

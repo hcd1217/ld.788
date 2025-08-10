@@ -95,7 +95,7 @@ export function MyTimesheetPage() {
     return (
       <AppMobileLayout
         scrollable={false}
-        header={<AppPageTitle fz="h4" title={t('timekeeper.myTimesheet.title' as any)} />}
+        header={<AppPageTitle fz="h4" title={t('timekeeper.myTimesheet.title')} />}
         noFooter
         withGoBack
         isLoading={isLoading}

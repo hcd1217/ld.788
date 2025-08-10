@@ -69,7 +69,7 @@ export function MyTimesheetDesktop({
         <Box>
           <Grid align="center">
             <Grid.Col span={6}>
-              <Title order={2}>{t('timekeeper.myTimesheet.title' as any)}</Title>
+              <Title order={2}>{t('timekeeper.myTimesheet.title')}</Title>
             </Grid.Col>
             <Grid.Col span={6}>
               <Group justify="flex-end">
@@ -191,7 +191,7 @@ export function MyTimesheetDesktop({
         {/* Daily Entries Section */}
         <Box>
           <Title order={4} mb="md">
-            {t('timekeeper.myTimesheet.title' as any)}
+            {t('timekeeper.myTimesheet.title')}
           </Title>
           <Grid gutter="md">
             {weekDays.map((day) => {

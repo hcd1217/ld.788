@@ -29,7 +29,7 @@ export function MyTimesheetWeekSummary({
         <Grid.Col span={4} className={classes.gridColumn}>
           <Box className={classes.summarySection}>
             <Text size="xs" className={classes.label}>
-              {t('timekeeper.summary.regular' as any)}:
+              {t('timekeeper.summary.regular')}:
             </Text>
             <Text size="lg" fw={600} className={classes.value}>
               {formatDuration(regularHours)}
@@ -41,7 +41,7 @@ export function MyTimesheetWeekSummary({
         <Grid.Col span={4} className={classes.gridColumn}>
           <Box className={classes.summarySection}>
             <Text size="xs" className={classes.label}>
-              {t('timekeeper.summary.overtime' as any)}:
+              {t('timekeeper.summary.overtime')}:
             </Text>
             <Text size="lg" fw={600} className={classes.value}>
               {formatDuration(overtimeHours)}
@@ -53,7 +53,7 @@ export function MyTimesheetWeekSummary({
         <Grid.Col span={4} className={classes.gridColumn}>
           <Box className={classes.summarySection}>
             <Text size="xs" className={classes.label}>
-              {t('timekeeper.summary.total' as any)}:
+              {t('timekeeper.summary.total')}:
             </Text>
             <Text size="lg" fw={600} className={classes.value}>
               {formatDuration(totalHours)}

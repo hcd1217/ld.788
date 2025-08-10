@@ -2,8 +2,21 @@
   "common": {
     "pages": {
       "blank": "Trang này là đang được phát triển, nếu bạn thấy trang này, có nghĩa là nó đang được xây dựng, vui lòng bỏ qua",
+      "home": "Trang chủ",
+      "storeManagement": "Quản Lý Cửa Hàng",
+      "salaryManagement": "Quản Lý Lương",
+      "employeeManagement": "Quản Lý Nhân Viên",
+      "employeeManagementMobile": "Nhân Viên",
+      "poManagement": "Quản Lý Đơn Đặt Hàng",
+      "poManagementMobile": "Đơn Hàng",
       "customerManagement": "Quản Lý Khách Hàng",
       "productManagement": "Quản Lý Sản phẩm",
+      "employeeConfig": "Cấu Hình Nhân Viên",
+      "productConfig": "Cấu Hình Sản Phẩm",
+      "roleConfig": "Cấu Hình Phân Quyền",
+      "customerConfig": "Cấu Hình Khách Hàng",
+      "configuration": "Thiết lập hệ thống",
+      "staffManagement": "Quản Lý Nhân Viên",
       "dashboard": "Bảng điều khiển",
       "explore": "Khám phá",
       "notifications": "Thông báo",
@@ -508,14 +521,7 @@
     "clientCode": "Mã Khách Hàng",
     "rootUser": "Người Dùng Gốc",
     "roles": "Vai Trò",
-    "level": "Cấp Độ",
-    "features": {
-      "role-management.customRoles": "Vai Trò Tùy Chỉnh",
-      "role-management.roleHierarchy": "Phân Cấp Vai Trò",
-      "user-management.bulkImport": "Nhập Hàng Loạt",
-      "user-management.userInvitations": "Lời Mời Người Dùng",
-      "user-management.createUserWithDepartment": "Tạo Người Dùng Với Phòng Ban"
-    }
+    "level": "Cấp Độ"
   },
   "staff": {
     "actions": "",
@@ -1146,7 +1152,6 @@
     "clockedInAt": "Đã chấm công lúc {{time}}",
     "clockedInMinuteAgo": "{{minutes}} phút trước",
     "clockedInHourAgo": "{{hours}} giờ",
-    "todayHours": "Hôm nay",
     "youHaveWorked": "Bạn đã làm việc",
     "today": "hôm nay",
     "weeklyHours": "Tuần này",
@@ -1175,7 +1180,11 @@
     "noEntry": "Không có dữ liệu",
     "thisWeek": "Tuần này",
     "daysWorked": "ngày làm việc",
-    "summary": {},
+    "summary": {
+      "regular": "Tiêu chuẩn",
+      "overtime": "Làm thêm",
+      "total": "Tổng cộng"
+    },
     "leaveTypes": {},
     "statuses": {},
     "myTimesheet": {
