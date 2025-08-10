@@ -64,7 +64,7 @@ export function AppMobileLayout({
         <Container
           fluid
           w="100%"
-          p="xs"
+          p={0}
           className={scrollable ? classes.content : classes.contentNoScroll}
           mt={noHeader ? undefined : 60}
           mb={noFooter ? undefined : 60}

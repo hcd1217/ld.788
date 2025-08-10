@@ -73,6 +73,7 @@ export function MyTimesheetMobile({
         flexDirection: 'column',
         overflow: 'hidden',
       }}
+      px={0}
     >
       {/* Fixed header section */}
       <Box px={0} pt="lg" pb="md">
@@ -153,7 +154,7 @@ export function MyTimesheetMobile({
           paddingBottom: 'var(--mantine-spacing-lg)',
         }}
       >
-        <Stack gap="xs">
+        <Stack gap="lg">
           {weekDays.map((day) => {
             const entry = entriesByDate.get(day.toDateString());
             return <MyTimesheetDayCard key={day.toISOString()} date={day} entry={entry} />;
