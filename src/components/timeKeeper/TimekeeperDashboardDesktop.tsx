@@ -18,6 +18,7 @@ interface TimekeeperDashboardDesktopProps {
     userName: string;
     clockInTime: string;
     minutesAgo: number;
+    hoursAgo: number;
     workedHours: string;
     weeklyHours: string;
     remainingHours: string;

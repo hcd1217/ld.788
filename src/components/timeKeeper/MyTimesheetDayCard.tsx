@@ -43,7 +43,7 @@ export function MyTimesheetDayCard({ date, entry }: MyTimesheetDayCardProps) {
       radius="md"
       className={classes.dayCard}
       style={{
-        borderLeft: isToday ? '3px solid var(--mantine-color-brand-6)' : undefined,
+        borderLeft: isToday ? '1px solid var(--mantine-color-brand-6)' : undefined,
         background: isToday ? 'var(--mantine-color-brand-0)' : undefined,
       }}
     >

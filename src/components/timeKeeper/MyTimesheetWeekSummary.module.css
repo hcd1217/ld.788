@@ -1,8 +1,8 @@
 .summaryBar {
-  background: #52a373;
-  border-radius: 8px;
-  padding: 12px 0;
-  color: white;
+  background: var(--mantine-color-brand-7);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-sm) 0;
+  color: var(--mantine-color-white);
   min-height: 70px;
 }
 
@@ -30,19 +30,19 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 8px 16px;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
   width: 100%;
 }
 
 .label {
   color: rgba(255, 255, 255, 0.9);
   white-space: nowrap;
-  margin-bottom: 4px;
+  margin-bottom: var(--mantine-spacing-xs);
   line-height: 1.2;
 }
 
 .value {
-  color: white;
+  color: var(--mantine-color-white);
   white-space: nowrap;
   line-height: 1.2;
 }

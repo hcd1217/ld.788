@@ -75,7 +75,7 @@ export function MyTimesheetMobile({
       }}
     >
       {/* Fixed header section */}
-      <Box px="md" pt="lg" pb="md">
+      <Box px={0} pt="lg" pb="md">
         {/* Header with navigation */}
         <Grid>
           {/* Week selector - Mobile optimized */}
@@ -87,7 +87,7 @@ export function MyTimesheetMobile({
                 variant="subtle"
                 size="lg"
                 onClick={onPreviousWeek}
-                c="var(--mantine-color-dark-3)"
+                c="var(--mantine-color-black)"
                 aria-label="Previous week"
               >
                 <IconChevronLeft size={20} />
@@ -96,7 +96,7 @@ export function MyTimesheetMobile({
               <Button
                 variant={isCurrentWeek ? 'filled' : 'light'}
                 color="var(--mantine-color-white)"
-                bg="var(--mantine-color-dark-3)"
+                bg="var(--mantine-color-black)"
                 size="sm"
                 radius="xl"
                 p={0}
@@ -111,7 +111,7 @@ export function MyTimesheetMobile({
                 m={0}
                 variant="subtle"
                 size="lg"
-                c="var(--mantine-color-dark-3)"
+                c="var(--mantine-color-black)"
                 onClick={onNextWeek}
                 aria-label="Next week"
               >

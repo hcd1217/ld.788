@@ -1,7 +1,7 @@
 import type { ElementType } from 'react';
 import { useMemo } from 'react';
 import { SimpleGrid, Card, Group, Text, Badge, Box } from '@mantine/core';
-import { IconCalendarCheck, IconCalendarWeek, IconUser, IconBeach } from '@tabler/icons-react';
+import { IconCalendarCheck, IconCalendarWeek, IconBeach, IconUserMinus } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from '@/hooks/useTranslation';
 import { ROUTERS } from '@/config/routeConfig';
@@ -60,7 +60,7 @@ export function DashboardQuickActions({
       },
       {
         id: 'leave',
-        icon: IconUser,
+        icon: IconUserMinus,
         titleKey: 'timekeeper.myLeave.title',
         descriptionKey: 'timekeeper.myLeave.description',
         route: ROUTERS.TIME_KEEPER_DASHBOARD, // TODO: Update to ROUTERS.TIME_KEEPER_LEAVE when available
