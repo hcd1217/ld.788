@@ -122,12 +122,15 @@ export function DashboardQuickActions({
                   </Badge>
                 )}
               </Group>
-              <Text size="xs" fw={600} mb={4} mt={'.2rem'}>
-                {t(action.titleKey as any)}
-              </Text>
-              <Text size="xs" c="dimmed">
-                {t(action.descriptionKey as any)}
-              </Text>
+              <Box style={{ flexGrow: 1 }} />
+              <Box>
+                <Text size="xs" fw={600} mb={4}>
+                  {t(action.titleKey as any)}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  {t(action.descriptionKey as any)}
+                </Text>
+              </Box>
             </Card>
           );
         })}

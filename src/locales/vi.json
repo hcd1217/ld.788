@@ -1147,6 +1147,8 @@
     "clockedInMinuteAgo": "{{minutes}} phút trước",
     "clockedInHourAgo": "{{hours}} giờ",
     "todayHours": "Hôm nay",
+    "youHaveWorked": "Bạn đã làm việc",
+    "today": "hôm nay",
     "weeklyHours": "Tuần này",
     "remaining": "Còn lại",
     "upcomingShifts": "Ca làm sắp tới",

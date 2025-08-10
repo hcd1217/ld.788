@@ -34,7 +34,7 @@ export function DashboardHeader({
   return (
     <Box className={classes.dashboardHeader} style={{ backgroundColor: theme.colors.brand[7] }}>
       <Container className={classes.headerContent}>
-        <Flex gap="md" align="stretch">
+        <Flex gap="md" align="stretch" justify={'space-between'}>
           <Box>
             <Stack gap="xl">
               <IconHandStop
@@ -44,7 +44,8 @@ export function DashboardHeader({
                 stroke={1.5}
               />
               <Text c="white" size="md" fw={600} lh={1.3}>
-                {greeting}, {userName}
+                {greeting}, <br />
+                {userName}
               </Text>
               <Text size="xs" c="white" opacity={0.85}>
                 {t('timekeeper.clockedInAt', { time: clockInTime })}
@@ -56,12 +57,15 @@ export function DashboardHeader({
 
           <Box className={classes.mobileTimeStatsBox}>
             <Center>
-              <Stack>
+              <Stack gap="xs">
                 <Text ta="center" size="xs" c="white" opacity={0.7} fw={500}>
-                  {t('timekeeper.todayHours')}
+                  {t('timekeeper.youHaveWorked')}
                 </Text>
                 <Text ta="center" size="xl" fw={700} c="white" lh={1}>
                   {workedHours}
+                </Text>
+                <Text ta="center" size="xs" c="white" opacity={0.7} fw={500}>
+                  {t('timekeeper.today')}
                 </Text>
               </Stack>
             </Center>

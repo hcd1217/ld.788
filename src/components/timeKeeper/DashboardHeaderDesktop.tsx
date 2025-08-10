@@ -74,10 +74,13 @@ export function DashboardHeaderDesktop({
             <Paper className={classes.statBox} shadow="xs" radius="md" p="md">
               <Stack gap={4} align="center">
                 <Text size="xs" c="dimmed" fw={500}>
-                  {t('timekeeper.todayHours')}
+                  {t('timekeeper.youHaveWorked')}
                 </Text>
                 <Text size="xl" fw={700} c="brand.7">
                   {workedHours}
+                </Text>
+                <Text size="xs" c="dimmed" fw={500}>
+                  {t('timekeeper.today')}
                 </Text>
               </Stack>
             </Paper>

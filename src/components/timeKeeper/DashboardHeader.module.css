@@ -28,7 +28,7 @@
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   justify-content: center;
-  width: min(120px, 35%);
+  width: min(200px, 35%);
   aspect-ratio: 1;
   margin: auto;
   max-width: 150px;
