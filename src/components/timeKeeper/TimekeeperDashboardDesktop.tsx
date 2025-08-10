@@ -1,4 +1,4 @@
-import { Grid, Container, Paper, Stack, Title, Group, Badge, Text } from '@mantine/core';
+import { Grid, Box, Paper, Stack, Title, Group, Badge, Text } from '@mantine/core';
 import {
   IconCalendarEvent,
   IconClipboardList,
@@ -61,7 +61,7 @@ export function TimekeeperDashboardDesktop({
   ];
 
   return (
-    <Container fluid px="xl" py="md" className={classes.container}>
+    <Box px="xl" py="md" className={classes.container}>
       <Stack gap="lg">
         {/* Header */}
         <DashboardHeaderDesktop {...headerData} />
@@ -69,7 +69,7 @@ export function TimekeeperDashboardDesktop({
         {/* Main Content Grid */}
         <Grid gutter="lg">
           {/* Left Column - Timesheet and Quick Actions */}
-          <Grid.Col span={8}>
+          <Grid.Col span={9}>
             <Stack gap="lg">
               {/* Timesheet */}
               <Paper shadow="sm" radius="md" p="lg">
@@ -165,7 +165,7 @@ export function TimekeeperDashboardDesktop({
           </Grid.Col>
 
           {/* Right Column - Resources */}
-          <Grid.Col span={4}>
+          <Grid.Col span={3}>
             <Paper shadow="sm" radius="md" p="lg">
               <Title order={5} mb="md">
                 {t('timekeeper.quickLinks')}
@@ -200,6 +200,6 @@ export function TimekeeperDashboardDesktop({
           </Grid.Col>
         </Grid>
       </Stack>
-    </Container>
+    </Box>
   );
 }
