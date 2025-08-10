@@ -127,8 +127,17 @@ class TimekeeperService {
    */
   private getMockDashboardData(): DashboardData {
     const now = new Date();
-    const clockInTime = new Date();
+    let clockInTime = new Date();
     clockInTime.setHours(9, 0, 0, 0); // 9:00 AM
+    const ONE_HOUR = 1000 * 60 * 60;
+    while (clockInTime > now) {
+      clockInTime = new Date(clockInTime.getTime() - ONE_HOUR);
+    }
+
+    const mark = now.getTime() - 7 * ONE_HOUR;
+    while (clockInTime.getTime() < mark) {
+      clockInTime = new Date(clockInTime.getTime() + ONE_HOUR);
+    }
 
     const workedMinutes = Math.floor((now.getTime() - clockInTime.getTime()) / (1000 * 60));
 

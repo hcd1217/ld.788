@@ -3,7 +3,7 @@
   color: white;
   padding: 24px 0 60px;
   position: relative;
-  height: 25vh;
+  min-height: 180px;
   background: linear-gradient(
     135deg,
     var(--mantine-color-brand-7) 0%,
@@ -28,7 +28,8 @@
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   justify-content: center;
-  width: 30vw;
-  height: 30vw;
+  width: min(120px, 35%);
+  aspect-ratio: 1;
   margin: auto;
+  max-width: 150px;
 }

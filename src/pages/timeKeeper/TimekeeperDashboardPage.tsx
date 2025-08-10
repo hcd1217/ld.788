@@ -68,7 +68,7 @@ export function TimekeeperDashboardPage() {
   // Show skeleton while loading
   if (isLoading && !dashboard) {
     return (
-      <AppMobileLayout scrollable={false} noHeader footer={<TimekeeperMobileFooter />}>
+      <AppMobileLayout scrollable noHeader footer={<TimekeeperMobileFooter />}>
         <DashboardSkeleton />
       </AppMobileLayout>
     );
@@ -78,7 +78,7 @@ export function TimekeeperDashboardPage() {
   if (!dashboard && error) {
     return (
       <AppMobileLayout
-        scrollable={false}
+        scrollable
         noHeader
         footer={<TimekeeperMobileFooter />}
         error={error}
@@ -92,7 +92,7 @@ export function TimekeeperDashboardPage() {
   // Show empty state if no data
   if (!dashboard || !headerData) {
     return (
-      <AppMobileLayout scrollable={false} noHeader footer={<TimekeeperMobileFooter />}>
+      <AppMobileLayout scrollable noHeader footer={<TimekeeperMobileFooter />}>
         <Box className={classes.container} />
       </AppMobileLayout>
     );
@@ -100,7 +100,7 @@ export function TimekeeperDashboardPage() {
 
   return (
     <AppMobileLayout
-      scrollable={false}
+      scrollable
       noHeader
       footer={<TimekeeperMobileFooter />}
       isLoading={isLoading}

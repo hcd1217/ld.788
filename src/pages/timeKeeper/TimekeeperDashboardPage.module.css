@@ -1,6 +1,6 @@
 /* Dashboard Container */
 .container {
-  min-height: 100vh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   background-color: var(--mantine-color-gray-0);
@@ -10,6 +10,7 @@
 .dashboardContent {
   padding: 0 16px 90px;
   flex: 1;
+  min-height: 0;
 }
 
 /* Overlapping Timesheet Card */
