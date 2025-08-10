@@ -66,12 +66,7 @@ export function MyTimesheetWeekNavigator({
   return (
     <Group justify="space-between" align="center">
       <Group gap="md">
-        <ActionIcon
-          variant="subtle"
-          size="lg"
-          onClick={onPreviousWeek}
-          aria-label="Previous week"
-        >
+        <ActionIcon variant="subtle" size="lg" onClick={onPreviousWeek} aria-label="Previous week">
           <IconChevronLeft size={20} />
         </ActionIcon>
 

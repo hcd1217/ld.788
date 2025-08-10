@@ -68,7 +68,7 @@ export function MyTimesheetMobile({
   return (
     <Box
       style={{
-        height: 'calc(100dvh - 60px)', // Use dvh for dynamic viewport height on mobile
+        height: '100%', // Use 100% since parent now has proper flexbox layout
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -150,7 +150,7 @@ export function MyTimesheetMobile({
           paddingBottom: 'var(--mantine-spacing-lg)',
         }}
       >
-        <Stack gap="sm">
+        <Stack gap="xs">
           {weekDays.map((day) => {
             const entry = entriesByDate.get(day.toDateString());
             return <MyTimesheetDayCard key={day.toISOString()} date={day} entry={entry} />;

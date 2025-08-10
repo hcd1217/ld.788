@@ -7,7 +7,6 @@ import { AppMobileLayout, AppDesktopLayout, AppPageTitle } from '@/components/co
 import { MyTimesheetDesktop, MyTimesheetMobile } from '@/components/timeKeeper';
 import {
   useTimekeeperStore,
-  useTimekeeperLoading,
   useTimekeeperError,
   useTimekeeperActions,
 } from '@/stores/useTimekeeperStore';
@@ -38,10 +37,9 @@ export function MyTimesheetPage() {
 
   // Store hooks
   const timesheetEntries = useTimekeeperStore((state) => state.timesheetEntries);
-  const isLoading = useTimekeeperLoading();
   const error = useTimekeeperError();
   const { clearError } = useTimekeeperActions();
-  const fetchTimesheet = useTimekeeperStore((state) => state.fetchTimesheet);
+  const { isLoading, fetchTimesheet } = useTimekeeperStore();
 
   // Local state for current week
   const [currentWeek, setCurrentWeek] = useState<Date>(new Date());

@@ -3,7 +3,13 @@ import { ResponsiveAuthLayout } from '@/components/layouts/ResponsiveAuthLayout'
 import { AppLayout } from '@/components/layouts/AppLayout';
 import { ProtectedRoute } from '@/components/layouts/ProtectedRoute';
 import { ROUTERS } from '@/config/routeConfig';
-import { TimekeeperDashboardPage, ServiceLayout, RootUserLayout, NotFound } from './components';
+import {
+  TimekeeperDashboardPage,
+  ServiceLayout,
+  RootUserLayout,
+  NotFound,
+  HomePage,
+} from './components';
 import { authRouteObjects } from './auth';
 import { adminRouteObjects } from './admin';
 import { configRouteObjects } from './config';
@@ -30,6 +36,7 @@ export const routeObjects: ThemeRouteObject[] = [
     path: ROUTERS.ROOT,
     Component: () => <Navigate to={ROUTERS.LOGIN} />,
   },
+  { path: ROUTERS.HOME, Component: HomePage },
   // Timekeeper routes with timeKeeper theme
   {
     path: '',

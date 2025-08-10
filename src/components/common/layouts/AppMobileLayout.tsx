@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppShell, Group, LoadingOverlay } from '@mantine/core';
+import { AppShell, Container, Group, LoadingOverlay } from '@mantine/core';
 import { CommonMobileHeader } from '../ui/CommonMobileHeader';
 import { CommonMobileFooter } from '../ui';
 import { AppLogo, GoBack } from '../navigation';
@@ -35,14 +35,12 @@ export function AppMobileLayout({
   const isDefaultHeader = !header && !noHeader;
   return (
     <AppShell
-      header={{ height: 60 }}
-      footer={{ height: 60 }}
+      header={noHeader ? undefined : { height: 60, offset: false }}
+      footer={noFooter ? undefined : { height: 60, offset: false }}
       padding={0}
       className={classes.mobileLayout}
     >
-      {noHeader ? (
-        <AppShell.Header h={0}></AppShell.Header>
-      ) : (
+      {!noHeader && (
         <AppShell.Header className={classes.header}>
           {isDefaultHeader ? (
             <CommonMobileHeader />
@@ -56,20 +54,25 @@ export function AppMobileLayout({
         </AppShell.Header>
       )}
 
-      <AppShell.Main
-        my={noHeader ? 0 : 'sm'}
-        pt={noHeader ? 0 : undefined}
-        className={scrollable ? classes.main : classes.mainNoScroll}
-      >
+      <AppShell.Main className={classes.main}>
         <LoadingOverlay
           visible={isLoading}
           overlayProps={{ blur: 2 }}
           transitionProps={{ duration: 300 }}
         />
         <ErrorAlert error={error} clearError={clearError} />
-        {children}
+        <Container
+          fluid
+          w="100%"
+          p="xs"
+          className={scrollable ? classes.content : classes.contentNoScroll}
+          mt={noHeader ? undefined : 60}
+          mb={noFooter ? undefined : 60}
+        >
+          {children}
+        </Container>
       </AppShell.Main>
-      {noFooter ? null : (
+      {!noFooter && (
         <AppShell.Footer className={classes.footer}>
           {footer ?? <CommonMobileFooter />}
         </AppShell.Footer>

@@ -1,10 +1,12 @@
 import { AppMobileLayout } from "@/components/common";
-import { Container, Title } from "@mantine/core";
+import { Space, Title } from "@mantine/core";
 
 export function Sample() {
-  return <AppMobileLayout>
-    <Container bg='red.2' h="100vh">
-      <Title>Sample</Title>
-    </Container>
+  return <AppMobileLayout scrollable={true}>
+    <Title>Sample</Title>
+    <Space h="50vh"/>
+    <Title>Sample</Title>
+    <Space h="40vh"/>
+    <Title>Sample</Title>
   </AppMobileLayout>
 }

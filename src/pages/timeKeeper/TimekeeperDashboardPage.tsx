@@ -14,15 +14,15 @@ import {
 import { TimekeeperDashboardDesktop } from '@/components/timeKeeper/TimekeeperDashboardDesktop';
 import {
   useTimekeeperDashboard,
-  useTimekeeperLoading,
   useTimekeeperError,
   useTimekeeperActions,
+  useTimekeeperStore,
 } from '@/stores/useTimekeeperStore';
 import classes from './TimekeeperDashboardPage.module.css';
 
 export function TimekeeperDashboardPage() {
   const dashboard = useTimekeeperDashboard();
-  const isLoading = useTimekeeperLoading();
+  const { isLoading } = useTimekeeperStore();
   const error = useTimekeeperError();
   const { fetchDashboard, clearError } = useTimekeeperActions();
   const isMobile = useMediaQuery('(max-width: 768px)');

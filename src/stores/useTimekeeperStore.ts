@@ -206,12 +206,16 @@ export const useTimekeeperStore = create<TimekeeperState>()(
         set({ isLoading: true, error: undefined });
         try {
           const timesheetEntries = await timekeeperService.getTimesheet(startDate, endDate);
-          set({ timesheetEntries, isLoading: false });
+          console.log('timesheetEntries', timesheetEntries);
+          set({ timesheetEntries });
         } catch (error) {
           set({
-            isLoading: false,
             error: getErrorMessage(error, 'Failed to load timesheet'),
           });
+        } finally {
+          setTimeout(() => {
+            set({ isLoading: false });
+          }, 200);
         }
       },
 
@@ -276,7 +280,6 @@ export const useTimekeeperStore = create<TimekeeperState>()(
 
 // Selectors
 export const useTimekeeperDashboard = () => useTimekeeperStore((state) => state.dashboard);
-export const useTimekeeperLoading = () => useTimekeeperStore((state) => state.isDashboardLoading);
 export const useTimekeeperError = () => useTimekeeperStore((state) => state.error);
 export const useCurrentClock = () => useTimekeeperStore((state) => state.currentClock);
 export const useClockActionLoading = () =>

@@ -8,12 +8,19 @@ import type {
   LeaveRequest,
   TimesheetEntry,
 } from '@/types/timekeeper';
+import { shouldUseDemoData } from '@/config/demo.config';
+import { timekeeperDemoService } from './timekeeperDemo.service';
 
 class TimekeeperService {
   /**
    * Get dashboard data for the current user
    */
   async getDashboard(): Promise<DashboardData> {
+    // Use demo data if configured
+    if (shouldUseDemoData('dashboard')) {
+      return timekeeperDemoService.getDashboard();
+    }
+
     // TODO: Replace with actual API call when endpoint is available
     // const response = await userApi.timekeeper.getDashboard();
     // return this.transformDashboardData(response);
@@ -26,6 +33,11 @@ class TimekeeperService {
    * Clock in
    */
   async clockIn(_location?: { latitude: number; longitude: number }): Promise<ClockResponse> {
+    // Use demo data if configured
+    if (shouldUseDemoData('timekeeper')) {
+      return timekeeperDemoService.clockIn(_location);
+    }
+
     // TODO: Implement when API endpoint is available
     // const response = await userApi.timekeeper.clockIn({ location: _location });
     // return this.transformClockResponse(response);
@@ -37,6 +49,11 @@ class TimekeeperService {
    * Clock out
    */
   async clockOut(_location?: { latitude: number; longitude: number }): Promise<ClockResponse> {
+    // Use demo data if configured
+    if (shouldUseDemoData('timekeeper')) {
+      return timekeeperDemoService.clockOut(_location);
+    }
+
     // TODO: Implement when API endpoint is available
     // const response = await userApi.timekeeper.clockOut({ location: _location });
     // return this.transformClockResponse(response);
@@ -48,6 +65,11 @@ class TimekeeperService {
    * Start break
    */
   async startBreak(): Promise<ClockResponse> {
+    // Use demo data if configured
+    if (shouldUseDemoData('timekeeper')) {
+      return timekeeperDemoService.startBreak();
+    }
+
     // TODO: Implement when API endpoint is available
     throw new Error('Start break functionality not yet implemented');
   }
@@ -56,6 +78,11 @@ class TimekeeperService {
    * End break
    */
   async endBreak(): Promise<ClockResponse> {
+    // Use demo data if configured
+    if (shouldUseDemoData('timekeeper')) {
+      return timekeeperDemoService.endBreak();
+    }
+
     // TODO: Implement when API endpoint is available
     throw new Error('End break functionality not yet implemented');
   }
@@ -64,10 +91,19 @@ class TimekeeperService {
    * Get timesheet entries for a date range
    */
   async getTimesheet(_startDate: Date, _endDate: Date): Promise<TimesheetEntry[]> {
+    // Use demo data if configured
+    if (shouldUseDemoData('timesheet')) {
+      console.log('Using demo timesheet data for date range:', _startDate, 'to', _endDate);
+      const result = await timekeeperDemoService.getTimesheet(_startDate, _endDate);
+      console.log('Demo timesheet entries returned:', result.length, 'entries');
+      return result;
+    }
+
     // TODO: Implement when API endpoint is available
     // const response = await userApi.timekeeper.getTimesheet({ startDate: _startDate, endDate: _endDate });
     // return this.transformTimesheetData(response);
 
+    console.log('Demo mode disabled, returning empty array');
     return [];
   }
 
@@ -75,6 +111,11 @@ class TimekeeperService {
    * Get upcoming shifts
    */
   async getUpcomingShifts(): Promise<Shift[]> {
+    // Use demo data if configured
+    if (shouldUseDemoData('shifts')) {
+      return timekeeperDemoService.getUpcomingShifts();
+    }
+
     // TODO: Implement when API endpoint is available
     // const response = await userApi.timekeeper.getShifts({ status: 'SCHEDULED' });
     // return this.transformShifts(response);
@@ -86,6 +127,11 @@ class TimekeeperService {
    * Get leave requests
    */
   async getLeaveRequests(): Promise<LeaveRequest[]> {
+    // Use demo data if configured
+    if (shouldUseDemoData('leaveRequests')) {
+      return timekeeperDemoService.getLeaveRequests();
+    }
+
     // TODO: Implement when API endpoint is available
     // const response = await userApi.timekeeper.getLeaveRequests();
     // return this.transformLeaveRequests(response);
@@ -102,6 +148,11 @@ class TimekeeperService {
     endDate: Date;
     reason?: string;
   }): Promise<LeaveRequest> {
+    // Use demo data if configured
+    if (shouldUseDemoData('leaveRequests')) {
+      return timekeeperDemoService.submitLeaveRequest(_request);
+    }
+
     // TODO: Implement when API endpoint is available
     // const response = await userApi.timekeeper.submitLeaveRequest(_request);
     // return this.transformLeaveRequest(response);
@@ -113,6 +164,11 @@ class TimekeeperService {
    * Get current clock status
    */
   async getCurrentClockStatus(): Promise<ClockEntry | null> {
+    // Use demo data if configured
+    if (shouldUseDemoData('timekeeper')) {
+      return timekeeperDemoService.getCurrentClockStatus();
+    }
+
     // TODO: Implement when API endpoint is available
     // const response = await userApi.timekeeper.getCurrentClock();
     // return response ? this.transformClockEntry(response) : null;
