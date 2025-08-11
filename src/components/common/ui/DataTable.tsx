@@ -19,6 +19,8 @@ type DataTableProps<T> = {
   readonly renderActions?: (item: T) => React.ReactNode;
   readonly onRowClick?: (item: T) => void;
   readonly ariaLabel?: string;
+  readonly getRowStyles?: (item: T) => React.CSSProperties;
+  readonly onActionCellClick?: (event: React.MouseEvent) => void;
 };
 
 export function DataTable<T extends Record<string, unknown> & { id: string }>({
@@ -29,6 +31,8 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
   renderActions,
   onRowClick,
   ariaLabel,
+  getRowStyles,
+  onActionCellClick,
 }: DataTableProps<T>) {
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
@@ -64,23 +68,30 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {data.map((item) => (
-                <Table.Tr
-                  key={item.id}
-                  onClick={() => onRowClick?.(item)}
-                  style={onRowClick ? { cursor: 'pointer' } : undefined}
-                >
-                  {columns.map((column) => (
-                    <Table.Td
-                      key={column.key}
-                      style={column.width ? { width: column.width } : undefined}
-                    >
-                      {renderCellContent(item, column)}
-                    </Table.Td>
-                  ))}
-                  {renderActions ? <Table.Td>{renderActions(item)}</Table.Td> : null}
-                </Table.Tr>
-              ))}
+              {data.map((item) => {
+                const rowStyles = getRowStyles?.(item) || {};
+                const hasClickHandler = Boolean(onRowClick);
+                const combinedStyles = {
+                  ...(hasClickHandler ? { cursor: 'pointer' } : {}),
+                  ...rowStyles,
+                };
+
+                return (
+                  <Table.Tr key={item.id} onClick={() => onRowClick?.(item)} style={combinedStyles}>
+                    {columns.map((column) => (
+                      <Table.Td
+                        key={column.key}
+                        style={column.width ? { width: column.width } : undefined}
+                      >
+                        {renderCellContent(item, column)}
+                      </Table.Td>
+                    ))}
+                    {renderActions ? (
+                      <Table.Td onClick={onActionCellClick}>{renderActions(item)}</Table.Td>
+                    ) : null}
+                  </Table.Tr>
+                );
+              })}
             </Table.Tbody>
           </Table>
         </ScrollArea>

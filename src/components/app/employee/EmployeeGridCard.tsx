@@ -4,7 +4,9 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
 import { SelectableCard } from '@/components/common';
 import { getEmployeeDetailRoute } from '@/config/routeConfig';
-import { ActiveBadge } from '@/components/common/ui';
+import { ActiveBadge, ContactInfo } from '@/components/common/ui';
+import { WorkTypeBadge } from './WorkTypeBadge';
+import { formatDate } from '@/utils/string';
 import { getEndDateHighlightStyles } from '@/utils/time';
 
 type EmployeeGridCardProps = {
@@ -23,57 +25,87 @@ export function EmployeeGridCard({ employee }: EmployeeGridCardProps) {
       shadow="sm"
       padding="lg"
       radius="md"
-      style={{
-        cursor: 'pointer',
-        ...highlightStyles,
-      }}
       aria-label={t('employee.employeeCard', {
         name: `${employee.firstName} ${employee.lastName}`,
       })}
       onClick={() => navigate(getEmployeeDetailRoute(employee.id))}
+      style={{
+        cursor: 'pointer',
+        position: 'relative',
+        ...highlightStyles,
+      }}
     >
-      <Stack
-        gap="sm"
+      {/* Status Badge - Absolute positioned */}
+      <div
         style={{
-          position: 'relative',
+          position: 'absolute',
+          top: 12,
+          right: 12,
+          zIndex: 1,
         }}
       >
-        <Group justify="space-between" align="flex-start">
-          <div>
-            <Group gap="sm" justify="start">
-              <Text fw={400}>{employee.fullName}</Text>
-              {employee?.position ? (
-                <Text c="dimmed" size="sm">
-                  {' '}
-                  ({employee?.position})
-                </Text>
-              ) : null}
-            </Group>
-            {employee.unitId ? (
-              <Text size="sm" c="dimmed">
-                {t('employee.unit')}: {employee.unit ?? '-'}
+        <ActiveBadge isActive={employee.isActive} />
+      </div>
+
+      <Stack gap="xs">
+        {/* Header with name and position */}
+        <Group gap="xs" wrap="nowrap">
+          <Text fw={500} truncate>
+            {employee.fullName}
+          </Text>
+          {employee?.position ? (
+            <Text c="dimmed" size="sm">
+              ({employee?.position})
+            </Text>
+          ) : null}
+        </Group>
+
+        {/* Unit */}
+        {employee.unit ? (
+          <Text size="sm" c="dimmed">
+            {t('employee.unit')}: {employee.unit}
+          </Text>
+        ) : null}
+
+        {/* Contact Info */}
+        <Group wrap="nowrap">
+          <Text size="xs" c="dimmed" fw={500} mb={4}>
+            {t('common.contact')}:
+          </Text>
+          <ContactInfo email={employee.email} phoneNumber={employee.phone} />
+        </Group>
+
+        {/* Work Type */}
+        <Group wrap="nowrap">
+          <Text size="xs" c="dimmed" fw={500} mb={4}>
+            {t('employee.workType')}:
+          </Text>
+          <WorkTypeBadge workType={employee.workType} />
+        </Group>
+
+        {/* Dates Row */}
+        <Group gap="md" wrap="wrap">
+          {/* Start Date */}
+          {employee.startDate ? (
+            <div>
+              <Text size="xs" c="dimmed" fw={500} mb={4}>
+                {t('employee.startDate')}:
               </Text>
-            ) : null}
-            {employee.email ? (
-              <Text size="sm" c="dimmed">
-                {t('employee.email')}: {employee.email}
+              <Text size="sm">{formatDate(employee.startDate)}</Text>
+            </div>
+          ) : null}
+
+          {/* End Date */}
+          {employee.endDate ? (
+            <div>
+              <Text size="xs" c="dimmed" fw={500} mb={4}>
+                {t('employee.endDate')}:
               </Text>
-            ) : null}
-            {employee.phone ? (
-              <Text size="sm" c="dimmed">
-                {t('employee.phone')}: {employee.phone}
+              <Text size="sm" c="red.6">
+                {formatDate(employee.endDate)}
               </Text>
-            ) : null}
-          </div>
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-            }}
-          >
-            <ActiveBadge isActive={employee.isActive} />
-          </div>
+            </div>
+          ) : null}
         </Group>
       </Stack>
     </SelectableCard>

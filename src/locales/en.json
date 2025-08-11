@@ -59,6 +59,7 @@
         "autoUpdate": {}
       }
     },
+    "contact": "Contact",
     "firstName": "First name",
     "lastName": "Last name",
     "logout": "Logout",
@@ -549,7 +550,6 @@
     "deleteStaffTooltip": "Delete staff",
     "edit": "Edit",
     "staffMemberHeader": "Staff Member",
-    "contact": "Contact",
     "role": "Role",
     "workingPatternLabel": "Working Pattern",
     "hourlyRate": "Hourly Rate",
@@ -734,7 +734,6 @@
     }
   },
   "customer": {
-    "contact": "Contact",
     "company": "Company",
     "address": "Address",
     "taxCode": "Tax Code",

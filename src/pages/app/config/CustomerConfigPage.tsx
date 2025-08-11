@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Paper, Text, Stack, Group } from '@mantine/core';
+import { Paper, Text, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
@@ -13,6 +13,7 @@ import {
   SearchBar,
   Pagination,
   ActiveBadge,
+  ContactInfo,
 } from '@/components/common';
 import { CustomerFormModal } from '@/components/app/config';
 import {
@@ -35,29 +36,6 @@ export type CustomerFormValues = {
   address?: string;
   taxCode?: string;
   isActive?: boolean;
-};
-
-// Helper function to render contact information
-const renderContactInfo = (customer: Customer) => {
-  const hasEmail = customer.contactEmail && customer.contactEmail.length > 0;
-  const hasPhone = customer.contactPhone && customer.contactPhone.length > 0;
-
-  if (!hasEmail && !hasPhone) {
-    return '-';
-  }
-
-  if (hasEmail && hasPhone) {
-    return (
-      <Stack gap={4}>
-        <Text size="sm">{customer.contactEmail}</Text>
-        <Text size="sm" c="dimmed">
-          {customer.contactPhone}
-        </Text>
-      </Stack>
-    );
-  }
-
-  return hasEmail ? customer.contactEmail : customer.contactPhone;
 };
 
 export function CustomerConfigPage() {
@@ -350,9 +328,9 @@ export function CustomerConfigPage() {
             },
             {
               key: 'contact',
-              header: t('customer.contact'),
+              header: t('common.contact'),
               width: '200px',
-              render: renderContactInfo,
+              render: (customer: Customer) => <ContactInfo {...customer} />,
             },
             {
               key: 'status',

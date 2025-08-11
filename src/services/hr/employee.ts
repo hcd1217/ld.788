@@ -172,6 +172,7 @@ export const employeeService = {
       departmentId: employee.unitId,
       employmentType: employee.workType,
       phoneNumber: employee.phone,
+      email: employee.email,
       hireDate: new Date(employee.startDate).toISOString(),
       terminationDate: employee.endDate ? new Date(employee.endDate).toISOString() : undefined,
       metadata: {

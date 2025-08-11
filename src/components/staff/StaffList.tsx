@@ -359,7 +359,7 @@ export function StaffList({ staffs, onEdit, onDelete, onToggleStatus }: StaffLis
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>{t('staff.staffMemberHeader')}</Table.Th>
-                <Table.Th>{t('staff.contact')}</Table.Th>
+                <Table.Th>{t('common.contact')}</Table.Th>
                 <Table.Th>{t('staff.role')}</Table.Th>
                 <Table.Th>{t('staff.workingPatternLabel')}</Table.Th>
                 <Table.Th>{t('staff.clockIn')}</Table.Th>

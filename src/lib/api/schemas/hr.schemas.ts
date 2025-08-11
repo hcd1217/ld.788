@@ -32,6 +32,7 @@ export const EmployeeSchema = z.object({
   firstName: stringSchema,
   lastName: stringSchema,
   employeeCode: stringSchema,
+  email: emailSchema.optional(),
   phoneNumber: phoneNumberSchema,
   employmentType: z
     .enum(['FULL_TIME', 'PART_TIME'])

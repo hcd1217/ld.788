@@ -50,18 +50,14 @@ export const EmployeeListPage = lazy(async () => {
   return { default: module.EmployeeListPage };
 });
 
-export const EmployeeCreatePage = lazy(async () => {
-  const module = await import('@/pages/app/employee/EmployeeCreatePage');
-  return { default: module.EmployeeCreatePage };
+export const EmployeeFormPage = lazy(async () => {
+  const module = await import('@/pages/app/employee/EmployeeFormPage');
+  return { default: module.EmployeeFormPage };
 });
 
 export const EmployeeDetailPage = lazy(async () => {
   const module = await import('@/pages/app/employee/EmployeeDetailPage');
   return { default: module.EmployeeDetailPage };
-});
-export const EditEmployeePage = lazy(async () => {
-  const module = await import('@/pages/app/employee/EditEmployeePage');
-  return { default: module.EditEmployeePage };
 });
 
 export const HomePage = lazy(async () => {

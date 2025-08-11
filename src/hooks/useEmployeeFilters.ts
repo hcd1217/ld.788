@@ -22,32 +22,45 @@ const defaultFilters: EmployeeFilters = {
   status: EMPLOYEE_STATUS.ALL,
 };
 
-export function useEmployeeFilters(
-  employees: readonly Employee[],
-): [Employee[], EmployeeFilters, EmployeeFilterHandlers] {
+export function useEmployeeFilters(employees: readonly Employee[]) {
   const [filters, setFilters] = useState<EmployeeFilters>(defaultFilters);
 
-  const handlers: EmployeeFilterHandlers = {
-    setSearchQuery: useCallback((query: string) => {
-      setFilters((prev) => ({ ...prev, searchQuery: query }));
-    }, []),
+  const hasActiveFilters = useMemo(() => {
+    if (filters.unitId) {
+      return true;
+    }
+    if (defaultFilters.status !== filters.status) {
+      return true;
+    }
+    if (defaultFilters.searchQuery !== filters.searchQuery) {
+      return true;
+    }
+    return false;
+  }, [filters]);
 
-    setUnitId: useCallback((unitId: string | undefined) => {
-      setFilters((prev) => ({ ...prev, unitId }));
-    }, []),
+  const filterHandlers: EmployeeFilterHandlers = useMemo(() => {
+    return {
+      setSearchQuery: (query: string) => {
+        setFilters((prev) => ({ ...prev, searchQuery: query }));
+      },
 
-    setStatus: useCallback((status: EmployeeStatusType) => {
-      setFilters((prev) => ({ ...prev, status }));
-    }, []),
+      setUnitId: (unitId: string | undefined) => {
+        setFilters((prev) => ({ ...prev, unitId }));
+      },
 
-    updateFilters: useCallback((updates: Partial<EmployeeFilters>) => {
-      setFilters((prev) => ({ ...prev, ...updates }));
-    }, []),
+      setStatus: (status: EmployeeStatusType) => {
+        setFilters((prev) => ({ ...prev, status }));
+      },
 
-    resetFilters: useCallback(() => {
-      setFilters(defaultFilters);
-    }, []),
-  };
+      updateFilters: (updates: Partial<EmployeeFilters>) => {
+        setFilters((prev) => ({ ...prev, ...updates }));
+      },
+
+      resetFilters: () => {
+        setFilters(defaultFilters);
+      },
+    };
+  }, []);
 
   const filteredEmployees = useMemo(() => {
     return employees.filter((employee) => {
@@ -83,5 +96,11 @@ export function useEmployeeFilters(
     });
   }, [employees, filters]);
 
-  return [filteredEmployees, filters, handlers];
+  const clearAllFilters = useCallback(() => {
+    filterHandlers.setSearchQuery('');
+    filterHandlers.setUnitId(undefined);
+    filterHandlers.setStatus(EMPLOYEE_STATUS.ALL);
+  }, [filterHandlers]);
+
+  return { filteredEmployees, filters, filterHandlers, hasActiveFilters, clearAllFilters };
 }

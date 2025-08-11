@@ -24,6 +24,7 @@ export function validateEmail(value: string, t: TranslationFunction): string | u
 export function validatePhone(value: string, t: TranslationFunction): string | undefined {
   if (!value) return t('validation.phoneRequired');
   if (value.length < 10) return t('validation.phoneTooShort');
+  // TODO: validate phone number format
   return undefined;
 }
 
@@ -81,8 +82,8 @@ export function validateIdentifier(value: string, t: TranslationFunction): strin
   return undefined;
 }
 
-// Create form validation object for common auth forms
-export function createAuthValidation(t: TranslationFunction) {
+// Create form validation object for common forms
+function createValidation(t: TranslationFunction) {
   return {
     email: (value: string) => validateEmail(value, t),
     phone: (value: string) => validatePhone(value, t),
@@ -99,18 +100,18 @@ export function createAuthValidation(t: TranslationFunction) {
 }
 
 // Helper to get only the validators needed for a specific form
-export function getFormValidators<T extends keyof ReturnType<typeof createAuthValidation>>(
+export function getFormValidators<T extends keyof ReturnType<typeof createValidation>>(
   t: TranslationFunction,
   fields: T[],
-): Pick<ReturnType<typeof createAuthValidation>, T> {
-  const allValidators = createAuthValidation(t);
-  const result: Partial<Pick<ReturnType<typeof createAuthValidation>, T>> = {};
+): Pick<ReturnType<typeof createValidation>, T> {
+  const allValidators = createValidation(t);
+  const result: Partial<Pick<ReturnType<typeof createValidation>, T>> = {};
 
   for (const field of fields) {
     result[field] = allValidators[field];
   }
 
-  return result as Pick<ReturnType<typeof createAuthValidation>, T>;
+  return result as Pick<ReturnType<typeof createValidation>, T>;
 }
 
 // Simple validation helpers for basic forms

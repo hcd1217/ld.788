@@ -9,11 +9,6 @@ export const PO_STATUS = {
   REFUNDED: 'REFUNDED',
 } as const;
 
-export const VIEW_MODE = {
-  TABLE: 'table',
-  GRID: 'grid',
-} as const;
-
 export const PAYMENT_TERMS = {
   NET30: 'Net 30',
   NET60: 'Net 60',
@@ -32,7 +27,6 @@ export const PO_ACTIONS = {
 } as const;
 
 export type POStatusType = (typeof PO_STATUS)[keyof typeof PO_STATUS];
-export type ViewModeType = (typeof VIEW_MODE)[keyof typeof VIEW_MODE];
 export type PaymentTermsType = (typeof PAYMENT_TERMS)[keyof typeof PAYMENT_TERMS];
 export type POActionType = (typeof PO_ACTIONS)[keyof typeof PO_ACTIONS];
 

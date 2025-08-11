@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import { Stack, Group, Box, SimpleGrid, Select, SegmentedControl } from '@mantine/core';
-import { IconUser } from '@tabler/icons-react';
+import { Stack, Group, Box, SimpleGrid, Select, SegmentedControl, Button } from '@mantine/core';
+import { IconClearAll, IconUser } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { useOnce } from '@/hooks/useOnce';
@@ -33,12 +33,13 @@ import {
 } from '@/components/app/employee';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { ROUTERS } from '@/config/routeConfig';
-import { EMPLOYEE_STATUS, VIEW_MODE, type ViewModeType } from '@/constants/employee';
+import { EMPLOYEE_STATUS } from '@/constants/employee';
 import { useDisclosure } from '@mantine/hooks';
+import { useViewMode } from '@/hooks/useViewMode';
 
 export function EmployeeListPage() {
   const navigate = useNavigate();
-  const { isMobile, isDesktop } = useDeviceType();
+  const { isMobile } = useDeviceType();
   const { t } = useTranslation();
   const employees = useEmployeeList();
   const units = useUnitList();
@@ -47,9 +48,10 @@ export function EmployeeListPage() {
   const { refreshEmployees, clearError, loadUnits } = useHrActions();
 
   // Use the new employee filters hook
-  const [filteredEmployees, filters, filterHandlers] = useEmployeeFilters(employees);
+  const { filteredEmployees, filters, filterHandlers, hasActiveFilters, clearAllFilters } =
+    useEmployeeFilters(employees);
 
-  const [viewMode, setViewMode] = useState<ViewModeType>(VIEW_MODE.TABLE);
+  const { viewMode, isTableView, setViewMode } = useViewMode();
 
   // Drawer states using Mantine's useDisclosure directly
   const [unitDrawerOpened, { open: openUnitDrawer, close: closeUnitDrawer }] = useDisclosure(false);
@@ -59,12 +61,7 @@ export function EmployeeListPage() {
   // Use client-side pagination hook with filtered employees
   const [paginatedEmployees, paginationState, paginationHandlers] = useClientSidePagination({
     data: filteredEmployees,
-    defaultPageSize: isDesktop ? undefined : 1000,
-  });
-
-  useOnce(() => {
-    void refreshEmployees();
-    void loadUnits();
+    defaultPageSize: isMobile ? 1000 : undefined,
   });
 
   // Prepare department options for select
@@ -77,19 +74,10 @@ export function EmployeeListPage() {
     [units],
   );
 
-  // Check if any filters are active
-  const hasActiveFilters = !!(
-    filters.searchQuery ||
-    filters.unitId ||
-    filters.status !== EMPLOYEE_STATUS.ALL
-  );
-
-  // Clear all filters
-  const clearAllFilters = () => {
-    filterHandlers.setSearchQuery('');
-    filterHandlers.setUnitId(undefined);
-    filterHandlers.setStatus(EMPLOYEE_STATUS.ALL);
-  };
+  useOnce(() => {
+    void refreshEmployees();
+    void loadUnits();
+  });
 
   if (isMobile) {
     return (
@@ -174,7 +162,7 @@ export function EmployeeListPage() {
       {/* Search Bar and View Mode Selector */}
       <Group justify="space-between" align="flex-end">
         <SearchBar
-          hidden={paginationState.totalPages < 2}
+          // hidden={paginationState.totalPages < 2}
           placeholder={t('employee.searchPlaceholder')}
           searchQuery={filters.searchQuery}
           setSearchQuery={filterHandlers.setSearchQuery}
@@ -203,6 +191,14 @@ export function EmployeeListPage() {
               )
             }
           />
+          <Button
+            disabled={!hasActiveFilters}
+            variant="subtle"
+            leftSection={<IconClearAll size={16} />}
+            onClick={clearAllFilters}
+          >
+            {t('common.clear')}
+          </Button>
           <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
         </Group>
       </Group>
@@ -212,17 +208,15 @@ export function EmployeeListPage() {
           hidden={paginationState.totalItems > 0 || isLoading}
           icon={<IconUser size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />}
           title={
-            filters.searchQuery
-              ? t('employee.noEmployeesFoundSearch')
-              : t('employee.noEmployeesFound')
+            hasActiveFilters ? t('employee.noEmployeesFoundSearch') : t('employee.noEmployeesFound')
           }
           description={
-            filters.searchQuery
+            hasActiveFilters
               ? t('employee.tryDifferentSearch')
               : t('employee.createFirstEmployeeDescription')
           }
           button={
-            filters.searchQuery
+            hasActiveFilters
               ? undefined
               : {
                   label: t('employee.createFirstEmployee'),
@@ -236,7 +230,7 @@ export function EmployeeListPage() {
             {/* Desktop View - Table or Grid based on selection */}
             {isLoading && employees.length === 0 ? (
               <EmployeeListSkeleton viewMode={viewMode} count={10} />
-            ) : viewMode === VIEW_MODE.TABLE ? (
+            ) : isTableView ? (
               <EmployeeDataTable noAction employees={paginatedEmployees} />
             ) : (
               <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">

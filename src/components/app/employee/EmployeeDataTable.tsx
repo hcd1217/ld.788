@@ -1,13 +1,15 @@
-import { Table, Text, ScrollArea, Group } from '@mantine/core';
+import React from 'react';
+import { Text, Group } from '@mantine/core';
 import { useNavigate } from 'react-router';
 import { EmployeeActions } from './EmployeeActions';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
 import { getEmployeeDetailRoute } from '@/config/routeConfig';
 import { formatDate } from '@/utils/string';
-import { ActiveBadge } from '@/components/common/ui';
+import { ActiveBadge, ContactInfo, DataTable } from '@/components/common/ui';
 import { WorkTypeBadge } from './WorkTypeBadge';
 import { getEndDateHighlightStyles } from '@/utils/time';
+import { useMemo } from 'react';
 
 type EmployeeDataTableProps = {
   readonly employees: readonly Employee[];
@@ -25,83 +27,97 @@ export function EmployeeDataTable({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
+  const columns = useMemo(
+    () => [
+      {
+        key: 'name',
+        header: t('employee.name'),
+        render: (employee: Employee) => (
+          <Group gap="sm" justify="start">
+            {/* @todo: custom this */}
+            <Text fw={400}>{employee.fullName}</Text>
+            {employee?.position ? <Text c="dimmed"> ({employee?.position})</Text> : null}
+          </Group>
+        ),
+      },
+      {
+        key: 'unit',
+        header: t('employee.unit'),
+        accessor: 'unit' as keyof Employee,
+      },
+      {
+        key: 'contact',
+        header: t('common.contact'),
+        render: (employee: Employee) => <ContactInfo {...employee} />,
+      },
+      {
+        key: 'workType',
+        header: t('employee.workType'),
+        render: (employee: Employee) => <WorkTypeBadge workType={employee.workType} />,
+      },
+      {
+        key: 'startDate',
+        header: t('employee.startDate'),
+        render: (employee: Employee) => (
+          <>
+            {employee.startDate ? formatDate(employee.startDate) : '-'}
+            {employee.endDate ? formatDate(employee.endDate) : null}
+          </>
+        ),
+      },
+      {
+        key: 'status',
+        header: t('employee.status'),
+        render: (employee: Employee) => <ActiveBadge isActive={employee.isActive} />,
+      },
+    ],
+    [t],
+  );
+
+  const handleRowClick = (employee: Employee) => {
+    navigate(getEmployeeDetailRoute(employee.id));
+  };
+
+  const getRowStyles = (employee: Employee) => {
+    return getEndDateHighlightStyles(employee.endDate, employee.isActive);
+  };
+
+  const renderActions = noAction
+    ? undefined
+    : (employee: Employee) => (
+        <EmployeeActions
+          employeeId={employee.id}
+          isActive={employee.isActive}
+          onDeactivate={
+            onDeactivateEmployee
+              ? () => {
+                  onDeactivateEmployee(employee);
+                }
+              : undefined
+          }
+          onActivate={
+            onActivateEmployee
+              ? () => {
+                  onActivateEmployee(employee);
+                }
+              : undefined
+          }
+        />
+      );
+
+  const handleActionCellClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
-    <ScrollArea>
-      <Table striped highlightOnHover aria-label={t('employee.tableAriaLabel')}>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t('employee.name')}</Table.Th>
-            <Table.Th>{t('employee.unit')}</Table.Th>
-            <Table.Th>{t('employee.email')}</Table.Th>
-            <Table.Th>{t('employee.phone')}</Table.Th>
-            <Table.Th>{t('employee.workType')}</Table.Th>
-            <Table.Th>{t('employee.startDate')}</Table.Th>
-            <Table.Th>{t('employee.endDate')}</Table.Th>
-            <Table.Th>{t('employee.status')}</Table.Th>
-            {noAction ? null : <Table.Th style={{ width: 100 }}>{t('common.actions')}</Table.Th>}
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {employees.map((employee) => {
-            const highlightStyles = getEndDateHighlightStyles(employee.endDate, employee.isActive);
-            return (
-              <Table.Tr
-                key={employee.id}
-                style={{
-                  cursor: 'pointer',
-                  ...highlightStyles,
-                }}
-                onClick={() => navigate(getEmployeeDetailRoute(employee.id))}
-              >
-                <Table.Td>
-                  <Group gap="sm" justify="start">
-                    {/* @todo: custom this */}
-                    <Text fw={400}>{employee.fullName}</Text>
-                    {employee?.position ? <Text c="dimmed"> ({employee?.position})</Text> : null}
-                  </Group>
-                </Table.Td>
-                <Table.Td>{employee.unit ?? '-'}</Table.Td>
-                <Table.Td>{employee.email ?? '-'}</Table.Td>
-                <Table.Td>{employee.phone ?? '-'}</Table.Td>
-                <Table.Td>
-                  <WorkTypeBadge workType={employee.workType} />
-                </Table.Td>
-                <Table.Td>
-                  {employee.startDate ? formatDate(employee.startDate.toString()) : '-'}
-                </Table.Td>
-                <Table.Td>
-                  {employee.endDate ? formatDate(employee.endDate.toString()) : '-'}
-                </Table.Td>
-                <Table.Td>
-                  <ActiveBadge isActive={employee.isActive} />
-                </Table.Td>
-                {noAction ? null : (
-                  <Table.Td onClick={(e) => e.stopPropagation()}>
-                    <EmployeeActions
-                      employeeId={employee.id}
-                      isActive={employee.isActive}
-                      onDeactivate={
-                        onDeactivateEmployee
-                          ? () => {
-                              onDeactivateEmployee(employee);
-                            }
-                          : undefined
-                      }
-                      onActivate={
-                        onActivateEmployee
-                          ? () => {
-                              onActivateEmployee(employee);
-                            }
-                          : undefined
-                      }
-                    />
-                  </Table.Td>
-                )}
-              </Table.Tr>
-            );
-          })}
-        </Table.Tbody>
-      </Table>
-    </ScrollArea>
+    <DataTable
+      data={employees as Employee[]}
+      columns={columns}
+      renderActions={renderActions}
+      onRowClick={handleRowClick}
+      getRowStyles={getRowStyles}
+      onActionCellClick={handleActionCellClick}
+      ariaLabel={t('employee.tableAriaLabel')}
+    />
   );
 }

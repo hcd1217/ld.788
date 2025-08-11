@@ -13,6 +13,7 @@ export { EmployeeDetailAccordion } from './EmployeeDetailAccordion';
 export { EmployeeDetailAlert } from './EmployeeDetailAlert';
 export { SingleEmployeeForm } from './SingleEmployeeForm';
 export { BulkImportForm } from './BulkImportForm';
+export { EmployeeFormLayout } from './EmployeeFormLayout';
 export { EmployeeListSkeleton } from './EmployeeListSkeleton';
 export { EmployeeFilterBar } from './EmployeeFilterBar';
 export { EmployeeUnitDrawer } from './EmployeeUnitDrawer';

@@ -2,11 +2,12 @@ import { Center, Box, SegmentedControl, type MantineBreakpoint } from '@mantine/
 import { IconLayoutGrid, IconTable } from '@tabler/icons-react';
 import { Tooltip } from './Tooltip';
 import { useTranslation } from '@/hooks/useTranslation';
+import { VIEW_MODE, type ViewModeType } from '@/hooks/useViewMode';
 
 type SwitchViewProps = {
-  readonly viewMode: 'table' | 'grid';
+  readonly viewMode: ViewModeType;
   readonly visibleFrom?: MantineBreakpoint;
-  readonly setViewMode: (viewMode: 'table' | 'grid') => void;
+  readonly setViewMode: (viewMode: ViewModeType) => void;
 };
 export function SwitchView({ visibleFrom, viewMode, setViewMode }: SwitchViewProps) {
   const { t } = useTranslation();
@@ -17,7 +18,7 @@ export function SwitchView({ visibleFrom, viewMode, setViewMode }: SwitchViewPro
         value={viewMode}
         data={[
           {
-            value: 'table',
+            value: VIEW_MODE.TABLE,
             label: (
               <Tooltip label={t('common.tableView')} position="bottom">
                 <Center>
@@ -27,7 +28,7 @@ export function SwitchView({ visibleFrom, viewMode, setViewMode }: SwitchViewPro
             ),
           },
           {
-            value: 'grid',
+            value: VIEW_MODE.GRID,
             label: (
               <Tooltip label={t('common.gridView')} position="bottom">
                 <Center>
@@ -38,7 +39,7 @@ export function SwitchView({ visibleFrom, viewMode, setViewMode }: SwitchViewPro
           },
         ]}
         onChange={(value) => {
-          setViewMode(value as 'table' | 'grid');
+          setViewMode(value as ViewModeType);
         }}
       />
     </Box>

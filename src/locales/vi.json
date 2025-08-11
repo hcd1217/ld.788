@@ -59,6 +59,7 @@
         "autoUpdate": {}
       }
     },
+    "contact": "Liên Hệ",
     "firstName": "Tên",
     "lastName": "Họ",
     "logout": "Đăng xuất",
@@ -541,7 +542,6 @@
     "clockIn": "Chấm công",
     "clockInUrl": "URL chấm công:",
     "clockInUrlLabel": "URL chấm công",
-    "contact": "Liên Hệ",
     "copied": "Đã sao chép!",
     "copyClockInUrl": "Sao chép URL chấm công",
     "copyUrl": "Sao chép URL",
@@ -734,7 +734,6 @@
     }
   },
   "customer": {
-    "contact": "Liên Hệ",
     "company": "Công Ty",
     "address": "Địa Chỉ",
     "taxCode": "Mã Số Thuế",

@@ -10,6 +10,7 @@ export {
   ComingSoonCard,
   CommonMobileFooter,
   CommonMobileHeader,
+  ContactInfo,
   DataTable,
   Drawer,
   SearchBar,

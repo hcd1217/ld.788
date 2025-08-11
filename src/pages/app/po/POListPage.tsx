@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import { Stack, Group, Box, SimpleGrid, Select } from '@mantine/core';
-import { IconFileInvoice } from '@tabler/icons-react';
+import { Stack, Group, Box, SimpleGrid, Select, Button } from '@mantine/core';
+import { IconFileInvoice, IconClearAll } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { useOnce } from '@/hooks/useOnce';
@@ -34,7 +34,8 @@ import {
 } from '@/components/app/po';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { ROUTERS } from '@/config/routeConfig';
-import { PO_STATUS, VIEW_MODE, type ViewModeType } from '@/constants/purchaseOrder';
+import { PO_STATUS } from '@/constants/purchaseOrder';
+import { useViewMode } from '@/hooks/useViewMode';
 import { useDisclosure } from '@mantine/hooks';
 
 export function POListPage() {
@@ -48,9 +49,10 @@ export function POListPage() {
   const { refreshPurchaseOrders, clearError, loadCustomers } = usePOActions();
 
   // Use the PO filters hook
-  const [filteredPOs, filters, filterHandlers] = usePOFilters(purchaseOrders);
+  const { filteredPOs, filters, filterHandlers, hasActiveFilters, clearAllFilters } =
+    usePOFilters(purchaseOrders);
 
-  const [viewMode, setViewMode] = useState<ViewModeType>(VIEW_MODE.TABLE);
+  const { viewMode, isTableView, setViewMode } = useViewMode();
 
   // Drawer states using Mantine's useDisclosure directly
   const [customerDrawerOpened, { open: openCustomerDrawer, close: closeCustomerDrawer }] =
@@ -65,11 +67,6 @@ export function POListPage() {
     defaultPageSize: isDesktop ? undefined : 1000,
   });
 
-  useOnce(() => {
-    void refreshPurchaseOrders();
-    void loadCustomers();
-  });
-
   // Prepare customer options for select
   const customerOptions = useMemo(
     () =>
@@ -81,34 +78,25 @@ export function POListPage() {
   );
 
   // Status options for select
-  const statusOptions = [
-    { value: PO_STATUS.ALL, label: t('po.allStatus') },
-    { value: PO_STATUS.NEW, label: t('po.status.NEW') },
-    { value: PO_STATUS.CONFIRMED, label: t('po.status.CONFIRMED') },
-    { value: PO_STATUS.PROCESSING, label: t('po.status.PROCESSING') },
-    { value: PO_STATUS.SHIPPED, label: t('po.status.SHIPPED') },
-    { value: PO_STATUS.DELIVERED, label: t('po.status.DELIVERED') },
-    { value: PO_STATUS.CANCELLED, label: t('po.status.CANCELLED') },
-    { value: PO_STATUS.REFUNDED, label: t('po.status.REFUNDED') },
-  ];
+  const statusOptions = useMemo(() => {
+    return [
+      { value: PO_STATUS.ALL, label: t('po.allStatus') },
+      { value: PO_STATUS.NEW, label: t('po.status.NEW') },
+      { value: PO_STATUS.CONFIRMED, label: t('po.status.CONFIRMED') },
+      { value: PO_STATUS.PROCESSING, label: t('po.status.PROCESSING') },
+      { value: PO_STATUS.SHIPPED, label: t('po.status.SHIPPED') },
+      { value: PO_STATUS.DELIVERED, label: t('po.status.DELIVERED') },
+      { value: PO_STATUS.CANCELLED, label: t('po.status.CANCELLED') },
+      { value: PO_STATUS.REFUNDED, label: t('po.status.REFUNDED') },
+    ];
+  }, [t]);
 
-  // Check if any filters are active
-  const hasActiveFilters = !!(
-    filters.searchQuery ||
-    filters.customerId ||
-    filters.status !== PO_STATUS.ALL ||
-    filters.dateRange.start ||
-    filters.dateRange.end
-  );
   const hasDateFilter = !!(filters.dateRange.start || filters.dateRange.end);
 
-  // Clear all filters
-  const clearAllFilters = () => {
-    filterHandlers.setSearchQuery('');
-    filterHandlers.setCustomerId(undefined);
-    filterHandlers.setStatus(PO_STATUS.ALL);
-    filterHandlers.setDateRange(undefined, undefined);
-  };
+  useOnce(() => {
+    void refreshPurchaseOrders();
+    void loadCustomers();
+  });
 
   if (isMobile) {
     return (
@@ -165,9 +153,9 @@ export function POListPage() {
           icon={
             <IconFileInvoice size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />
           }
-          title={filters.searchQuery ? t('po.noPOsFoundSearch') : t('po.noPOsFound')}
+          title={hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound')}
           description={
-            filters.searchQuery ? t('po.tryDifferentSearch') : t('po.createFirstPODescription')
+            hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription')
           }
         />
         <Box mt="md">
@@ -200,7 +188,6 @@ export function POListPage() {
       {/* Search Bar and View Mode Selector */}
       <Group justify="space-between" align="flex-end">
         <SearchBar
-          hidden={paginationState.totalPages < 2}
           placeholder={t('po.searchPlaceholder')}
           searchQuery={filters.searchQuery}
           setSearchQuery={filterHandlers.setSearchQuery}
@@ -226,6 +213,14 @@ export function POListPage() {
               filterHandlers.setStatus(value as (typeof PO_STATUS)[keyof typeof PO_STATUS])
             }
           />
+          <Button
+            disabled={!hasActiveFilters}
+            variant="subtle"
+            leftSection={<IconClearAll size={16} />}
+            onClick={clearAllFilters}
+          >
+            {t('common.clear')}
+          </Button>
           <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
         </Group>
       </Group>
@@ -236,12 +231,12 @@ export function POListPage() {
           icon={
             <IconFileInvoice size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />
           }
-          title={filters.searchQuery ? t('po.noPOsFoundSearch') : t('po.noPOsFound')}
+          title={hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound')}
           description={
-            filters.searchQuery ? t('po.tryDifferentSearch') : t('po.createFirstPODescription')
+            hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription')
           }
           button={
-            filters.searchQuery
+            hasActiveFilters
               ? undefined
               : {
                   label: t('po.createFirstPO'),
@@ -255,7 +250,7 @@ export function POListPage() {
             {/* Desktop View - Table or Grid based on selection */}
             {isLoading && purchaseOrders.length === 0 ? (
               <POListSkeleton viewMode={viewMode} count={10} />
-            ) : viewMode === VIEW_MODE.TABLE ? (
+            ) : isTableView ? (
               <PODataTable noAction purchaseOrders={paginatedPOs} />
             ) : (
               <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">

@@ -1,18 +1,12 @@
 import { ROUTERS } from '@/config/routeConfig';
-import {
-  EmployeeListPage,
-  EmployeeCreatePage,
-  EmployeeDetailPage,
-  EditEmployeePage,
-  BlankPage,
-} from './components';
+import { EmployeeListPage, EmployeeFormPage, EmployeeDetailPage, BlankPage } from './components';
 
 export const managementRouteObjects = [
   // Employee Management
   { path: ROUTERS.EMPLOYEE_MANAGEMENT, Component: EmployeeListPage },
   { path: ROUTERS.EMPLOYEE_DETAIL, Component: EmployeeDetailPage },
-  { path: ROUTERS.EMPLOYEE_EDIT, Component: EditEmployeePage },
-  { path: ROUTERS.EMPLOYEES_ADD, Component: EmployeeCreatePage },
+  { path: ROUTERS.EMPLOYEE_EDIT, Component: () => <EmployeeFormPage mode="edit" /> },
+  { path: ROUTERS.EMPLOYEES_ADD, Component: () => <EmployeeFormPage mode="create" /> },
 
   // Customer Management (placeholder)
   { path: ROUTERS.CUSTOMER_MANAGEMENT, Component: BlankPage },
