@@ -25,7 +25,7 @@
   border-radius: 9999px;
   backdrop-filter: blur(10px);
   justify-content: center;
-  width: 150px;
+  width: 40vw;
   aspect-ratio: 1;
   margin: auto;
 }

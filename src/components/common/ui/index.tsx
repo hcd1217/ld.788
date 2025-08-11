@@ -10,7 +10,6 @@ export { CommonMobileFooter } from './CommonMobileFooter';
 export { CommonMobileHeader } from './CommonMobileHeader';
 export { DataTable } from './DataTable';
 export { Drawer } from './Drawer';
-export { PCOnlyAlert } from './PCOnlyAlert';
 export { SearchBar } from './SearchBar';
 export { SelectableCard } from './SelectableCard';
 export { SwitchView } from './SwitchView';

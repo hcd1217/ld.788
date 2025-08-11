@@ -1,13 +1,13 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Paper, Text, Stack } from '@mantine/core';
+import { useState, useMemo } from 'react';
+import { Paper, Text, Stack, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAction } from '@/hooks/useAction';
 import {
   DataTable,
-  PCOnlyAlert,
   AppDesktopLayout,
   AppPageTitle,
   SearchBar,
@@ -21,11 +21,11 @@ import {
   type CreateCustomerRequest,
   type UpdateCustomerRequest,
 } from '@/services/sales/customer';
-import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
+import { showSuccessNotification } from '@/utils/notifications';
 import { validateEmail } from '@/utils/validation';
 import { isDevelopment } from '@/utils/env';
-import { useDeviceType } from '@/hooks/useDeviceType';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
+import { useOnce } from '@/hooks/useOnce';
 
 export type CustomerFormValues = {
   name: string;
@@ -33,6 +33,7 @@ export type CustomerFormValues = {
   contactEmail?: string;
   contactPhone?: string;
   address?: string;
+  taxCode?: string;
   isActive?: boolean;
 };
 
@@ -61,7 +62,6 @@ const renderContactInfo = (customer: Customer) => {
 
 export function CustomerConfigPage() {
   const { t } = useTranslation();
-  const { isMobile } = useDeviceType();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -71,16 +71,30 @@ export function CustomerConfigPage() {
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
 
   const form = useForm<CustomerFormValues>({
-    initialValues: {
-      name: '',
-      companyName: '',
-      contactEmail: '',
-      contactPhone: '',
-      address: '',
-      isActive: true,
-    },
+    initialValues: isDevelopment
+      ? {
+          // cspell:disable
+          name: 'CARMALL TYRE',
+          companyName: 'CÔNG TY CỔ PHẦN CARMALL TYRE',
+          contactEmail: '',
+          contactPhone: '03-1234-2211',
+          address:
+            'Số 3 Đường số 32, Phường An Phú, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, Việt Nam',
+          taxCode: '0316162825',
+          isActive: true,
+          // cspell:enable
+        }
+      : {
+          name: '',
+          companyName: '',
+          contactEmail: '',
+          contactPhone: '',
+          address: '',
+          taxCode: '',
+          isActive: true,
+        },
     validate: {
-      name: (value) => (!value ? t('common.error') : null),
+      // name: (value) => (!value ? t('common.error') : null),
       contactEmail: (value) => {
         if (value && value.length > 0) {
           return validateEmail(value, t);
@@ -93,7 +107,6 @@ export function CustomerConfigPage() {
   // Filter customers based on search query
   const filteredCustomers = useMemo(() => {
     if (!searchQuery) return customers;
-
     const query = searchQuery.toLowerCase();
     return customers.filter(
       (customer) =>
@@ -107,36 +120,44 @@ export function CustomerConfigPage() {
   // Use client-side pagination hook
   const [paginatedCustomers, paginationState, paginationHandlers] = useClientSidePagination({
     data: filteredCustomers,
-    defaultPageSize: 10,
+    defaultPageSize: 20,
   });
 
-  const loadCustomers = useCallback(async () => {
-    try {
+  const loadCustomers = useAction<Record<string, never>>({
+    options: {
+      errorTitle: t('common.error'),
+      errorMessage: t('common.loadingFailed'),
+    },
+    async actionHandler() {
       setIsLoading(true);
       setError(undefined);
       const data = await customerService.getAllCustomers();
       setCustomers(data);
-    } catch (err) {
+    },
+    errorHandler(err) {
       if (isDevelopment) {
         console.error('Failed to load customers:', err);
       }
       setError(t('common.loadingFailed'));
-      showErrorNotification(t('common.error'), t('common.loadingFailed'));
-    } finally {
+    },
+    cleanupHandler() {
       setIsLoading(false);
-    }
-  }, [t]);
+    },
+  });
 
-  const clearError = useCallback(() => {
-    setError(undefined);
-  }, []);
-
-  useEffect(() => {
+  useOnce(() => {
     loadCustomers();
-  }, [loadCustomers]);
+  });
 
-  const handleCreateCustomer = async (values: CustomerFormValues) => {
-    try {
+  const handleCreateCustomer = useAction<CustomerFormValues>({
+    options: {
+      errorTitle: t('common.error'),
+      errorMessage: t('common.addFailed'),
+    },
+    async actionHandler(values) {
+      if (!values) {
+        throw new Error(t('common.addFailed'));
+      }
       setIsLoading(true);
       const data: CreateCustomerRequest = {
         name: values.name,
@@ -144,6 +165,7 @@ export function CustomerConfigPage() {
         contactEmail: values.contactEmail || undefined,
         contactPhone: values.contactPhone || undefined,
         address: values.address || undefined,
+        taxCode: values.taxCode || undefined,
       };
       await customerService.createCustomer(data);
       showSuccessNotification(
@@ -153,20 +175,26 @@ export function CustomerConfigPage() {
       closeCreate();
       form.reset();
       await loadCustomers();
-    } catch (error) {
+    },
+    errorHandler(error) {
       if (isDevelopment) {
         console.error('Failed to create customer:', error);
       }
-      showErrorNotification(t('common.error'), t('common.addFailed'));
-    } finally {
+    },
+    cleanupHandler() {
       setIsLoading(false);
-    }
-  };
+    },
+  });
 
-  const handleUpdateCustomer = async (values: CustomerFormValues) => {
-    if (!selectedCustomer) return;
-
-    try {
+  const handleUpdateCustomer = useAction<CustomerFormValues>({
+    options: {
+      errorTitle: t('common.error'),
+      errorMessage: t('common.updateFailed'),
+    },
+    async actionHandler(values) {
+      if (!values || !selectedCustomer) {
+        throw new Error(t('po.customerNotFound'));
+      }
       setIsLoading(true);
       const data: UpdateCustomerRequest = {
         name: values.name,
@@ -174,6 +202,7 @@ export function CustomerConfigPage() {
         contactEmail: values.contactEmail || undefined,
         contactPhone: values.contactPhone || undefined,
         address: values.address || undefined,
+        taxCode: values.taxCode || undefined,
         isActive: values.isActive,
       };
       await customerService.updateCustomer(selectedCustomer.id, data);
@@ -183,15 +212,45 @@ export function CustomerConfigPage() {
       );
       closeEdit();
       await loadCustomers();
-    } catch (error) {
+    },
+    errorHandler(error) {
       if (isDevelopment) {
         console.error('Failed to update customer:', error);
       }
-      showErrorNotification(t('common.error'), t('common.updateFailed'));
-    } finally {
+    },
+    cleanupHandler() {
       setIsLoading(false);
-    }
-  };
+    },
+  });
+
+  const confirmDeleteCustomer = useAction<{ customer: Customer }>({
+    options: {
+      successTitle: t('customer.deleted'),
+      errorTitle: t('common.error'),
+      errorMessage: t('common.deleteFailed'),
+    },
+    async actionHandler(values) {
+      if (!values?.customer) {
+        throw new Error(t('po.customerNotFound'));
+      }
+      setIsLoading(true);
+      await customerService.deleteCustomer(values.customer.id);
+      // Success message is handled by options with dynamic customer name
+      showSuccessNotification(
+        t('customer.deleted'),
+        t('customer.deletedMessage', { name: values.customer.name }),
+      );
+      await loadCustomers();
+    },
+    errorHandler(error) {
+      if (isDevelopment) {
+        console.error('Failed to delete customer:', error);
+      }
+    },
+    cleanupHandler() {
+      setIsLoading(false);
+    },
+  });
 
   const handleDeleteCustomer = (customer: Customer) => {
     modals.openConfirmModal({
@@ -199,24 +258,7 @@ export function CustomerConfigPage() {
       children: <Text size="sm">{t('common.confirmDeleteMessage', { name: customer.name })}</Text>,
       labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
       confirmProps: { color: 'red' },
-      onConfirm: async () => {
-        try {
-          setIsLoading(true);
-          await customerService.deleteCustomer(customer.id);
-          showSuccessNotification(
-            t('customer.deleted'),
-            t('customer.deletedMessage', { name: customer.name }),
-          );
-          await loadCustomers();
-        } catch (error) {
-          if (isDevelopment) {
-            console.error('Failed to delete customer:', error);
-          }
-          showErrorNotification(t('common.error'), t('common.deleteFailed'));
-        } finally {
-          setIsLoading(false);
-        }
-      },
+      onConfirm: () => confirmDeleteCustomer({ customer }),
     });
   };
 
@@ -228,6 +270,7 @@ export function CustomerConfigPage() {
       contactEmail: customer.contactEmail || '',
       contactPhone: customer.contactPhone || '',
       address: customer.address || '',
+      taxCode: customer.taxCode || '',
       isActive: customer.isActive,
     });
     openEdit();
@@ -238,16 +281,13 @@ export function CustomerConfigPage() {
     openCreate();
   };
 
-  // PC-only check at the beginning
-  if (isMobile) {
-    return <PCOnlyAlert />;
-  }
-
   return (
     <AppDesktopLayout
       isLoading={isLoading && !createOpened && !editOpened}
       error={error}
-      clearError={clearError}
+      clearError={() => {
+        setError(undefined);
+      }}
     >
       {/* Page Title with Actions */}
       <AppPageTitle
@@ -295,7 +335,18 @@ export function CustomerConfigPage() {
             {
               key: 'companyName',
               header: t('customer.company'),
-              render: (customer: Customer) => customer.companyName || '-',
+              render: (customer: Customer) => (
+                <Group gap="xs">
+                  {customer.companyName || '-'}
+                  {customer.taxCode ? (
+                    <Text c="dimmed" ml={2} size="xs" fw={600}>
+                      (MST: {customer.taxCode})
+                    </Text>
+                  ) : (
+                    ''
+                  )}
+                </Group>
+              ),
             },
             {
               key: 'contact',
@@ -315,7 +366,7 @@ export function CustomerConfigPage() {
 
       {/* Pagination */}
       <Pagination
-        hidden={paginationState.totalItems === 0}
+        hidden={paginationState.totalPages < 2}
         totalPages={paginationState.totalPages}
         pageSize={paginationState.pageSize}
         currentPage={paginationState.currentPage}

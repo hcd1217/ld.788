@@ -17,17 +17,19 @@ import type { ProductStatus } from '@/services/sales/product';
 export type ProductFormValues = {
   productCode: string;
   name: string;
+  color?: string;
   description?: string;
   category?: string;
   unitPrice: number;
   costPrice?: number;
   status: ProductStatus;
-  stockLevel: number;
+  stockLevel?: number;
   minStock?: number;
   maxStock?: number;
   unit?: string;
   sku?: string;
   barcode?: string;
+  metaData?: Record<string, string>;
 };
 
 type ProductFormModalProps = {
@@ -95,13 +97,49 @@ export function ProductFormModal({
               minRows={2}
               {...form.getInputProps('description')}
             />
-            <TextInput
-              label={t('product.category')}
-              placeholder={t('product.categoryPlaceholder')}
-              error={form.errors.category}
+            <Select
+              required
+              label={t('common.status')}
+              placeholder={t('product.statusPlaceholder')}
+              data={statusOptions}
+              error={form.errors.status}
               disabled={isLoading}
-              {...form.getInputProps('category')}
+              {...form.getInputProps('status')}
             />
+            <Group grow>
+              <TextInput
+                label={t('product.category')}
+                placeholder={t('product.categoryPlaceholder')}
+                error={form.errors.category}
+                disabled={isLoading}
+                {...form.getInputProps('category')}
+              />
+              <TextInput
+                label={t('product.color')}
+                placeholder={t('product.colorPlaceholder')}
+                error={form.errors.color}
+                disabled={isLoading}
+                {...form.getInputProps('color')}
+              />
+            </Group>
+
+            {/* Stock information */}
+            <Group grow>
+              <NumberInput
+                label={t('product.stockLevel')}
+                placeholder={t('product.stockLevelPlaceholder')}
+                error={form.errors.stockLevel}
+                disabled={isLoading}
+                {...form.getInputProps('stockLevel')}
+              />
+              <NumberInput
+                label={t('product.minStock')}
+                placeholder={t('product.minStockPlaceholder')}
+                error={form.errors.minStock}
+                disabled={isLoading}
+                {...form.getInputProps('minStock')}
+              />
+            </Group>
 
             {/* Pricing */}
             <Group grow>
@@ -115,82 +153,12 @@ export function ProductFormModal({
                 min={0}
                 {...form.getInputProps('unitPrice')}
               />
-              <NumberInput
-                label={t('product.costPrice')}
-                placeholder={t('product.costPricePlaceholder')}
-                error={form.errors.costPrice}
-                disabled={isLoading}
-                decimalScale={2}
-                min={0}
-                {...form.getInputProps('costPrice')}
-              />
-            </Group>
-
-            {/* Stock Information */}
-            <Group grow>
-              <NumberInput
-                required
-                label={t('product.stockLevel')}
-                placeholder={t('product.stockLevelPlaceholder')}
-                error={form.errors.stockLevel}
-                disabled={isLoading}
-                min={0}
-                {...form.getInputProps('stockLevel')}
-              />
               <TextInput
                 label={t('product.unit')}
                 placeholder={t('product.unitPlaceholder')}
                 error={form.errors.unit}
                 disabled={isLoading}
                 {...form.getInputProps('unit')}
-              />
-            </Group>
-
-            <Group grow>
-              <NumberInput
-                label={t('product.minStock')}
-                placeholder={t('product.minStockPlaceholder')}
-                error={form.errors.minStock}
-                disabled={isLoading}
-                min={0}
-                {...form.getInputProps('minStock')}
-              />
-              <NumberInput
-                label={t('product.maxStock')}
-                placeholder={t('product.maxStockPlaceholder')}
-                error={form.errors.maxStock}
-                disabled={isLoading}
-                min={0}
-                {...form.getInputProps('maxStock')}
-              />
-            </Group>
-
-            {/* Status */}
-            <Select
-              required
-              label={t('common.status')}
-              placeholder={t('product.statusPlaceholder')}
-              data={statusOptions}
-              error={form.errors.status}
-              disabled={isLoading}
-              {...form.getInputProps('status')}
-            />
-
-            {/* Additional Information */}
-            <Group grow>
-              <TextInput
-                label={t('product.sku')}
-                placeholder={t('product.skuPlaceholder')}
-                error={form.errors.sku}
-                disabled={isLoading}
-                {...form.getInputProps('sku')}
-              />
-              <TextInput
-                label={t('product.barcode')}
-                placeholder={t('product.barcodePlaceholder')}
-                error={form.errors.barcode}
-                disabled={isLoading}
-                {...form.getInputProps('barcode')}
               />
             </Group>
 

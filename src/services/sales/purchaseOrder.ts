@@ -56,6 +56,7 @@ export const purchaseOrderService = {
       items: data.items.map((item) => ({
         productCode: item.productCode,
         description: item.description,
+        color: item.color,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         discount: item.discount,

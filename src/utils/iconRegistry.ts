@@ -16,6 +16,7 @@ import {
   IconDots,
   type Icon,
   IconError404,
+  IconDatabaseCog,
 } from '@tabler/icons-react';
 
 // Type-safe icon component type from Tabler
@@ -23,6 +24,7 @@ export type TablerIconComponent = Icon;
 
 // Type for icon identifiers - ensures type safety
 export const IconIdentifiers = {
+  DATABASE_COG: 'database-cog',
   ARROW_LEFT: 'arrow-left',
   ERROR_404: 'error-404',
   DASHBOARD: 'dashboard',
@@ -45,6 +47,7 @@ export type IconIdentifier = (typeof IconIdentifiers)[keyof typeof IconIdentifie
 // Icon registry with all navigation icons
 const iconRegistry: Record<IconIdentifier, TablerIconComponent> = {
   [IconIdentifiers.ERROR_404]: IconError404,
+  [IconIdentifiers.DATABASE_COG]: IconDatabaseCog,
   [IconIdentifiers.ARROW_LEFT]: IconArrowLeft,
   [IconIdentifiers.DASHBOARD]: IconLayoutDashboard,
   [IconIdentifiers.USERS]: IconUsers,

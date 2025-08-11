@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Box, Container, Text, Flex, Center, Stack, useMantineTheme } from '@mantine/core';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useGreeting } from '@/hooks/useGreeting';
@@ -7,7 +8,7 @@ import { IconHandStop } from '@tabler/icons-react';
 
 type DashboardHeaderProps = DashboardHeaderData;
 
-export function DashboardHeader({
+export const DashboardHeader = memo(function DashboardHeader({
   userName,
   clockInTime,
   minutesAgo,
@@ -22,8 +23,8 @@ export function DashboardHeader({
     <Box className={classes.dashboardHeader} style={{ backgroundColor: theme.colors.brand[7] }}>
       <Container className={classes.headerContent}>
         <Flex gap="md" align="stretch" justify={'space-between'}>
-          <Box>
-            <Stack gap="xl">
+          <Box w="60vw">
+            <Stack gap="sm">
               <IconHandStop
                 size={56}
                 style={{ transform: 'scaleX(-1) rotate(45deg)' }}
@@ -61,4 +62,4 @@ export function DashboardHeader({
       </Container>
     </Box>
   );
-}
+});

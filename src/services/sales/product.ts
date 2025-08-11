@@ -9,10 +9,11 @@ export type CreateProductRequest = {
   name: string;
   description?: string;
   category?: string;
+  color?: string;
   unitPrice: number;
   costPrice?: number;
   status?: ProductStatus;
-  stockLevel: number;
+  stockLevel?: number;
   minStock?: number;
   maxStock?: number;
   unit?: string;
@@ -24,6 +25,7 @@ export type UpdateProductRequest = {
   name?: string;
   description?: string;
   category?: string;
+  color?: string;
   unitPrice?: number;
   costPrice?: number;
   status?: ProductStatus;
@@ -46,7 +48,10 @@ export const productService = {
     maxPrice?: number;
     lowStock?: boolean;
   }): Promise<Product[]> {
-    const response = await salesApi.getProducts(params);
+    const response = await salesApi.getProducts({
+      ...params,
+      limit: 100,
+    });
     return response.products;
   },
 

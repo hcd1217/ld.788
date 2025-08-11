@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
 
@@ -24,34 +25,48 @@ export function useAction<T extends Record<string, unknown>>({
 }: UseActionProps<T>) {
   const navigate = useNavigate();
 
-  const handleSubmit = async (values?: T) => {
-    try {
-      await actionHandler(values);
+  const handler = useCallback(
+    async (values?: T) => {
+      try {
+        await actionHandler(values);
 
-      if (options.successTitle) {
-        showSuccessNotification(options.successTitle, options.successMessage);
+        if (options.successTitle) {
+          showSuccessNotification(options.successTitle, options.successMessage);
+        }
+
+        // Navigate after successful action
+        if (options.navigateTo) {
+          const destination = options.navigateTo;
+          setTimeout(() => {
+            navigate(destination);
+          }, options.delay ?? 100);
+        }
+      } catch (error) {
+        errorHandler?.(error);
+
+        if (options.errorTitle) {
+          showErrorNotification(
+            options.errorTitle,
+            error instanceof Error ? error.message : options.errorMessage,
+          );
+        }
+      } finally {
+        cleanupHandler?.();
       }
+    },
+    [
+      actionHandler,
+      cleanupHandler,
+      errorHandler,
+      navigate,
+      options.delay,
+      options.errorMessage,
+      options.errorTitle,
+      options.navigateTo,
+      options.successMessage,
+      options.successTitle,
+    ],
+  );
 
-      // Navigate after successful action
-      if (options.navigateTo) {
-        const destination = options.navigateTo;
-        setTimeout(() => {
-          navigate(destination);
-        }, options.delay ?? 100);
-      }
-    } catch (error) {
-      errorHandler?.(error);
-
-      if (options.errorTitle) {
-        showErrorNotification(
-          options.errorTitle,
-          error instanceof Error ? error.message : options.errorMessage,
-        );
-      }
-    } finally {
-      cleanupHandler?.();
-    }
-  };
-
-  return handleSubmit;
+  return handler;
 }

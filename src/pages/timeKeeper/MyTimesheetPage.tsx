@@ -1,10 +1,9 @@
 import { Alert } from '@mantine/core';
-import { AppMobileLayout, AppDesktopLayout, AppPageTitle } from '@/components/common';
+import { AppMobileLayout, AppPageTitle } from '@/components/common';
 import { getWeekRange, getDaysOfWeek } from '@/utils/timekeeper.utils';
 import { IconAlertCircle } from '@tabler/icons-react';
-import { MyTimesheetDesktop, MyTimesheetMobile } from '@/components/timeKeeper';
+import { MyTimesheetMobile, TimekeeperErrorBoundary } from '@/components/timeKeeper';
 import { ROUTERS } from '@/config/routeConfig';
-import { useDeviceType } from '@/hooks/useDeviceType';
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
@@ -15,7 +14,6 @@ import {
 
 export function MyTimesheetPage() {
   const { t } = useTranslation();
-  const { isMobile } = useDeviceType();
 
   // Store hooks
   const timesheetEntries = useTimekeeperStore((state) => state.timesheetEntries);
@@ -77,7 +75,7 @@ export function MyTimesheetPage() {
     setCurrentWeek(new Date());
   };
 
-  // Error Alert component (shared between mobile and desktop)
+  // Error Alert component
   const errorAlert = error && (
     <Alert
       icon={<IconAlertCircle size={16} />}
@@ -91,9 +89,9 @@ export function MyTimesheetPage() {
     </Alert>
   );
 
-  // Mobile layout
-  if (isMobile) {
-    return (
+  // Mobile-only layout
+  return (
+    <TimekeeperErrorBoundary componentName="MyTimesheet">
       <AppMobileLayout
         goBackRoute={ROUTERS.TIME_KEEPER_DASHBOARD}
         header={<AppPageTitle fz="h4" title={t('timekeeper.myTimesheet.title')} />}
@@ -114,22 +112,6 @@ export function MyTimesheetPage() {
           onCurrentWeek={goToCurrentWeek}
         />
       </AppMobileLayout>
-    );
-  }
-
-  // Desktop layout
-  return (
-    <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
-      {errorAlert}
-      <MyTimesheetDesktop
-        currentWeek={currentWeek}
-        weekDays={weekDays}
-        entriesByDate={entriesByDate}
-        weekTotals={weekTotals}
-        onPreviousWeek={goToPreviousWeek}
-        onNextWeek={goToNextWeek}
-        onCurrentWeek={goToCurrentWeek}
-      />
-    </AppDesktopLayout>
+    </TimekeeperErrorBoundary>
   );
 }

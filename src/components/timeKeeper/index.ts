@@ -13,3 +13,4 @@ export { DashboardTimesheet } from './dashboard/DashboardTimesheet';
 export { MyTimesheetDesktop } from './myTimesheet/MyTimesheetDesktop';
 export { TimesheetWeekNavigation } from './myTimesheet/TimesheetWeekNavigation';
 export { TimesheetDayCardsList } from './myTimesheet/TimesheetDayCardsList';
+export { TimekeeperErrorBoundary } from './common/TimekeeperErrorBoundary';

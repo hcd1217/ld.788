@@ -2,18 +2,20 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { MobileCameraCapture } from '@/components/timeKeeper/clock/MobileCameraCapture';
+import { TimekeeperErrorBoundary } from '@/components/timeKeeper';
 import { useTimekeeperStore } from '@/stores/useTimekeeperStore';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { ROUTERS } from '@/config/routeConfig';
+import { isDevelopment } from '@/utils/env';
 
-export function ClockManagementPage() {
+function ClockManagementPageContent() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isMobile } = useDeviceType();
   const [userLocation, setUserLocation] = useState<
     { latitude: number; longitude: number } | undefined
   >();
-  const [_locationError, setLocationError] = useState<string | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const [showCamera, setShowCamera] = useState(false);
 
   const { currentClock, clockIn, clockOut, fetchTodayClockEntries, getCurrentClockStatus } =
@@ -30,7 +32,9 @@ export function ClockManagementPage() {
           });
         },
         (error) => {
-          console.error('Location error:', error);
+          if (isDevelopment) {
+            console.error('Location error:', error);
+          }
           setLocationError(t('timekeeper.clock.location.error'));
         },
       );
@@ -84,7 +88,15 @@ export function ClockManagementPage() {
       opened={showCamera}
       onClose={handleCameraClose}
       onCapture={handleCameraCapture}
-      location={userLocation}
+      location={locationError ? undefined : userLocation}
     />
+  );
+}
+
+export function ClockManagementPage() {
+  return (
+    <TimekeeperErrorBoundary componentName="ClockManagement">
+      <ClockManagementPageContent />
+    </TimekeeperErrorBoundary>
   );
 }

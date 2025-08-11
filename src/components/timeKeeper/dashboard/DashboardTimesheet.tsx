@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Card, Group, Box, Title, Text } from '@mantine/core';
 import { IconClockHour3 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
@@ -5,7 +6,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { ROUTERS } from '@/config/routeConfig';
 import classes from './DashboardTimesheet.module.css';
 
-export function DashboardTimesheet() {
+export const DashboardTimesheet = memo(function DashboardTimesheet() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -41,4 +42,4 @@ export function DashboardTimesheet() {
       </Group>
     </Card>
   );
-}
+});

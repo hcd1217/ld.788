@@ -140,5 +140,9 @@ export function useClientSidePagination<T, TFilters = { searchQuery?: string }>(
     lastPage,
   };
 
-  return [paginatedData, paginationState, paginationHandlers] as const;
+  return [paginatedData, paginationState, paginationHandlers] as [
+    T[],
+    PaginationState,
+    PaginationHandlers,
+  ];
 }

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import { SimpleGrid, Box } from '@mantine/core';
 import { useNavigate } from 'react-router';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -21,7 +21,7 @@ interface DashboardQuickActionsProps {
   readonly pendingRequests?: number;
 }
 
-export function DashboardQuickActions({
+export const DashboardQuickActions = memo(function DashboardQuickActions({
   upcomingShifts = 0,
   pendingRequests = 0,
 }: DashboardQuickActionsProps) {
@@ -81,4 +81,4 @@ export function DashboardQuickActions({
       </SimpleGrid>
     </Box>
   );
-}
+});

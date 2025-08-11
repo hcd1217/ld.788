@@ -18,6 +18,7 @@ import { salesRouteObjects } from './sales';
 import { appRouteObjects } from './app';
 import { userRouteObjects } from './user';
 import { storeRouteObjects } from './store';
+import { managementRouteObjects } from './management';
 import { Sample } from '@/pages/Sample';
 
 // Type for route with theme metadata
@@ -37,7 +38,6 @@ export const routeObjects: ThemeRouteObject[] = [
     path: ROUTERS.ROOT,
     Component: () => <Navigate to={ROUTERS.LOGIN} />,
   },
-  { path: ROUTERS.HOME, Component: HomePage },
   // Timekeeper routes with timeKeeper theme
   {
     path: '',
@@ -75,7 +75,12 @@ export const routeObjects: ThemeRouteObject[] = [
         <AppLayout />
       </ProtectedRoute>
     ),
-    children: [...configRouteObjects, ...salesRouteObjects],
+    children: [
+      { path: ROUTERS.HOME, Component: HomePage },
+      ...configRouteObjects,
+      ...managementRouteObjects,
+      ...salesRouteObjects,
+    ],
   },
   // Old APP routes (with ResponsiveAuthLayout) - elegant theme
   {

@@ -64,11 +64,6 @@ export function PODataTable({
                 <Table.Td>
                   <Group gap="sm" justify="start">
                     <Text fw={400}>{po.customer?.name ?? '-'}</Text>
-                    {po.customer?.companyName ? (
-                      <Text c="dimmed" size="sm">
-                        ({po.customer.companyName})
-                      </Text>
-                    ) : null}
                   </Group>
                 </Table.Td>
                 <Table.Td>{formatDate(po.orderDate)}</Table.Td>

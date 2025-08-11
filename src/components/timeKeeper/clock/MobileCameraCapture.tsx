@@ -1,8 +1,12 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Box, Text, Stack, Button, Group, ActionIcon, Progress, Image } from '@mantine/core';
-import { IconX, IconCamera, IconCheck, IconRefresh } from '@tabler/icons-react';
+import { Box, Button } from '@mantine/core';
+import { IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { isDevelopment } from '@/utils/env';
+import { CameraView } from './CameraView';
+import { PhotoPreview } from './PhotoPreview';
+import { CameraError } from './CameraError';
 
 interface MobileCameraCaptureProps {
   readonly opened: boolean;
@@ -61,7 +65,9 @@ export function MobileCameraCapture({
         videoRef.current.srcObject = stream;
       }
     } catch (err) {
-      console.error('Camera access denied:', err);
+      if (isDevelopment) {
+        console.error('Camera access denied:', err);
+      }
       setError(t('timekeeper.clock.camera.permissionDenied'));
     }
   }, [t]);
@@ -256,136 +262,19 @@ export function MobileCameraCapture({
 
       {/* Camera view or captured photo */}
       {!capturedPhoto ? (
-        <>
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-          />
-
-          {/* Capture button */}
-          <Box
-            style={{
-              position: 'absolute',
-              bottom: 'var(--mantine-spacing-xl)',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              zIndex: 10000,
-            }}
-          >
-            <ActionIcon
-              size={80}
-              radius="xl"
-              variant="filled"
-              color="white"
-              onClick={capturePhoto}
-              style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-              }}
-            >
-              <IconCamera size={40} color="black" />
-            </ActionIcon>
-          </Box>
-        </>
+        <CameraView ref={videoRef} onCapture={capturePhoto} />
       ) : (
-        <>
-          {/* Captured photo preview */}
-          <Image
-            src={capturedPhoto}
-            alt="Captured photo"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-            }}
-          />
-
-          {/* Auto-confirm progress */}
-          {autoConfirmCountdown !== null && (
-            <Box
-              style={{
-                position: 'absolute',
-                top: 'var(--mantine-spacing-md)',
-                left: 'var(--mantine-spacing-md)',
-                right: 'var(--mantine-spacing-md)',
-                zIndex: 10000,
-              }}
-            >
-              <Stack gap="xs">
-                <Text c="white" ta="center" size="sm">
-                  {t('timekeeper.clock.camera.autoConfirm', { seconds: autoConfirmCountdown })}
-                </Text>
-                <Progress
-                  value={(1 - autoConfirmCountdown / AUTO_CONFIRM_SECONDS) * 100}
-                  color="green"
-                  size="sm"
-                  animated
-                />
-              </Stack>
-            </Box>
-          )}
-
-          {/* Confirm/Retake buttons */}
-          <Box
-            style={{
-              position: 'absolute',
-              bottom: 'var(--mantine-spacing-xl)',
-              left: 'var(--mantine-spacing-md)',
-              right: 'var(--mantine-spacing-md)',
-              zIndex: 10000,
-            }}
-          >
-            <Group grow>
-              <Button
-                size="lg"
-                variant="outline"
-                color="white"
-                leftSection={<IconRefresh size={20} />}
-                onClick={retakePhoto}
-                style={{
-                  borderColor: 'white',
-                  color: 'white',
-                }}
-              >
-                {t('timekeeper.clock.camera.retake')}
-              </Button>
-              <Button
-                size="lg"
-                color="brand"
-                leftSection={<IconCheck size={20} />}
-                onClick={confirmPhoto}
-              >
-                {t('timekeeper.clock.camera.confirm')}
-              </Button>
-            </Group>
-          </Box>
-        </>
+        <PhotoPreview
+          capturedPhoto={capturedPhoto}
+          autoConfirmCountdown={autoConfirmCountdown}
+          autoConfirmSeconds={AUTO_CONFIRM_SECONDS}
+          onRetake={retakePhoto}
+          onConfirm={confirmPhoto}
+        />
       )}
 
       {/* Error message */}
-      {error && (
-        <Box
-          style={{
-            position: 'absolute',
-            bottom: 'var(--mantine-spacing-xl)',
-            left: 'var(--mantine-spacing-md)',
-            right: 'var(--mantine-spacing-md)',
-            zIndex: 10000,
-          }}
-        >
-          <Group justify="center">
-            <Text c="white" ta="center">
-              {error}
-            </Text>
-          </Group>
-        </Box>
-      )}
+      {error && <CameraError error={error} />}
 
       {/* Hidden canvas for photo capture */}
       <canvas ref={canvasRef} style={{ display: 'none' }} />

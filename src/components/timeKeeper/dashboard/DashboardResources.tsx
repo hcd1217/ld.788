@@ -6,7 +6,7 @@ export function DashboardResources() {
   const { t } = useTranslation();
 
   return (
-    <Box>
+    <Box my="1rem">
       <Title order={4} size="h5" mb="sm" c="dimmed">
         {t('timekeeper.resourcesTitle')}
       </Title>

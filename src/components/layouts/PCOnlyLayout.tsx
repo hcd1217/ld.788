@@ -1,40 +1,22 @@
-import {
-  Anchor,
-  Box,
-  Center,
-  Container,
-  Group,
-  rem,
-  Stack,
-  Paper,
-  Title,
-  Text,
-} from '@mantine/core';
-import { IconArrowLeft, IconDeviceDesktop } from '@tabler/icons-react';
-import { Outlet, useNavigate } from 'react-router';
-import { useTranslation } from '@/hooks/useTranslation';
+import { Center, Container, Stack, Paper, Title, Text, Button } from '@mantine/core';
+import { IconDeviceDesktop } from '@tabler/icons-react';
+import { Outlet } from 'react-router';
+import { ROUTERS } from '@/config/routeConfig';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useIsDarkMode } from '@/hooks/useIsDarkMode';
+import { useNavigate } from 'react-router';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function PCOnlyLayout() {
+  const { isMobile } = useDeviceType();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const isDarkMode = useIsDarkMode();
-  const { isMobile } = useDeviceType();
 
   if (isMobile) {
     return (
-      <Container size="sm" mt="xl">
-        <Stack gap="xl">
-          <Group>
-            <Anchor component="button" type="button" size="sm" onClick={() => navigate(-1)}>
-              <Center inline>
-                <IconArrowLeft style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
-                <Box ml={5}>{t('common.backToPreviousPage')}</Box>
-              </Center>
-            </Anchor>
-          </Group>
-
+      <Container size="sm" mt="xl" h="90vh">
+        <Center h="100%">
           <Paper
             withBorder
             shadow="sm"
@@ -48,7 +30,7 @@ export function PCOnlyLayout() {
             }}
           >
             <Stack gap="lg" align="center">
-              <IconDeviceDesktop size={64} color="var(--mantine-color-brand-6)" />
+              <IconDeviceDesktop size={64} color="var(--mantine-color-blue-6)" />
 
               <Title order={2}>{t('pcOnly.title')}</Title>
 
@@ -56,8 +38,11 @@ export function PCOnlyLayout() {
                 {t('pcOnly.description')}
               </Text>
             </Stack>
+            <Button mt="md" onClick={() => navigate(ROUTERS.ROOT)}>
+              {t('common.goToHome')}
+            </Button>
           </Paper>
-        </Stack>
+        </Center>
       </Container>
     );
   }

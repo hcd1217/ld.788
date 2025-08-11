@@ -1,13 +1,14 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Paper, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAction } from '@/hooks/useAction';
+import { useOnce } from '@/hooks/useOnce';
 import {
   DataTable,
-  PCOnlyAlert,
   AppDesktopLayout,
   AppPageTitle,
   SearchBar,
@@ -25,15 +26,13 @@ import {
   type CreateProductRequest,
   type UpdateProductRequest,
 } from '@/services/sales/product';
-import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
+import { showSuccessNotification } from '@/utils/notifications';
 import { formatCurrency } from '@/utils/string';
 import { isDevelopment } from '@/utils/env';
-import { useDeviceType } from '@/hooks/useDeviceType';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 
 export function ProductConfigPage() {
   const { t } = useTranslation();
-  const { isMobile } = useDeviceType();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -43,55 +42,34 @@ export function ProductConfigPage() {
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
 
   const form = useForm<ProductFormValues>({
-    initialValues: {
-      productCode: '',
-      name: '',
-      description: '',
-      category: '',
-      unitPrice: 0,
-      costPrice: undefined,
-      status: 'ACTIVE',
-      stockLevel: 0,
-      minStock: 0,
-      maxStock: undefined,
-      unit: 'pcs',
-      sku: '',
-      barcode: '',
-    },
+    initialValues: isDevelopment
+      ? {
+          // cspell:disable
+          productCode: 'MX_800',
+          name: 'Mâm xoay bàn nhôm 800mm',
+          description: '',
+          category: '',
+          color: 'Trắng',
+          unitPrice: 1350000,
+          status: 'ACTIVE',
+          unit: 'Cái',
+        }
+      : {
+          productCode: '',
+          name: '',
+          description: '',
+          category: '',
+          color: '',
+          unitPrice: 0,
+          status: 'ACTIVE',
+          unit: '',
+        },
     validate: {
       productCode: (value) => (!value ? t('common.error') : null),
       name: (value) => (!value ? t('common.error') : null),
       unitPrice: (value) => {
         if (value === undefined || value === null) return t('common.error');
         if (value < 0) return t('product.priceCannotBeNegative');
-        return null;
-      },
-      costPrice: (value) => {
-        // costPrice is optional, so undefined/null is valid
-        if (value !== undefined && value !== null && value < 0) {
-          return t('product.priceCannotBeNegative');
-        }
-        return null;
-      },
-      stockLevel: (value) => {
-        if (value === undefined || value === null) return t('common.error');
-        if (value < 0) return t('product.stockCannotBeNegative');
-        return null;
-      },
-      minStock: (value, values) => {
-        if (value === undefined || value === null) return null;
-        if (value < 0) return t('product.stockCannotBeNegative');
-        if (values.maxStock !== undefined && values.maxStock !== null && value > values.maxStock) {
-          return t('product.minStockCannotExceedMax');
-        }
-        return null;
-      },
-      maxStock: (value, values) => {
-        if (value === undefined || value === null) return null;
-        if (value < 0) return t('product.stockCannotBeNegative');
-        if (values.minStock !== undefined && values.minStock !== null && value < values.minStock) {
-          return t('product.maxStockCannotBeLessThanMin');
-        }
         return null;
       },
     },
@@ -116,48 +94,53 @@ export function ProductConfigPage() {
     defaultPageSize: 10,
   });
 
-  const loadProducts = useCallback(async () => {
-    try {
+  const loadProducts = useAction<Record<string, never>>({
+    options: {
+      errorTitle: t('common.error'),
+      errorMessage: t('common.loadingFailed'),
+    },
+    async actionHandler() {
       setIsLoading(true);
       setError(undefined);
       const data = await productService.getAllProducts();
       setProducts(data);
-    } catch (err) {
+    },
+    errorHandler(err) {
       if (isDevelopment) {
         console.error('Failed to load products:', err);
       }
       setError(t('common.loadingFailed'));
-      showErrorNotification(t('common.error'), t('common.loadingFailed'));
-    } finally {
+    },
+    cleanupHandler() {
       setIsLoading(false);
-    }
-  }, [t]);
+    },
+  });
 
-  const clearError = useCallback(() => {
-    setError(undefined);
-  }, []);
-
-  useEffect(() => {
+  useOnce(() => {
     loadProducts();
-  }, [loadProducts]);
+  });
 
-  const handleCreateProduct = async (values: ProductFormValues) => {
-    try {
+  const handleCreateProduct = useAction<ProductFormValues>({
+    options: {
+      errorTitle: t('common.error'),
+      errorMessage: t('common.addFailed'),
+    },
+    async actionHandler(values) {
+      if (!values) {
+        throw new Error(t('common.addFailed'));
+      }
       setIsLoading(true);
       const data: CreateProductRequest = {
         productCode: values.productCode,
         name: values.name,
         description: values.description || undefined,
         category: values.category || undefined,
+        color: values.color || undefined,
         unitPrice: values.unitPrice,
         costPrice: values.costPrice || undefined,
         status: values.status,
-        stockLevel: values.stockLevel,
-        minStock: values.minStock || undefined,
-        maxStock: values.maxStock || undefined,
+        stockLevel: values.stockLevel ?? 0,
         unit: values.unit || undefined,
-        sku: values.sku || undefined,
-        barcode: values.barcode || undefined,
       };
       await productService.createProduct(data);
       showSuccessNotification(
@@ -167,25 +150,32 @@ export function ProductConfigPage() {
       closeCreate();
       form.reset();
       await loadProducts();
-    } catch (error) {
+    },
+    errorHandler(error) {
       if (isDevelopment) {
         console.error('Failed to create product:', error);
       }
-      showErrorNotification(t('common.error'), t('common.addFailed'));
-    } finally {
+    },
+    cleanupHandler() {
       setIsLoading(false);
-    }
-  };
+    },
+  });
 
-  const handleUpdateProduct = async (values: ProductFormValues) => {
-    if (!selectedProduct) return;
-
-    try {
+  const handleUpdateProduct = useAction<ProductFormValues>({
+    options: {
+      errorTitle: t('common.error'),
+      errorMessage: t('common.updateFailed'),
+    },
+    async actionHandler(values) {
+      if (!values || !selectedProduct) {
+        throw new Error(t('common.updateFailed'));
+      }
       setIsLoading(true);
       const data: UpdateProductRequest = {
         name: values.name,
         description: values.description || undefined,
         category: values.category || undefined,
+        color: values.color || undefined,
         unitPrice: values.unitPrice,
         costPrice: values.costPrice || undefined,
         status: values.status,
@@ -203,15 +193,44 @@ export function ProductConfigPage() {
       );
       closeEdit();
       await loadProducts();
-    } catch (error) {
+    },
+    errorHandler(error) {
       if (isDevelopment) {
         console.error('Failed to update product:', error);
       }
-      showErrorNotification(t('common.error'), t('common.updateFailed'));
-    } finally {
+    },
+    cleanupHandler() {
       setIsLoading(false);
-    }
-  };
+    },
+  });
+
+  const confirmDeleteProduct = useAction<{ product: Product }>({
+    options: {
+      successTitle: t('product.deleted'),
+      errorTitle: t('common.error'),
+      errorMessage: t('common.deleteFailed'),
+    },
+    async actionHandler(values) {
+      if (!values?.product) {
+        throw new Error(t('common.deleteFailed'));
+      }
+      setIsLoading(true);
+      await productService.deleteProduct(values.product.id);
+      showSuccessNotification(
+        t('product.deleted'),
+        t('product.deletedMessage', { name: values.product.name }),
+      );
+      await loadProducts();
+    },
+    errorHandler(error) {
+      if (isDevelopment) {
+        console.error('Failed to delete product:', error);
+      }
+    },
+    cleanupHandler() {
+      setIsLoading(false);
+    },
+  });
 
   const handleDeleteProduct = (product: Product) => {
     modals.openConfirmModal({
@@ -219,24 +238,7 @@ export function ProductConfigPage() {
       children: <Text size="sm">{t('common.confirmDeleteMessage', { name: product.name })}</Text>,
       labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
       confirmProps: { color: 'red' },
-      onConfirm: async () => {
-        try {
-          setIsLoading(true);
-          await productService.deleteProduct(product.id);
-          showSuccessNotification(
-            t('product.deleted'),
-            t('product.deletedMessage', { name: product.name }),
-          );
-          await loadProducts();
-        } catch (error) {
-          if (isDevelopment) {
-            console.error('Failed to delete product:', error);
-          }
-          showErrorNotification(t('common.error'), t('common.deleteFailed'));
-        } finally {
-          setIsLoading(false);
-        }
-      },
+      onConfirm: () => confirmDeleteProduct({ product }),
     });
   };
 
@@ -247,6 +249,7 @@ export function ProductConfigPage() {
       name: product.name,
       description: product.description || '',
       category: product.category || '',
+      color: product.color || '',
       unitPrice: product.unitPrice,
       costPrice: product.costPrice || undefined,
       status: product.status,
@@ -265,15 +268,13 @@ export function ProductConfigPage() {
     openCreate();
   };
 
-  if (isMobile) {
-    return <PCOnlyAlert />;
-  }
-
   return (
     <AppDesktopLayout
       isLoading={isLoading && !createOpened && !editOpened}
       error={error}
-      clearError={clearError}
+      clearError={() => {
+        setError(undefined);
+      }}
     >
       <AppPageTitle
         title={t('common.pages.productManagement')}
@@ -293,7 +294,7 @@ export function ProductConfigPage() {
 
       <Paper withBorder shadow="md" p="md" radius="md">
         <DataTable
-          data={[...paginatedProducts]}
+          data={paginatedProducts as Product[]}
           isLoading={false}
           emptyMessage={t('common.noDataFound')}
           onRowClick={openEditModal}
@@ -314,6 +315,11 @@ export function ProductConfigPage() {
               key: 'category',
               header: t('product.category'),
               render: (product: Product) => product.category || '-',
+            },
+            {
+              key: 'color',
+              header: t('product.color'),
+              render: (product: Product) => product.color || '-',
             },
             {
               key: 'unitPrice',
@@ -339,7 +345,7 @@ export function ProductConfigPage() {
       </Paper>
 
       <Pagination
-        hidden={paginationState.totalItems === 0}
+        hidden={paginationState.totalPages < 2}
         totalPages={paginationState.totalPages}
         pageSize={paginationState.pageSize}
         currentPage={paginationState.currentPage}

@@ -93,9 +93,7 @@ class TimekeeperService {
   async getTimesheet(_startDate: Date, _endDate: Date): Promise<TimesheetEntry[]> {
     // Use demo data if configured
     if (shouldUseDemoData('timesheet')) {
-      console.log('Using demo timesheet data for date range:', _startDate, 'to', _endDate);
       const result = await timekeeperDemoService.getTimesheet(_startDate, _endDate);
-      console.log('Demo timesheet entries returned:', result.length, 'entries');
       return result;
     }
 
@@ -103,7 +101,6 @@ class TimekeeperService {
     // const response = await userApi.timekeeper.getTimesheet({ startDate: _startDate, endDate: _endDate });
     // return this.transformTimesheetData(response);
 
-    console.log('Demo mode disabled, returning empty array');
     return [];
   }
 

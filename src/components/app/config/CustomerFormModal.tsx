@@ -9,6 +9,7 @@ type CustomerFormValues = {
   contactEmail?: string;
   contactPhone?: string;
   address?: string;
+  taxCode?: string;
   creditLimit?: number;
   isActive?: boolean;
 };
@@ -80,6 +81,13 @@ export function CustomerFormModal({
               error={form.errors.address}
               disabled={isLoading}
               {...form.getInputProps('address')}
+            />
+            <TextInput
+              label={t('customer.taxCode')}
+              placeholder={t('customer.taxCodePlaceholder')}
+              error={form.errors.taxCode}
+              disabled={isLoading}
+              {...form.getInputProps('taxCode')}
             />
             {mode === 'edit' && (
               <Switch

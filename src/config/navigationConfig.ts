@@ -46,8 +46,8 @@ export const NAVIGATION_STRUCTURE = [
     activePaths: [ROUTERS.PO_ADD, ROUTERS.PO_DETAIL, ROUTERS.PO_EDIT, ROUTERS.PO_MANAGEMENT],
   },
   {
-    id: 'nav-configuration',
-    translationKey: 'common.pages.configuration',
+    id: 'nav-master-data',
+    translationKey: 'common.pages.masterData',
     icon: IconSettingsFilled,
     subs: [
       {

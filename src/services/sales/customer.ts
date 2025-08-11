@@ -16,6 +16,10 @@ export const customerService = {
   customers: [] as Customer[],
 
   async getAllCustomers(): Promise<Customer[]> {
+    const debug = false;
+    if (debug) {
+      throw new Error('Not implemented');
+    }
     const response = await salesApi.getCustomers({
       limit: 1000, // Get all customers
     });

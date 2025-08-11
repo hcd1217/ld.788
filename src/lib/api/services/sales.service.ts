@@ -1,5 +1,5 @@
 import { BaseApiClient } from '../base';
-import { fakeEmail, firstName, lastName, randomElement } from '@/utils/fake';
+import { randomElement } from '@/utils/fake';
 import {
   // Customer schemas
   GetCustomersResponseSchema,
@@ -54,43 +54,31 @@ import {
 // ========== Fake Data Generation ==========
 // cspell:words cust
 
-// Sample data for fake generation
-const companyNames = [
-  'ABC Corporation',
-  'XYZ Industries',
-  'Global Tech Solutions',
-  'Prime Manufacturing',
-  'Elite Services',
-  'Innovative Systems',
-  'Quality Products Ltd',
-  'Dynamic Enterprises',
-  'Modern Solutions',
-  'Advanced Technologies',
-  'Future Vision Corp',
-  'Smart Industries',
+// Sample data for fake Purchase Order generation
+const contactNames = [
+  'James Wilson',
+  'Sarah Johnson',
+  'Michael Chen',
+  'Emily Davis',
+  'Robert Lee',
+  'Jennifer Martinez',
+  'David Thompson',
+  'Lisa Anderson',
+  'Christopher Taylor',
+  'Maria Rodriguez',
+  'William Brown',
+  'Jessica White',
+  'Daniel Kim',
+  'Amanda Harris',
+  'Matthew Clark',
+  'Sophia Lewis',
+  'Andrew Walker',
+  'Olivia Hall',
+  'Joseph Young',
+  'Isabella King',
 ];
 
-const productCategories = ['Electronics', 'Office Supplies', 'Hardware', 'Software', 'Services'];
 const paymentTermsList = ['Net 30', 'Net 60', 'Due on Receipt', '2/10 Net 30', 'COD'];
-
-const productNames = [
-  'Laptop Computer',
-  'Desktop Monitor',
-  'Wireless Mouse',
-  'Mechanical Keyboard',
-  'Office Chair',
-  'Standing Desk',
-  'Printer Paper',
-  'Toner Cartridge',
-  'USB Cable',
-  'HDMI Adapter',
-  'External Hard Drive',
-  'Cloud Storage License',
-  'Software Subscription',
-  'Technical Support',
-  'Consultation Service',
-  'Training Package',
-];
 
 // cspell:disable
 const streets = [
@@ -111,69 +99,80 @@ const generateFakeAddress = (): Address => ({
   country: 'Vietnam',
 });
 
-const generateFakePOItems = (count: number = Math.floor(Math.random() * 9) + 1): POItem[] => {
-  return Array.from({ length: count }, (_, index) => {
-    const quantity = Math.floor(Math.random() * 99) + 1;
-    const unitPrice = Math.floor(Math.random() * 4990) + 10;
-    const discount = Math.random() > 0.7 ? Math.random() * 0.2 : 0;
-    const totalPrice = quantity * unitPrice * (1 - discount);
+const generateFakePOItems = (products: Product[], count?: number): POItem[] => {
+  const itemCount = count || Math.floor(Math.random() * 5) + 1; // 1-5 items per PO
+  const activeProducts = products.filter((p) => p.status === 'ACTIVE' || p.status === 'LOW_STOCK');
 
-    return {
-      id: `item-${Date.now()}-${index}`,
+  if (activeProducts.length === 0) {
+    return [];
+  }
+
+  const selectedProducts = new Set<string>();
+  const items: POItem[] = [];
+
+  for (let i = 0; i < itemCount && i < activeProducts.length; i++) {
+    // Select unique products for the PO
+    let product: Product;
+    do {
+      product = randomElement(activeProducts);
+    } while (selectedProducts.has(product.id) && selectedProducts.size < activeProducts.length);
+
+    selectedProducts.add(product.id);
+
+    const quantity = Math.floor(Math.random() * 20) + 1; // 1-20 units
+    const discount = Math.random() > 0.7 ? Math.random() * 0.15 : 0; // 30% chance of up to 15% discount
+    const totalPrice = quantity * product.unitPrice * (1 - discount);
+
+    // Generate color options for certain categories
+    const colors = ['Black', 'White', 'Silver', 'Blue', 'Red', 'Gray'];
+    const needsColor = ['Electronics', 'Office Supplies', 'Hardware'].includes(
+      product.category || '',
+    );
+
+    items.push({
+      id: `item-${Date.now()}-${i}`,
       purchaseOrderId: '',
-      productCode: `PRD-${Math.floor(Math.random() * 9000) + 1000}`,
-      description: randomElement(productNames),
+      productCode: product.productCode,
+      description: product.name,
+      color: needsColor && Math.random() > 0.3 ? randomElement(colors) : undefined,
       quantity,
-      unitPrice,
+      unitPrice: product.unitPrice,
       totalPrice: Math.round(totalPrice * 100) / 100,
-      discount: discount > 0 ? Math.round(discount * 100) / 100 : undefined,
-      category: randomElement(productCategories),
+      discount: discount > 0 ? Math.round(discount * 10000) / 10000 : undefined,
+      category: product.category,
       createdAt: new Date(),
       updatedAt: new Date(),
-    };
-  });
+    });
+  }
+
+  return items;
 };
 
 const calculatePOTotal = (items: POItem[]): number => {
   return items.reduce((sum, item) => sum + item.totalPrice, 0);
 };
 
-const generateFakeCustomers = (): Customer[] => {
-  return Array.from({ length: 20 }, (_, index) => {
-    const fname = firstName();
-    const lname = lastName();
-    const fullName = `${lname} ${fname}`;
-    const company = randomElement(companyNames);
+// Note: generateFakeCustomers removed - using real API data
 
-    return {
-      id: `cust-${Date.now()}-${index}`,
-      clientId: 'fake-client-id',
-      name: fullName,
-      companyName: Math.random() > 0.3 ? company : undefined,
-      contactEmail: fakeEmail(fullName),
-      contactPhone: `0${Math.floor(Math.random() * 9) + 1}0-${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 900) + 100}`,
-      creditLimit: Math.floor(Math.random() * 100 + 50) * 1000000, // 50M to 150M
-      creditUsed: Math.floor(Math.random() * 40) * 1000000, // 0 to 40M
-      // cspell:disable-next-line
-      address: `${Math.floor(Math.random() * 999) + 1} ${randomElement(['Nguyễn Huệ', 'Lê Lợi', 'Trần Hưng Đạo', 'Võ Văn Tần'])} Street, District ${Math.floor(Math.random() * 12) + 1}`,
-      isActive: Math.random() > 0.1, // 90% active
-      deletedAt: undefined,
-      deletedBy: undefined,
-      metadata: {},
-      createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000 * 2), // Past 2 years
-      updatedAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000), // Past 30 days
-    };
-  });
-};
-
-const generateFakePOs = (customers: Customer[]): PurchaseOrder[] => {
+const generateFakePOs = (customers: Customer[], products: Product[]): PurchaseOrder[] => {
   const activeCustomers = customers.filter((c) => c.isActive);
+  const purchaseOrders: PurchaseOrder[] = [];
 
-  return Array.from({ length: 50 }, (_, index) => {
+  if (activeCustomers.length === 0 || products.length === 0) {
+    return purchaseOrders;
+  }
+
+  // Generate 30-50 POs
+  const poCount = Math.floor(Math.random() * 20) + 30;
+
+  for (let index = 0; index < poCount; index++) {
     const customer = randomElement(activeCustomers);
     const status = randomElement<POStatus>([
       'NEW',
+      'NEW', // More NEW orders
       'CONFIRMED',
+      'CONFIRMED',
+      'PROCESSING',
       'PROCESSING',
       'SHIPPED',
       'DELIVERED',
@@ -181,7 +180,7 @@ const generateFakePOs = (customers: Customer[]): PurchaseOrder[] => {
     ]);
     const daysAgo = Math.floor(Math.random() * 90);
     const orderDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
-    const items = generateFakePOItems();
+    const items = generateFakePOItems(products);
 
     const po: PurchaseOrder = {
       id: `po-${Date.now()}-${index}`,
@@ -193,7 +192,7 @@ const generateFakePOs = (customers: Customer[]): PurchaseOrder[] => {
       totalAmount: calculatePOTotal(items),
       orderDate,
       items: items.map((item) => ({ ...item, purchaseOrderId: `po-${Date.now()}-${index}` })),
-      createdBy: `${lastName()} ${firstName()}`,
+      createdBy: randomElement(contactNames),
       shippingAddress: generateFakeAddress(),
       billingAddress: Math.random() > 0.5 ? generateFakeAddress() : undefined,
       paymentTerms: randomElement(paymentTermsList),
@@ -213,179 +212,92 @@ const generateFakePOs = (customers: Customer[]): PurchaseOrder[] => {
       refundAmount: undefined,
     };
 
-    // Set dates based on status
+    // Set dates and responsible persons based on status
     if (['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'].includes(status)) {
-      po.processedBy = `${lastName()} ${firstName()}`;
+      po.processedBy = randomElement(contactNames);
     }
     if (['SHIPPED', 'DELIVERED'].includes(status)) {
       const shippedDaysAfter = Math.floor(Math.random() * 7) + 1;
       po.deliveryDate = new Date(orderDate.getTime() + shippedDaysAfter * 24 * 60 * 60 * 1000);
+      po.shippedBy = randomElement(contactNames);
     }
     if (status === 'DELIVERED') {
       const deliveredDaysAfter = Math.floor(Math.random() * 3) + 1;
       po.completedDate = new Date(
         new Date(po.deliveryDate || orderDate).getTime() + deliveredDaysAfter * 24 * 60 * 60 * 1000,
       );
+      po.deliveredBy = randomElement(contactNames);
+    }
+    if (status === 'CANCELLED') {
+      po.cancelledBy = randomElement(contactNames);
+      po.cancelReason = randomElement([
+        'Customer request',
+        'Out of stock',
+        'Payment issue',
+        'Duplicate order',
+      ]);
     }
 
-    return po;
-  });
+    purchaseOrders.push(po);
+  }
+
+  return purchaseOrders;
 };
 
-const generateFakeProducts = (): Product[] => {
-  const units = ['pcs', 'box', 'pack', 'set', 'unit', 'kg', 'gram', 'liter', 'meter'];
+// Note: generateFakeProducts removed - using real API data
 
-  const productData = [
-    // Electronics
-    { name: 'Laptop Computer Pro', category: 'Electronics', basePrice: 25000000, code: 'LAP' },
-    { name: 'Desktop Monitor 27"', category: 'Electronics', basePrice: 8000000, code: 'MON' },
-    { name: 'Wireless Mouse', category: 'Electronics', basePrice: 500000, code: 'MOU' },
-    { name: 'Mechanical Keyboard', category: 'Electronics', basePrice: 2000000, code: 'KEY' },
-    { name: 'USB-C Hub', category: 'Electronics', basePrice: 1500000, code: 'HUB' },
-    { name: 'Webcam HD', category: 'Electronics', basePrice: 1800000, code: 'CAM' },
-    { name: 'External SSD 1TB', category: 'Electronics', basePrice: 3000000, code: 'SSD' },
-    { name: 'Wireless Headphones', category: 'Electronics', basePrice: 2500000, code: 'HDP' },
-
-    // Office Supplies
-    {
-      name: 'Office Chair Ergonomic',
-      category: 'Office Supplies',
-      basePrice: 5000000,
-      code: 'CHR',
-    },
-    { name: 'Standing Desk', category: 'Office Supplies', basePrice: 8000000, code: 'DSK' },
-    { name: 'Printer Paper A4', category: 'Office Supplies', basePrice: 80000, code: 'PAP' },
-    { name: 'Toner Cartridge Black', category: 'Office Supplies', basePrice: 1200000, code: 'TNR' },
-    { name: 'Whiteboard Marker Set', category: 'Office Supplies', basePrice: 50000, code: 'MRK' },
-    { name: 'File Cabinet 4-Drawer', category: 'Office Supplies', basePrice: 3500000, code: 'CAB' },
-    { name: 'Desk Lamp LED', category: 'Office Supplies', basePrice: 800000, code: 'LMP' },
-
-    // Hardware
-    { name: 'HDMI Cable 2m', category: 'Hardware', basePrice: 200000, code: 'HDM' },
-    { name: 'USB Cable Type-C', category: 'Hardware', basePrice: 150000, code: 'USB' },
-    { name: 'Power Strip 6-Outlet', category: 'Hardware', basePrice: 300000, code: 'PWR' },
-    { name: 'Network Cable Cat6', category: 'Hardware', basePrice: 100000, code: 'NET' },
-    { name: 'Screwdriver Set', category: 'Hardware', basePrice: 250000, code: 'SCR' },
-
-    // Software
-    { name: 'Office Suite License', category: 'Software', basePrice: 2000000, code: 'OFC' },
-    { name: 'Antivirus Software', category: 'Software', basePrice: 800000, code: 'ANT' },
-    { name: 'Cloud Storage 1TB/Year', category: 'Software', basePrice: 1500000, code: 'CLD' },
-    { name: 'Project Management Tool', category: 'Software', basePrice: 500000, code: 'PMT' },
-    { name: 'Video Editing Software', category: 'Software', basePrice: 3000000, code: 'VID' },
-
-    // Services
-    { name: 'IT Support Package', category: 'Services', basePrice: 5000000, code: 'ITS' },
-    { name: 'Consultation Hour', category: 'Services', basePrice: 1000000, code: 'CON' },
-    { name: 'Training Session', category: 'Services', basePrice: 3000000, code: 'TRN' },
-    { name: 'System Installation', category: 'Services', basePrice: 2000000, code: 'INS' },
-    { name: 'Maintenance Contract', category: 'Services', basePrice: 10000000, code: 'MNT' },
-  ];
-
-  return productData.map((item, index) => {
-    const stockLevel = Math.floor(Math.random() * 500);
-    const minStock = Math.floor(Math.random() * 50) + 10;
-    const maxStock = minStock + Math.floor(Math.random() * 450) + 100;
-
-    // Determine status based on stock level
-    let status: ProductStatus = 'ACTIVE';
-    if (Math.random() < 0.1) {
-      status = randomElement(['DISCONTINUED', 'INACTIVE']);
-    } else if (stockLevel === 0) {
-      status = 'OUT_OF_STOCK';
-    } else if (stockLevel < minStock) {
-      status = 'LOW_STOCK';
-    }
-
-    const product: Product = {
-      id: `prod-${Date.now()}-${index}`,
-      productCode: `${item.code}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
-      name: item.name,
-      description: `High-quality ${item.name.toLowerCase()} for professional use`,
-      category: item.category,
-      unitPrice: item.basePrice + (Math.random() * item.basePrice * 0.2 - item.basePrice * 0.1),
-      costPrice: item.basePrice * (0.6 + Math.random() * 0.2),
-      status,
-      stockLevel,
-      minStock,
-      maxStock,
-      unit: randomElement(units),
-      sku: `SKU-${item.code}-${String(Math.floor(Math.random() * 900000) + 100000)}`,
-      barcode: `${Math.floor(Math.random() * 9000000000000) + 1000000000000}`,
-      weight: Math.random() < 0.7 ? Math.floor(Math.random() * 5000) + 100 : undefined,
-      dimensions:
-        Math.random() < 0.5
-          ? {
-              length: Math.floor(Math.random() * 50) + 10,
-              width: Math.floor(Math.random() * 50) + 10,
-              height: Math.floor(Math.random() * 30) + 5,
-            }
-          : undefined,
-      metadata: {},
-      createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000 * 2),
-      updatedAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
-    };
-
-    return product;
-  });
-};
-
-// Mock data storage
+// Mock data storage - Only for Purchase Orders
 class MockDataStore {
-  private customers: Customer[] = [];
   private purchaseOrders: PurchaseOrder[] = [];
-  private products: Product[] = [];
+  private cachedCustomers: Customer[] = [];
+  private cachedProducts: Product[] = [];
   private initialized = false;
+  private lastFetch = 0;
+  private CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
 
-  private initialize(): void {
-    if (!this.initialized) {
-      this.customers = generateFakeCustomers();
-      this.purchaseOrders = generateFakePOs(this.customers);
-      this.products = generateFakeProducts();
+  async initialize(): Promise<void> {
+    if (!this.initialized || Date.now() - this.lastFetch > this.CACHE_DURATION) {
+      // Fetch real customers and products from API
+      await this.refreshCache();
+      this.purchaseOrders = generateFakePOs(this.cachedCustomers, this.cachedProducts);
       this.initialized = true;
+      this.lastFetch = Date.now();
     }
   }
 
-  getCustomers(): Customer[] {
-    this.initialize();
-    return this.customers;
+  async refreshCache(): Promise<void> {
+    try {
+      // Note: We need access to the API instance, will be passed from SalesApi
+      // For now, these will be populated by SalesApi
+      console.log('Cache needs to be refreshed from API');
+    } catch (error) {
+      console.error('Failed to refresh cache:', error);
+    }
   }
 
-  getCustomer(id: string): Customer | undefined {
-    this.initialize();
-    return this.customers.find((c) => c.id === id);
+  setCachedCustomers(customers: Customer[]): void {
+    this.cachedCustomers = customers;
   }
 
-  addCustomer(customer: Customer): void {
-    this.customers.unshift(customer);
+  setCachedProducts(products: Product[]): void {
+    this.cachedProducts = products;
   }
 
-  updateCustomer(id: string, data: Partial<Customer>): Customer | undefined {
-    const index = this.customers.findIndex((c) => c.id === id);
-    if (index === -1) return undefined;
-
-    this.customers[index] = {
-      ...this.customers[index],
-      ...data,
-      updatedAt: new Date(),
-    };
-    return this.customers[index];
+  getCachedCustomers(): Customer[] {
+    return this.cachedCustomers;
   }
 
-  deleteCustomer(id: string): boolean {
-    const index = this.customers.findIndex((c) => c.id === id);
-    if (index === -1) return false;
-    this.customers.splice(index, 1);
-    return true;
+  getCachedProducts(): Product[] {
+    return this.cachedProducts;
   }
 
-  getPurchaseOrders(): PurchaseOrder[] {
-    this.initialize();
+  async getPurchaseOrders(): Promise<PurchaseOrder[]> {
+    await this.initialize();
     return this.purchaseOrders;
   }
 
-  getPurchaseOrder(id: string): PurchaseOrder | undefined {
-    this.initialize();
+  async getPurchaseOrder(id: string): Promise<PurchaseOrder | undefined> {
+    await this.initialize();
     return this.purchaseOrders.find((po) => po.id === id);
   }
 
@@ -412,48 +324,49 @@ class MockDataStore {
     return true;
   }
 
-  getProducts(): Product[] {
-    this.initialize();
-    return this.products;
+  getCustomer(id: string): Customer | undefined {
+    return this.cachedCustomers.find((c) => c.id === id);
   }
 
   getProduct(id: string): Product | undefined {
-    this.initialize();
-    return this.products.find((p) => p.id === id);
-  }
-
-  addProduct(product: Product): void {
-    this.products.unshift(product);
-  }
-
-  updateProduct(id: string, data: Partial<Product>): Product | undefined {
-    const index = this.products.findIndex((p) => p.id === id);
-    if (index === -1) return undefined;
-
-    this.products[index] = {
-      ...this.products[index],
-      ...data,
-      updatedAt: new Date(),
-    };
-    return this.products[index];
-  }
-
-  deleteProduct(id: string): boolean {
-    const index = this.products.findIndex((p) => p.id === id);
-    if (index === -1) return false;
-    this.products.splice(index, 1);
-    return true;
+    return this.cachedProducts.find((p) => p.id === id);
   }
 }
 
 const mockStore = new MockDataStore();
 
 export class SalesApi extends BaseApiClient {
-  private useMockData = true;
+  private useMockPOData = true; // Only mock Purchase Orders, not customers/products
 
-  // Enable/disable mock data mode
-  setMockMode(enabled: boolean): void {
-    this.useMockData = enabled;
+  // Initialize mock store with real data from API
+  private async initializeMockStore(): Promise<void> {
+    try {
+      // Fetch real customers and products
+      const [customersResponse, productsResponse] = await Promise.all([
+        this.get<GetCustomersResponse, void>(
+          '/api/sales/customers?limit=1000',
+          undefined,
+          GetCustomersResponseSchema,
+        ),
+        this.get<GetProductsResponse, void>(
+          '/api/sales/products?limit=1000',
+          undefined,
+          GetProductsResponseSchema,
+        ),
+      ]);
+
+      // Cache the real data in mock store
+      mockStore.setCachedCustomers(customersResponse.customers);
+      mockStore.setCachedProducts(productsResponse.products);
+      await mockStore.initialize();
+    } catch (error) {
+      console.error('Failed to initialize mock store with real data:', error);
+    }
+  }
+
+  // Enable/disable mock data mode for Purchase Orders only
+  setMockPOMode(enabled: boolean): void {
+    this.useMockPOData = enabled;
   }
 
   // ========== Customer Methods ==========
@@ -468,54 +381,7 @@ export class SalesApi extends BaseApiClient {
     sortBy?: 'createdAt' | 'name' | 'companyName' | 'updatedAt';
     sortOrder?: 'asc' | 'desc';
   }): Promise<GetCustomersResponse> {
-    // Use mock data if enabled
-    if (this.useMockData) {
-      let customers = mockStore.getCustomers();
-
-      // Apply filters
-      if (params?.name) {
-        const searchName = params.name.toLowerCase();
-        customers = customers.filter((c) => c.name.toLowerCase().includes(searchName));
-      }
-      if (params?.companyName) {
-        const searchCompany = params.companyName.toLowerCase();
-        customers = customers.filter((c) => c.companyName?.toLowerCase().includes(searchCompany));
-      }
-      if (params?.contactEmail) {
-        const searchEmail = params.contactEmail.toLowerCase();
-        customers = customers.filter((c) => c.contactEmail?.toLowerCase().includes(searchEmail));
-      }
-      if (params?.isActive !== undefined) {
-        customers = customers.filter((c) => c.isActive === params.isActive);
-      }
-
-      // Apply sorting
-      if (params?.sortBy) {
-        customers.sort((a, b) => {
-          const sortBy = params.sortBy!;
-          const aVal = a[sortBy as keyof Customer];
-          const bVal = b[sortBy as keyof Customer];
-          const comparison = (aVal ?? '') > (bVal ?? '') ? 1 : (aVal ?? '') < (bVal ?? '') ? -1 : 0;
-          return params.sortOrder === 'desc' ? -comparison : comparison;
-        });
-      }
-
-      // Apply limit
-      const limit = params?.limit || 1000;
-      const paginatedCustomers = customers.slice(0, limit);
-
-      return Promise.resolve({
-        customers: paginatedCustomers,
-        pagination: {
-          limit,
-          hasNext: customers.length > limit,
-          hasPrev: false,
-          nextCursor: customers.length > limit ? 'next' : undefined,
-          prevCursor: undefined,
-        },
-      });
-    }
-
+    // Always use real API for customers
     const queryParams = new URLSearchParams();
 
     if (params?.name) queryParams.append('name', params.name);
@@ -535,14 +401,7 @@ export class SalesApi extends BaseApiClient {
   }
 
   async getCustomerById(id: string): Promise<GetCustomerResponse> {
-    if (this.useMockData) {
-      const customer = mockStore.getCustomer(id);
-      if (!customer) {
-        throw new Error('Customer not found');
-      }
-      return Promise.resolve(customer);
-    }
-
+    // Always use real API for customers
     return this.get<GetCustomerResponse, void>(
       `/api/sales/customers/${id}`,
       undefined,
@@ -551,28 +410,7 @@ export class SalesApi extends BaseApiClient {
   }
 
   async createCustomer(data: CreateCustomerRequest): Promise<CreateCustomerResponse> {
-    if (this.useMockData) {
-      const newCustomer: Customer = {
-        id: `cust-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        clientId: 'fake-client-id',
-        name: data.name,
-        companyName: data.companyName,
-        contactEmail: data.contactEmail,
-        contactPhone: data.contactPhone,
-        address: data.address,
-        creditLimit: data.creditLimit,
-        creditUsed: 0,
-        isActive: true,
-        metadata: data.metadata || {},
-        deletedAt: undefined,
-        deletedBy: undefined,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      mockStore.addCustomer(newCustomer);
-      return Promise.resolve(newCustomer);
-    }
-
+    // Always use real API for customers
     return this.post<CreateCustomerResponse, CreateCustomerRequest>(
       '/api/sales/customers',
       data,
@@ -582,14 +420,7 @@ export class SalesApi extends BaseApiClient {
   }
 
   async updateCustomer(id: string, data: UpdateCustomerRequest): Promise<UpdateCustomerResponse> {
-    if (this.useMockData) {
-      const updated = mockStore.updateCustomer(id, data);
-      if (!updated) {
-        throw new Error('Customer not found');
-      }
-      return Promise.resolve(updated);
-    }
-
+    // Always use real API for customers
     return this.patch<UpdateCustomerResponse, UpdateCustomerRequest>(
       `/api/sales/customers/${id}`,
       data,
@@ -599,14 +430,7 @@ export class SalesApi extends BaseApiClient {
   }
 
   async deleteCustomer(id: string): Promise<void> {
-    if (this.useMockData) {
-      const deleted = mockStore.deleteCustomer(id);
-      if (!deleted) {
-        throw new Error('Customer not found');
-      }
-      return Promise.resolve();
-    }
-
+    // Always use real API for customers
     await this.delete(`/api/sales/customers/${id}`);
   }
 
@@ -623,8 +447,10 @@ export class SalesApi extends BaseApiClient {
     sortBy?: 'createdAt' | 'orderDate' | 'poNumber' | 'totalAmount' | 'updatedAt';
     sortOrder?: 'asc' | 'desc';
   }): Promise<GetPurchaseOrdersResponse> {
-    if (this.useMockData) {
-      let orders = mockStore.getPurchaseOrders();
+    if (this.useMockPOData) {
+      // Initialize mock store with real customers/products if needed
+      await this.initializeMockStore();
+      let orders = await mockStore.getPurchaseOrders();
 
       // Apply filters
       if (params?.poNumber) {
@@ -697,8 +523,9 @@ export class SalesApi extends BaseApiClient {
   }
 
   async getPurchaseOrderById(id: string): Promise<GetPurchaseOrderResponse> {
-    if (this.useMockData) {
-      const order = mockStore.getPurchaseOrder(id);
+    if (this.useMockPOData) {
+      await this.initializeMockStore();
+      const order = await mockStore.getPurchaseOrder(id);
       if (!order) {
         throw new Error('Purchase order not found');
       }
@@ -715,7 +542,8 @@ export class SalesApi extends BaseApiClient {
   async createPurchaseOrder(
     data: CreatePurchaseOrderRequest,
   ): Promise<CreatePurchaseOrderResponse> {
-    if (this.useMockData) {
+    if (this.useMockPOData) {
+      await this.initializeMockStore();
       const items = data.items.map((item, index) => ({
         id: `item-${Date.now()}-${index}`,
         purchaseOrderId: '',
@@ -745,7 +573,7 @@ export class SalesApi extends BaseApiClient {
           ...item,
           purchaseOrderId: `po-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
         })),
-        createdBy: `${lastName()} ${firstName()}`,
+        createdBy: randomElement(contactNames),
         shippingAddress: data.shippingAddress,
         billingAddress: data.billingAddress,
         paymentTerms: data.paymentTerms,
@@ -779,7 +607,8 @@ export class SalesApi extends BaseApiClient {
     id: string,
     data: UpdatePurchaseOrderRequest,
   ): Promise<UpdatePurchaseOrderResponse> {
-    if (this.useMockData) {
+    if (this.useMockPOData) {
+      await this.initializeMockStore();
       let updateData: Partial<PurchaseOrder> = {
         customerId: data.customerId,
         status: data.status,
@@ -833,7 +662,8 @@ export class SalesApi extends BaseApiClient {
   }
 
   async deletePurchaseOrder(id: string): Promise<void> {
-    if (this.useMockData) {
+    if (this.useMockPOData) {
+      await this.initializeMockStore();
       const deleted = mockStore.deletePurchaseOrder(id);
       if (!deleted) {
         throw new Error('Purchase order not found');
@@ -850,10 +680,11 @@ export class SalesApi extends BaseApiClient {
     id: string,
     data?: UpdatePOStatusRequest,
   ): Promise<UpdatePurchaseOrderResponse> {
-    if (this.useMockData) {
+    if (this.useMockPOData) {
+      await this.initializeMockStore();
       const updated = mockStore.updatePurchaseOrder(id, {
         status: 'CONFIRMED',
-        processedBy: `${lastName()} ${firstName()}`,
+        processedBy: randomElement(contactNames),
       });
       if (!updated) {
         throw new Error('Purchase order not found');
@@ -873,10 +704,11 @@ export class SalesApi extends BaseApiClient {
     id: string,
     data?: UpdatePOStatusRequest,
   ): Promise<UpdatePurchaseOrderResponse> {
-    if (this.useMockData) {
+    if (this.useMockPOData) {
+      await this.initializeMockStore();
       const updated = mockStore.updatePurchaseOrder(id, {
         status: 'PROCESSING',
-        processedBy: `${lastName()} ${firstName()}`,
+        processedBy: randomElement(contactNames),
       });
       if (!updated) {
         throw new Error('Purchase order not found');
@@ -896,11 +728,12 @@ export class SalesApi extends BaseApiClient {
     id: string,
     data?: UpdatePOStatusRequest,
   ): Promise<UpdatePurchaseOrderResponse> {
-    if (this.useMockData) {
+    if (this.useMockPOData) {
+      await this.initializeMockStore();
       const daysAhead = Math.floor(Math.random() * 7) + 1;
       const updated = mockStore.updatePurchaseOrder(id, {
         status: 'SHIPPED',
-        shippedBy: `${lastName()} ${firstName()}`,
+        shippedBy: randomElement(contactNames),
         deliveryDate: new Date(Date.now() + daysAhead * 24 * 60 * 60 * 1000),
       });
       if (!updated) {
@@ -921,10 +754,11 @@ export class SalesApi extends BaseApiClient {
     id: string,
     data?: UpdatePOStatusRequest,
   ): Promise<UpdatePurchaseOrderResponse> {
-    if (this.useMockData) {
+    if (this.useMockPOData) {
+      await this.initializeMockStore();
       const updated = mockStore.updatePurchaseOrder(id, {
         status: 'DELIVERED',
-        deliveredBy: `${lastName()} ${firstName()}`,
+        deliveredBy: randomElement(contactNames),
         completedDate: new Date(),
       });
       if (!updated) {
@@ -945,10 +779,11 @@ export class SalesApi extends BaseApiClient {
     id: string,
     data?: UpdatePOStatusRequest,
   ): Promise<UpdatePurchaseOrderResponse> {
-    if (this.useMockData) {
+    if (this.useMockPOData) {
+      await this.initializeMockStore();
       const updated = mockStore.updatePurchaseOrder(id, {
         status: 'CANCELLED',
-        cancelledBy: `${lastName()} ${firstName()}`,
+        cancelledBy: randomElement(contactNames),
         cancelReason: data?.reason,
       });
       if (!updated) {
@@ -969,10 +804,11 @@ export class SalesApi extends BaseApiClient {
     id: string,
     data?: UpdatePOStatusRequest,
   ): Promise<UpdatePurchaseOrderResponse> {
-    if (this.useMockData) {
+    if (this.useMockPOData) {
+      await this.initializeMockStore();
       const updated = mockStore.updatePurchaseOrder(id, {
         status: 'REFUNDED',
-        refundedBy: `${lastName()} ${firstName()}`,
+        refundedBy: randomElement(contactNames),
         refundReason: data?.reason,
         refundAmount: data?.refundAmount,
       });
@@ -1004,62 +840,7 @@ export class SalesApi extends BaseApiClient {
     sortBy?: 'name' | 'productCode' | 'unitPrice' | 'stockLevel' | 'createdAt';
     sortOrder?: 'asc' | 'desc';
   }): Promise<GetProductsResponse> {
-    if (this.useMockData) {
-      let products = mockStore.getProducts();
-
-      // Apply filters
-      if (params?.search) {
-        const searchTerm = params.search.toLowerCase();
-        products = products.filter(
-          (p) =>
-            p.name.toLowerCase().includes(searchTerm) ||
-            p.description?.toLowerCase().includes(searchTerm) ||
-            p.productCode.toLowerCase().includes(searchTerm),
-        );
-      }
-      if (params?.category) {
-        products = products.filter((p) => p.category === params.category);
-      }
-      if (params?.status) {
-        products = products.filter((p) => p.status === params.status);
-      }
-      if (params?.minPrice !== undefined) {
-        products = products.filter((p) => p.unitPrice >= params.minPrice!);
-      }
-      if (params?.maxPrice !== undefined) {
-        products = products.filter((p) => p.unitPrice <= params.maxPrice!);
-      }
-      if (params?.lowStock) {
-        products = products.filter((p) => p.status === 'LOW_STOCK' || p.status === 'OUT_OF_STOCK');
-      }
-
-      // Apply sorting
-      if (params?.sortBy) {
-        products.sort((a, b) => {
-          const sortBy = params.sortBy!;
-          const aVal = a[sortBy as keyof Product];
-          const bVal = b[sortBy as keyof Product];
-          const comparison = (aVal ?? '') > (bVal ?? '') ? 1 : (aVal ?? '') < (bVal ?? '') ? -1 : 0;
-          return params.sortOrder === 'desc' ? -comparison : comparison;
-        });
-      }
-
-      // Apply limit
-      const limit = params?.limit || 20;
-      const paginatedProducts = products.slice(0, limit);
-
-      return Promise.resolve({
-        products: paginatedProducts,
-        pagination: {
-          limit,
-          hasNext: products.length > limit,
-          hasPrev: false,
-          nextCursor: products.length > limit ? 'next' : undefined,
-          prevCursor: undefined,
-        },
-      });
-    }
-
+    // Always use real API for products
     const queryParams = new URLSearchParams();
 
     if (params?.search) queryParams.append('search', params.search);
@@ -1081,14 +862,7 @@ export class SalesApi extends BaseApiClient {
   }
 
   async getProductById(id: string): Promise<GetProductResponse> {
-    if (this.useMockData) {
-      const product = mockStore.getProduct(id);
-      if (!product) {
-        throw new Error('Product not found');
-      }
-      return Promise.resolve(product);
-    }
-
+    // Always use real API for products
     return this.get<GetProductResponse, void>(
       `/api/sales/products/${id}`,
       undefined,
@@ -1097,32 +871,7 @@ export class SalesApi extends BaseApiClient {
   }
 
   async createProduct(data: CreateProductRequest): Promise<CreateProductResponse> {
-    if (this.useMockData) {
-      const newProduct: Product = {
-        id: `prod-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        productCode: data.productCode,
-        name: data.name,
-        description: data.description,
-        category: data.category,
-        unitPrice: data.unitPrice,
-        costPrice: data.costPrice,
-        status: data.status || 'ACTIVE',
-        stockLevel: data.stockLevel,
-        minStock: data.minStock,
-        maxStock: data.maxStock,
-        unit: data.unit,
-        sku: data.sku,
-        barcode: data.barcode,
-        weight: data.weight,
-        dimensions: data.dimensions,
-        metadata: data.metadata || {},
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      mockStore.addProduct(newProduct);
-      return Promise.resolve(newProduct);
-    }
-
+    // Always use real API for products
     return this.post<CreateProductResponse, CreateProductRequest>(
       '/api/sales/products',
       data,
@@ -1132,14 +881,7 @@ export class SalesApi extends BaseApiClient {
   }
 
   async updateProduct(id: string, data: UpdateProductRequest): Promise<UpdateProductResponse> {
-    if (this.useMockData) {
-      const updated = mockStore.updateProduct(id, data);
-      if (!updated) {
-        throw new Error('Product not found');
-      }
-      return Promise.resolve(updated);
-    }
-
+    // Always use real API for products
     return this.patch<UpdateProductResponse, UpdateProductRequest>(
       `/api/sales/products/${id}`,
       data,
@@ -1149,14 +891,7 @@ export class SalesApi extends BaseApiClient {
   }
 
   async deleteProduct(id: string): Promise<void> {
-    if (this.useMockData) {
-      const deleted = mockStore.deleteProduct(id);
-      if (!deleted) {
-        throw new Error('Product not found');
-      }
-      return Promise.resolve();
-    }
-
+    // Always use real API for products
     await this.delete(`/api/sales/products/${id}`);
   }
 }

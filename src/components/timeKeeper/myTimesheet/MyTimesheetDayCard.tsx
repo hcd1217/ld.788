@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Card, Group, Text, Box, ActionIcon } from '@mantine/core';
 import { IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -11,7 +12,10 @@ interface MyTimesheetDayCardProps {
   readonly entry?: TimesheetEntry;
 }
 
-export function MyTimesheetDayCard({ date, entry }: MyTimesheetDayCardProps) {
+export const MyTimesheetDayCard = memo(function MyTimesheetDayCard({
+  date,
+  entry,
+}: MyTimesheetDayCardProps) {
   const { t } = useTranslation();
   const isToday = new Date().toDateString() === date.toDateString();
 
@@ -79,4 +83,4 @@ export function MyTimesheetDayCard({ date, entry }: MyTimesheetDayCardProps) {
       </Group>
     </Card>
   );
-}
+});

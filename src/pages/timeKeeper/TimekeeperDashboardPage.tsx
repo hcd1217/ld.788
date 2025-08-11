@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Box, Container } from '@mantine/core';
 import { useOnce } from '@/hooks/useOnce';
-import { AppMobileLayout, AppDesktopLayout } from '@/components/common';
+import { AppMobileLayout } from '@/components/common';
 import { formatHours } from '@/utils/timekeeper.utils';
 import {
   TimekeeperMobileFooter,
@@ -10,8 +10,8 @@ import {
   DashboardQuickActions,
   DashboardResources,
   DashboardSkeleton,
+  TimekeeperErrorBoundary,
 } from '@/components/timeKeeper';
-import { TimekeeperDashboardDesktop } from '@/components/timeKeeper';
 import {
   useTimekeeperDashboard,
   useTimekeeperError,
@@ -19,18 +19,12 @@ import {
   useTimekeeperStore,
 } from '@/stores/useTimekeeperStore';
 import classes from './TimekeeperDashboardPage.module.css';
-import { useDeviceType } from '@/hooks/useDeviceType';
 
-export function TimekeeperDashboardPage() {
+function TimekeeperDashboardPageContent() {
   const dashboard = useTimekeeperDashboard();
   const { isLoading } = useTimekeeperStore();
   const error = useTimekeeperError();
   const { fetchDashboard, clearError } = useTimekeeperActions();
-  const { isMobile } = useDeviceType();
-
-  // Get the counts from dashboard data
-  const upcomingShifts = dashboard?.upcomingShifts || 0;
-  const pendingRequests = dashboard?.pendingLeaveRequests || 0;
 
   // Fetch dashboard data on mount
   useOnce(() => {
@@ -70,95 +64,68 @@ export function TimekeeperDashboardPage() {
 
   // Show skeleton while loading
   if (isLoading && !dashboard) {
-    if (isMobile) {
-      return (
-        <AppMobileLayout scrollable noHeader footer={<TimekeeperMobileFooter />}>
-          <DashboardSkeleton />
-        </AppMobileLayout>
-      );
-    }
     return (
-      <AppDesktopLayout isLoading={isLoading}>
-        <Box />
-      </AppDesktopLayout>
+      <AppMobileLayout scrollable noHeader footer={<TimekeeperMobileFooter />}>
+        <DashboardSkeleton />
+      </AppMobileLayout>
     );
   }
 
   // Show error state if needed
   if (!dashboard && error) {
-    if (isMobile) {
-      return (
-        <AppMobileLayout
-          scrollable
-          noHeader
-          footer={<TimekeeperMobileFooter />}
-          error={error}
-          clearError={clearError}
-        >
-          <Box className={classes.container} />
-        </AppMobileLayout>
-      );
-    }
-    return (
-      <AppDesktopLayout error={error} clearError={clearError}>
-        <Box />
-      </AppDesktopLayout>
-    );
-  }
-
-  // Show empty state if no data
-  if (!dashboard || !headerData) {
-    if (isMobile) {
-      return (
-        <AppMobileLayout scrollable noHeader footer={<TimekeeperMobileFooter />}>
-          <Box className={classes.container} />
-        </AppMobileLayout>
-      );
-    }
-    return (
-      <AppDesktopLayout>
-        <Box />
-      </AppDesktopLayout>
-    );
-  }
-
-  // Mobile Layout
-  if (isMobile) {
     return (
       <AppMobileLayout
         scrollable
         noHeader
         footer={<TimekeeperMobileFooter />}
-        isLoading={isLoading}
         error={error}
         clearError={clearError}
       >
-        <Box className={classes.container}>
-          <DashboardHeader {...headerData} />
-          <Container className={classes.dashboardContent}>
-            <Box className={classes.overlappingTimesheet}>
-              <DashboardTimesheet />
-            </Box>
-            <DashboardQuickActions
-              upcomingShifts={dashboard.upcomingShifts}
-              pendingRequests={dashboard.pendingLeaveRequests}
-            />
-            <DashboardResources />
-            <Box h="1rem" />
-          </Container>
-        </Box>
+        <Box className={classes.container} />
       </AppMobileLayout>
     );
   }
 
-  // Desktop Layout
+  // Show empty state if no data
+  if (!dashboard || !headerData) {
+    return (
+      <AppMobileLayout scrollable noHeader footer={<TimekeeperMobileFooter />}>
+        <Box className={classes.container} />
+      </AppMobileLayout>
+    );
+  }
+
+  // Main mobile layout
   return (
-    <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
-      <TimekeeperDashboardDesktop
-        headerData={headerData}
-        upcomingShifts={upcomingShifts}
-        pendingRequests={pendingRequests}
-      />
-    </AppDesktopLayout>
+    <AppMobileLayout
+      scrollable
+      noHeader
+      footer={<TimekeeperMobileFooter />}
+      isLoading={isLoading}
+      error={error}
+      clearError={clearError}
+    >
+      <Box className={classes.container}>
+        <DashboardHeader {...headerData} />
+        <Container className={classes.dashboardContent}>
+          <Box className={classes.overlappingTimesheet}>
+            <DashboardTimesheet />
+          </Box>
+          <DashboardQuickActions
+            upcomingShifts={dashboard.upcomingShifts}
+            pendingRequests={dashboard.pendingLeaveRequests}
+          />
+          <DashboardResources />
+        </Container>
+      </Box>
+    </AppMobileLayout>
+  );
+}
+
+export function TimekeeperDashboardPage() {
+  return (
+    <TimekeeperErrorBoundary componentName="TimekeeperDashboard">
+      <TimekeeperDashboardPageContent />
+    </TimekeeperErrorBoundary>
   );
 }
