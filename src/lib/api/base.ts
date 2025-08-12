@@ -371,6 +371,19 @@ export class BaseApiClient {
 
       if (!response.ok) {
         const apiError = new ApiError(response.status, response.statusText, data);
+
+        // Handle 401 / 403 errors globally
+        if (response.status === 401 || response.status === 403) {
+          // Import app store dynamically to avoid circular dependencies
+          import('@/stores/useAppStore').then(({ useAppStore }) => {
+            const state = useAppStore.getState();
+            // If user is authenticated but got 401, it's a permission error
+            if (state.isAuthenticated) {
+              state.setPermissionError(true);
+            }
+          });
+        }
+
         // Log to error store in development
         if (!options?.noError && isDevelopment) {
           addApiError(apiError.message, response.status, endpoint, {

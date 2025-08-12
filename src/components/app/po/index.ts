@@ -22,13 +22,15 @@ export { POBasicInfoCardSkeleton } from './POBasicInfoCardSkeleton';
 export { PODetailTabsSkeleton } from './PODetailTabsSkeleton';
 
 // Action modals
+export { POActionModal } from './POActionModal';
 export { POStatusModal } from './POStatusModal';
-export { POConfirmModal } from './POConfirmModal';
-export { POProcessModal } from './POProcessModal';
-export { POShipModal } from './POShipModal';
-export { PODeliverModal } from './PODeliverModal';
-export { POCancelModal } from './POCancelModal';
-export { PORefundModal } from './PORefundModal';
+// Individual modal components deprecated in favor of POActionModal
+// export { POConfirmModal } from './POConfirmModal';
+// export { POProcessModal } from './POProcessModal';
+// export { POShipModal } from './POShipModal';
+// export { PODeliverModal } from './PODeliverModal';
+// export { POCancelModal } from './POCancelModal';
+// export { PORefundModal } from './PORefundModal';
 
 // Mobile filter components
 export { POFilterBar } from './POFilterBar';

@@ -70,11 +70,12 @@ export const GetCustomerResponseSchema = CustomerSchema;
 
 // Address schema
 export const AddressSchema = z.object({
-  street: stringSchema,
-  city: stringSchema,
+  oneLineAddress: optionalStringSchema,
+  street: optionalStringSchema,
+  city: optionalStringSchema,
   state: optionalStringSchema,
   postalCode: optionalStringSchema,
-  country: stringSchema,
+  country: optionalStringSchema,
 });
 
 // PO Item schemas

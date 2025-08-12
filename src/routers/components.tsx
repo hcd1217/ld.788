@@ -195,6 +195,16 @@ export const AdminDashboardPage = lazy(async () => {
   return { default: module.AdminDashboardPage };
 });
 
+export const MyTimesheetPage = lazy(async () => {
+  const module = await import('@/pages/timeKeeper/MyTimesheetPage');
+  return { default: module.MyTimesheetPage };
+});
+
+export const ClockManagementPage = lazy(async () => {
+  const module = await import('@/pages/timeKeeper/ClockManagementPage');
+  return { default: module.ClockManagementPage };
+});
+
 export const TimekeeperDashboardPage = lazy(async () => {
   const module = await import('@/pages/timeKeeper/TimekeeperDashboardPage');
   return { default: module.TimekeeperDashboardPage };

@@ -1,6 +1,7 @@
 import { Modal, Text, Group, Button, Stack, Alert } from '@mantine/core';
 import { IconCheck, IconAlertTriangle } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useState } from 'react';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { formatCurrency } from '@/utils/number';
 
@@ -13,11 +14,28 @@ type POConfirmModalProps = {
 
 export function POConfirmModal({ opened, purchaseOrder, onClose, onConfirm }: POConfirmModalProps) {
   const { t } = useTranslation();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleConfirm = async () => {
+    setIsLoading(true);
+    try {
+      await onConfirm();
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!purchaseOrder) return null;
 
   return (
-    <Modal opened={opened} onClose={onClose} title={t('po.confirmOrder')} centered>
+    <Modal
+      opened={opened}
+      onClose={isLoading ? () => {} : onClose}
+      title={t('po.confirmOrder')}
+      centered
+      closeOnClickOutside={!isLoading}
+      closeOnEscape={!isLoading}
+    >
       <Stack gap="md">
         <Alert icon={<IconAlertTriangle size={16} />} color="blue" variant="light">
           {t('po.confirmOrderDescription')}
@@ -42,10 +60,15 @@ export function POConfirmModal({ opened, purchaseOrder, onClose, onConfirm }: PO
         </div>
 
         <Group justify="flex-end">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>
             {t('common.cancel')}
           </Button>
-          <Button color="green" leftSection={<IconCheck size={16} />} onClick={() => onConfirm()}>
+          <Button
+            color="green"
+            leftSection={<IconCheck size={16} />}
+            onClick={handleConfirm}
+            loading={isLoading}
+          >
             {t('po.confirmOrder')}
           </Button>
         </Group>

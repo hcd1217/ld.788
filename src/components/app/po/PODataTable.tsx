@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Table, Text, ScrollArea, Group } from '@mantine/core';
 import { useNavigate } from 'react-router';
 import { POActions } from './POActions';
@@ -19,7 +20,7 @@ type PODataTableProps = {
   readonly onRefundPO?: (po: PurchaseOrder) => void;
 };
 
-export function PODataTable({
+function PODataTableComponent({
   purchaseOrders,
   noAction = false,
   onConfirmPO,
@@ -138,3 +139,5 @@ export function PODataTable({
     </ScrollArea>
   );
 }
+
+export const PODataTable = memo(PODataTableComponent);

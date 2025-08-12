@@ -34,12 +34,18 @@ export const dictionarySchema: z.ZodType<Dictionary> = z.lazy(() =>
 );
 export const phoneNumberSchema = optionalStringSchema
   .transform((val) => {
+    if (!val) {
+      return undefined;
+    }
     // remove non-numeric and convert 09012345678 / 090123456789 to 0901-234-5678 / 0901-234-56789
     return val?.replace(/[^0-9]/g, '').replace(/(\d{4})(\d{3})(\d+)/, '$1-$2-$3');
   })
   .optional();
 export const backendPhoneNumberSchema = optionalStringSchema
   .transform((val) => {
+    if (!val) {
+      return undefined;
+    }
     return val?.replace(/[^0-9]/g, '');
   })
   .optional();

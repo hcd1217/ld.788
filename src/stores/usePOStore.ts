@@ -179,17 +179,29 @@ export const usePOStore = create<POState>()(
       },
 
       async confirmPO(id) {
-        set({ isLoading: true, error: undefined });
+        // Optimistically update the status
+        set((state) => ({
+          purchaseOrders: state.purchaseOrders.map((po) =>
+            po.id === id ? { ...po, status: 'CONFIRMED' as const } : po,
+          ),
+          currentPO:
+            state.currentPO?.id === id
+              ? { ...state.currentPO, status: 'CONFIRMED' as const }
+              : state.currentPO,
+          error: undefined,
+        }));
+
         try {
           const updatedPO = await purchaseOrderService.confirmPO(id);
+          // Update with server response
           set((state) => ({
-            isLoading: false,
             purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
             currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
           }));
         } catch (error) {
+          // Rollback on error
+          await get().refreshPOs();
           set({
-            isLoading: false,
             error: getErrorMessage(error, 'Failed to confirm purchase order'),
           });
           throw error;
@@ -197,17 +209,29 @@ export const usePOStore = create<POState>()(
       },
 
       async processPO(id) {
-        set({ isLoading: true, error: undefined });
+        // Optimistically update the status
+        set((state) => ({
+          purchaseOrders: state.purchaseOrders.map((po) =>
+            po.id === id ? { ...po, status: 'PROCESSING' as const } : po,
+          ),
+          currentPO:
+            state.currentPO?.id === id
+              ? { ...state.currentPO, status: 'PROCESSING' as const }
+              : state.currentPO,
+          error: undefined,
+        }));
+
         try {
           const updatedPO = await purchaseOrderService.processPO(id);
+          // Update with server response
           set((state) => ({
-            isLoading: false,
             purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
             currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
           }));
         } catch (error) {
+          // Rollback on error
+          await get().refreshPOs();
           set({
-            isLoading: false,
             error: getErrorMessage(error, 'Failed to process purchase order'),
           });
           throw error;
@@ -215,17 +239,29 @@ export const usePOStore = create<POState>()(
       },
 
       async shipPO(id) {
-        set({ isLoading: true, error: undefined });
+        // Optimistically update the status
+        set((state) => ({
+          purchaseOrders: state.purchaseOrders.map((po) =>
+            po.id === id ? { ...po, status: 'SHIPPED' as const } : po,
+          ),
+          currentPO:
+            state.currentPO?.id === id
+              ? { ...state.currentPO, status: 'SHIPPED' as const }
+              : state.currentPO,
+          error: undefined,
+        }));
+
         try {
           const updatedPO = await purchaseOrderService.shipPO(id);
+          // Update with server response
           set((state) => ({
-            isLoading: false,
             purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
             currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
           }));
         } catch (error) {
+          // Rollback on error
+          await get().refreshPOs();
           set({
-            isLoading: false,
             error: getErrorMessage(error, 'Failed to ship purchase order'),
           });
           throw error;
@@ -233,17 +269,29 @@ export const usePOStore = create<POState>()(
       },
 
       async deliverPO(id) {
-        set({ isLoading: true, error: undefined });
+        // Optimistically update the status
+        set((state) => ({
+          purchaseOrders: state.purchaseOrders.map((po) =>
+            po.id === id ? { ...po, status: 'DELIVERED' as const } : po,
+          ),
+          currentPO:
+            state.currentPO?.id === id
+              ? { ...state.currentPO, status: 'DELIVERED' as const }
+              : state.currentPO,
+          error: undefined,
+        }));
+
         try {
           const updatedPO = await purchaseOrderService.deliverPO(id);
+          // Update with server response
           set((state) => ({
-            isLoading: false,
             purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
             currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
           }));
         } catch (error) {
+          // Rollback on error
+          await get().refreshPOs();
           set({
-            isLoading: false,
             error: getErrorMessage(error, 'Failed to deliver purchase order'),
           });
           throw error;
@@ -251,17 +299,29 @@ export const usePOStore = create<POState>()(
       },
 
       async cancelPO(id) {
-        set({ isLoading: true, error: undefined });
+        // Optimistically update the status
+        set((state) => ({
+          purchaseOrders: state.purchaseOrders.map((po) =>
+            po.id === id ? { ...po, status: 'CANCELLED' as const } : po,
+          ),
+          currentPO:
+            state.currentPO?.id === id
+              ? { ...state.currentPO, status: 'CANCELLED' as const }
+              : state.currentPO,
+          error: undefined,
+        }));
+
         try {
           const updatedPO = await purchaseOrderService.cancelPO(id);
+          // Update with server response
           set((state) => ({
-            isLoading: false,
             purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
             currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
           }));
         } catch (error) {
+          // Rollback on error
+          await get().refreshPOs();
           set({
-            isLoading: false,
             error: getErrorMessage(error, 'Failed to cancel purchase order'),
           });
           throw error;
@@ -269,17 +329,29 @@ export const usePOStore = create<POState>()(
       },
 
       async refundPO(id) {
-        set({ isLoading: true, error: undefined });
+        // Optimistically update the status
+        set((state) => ({
+          purchaseOrders: state.purchaseOrders.map((po) =>
+            po.id === id ? { ...po, status: 'REFUNDED' as const } : po,
+          ),
+          currentPO:
+            state.currentPO?.id === id
+              ? { ...state.currentPO, status: 'REFUNDED' as const }
+              : state.currentPO,
+          error: undefined,
+        }));
+
         try {
           const updatedPO = await purchaseOrderService.refundPO(id);
+          // Update with server response
           set((state) => ({
-            isLoading: false,
             purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
             currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
           }));
         } catch (error) {
+          // Rollback on error
+          await get().refreshPOs();
           set({
-            isLoading: false,
             error: getErrorMessage(error, 'Failed to refund purchase order'),
           });
           throw error;

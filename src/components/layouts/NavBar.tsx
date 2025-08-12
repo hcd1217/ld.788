@@ -1,18 +1,14 @@
 import { AppShell, Collapse, Group, Stack, Text, UnstyledButton } from '@mantine/core';
 import { IconCaretDownFilled } from '@tabler/icons-react';
 import type { TFunction } from 'i18next';
-import { useEffect, useMemo, useState, useCallback, memo } from 'react';
+import { useEffect, useState, useCallback, memo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import classes from './AuthLayout.module.css';
 import type { NavigationItem } from './types';
 import { LAYOUT_CONFIG } from '@/config/layoutConfig';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAppStore } from '@/stores/useAppStore';
+import { useDesktopNavigation } from '@/hooks/useNavigationItems';
 import { isNavigationItemActive } from '@/utils/navigationUtils';
-import { getNavigationItems } from '@/services/navigationService';
-
-// Note: Navigation transformation logic has been moved to navigationService.ts
-// This component now uses getNavigationItems() for backend-driven navigation with static fallback
 
 // Persist expanded menu state
 const EXPANDED_MENU_KEY = 'auth-layout-expanded-menu';
@@ -59,6 +55,7 @@ const NavigationItemComponent = memo(
     const Icon = item.icon;
 
     const handleClick = () => {
+      if (item.disabled) return;
       if (item.subs) {
         onToggle(item.id);
       } else if (item.path) {
@@ -72,7 +69,12 @@ const NavigationItemComponent = memo(
         aria-current={isActive && !item.subs ? 'page' : undefined}
         aria-expanded={item.subs ? isExpanded : undefined}
         aria-controls={item.subs ? `submenu-${item.id}` : undefined}
+        aria-disabled={item.disabled}
         onClick={handleClick}
+        style={{
+          opacity: item.disabled ? 0.5 : 1,
+          cursor: item.disabled ? 'not-allowed' : 'pointer',
+        }}
       >
         <Group className={classes.navGroup}>
           <Group>
@@ -151,10 +153,16 @@ const NavigationSubItem = memo(
       <UnstyledButton
         className={`${classes.subNavButton} ${isActive ? classes.active : ''}`}
         aria-current={isActive ? 'page' : undefined}
+        aria-disabled={item.disabled}
         onClick={() => {
+          if (item.disabled) return;
           if (item.path) {
             onNavigate(item.path);
           }
+        }}
+        style={{
+          opacity: item.disabled ? 0.5 : 1,
+          cursor: item.disabled ? 'not-allowed' : 'pointer',
         }}
       >
         <Group className={classes.subNavGroup}>
@@ -173,31 +181,20 @@ const NavigationSubItem = memo(
 
 NavigationSubItem.displayName = 'NavigationSubItem';
 
-// Stable empty object reference to avoid infinite loops
-const EMPTY_ROUTE_CONFIG = {};
-
 export function NavBar() {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Use selector to only subscribe to userProfile changes (includes routeConfig and navigation in clientConfig)
-  const userProfile = useAppStore((state) => state.userProfile);
-  const routeConfig = userProfile?.routeConfig || EMPTY_ROUTE_CONFIG;
-
   const { t } = useTranslation();
+
+  // Use shared hook for navigation items
+  const { navigationItems } = useDesktopNavigation();
+
   const [expandedMenuId, setExpandedMenuId] = useState<string | undefined>(
     getPersistedExpandedMenuId(),
   );
 
-  // Get navigation items from backend or static fallback
-  // Backend navigation takes priority if available
-  const navigationItems = useMemo(() => {
-    return getNavigationItems(userProfile?.clientConfig?.navigation, t, routeConfig);
-  }, [userProfile, t, routeConfig]);
-
   // Auto-expand menus that have active submenus
   useEffect(() => {
-    // Remove debug log
     const itemsWithActiveSubs = navigationItems.filter((item) =>
       item.subs?.some((sub) => isNavigationItemActive(sub, location.pathname)),
     );

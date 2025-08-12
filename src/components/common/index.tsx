@@ -34,6 +34,7 @@ export {
   AppMobileLayout,
   DetailPageLayout,
   ModalOrDrawer,
+  NoPermission,
   ResourceNotFound,
   TimekeeperLayout,
 } from './layouts';

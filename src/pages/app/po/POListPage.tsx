@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Stack, Group, Box, SimpleGrid, Select, Button } from '@mantine/core';
 import { IconFileInvoice, IconClearAll } from '@tabler/icons-react';
@@ -36,7 +36,7 @@ import { useDeviceType } from '@/hooks/useDeviceType';
 import { ROUTERS } from '@/config/routeConfig';
 import { PO_STATUS } from '@/constants/purchaseOrder';
 import { useViewMode } from '@/hooks/useViewMode';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
 
 export function POListPage() {
   const navigate = useNavigate();
@@ -48,9 +48,15 @@ export function POListPage() {
   const error = usePOError();
   const { refreshPurchaseOrders, clearError, loadCustomers } = usePOActions();
 
-  // Use the PO filters hook
-  const { filteredPOs, filters, filterHandlers, hasActiveFilters, clearAllFilters } =
-    usePOFilters(purchaseOrders);
+  // Search input state with debounce
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch] = useDebouncedValue(searchInput, 300);
+
+  // Use the PO filters hook with debounced search
+  const { filteredPOs, filters, filterHandlers, hasActiveFilters, clearAllFilters } = usePOFilters(
+    purchaseOrders,
+    debouncedSearch,
+  );
 
   const { viewMode, isTableView, setViewMode } = useViewMode();
 
@@ -109,13 +115,13 @@ export function POListPage() {
       >
         {/* Filter Bar */}
         <POFilterBar
-          searchQuery={filters.searchQuery}
+          searchQuery={searchInput}
           customerId={filters.customerId}
           status={filters.status}
           hasDateFilter={hasDateFilter}
           customers={customers}
           hasActiveFilters={hasActiveFilters}
-          onSearchChange={filterHandlers.setSearchQuery}
+          onSearchChange={setSearchInput}
           onCustomerClick={openCustomerDrawer}
           onStatusClick={openStatusDrawer}
           onDateClick={openDateDrawer}
@@ -189,8 +195,8 @@ export function POListPage() {
       <Group justify="space-between" align="flex-end">
         <SearchBar
           placeholder={t('po.searchPlaceholder')}
-          searchQuery={filters.searchQuery}
-          setSearchQuery={filterHandlers.setSearchQuery}
+          searchQuery={searchInput}
+          setSearchQuery={setSearchInput}
         />
         <Select
           clearable

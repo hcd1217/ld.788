@@ -8,17 +8,17 @@
     "dist"
   ],
   "words": [
-    "overscan",
-    "dontShowAgain",
     "beforeinstallprompt",
     "Cantarell",
     "defval",
+    "dontShowAgain",
     "Fira",
     "gstatic",
     "hammerjs",
     "languagedetector",
     "mantine",
     "Neue",
+    "overscan",
     "partialize",
     "qrcode",
     "Segoe",
@@ -27,6 +27,7 @@
     "Tiếng",
     "timesheet",
     "unhandledrejection",
+    "POUI",
     "Việt",
     "webfonts",
     "zustand"

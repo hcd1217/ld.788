@@ -149,6 +149,11 @@
     "title": "Desktop Feature",
     "description": "This feature requires a desktop or laptop computer to work properly. File management and advanced features work best on larger screens."
   },
+  "noPermission": {
+    "title": "Access Denied",
+    "description": "You don't have permission to access this page. Please contact your administrator if you believe this is an error.",
+    "goBack": "Go Back"
+  },
   "mobileOnly": {
     "title": "Mobile Feature",
     "description": "This feature is optimized for mobile devices. Please access it from your smartphone or tablet for the best experience."
@@ -983,6 +988,8 @@
     "actionDescription": "You can {{status}} this order. Select an action below to proceed.",
     "addPO": "Add Purchase Order",
     "additionalInformation": "Additional Information",
+    "address": "Address",
+    "addressPlaceholder": "Enter complete address",
     "allCustomers": "All Customers",
     "allStatus": "All Status",
     "availableActions": "Available Actions",

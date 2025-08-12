@@ -3,6 +3,7 @@ import { IconArrowLeft, IconChevronLeft } from '@tabler/icons-react';
 import { useLocation, useNavigate } from 'react-router';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useCallback } from 'react';
+import { ROUTERS } from '@/config/routeConfig';
 
 type GoBackProps = {
   readonly variant?: 'anchor' | 'mobile-header';
@@ -14,8 +15,8 @@ export function GoBack({ label, variant = 'anchor', route }: GoBackProps) {
   const { t } = useTranslation();
   const location = useLocation();
   const goBack = useCallback(() => {
-    if (location.key !== 'default') {
-      route ? navigate(route) : navigate(-1);
+    if (location.key === 'default') {
+      route ? navigate(route) : navigate(ROUTERS.HOME);
     } else {
       navigate(-1);
     }

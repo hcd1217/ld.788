@@ -1,0 +1,168 @@
+import { useState, useCallback } from 'react';
+import { useDisclosure } from '@mantine/hooks';
+import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+
+export type ModalType = 'confirm' | 'process' | 'ship' | 'deliver' | 'cancel' | 'refund';
+
+export function usePOModals() {
+  const [selectedPO, setSelectedPO] = useState<PurchaseOrder | undefined>(undefined);
+  const [activeModal, setActiveModal] = useState<ModalType | null>(null);
+
+  // Modal states
+  const [confirmModalOpened, { open: openConfirmModal, close: closeConfirmModal }] =
+    useDisclosure(false);
+  const [processModalOpened, { open: openProcessModal, close: closeProcessModal }] =
+    useDisclosure(false);
+  const [shipModalOpened, { open: openShipModal, close: closeShipModal }] = useDisclosure(false);
+  const [deliverModalOpened, { open: openDeliverModal, close: closeDeliverModal }] =
+    useDisclosure(false);
+  const [cancelModalOpened, { open: openCancelModal, close: closeCancelModal }] =
+    useDisclosure(false);
+  const [refundModalOpened, { open: openRefundModal, close: closeRefundModal }] =
+    useDisclosure(false);
+
+  // Modal handlers
+  const openModal = useCallback(
+    (type: ModalType, purchaseOrder: PurchaseOrder) => {
+      setSelectedPO(purchaseOrder);
+      setActiveModal(type);
+
+      switch (type) {
+        case 'confirm':
+          openConfirmModal();
+          break;
+        case 'process':
+          openProcessModal();
+          break;
+        case 'ship':
+          openShipModal();
+          break;
+        case 'deliver':
+          openDeliverModal();
+          break;
+        case 'cancel':
+          openCancelModal();
+          break;
+        case 'refund':
+          openRefundModal();
+          break;
+      }
+    },
+    [
+      openConfirmModal,
+      openProcessModal,
+      openShipModal,
+      openDeliverModal,
+      openCancelModal,
+      openRefundModal,
+    ],
+  );
+
+  const closeModal = useCallback(
+    (type: ModalType) => {
+      setSelectedPO(undefined);
+      setActiveModal(null);
+
+      switch (type) {
+        case 'confirm':
+          closeConfirmModal();
+          break;
+        case 'process':
+          closeProcessModal();
+          break;
+        case 'ship':
+          closeShipModal();
+          break;
+        case 'deliver':
+          closeDeliverModal();
+          break;
+        case 'cancel':
+          closeCancelModal();
+          break;
+        case 'refund':
+          closeRefundModal();
+          break;
+      }
+    },
+    [
+      closeConfirmModal,
+      closeProcessModal,
+      closeShipModal,
+      closeDeliverModal,
+      closeCancelModal,
+      closeRefundModal,
+    ],
+  );
+
+  // Action handlers
+  const handleConfirm = useCallback(
+    (purchaseOrder: PurchaseOrder) => {
+      openModal('confirm', purchaseOrder);
+    },
+    [openModal],
+  );
+
+  const handleProcess = useCallback(
+    (purchaseOrder: PurchaseOrder) => {
+      openModal('process', purchaseOrder);
+    },
+    [openModal],
+  );
+
+  const handleShip = useCallback(
+    (purchaseOrder: PurchaseOrder) => {
+      openModal('ship', purchaseOrder);
+    },
+    [openModal],
+  );
+
+  const handleDeliver = useCallback(
+    (purchaseOrder: PurchaseOrder) => {
+      openModal('deliver', purchaseOrder);
+    },
+    [openModal],
+  );
+
+  const handleCancel = useCallback(
+    (purchaseOrder: PurchaseOrder) => {
+      openModal('cancel', purchaseOrder);
+    },
+    [openModal],
+  );
+
+  const handleRefund = useCallback(
+    (purchaseOrder: PurchaseOrder) => {
+      openModal('refund', purchaseOrder);
+    },
+    [openModal],
+  );
+
+  return {
+    // Modal states
+    modals: {
+      confirmModalOpened,
+      processModalOpened,
+      shipModalOpened,
+      deliverModalOpened,
+      cancelModalOpened,
+      refundModalOpened,
+    },
+
+    // Selected PO for modals
+    selectedPO,
+    activeModal,
+
+    // Modal controls
+    closeModal,
+
+    // Action handlers
+    handlers: {
+      handleConfirm,
+      handleProcess,
+      handleShip,
+      handleDeliver,
+      handleCancel,
+      handleRefund,
+    },
+  };
+}

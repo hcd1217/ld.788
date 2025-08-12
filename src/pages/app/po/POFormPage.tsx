@@ -5,7 +5,6 @@ import { useForm } from '@mantine/form';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { getBasicValidators } from '@/utils/validation';
 import { AppPageTitle, AppMobileLayout, AppDesktopLayout } from '@/components/common';
 import { POForm } from '@/components/app/po/POForm';
 import { usePOActions, useCustomerList, usePOLoading, usePOError } from '@/stores/usePOStore';
@@ -14,34 +13,13 @@ import { ROUTERS } from '@/config/routeConfig';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useAction } from '@/hooks/useAction';
 import { useOnce } from '@/hooks/useOnce';
-import type { PurchaseOrder, POItem } from '@/lib/api/schemas/sales.schemas';
+import { type POFormValues, usePOForm } from '@/hooks/usePOForm';
+import type { PurchaseOrder } from '@/lib/api/schemas/sales.schemas';
 
 type PageMode = 'create' | 'edit';
 
 type POFormPageProps = {
   readonly mode: PageMode;
-};
-
-type POFormValues = {
-  customerId: string;
-  items: POItem[];
-  shippingAddress: {
-    street: string;
-    city: string;
-    state?: string;
-    postalCode?: string;
-    country: string;
-  };
-  billingAddress?: {
-    street: string;
-    city: string;
-    state?: string;
-    postalCode?: string;
-    country: string;
-  };
-  paymentTerms?: string;
-  notes?: string;
-  useSameAddress?: boolean;
 };
 
 export function POFormPage({ mode }: POFormPageProps) {
@@ -58,44 +36,13 @@ export function POFormPage({ mode }: POFormPageProps) {
   const [currentPO, setCurrentPO] = useState<PurchaseOrder | null>(null);
 
   const isEditMode = mode === 'edit';
-  const validators = getBasicValidators();
 
-  // Initial form values - memoized for stability
-  const initialValues = useMemo<POFormValues>(
-    () => ({
-      customerId: '',
-      items: [],
-      shippingAddress: {
-        street: '',
-        city: '',
-        state: '',
-        postalCode: '',
-        country: 'Vietnam',
-      },
-      billingAddress: undefined,
-      paymentTerms: 'Net 30',
-      notes: '',
-      useSameAddress: true,
-    }),
-    [],
-  );
+  // Use the PO form hook
+  const { initialValues, validation } = usePOForm({ isEditMode });
 
   const form = useForm<POFormValues>({
     initialValues,
-    validate: {
-      customerId: validators.required(t('po.customerRequired')),
-      items: (value) => {
-        if (!value || value.length === 0) {
-          return t('po.itemsRequired');
-        }
-        return null;
-      },
-      shippingAddress: {
-        street: validators.required(t('po.streetRequired')),
-        city: validators.required(t('po.cityRequired')),
-        country: validators.required(t('po.countryRequired')),
-      },
-    },
+    validate: validation,
   });
 
   // Load PO data for edit mode

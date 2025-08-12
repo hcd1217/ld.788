@@ -15,18 +15,20 @@ type POFormValues = {
   customerId: string;
   items: POItem[];
   shippingAddress: {
-    street: string;
-    city: string;
+    oneLineAddress?: string;
+    street?: string;
+    city?: string;
     state?: string;
     postalCode?: string;
-    country: string;
+    country?: string;
   };
   billingAddress?: {
-    street: string;
-    city: string;
+    oneLineAddress?: string;
+    street?: string;
+    city?: string;
     state?: string;
     postalCode?: string;
-    country: string;
+    country?: string;
   };
   paymentTerms?: string;
   notes?: string;
@@ -43,64 +45,30 @@ type POFormProps = {
   readonly isEditMode?: boolean;
 };
 
-// Helper function to format address into single line
-function formatAddressToSingleLine(address: string | undefined): {
-  street: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
+// Helper function to create address from customer data
+function createAddressFromCustomer(customerAddress: string | undefined): {
+  oneLineAddress?: string;
+  street?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
 } {
-  if (!address) {
+  if (!customerAddress) {
     return {
-      street: '',
-      city: '',
-      state: '',
-      postalCode: '',
-      country: 'Vietnam',
+      oneLineAddress: '',
     };
   }
 
-  // Parse address assuming format: "Street, City, State PostalCode, Country"
-  // or simpler formats like "Street, City"
-  const parts = address.split(',').map((part) => part.trim());
-
-  let street = '';
-  let city = '';
-  let state = '';
-  let postalCode = '';
-  let country = 'Vietnam';
-
-  if (parts.length >= 2) {
-    street = parts[0] || '';
-    city = parts[1] || '';
-
-    if (parts.length >= 3) {
-      // Check if third part contains state and postal code
-      const statePostal = parts[2];
-      const postalMatch = statePostal.match(/(\d+)/);
-      if (postalMatch) {
-        postalCode = postalMatch[1];
-        state = statePostal.replace(postalMatch[1], '').trim();
-      } else {
-        state = statePostal;
-      }
-    }
-
-    if (parts.length >= 4) {
-      country = parts[3] || 'Vietnam';
-    }
-  } else if (parts.length === 1) {
-    // If only one part, use it as street
-    street = parts[0];
-  }
-
+  // Use the customer address as one-line address
   return {
-    street,
-    city,
-    state,
-    postalCode,
-    country,
+    oneLineAddress: customerAddress,
+    // Keep other fields empty - user can fill them if needed
+    street: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: '',
   };
 }
 
@@ -143,11 +111,11 @@ export function POForm({
   // Auto-fill shipping address when customer is selected
   useEffect(() => {
     if (selectedCustomer?.address && !isEditMode) {
-      const parsedAddress = formatAddressToSingleLine(selectedCustomer.address);
-      form.setFieldValue('shippingAddress', parsedAddress);
+      const address = createAddressFromCustomer(selectedCustomer.address);
+      form.setFieldValue('shippingAddress', address);
       // Always use shipping address as billing address
       form.setFieldValue('useSameAddress', true);
-      form.setFieldValue('billingAddress', parsedAddress);
+      form.setFieldValue('billingAddress', address);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCustomer?.id, isEditMode]);
@@ -218,7 +186,7 @@ export function POForm({
             <Text fw={500} size="lg">
               {t('po.shippingAddress')}
             </Text>
-            <POAddressFields form={form} fieldPrefix="shippingAddress" required />
+            <POAddressFields form={form} fieldPrefix="shippingAddress" />
             {selectedCustomer?.address && (
               <Text size="sm" c="dimmed" fs="italic">
                 Auto-filled from customer address

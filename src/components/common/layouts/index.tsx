@@ -1,4 +1,5 @@
 export { DetailPageLayout } from './DetailPageLayout';
+export { NoPermission } from './NoPermission';
 export { ResourceNotFound } from './ResourceNotFound';
 export { AppMobileLayout } from './AppMobileLayout';
 export { AppDesktopLayout } from './AppDesktopLayout';

@@ -7,18 +7,20 @@ export type POFormValues = {
   customerId: string;
   items: POItem[];
   shippingAddress: {
-    street: string;
-    city: string;
+    oneLineAddress?: string;
+    street?: string;
+    city?: string;
     state?: string;
     postalCode?: string;
-    country: string;
+    country?: string;
   };
   billingAddress?: {
-    street: string;
-    city: string;
+    oneLineAddress?: string;
+    street?: string;
+    city?: string;
     state?: string;
     postalCode?: string;
-    country: string;
+    country?: string;
   };
   paymentTerms?: string;
   notes?: string;
@@ -39,11 +41,12 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
       customerId: '',
       items: [],
       shippingAddress: {
+        oneLineAddress: '',
         street: '',
         city: '',
         state: '',
         postalCode: '',
-        country: 'Vietnam',
+        country: '',
       },
       billingAddress: undefined,
       paymentTerms: 'Net 30',
@@ -63,11 +66,7 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
         }
         return null;
       },
-      shippingAddress: {
-        street: validators.required(t('po.streetRequired')),
-        city: validators.required(t('po.cityRequired')),
-        country: validators.required(t('po.countryRequired')),
-      },
+      // No validation for address fields - all are optional
     }),
     [t, validators],
   );

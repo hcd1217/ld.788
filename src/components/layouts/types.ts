@@ -7,5 +7,6 @@ export interface NavigationItem {
   activePaths?: string[];
   path?: string;
   hidden?: boolean;
+  disabled?: boolean;
   subs?: NavigationItem[];
 }

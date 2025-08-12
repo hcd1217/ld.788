@@ -149,6 +149,11 @@
     "title": "Tính Năng Máy Tính",
     "description": "Tính năng này yêu cầu máy tính để bàn hoặc laptop để hoạt động tốt. Quản lý file và các tính năng nâng cao hoạt động tốt nhất trên màn hình lớn."
   },
+  "noPermission": {
+    "title": "Truy Cập Bị Từ Chối",
+    "description": "Bạn không có quyền truy cập trang này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi.",
+    "goBack": "Quay Lại"
+  },
   "mobileOnly": {
     "title": "Tính Năng Di Động",
     "description": "Tính năng này được tối ưu cho thiết bị di động. Vui lòng truy cập từ điện thoại thông minh hoặc máy tính bảng để có trải nghiệm tốt nhất."
@@ -983,6 +988,8 @@
     "actionDescription": "Bạn có thể {{status}} đơn hàng này. Chọn hành động bên dưới để tiếp tục.",
     "addPO": "Thêm Đơn Hàng",
     "additionalInformation": "Thông Tin Bổ Sung",
+    "address": "Địa chỉ",
+    "addressPlaceholder": "Nhập địa chỉ đầy đủ",
     "allCustomers": "Tất Cả Khách Hàng",
     "allStatus": "Tất Cả Trạng Thái",
     "availableActions": "Hành Động Khả Dụng",

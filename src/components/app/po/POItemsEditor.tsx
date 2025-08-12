@@ -1,3 +1,4 @@
+import { memo, useState, useMemo, useEffect } from 'react';
 import {
   Table,
   TextInput,
@@ -11,7 +12,7 @@ import {
 import { IconTrash, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { formatCurrency } from '@/utils/number';
-import { useState, useMemo, useEffect } from 'react';
+import { showErrorNotification } from '@/utils/notifications';
 import { useProductList, usePOActions } from '@/stores/usePOStore';
 import type { POItem } from '@/lib/api/schemas/sales.schemas';
 
@@ -29,7 +30,7 @@ const productCategories = [
   { value: 'Services', label: 'Services' },
 ];
 
-export function POItemsEditor({ items, onChange, disabled = false }: POItemsEditorProps) {
+function POItemsEditorComponent({ items, onChange, disabled = false }: POItemsEditorProps) {
   const { t } = useTranslation();
 
   // Get products from store
@@ -67,6 +68,14 @@ export function POItemsEditor({ items, onChange, disabled = false }: POItemsEdit
       !newItem.quantity ||
       newItem.unitPrice === undefined
     ) {
+      return;
+    }
+
+    // Check for duplicate product
+    const isDuplicate = items.some((item) => item.productCode === newItem.productCode);
+
+    if (isDuplicate) {
+      showErrorNotification(t('common.error'), `Product ${newItem.productCode} is already added`);
       return;
     }
 
@@ -388,3 +397,5 @@ export function POItemsEditor({ items, onChange, disabled = false }: POItemsEdit
     </Stack>
   );
 }
+
+export const POItemsEditor = memo(POItemsEditorComponent);

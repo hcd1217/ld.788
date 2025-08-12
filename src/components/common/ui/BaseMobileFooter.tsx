@@ -7,6 +7,7 @@ export interface BaseMobileFooterItem {
   readonly icon: React.ElementType;
   readonly label: string;
   readonly path?: string;
+  readonly disabled?: boolean;
   readonly badge?: React.ReactNode;
 }
 
@@ -44,9 +45,14 @@ export function BaseMobileFooter({
               className={`${classes.navItem} ${itemClassName || ''} ${
                 isActive ? `${classes.navItemActive} ${activeItemClassName || ''}` : ''
               }`}
-              onClick={() => onItemClick?.(item)}
+              onClick={() => !item.disabled && onItemClick?.(item)}
               w="100%"
               h="100%"
+              disabled={item.disabled}
+              style={{
+                opacity: item.disabled ? 0.5 : 1,
+                cursor: item.disabled ? 'not-allowed' : 'pointer',
+              }}
             >
               <Stack gap={4} align="center" justify="center" h="100%">
                 <Icon size={iconSize} stroke={isActive ? 2.5 : 1.5} className={classes.navIcon} />

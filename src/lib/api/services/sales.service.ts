@@ -336,7 +336,7 @@ class MockDataStore {
 const mockStore = new MockDataStore();
 
 export class SalesApi extends BaseApiClient {
-  private useMockPOData = true; // Only mock Purchase Orders, not customers/products
+  private useMockPOData = false; // Only mock Purchase Orders, not customers/products
 
   // Initialize mock store with real data from API
   private async initializeMockStore(): Promise<void> {

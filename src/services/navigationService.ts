@@ -20,6 +20,7 @@ function transformBackendItem(item: BackendNavigationItem, t: any): FrontendNavi
     icon: iconComponent,
     path: item.path ? getRoute(item.path) : undefined,
     hidden: item.hidden,
+    disabled: item.disabled,
     activePaths: item.activePaths
       ?.map((routeId) => getRoute(routeId))
       .filter((route): route is string => route !== undefined),
@@ -66,17 +67,19 @@ interface StaticNavigationItem {
  * @param staticNav Static navigation configuration
  * @param t Translation function
  * @param routeConfig Optional route permissions
+ * @param skipHiddenFilter Skip filtering of hidden items (useful when profile is loading)
  * @returns Array of frontend navigation items
  */
 export function transformStaticNavigation(
   staticNav: readonly StaticNavigationItem[],
   t: any,
   routeConfig?: Record<string, boolean>,
+  skipHiddenFilter?: boolean,
 ): FrontendNavigationItem[] {
   return staticNav
     .filter((item: StaticNavigationItem) => {
-      // Filter out hidden items
-      if ('hidden' in item && item.hidden) {
+      // Skip filtering hidden items if profile is loading to show full menu
+      if (!skipHiddenFilter && 'hidden' in item && item.hidden) {
         return false;
       }
       // Filter by route permissions if available
@@ -98,7 +101,8 @@ export function transformStaticNavigation(
       if ('subs' in item && item.subs) {
         frontendItem.subs = item.subs
           .filter((sub: any) => {
-            if ('hidden' in sub && sub.hidden) {
+            // Skip filtering hidden items if profile is loading
+            if (!skipHiddenFilter && 'hidden' in sub && sub.hidden) {
               return false;
             }
             if ('path' in sub && sub.path && routeConfig && !routeConfig[sub.path]) {
@@ -124,6 +128,8 @@ export function transformStaticNavigation(
  * @param backendNav Optional backend navigation configuration
  * @param t Translation function
  * @param routeConfig Optional route permissions for static navigation
+ * @param userRoles Optional user roles for role-based filtering
+ * @param isProfileLoading Whether the user profile is still loading
  * @returns Array of frontend navigation items ready for rendering
  */
 export function getNavigationItems(
@@ -142,62 +148,64 @@ export function getNavigationItems(
    */
   t: any,
   routeConfig?: Record<string, boolean>,
+  userRoles?: string[],
+  isProfileLoading?: boolean,
 ): FrontendNavigationItem[] {
   // Use backend navigation if available
   if (backendNav?.length) {
-    return transformBackendNavigation(backendNav, t);
+    // Apply role-based access control if user roles are provided
+    const processedNav = userRoles ? applyRoleBasedAccess(backendNav, userRoles) : backendNav;
+    return transformBackendNavigation(processedNav, t);
   }
 
   // Fallback to static navigation
-  return transformStaticNavigation(NAVIGATION_STRUCTURE, t, routeConfig);
+  // When profile is loading, don't filter out hidden items to avoid showing minimal menu
+  return transformStaticNavigation(NAVIGATION_STRUCTURE, t, routeConfig, isProfileLoading);
 }
 
 /**
- * Filters navigation items based on user roles
- * @param items Navigation items to filter
+ * Applies role-based access control to navigation items
+ * Marks items as disabled if user lacks required roles
+ * @param items Navigation items to process
  * @param userRoles User's current roles
- * @returns Filtered navigation items
+ * @returns Navigation items with disabled state applied based on roles
  */
-export function filterNavigationByRoles(
+function applyRoleBasedAccess(
   items: BackendNavigationItem[],
   userRoles: string[],
 ): BackendNavigationItem[] {
-  return items
-    .map((item) => {
-      // If no roles specified, item is available to all
-      if (!item.roles?.length) {
-        // Filter sub-items if they exist
-        if (item.subs?.length) {
-          const filteredSubs = filterNavigationByRoles(item.subs, userRoles);
-          if (filteredSubs.length !== item.subs.length) {
-            return { ...item, subs: filteredSubs };
-          }
-        }
-        return item;
+  return items.map((item) => {
+    // Create a new item to avoid mutation
+    const newItem = { ...item };
+
+    // Check if user has required role (if roles are specified)
+    const hasRequiredRole =
+      !item.roles?.length || item.roles.some((role) => userRoles.includes(role));
+
+    // Mark as disabled if user lacks required role
+    if (!hasRequiredRole) {
+      newItem.disabled = true;
+    }
+
+    // Process sub-items recursively
+    if (item.subs?.length) {
+      const processedSubs = applyRoleBasedAccess(item.subs, userRoles);
+
+      // If parent is disabled, all children should be disabled too
+      if (newItem.disabled) {
+        newItem.subs = processedSubs.map((sub) => ({ ...sub, disabled: true }));
+      } else {
+        newItem.subs = processedSubs;
       }
 
-      // Check if user has at least one required role
-      const hasRequiredRole = item.roles.some((role) => userRoles.includes(role));
-      if (!hasRequiredRole) {
-        return null;
+      // If parent has no path and all children are disabled, disable parent too
+      if (!newItem.path && processedSubs.every((sub) => sub.disabled)) {
+        newItem.disabled = true;
       }
+    }
 
-      // Filter sub-items recursively
-      if (item.subs?.length) {
-        const filteredSubs = filterNavigationByRoles(item.subs, userRoles);
-        // Keep parent with filtered subs if it has accessible sub-items
-        if (filteredSubs.length > 0) {
-          return { ...item, subs: filteredSubs };
-        }
-        // Remove parent if no sub-items are accessible and parent has no path
-        if (!item.path) {
-          return null;
-        }
-      }
-
-      return item;
-    })
-    .filter((item): item is BackendNavigationItem => item !== null);
+    return newItem;
+  });
 }
 
 /**
@@ -253,18 +261,27 @@ export function filterNavigationByFeatureFlags(
  * @param backendMobileNav Optional backend mobile navigation configuration
  * @param t Translation function
  * @param routeConfig Optional route permissions for static navigation
+ * @param userRoles Optional user roles for role-based filtering
+ * @param isProfileLoading Whether the user profile is still loading
  * @returns Array of frontend navigation items ready for mobile navigation
  */
 export function getMobileNavigationItems(
   backendMobileNav: BackendNavigationItem[] | undefined,
   t: any,
   routeConfig?: Record<string, boolean>,
+  userRoles?: string[],
+  isProfileLoading?: boolean,
 ): FrontendNavigationItem[] {
   // Use backend mobile navigation if available
   if (backendMobileNav?.length) {
-    return transformBackendNavigation(backendMobileNav, t);
+    // Apply role-based access control if user roles are provided
+    const processedNav = userRoles
+      ? applyRoleBasedAccess(backendMobileNav, userRoles)
+      : backendMobileNav;
+    return transformBackendNavigation(processedNav, t);
   }
 
   // Fallback to static mobile navigation
-  return transformStaticNavigation(MOBILE_NAVIGATION_STRUCTURE, t, routeConfig);
+  // When profile is loading, don't filter out hidden items
+  return transformStaticNavigation(MOBILE_NAVIGATION_STRUCTURE, t, routeConfig, isProfileLoading);
 }

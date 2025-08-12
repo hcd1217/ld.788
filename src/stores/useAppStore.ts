@@ -33,6 +33,7 @@ type AppState = {
   isLoading: boolean;
   adminApiLoading: boolean;
   adminApiLoadingMessage: string;
+  permissionError: boolean;
   theme: 'light' | 'dark';
   config: {
     pagination: {
@@ -52,6 +53,7 @@ type AppState = {
   setTheme: (theme: 'light' | 'dark') => void;
   setAdminAuth: (authenticated: boolean) => void;
   setAdminApiLoading: (loading: boolean, message?: string) => void;
+  setPermissionError: (hasError: boolean) => void;
   fetchPublicClientConfig: (clientCode: string) => Promise<void>;
   login: (params: { identifier: string; password: string; clientCode: string }) => Promise<void>;
   logout: () => void;
@@ -87,6 +89,7 @@ export const useAppStore = create<AppState>()(
         isLoading: false,
         adminApiLoading: false,
         adminApiLoadingMessage: '',
+        permissionError: false,
         theme: 'light',
         config: {
           pagination: {
@@ -110,7 +113,7 @@ export const useAppStore = create<AppState>()(
         async fetchUserProfile() {
           try {
             const profile = await authApi.getMe();
-            set({ userProfile: profile });
+            set({ userProfile: profile, permissionError: false });
 
             // Cache navigation config if available
             if (profile.clientConfig?.navigation?.length) {
@@ -123,10 +126,20 @@ export const useAppStore = create<AppState>()(
               clearClientTranslations();
               updateClientTranslations(profile.clientConfig.translations);
             }
-          } catch (error) {
+          } catch (error: unknown) {
             console.error('Failed to fetch user profile:', error);
-            // Only logout if we're not in the middle of a login process
-            if (!get().isLoading) {
+
+            // Check if it's a 401 or 403 error
+            const isApiError = error && typeof error === 'object' && 'status' in error;
+            const errorStatus = isApiError ? (error as { status: number }).status : 0;
+            const isApiPermissionError = [401, 403].includes(errorStatus);
+
+            if (isApiPermissionError && get().isAuthenticated) {
+              // User is authenticated but got 401 / 403 - this is a permission error
+              set({ permissionError: true });
+            } else if (!get().isLoading) {
+              // Only logout if we're not in the middle of a login process
+              // and it's not a permission error
               get().logout();
             }
           }
@@ -135,6 +148,7 @@ export const useAppStore = create<AppState>()(
         setAdminAuth: (authenticated) => set({ adminAuthenticated: authenticated }),
         setAdminApiLoading: (loading, message = '') =>
           set({ adminApiLoading: loading, adminApiLoadingMessage: message }),
+        setPermissionError: (hasError) => set({ permissionError: hasError }),
         async fetchPublicClientConfig(clientCode: string) {
           try {
             const config = await clientApi.getPubicClientConfig(clientCode);
@@ -181,6 +195,7 @@ export const useAppStore = create<AppState>()(
             // Don't clear client-specific public config on logout
             // publicClientConfig: undefined,
             isAuthenticated: false,
+            permissionError: false,
           });
           // Don't clear client-specific translations on logout
           // clearClientTranslations();
@@ -198,6 +213,7 @@ export const useAppStore = create<AppState>()(
               user: undefined,
               userProfile: undefined,
               isAuthenticated: false,
+              permissionError: false,
             });
           }
           set({ authInitialized: true });

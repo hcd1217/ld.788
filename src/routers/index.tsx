@@ -10,6 +10,8 @@ import {
   NotFound,
   HomePage,
   MobileOnlyLayout,
+  ClockManagementPage,
+  MyTimesheetPage,
 } from './components';
 import { authRouteObjects } from './auth';
 import { adminRouteObjects } from './admin';
@@ -50,17 +52,11 @@ export const routeObjects: ThemeRouteObject[] = [
       },
       {
         path: ROUTERS.TIME_KEEPER_MY_TIMESHEET,
-        lazy: () =>
-          import('@/pages/timeKeeper/MyTimesheetPage').then((module) => {
-            return { Component: module.MyTimesheetPage };
-          }),
+        Component: MyTimesheetPage,
       },
       {
         path: ROUTERS.TIME_KEEPER_CLOCK,
-        lazy: () =>
-          import('@/pages/timeKeeper/ClockManagementPage').then((module) => {
-            return { Component: module.ClockManagementPage };
-          }),
+        Component: ClockManagementPage,
       },
     ],
   },

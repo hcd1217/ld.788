@@ -31,7 +31,7 @@ const defaultFilters: POFilters = {
   },
 };
 
-export function usePOFilters(purchaseOrders: readonly PurchaseOrder[]) {
+export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOverride?: string) {
   const [filters, setFilters] = useState<POFilters>(defaultFilters);
 
   const hasActiveFilters = useMemo(() => {
@@ -50,40 +50,48 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[]) {
     return false;
   }, [filters]);
 
+  const setSearchQuery = useCallback((query: string) => {
+    setFilters((prev) => ({ ...prev, searchQuery: query }));
+  }, []);
+
+  const setCustomerId = useCallback((customerId: string | undefined) => {
+    setFilters((prev) => ({ ...prev, customerId }));
+  }, []);
+
+  const setStatus = useCallback((status: POStatusType) => {
+    setFilters((prev) => ({ ...prev, status }));
+  }, []);
+
+  const setDateRange = useCallback((start: Date | undefined, end: Date | undefined) => {
+    setFilters((prev) => ({
+      ...prev,
+      dateRange: { start, end },
+    }));
+  }, []);
+
+  const updateFilters = useCallback((updates: Partial<POFilters>) => {
+    setFilters((prev) => ({ ...prev, ...updates }));
+  }, []);
+
+  const resetFilters = useCallback(() => {
+    setFilters(defaultFilters);
+  }, []);
+
   const filterHandlers: POFilterHandlers = useMemo(() => {
     return {
-      setSearchQuery: (query: string) => {
-        setFilters((prev) => ({ ...prev, searchQuery: query }));
-      },
-
-      setCustomerId: (customerId: string | undefined) => {
-        setFilters((prev) => ({ ...prev, customerId }));
-      },
-
-      setStatus: (status: POStatusType) => {
-        setFilters((prev) => ({ ...prev, status }));
-      },
-
-      setDateRange: (start: Date | undefined, end: Date | undefined) => {
-        setFilters((prev) => ({
-          ...prev,
-          dateRange: { start, end },
-        }));
-      },
-
-      updateFilters: (updates: Partial<POFilters>) => {
-        setFilters((prev) => ({ ...prev, ...updates }));
-      },
-
-      resetFilters: () => {
-        setFilters(defaultFilters);
-      },
+      setSearchQuery,
+      setCustomerId,
+      setStatus,
+      setDateRange,
+      updateFilters,
+      resetFilters,
     };
-  }, []);
+  }, [setSearchQuery, setCustomerId, setStatus, setDateRange, updateFilters, resetFilters]);
 
   const filteredPOs = useMemo(() => {
     return purchaseOrders.filter((po) => {
-      const { searchQuery, customerId, status, dateRange } = filters;
+      const { customerId, status, dateRange } = filters;
+      const searchQuery = searchOverride !== undefined ? searchOverride : filters.searchQuery;
 
       // Status filter
       if (status !== PO_STATUS.ALL && po.status !== status) {
@@ -118,14 +126,14 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[]) {
 
       return true;
     });
-  }, [purchaseOrders, filters]);
+  }, [purchaseOrders, filters, searchOverride]);
 
   const clearAllFilters = useCallback(() => {
-    filterHandlers.setSearchQuery('');
-    filterHandlers.setCustomerId(undefined);
-    filterHandlers.setStatus(PO_STATUS.ALL);
-    filterHandlers.setDateRange(undefined, undefined);
-  }, [filterHandlers]);
+    setSearchQuery('');
+    setCustomerId(undefined);
+    setStatus(PO_STATUS.ALL);
+    setDateRange(undefined, undefined);
+  }, [setSearchQuery, setCustomerId, setStatus, setDateRange]);
 
   return { filteredPOs, filters, filterHandlers, hasActiveFilters, clearAllFilters };
 }
