@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { Container, Loader, Center, Alert } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -6,14 +6,21 @@ import { IconAlertCircle } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { getBasicValidators } from '@/utils/validation';
-import { AppPageTitle, AppMobileLayout, AppDesktopLayout, GoBack } from '@/components/common';
-import { POForm } from '@/components/app/po';
+import { AppPageTitle, AppMobileLayout, AppDesktopLayout } from '@/components/common';
+import { POForm } from '@/components/app/po/POForm';
 import { usePOActions, useCustomerList, usePOLoading, usePOError } from '@/stores/usePOStore';
 import { purchaseOrderService } from '@/services/sales/purchaseOrder';
 import { ROUTERS } from '@/config/routeConfig';
+import { getPODetailRoute } from '@/config/routeConfig';
 import { useAction } from '@/hooks/useAction';
 import { useOnce } from '@/hooks/useOnce';
-import type { PurchaseOrder, POItem } from '@/services/sales/purchaseOrder';
+import type { PurchaseOrder, POItem } from '@/lib/api/schemas/sales.schemas';
+
+type PageMode = 'create' | 'edit';
+
+type POFormPageProps = {
+  readonly mode: PageMode;
+};
 
 type POFormValues = {
   customerId: string;
@@ -37,7 +44,7 @@ type POFormValues = {
   useSameAddress?: boolean;
 };
 
-export function EditPOPage() {
+export function POFormPage({ mode }: POFormPageProps) {
   const { poId: id } = useParams<{ poId: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -45,15 +52,17 @@ export function EditPOPage() {
   const customers = useCustomerList();
   const isLoading = usePOLoading();
   const error = usePOError();
-  const { loadCustomers, clearError, updatePurchaseOrder } = usePOActions();
+  const { loadCustomers, clearError, createPurchaseOrder, updatePurchaseOrder } = usePOActions();
 
-  const [isLoadingPO, setIsLoadingPO] = useState(true);
+  const [isLoadingPO, setIsLoadingPO] = useState(mode === 'edit');
   const [currentPO, setCurrentPO] = useState<PurchaseOrder | null>(null);
 
+  const isEditMode = mode === 'edit';
   const validators = getBasicValidators();
 
-  const form = useForm<POFormValues>({
-    initialValues: {
+  // Initial form values - memoized for stability
+  const initialValues = useMemo<POFormValues>(
+    () => ({
       customerId: '',
       items: [],
       shippingAddress: {
@@ -67,7 +76,12 @@ export function EditPOPage() {
       paymentTerms: 'Net 30',
       notes: '',
       useSameAddress: true,
-    },
+    }),
+    [],
+  );
+
+  const form = useForm<POFormValues>({
+    initialValues,
     validate: {
       customerId: validators.required(t('po.customerRequired')),
       items: (value) => {
@@ -84,12 +98,7 @@ export function EditPOPage() {
     },
   });
 
-  // Load customers and PO data on mount
-  useOnce(() => {
-    void loadCustomers();
-    void loadPO();
-  });
-
+  // Load PO data for edit mode
   const loadPO = async () => {
     if (!id) {
       navigate(ROUTERS.PO_MANAGEMENT);
@@ -117,13 +126,7 @@ export function EditPOPage() {
       form.setValues({
         customerId: po.customerId,
         items: po.items,
-        shippingAddress: po.shippingAddress || {
-          street: '',
-          city: '',
-          state: '',
-          postalCode: '',
-          country: 'Vietnam',
-        },
+        shippingAddress: po.shippingAddress || initialValues.shippingAddress,
         billingAddress: po.billingAddress,
         paymentTerms: po.paymentTerms || 'Net 30',
         notes: po.notes || '',
@@ -137,18 +140,26 @@ export function EditPOPage() {
     }
   };
 
+  // Load initial data
+  useOnce(() => {
+    void loadCustomers();
+    if (isEditMode) {
+      void loadPO();
+    }
+  });
+
+  // Unified submit handler
   const handleSubmit = useAction<POFormValues>({
     options: {
       successTitle: t('common.success'),
-      successMessage: t('po.updated'),
-      navigateTo: getPODetailRoute(id!),
+      successMessage: t(isEditMode ? 'po.updated' : 'po.created'),
+      navigateTo: isEditMode && id ? getPODetailRoute(id) : ROUTERS.PO_MANAGEMENT,
     },
     async actionHandler(values) {
-      if (!id || !currentPO) return;
-
-      // Check customer credit limit
       if (!values) return;
+      if (isEditMode && (!id || !currentPO)) return;
 
+      // Validate customer and credit limit
       const customer = customers.find((c) => c.id === values.customerId);
       if (!customer) {
         throw new Error(t('po.customerNotFound'));
@@ -168,7 +179,8 @@ export function EditPOPage() {
         );
       }
 
-      const updatedPO: Partial<PurchaseOrder> = {
+      // Prepare PO data
+      const poData = {
         customerId: values.customerId,
         customer,
         totalAmount,
@@ -179,30 +191,52 @@ export function EditPOPage() {
         notes: values.notes,
       };
 
-      await updatePurchaseOrder(id, updatedPO);
+      if (isEditMode && id) {
+        await updatePurchaseOrder(id, poData);
+      } else {
+        const newPO = {
+          ...poData,
+          status: 'NEW' as const,
+          orderDate: new Date(),
+          createdBy: 'Current User', // In real app, get from auth context
+          poNumber: `PO-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`,
+        };
+        await createPurchaseOrder(newPO as Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt'>);
+      }
     },
   });
 
+  // Page title - memoized
+  const pageTitle = useMemo(() => t(isEditMode ? 'po.editPO' : 'po.createPO'), [isEditMode, t]);
+
+  // Cancel navigation - memoized callback
+  const handleCancel = useMemo(() => {
+    if (isEditMode && id) {
+      return () => navigate(getPODetailRoute(id));
+    }
+    return () => navigate(ROUTERS.PO_MANAGEMENT);
+  }, [isEditMode, id, navigate]);
+
   const pageContent = (
     <Container fluid w="100%">
-      {isLoadingPO ? (
+      {isEditMode && isLoadingPO ? (
         <Center h={400}>
           <Loader size="lg" />
         </Center>
-      ) : currentPO ? (
+      ) : isEditMode && !currentPO ? (
+        <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
+          {t('po.notFound')}
+        </Alert>
+      ) : (
         <POForm
           form={form}
           customers={customers}
           isLoading={isLoading}
           error={error}
           onSubmit={handleSubmit}
-          onCancel={() => navigate(getPODetailRoute(id!))}
-          isEditMode
+          onCancel={handleCancel}
+          isEditMode={isEditMode}
         />
-      ) : (
-        <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
-          {t('po.notFound')}
-        </Alert>
       )}
     </Container>
   );
@@ -211,15 +245,11 @@ export function EditPOPage() {
     return (
       <AppMobileLayout
         showLogo
+        withGoBack
         isLoading={isLoading}
         error={error}
         clearError={clearError}
-        header={
-          <>
-            <GoBack />
-            <AppPageTitle title={t('po.editPO')} />
-          </>
-        }
+        header={<AppPageTitle title={pageTitle} />}
       >
         {pageContent}
       </AppMobileLayout>
@@ -228,11 +258,8 @@ export function EditPOPage() {
 
   return (
     <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
-      <AppPageTitle title={t('po.editPO')} />
+      <AppPageTitle title={pageTitle} />
       {pageContent}
     </AppDesktopLayout>
   );
 }
-
-// Import helper function
-import { getPODetailRoute } from '@/config/routeConfig';

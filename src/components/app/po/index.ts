@@ -22,6 +22,7 @@ export { POBasicInfoCardSkeleton } from './POBasicInfoCardSkeleton';
 export { PODetailTabsSkeleton } from './PODetailTabsSkeleton';
 
 // Action modals
+export { POStatusModal } from './POStatusModal';
 export { POConfirmModal } from './POConfirmModal';
 export { POProcessModal } from './POProcessModal';
 export { POShipModal } from './POShipModal';

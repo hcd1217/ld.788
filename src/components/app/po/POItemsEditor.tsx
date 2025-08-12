@@ -1,9 +1,19 @@
-import { Table, TextInput, NumberInput, Select, ActionIcon, Stack, Text } from '@mantine/core';
+import {
+  Table,
+  TextInput,
+  NumberInput,
+  Select,
+  ActionIcon,
+  Stack,
+  Text,
+  Autocomplete,
+} from '@mantine/core';
 import { IconTrash, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { formatCurrency } from '@/utils/number';
-import { useState } from 'react';
-import type { POItem } from '@/services/sales/purchaseOrder';
+import { useState, useMemo, useEffect } from 'react';
+import { useProductList, usePOActions } from '@/stores/usePOStore';
+import type { POItem } from '@/lib/api/schemas/sales.schemas';
 
 type POItemsEditorProps = {
   readonly items: POItem[];
@@ -22,6 +32,11 @@ const productCategories = [
 export function POItemsEditor({ items, onChange, disabled = false }: POItemsEditorProps) {
   const { t } = useTranslation();
 
+  // Get products from store
+  const products = useProductList();
+  const { loadProducts } = usePOActions();
+  const [productSearch, setProductSearch] = useState('');
+
   const [newItem, setNewItem] = useState<Partial<POItem>>({
     productCode: '',
     description: '',
@@ -30,6 +45,20 @@ export function POItemsEditor({ items, onChange, disabled = false }: POItemsEdit
     discount: 0,
     category: '',
   });
+
+  // Load products on mount if not already loaded
+  useEffect(() => {
+    if (products.length === 0) {
+      loadProducts();
+    }
+  }, [products.length, loadProducts]);
+
+  // Generate autocomplete data from products with search filter
+  const productOptions = useMemo(() => {
+    // For Mantine Autocomplete, we need to return an array of strings
+    // We'll create a map to look up products by their display label
+    return products.map((p) => `${p.productCode} - ${p.name}`);
+  }, [products]);
 
   const handleAddItem = () => {
     if (
@@ -71,6 +100,7 @@ export function POItemsEditor({ items, onChange, disabled = false }: POItemsEdit
       discount: 0,
       category: '',
     });
+    setProductSearch('');
   };
 
   const handleRemoveItem = (id: string) => {
@@ -105,7 +135,7 @@ export function POItemsEditor({ items, onChange, disabled = false }: POItemsEdit
       <Table withTableBorder withColumnBorders>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th style={{ width: 120 }}>{t('po.productCode')}</Table.Th>
+            <Table.Th style={{ width: 150 }}>{t('po.productCode')}</Table.Th>
             <Table.Th>{t('po.description')}</Table.Th>
             <Table.Th style={{ width: 120 }}>{t('po.category')}</Table.Th>
             <Table.Th style={{ width: 80 }}>{t('po.quantity')}</Table.Th>
@@ -119,11 +149,43 @@ export function POItemsEditor({ items, onChange, disabled = false }: POItemsEdit
           {items.map((item) => (
             <Table.Tr key={item.id}>
               <Table.Td>
-                <TextInput
+                <Autocomplete
                   size="xs"
                   value={item.productCode}
-                  onChange={(e) => handleUpdateItem(item.id, 'productCode', e.target.value)}
+                  onChange={(value) => {
+                    handleUpdateItem(item.id, 'productCode', value);
+                  }}
+                  onOptionSubmit={(value) => {
+                    // value is the selected option from dropdown (format: "CODE - Name")
+                    const productCode = value.split(' - ')[0];
+                    const product = products.find((p) => p.productCode === productCode);
+                    if (product) {
+                      // Update all fields at once
+                      const updatedItems = items.map((currentItem) => {
+                        if (currentItem.id === item.id) {
+                          const quantity = currentItem.quantity;
+                          const discount = currentItem.discount || 0;
+                          const unitPrice = product.unitPrice;
+                          const totalPrice =
+                            Math.round(quantity * unitPrice * (1 - discount / 100) * 100) / 100;
+
+                          return {
+                            ...currentItem,
+                            productCode: product.productCode,
+                            description: product.name,
+                            unitPrice: product.unitPrice,
+                            category: product.category || currentItem.category,
+                            totalPrice,
+                          };
+                        }
+                        return currentItem;
+                      });
+                      onChange(updatedItems);
+                    }
+                  }}
+                  data={productOptions}
                   disabled={disabled}
+                  limit={10}
                 />
               </Table.Td>
               <Table.Td>
@@ -197,12 +259,37 @@ export function POItemsEditor({ items, onChange, disabled = false }: POItemsEdit
           {/* Add new item row */}
           <Table.Tr>
             <Table.Td>
-              <TextInput
+              <Autocomplete
                 size="xs"
                 placeholder={t('po.enterCode')}
-                value={newItem.productCode || ''}
-                onChange={(e) => setNewItem({ ...newItem, productCode: e.target.value })}
+                value={productSearch}
+                onChange={(value) => {
+                  setProductSearch(value);
+                  // Only update productCode if no product is selected from dropdown
+                  // The auto-fill happens in onOptionSubmit
+                  if (!value.includes(' - ')) {
+                    setNewItem({ ...newItem, productCode: value });
+                  }
+                }}
+                onOptionSubmit={(value) => {
+                  // value is the selected option from dropdown (format: "CODE - Name")
+                  const productCode = value.split(' - ')[0];
+                  const product = products.find((p) => p.productCode === productCode);
+                  if (product) {
+                    // Update all fields at once for new item
+                    setNewItem({
+                      ...newItem,
+                      productCode: product.productCode,
+                      description: product.name,
+                      unitPrice: product.unitPrice,
+                      category: product.category || newItem.category || '',
+                    });
+                    setProductSearch(product.productCode);
+                  }
+                }}
+                data={productOptions}
                 disabled={disabled}
+                limit={10}
               />
             </Table.Td>
             <Table.Td>

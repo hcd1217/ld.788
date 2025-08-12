@@ -1,4 +1,4 @@
-import { Button, Stack, Alert, Transition, Group, Card, Text, Switch } from '@mantine/core';
+import { Button, Stack, Alert, Transition, Group, Card, Text } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -6,10 +6,10 @@ import { POItemsEditor } from './POItemsEditor';
 import { POCustomerSelection } from './POCustomerSelection';
 import { POAddressFields } from './POAddressFields';
 import { POAdditionalInfo } from './POAdditionalInfo';
-import type { Customer } from '@/services/sales/customer';
-import type { POItem } from '@/services/sales/purchaseOrder';
+import type { Customer } from '@/lib/api/schemas/sales.schemas';
+import type { POItem } from '@/lib/api/schemas/sales.schemas';
 import { formatCurrency } from '@/utils/number';
-import { useMemo } from 'react';
+import { useMemo, useEffect, useCallback } from 'react';
 
 type POFormValues = {
   customerId: string;
@@ -42,6 +42,67 @@ type POFormProps = {
   readonly onCancel: () => void;
   readonly isEditMode?: boolean;
 };
+
+// Helper function to format address into single line
+function formatAddressToSingleLine(address: string | undefined): {
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+} {
+  if (!address) {
+    return {
+      street: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: 'Vietnam',
+    };
+  }
+
+  // Parse address assuming format: "Street, City, State PostalCode, Country"
+  // or simpler formats like "Street, City"
+  const parts = address.split(',').map((part) => part.trim());
+
+  let street = '';
+  let city = '';
+  let state = '';
+  let postalCode = '';
+  let country = 'Vietnam';
+
+  if (parts.length >= 2) {
+    street = parts[0] || '';
+    city = parts[1] || '';
+
+    if (parts.length >= 3) {
+      // Check if third part contains state and postal code
+      const statePostal = parts[2];
+      const postalMatch = statePostal.match(/(\d+)/);
+      if (postalMatch) {
+        postalCode = postalMatch[1];
+        state = statePostal.replace(postalMatch[1], '').trim();
+      } else {
+        state = statePostal;
+      }
+    }
+
+    if (parts.length >= 4) {
+      country = parts[3] || 'Vietnam';
+    }
+  } else if (parts.length === 1) {
+    // If only one part, use it as street
+    street = parts[0];
+  }
+
+  return {
+    street,
+    city,
+    state,
+    postalCode,
+    country,
+  };
+}
 
 export function POForm({
   form,
@@ -79,8 +140,34 @@ export function POForm({
     };
   }, [selectedCustomer, totalAmount]);
 
+  // Auto-fill shipping address when customer is selected
+  useEffect(() => {
+    if (selectedCustomer?.address && !isEditMode) {
+      const parsedAddress = formatAddressToSingleLine(selectedCustomer.address);
+      form.setFieldValue('shippingAddress', parsedAddress);
+      // Always use shipping address as billing address
+      form.setFieldValue('useSameAddress', true);
+      form.setFieldValue('billingAddress', parsedAddress);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCustomer?.id, isEditMode]);
+
+  // Handle form submission with address sync
+  const handleSubmit = useCallback(
+    (values: POFormValues) => {
+      // Always ensure billing address matches shipping address
+      const submissionValues = {
+        ...values,
+        useSameAddress: true,
+        billingAddress: values.shippingAddress,
+      };
+      onSubmit(submissionValues);
+    },
+    [onSubmit],
+  );
+
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
+    <form onSubmit={form.onSubmit(handleSubmit)}>
       <Stack gap="lg">
         <Transition mounted={Boolean(error)} transition="fade">
           {(styles) => (
@@ -132,24 +219,10 @@ export function POForm({
               {t('po.shippingAddress')}
             </Text>
             <POAddressFields form={form} fieldPrefix="shippingAddress" required />
-          </Stack>
-        </Card>
-
-        {/* Billing Address */}
-        <Card withBorder radius="md" p="xl">
-          <Stack gap="md">
-            <Group justify="space-between">
-              <Text fw={500} size="lg">
-                {t('po.billingAddress')}
+            {selectedCustomer?.address && (
+              <Text size="sm" c="dimmed" fs="italic">
+                Auto-filled from customer address
               </Text>
-              <Switch
-                label={t('po.sameAsShipping')}
-                {...form.getInputProps('useSameAddress', { type: 'checkbox' })}
-              />
-            </Group>
-
-            {!form.values.useSameAddress && (
-              <POAddressFields form={form} fieldPrefix="billingAddress" required />
             )}
           </Stack>
         </Card>

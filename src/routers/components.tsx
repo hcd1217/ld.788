@@ -146,8 +146,8 @@ export const POListPage = lazy(async () => {
 });
 
 export const POCreatePage = lazy(async () => {
-  const module = await import('@/pages/app/po/POCreatePage');
-  return { default: module.POCreatePage };
+  const module = await import('@/pages/app/po/POFormPage');
+  return { default: () => module.POFormPage({ mode: 'create' }) };
 });
 
 export const PODetailPage = lazy(async () => {
@@ -156,8 +156,8 @@ export const PODetailPage = lazy(async () => {
 });
 
 export const EditPOPage = lazy(async () => {
-  const module = await import('@/pages/app/po/EditPOPage');
-  return { default: module.EditPOPage };
+  const module = await import('@/pages/app/po/POFormPage');
+  return { default: () => module.POFormPage({ mode: 'edit' }) };
 });
 
 export const LoginPage = lazy(async () => {

@@ -15,6 +15,7 @@ import {
 import type { UseFormReturnType } from '@mantine/form';
 import { IconAlertCircle, IconUser, IconMail, IconPhone } from '@tabler/icons-react';
 import { DateInput, DatesProvider } from '@mantine/dates';
+import { useMemo } from 'react';
 import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -61,10 +62,14 @@ export function SingleEmployeeForm({
 }: SingleEmployeeFormProps) {
   const { t } = useTranslation();
 
-  const unitOptions = units.map((unit) => ({
-    value: unit.id,
-    label: unit.name,
-  }));
+  const unitOptions = useMemo(
+    () =>
+      units.map((unit) => ({
+        value: unit.id,
+        label: unit.name,
+      })),
+    [units],
+  );
 
   const locale = i18n.language;
   const valueFormat = locale === 'vi' ? 'DD/MM/YYYY' : 'MMM DD, YYYY';

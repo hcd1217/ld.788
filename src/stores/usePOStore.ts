@@ -3,8 +3,10 @@ import { devtools } from 'zustand/middleware';
 import {
   purchaseOrderService,
   customerService,
+  productService,
   type PurchaseOrder,
   type Customer,
+  type Product,
 } from '@/services/sales';
 import { getErrorMessage } from '@/utils/errorUtils';
 import { useMemo } from 'react';
@@ -14,6 +16,7 @@ type POState = {
   purchaseOrders: PurchaseOrder[];
   customers: Customer[];
   customerMap: Map<string, Customer>;
+  products: Product[];
   currentPO: PurchaseOrder | undefined;
   isLoading: boolean;
   error: string | undefined;
@@ -22,6 +25,7 @@ type POState = {
   setCurrentPO: (po: PurchaseOrder | undefined) => void;
   loadPOs: (force?: boolean) => Promise<void>;
   loadCustomers: () => Promise<void>;
+  loadProducts: () => Promise<void>;
   refreshPOs: () => Promise<void>;
   loadPO: (id: string) => Promise<void>;
   createPO: (po: Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
@@ -47,6 +51,7 @@ export const usePOStore = create<POState>()(
       purchaseOrders: [],
       customers: [],
       customerMap: new Map(),
+      products: [],
       currentPO: undefined,
       isLoading: false,
       error: undefined,
@@ -71,6 +76,18 @@ export const usePOStore = create<POState>()(
         }
       },
 
+      async loadProducts() {
+        set({ error: undefined });
+        try {
+          const products = await productService.getActiveProducts();
+          set({ products });
+        } catch (error) {
+          set({
+            error: getErrorMessage(error, 'Failed to load products'),
+          });
+        }
+      },
+
       async loadPOs(force = false) {
         if (get().purchaseOrders.length > 0 && !force) {
           return;
@@ -78,16 +95,18 @@ export const usePOStore = create<POState>()(
 
         set({ isLoading: true, error: undefined });
         try {
-          // Load both POs and customers in parallel
-          const [purchaseOrders, customers] = await Promise.all([
+          // Load POs, customers and products in parallel
+          const [purchaseOrders, customers, products] = await Promise.all([
             purchaseOrderService.getAllPOs(),
             customerService.getAllCustomers(),
+            productService.getActiveProducts(),
           ]);
           set({
             isLoading: false,
             purchaseOrders,
             customers,
             customerMap: new Map(customers.map((customer: Customer) => [customer.id, customer])),
+            products,
           });
         } catch (error) {
           set({
@@ -296,12 +315,14 @@ export const usePOStore = create<POState>()(
 // Convenience hooks
 export const usePurchaseOrderList = () => usePOStore((state) => state.purchaseOrders);
 export const useCustomerList = () => usePOStore((state) => state.customers);
+export const useProductList = () => usePOStore((state) => state.products);
 export const usePOLoading = () => usePOStore((state) => state.isLoading);
 export const usePOError = () => usePOStore((state) => state.error);
 // Export individual action hooks to avoid object creation
 export const usePOActions = () => {
   const loadPOs = usePOStore((state) => state.loadPOs);
   const loadCustomers = usePOStore((state) => state.loadCustomers);
+  const loadProducts = usePOStore((state) => state.loadProducts);
   const refreshPOs = usePOStore((state) => state.refreshPOs);
   const loadPO = usePOStore((state) => state.loadPO);
   const createPO = usePOStore((state) => state.createPO);
@@ -318,6 +339,7 @@ export const usePOActions = () => {
     () => ({
       loadPOs,
       loadCustomers,
+      loadProducts,
       refreshPOs,
       loadPO,
       createPO,
@@ -343,6 +365,7 @@ export const usePOActions = () => {
     [
       loadPOs,
       loadCustomers,
+      loadProducts,
       refreshPOs,
       loadPO,
       createPO,

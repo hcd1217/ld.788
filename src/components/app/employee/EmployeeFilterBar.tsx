@@ -1,5 +1,6 @@
 import { Stack, Group, Box, Button } from '@mantine/core';
 import { IconChevronDown, IconClearAll } from '@tabler/icons-react';
+import { useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { SearchBar } from '@/components/common';
 import { EMPLOYEE_STATUS } from '@/constants/employee';
@@ -30,6 +31,12 @@ export function EmployeeFilterBar({
 }: EmployeeFilterBarProps) {
   const { t } = useTranslation();
 
+  const selectedUnitName = useMemo(() => {
+    if (!unitId) return t('employee.allUnit');
+    const unit = units.find((unit) => unit.id === unitId);
+    return unit?.name || t('employee.allUnit');
+  }, [unitId, units, t]);
+
   return (
     <Box p="sm" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
       <Stack gap="sm">
@@ -49,7 +56,7 @@ export function EmployeeFilterBar({
             onClick={onUnitClick}
             style={{ flex: 1 }}
           >
-            {unitId ? units.find((unit) => unit.id === unitId)?.name : t('employee.allUnit')}
+            {selectedUnitName}
           </Button>
 
           <Button

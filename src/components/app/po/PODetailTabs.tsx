@@ -99,7 +99,7 @@ export function PODetailTabs({
             width: '100%',
           }}
         >
-          <Box style={{ maxWidth: '800px', width: '100%' }}>
+          <Box w="100%">
             <Stack gap="xl">
               <POErrorBoundary componentName="POBasicInfoCard">
                 <POBasicInfoCard purchaseOrder={purchaseOrder} onEdit={onEdit} />
@@ -126,7 +126,7 @@ export function PODetailTabs({
             width: '100%',
           }}
         >
-          <Box style={{ maxWidth: '800px', width: '100%' }}>
+          <Box w="100%">
             <POItemsList purchaseOrder={purchaseOrder} />
           </Box>
         </Box>
@@ -140,7 +140,7 @@ export function PODetailTabs({
             width: '100%',
           }}
         >
-          <Box style={{ maxWidth: '800px', width: '100%' }}>
+          <Box w="100%">
             <POTimeline purchaseOrder={purchaseOrder} />
           </Box>
         </Box>
@@ -154,7 +154,7 @@ export function PODetailTabs({
             width: '100%',
           }}
         >
-          <Box style={{ maxWidth: '800px', width: '100%' }}>
+          <Box w="100%">
             <Stack gap="lg">
               <Group justify="space-between">
                 <div>

@@ -9,8 +9,7 @@ import { DetailPageLayout } from '@/components/common/layouts/DetailPageLayout';
 import { AppPageTitle } from '@/components/common';
 import { AppMobileLayout } from '@/components/common';
 import {
-  EmployeeDeactivateModal,
-  EmployeeActivateModal,
+  EmployeeStatusModal,
   EmployeeDetailTabs,
   EmployeeDetailAccordion,
   EmployeeDetailAlert,
@@ -95,13 +94,15 @@ export function EmployeeDetailPage() {
   // Modal components
   const modals = (
     <>
-      <EmployeeDeactivateModal
+      <EmployeeStatusModal
+        mode="deactivate"
         opened={deactivateModal.opened}
         employee={targetEmployee}
         onClose={deactivateModal.close}
         onConfirm={confirmDeactivateEmployee}
       />
-      <EmployeeActivateModal
+      <EmployeeStatusModal
+        mode="activate"
         opened={activateModal.opened}
         employee={targetEmployee}
         onClose={activateModal.close}
