@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { Stack, Text, Space, Button, PasswordInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -24,6 +24,7 @@ export function ResetPasswordPage() {
   const { t } = useTranslation();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isValidToken, setIsValidToken] = useState(true);
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const email = searchParams.get('email') ?? '';
   const token = searchParams.get('token') ?? '';
@@ -34,6 +35,13 @@ export function ResetPasswordPage() {
       setIsValidToken(false);
       showErrorNotification(t('auth.invalidResetLink'), t('auth.invalidResetLinkDescription'));
     }
+
+    // Cleanup redirect timer on unmount
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+    };
   }, [email, token, t]);
 
   const form = useForm<ResetPasswordFormValues>({
@@ -50,7 +58,7 @@ export function ResetPasswordPage() {
     errorTitle: t('auth.passwordResetFailed'),
     onSuccess() {
       setIsSubmitted(true);
-      setTimeout(() => navigate(ROUTERS.LOGIN), 3000);
+      redirectTimerRef.current = setTimeout(() => navigate(ROUTERS.LOGIN), 3000);
     },
   });
 

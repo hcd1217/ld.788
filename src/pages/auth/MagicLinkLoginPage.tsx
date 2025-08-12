@@ -16,7 +16,7 @@ const MAGIC_LINK_STORAGE_KEY = 'magicLinkParams';
 export function MagicLinkLoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { setUser } = useAppStore();
+  const { setUser, fetchUserProfile } = useAppStore();
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -82,6 +82,8 @@ export function MagicLinkLoginPage() {
       const { user } = await authService.loginWithMagicToken(clientCode, token);
 
       setUser(user);
+      // Fetch user profile after successful magic link login
+      await fetchUserProfile();
       setError(undefined);
     },
     errorHandler(error) {

@@ -7,6 +7,7 @@ export { BlankContainer } from './BlankContainer';
 export { BlankState } from './BlankState';
 export { ComingSoonCard } from './ComingSoonCard';
 export { CommonMobileFooter } from './CommonMobileFooter';
+export { CommonMobileFooterSkeleton } from './CommonMobileFooterSkeleton';
 export { CommonMobileHeader } from './CommonMobileHeader';
 export { ContactInfo } from './ContactInfo';
 export { DataTable } from './DataTable';

@@ -2,9 +2,15 @@ import { AppShell } from '@mantine/core';
 import { Outlet } from 'react-router';
 import classes from './AuthLayoutMobile.module.css';
 import { CommonMobileFooter, CommonMobileHeader } from '@/components/common';
+import { CommonMobileFooterSkeleton } from '@/components/common/ui/CommonMobileFooterSkeleton';
+import { useAppStore } from '@/stores/useAppStore';
 
 // @deprecated: This method should not be used any more
 export function AuthLayoutMobile() {
+  // Check if user profile is loading
+  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
+  const userProfile = useAppStore((state) => state.userProfile);
+  const isProfileLoading = isAuthenticated && !userProfile;
   return (
     <AppShell
       header={{ height: 60 }}
@@ -21,7 +27,7 @@ export function AuthLayoutMobile() {
       </AppShell.Main>
 
       <AppShell.Footer className={classes.footer}>
-        <CommonMobileFooter />
+        {isProfileLoading ? <CommonMobileFooterSkeleton /> : <CommonMobileFooter />}
       </AppShell.Footer>
     </AppShell>
   );

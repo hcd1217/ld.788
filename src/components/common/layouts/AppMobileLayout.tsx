@@ -2,6 +2,8 @@ import React from 'react';
 import { AppShell, Container, Group, LoadingOverlay } from '@mantine/core';
 import { CommonMobileHeader } from '../ui/CommonMobileHeader';
 import { CommonMobileFooter } from '../ui';
+import { CommonMobileFooterSkeleton } from '../ui/CommonMobileFooterSkeleton';
+import { useAppStore } from '@/stores/useAppStore';
 import { AppLogo, GoBack } from '../navigation';
 import { ErrorAlert } from '../feedback';
 import classes from './AppLayoutMobile.module.css';
@@ -35,6 +37,11 @@ export function AppMobileLayout({
   clearError,
 }: AppMobileLayoutProps) {
   const isDefaultHeader = !header && !noHeader;
+
+  // Check if user profile is loading
+  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
+  const userProfile = useAppStore((state) => state.userProfile);
+  const isProfileLoading = isAuthenticated && !userProfile;
   return (
     <AppShell
       header={noHeader ? undefined : { height: 60, offset: false }}
@@ -76,7 +83,7 @@ export function AppMobileLayout({
       </AppShell.Main>
       {!noFooter && (
         <AppShell.Footer className={classes.footer}>
-          {footer ?? <CommonMobileFooter />}
+          {footer ?? (isProfileLoading ? <CommonMobileFooterSkeleton /> : <CommonMobileFooter />)}
         </AppShell.Footer>
       )}
     </AppShell>

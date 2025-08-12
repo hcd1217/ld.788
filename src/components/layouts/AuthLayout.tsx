@@ -2,14 +2,21 @@ import { AppShell, Group, Burger } from '@mantine/core';
 import { Outlet } from 'react-router';
 import { useDisclosure } from '@mantine/hooks';
 import { NavBar } from './NavBar';
+import { NavBarSkeleton } from './NavBarSkeleton';
 import { UserMenu } from './UserMenu';
 import { ColorSchemeToggle, LanguageSwitcher, AppLogo } from '@/components/common';
 import { LAYOUT_CONFIG } from '@/config/layoutConfig';
 import { useDeviceType } from '@/hooks/useDeviceType';
+import { useAppStore } from '@/stores/useAppStore';
 
 export function AuthLayout() {
   const [isMenuOpen, { toggle: toggleMenu }] = useDisclosure(true);
   const { isMobile } = useDeviceType();
+
+  // Check if user profile is loading
+  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
+  const userProfile = useAppStore((state) => state.userProfile);
+  const isProfileLoading = isAuthenticated && !userProfile;
 
   if (isMobile) {
     return <Outlet />;
@@ -51,7 +58,7 @@ export function AuthLayout() {
           </Group>
         </Group>
       </AppShell.Header>
-      {isMenuOpen ? <NavBar /> : null}
+      {isMenuOpen ? isProfileLoading ? <NavBarSkeleton /> : <NavBar /> : null}
       <AppShell.Main pl={mainPaddingLeft}>
         <Outlet />
       </AppShell.Main>

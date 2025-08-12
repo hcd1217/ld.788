@@ -84,9 +84,17 @@ export function downloadFile(content: string, filename: string, mimeType = 'text
   const link = document.createElement('a');
   link.href = url;
   link.download = filename;
-  document.body.append(link);
-  link.click();
-  link.remove();
+
+  // Add defensive checks for DOM manipulation
+  if (document.body) {
+    document.body.append(link);
+    link.click();
+    // Use defensive removal with parentNode check
+    if (link.parentNode) {
+      link.parentNode.removeChild(link);
+    }
+  }
+
   URL.revokeObjectURL(url);
 }
 

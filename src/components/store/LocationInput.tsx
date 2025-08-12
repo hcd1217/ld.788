@@ -77,7 +77,20 @@ export function LocationInput({
 
     return () => {
       if (autocompleteRef.current) {
+        // Clear all event listeners from the autocomplete instance
         google.maps.event.clearInstanceListeners(autocompleteRef.current);
+
+        // Remove Google Maps autocomplete dropdown from DOM if it exists
+        // Google Maps creates pac-container elements that might not be cleaned up properly
+        const pacContainers = document.querySelectorAll('.pac-container');
+        pacContainers.forEach((container) => {
+          if (container && container.parentNode) {
+            container.parentNode.removeChild(container);
+          }
+        });
+
+        // Clear the reference
+        autocompleteRef.current = null;
       }
     };
   }, [isLoaded, onLocationSelect, onAddressChange]);

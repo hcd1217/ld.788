@@ -95,7 +95,6 @@ export class AuthApi extends BaseApiClient {
     // const isCached = this.hasCachedData(cacheKey);
     // const ttlRemaining = this.getCacheTTL(cacheKey);
     // this.clearCacheEntry(cacheKey); // To clear specific cache
-
     return this.get<GetMeResponse>('/auth/me', undefined, GetMeResponseSchema);
   }
 }

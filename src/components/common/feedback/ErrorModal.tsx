@@ -362,9 +362,17 @@ export function ErrorModal({ isAutoOpen = true, autoCloseDelay }: ErrorModalProp
     const link = document.createElement('a');
     link.href = url;
     link.download = `error-log-${Date.now()}.json`;
-    document.body.append(link);
-    link.click();
-    link.remove();
+
+    // Add defensive check before DOM manipulation
+    if (document.body) {
+      document.body.append(link);
+      link.click();
+      // Use defensive removal with parentNode check
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+    }
+
     URL.revokeObjectURL(url);
 
     showSuccessNotification('Success', 'Error log exported successfully');
