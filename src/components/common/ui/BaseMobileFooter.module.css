@@ -17,9 +17,6 @@
 .navItemActive {
   color: var(--mantine-color-brand-filled);
 }
-.navItemActiveBg {
-  background-color: light-dark(var(--mantine-color-brand-0), var(--mantine-color-dark-7));
-}
 
 .navIcon {
   transition: all 0.2s ease;

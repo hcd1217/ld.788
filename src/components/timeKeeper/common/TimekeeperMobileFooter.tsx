@@ -57,7 +57,6 @@ export function TimekeeperMobileFooter() {
 
   return (
     <BaseMobileFooter
-      noActiveBg
       items={navigationItems}
       activeItemId={activeItemId}
       onItemClick={handleItemClick}

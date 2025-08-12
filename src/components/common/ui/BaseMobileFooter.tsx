@@ -17,7 +17,6 @@ export interface BaseMobileFooterProps {
   readonly className?: string;
   readonly itemClassName?: string;
   readonly activeItemClassName?: string;
-  readonly noActiveBg?: boolean;
   readonly onItemClick?: (item: BaseMobileFooterItem) => void;
 }
 
@@ -27,7 +26,6 @@ export function BaseMobileFooter({
   iconSize = 24,
   className,
   itemClassName,
-  noActiveBg,
   activeItemClassName,
   onItemClick,
 }: BaseMobileFooterProps) {
@@ -45,7 +43,7 @@ export function BaseMobileFooter({
             <UnstyledButton
               className={`${classes.navItem} ${itemClassName || ''} ${
                 isActive ? `${classes.navItemActive} ${activeItemClassName || ''}` : ''
-              } ${isActive && !noActiveBg ? classes.navItemActiveBg : ''}`}
+              }`}
               onClick={() => onItemClick?.(item)}
               w="100%"
               h="100%"
