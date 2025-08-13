@@ -33,6 +33,7 @@ import { StaffList } from '@/components/staff';
 import type { Staff } from '@/services/staff';
 import { ErrorAlert } from '@/components/common';
 import { ROUTERS, getStaffEditRoute } from '@/config/routeConfig';
+import { isDevelopment } from '@/utils/env';
 
 export function StaffListPage() {
   const navigate = useNavigate();
@@ -57,7 +58,9 @@ export function StaffListPage() {
         try {
           await loadStaff(currentStore.id);
         } catch (error) {
-          console.error(error);
+          if (isDevelopment) {
+            console.error(error);
+          }
         }
       }
     };

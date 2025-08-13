@@ -1160,7 +1160,12 @@
     "selectDateRange": "Chọn khoảng thời gian",
     "selectEndDate": "Chọn ngày kết thúc",
     "selectStartDate": "Chọn ngày bắt đầu",
-    "dateRange": "Khoảng thời gian"
+    "dateRange": "Khoảng thời gian",
+    "unsavedItem": "Mục chưa lưu",
+    "unsavedItemMessage": "Bạn có một mục chưa lưu trong biểu mẫu. Bạn có muốn thêm nó trước khi lưu không?",
+    "pendingItemDetails": "Chi tiết mục đang chờ",
+    "addAndContinue": "Thêm mục và lưu",
+    "continueWithoutAdding": "Lưu mà không thêm"
   },
   "timekeeper": {
     "checkIn": "Vào ca",

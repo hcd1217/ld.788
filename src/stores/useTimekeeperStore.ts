@@ -10,6 +10,7 @@ import type {
   TimesheetEntry,
 } from '@/types/timekeeper';
 import { getErrorMessage } from '@/utils/errorUtils';
+import { isDevelopment } from '@/utils/env';
 
 interface PhotoData {
   base64: string;
@@ -358,7 +359,9 @@ export const useTimekeeperStore = create<TimekeeperState>()(
             clockPhotos: photos,
           });
         } catch (error) {
-          console.error('Failed to fetch today clock entries:', error);
+          if (isDevelopment) {
+            console.error('Failed to fetch today clock entries:', error);
+          }
         }
       },
 

@@ -5,6 +5,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { showSuccessNotification, showErrorNotification } from '@/utils/notifications';
 import type { Employee } from '@/services/hr/employee';
 import { renderFullName } from '@/utils/string';
+import { isDevelopment } from '@/utils/env';
 
 type EmployeeMagicLinkModalProps = {
   readonly opened: boolean;
@@ -52,7 +53,9 @@ export function EmployeeMagicLinkModal({
         setCopiedImage(false);
       }, 2000);
     } catch (error) {
-      console.error('Failed to copy QR code:', error);
+      if (isDevelopment) {
+        console.error('Failed to copy QR code:', error);
+      }
       showErrorNotification(t('common.error'), t('employee.copyQrCodeFailed'));
     }
   }, [qrCodeData, t]);

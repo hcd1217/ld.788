@@ -4,6 +4,7 @@ import { notifications } from '@mantine/notifications';
 import { useLocalStorage } from '@mantine/hooks';
 import { showSuccessNotification } from '@/utils/notifications';
 import { useTranslation } from '@/hooks/useTranslation';
+import { isDevelopment } from '@/utils/env';
 
 // Browser detection utilities
 const isChromium = () => {
@@ -64,7 +65,9 @@ export function usePWA() {
       }
     },
     onRegisterError(error) {
-      console.error('PWA Service Worker registration error:', error);
+      if (isDevelopment) {
+        console.error('PWA Service Worker registration error:', error);
+      }
     },
   });
 

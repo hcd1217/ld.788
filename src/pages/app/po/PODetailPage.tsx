@@ -11,7 +11,7 @@ import { AppMobileLayout } from '@/components/common';
 import {
   PODetailTabs,
   PODetailAccordion,
-  POActionModal,
+  POStatusModal,
   POErrorBoundary,
   PODetailTabsSkeleton,
 } from '@/components/app/po';
@@ -154,11 +154,11 @@ export function PODetailPage() {
       errorTitle: t('common.error'),
       errorMessage: t('po.cancelFailed'),
     },
-    async actionHandler() {
+    async actionHandler(data) {
       if (!selectedPO) {
         throw new Error(t('po.cancelFailed'));
       }
-      await cancelPurchaseOrder(selectedPO.id);
+      await cancelPurchaseOrder(selectedPO.id, data);
       closeModal('cancel');
     },
   });
@@ -170,11 +170,11 @@ export function PODetailPage() {
       errorTitle: t('common.error'),
       errorMessage: t('po.refundFailed'),
     },
-    async actionHandler() {
+    async actionHandler(data?: { reason?: string; refundAmount?: number }) {
       if (!selectedPO) {
         throw new Error(t('po.refundFailed'));
       }
-      await refundPurchaseOrder(selectedPO.id);
+      await refundPurchaseOrder(selectedPO.id, data);
       closeModal('refund');
     },
   });
@@ -183,48 +183,48 @@ export function PODetailPage() {
     void refreshPurchaseOrders();
   });
 
-  // Modal components using the generic POActionModal
+  // Modal components using the enhanced POStatusModal
   const modalComponents = (
     <>
-      <POActionModal
+      <POStatusModal
         opened={modals.confirmModalOpened}
         purchaseOrder={selectedPO}
-        action="confirm"
+        mode="confirm"
         onClose={() => closeModal('confirm')}
         onConfirm={confirmPOAction}
       />
-      <POActionModal
+      <POStatusModal
         opened={modals.processModalOpened}
         purchaseOrder={selectedPO}
-        action="process"
+        mode="process"
         onClose={() => closeModal('process')}
         onConfirm={processPOAction}
       />
-      <POActionModal
+      <POStatusModal
         opened={modals.shipModalOpened}
         purchaseOrder={selectedPO}
-        action="ship"
+        mode="ship"
         onClose={() => closeModal('ship')}
         onConfirm={shipPOAction}
       />
-      <POActionModal
+      <POStatusModal
         opened={modals.deliverModalOpened}
         purchaseOrder={selectedPO}
-        action="deliver"
+        mode="deliver"
         onClose={() => closeModal('deliver')}
         onConfirm={deliverPOAction}
       />
-      <POActionModal
+      <POStatusModal
         opened={modals.cancelModalOpened}
         purchaseOrder={selectedPO}
-        action="cancel"
+        mode="cancel"
         onClose={() => closeModal('cancel')}
         onConfirm={cancelPOAction}
       />
-      <POActionModal
+      <POStatusModal
         opened={modals.refundModalOpened}
         purchaseOrder={selectedPO}
-        action="refund"
+        mode="refund"
         onClose={() => closeModal('refund')}
         onConfirm={refundPOAction}
       />

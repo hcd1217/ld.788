@@ -26,9 +26,18 @@ export const PO_ACTIONS = {
   REFUND: 'refund',
 } as const;
 
+export const PRODUCT_CATEGORIES = [
+  { value: 'Electronics', label: 'Electronics' },
+  { value: 'Office Supplies', label: 'Office Supplies' },
+  { value: 'Hardware', label: 'Hardware' },
+  { value: 'Software', label: 'Software' },
+  { value: 'Services', label: 'Services' },
+] as const;
+
 export type POStatusType = (typeof PO_STATUS)[keyof typeof PO_STATUS];
 export type PaymentTermsType = (typeof PAYMENT_TERMS)[keyof typeof PAYMENT_TERMS];
 export type POActionType = (typeof PO_ACTIONS)[keyof typeof PO_ACTIONS];
+export type ProductCategoryType = (typeof PRODUCT_CATEGORIES)[number];
 
 // Status colors for UI
 export const PO_STATUS_COLORS: Record<Exclude<POStatusType, 'all'>, string> = {

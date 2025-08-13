@@ -176,7 +176,8 @@ export const UpdatePurchaseOrderRequestSchema = z.object({
 });
 
 export const UpdatePOStatusRequestSchema = z.object({
-  reason: optionalStringSchema,
+  cancelReason: optionalStringSchema,
+  refundReason: optionalStringSchema,
   refundAmount: numberSchema.optional(),
 });
 

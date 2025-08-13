@@ -12,6 +12,7 @@ import { authApi, clientApi, type ClientPublicConfigResponse } from '@/lib/api';
 import { updateClientTranslations, clearClientTranslations } from '@/lib/i18n';
 import type { GetMeResponse } from '@/lib/api/schemas/auth.schemas';
 import { cacheNavigationConfig, clearNavigationCache } from '@/utils/navigationCache';
+import { isDevelopment } from '@/utils/env';
 
 type User = {
   id: string;
@@ -76,7 +77,9 @@ export const useAppStore = create<AppState>()(
           set({ publicClientConfig: config });
         })
         .catch((error) => {
-          console.error('Failed to fetch initial public client config:', error);
+          if (isDevelopment) {
+            console.error('Failed to fetch initial public client config:', error);
+          }
         });
 
       return {
@@ -127,19 +130,14 @@ export const useAppStore = create<AppState>()(
               updateClientTranslations(profile.clientConfig.translations);
             }
           } catch (error: unknown) {
-            console.error('Failed to fetch user profile:', error);
+            if (isDevelopment) {
+              console.error('Failed to fetch user profile:', error);
+            }
 
-            // Check if it's a 401 or 403 error
+            // Check if it's a 401
             const isApiError = error && typeof error === 'object' && 'status' in error;
             const errorStatus = isApiError ? (error as { status: number }).status : 0;
-            const isApiPermissionError = [401, 403].includes(errorStatus);
-
-            if (isApiPermissionError && get().isAuthenticated) {
-              // User is authenticated but got 401 / 403 - this is a permission error
-              set({ permissionError: true });
-            } else if (!get().isLoading) {
-              // Only logout if we're not in the middle of a login process
-              // and it's not a permission error
+            if (errorStatus === 401) {
               get().logout();
             }
           }
@@ -154,7 +152,9 @@ export const useAppStore = create<AppState>()(
             const config = await clientApi.getPubicClientConfig(clientCode);
             set({ publicClientConfig: config });
           } catch (error) {
-            console.error('Failed to fetch public client config:', error);
+            if (isDevelopment) {
+              console.error('Failed to fetch public client config:', error);
+            }
             // Don't throw the error, just log it
             // The UI can handle the undefined publicClientConfig state
           }

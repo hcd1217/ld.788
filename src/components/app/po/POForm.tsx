@@ -1,17 +1,25 @@
-import { Button, Stack, Alert, Transition, Group, Card, Text } from '@mantine/core';
+import React from 'react';
+import { Stack, Alert, Transition, Card, Text, Box } from '@mantine/core';
+import { modals } from '@mantine/modals';
 import type { UseFormReturnType } from '@mantine/form';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { POItemsEditor } from './POItemsEditor';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { POItemsEditor, type POItemsEditorRef } from './POItemsEditor';
 import { POCustomerSelection } from './POCustomerSelection';
 import { POAddressFields } from './POAddressFields';
 import { POAdditionalInfo } from './POAdditionalInfo';
-import type { Customer } from '@/lib/api/schemas/sales.schemas';
-import type { POItem } from '@/lib/api/schemas/sales.schemas';
+import { POFormActions } from './POFormActions';
+import {
+  createAddressFromCustomer,
+  prepareSubmissionValues,
+  calculateCreditStatus,
+} from './POFormHelpers';
+import type { Customer, POItem } from '@/lib/api/schemas/sales.schemas';
 import { formatCurrency } from '@/utils/number';
-import { useMemo, useEffect, useCallback } from 'react';
+import { useMemo, useEffect, useCallback, useRef } from 'react';
 
-type POFormValues = {
+export type POFormValues = {
   customerId: string;
   items: POItem[];
   shippingAddress: {
@@ -45,33 +53,6 @@ type POFormProps = {
   readonly isEditMode?: boolean;
 };
 
-// Helper function to create address from customer data
-function createAddressFromCustomer(customerAddress: string | undefined): {
-  oneLineAddress?: string;
-  street?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  country?: string;
-} {
-  if (!customerAddress) {
-    return {
-      oneLineAddress: '',
-    };
-  }
-
-  // Use the customer address as one-line address
-  return {
-    oneLineAddress: customerAddress,
-    // Keep other fields empty - user can fill them if needed
-    street: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: '',
-  };
-}
-
 export function POForm({
   form,
   customers,
@@ -82,7 +63,10 @@ export function POForm({
   isEditMode = false,
 }: POFormProps) {
   const { t } = useTranslation();
+  const { isMobile } = useDeviceType();
+  const itemsEditorRef = useRef<POItemsEditorRef>(null);
 
+  // Computed values
   const selectedCustomer = useMemo(
     () => customers.find((c) => c.id === form.values.customerId),
     [customers, form.values.customerId],
@@ -93,121 +77,278 @@ export function POForm({
     [form.values.items],
   );
 
-  const creditStatus = useMemo(() => {
-    if (!selectedCustomer || !selectedCustomer.creditLimit) return undefined;
-
-    const availableCredit = selectedCustomer.creditLimit - selectedCustomer.creditUsed;
-    const afterOrderCredit = availableCredit - totalAmount;
-
-    return {
-      limit: selectedCustomer.creditLimit,
-      current: selectedCustomer.creditUsed,
-      available: availableCredit,
-      afterOrder: afterOrderCredit,
-      exceeds: afterOrderCredit < 0,
-    };
-  }, [selectedCustomer, totalAmount]);
+  const creditStatus = useMemo(
+    () => calculateCreditStatus(selectedCustomer, totalAmount),
+    [selectedCustomer, totalAmount],
+  );
 
   // Auto-fill shipping address when customer is selected
   useEffect(() => {
     if (selectedCustomer?.address && !isEditMode) {
       const address = createAddressFromCustomer(selectedCustomer.address);
       form.setFieldValue('shippingAddress', address);
-      // Always use shipping address as billing address
       form.setFieldValue('useSameAddress', true);
       form.setFieldValue('billingAddress', address);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCustomer?.id, isEditMode]);
 
-  // Handle form submission with address sync
-  const handleSubmit = useCallback(
-    (values: POFormValues) => {
-      // Always ensure billing address matches shipping address
-      const submissionValues = {
-        ...values,
-        useSameAddress: true,
-        billingAddress: values.shippingAddress,
-      };
-      onSubmit(submissionValues);
+  // Handle pending item confirmation
+  const handlePendingItemConfirmation = useCallback(
+    (values: POFormValues, pendingItem: any) => {
+      modals.openConfirmModal({
+        title: t('po.unsavedItem'),
+        children: <PendingItemMessage pendingItem={pendingItem} />,
+        labels: {
+          confirm: t('po.addAndContinue'),
+          cancel: t('po.continueWithoutAdding'),
+        },
+        confirmProps: { color: 'blue' },
+        onConfirm: () => {
+          const newItem = itemsEditorRef.current?.buildPendingItem();
+          if (newItem) {
+            const submissionValues = prepareSubmissionValues({
+              ...values,
+              items: [...values.items, newItem],
+            });
+            itemsEditorRef.current?.clearPendingItem();
+            onSubmit(submissionValues);
+          } else {
+            onSubmit(prepareSubmissionValues(values));
+          }
+        },
+        onCancel: () => {
+          itemsEditorRef.current?.clearPendingItem();
+          onSubmit(prepareSubmissionValues(values));
+        },
+      });
     },
-    [onSubmit],
+    [onSubmit, t],
   );
 
+  // Handle form submission
+  const handleSubmit = useCallback(
+    (values: POFormValues) => {
+      if (itemsEditorRef.current?.hasPendingItem()) {
+        const pendingItem = itemsEditorRef.current.getPendingItemDetails();
+        handlePendingItemConfirmation(values, pendingItem);
+      } else {
+        onSubmit(prepareSubmissionValues(values));
+      }
+    },
+    [handlePendingItemConfirmation, onSubmit],
+  );
+
+  // Form content without actions
+  const formContent = (
+    <Stack gap="lg">
+      {/* Error Alert */}
+      <ErrorAlert error={error} />
+
+      {/* Customer Selection */}
+      <POCustomerSelection
+        form={form}
+        customers={customers}
+        selectedCustomer={selectedCustomer}
+        creditStatus={creditStatus}
+        isEditMode={isEditMode}
+      />
+
+      {/* Order Items */}
+      <OrderItemsSection
+        form={form}
+        itemsEditorRef={itemsEditorRef}
+        isLoading={isLoading}
+        totalAmount={totalAmount}
+      />
+
+      {/* Shipping Address */}
+      <ShippingAddressSection form={form} selectedCustomer={selectedCustomer} />
+
+      {/* Additional Information */}
+      <POAdditionalInfo form={form} />
+    </Stack>
+  );
+
+  // Mobile layout with fixed buttons
+  if (isMobile) {
+    return (
+      <>
+        <form id="po-form" onSubmit={form.onSubmit(handleSubmit)}>
+          <Box pb={100}>
+            {/* Padding to ensure content isn't hidden behind fixed buttons */}
+            {formContent}
+          </Box>
+        </form>
+
+        {/* Fixed buttons at bottom of viewport */}
+        <Box
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'var(--mantine-color-body)',
+            borderTop: '1px solid var(--mantine-color-gray-3)',
+            padding: '12px 16px',
+            zIndex: 1000,
+          }}
+        >
+          <POFormActions
+            onCancel={onCancel}
+            isLoading={isLoading}
+            isEditMode={isEditMode}
+            isMobile={true}
+            formId="po-form"
+          />
+        </Box>
+      </>
+    );
+  }
+
+  // Desktop layout - simple approach with fixed buttons at viewport bottom
   return (
-    <form onSubmit={form.onSubmit(handleSubmit)}>
-      <Stack gap="lg">
-        <Transition mounted={Boolean(error)} transition="fade">
-          {(styles) => (
-            <Alert
-              withCloseButton
-              style={styles}
-              icon={<IconAlertCircle size={16} />}
-              color="red"
-              variant="light"
-              onClose={() => {}}
-            >
-              {error || t('common.checkFormErrors')}
-            </Alert>
-          )}
-        </Transition>
+    <>
+      <form id="po-form-desktop" onSubmit={form.onSubmit(handleSubmit)}>
+        <Box pb={100}>
+          {/* Padding to prevent content overlap with fixed buttons */}
+          {formContent}
+        </Box>
+      </form>
 
-        {/* Customer Selection */}
-        <POCustomerSelection
-          form={form}
-          customers={customers}
-          selectedCustomer={selectedCustomer}
-          creditStatus={creditStatus}
-          isEditMode={isEditMode}
+      {/* Fixed buttons at bottom of viewport for desktop */}
+      <Box
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          borderTop: '1px solid var(--mantine-color-gray-3)',
+          padding: 'var(--mantine-spacing-md) var(--mantine-spacing-xl)',
+          backgroundColor: 'var(--mantine-color-body)',
+          zIndex: 100,
+        }}
+      >
+        <Box style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <POFormActions
+            onCancel={onCancel}
+            isLoading={isLoading}
+            isEditMode={isEditMode}
+            isMobile={false}
+            formId="po-form-desktop"
+          />
+        </Box>
+      </Box>
+    </>
+  );
+}
+
+// Sub-components for cleaner organization
+function ErrorAlert({ error }: { error?: string | null }) {
+  const { t } = useTranslation();
+
+  return (
+    <Transition mounted={Boolean(error)} transition="fade">
+      {(styles) => (
+        <Alert
+          withCloseButton
+          style={styles}
+          icon={<IconAlertCircle size={16} />}
+          color="red"
+          variant="light"
+          onClose={() => {}}
+        >
+          {error || t('common.checkFormErrors')}
+        </Alert>
+      )}
+    </Transition>
+  );
+}
+
+function OrderItemsSection({
+  form,
+  itemsEditorRef,
+  isLoading,
+  totalAmount,
+}: {
+  form: UseFormReturnType<POFormValues>;
+  itemsEditorRef: React.RefObject<POItemsEditorRef | null>;
+  isLoading: boolean;
+  totalAmount: number;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <Card withBorder radius="md" p="xl">
+      <Stack gap="md">
+        <Text fw={500} size="lg">
+          {t('po.orderItems')}
+        </Text>
+        <POItemsEditor
+          ref={itemsEditorRef}
+          items={form.values.items}
+          onChange={(items) => form.setFieldValue('items', items)}
+          disabled={isLoading}
         />
-
-        {/* Order Items */}
-        <Card withBorder radius="md" p="xl">
-          <Stack gap="md">
-            <Text fw={500} size="lg">
-              {t('po.orderItems')}
-            </Text>
-            <POItemsEditor
-              items={form.values.items}
-              onChange={(items) => form.setFieldValue('items', items)}
-              disabled={isLoading}
-            />
-            <Group justify="flex-end">
-              <Text size="lg" fw={600}>
-                {t('po.totalAmount')}: {formatCurrency(totalAmount)}
-              </Text>
-            </Group>
-          </Stack>
-        </Card>
-
-        {/* Shipping Address */}
-        <Card withBorder radius="md" p="xl">
-          <Stack gap="md">
-            <Text fw={500} size="lg">
-              {t('po.shippingAddress')}
-            </Text>
-            <POAddressFields form={form} fieldPrefix="shippingAddress" />
-            {selectedCustomer?.address && (
-              <Text size="sm" c="dimmed" fs="italic">
-                Auto-filled from customer address
-              </Text>
-            )}
-          </Stack>
-        </Card>
-
-        {/* Additional Information */}
-        <POAdditionalInfo form={form} />
-
-        {/* Form Actions */}
-        <Group justify="flex-end">
-          <Button variant="default" onClick={onCancel}>
-            {t('common.cancel')}
-          </Button>
-          <Button type="submit" loading={isLoading}>
-            {isEditMode ? t('common.save') : t('po.createPO')}
-          </Button>
-        </Group>
+        <Text size="lg" fw={600} ta="right">
+          {t('po.totalAmount')}: {formatCurrency(totalAmount)}
+        </Text>
       </Stack>
-    </form>
+    </Card>
+  );
+}
+
+function ShippingAddressSection({
+  form,
+  selectedCustomer,
+}: {
+  form: UseFormReturnType<POFormValues>;
+  selectedCustomer?: Customer;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <Card withBorder radius="md" p="xl">
+      <Stack gap="md">
+        <Text fw={500} size="lg">
+          {t('po.shippingAddress')}
+        </Text>
+        <POAddressFields form={form} fieldPrefix="shippingAddress" />
+        {selectedCustomer?.address && (
+          <Text size="sm" c="dimmed" fs="italic">
+            Auto-filled from customer address
+          </Text>
+        )}
+      </Stack>
+    </Card>
+  );
+}
+
+function PendingItemMessage({ pendingItem }: { pendingItem: any }) {
+  const { t } = useTranslation();
+
+  return (
+    <Stack gap="sm">
+      <Text size="sm">{t('po.unsavedItemMessage')}</Text>
+      {pendingItem && (
+        <Stack gap="xs">
+          <Text size="sm" fw={500}>
+            {t('po.pendingItemDetails')}:
+          </Text>
+          <Text size="sm">
+            • {t('po.productCode')}: {pendingItem.productCode || '-'}
+          </Text>
+          <Text size="sm">
+            • {t('po.description')}: {pendingItem.description || '-'}
+          </Text>
+          <Text size="sm">
+            • {t('po.quantity')}: {pendingItem.quantity || 0}
+          </Text>
+          <Text size="sm">
+            • {t('po.unitPrice')}: {formatCurrency(pendingItem.unitPrice || 0)}
+          </Text>
+        </Stack>
+      )}
+    </Stack>
   );
 }

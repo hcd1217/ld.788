@@ -9,6 +9,7 @@ import type {
   UpdateStoreOperatingHoursRequest,
 } from '@/lib/api/schemas/store.schemas';
 import { getErrorMessage } from '@/utils/errorUtils';
+import { isDevelopment } from '@/utils/env';
 
 type StoreConfigState = {
   // Store data
@@ -90,7 +91,9 @@ export const useStoreConfigStore = create<StoreConfigState>()(
             get()
               .loadStores()
               .catch((error) => {
-                console.error('Background refresh failed:', error);
+                if (isDevelopment) {
+                  console.error('Background refresh failed:', error);
+                }
               });
 
             return newStore;
@@ -173,7 +176,9 @@ export const useStoreConfigStore = create<StoreConfigState>()(
             get()
               .loadStores()
               .catch((error) => {
-                console.error('Background refresh failed:', error);
+                if (isDevelopment) {
+                  console.error('Background refresh failed:', error);
+                }
               });
           } catch (error) {
             // Rollback on error
@@ -237,11 +242,15 @@ export const useStoreConfigStore = create<StoreConfigState>()(
               return !existsOnServer;
             } catch (apiError) {
               // If API check fails, fall back to local check only
-              console.error('API check failed, using local validation only:', apiError);
+              if (isDevelopment) {
+                console.error('API check failed, using local validation only:', apiError);
+              }
               return true; // Assume it's unique if we can't verify
             }
           } catch (error) {
-            console.error('Error checking store code uniqueness:', error);
+            if (isDevelopment) {
+              console.error('Error checking store code uniqueness:', error);
+            }
             return false;
           }
         },

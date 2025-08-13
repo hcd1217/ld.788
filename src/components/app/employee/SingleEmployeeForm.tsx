@@ -142,6 +142,7 @@ export function SingleEmployeeForm({
                 label={t('employee.monthlySalary')}
                 placeholder="12,000,000"
                 min={0}
+                step={1000000}
                 thousandSeparator=","
                 leftSection="₫"
                 {...form.getInputProps('monthlySalary')}
@@ -152,6 +153,7 @@ export function SingleEmployeeForm({
                 label={t('employee.hourlyRate')}
                 placeholder="25,000"
                 min={0}
+                step={1000}
                 thousandSeparator=","
                 leftSection="₫"
                 {...form.getInputProps('hourlyRate')}

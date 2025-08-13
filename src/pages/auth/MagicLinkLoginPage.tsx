@@ -10,6 +10,7 @@ import { FormContainer } from '@/components/form/FormContainer';
 import { AuthHeader, QrScannerModal } from '@/components/auth';
 import { ROUTERS } from '@/config/routeConfig';
 import { authService } from '@/services/auth';
+import { isDevelopment } from '@/utils/env';
 
 const MAGIC_LINK_STORAGE_KEY = 'magicLinkParams';
 
@@ -87,7 +88,9 @@ export function MagicLinkLoginPage() {
       setError(undefined);
     },
     errorHandler(error) {
-      console.error('Magic link verification failed:', error);
+      if (isDevelopment) {
+        console.error('Magic link verification failed:', error);
+      }
       setError(t('auth.magicLink.verificationFailed'));
     },
     cleanupHandler() {
@@ -154,7 +157,9 @@ export function MagicLinkLoginPage() {
         void verifyMagicLink();
       }
     } catch (err) {
-      console.error('Invalid QR code:', err);
+      if (isDevelopment) {
+        console.error('Invalid QR code:', err);
+      }
       setError(t('auth.magicLink.invalidQrCode'));
     }
   };
@@ -177,7 +182,9 @@ export function MagicLinkLoginPage() {
         void verifyMagicLink();
       }
     } catch (err) {
-      console.error('Invalid manual code:', err);
+      if (isDevelopment) {
+        console.error('Invalid manual code:', err);
+      }
       setError(t('auth.magicLink.invalidLink'));
     }
   };

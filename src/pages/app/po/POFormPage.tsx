@@ -15,6 +15,7 @@ import { useAction } from '@/hooks/useAction';
 import { useOnce } from '@/hooks/useOnce';
 import { type POFormValues, usePOForm } from '@/hooks/usePOForm';
 import type { PurchaseOrder } from '@/lib/api/schemas/sales.schemas';
+import { isDevelopment } from '@/utils/env';
 
 type PageMode = 'create' | 'edit';
 
@@ -80,7 +81,9 @@ export function POFormPage({ mode }: POFormPageProps) {
         useSameAddress: !po.billingAddress,
       });
     } catch (error) {
-      console.error('Failed to load PO:', error);
+      if (isDevelopment) {
+        console.error('Failed to load PO:', error);
+      }
       navigate(ROUTERS.PO_MANAGEMENT);
     } finally {
       setIsLoadingPO(false);

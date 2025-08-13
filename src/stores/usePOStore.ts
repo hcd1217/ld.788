@@ -34,8 +34,8 @@ type POState = {
   processPO: (id: string) => Promise<void>;
   shipPO: (id: string) => Promise<void>;
   deliverPO: (id: string) => Promise<void>;
-  cancelPO: (id: string) => Promise<void>;
-  refundPO: (id: string) => Promise<void>;
+  cancelPO: (id: string, data?: { cancelReason?: string }) => Promise<void>;
+  refundPO: (id: string, data?: { refundReason?: string; refundAmount?: number }) => Promise<void>;
   clearError: () => void;
 
   // Selectors
@@ -298,7 +298,7 @@ export const usePOStore = create<POState>()(
         }
       },
 
-      async cancelPO(id) {
+      async cancelPO(id, data) {
         // Optimistically update the status
         set((state) => ({
           purchaseOrders: state.purchaseOrders.map((po) =>
@@ -312,7 +312,7 @@ export const usePOStore = create<POState>()(
         }));
 
         try {
-          const updatedPO = await purchaseOrderService.cancelPO(id);
+          const updatedPO = await purchaseOrderService.cancelPO(id, data);
           // Update with server response
           set((state) => ({
             purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
@@ -328,7 +328,7 @@ export const usePOStore = create<POState>()(
         }
       },
 
-      async refundPO(id) {
+      async refundPO(id, data) {
         // Optimistically update the status
         set((state) => ({
           purchaseOrders: state.purchaseOrders.map((po) =>
@@ -342,7 +342,7 @@ export const usePOStore = create<POState>()(
         }));
 
         try {
-          const updatedPO = await purchaseOrderService.refundPO(id);
+          const updatedPO = await purchaseOrderService.refundPO(id, data);
           // Update with server response
           set((state) => ({
             purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),

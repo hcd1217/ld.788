@@ -4,6 +4,7 @@ import { employeeService, type Employee } from '@/services/hr/employee';
 import { unitService, type Unit } from '@/services/hr/unit';
 import { getErrorMessage } from '@/utils/errorUtils';
 import { useMemo } from 'react';
+import { isDevelopment } from '@/utils/env';
 
 type HrState = {
   // Employee data
@@ -139,7 +140,9 @@ export const useHrStore = create<HrState>()(
           get()
             .loadEmployees()
             .catch((error) => {
-              console.error('Background refresh failed:', error);
+              if (isDevelopment) {
+                console.error('Background refresh failed:', error);
+              }
             });
         } catch (error) {
           // Rollback on error

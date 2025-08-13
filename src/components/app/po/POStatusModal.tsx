@@ -1,4 +1,16 @@
-import { Modal, Text, Group, Button, Stack, Alert, Textarea } from '@mantine/core';
+import {
+  Modal,
+  Drawer,
+  ScrollArea,
+  Text,
+  Group,
+  Button,
+  Stack,
+  Alert,
+  Textarea,
+  NumberInput,
+  TextInput,
+} from '@mantine/core';
 import {
   IconAlertTriangle,
   IconCheck,
@@ -9,8 +21,10 @@ import {
 } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import type { PurchaseOrder } from '@/lib/api/schemas/sales.schemas';
 import { formatCurrency } from '@/utils/number';
+import { formatDate } from '@/utils/time';
 
 export type POModalMode = 'confirm' | 'cancel' | 'process' | 'ship' | 'deliver' | 'refund';
 
@@ -96,7 +110,12 @@ export function POStatusModal({
   onConfirm,
 }: POStatusModalProps) {
   const { t } = useTranslation();
+  const { isMobile } = useDeviceType();
   const [reason, setReason] = useState('');
+  const [refundAmount, setRefundAmount] = useState<number | undefined>(undefined);
+  const [deliveryNotes, setDeliveryNotes] = useState('');
+  const [trackingNumber, setTrackingNumber] = useState('');
+  const [carrier, setCarrier] = useState('');
 
   // Get modal configuration - memoized
   const config = useMemo(() => getModalConfig(mode, t), [mode, t]);
@@ -104,72 +123,188 @@ export function POStatusModal({
   if (!purchaseOrder) return null;
 
   const handleConfirm = async () => {
-    const data = config.requiresReason ? { reason } : undefined;
+    let data: any = undefined;
+    if (mode === 'refund') {
+      data = {
+        refundReason: reason.trim(),
+        refundAmount: refundAmount || purchaseOrder.totalAmount,
+      };
+    } else if (mode === 'cancel') {
+      data = { cancelReason: reason.trim() };
+    } else if (mode === 'deliver') {
+      data = { deliveryNotes: deliveryNotes.trim() };
+    } else if (mode === 'ship') {
+      data = { trackingNumber: trackingNumber.trim(), carrier: carrier.trim() };
+    }
     await onConfirm(data);
     handleClose();
   };
 
   const handleClose = () => {
     setReason('');
+    setRefundAmount(undefined);
+    setDeliveryNotes('');
+    setTrackingNumber('');
+    setCarrier('');
     onClose();
   };
 
   // Check if confirm button should be disabled
-  const isConfirmDisabled = config.requiresReason && !reason.trim();
+  const isConfirmDisabled = () => {
+    if (mode === 'cancel' || mode === 'refund') {
+      return !reason.trim();
+    }
+    if (mode === 'ship') {
+      return !trackingNumber.trim() && !carrier.trim();
+    }
+    return false;
+  };
 
-  return (
-    <Modal opened={opened} onClose={handleClose} title={config.title} centered size="md">
-      <Stack gap="md">
-        <Alert icon={<IconAlertTriangle size={16} />} color={config.alertColor} variant="light">
-          {config.description}
-        </Alert>
+  // Content to be rendered in both Modal and Drawer
+  const content = (
+    <Stack gap="md">
+      <Alert icon={<IconAlertTriangle size={16} />} color={config.alertColor} variant="light">
+        {config.description}
+      </Alert>
 
-        <div>
-          <Text fw={500} mb="xs">
-            {t(mode === 'confirm' ? 'po.orderSummary' : 'po.orderDetails')}
-          </Text>
+      <div>
+        <Text fw={500} mb="xs">
+          {t(mode === 'confirm' ? 'po.orderSummary' : 'po.orderDetails')}
+        </Text>
+        <Text size="sm" c="dimmed">
+          {t('po.poNumber')}: {purchaseOrder.poNumber}
+        </Text>
+        <Text size="sm" c="dimmed">
+          {t('po.customer')}: {purchaseOrder.customer?.name}
+        </Text>
+        <Text size="sm" c="dimmed">
+          {t('po.totalAmount')}: {formatCurrency(purchaseOrder.totalAmount)}
+        </Text>
+        <Text size="sm" c="dimmed">
+          {t('po.items')}: {purchaseOrder.items.length} {t('po.itemsCount')}
+        </Text>
+        <Text size="sm" c="dimmed">
+          {t('po.poStatus')}: {purchaseOrder.status}
+        </Text>
+        {purchaseOrder.deliveryDate && (mode === 'ship' || mode === 'deliver') && (
           <Text size="sm" c="dimmed">
-            {t('po.poNumber')}: {purchaseOrder.poNumber}
+            {t('po.expectedDelivery')}: {formatDate(purchaseOrder.deliveryDate)}
           </Text>
-          <Text size="sm" c="dimmed">
-            {t('po.customer')}: {purchaseOrder.customer?.name}
-          </Text>
-          <Text size="sm" c="dimmed">
-            {t('po.totalAmount')}: {formatCurrency(purchaseOrder.totalAmount)}
-          </Text>
-          <Text size="sm" c="dimmed">
-            {t('po.items')}: {purchaseOrder.items.length} {t('po.itemsCount')}
-          </Text>
-          <Text size="sm" c="dimmed">
-            {t('po.poStatus')}: {purchaseOrder.status}
-          </Text>
-        </div>
+        )}
+      </div>
 
-        {config.requiresReason && (
+      {mode === 'refund' && (
+        <>
+          <NumberInput
+            label={t('po.refundAmount')}
+            step={1000}
+            placeholder={t('po.enterRefundAmount')}
+            value={refundAmount}
+            onChange={(value) => setRefundAmount(typeof value === 'number' ? value : undefined)}
+            min={0}
+            max={purchaseOrder.totalAmount}
+            decimalScale={2}
+            prefix="$"
+            thousandSeparator=","
+            defaultValue={purchaseOrder.totalAmount}
+            description={`${t('po.maxRefundAmount')}: ${formatCurrency(purchaseOrder.totalAmount)}`}
+          />
           <Textarea
-            label={'reasonLabel' in config ? config.reasonLabel : ''}
-            placeholder={'reasonPlaceholder' in config ? config.reasonPlaceholder : ''}
+            label={t('po.refundReason')}
+            placeholder={t('po.enterRefundReason')}
             value={reason}
             onChange={(event) => setReason(event.currentTarget.value)}
             rows={3}
             required
           />
-        )}
+        </>
+      )}
+      {mode === 'cancel' && (
+        <Textarea
+          label={t('po.cancellationReason')}
+          placeholder={t('po.enterCancellationReason')}
+          value={reason}
+          onChange={(event) => setReason(event.currentTarget.value)}
+          rows={3}
+          required
+        />
+      )}
+      {mode === 'deliver' && (
+        <Textarea
+          label={t('po.deliveryNotes')}
+          placeholder={t('po.enterDeliveryNotes')}
+          value={deliveryNotes}
+          onChange={(event) => setDeliveryNotes(event.currentTarget.value)}
+          rows={3}
+        />
+      )}
+      {mode === 'ship' && (
+        <>
+          <TextInput
+            label={t('po.trackingNumber')}
+            placeholder={t('po.enterTrackingNumber')}
+            value={trackingNumber}
+            onChange={(event) => setTrackingNumber(event.currentTarget.value)}
+          />
+          <TextInput
+            label={t('po.carrier')}
+            placeholder={t('po.enterCarrier')}
+            value={carrier}
+            onChange={(event) => setCarrier(event.currentTarget.value)}
+          />
+        </>
+      )}
 
-        <Group justify="flex-end">
-          <Button variant="outline" onClick={handleClose}>
-            {t('common.cancel')}
-          </Button>
-          <Button
-            color={config.buttonColor}
-            leftSection={config.icon}
-            onClick={handleConfirm}
-            disabled={isConfirmDisabled}
-          >
-            {config.buttonText}
-          </Button>
-        </Group>
-      </Stack>
+      <Group justify="flex-end">
+        <Button variant="outline" onClick={handleClose}>
+          {t('common.cancel')}
+        </Button>
+        <Button
+          color={config.buttonColor}
+          leftSection={config.icon}
+          onClick={handleConfirm}
+          disabled={isConfirmDisabled()}
+        >
+          {config.buttonText}
+        </Button>
+      </Group>
+    </Stack>
+  );
+
+  // Use Drawer for mobile, Modal for desktop
+  if (isMobile) {
+    return (
+      <Drawer
+        opened={opened}
+        onClose={handleClose}
+        title={config.title}
+        position="bottom"
+        size="90%"
+        trapFocus
+        returnFocus
+        styles={{
+          body: { paddingBottom: 80 },
+          header: { padding: '16px 20px' },
+        }}
+      >
+        <ScrollArea h="calc(90% - 80px)" type="never">
+          {content}
+        </ScrollArea>
+      </Drawer>
+    );
+  }
+
+  return (
+    <Modal
+      opened={opened}
+      onClose={handleClose}
+      title={config.title}
+      centered
+      size="md"
+      trapFocus
+      returnFocus
+    >
+      {content}
     </Modal>
   );
 }

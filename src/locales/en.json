@@ -1160,7 +1160,12 @@
     "exportExcel": "Export Excel",
     "printInitiated": "Print dialog opened",
     "exportPDFComingSoon": "PDF export feature coming soon",
-    "exportExcelComingSoon": "Excel export feature coming soon"
+    "exportExcelComingSoon": "Excel export feature coming soon",
+    "unsavedItem": "Unsaved Item",
+    "unsavedItemMessage": "You have an unsaved item in the form. Would you like to add it before saving?",
+    "pendingItemDetails": "Pending item details",
+    "addAndContinue": "Add Item and Save",
+    "continueWithoutAdding": "Save Without Adding"
   },
   "timekeeper": {
     "checkIn": "Check In",

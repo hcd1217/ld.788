@@ -6,6 +6,7 @@ import {
   type ResetPasswordRequest,
   type ResetPasswordResponse,
 } from '@/lib/api';
+import { isDevelopment } from '@/utils/env';
 import { decodeJWT, isTokenExpired } from '@/utils/jwt';
 import { delay } from '@/utils/time';
 
@@ -24,7 +25,9 @@ export const authService = {
       });
       return await resolveAuthResponse(response);
     } catch (error) {
-      console.error('Login failed', error);
+      if (isDevelopment) {
+        console.error('Login failed', error);
+      }
       throw error;
     }
   },
@@ -35,7 +38,9 @@ export const authService = {
       const response = await authApi.login(credentials);
       return await resolveAuthResponse(response);
     } catch (error) {
-      console.error('Login failed', error);
+      if (isDevelopment) {
+        console.error('Login failed', error);
+      }
       throw error;
     }
   },
@@ -106,7 +111,9 @@ export const authService = {
       const response = await authApi.forgotPassword(data);
       return response;
     } catch (error) {
-      console.error('Failed to send password reset email', error);
+      if (isDevelopment) {
+        console.error('Failed to send password reset email', error);
+      }
       throw error;
     }
   },
@@ -116,7 +123,9 @@ export const authService = {
       const response = await authApi.resetPassword(data);
       return response;
     } catch (error) {
-      console.error('Failed to reset password', error);
+      if (isDevelopment) {
+        console.error('Failed to reset password', error);
+      }
       throw error;
     }
   },

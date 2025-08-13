@@ -50,6 +50,7 @@ import {
   type ProductStatus,
   type Product,
 } from '../schemas/sales.schemas';
+import { isDevelopment } from '@/utils/env';
 
 // ========== Fake Data Generation ==========
 // cspell:words cust
@@ -271,7 +272,9 @@ class MockDataStore {
       // For now, these will be populated by SalesApi
       console.log('Cache needs to be refreshed from API');
     } catch (error) {
-      console.error('Failed to refresh cache:', error);
+      if (isDevelopment) {
+        console.error('Failed to refresh cache:', error);
+      }
     }
   }
 
@@ -360,7 +363,9 @@ export class SalesApi extends BaseApiClient {
       mockStore.setCachedProducts(productsResponse.products);
       await mockStore.initialize();
     } catch (error) {
-      console.error('Failed to initialize mock store with real data:', error);
+      if (isDevelopment) {
+        console.error('Failed to initialize mock store with real data:', error);
+      }
     }
   }
 
@@ -784,7 +789,7 @@ export class SalesApi extends BaseApiClient {
       const updated = mockStore.updatePurchaseOrder(id, {
         status: 'CANCELLED',
         cancelledBy: randomElement(contactNames),
-        cancelReason: data?.reason,
+        cancelReason: data?.cancelReason,
       });
       if (!updated) {
         throw new Error('Purchase order not found');
@@ -809,7 +814,7 @@ export class SalesApi extends BaseApiClient {
       const updated = mockStore.updatePurchaseOrder(id, {
         status: 'REFUNDED',
         refundedBy: randomElement(contactNames),
-        refundReason: data?.reason,
+        refundReason: data?.refundReason,
         refundAmount: data?.refundAmount,
       });
       if (!updated) {

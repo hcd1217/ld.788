@@ -6,13 +6,16 @@ import {
   type HardDeleteClientRequest,
   adminApi,
 } from '@/lib/api';
+import { isDevelopment } from '@/utils/env';
 
 export const clientManagementService = {
   async getClients(): Promise<ClientListResponse> {
     try {
       return await adminApi.getClients();
     } catch (error) {
-      console.error('Failed to fetch clients:', error);
+      if (isDevelopment) {
+        console.error('Failed to fetch clients:', error);
+      }
       throw error;
     }
   },
@@ -21,7 +24,9 @@ export const clientManagementService = {
     try {
       return await adminApi.getClient(clientCode);
     } catch (error) {
-      console.error(`Failed to fetch client ${clientCode}:`, error);
+      if (isDevelopment) {
+        console.error(`Failed to fetch client ${clientCode}:`, error);
+      }
       throw error;
     }
   },
@@ -75,7 +80,9 @@ export const clientManagementService = {
       const data: HardDeleteClientRequest = { confirmClientCode, reason };
       await adminApi.hardDeleteClient(clientCode, data);
     } catch (error) {
-      console.error(`Failed to delete client ${clientCode}:`, error);
+      if (isDevelopment) {
+        console.error(`Failed to delete client ${clientCode}:`, error);
+      }
       throw error;
     }
   },
@@ -135,7 +142,9 @@ export const clientManagementService = {
       const { clients } = await adminApi.getClients();
       return !clients.some((client) => client.clientCode === code);
     } catch (error) {
-      console.error('Failed to check client code uniqueness:', error);
+      if (isDevelopment) {
+        console.error('Failed to check client code uniqueness:', error);
+      }
       return false;
     }
   },

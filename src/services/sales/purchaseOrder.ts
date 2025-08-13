@@ -3,13 +3,48 @@ import {
   type PurchaseOrder,
   type CreatePurchaseOrderRequest,
   type UpdatePurchaseOrderRequest,
+  type UpdatePOStatusRequest,
 } from '@/lib/api/schemas/sales.schemas';
 import { customerService } from './customer';
+import { isDevelopment } from '@/utils/env';
 
 // Re-export types for compatibility
 export type { POStatus, POItem, Address, PurchaseOrder } from '@/lib/api/schemas/sales.schemas';
 
 export type { Customer } from './customer';
+
+/**
+ * Simple retry helper for critical operations only
+ * Only retries on 5xx server errors with a single retry attempt
+ */
+async function retryOnServerError<T>(
+  operation: () => Promise<T>,
+  enableRetry: boolean = false,
+): Promise<T> {
+  if (!enableRetry) {
+    return operation();
+  }
+
+  try {
+    return await operation();
+  } catch (error: any) {
+    // Only retry on 5xx server errors
+    const isServerError =
+      (error?.status >= 500 && error?.status < 600) ||
+      (error?.response?.status >= 500 && error?.response?.status < 600);
+
+    if (isServerError) {
+      if (isDevelopment) {
+        console.log('PO Service: Retrying after server error', error);
+      }
+      // Wait 1 second before retry
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return operation(); // Single retry attempt
+    }
+
+    throw error;
+  }
+}
 
 export const purchaseOrderService = {
   purchaseOrders: [] as PurchaseOrder[],
@@ -41,13 +76,16 @@ export const purchaseOrderService = {
       }
       return undefined;
     } catch (error) {
-      console.error('Failed to get PO by ID:', error);
+      if (isDevelopment) {
+        console.error('Failed to get PO by ID:', error);
+      }
       return undefined;
     }
   },
 
   async createPO(
     data: Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt'>,
+    enableRetry: boolean = false,
   ): Promise<PurchaseOrder> {
     const createRequest: CreatePurchaseOrderRequest = {
       customerId: data.customerId,
@@ -70,7 +108,11 @@ export const purchaseOrderService = {
       metadata: data.metadata,
     };
 
-    const newPO = await salesApi.createPurchaseOrder(createRequest);
+    // Only critical operations get retry capability
+    const newPO = await retryOnServerError(
+      () => salesApi.createPurchaseOrder(createRequest),
+      enableRetry,
+    );
 
     // Attach customer data
     const customer = await customerService.getCustomer(newPO.customerId);
@@ -80,10 +122,14 @@ export const purchaseOrderService = {
     };
   },
 
-  async updatePO(id: string, data: Partial<PurchaseOrder>): Promise<PurchaseOrder> {
+  async updatePO(
+    id: string,
+    data: Partial<PurchaseOrder>,
+    enableRetry: boolean = false,
+  ): Promise<PurchaseOrder> {
     const updateRequest: UpdatePurchaseOrderRequest = {
-      customerId: data.customerId,
       status: data.status,
+      items: data.items,
       orderDate:
         data.orderDate instanceof Date
           ? data.orderDate.toISOString()
@@ -109,7 +155,11 @@ export const purchaseOrderService = {
       metadata: data.metadata,
     };
 
-    const updatedPO = await salesApi.updatePurchaseOrder(id, updateRequest);
+    // Only critical operations get retry capability
+    const updatedPO = await retryOnServerError(
+      () => salesApi.updatePurchaseOrder(id, updateRequest),
+      enableRetry,
+    );
 
     // Attach customer data
     const customer = await customerService.getCustomer(updatedPO.customerId);
@@ -155,8 +205,8 @@ export const purchaseOrderService = {
     };
   },
 
-  async cancelPO(id: string): Promise<PurchaseOrder> {
-    const updatedPO = await salesApi.cancelPurchaseOrder(id);
+  async cancelPO(id: string, data?: UpdatePOStatusRequest): Promise<PurchaseOrder> {
+    const updatedPO = await salesApi.cancelPurchaseOrder(id, data);
     const customer = await customerService.getCustomer(updatedPO.customerId);
     return {
       ...updatedPO,
@@ -164,8 +214,11 @@ export const purchaseOrderService = {
     };
   },
 
-  async refundPO(id: string): Promise<PurchaseOrder> {
-    const updatedPO = await salesApi.refundPurchaseOrder(id);
+  async refundPO(
+    id: string,
+    data?: { refundReason?: string; refundAmount?: number },
+  ): Promise<PurchaseOrder> {
+    const updatedPO = await salesApi.refundPurchaseOrder(id, data);
     const customer = await customerService.getCustomer(updatedPO.customerId);
     return {
       ...updatedPO,

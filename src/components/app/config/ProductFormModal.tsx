@@ -146,6 +146,7 @@ export function ProductFormModal({
               <NumberInput
                 required
                 label={t('product.unitPrice')}
+                step={1000}
                 placeholder={t('product.unitPricePlaceholder')}
                 error={form.errors.unitPrice}
                 disabled={isLoading}

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Stack, Group, Box, SimpleGrid, Select, Button } from '@mantine/core';
-import { IconFileInvoice, IconClearAll } from '@tabler/icons-react';
+import { Stack, Group, Box, SimpleGrid, Select, Button, Affix, ActionIcon } from '@mantine/core';
+import { IconFileInvoice, IconClearAll, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { useOnce } from '@/hooks/useOnce';
@@ -175,6 +175,21 @@ export function POListPage() {
             </Stack>
           )}
         </Box>
+
+        {/* Floating Action Button for Add PO */}
+        {!isLoading && (
+          <Affix position={{ bottom: 80, right: 20 }}>
+            <ActionIcon
+              size="xl"
+              radius="xl"
+              color="blue"
+              onClick={() => navigate(ROUTERS.PO_ADD)}
+              aria-label={t('po.addPO')}
+            >
+              <IconPlus size={24} />
+            </ActionIcon>
+          </Affix>
+        )}
       </AppMobileLayout>
     );
   }
