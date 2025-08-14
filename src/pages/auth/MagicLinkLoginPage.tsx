@@ -10,7 +10,7 @@ import { FormContainer } from '@/components/form/FormContainer';
 import { AuthHeader, QrScannerModal } from '@/components/auth';
 import { ROUTERS } from '@/config/routeConfig';
 import { authService } from '@/services/auth';
-import { isDevelopment } from '@/utils/env';
+import { logError } from '@/utils/logger';
 
 const MAGIC_LINK_STORAGE_KEY = 'magicLinkParams';
 
@@ -88,9 +88,10 @@ export function MagicLinkLoginPage() {
       setError(undefined);
     },
     errorHandler(error) {
-      if (isDevelopment) {
-        console.error('Magic link verification failed:', error);
-      }
+      logError('Magic link verification failed:', error, {
+        module: 'MagicLinkLoginPagePage',
+        action: 'if',
+      });
       setError(t('auth.magicLink.verificationFailed'));
     },
     cleanupHandler() {
@@ -157,9 +158,10 @@ export function MagicLinkLoginPage() {
         void verifyMagicLink();
       }
     } catch (err) {
-      if (isDevelopment) {
-        console.error('Invalid QR code:', err);
-      }
+      logError('Invalid QR code:', err, {
+        module: 'MagicLinkLoginPagePage',
+        action: 'clientCode',
+      });
       setError(t('auth.magicLink.invalidQrCode'));
     }
   };
@@ -182,9 +184,10 @@ export function MagicLinkLoginPage() {
         void verifyMagicLink();
       }
     } catch (err) {
-      if (isDevelopment) {
-        console.error('Invalid manual code:', err);
-      }
+      logError('Invalid manual code:', err, {
+        module: 'MagicLinkLoginPagePage',
+        action: 'clientCode',
+      });
       setError(t('auth.magicLink.invalidLink'));
     }
   };

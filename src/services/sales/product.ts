@@ -1,6 +1,6 @@
 import { salesApi } from '@/lib/api';
 import { type Product, type ProductStatus } from '@/lib/api/schemas/sales.schemas';
-import { isDevelopment } from '@/utils/env';
+import { logError } from '@/utils/logger';
 
 // Re-export Product types for compatibility
 export type { Product, ProductStatus } from '@/lib/api/schemas/sales.schemas';
@@ -61,9 +61,11 @@ export const productService = {
       const product = await salesApi.getProductById(id);
       return product;
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Failed to get product by ID:', error);
-      }
+      logError('Failed to get product by ID', error, {
+        module: 'ProductService',
+        action: 'getProduct',
+        metadata: { id },
+      });
       return undefined;
     }
   },

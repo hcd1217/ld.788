@@ -179,6 +179,9 @@ export const UpdatePOStatusRequestSchema = z.object({
   cancelReason: optionalStringSchema,
   refundReason: optionalStringSchema,
   refundAmount: numberSchema.optional(),
+  trackingNumber: optionalStringSchema,
+  carrier: optionalStringSchema,
+  deliveryNotes: optionalStringSchema,
 });
 
 // Purchase Order response schemas

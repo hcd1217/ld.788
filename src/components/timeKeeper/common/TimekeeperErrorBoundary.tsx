@@ -4,6 +4,7 @@ import { IconAlertTriangle, IconRefresh } from '@tabler/icons-react';
 import { addComponentError } from '@/stores/error';
 import { isDevelopment } from '@/utils/env';
 import { useTranslation } from '@/hooks/useTranslation';
+import { logError } from '@/utils/logger';
 
 interface TimekeeperErrorBoundaryProps {
   readonly children: ReactNode;
@@ -37,9 +38,10 @@ class TimekeeperErrorBoundaryInternal extends Component<
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log to console in development
-    if (isDevelopment) {
-      console.error('TimekeeperErrorBoundary caught error:', error, errorInfo);
-    }
+    logError('TimekeeperErrorBoundary caught error:', error, {
+      module: 'TimekeeperErrorBoundary',
+      action: 'componentDidCatch',
+    });
 
     // Add to error store
     addComponentError(

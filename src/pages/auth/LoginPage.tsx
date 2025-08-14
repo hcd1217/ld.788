@@ -24,6 +24,7 @@ import { useClientCode } from '@/hooks/useClientCode';
 import { isDevelopment } from '@/utils/env';
 import { ROUTERS } from '@/config/routeConfig';
 import { useOnce } from '@/hooks/useOnce';
+import { logInfo } from '@/utils/logger';
 
 type LoginFormValues = {
   identifier: string;
@@ -43,9 +44,10 @@ export function LoginPage() {
   useOnce(() => {
     // Extract client-code from URL query params
     const clientCodeFromUrl = searchParams.get('client-code');
-    if (isDevelopment) {
-      console.log('clientCodeFromUrl', clientCodeFromUrl);
-    }
+    logInfo('clientCodeFromUrl', {
+      module: 'LoginPagePage',
+      action: 'LoginPage',
+    });
 
     // Use client code from URL if available
     if (clientCodeFromUrl && clientCodeFromUrl !== clientCode) {

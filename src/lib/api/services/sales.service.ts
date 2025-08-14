@@ -50,7 +50,7 @@ import {
   type ProductStatus,
   type Product,
 } from '../schemas/sales.schemas';
-import { isDevelopment } from '@/utils/env';
+import { logError } from '@/utils/logger';
 
 // ========== Fake Data Generation ==========
 // cspell:words cust
@@ -272,9 +272,10 @@ class MockDataStore {
       // For now, these will be populated by SalesApi
       console.log('Cache needs to be refreshed from API');
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Failed to refresh cache:', error);
-      }
+      logError('Failed to refresh cache:', error, {
+        module: 'Sales.serviceService',
+        action: 'refreshCache',
+      });
     }
   }
 
@@ -363,9 +364,10 @@ export class SalesApi extends BaseApiClient {
       mockStore.setCachedProducts(productsResponse.products);
       await mockStore.initialize();
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Failed to initialize mock store with real data:', error);
-      }
+      logError('Failed to initialize mock store with real data:', error, {
+        module: 'Sales.serviceService',
+        action: 'catch',
+      });
     }
   }
 

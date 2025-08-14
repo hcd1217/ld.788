@@ -7,6 +7,7 @@ import {
   type PurchaseOrder,
   type Customer,
   type Product,
+  type UpdatePOStatusRequest,
 } from '@/services/sales';
 import { getErrorMessage } from '@/utils/errorUtils';
 import { useMemo } from 'react';
@@ -32,7 +33,7 @@ type POState = {
   updatePO: (id: string, data: Partial<PurchaseOrder>) => Promise<void>;
   confirmPO: (id: string) => Promise<void>;
   processPO: (id: string) => Promise<void>;
-  shipPO: (id: string) => Promise<void>;
+  shipPO: (id: string, data?: UpdatePOStatusRequest) => Promise<void>;
   deliverPO: (id: string) => Promise<void>;
   cancelPO: (id: string, data?: { cancelReason?: string }) => Promise<void>;
   refundPO: (id: string, data?: { refundReason?: string; refundAmount?: number }) => Promise<void>;
@@ -238,7 +239,7 @@ export const usePOStore = create<POState>()(
         }
       },
 
-      async shipPO(id) {
+      async shipPO(id, data) {
         // Optimistically update the status
         set((state) => ({
           purchaseOrders: state.purchaseOrders.map((po) =>
@@ -252,7 +253,7 @@ export const usePOStore = create<POState>()(
         }));
 
         try {
-          const updatedPO = await purchaseOrderService.shipPO(id);
+          const updatedPO = await purchaseOrderService.shipPO(id, data);
           // Update with server response
           set((state) => ({
             purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),

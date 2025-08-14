@@ -1032,6 +1032,7 @@
     "customerNotFound": "Customer not found",
     "customerRequired": "Customer is required",
     "deliverFailed": "Failed to mark as delivered",
+    "markAsDelivered": "Mark as Delivered",
     "deliverOrderDescription": "Mark this order as delivered. You can add delivery notes if needed.",
     "delivered": "Order marked as delivered",
     "deliveryDate": "Delivery Date",
@@ -1090,6 +1091,7 @@
     "postalCodePlaceholder": "Enter postal code",
     "process": "Process",
     "processFailed": "Failed to start processing",
+    "processOrder": "Process Order",
     "processOrderDescription": "Start processing this order. This will update the status to Processing.",
     "processRefund": "Process Refund",
     "processedBy": "Processed by",
@@ -1165,7 +1167,10 @@
     "unsavedItemMessage": "You have an unsaved item in the form. Would you like to add it before saving?",
     "pendingItemDetails": "Pending item details",
     "addAndContinue": "Add Item and Save",
-    "continueWithoutAdding": "Save Without Adding"
+    "continueWithoutAdding": "Save Without Adding",
+    "invalidQuantityOrPrice": "Invalid quantity or price",
+    "productAlreadyAdded": "Product {{productCode}} is already added",
+    "autoFilledFromCustomerAddress": "Auto-filled from customer address"
   },
   "timekeeper": {
     "checkIn": "Check In",

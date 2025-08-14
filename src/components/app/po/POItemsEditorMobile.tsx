@@ -8,6 +8,7 @@ import { useProductList, usePOActions } from '@/stores/usePOStore';
 import { POItemCard } from './POItemCard';
 import { POAddItemModal } from './POAddItemModal';
 import { createPOItem, calculateItemTotal } from '@/utils/poItemUtils';
+import { FAB_BOTTOM_OFFSET, FAB_RIGHT_OFFSET, FAB_Z_INDEX } from '@/constants/po.constants';
 import type { POItem } from '@/lib/api/schemas/sales.schemas';
 import type { POItemsEditorRef } from './POItemsEditor';
 
@@ -15,10 +16,11 @@ type POItemsEditorMobileProps = {
   readonly items: POItem[];
   readonly onChange: (items: POItem[]) => void;
   readonly disabled?: boolean;
+  readonly onModalStateChange?: (isOpen: boolean) => void;
 };
 
 const POItemsEditorMobileComponent = forwardRef<POItemsEditorRef, POItemsEditorMobileProps>(
-  ({ items, onChange, disabled = false }, ref) => {
+  ({ items, onChange, disabled = false, onModalStateChange }, ref) => {
     const { t } = useTranslation();
     const products = useProductList();
     const { loadProducts } = usePOActions();
@@ -31,6 +33,11 @@ const POItemsEditorMobileComponent = forwardRef<POItemsEditorRef, POItemsEditorM
         loadProducts();
       }
     }, [products.length, loadProducts]);
+
+    // Notify parent component when modal state changes
+    useEffect(() => {
+      onModalStateChange?.(modalOpened);
+    }, [modalOpened, onModalStateChange]);
 
     const handleAddItem = useCallback(
       (newItemData: Omit<POItem, 'id' | 'purchaseOrderId' | 'createdAt' | 'updatedAt'>) => {
@@ -182,9 +189,12 @@ const POItemsEditorMobileComponent = forwardRef<POItemsEditorRef, POItemsEditorM
           )}
         </Stack>
 
-        {/* Floating Action Button */}
-        {!disabled && items.length > 0 && (
-          <Affix position={{ bottom: 20, right: 20 }}>
+        {/* Floating Action Button - hide when modal is open */}
+        {!disabled && items.length > 0 && !modalOpened && (
+          <Affix
+            position={{ bottom: FAB_BOTTOM_OFFSET, right: FAB_RIGHT_OFFSET }}
+            zIndex={FAB_Z_INDEX}
+          >
             <ActionIcon
               size="xl"
               radius="xl"

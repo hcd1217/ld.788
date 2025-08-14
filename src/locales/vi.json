@@ -1032,6 +1032,7 @@
     "customerNotFound": "Không tìm thấy khách hàng",
     "customerRequired": "Khách hàng là bắt buộc",
     "deliverFailed": "Không thể đánh dấu đã giao hàng",
+    "markAsDelivered": "Đánh Dấu Đã Giao",
     "deliverOrderDescription": "Đánh dấu đơn hàng này đã giao. Bạn có thể thêm ghi chú giao hàng nếu cần.",
     "delivered": "Đã đánh dấu đơn hàng đã giao",
     "deliveryDate": "Ngày Giao Hàng",
@@ -1090,6 +1091,7 @@
     "postalCodePlaceholder": "Nhập mã bưu chính",
     "process": "Xử Lý",
     "processFailed": "Không thể bắt đầu xử lý",
+    "processOrder": "Xử Lý đơn hàng",
     "processOrderDescription": "Bắt đầu xử lý đơn hàng này. Trạng thái sẽ được cập nhật thành Đang Xử Lý.",
     "processRefund": "Hoàn Tiền",
     "processedBy": "Được xử lý bởi",
@@ -1165,7 +1167,10 @@
     "unsavedItemMessage": "Bạn có một mục chưa lưu trong biểu mẫu. Bạn có muốn thêm nó trước khi lưu không?",
     "pendingItemDetails": "Chi tiết mục đang chờ",
     "addAndContinue": "Thêm mục và lưu",
-    "continueWithoutAdding": "Lưu mà không thêm"
+    "continueWithoutAdding": "Lưu mà không thêm",
+    "invalidQuantityOrPrice": "Số lượng hoặc giá không hợp lệ",
+    "productAlreadyAdded": "Sản phẩm {{productCode}} đã được thêm",
+    "autoFilledFromCustomerAddress": "Tự động điền từ địa chỉ khách hàng"
   },
   "timekeeper": {
     "checkIn": "Vào ca",

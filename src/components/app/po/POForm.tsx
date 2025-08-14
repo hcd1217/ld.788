@@ -15,9 +15,14 @@ import {
   prepareSubmissionValues,
   calculateCreditStatus,
 } from './POFormHelpers';
+import {
+  FIXED_BUTTON_AREA_HEIGHT,
+  MOBILE_FORM_ACTIONS_Z_INDEX,
+  DESKTOP_FORM_ACTIONS_Z_INDEX,
+} from '@/constants/po.constants';
 import type { Customer, POItem } from '@/lib/api/schemas/sales.schemas';
 import { formatCurrency } from '@/utils/number';
-import { useMemo, useEffect, useCallback, useRef } from 'react';
+import { useMemo, useEffect, useCallback, useRef, useState } from 'react';
 
 export type POFormValues = {
   customerId: string;
@@ -65,6 +70,7 @@ export function POForm({
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
   const itemsEditorRef = useRef<POItemsEditorRef>(null);
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
 
   // Computed values
   const selectedCustomer = useMemo(
@@ -160,6 +166,7 @@ export function POForm({
         itemsEditorRef={itemsEditorRef}
         isLoading={isLoading}
         totalAmount={totalAmount}
+        onModalStateChange={setIsAddItemModalOpen}
       />
 
       {/* Shipping Address */}
@@ -175,7 +182,7 @@ export function POForm({
     return (
       <>
         <form id="po-form" onSubmit={form.onSubmit(handleSubmit)}>
-          <Box pb={100}>
+          <Box pb={FIXED_BUTTON_AREA_HEIGHT}>
             {/* Padding to ensure content isn't hidden behind fixed buttons */}
             {formContent}
           </Box>
@@ -191,7 +198,7 @@ export function POForm({
             backgroundColor: 'var(--mantine-color-body)',
             borderTop: '1px solid var(--mantine-color-gray-3)',
             padding: '12px 16px',
-            zIndex: 1000,
+            zIndex: MOBILE_FORM_ACTIONS_Z_INDEX,
           }}
         >
           <POFormActions
@@ -200,6 +207,7 @@ export function POForm({
             isEditMode={isEditMode}
             isMobile={true}
             formId="po-form"
+            isHidden={isAddItemModalOpen}
           />
         </Box>
       </>
@@ -210,7 +218,7 @@ export function POForm({
   return (
     <>
       <form id="po-form-desktop" onSubmit={form.onSubmit(handleSubmit)}>
-        <Box pb={100}>
+        <Box pb={FIXED_BUTTON_AREA_HEIGHT}>
           {/* Padding to prevent content overlap with fixed buttons */}
           {formContent}
         </Box>
@@ -226,7 +234,7 @@ export function POForm({
           borderTop: '1px solid var(--mantine-color-gray-3)',
           padding: 'var(--mantine-spacing-md) var(--mantine-spacing-xl)',
           backgroundColor: 'var(--mantine-color-body)',
-          zIndex: 100,
+          zIndex: DESKTOP_FORM_ACTIONS_Z_INDEX,
         }}
       >
         <Box style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -270,11 +278,13 @@ function OrderItemsSection({
   itemsEditorRef,
   isLoading,
   totalAmount,
+  onModalStateChange,
 }: {
   form: UseFormReturnType<POFormValues>;
   itemsEditorRef: React.RefObject<POItemsEditorRef | null>;
   isLoading: boolean;
   totalAmount: number;
+  onModalStateChange?: (isOpen: boolean) => void;
 }) {
   const { t } = useTranslation();
 
@@ -289,6 +299,7 @@ function OrderItemsSection({
           items={form.values.items}
           onChange={(items) => form.setFieldValue('items', items)}
           disabled={isLoading}
+          onModalStateChange={onModalStateChange}
         />
         <Text size="lg" fw={600} ta="right">
           {t('po.totalAmount')}: {formatCurrency(totalAmount)}
@@ -316,7 +327,7 @@ function ShippingAddressSection({
         <POAddressFields form={form} fieldPrefix="shippingAddress" />
         {selectedCustomer?.address && (
           <Text size="sm" c="dimmed" fs="italic">
-            Auto-filled from customer address
+            {t('po.autoFilledFromCustomerAddress')}
           </Text>
         )}
       </Stack>

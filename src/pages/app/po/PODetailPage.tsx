@@ -122,11 +122,11 @@ export function PODetailPage() {
       errorTitle: t('common.error'),
       errorMessage: t('po.shipFailed'),
     },
-    async actionHandler() {
+    async actionHandler(data?: any) {
       if (!selectedPO) {
         throw new Error(t('po.shipFailed'));
       }
-      await shipPurchaseOrder(selectedPO.id);
+      await shipPurchaseOrder(selectedPO.id, data);
       closeModal('ship');
     },
   });

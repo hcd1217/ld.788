@@ -7,6 +7,7 @@ type POFormActionsProps = {
   readonly isEditMode: boolean;
   readonly isMobile: boolean;
   readonly formId?: string;
+  readonly isHidden?: boolean;
 };
 
 export function POFormActions({
@@ -15,8 +16,14 @@ export function POFormActions({
   isEditMode,
   isMobile,
   formId,
+  isHidden = false,
 }: POFormActionsProps) {
   const { t } = useTranslation();
+
+  // Hide buttons on mobile when modal is open
+  if (isMobile && isHidden) {
+    return null;
+  }
 
   const cancelButton = (
     <Button

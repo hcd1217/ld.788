@@ -1,4 +1,5 @@
 import { isDevelopment } from './env';
+import { logInfo } from '@/utils/logger';
 
 export interface RouteTransition {
   readonly from: string | null;
@@ -109,9 +110,10 @@ class RouteTracker {
       ? ` (spent ${Math.round(transition.duration / 1000)}s on previous page)`
       : '';
 
-    if (isDevelopment) {
-      console.info(`${message}${details}`);
-    }
+    logInfo(`${message}${details}`, {
+      module: 'routeTracking',
+      action: 'message',
+    });
   }
 
   private trackAnalytics(transition: RouteTransition): void {

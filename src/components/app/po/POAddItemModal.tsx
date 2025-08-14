@@ -19,6 +19,12 @@ import { formatCurrency } from '@/utils/number';
 import { showErrorNotification } from '@/utils/notifications';
 import { calculateItemTotal } from '@/utils/poItemUtils';
 import { PRODUCT_CATEGORIES } from '@/constants/purchaseOrder';
+import {
+  FOCUS_DELAY_MS,
+  DRAWER_BODY_PADDING_BOTTOM,
+  DRAWER_HEADER_PADDING,
+  DRAWER_HEIGHT_CALC,
+} from '@/constants/po.constants';
 import type { POItem } from '@/lib/api/schemas/sales.schemas';
 import type { Product } from '@/services/sales/product';
 
@@ -67,17 +73,17 @@ export function POAddItemModal({
       setQuantity(1);
       setUnitPrice(0);
       setDiscount(0);
-    } else {
-      // Auto-focus first input when modal opens
+    } else if (!isMobile) {
+      // Only auto-focus on desktop to avoid disruptive keyboard/dropdown on mobile
       // Small delay to ensure modal is fully rendered
       const timer = setTimeout(() => {
         if (initialFocusRef.current) {
           initialFocusRef.current.focus();
         }
-      }, 100);
+      }, FOCUS_DELAY_MS);
       return () => clearTimeout(timer);
     }
-  }, [opened]);
+  }, [opened, isMobile]);
 
   const handleProductSelect = (value: string) => {
     const code = value.split(' - ')[0];
@@ -99,14 +105,14 @@ export function POAddItemModal({
     }
 
     if (quantity <= 0 || unitPrice < 0) {
-      showErrorNotification(t('common.error'), 'Invalid quantity or price');
+      showErrorNotification(t('common.error'), t('po.invalidQuantityOrPrice'));
       return;
     }
 
     // Check for duplicates
     const isDuplicate = existingItems.some((item) => item.productCode === productCode);
     if (isDuplicate) {
-      showErrorNotification(t('common.error'), `Product ${productCode} is already added`);
+      showErrorNotification(t('common.error'), t('po.productAlreadyAdded', { productCode }));
       return;
     }
 
@@ -144,6 +150,8 @@ export function POAddItemModal({
         leftSection={<IconSearch size={16} />}
         size="md"
         required
+        // Don't open dropdown on focus, only when typing
+        defaultDropdownOpened={false}
       />
 
       {/* Description */}
@@ -240,11 +248,11 @@ export function POAddItemModal({
         trapFocus
         returnFocus
         styles={{
-          body: { paddingBottom: 80 },
-          header: { padding: '16px 20px' },
+          body: { paddingBottom: DRAWER_BODY_PADDING_BOTTOM },
+          header: { padding: DRAWER_HEADER_PADDING },
         }}
       >
-        <ScrollArea h="calc(90vh - 80px)" type="never">
+        <ScrollArea h={DRAWER_HEIGHT_CALC} type="never">
           {content}
         </ScrollArea>
       </Drawer>

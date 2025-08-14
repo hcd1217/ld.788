@@ -3,10 +3,10 @@ import { createPortal } from 'react-dom';
 import { Box, Button } from '@mantine/core';
 import { IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { isDevelopment } from '@/utils/env';
 import { CameraView } from './CameraView';
 import { PhotoPreview } from './PhotoPreview';
 import { CameraError } from './CameraError';
+import { logError } from '@/utils/logger';
 
 interface MobileCameraCaptureProps {
   readonly opened: boolean;
@@ -65,9 +65,10 @@ export function MobileCameraCapture({
         videoRef.current.srcObject = stream;
       }
     } catch (err) {
-      if (isDevelopment) {
-        console.error('Camera access denied:', err);
-      }
+      logError('Camera access denied:', err, {
+        module: 'MobileCameraCapture',
+        action: 'startCamera',
+      });
       setError(t('timekeeper.clock.camera.permissionDenied'));
     }
   }, [t]);

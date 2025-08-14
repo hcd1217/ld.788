@@ -32,6 +32,7 @@ type POItemsEditorProps = {
   readonly items: POItem[];
   readonly onChange: (items: POItem[]) => void;
   readonly disabled?: boolean;
+  readonly onModalStateChange?: (isOpen: boolean) => void;
 };
 
 export type POItemsEditorRef = {
@@ -505,7 +506,9 @@ const POItemsEditorComponent = forwardRef<POItemsEditorRef, POItemsEditorProps>(
     return <POItemsEditorMobile ref={ref} {...props} />;
   }
 
-  return <POItemsEditorDesktop ref={ref} {...props} />;
+  // Desktop doesn't need modal state change callback
+  const { onModalStateChange, ...desktopProps } = props;
+  return <POItemsEditorDesktop ref={ref} {...desktopProps} />;
 });
 
 POItemsEditorComponent.displayName = 'POItemsEditor';

@@ -4,6 +4,7 @@ import { IconAlertTriangle, IconRefresh } from '@tabler/icons-react';
 import { addComponentError } from '@/stores/error';
 import { isDevelopment } from '@/utils/env';
 import { useTranslation } from '@/hooks/useTranslation';
+import { logError } from '@/utils/logger';
 
 interface POErrorBoundaryProps {
   readonly children: ReactNode;
@@ -35,9 +36,10 @@ class POErrorBoundaryInternal extends Component<
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log to console in development
-    if (isDevelopment) {
-      console.error('POErrorBoundary caught error:', error, errorInfo);
-    }
+    logError('POErrorBoundary caught error:', error, {
+      module: 'POErrorBoundary',
+      action: 'componentDidCatch',
+    });
 
     // Add to error store
     addComponentError(

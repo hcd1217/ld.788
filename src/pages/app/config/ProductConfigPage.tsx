@@ -30,6 +30,7 @@ import { showSuccessNotification } from '@/utils/notifications';
 import { formatCurrency } from '@/utils/string';
 import { isDevelopment } from '@/utils/env';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
+import { logError } from '@/utils/logger';
 
 export function ProductConfigPage() {
   const { t } = useTranslation();
@@ -106,9 +107,10 @@ export function ProductConfigPage() {
       setProducts(data);
     },
     errorHandler(err) {
-      if (isDevelopment) {
-        console.error('Failed to load products:', err);
-      }
+      logError('Failed to load products:', err, {
+        module: 'ProductConfigPagePage',
+        action: 'actionHandler',
+      });
       setError(t('common.loadingFailed'));
     },
     cleanupHandler() {
@@ -152,9 +154,10 @@ export function ProductConfigPage() {
       await loadProducts();
     },
     errorHandler(error) {
-      if (isDevelopment) {
-        console.error('Failed to create product:', error);
-      }
+      logError('Failed to create product:', error, {
+        module: 'ProductConfigPagePage',
+        action: 'errorHandler',
+      });
     },
     cleanupHandler() {
       setIsLoading(false);
@@ -195,9 +198,10 @@ export function ProductConfigPage() {
       await loadProducts();
     },
     errorHandler(error) {
-      if (isDevelopment) {
-        console.error('Failed to update product:', error);
-      }
+      logError('Failed to update product:', error, {
+        module: 'ProductConfigPagePage',
+        action: 'errorHandler',
+      });
     },
     cleanupHandler() {
       setIsLoading(false);
@@ -223,9 +227,10 @@ export function ProductConfigPage() {
       await loadProducts();
     },
     errorHandler(error) {
-      if (isDevelopment) {
-        console.error('Failed to delete product:', error);
-      }
+      logError('Failed to delete product:', error, {
+        module: 'ProductConfigPagePage',
+        action: 'actionHandler',
+      });
     },
     cleanupHandler() {
       setIsLoading(false);

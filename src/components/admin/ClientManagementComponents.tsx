@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { isDevelopment } from '@/utils/env';
 import {
   Badge,
   Group,
@@ -43,6 +42,7 @@ import { showSuccessNotification, showErrorNotification } from '@/utils/notifica
 import { useTranslation } from '@/hooks/useTranslation';
 import { type ExportColumn } from '@/utils/export';
 import { convertCamelCaseToText, formatDate } from '@/utils/string';
+import { logError } from '@/utils/logger';
 import {
   adminApi,
   type Client,
@@ -605,9 +605,10 @@ export const ClientFeatureFlagsSection = React.memo(function ({
       showSuccessNotification(t('common.success'), t('admin.clients.featureFlagUpdated'));
       onUpdate?.();
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Failed to update:', error);
-      }
+      logError('Failed to update:', error, {
+        module: 'ClientManagementComponents',
+        action: 'catch',
+      });
       showErrorNotification(t('common.error'), t('admin.clients.featureFlagUpdateFailed'));
     } finally {
       setUpdating((prev) => {
@@ -639,9 +640,10 @@ export const ClientFeatureFlagsSection = React.memo(function ({
       showSuccessNotification(t('common.success'), t('admin.clients.featureFlagValueUpdated'));
       onUpdate?.();
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Failed to update:', error);
-      }
+      logError('Failed to update:', error, {
+        module: 'ClientManagementComponents',
+        action: 'updatedValue',
+      });
       showErrorNotification(t('common.error'), t('admin.clients.featureFlagUpdateFailed'));
     } finally {
       setUpdating((prev) => {

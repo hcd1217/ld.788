@@ -12,7 +12,7 @@ import { authApi, clientApi, type ClientPublicConfigResponse } from '@/lib/api';
 import { updateClientTranslations, clearClientTranslations } from '@/lib/i18n';
 import type { GetMeResponse } from '@/lib/api/schemas/auth.schemas';
 import { cacheNavigationConfig, clearNavigationCache } from '@/utils/navigationCache';
-import { isDevelopment } from '@/utils/env';
+import { logError } from '@/utils/logger';
 
 type User = {
   id: string;
@@ -77,9 +77,10 @@ export const useAppStore = create<AppState>()(
           set({ publicClientConfig: config });
         })
         .catch((error) => {
-          if (isDevelopment) {
-            console.error('Failed to fetch initial public client config:', error);
-          }
+          logError('Failed to fetch initial public client config:', error, {
+            module: 'AppStore',
+            action: 'useAppStore',
+          });
         });
 
       return {
@@ -130,9 +131,10 @@ export const useAppStore = create<AppState>()(
               updateClientTranslations(profile.clientConfig.translations);
             }
           } catch (error: unknown) {
-            if (isDevelopment) {
-              console.error('Failed to fetch user profile:', error);
-            }
+            logError('Failed to fetch user profile:', error, {
+              module: 'AppStore',
+              action: 'if',
+            });
 
             // Check if it's a 401
             const isApiError = error && typeof error === 'object' && 'status' in error;
@@ -152,9 +154,10 @@ export const useAppStore = create<AppState>()(
             const config = await clientApi.getPubicClientConfig(clientCode);
             set({ publicClientConfig: config });
           } catch (error) {
-            if (isDevelopment) {
-              console.error('Failed to fetch public client config:', error);
-            }
+            logError('Failed to fetch public client config:', error, {
+              module: 'AppStore',
+              action: 'fetchPublicClientConfig',
+            });
             // Don't throw the error, just log it
             // The UI can handle the undefined publicClientConfig state
           }

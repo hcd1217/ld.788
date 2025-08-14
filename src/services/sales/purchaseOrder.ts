@@ -6,10 +6,17 @@ import {
   type UpdatePOStatusRequest,
 } from '@/lib/api/schemas/sales.schemas';
 import { customerService } from './customer';
-import { isDevelopment } from '@/utils/env';
+import { logError, logInfo } from '@/utils/logger';
+import { RETRY_DELAY_MS } from '@/constants/po.constants';
 
 // Re-export types for compatibility
-export type { POStatus, POItem, Address, PurchaseOrder } from '@/lib/api/schemas/sales.schemas';
+export type {
+  POStatus,
+  POItem,
+  Address,
+  PurchaseOrder,
+  UpdatePOStatusRequest,
+} from '@/lib/api/schemas/sales.schemas';
 
 export type { Customer } from './customer';
 
@@ -34,11 +41,13 @@ async function retryOnServerError<T>(
       (error?.response?.status >= 500 && error?.response?.status < 600);
 
     if (isServerError) {
-      if (isDevelopment) {
-        console.log('PO Service: Retrying after server error', error);
-      }
-      // Wait 1 second before retry
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      logInfo('Retrying after server error', {
+        module: 'PurchaseOrderService',
+        action: 'retryOnServerError',
+        metadata: { error },
+      });
+      // Wait before retry
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
       return operation(); // Single retry attempt
     }
 
@@ -76,9 +85,11 @@ export const purchaseOrderService = {
       }
       return undefined;
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Failed to get PO by ID:', error);
-      }
+      logError('Failed to get PO by ID', error, {
+        module: 'PurchaseOrderService',
+        action: 'getPOById',
+        metadata: { id },
+      });
       return undefined;
     }
   },
@@ -187,8 +198,8 @@ export const purchaseOrderService = {
     };
   },
 
-  async shipPO(id: string): Promise<PurchaseOrder> {
-    const updatedPO = await salesApi.shipPurchaseOrder(id);
+  async shipPO(id: string, data?: UpdatePOStatusRequest): Promise<PurchaseOrder> {
+    const updatedPO = await salesApi.shipPurchaseOrder(id, data);
     const customer = await customerService.getCustomer(updatedPO.customerId);
     return {
       ...updatedPO,

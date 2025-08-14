@@ -6,16 +6,17 @@ import {
   type HardDeleteClientRequest,
   adminApi,
 } from '@/lib/api';
-import { isDevelopment } from '@/utils/env';
+import { logError } from '@/utils/logger';
 
 export const clientManagementService = {
   async getClients(): Promise<ClientListResponse> {
     try {
       return await adminApi.getClients();
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Failed to fetch clients:', error);
-      }
+      logError('Failed to fetch clients:', error, {
+        module: 'ClientManagementService',
+        action: 'getClients',
+      });
       throw error;
     }
   },
@@ -24,9 +25,10 @@ export const clientManagementService = {
     try {
       return await adminApi.getClient(clientCode);
     } catch (error) {
-      if (isDevelopment) {
-        console.error(`Failed to fetch client ${clientCode}:`, error);
-      }
+      logError(`Failed to fetch client ${clientCode}:`, error, {
+        module: 'ClientManagementService',
+        action: 'getClients',
+      });
       throw error;
     }
   },
@@ -80,9 +82,10 @@ export const clientManagementService = {
       const data: HardDeleteClientRequest = { confirmClientCode, reason };
       await adminApi.hardDeleteClient(clientCode, data);
     } catch (error) {
-      if (isDevelopment) {
-        console.error(`Failed to delete client ${clientCode}:`, error);
-      }
+      logError(`Failed to delete client ${clientCode}:`, error, {
+        module: 'ClientManagementService',
+        action: 'hardDeleteClient',
+      });
       throw error;
     }
   },
@@ -142,9 +145,10 @@ export const clientManagementService = {
       const { clients } = await adminApi.getClients();
       return !clients.some((client) => client.clientCode === code);
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Failed to check client code uniqueness:', error);
-      }
+      logError('Failed to check client code uniqueness:', error, {
+        module: 'ClientManagementService',
+        action: 'isClientCodeUnique',
+      });
       return false;
     }
   },

@@ -6,7 +6,7 @@ import { TimekeeperErrorBoundary } from '@/components/timeKeeper';
 import { useTimekeeperStore } from '@/stores/useTimekeeperStore';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { ROUTERS } from '@/config/routeConfig';
-import { isDevelopment } from '@/utils/env';
+import { logError } from '@/utils/logger';
 
 function ClockManagementPageContent() {
   const { t } = useTranslation();
@@ -32,9 +32,10 @@ function ClockManagementPageContent() {
           });
         },
         (error) => {
-          if (isDevelopment) {
-            console.error('Location error:', error);
-          }
+          logError('Location error:', error, {
+            module: 'ClockManagementPagePage',
+            action: 'if',
+          });
           setLocationError(t('timekeeper.clock.location.error'));
         },
       );

@@ -3,7 +3,7 @@ import { IconDownload } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { exportToCSV, type ExportColumn } from '@/utils/export';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
-import { isDevelopment } from '@/utils/env';
+import { logError } from '@/utils/logger';
 
 interface ExportButtonProps<T> extends Omit<ButtonProps, 'onClick'> {
   readonly data: readonly T[];
@@ -31,9 +31,10 @@ export function ExportButton<T extends Record<string, unknown>>({
       );
       onExport?.();
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Export failed:', error);
-      }
+      logError('Export failed:', error, {
+        module: 'ExportButton',
+        action: 'ExportButton',
+      });
       showErrorNotification(t('common.error'), t('common.exportFailed'));
     }
   };

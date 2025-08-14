@@ -1,7 +1,7 @@
 // Mock staff service with CRUD operations, pagination, and validation
-import { isDevelopment } from '@/utils/env';
 import CryptoJS from 'crypto-js';
 import QRCode from 'qrcode';
+import { logError } from '@/utils/logger';
 
 export interface Staff {
   id: string;
@@ -391,9 +391,10 @@ const generateQRCode = async (url: string): Promise<string> => {
       },
     });
   } catch (error) {
-    if (isDevelopment) {
-      console.error('Error generating QR code:', error);
-    }
+    logError('Error generating QR code:', error, {
+      module: 'StaffService',
+      action: 'storeHash',
+    });
     return '';
   }
 };

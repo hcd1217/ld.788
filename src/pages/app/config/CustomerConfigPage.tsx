@@ -27,6 +27,7 @@ import { validateEmail } from '@/utils/validation';
 import { isDevelopment } from '@/utils/env';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { useOnce } from '@/hooks/useOnce';
+import { logError } from '@/utils/logger';
 
 export type CustomerFormValues = {
   name: string;
@@ -113,9 +114,10 @@ export function CustomerConfigPage() {
       setCustomers(data);
     },
     errorHandler(err) {
-      if (isDevelopment) {
-        console.error('Failed to load customers:', err);
-      }
+      logError('Failed to load customers:', err, {
+        module: 'CustomerConfigPagePage',
+        action: 'actionHandler',
+      });
       setError(t('common.loadingFailed'));
     },
     cleanupHandler() {
@@ -155,9 +157,10 @@ export function CustomerConfigPage() {
       await loadCustomers();
     },
     errorHandler(error) {
-      if (isDevelopment) {
-        console.error('Failed to create customer:', error);
-      }
+      logError('Failed to create customer:', error, {
+        module: 'CustomerConfigPagePage',
+        action: 'errorHandler',
+      });
     },
     cleanupHandler() {
       setIsLoading(false);
@@ -192,9 +195,10 @@ export function CustomerConfigPage() {
       await loadCustomers();
     },
     errorHandler(error) {
-      if (isDevelopment) {
-        console.error('Failed to update customer:', error);
-      }
+      logError('Failed to update customer:', error, {
+        module: 'CustomerConfigPagePage',
+        action: 'errorHandler',
+      });
     },
     cleanupHandler() {
       setIsLoading(false);
@@ -221,9 +225,10 @@ export function CustomerConfigPage() {
       await loadCustomers();
     },
     errorHandler(error) {
-      if (isDevelopment) {
-        console.error('Failed to delete customer:', error);
-      }
+      logError('Failed to delete customer:', error, {
+        module: 'CustomerConfigPagePage',
+        action: 'actionHandler',
+      });
     },
     cleanupHandler() {
       setIsLoading(false);

@@ -4,6 +4,7 @@ import { authService } from '@/services/auth';
 import { cleanObject } from '@/utils/object';
 import { isDevelopment } from '@/utils/env';
 import { delay } from '@/utils/time';
+import { logError } from '@/utils/logger';
 
 type ApiConfig = {
   baseURL: string;
@@ -148,9 +149,10 @@ export class BaseApiClient {
       this.setCachedData(cacheKey, result);
       return result;
     } catch (error) {
-      if (isDevelopment) {
-        console.error(error);
-      }
+      logError('API request failed', error, {
+        module: 'BaseApiClient',
+        action: 'request',
+      });
       throw error;
     } finally {
       this.locks.delete(cacheKey);

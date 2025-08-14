@@ -16,8 +16,8 @@ import { useHrActions, useUnitList, useHrLoading, useHrError } from '@/stores/us
 import { employeeService } from '@/services/hr/employee';
 import { ROUTERS } from '@/config/routeConfig';
 import { useAction } from '@/hooks/useAction';
-import { isDevelopment } from '@/utils/env';
 import { useOnce } from '@/hooks/useOnce';
+import { logError } from '@/utils/logger';
 import {
   type SingleEmployeeFormValues,
   type ImportResult,
@@ -101,9 +101,10 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
         displayOrder: employee.displayOrder,
       });
     } catch (error) {
-      if (isDevelopment) {
-        console.error(error);
-      }
+      logError('Failed to load employee', error, {
+        module: 'EmployeeFormPage',
+        action: 'loadEmployee',
+      });
       setSingleError(t('employee.notFound'));
       setShowSingleAlert(true);
     } finally {

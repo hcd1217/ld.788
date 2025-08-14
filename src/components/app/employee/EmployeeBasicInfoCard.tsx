@@ -12,7 +12,7 @@ import { generateQRCodeWithLogo } from '@/utils/qr';
 import { useClientCode } from '@/hooks/useClientCode';
 import { ActiveBadge } from '@/components/common/ui';
 import { WorkTypeBadge } from './WorkTypeBadge';
-import { isDevelopment } from '@/utils/env';
+import { logError } from '@/utils/logger';
 
 type EmployeeBasicInfoCardProps = {
   readonly employee: Employee;
@@ -34,9 +34,10 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
           setQrCodeData(dataUrl);
         })
         .catch((error) => {
-          if (isDevelopment) {
-            console.error('Error generating QR code:', error);
-          }
+          logError('Error generating QR code:', error, {
+            module: 'EmployeeBasicInfoCard',
+            action: 'clientCode',
+          });
         });
     }
   }, [magicLink]);

@@ -6,7 +6,7 @@ import {
   type ResetPasswordRequest,
   type ResetPasswordResponse,
 } from '@/lib/api';
-import { isDevelopment } from '@/utils/env';
+import { logError } from '@/utils/logger';
 import { decodeJWT, isTokenExpired } from '@/utils/jwt';
 import { delay } from '@/utils/time';
 
@@ -25,9 +25,11 @@ export const authService = {
       });
       return await resolveAuthResponse(response);
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Login failed', error);
-      }
+      logError('Login failed', error, {
+        module: 'AuthService',
+        action: 'loginWithMagicToken',
+        clientCode,
+      });
       throw error;
     }
   },
@@ -38,9 +40,11 @@ export const authService = {
       const response = await authApi.login(credentials);
       return await resolveAuthResponse(response);
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Login failed', error);
-      }
+      logError('Login failed', error, {
+        module: 'AuthService',
+        action: 'login',
+        clientCode: credentials.clientCode,
+      });
       throw error;
     }
   },
@@ -111,9 +115,11 @@ export const authService = {
       const response = await authApi.forgotPassword(data);
       return response;
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Failed to send password reset email', error);
-      }
+      logError('Failed to send password reset email', error, {
+        module: 'AuthService',
+        action: 'forgotPassword',
+        metadata: { email: data.email },
+      });
       throw error;
     }
   },
@@ -123,9 +129,10 @@ export const authService = {
       const response = await authApi.resetPassword(data);
       return response;
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Failed to reset password', error);
-      }
+      logError('Failed to reset password', error, {
+        module: 'AuthService',
+        action: 'resetPassword',
+      });
       throw error;
     }
   },

@@ -22,6 +22,7 @@ import {
 import { useState, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
+import { DRAWER_BODY_PADDING_BOTTOM, DRAWER_HEADER_PADDING } from '@/constants/po.constants';
 import type { PurchaseOrder } from '@/lib/api/schemas/sales.schemas';
 import { formatCurrency } from '@/utils/number';
 import { formatDate } from '@/utils/time';
@@ -155,7 +156,7 @@ export function POStatusModal({
       return !reason.trim();
     }
     if (mode === 'ship') {
-      return !trackingNumber.trim() && !carrier.trim();
+      return !trackingNumber.trim();
     }
     return false;
   };
@@ -245,6 +246,7 @@ export function POStatusModal({
             placeholder={t('po.enterTrackingNumber')}
             value={trackingNumber}
             onChange={(event) => setTrackingNumber(event.currentTarget.value)}
+            required
           />
           <TextInput
             label={t('po.carrier')}
@@ -283,8 +285,8 @@ export function POStatusModal({
         trapFocus
         returnFocus
         styles={{
-          body: { paddingBottom: 80 },
-          header: { padding: '16px 20px' },
+          body: { paddingBottom: DRAWER_BODY_PADDING_BOTTOM },
+          header: { padding: DRAWER_HEADER_PADDING },
         }}
       >
         <ScrollArea h="calc(90% - 80px)" type="never">

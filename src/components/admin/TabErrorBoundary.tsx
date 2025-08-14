@@ -4,6 +4,7 @@ import { IconAlertTriangle, IconRefresh } from '@tabler/icons-react';
 import { addComponentError } from '@/stores/error';
 import { isDevelopment } from '@/utils/env';
 import { useTranslation } from '@/hooks/useTranslation';
+import { logError } from '@/utils/logger';
 
 interface TabErrorBoundaryProps {
   readonly children: ReactNode;
@@ -33,9 +34,10 @@ class TabErrorBoundaryInternal extends Component<
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log to console in development
-    if (isDevelopment) {
-      console.error('TabErrorBoundary caught error:', error, errorInfo);
-    }
+    logError('TabErrorBoundary caught error:', error, {
+      module: 'TabErrorBoundary',
+      action: 'componentDidCatch',
+    });
 
     // Add to error store
     addComponentError(

@@ -95,3 +95,117 @@ export function registerLogger() {
 function productionLog() {
   // ignore all log
 }
+
+// ============================================================================
+// Standardized Logging Functions
+// ============================================================================
+
+export type LogContext = {
+  readonly module?: string; // Module or service name
+  readonly action?: string; // Action being performed
+  readonly userId?: string; // User context
+  readonly clientCode?: string; // Client context
+  readonly metadata?: Record<string, unknown>; // Additional data
+};
+
+/**
+ * Log an error with context
+ * Only logs in development mode unless forced
+ */
+export function logError(
+  message: string,
+  error?: unknown,
+  context?: LogContext,
+  forceLog: boolean = false,
+): void {
+  if (!isDevelopment && !forceLog) return;
+
+  const errorDetails = error instanceof Error ? error : new Error(String(error));
+  const logMessage = formatLogMessage('ERROR', message, context);
+
+  if (isDevelopment) {
+    console.error(logMessage, errorDetails, context?.metadata);
+  } else if (forceLog) {
+    // In production, use a more structured format
+    console.error(
+      JSON.stringify({
+        level: 'ERROR',
+        message,
+        error: errorDetails.message,
+        stack: errorDetails.stack,
+        context,
+        timestamp: new Date().toISOString(),
+      }),
+    );
+  }
+}
+
+/**
+ * Log a warning with context
+ * Only logs in development mode unless forced
+ */
+export function logWarn(message: string, context?: LogContext, forceLog: boolean = false): void {
+  if (!isDevelopment && !forceLog) return;
+
+  const logMessage = formatLogMessage('WARN', message, context);
+
+  if (isDevelopment) {
+    console.warn(logMessage, context?.metadata);
+  } else if (forceLog) {
+    console.warn(
+      JSON.stringify({
+        level: 'WARN',
+        message,
+        context,
+        timestamp: new Date().toISOString(),
+      }),
+    );
+  }
+}
+
+/**
+ * Log info with context
+ * Only logs in development mode unless forced
+ */
+export function logInfo(message: string, context?: LogContext, forceLog: boolean = false): void {
+  if (!isDevelopment && !forceLog) return;
+
+  const logMessage = formatLogMessage('INFO', message, context);
+
+  if (isDevelopment) {
+    console.info(logMessage, context?.metadata);
+  } else if (forceLog) {
+    console.info(
+      JSON.stringify({
+        level: 'INFO',
+        message,
+        context,
+        timestamp: new Date().toISOString(),
+      }),
+    );
+  }
+}
+
+/**
+ * Log debug information
+ * Only logs in development mode
+ */
+export function logDebug(message: string, data?: unknown): void {
+  if (!isDevelopment) return;
+
+  console.debug(`[DEBUG] ${message}`, data);
+}
+
+/**
+ * Format log message with context
+ */
+function formatLogMessage(level: string, message: string, context?: LogContext): string {
+  const parts = [
+    `[${level}]`,
+    context?.module && `[${context.module}]`,
+    context?.action && `[${context.action}]`,
+    message,
+  ].filter(Boolean);
+
+  return parts.join(' ');
+}

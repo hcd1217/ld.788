@@ -1,5 +1,5 @@
 import { type AdminLoginRequest, adminApi } from '@/lib/api';
-import { isDevelopment } from '@/utils/env';
+import { logError } from '@/utils/logger';
 
 export const adminService = {
   async login({ accessKey }: AdminLoginRequest): Promise<{ success: boolean }> {
@@ -7,9 +7,10 @@ export const adminService = {
       const response = await adminApi.login({ accessKey });
       return response;
     } catch (error) {
-      if (isDevelopment) {
-        console.error('Login failed', error);
-      }
+      logError('Login failed', error, {
+        module: 'AdminService',
+        action: 'login',
+      });
       return { success: false };
     }
   },

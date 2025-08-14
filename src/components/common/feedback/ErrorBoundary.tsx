@@ -3,6 +3,7 @@ import { Alert, Button, Stack, Text, Title } from '@mantine/core';
 import { IconAlertTriangle } from '@tabler/icons-react';
 import { addComponentError } from '@/stores/error';
 import { isDevelopment } from '@/utils/env';
+import { logError } from '@/utils/logger';
 
 type Props = {
   readonly children: ReactNode;
@@ -27,9 +28,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log to console in development
-    if (isDevelopment) {
-      console.error('ErrorBoundary caught error:', error, errorInfo);
-    }
+    logError('ErrorBoundary caught error:', error, {
+      module: 'ErrorBoundary',
+      action: 'componentDidCatch',
+    });
 
     // Add to error store
     addComponentError(error.message, errorInfo.componentStack ?? '', error.cause as Error);

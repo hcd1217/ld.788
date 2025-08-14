@@ -4,7 +4,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { clientManagementService } from '@/services/clientManagement';
 import type { ClientDetail } from '@/lib/api';
 import { ROUTERS } from '@/config/routeConfig';
-import { isDevelopment } from '@/utils/env';
+import { logError } from '@/utils/logger';
 
 export function useClientDetail(clientCode: string | undefined) {
   const navigate = useNavigate();
@@ -35,9 +35,10 @@ export function useClientDetail(clientCode: string | undefined) {
           setError(errorMessage);
         }
 
-        if (isDevelopment) {
-          console.error('Failed to load client:', error);
-        }
+        logError('Failed to load client:', error, {
+          module: 'useClientDetail',
+          action: 'clientData',
+        });
       } finally {
         if (withLoadingState) {
           setIsLoading(false);
