@@ -20,7 +20,8 @@ import {
   MOBILE_FORM_ACTIONS_Z_INDEX,
   DESKTOP_FORM_ACTIONS_Z_INDEX,
 } from '@/constants/po.constants';
-import type { Customer, POItem } from '@/lib/api/schemas/sales.schemas';
+import type { POItem } from '@/services/sales/purchaseOrder';
+import type { Customer } from '@/services/sales/customer';
 import { formatCurrency } from '@/utils/number';
 import { useMemo, useEffect, useCallback, useRef, useState } from 'react';
 

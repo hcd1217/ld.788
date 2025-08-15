@@ -26,7 +26,7 @@ import { showErrorNotification } from '@/utils/notifications';
 import { useProductList, usePOActions, usePOLoading } from '@/stores/usePOStore';
 import { createPOItem, calculateItemTotal } from '@/utils/poItemUtils';
 import { PRODUCT_CATEGORIES } from '@/constants/purchaseOrder';
-import type { POItem } from '@/lib/api/schemas/sales.schemas';
+import type { POItem } from '@/services/sales/purchaseOrder';
 
 type POItemsEditorProps = {
   readonly items: POItem[];
@@ -265,7 +265,7 @@ const POItemsEditorDesktop = forwardRef<POItemsEditorRef, POItemsEditorProps>(
 
     return (
       <Stack gap="md">
-        <Table withTableBorder withColumnBorders>
+        <Table withTableBorder withColumnBorders aria-label={t('po.itemsTableAriaLabel')}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th style={{ width: 150 }}>{t('po.productCode')}</Table.Th>

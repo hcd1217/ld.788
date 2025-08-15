@@ -31,6 +31,12 @@ const defaultFilters: POFilters = {
   },
 };
 
+// Pre-computed searchable text for each PO to avoid repeated toLowerCase() calls
+interface POWithSearchText {
+  po: PurchaseOrder;
+  searchText: string;
+}
+
 export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOverride?: string) {
   const [filters, setFilters] = useState<POFilters>(defaultFilters);
 
@@ -88,22 +94,56 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOve
     };
   }, [setSearchQuery, setCustomerId, setStatus, setDateRange, updateFilters, resetFilters]);
 
-  const filteredPOs = useMemo(() => {
-    return purchaseOrders.filter((po) => {
-      const { customerId, status, dateRange } = filters;
-      const searchQuery = searchOverride !== undefined ? searchOverride : filters.searchQuery;
+  // Pre-compute searchable text for all POs once when data changes
+  // This avoids repeated toLowerCase() calls during filtering
+  const posWithSearchText = useMemo<readonly POWithSearchText[]>(() => {
+    return purchaseOrders.map((po) => {
+      // Combine all searchable fields into a single lowercase string
+      const searchParts: string[] = [
+        po.poNumber,
+        po.customer?.name ?? '',
+        po.customer?.companyName ?? '',
+        po.notes ?? '',
+      ];
+      
+      const searchText = searchParts
+        .filter(Boolean) // Remove empty strings
+        .join(' ')
+        .toLowerCase();
+      
+      return { po, searchText };
+    });
+  }, [purchaseOrders]);
 
-      // Status filter
+  // Memoize the normalized search query to avoid repeated toLowerCase() calls
+  const normalizedSearchQuery = useMemo(() => {
+    const query = searchOverride !== undefined ? searchOverride : filters.searchQuery;
+    return query.trim().toLowerCase();
+  }, [filters.searchQuery, searchOverride]);
+
+  const filteredPOs = useMemo(() => {
+    const { customerId, status, dateRange } = filters;
+    
+    // Early exit if no filters are applied
+    if (!hasActiveFilters && !normalizedSearchQuery) {
+      return purchaseOrders;
+    }
+
+    // Filter the pre-computed POs with optimized checks
+    const filtered = posWithSearchText.filter(({ po, searchText }) => {
+      // Perform cheapest checks first for early exits
+      
+      // Status filter (simple enum comparison - very fast)
       if (status !== PO_STATUS.ALL && po.status !== status) {
         return false;
       }
 
-      // Customer filter
+      // Customer filter (simple ID comparison - very fast)
       if (customerId && po.customerId !== customerId) {
         return false;
       }
 
-      // Date range filter
+      // Date range filter (date comparison - fast)
       if (dateRange.start && po.orderDate < dateRange.start) {
         return false;
       }
@@ -111,22 +151,17 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOve
         return false;
       }
 
-      // Search query filter
-      if (searchQuery.trim()) {
-        const lowerQuery = searchQuery.toLowerCase();
-        const matchesSearch =
-          po.poNumber.toLowerCase().includes(lowerQuery) ||
-          (po.customer?.name.toLowerCase().includes(lowerQuery) ?? false) ||
-          (po.customer?.companyName?.toLowerCase().includes(lowerQuery) ?? false) ||
-          (po.notes?.toLowerCase().includes(lowerQuery) ?? false);
-        if (!matchesSearch) {
-          return false;
-        }
+      // Search query filter (string search - most expensive, do last)
+      if (normalizedSearchQuery && !searchText.includes(normalizedSearchQuery)) {
+        return false;
       }
 
       return true;
     });
-  }, [purchaseOrders, filters, searchOverride]);
+
+    // Extract just the PO objects from the filtered results
+    return filtered.map(({ po }) => po);
+  }, [posWithSearchText, filters.customerId, filters.status, filters.dateRange, normalizedSearchQuery, hasActiveFilters, purchaseOrders]);
 
   const clearAllFilters = useCallback(() => {
     setSearchQuery('');

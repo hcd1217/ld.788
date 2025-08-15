@@ -19,6 +19,7 @@ import { POStatusBadge } from './POStatusBadge';
 
 type PODetailAccordionProps = {
   readonly purchaseOrder: PurchaseOrder;
+  readonly isLoading?: boolean;
   readonly onEdit: () => void;
   readonly onConfirm: () => void;
   readonly onProcess: () => void;
@@ -30,6 +31,7 @@ type PODetailAccordionProps = {
 
 export function PODetailAccordion({
   purchaseOrder,
+  isLoading = false,
   onEdit,
   onConfirm,
   onProcess,
@@ -49,6 +51,7 @@ export function PODetailAccordion({
           key="edit"
           variant="light"
           size="xs"
+          loading={isLoading}
           leftSection={<IconEdit size={14} />}
           onClick={onEdit}
         >
@@ -58,6 +61,7 @@ export function PODetailAccordion({
           key="confirm"
           color="green"
           size="xs"
+          loading={isLoading}
           leftSection={<IconCheck size={14} />}
           onClick={onConfirm}
         >
@@ -68,6 +72,7 @@ export function PODetailAccordion({
           color="red"
           variant="outline"
           size="xs"
+          loading={isLoading}
           leftSection={<IconX size={14} />}
           onClick={onCancel}
         >
@@ -80,6 +85,7 @@ export function PODetailAccordion({
           key="process"
           color="blue"
           size="xs"
+          loading={isLoading}
           leftSection={<IconPackage size={14} />}
           onClick={onProcess}
         >
@@ -90,6 +96,7 @@ export function PODetailAccordion({
           color="red"
           variant="outline"
           size="xs"
+          loading={isLoading}
           leftSection={<IconX size={14} />}
           onClick={onCancel}
         >
@@ -102,6 +109,7 @@ export function PODetailAccordion({
           key="ship"
           color="indigo"
           size="xs"
+          loading={isLoading}
           leftSection={<IconTruck size={14} />}
           onClick={onShip}
         >
@@ -114,6 +122,7 @@ export function PODetailAccordion({
           key="deliver"
           color="green"
           size="xs"
+          loading={isLoading}
           leftSection={<IconPackageExport size={14} />}
           onClick={onDeliver}
         >
@@ -124,6 +133,7 @@ export function PODetailAccordion({
           color="orange"
           variant="outline"
           size="xs"
+          loading={isLoading}
           leftSection={<IconReceipt size={14} />}
           onClick={onRefund}
         >
@@ -137,6 +147,7 @@ export function PODetailAccordion({
           color="orange"
           variant="outline"
           size="xs"
+          loading={isLoading}
           leftSection={<IconReceipt size={14} />}
           onClick={onRefund}
         >

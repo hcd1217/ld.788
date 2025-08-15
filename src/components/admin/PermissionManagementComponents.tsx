@@ -77,7 +77,7 @@ export function PermissionTable({ permissions, onEdit, onDelete }: PermissionTab
         ) : (
           <Menu shadow="md" width={200} position="bottom-end">
             <Menu.Target>
-              <ActionIcon variant="subtle" color="gray">
+              <ActionIcon variant="subtle" color="gray" aria-label={t('admin.permissions.actions')}>
                 <IconDotsVertical size={16} />
               </ActionIcon>
             </Menu.Target>
@@ -109,7 +109,13 @@ export function PermissionTable({ permissions, onEdit, onDelete }: PermissionTab
 
   return (
     <ScrollArea>
-      <Table striped highlightOnHover withTableBorder withColumnBorders>
+      <Table
+        striped
+        highlightOnHover
+        withTableBorder
+        withColumnBorders
+        aria-label={t('permission.tableAriaLabel')}
+      >
         <Table.Thead>
           <Table.Tr>
             <Table.Th>{t('admin.permissions.permission')}</Table.Th>

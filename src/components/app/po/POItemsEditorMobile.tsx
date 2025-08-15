@@ -9,7 +9,7 @@ import { POItemCard } from './POItemCard';
 import { POAddItemModal } from './POAddItemModal';
 import { createPOItem, calculateItemTotal } from '@/utils/poItemUtils';
 import { FAB_BOTTOM_OFFSET, FAB_RIGHT_OFFSET, FAB_Z_INDEX } from '@/constants/po.constants';
-import type { POItem } from '@/lib/api/schemas/sales.schemas';
+import type { POItem } from '@/services/sales/purchaseOrder';
 import type { POItemsEditorRef } from './POItemsEditor';
 
 type POItemsEditorMobileProps = {

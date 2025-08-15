@@ -1,13 +1,13 @@
+import { useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { LoadingOverlay, Stack } from '@mantine/core';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { usePurchaseOrderList, usePOActions, usePOLoading } from '@/stores/usePOStore';
+import { usePurchaseOrderList, usePOActions, usePOLoading, usePOError } from '@/stores/usePOStore';
 import { usePOModals } from '@/hooks/usePOModals';
 import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
-import { DetailPageLayout } from '@/components/common/layouts/DetailPageLayout';
 import { AppPageTitle } from '@/components/common';
-import { AppMobileLayout } from '@/components/common';
+import { AppMobileLayout, AppDesktopLayout } from '@/components/common';
 import {
   PODetailTabs,
   PODetailAccordion,
@@ -26,6 +26,7 @@ export function PODetailPage() {
   const { isMobile } = useDeviceType();
   const purchaseOrders = usePurchaseOrderList();
   const isLoading = usePOLoading();
+  const error = usePOError();
   const {
     refreshPurchaseOrders,
     confirmPurchaseOrder,
@@ -34,12 +35,21 @@ export function PODetailPage() {
     deliverPurchaseOrder,
     cancelPurchaseOrder,
     refundPurchaseOrder,
+    clearError,
   } = usePOActions();
 
   const purchaseOrder = purchaseOrders.find((po) => po.id === poId);
 
   // Use the centralized modal hook
   const { modals, selectedPO, closeModal, handlers } = usePOModals();
+
+  // Memoized modal close handlers
+  const handleCloseConfirmModal = useCallback(() => closeModal('confirm'), [closeModal]);
+  const handleCloseProcessModal = useCallback(() => closeModal('process'), [closeModal]);
+  const handleCloseShipModal = useCallback(() => closeModal('ship'), [closeModal]);
+  const handleCloseDeliverModal = useCallback(() => closeModal('deliver'), [closeModal]);
+  const handleCloseCancelModal = useCallback(() => closeModal('cancel'), [closeModal]);
+  const handleCloseRefundModal = useCallback(() => closeModal('refund'), [closeModal]);
 
   const handleEdit = () => {
     if (purchaseOrder && purchaseOrder.status === 'NEW') {
@@ -190,42 +200,42 @@ export function PODetailPage() {
         opened={modals.confirmModalOpened}
         purchaseOrder={selectedPO}
         mode="confirm"
-        onClose={() => closeModal('confirm')}
+        onClose={handleCloseConfirmModal}
         onConfirm={confirmPOAction}
       />
       <POStatusModal
         opened={modals.processModalOpened}
         purchaseOrder={selectedPO}
         mode="process"
-        onClose={() => closeModal('process')}
+        onClose={handleCloseProcessModal}
         onConfirm={processPOAction}
       />
       <POStatusModal
         opened={modals.shipModalOpened}
         purchaseOrder={selectedPO}
         mode="ship"
-        onClose={() => closeModal('ship')}
+        onClose={handleCloseShipModal}
         onConfirm={shipPOAction}
       />
       <POStatusModal
         opened={modals.deliverModalOpened}
         purchaseOrder={selectedPO}
         mode="deliver"
-        onClose={() => closeModal('deliver')}
+        onClose={handleCloseDeliverModal}
         onConfirm={deliverPOAction}
       />
       <POStatusModal
         opened={modals.cancelModalOpened}
         purchaseOrder={selectedPO}
         mode="cancel"
-        onClose={() => closeModal('cancel')}
+        onClose={handleCloseCancelModal}
         onConfirm={cancelPOAction}
       />
       <POStatusModal
         opened={modals.refundModalOpened}
         purchaseOrder={selectedPO}
         mode="refund"
-        onClose={() => closeModal('refund')}
+        onClose={handleCloseRefundModal}
         onConfirm={refundPOAction}
       />
     </>
@@ -236,7 +246,7 @@ export function PODetailPage() {
   if (isMobile) {
     if (isLoading || !purchaseOrder) {
       return (
-        <AppMobileLayout showLogo isLoading={isLoading} header={<AppPageTitle title={title} />}>
+        <AppMobileLayout showLogo isLoading={isLoading} error={error} clearError={clearError} header={<AppPageTitle title={title} />}>
           {isLoading ? (
             <LoadingOverlay visible />
           ) : (
@@ -251,11 +261,14 @@ export function PODetailPage() {
         withGoBack
         noFooter
         isLoading={isLoading}
+        error={error}
+        clearError={clearError}
         header={<AppPageTitle title={title} />}
       >
         <Stack gap="md">
           <PODetailAccordion
             purchaseOrder={purchaseOrder}
+            isLoading={isLoading}
             onEdit={handleEdit}
             onConfirm={handleConfirm}
             onProcess={handleProcess}
@@ -271,7 +284,8 @@ export function PODetailPage() {
   }
 
   return (
-    <DetailPageLayout titleAlign="center" title={title} isLoading={false}>
+    <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
+      <AppPageTitle title={title} />
       {isLoading ? (
         <Stack gap="md">
           <PODetailTabsSkeleton />
@@ -281,6 +295,7 @@ export function PODetailPage() {
           <POErrorBoundary componentName="PODetailTabs">
             <PODetailTabs
               purchaseOrder={purchaseOrder}
+              isLoading={isLoading}
               onEdit={handleEdit}
               onConfirm={handleConfirm}
               onProcess={handleProcess}
@@ -295,6 +310,6 @@ export function PODetailPage() {
         <ResourceNotFound message={t('po.notFound')} />
       )}
       {modalComponents}
-    </DetailPageLayout>
+    </AppDesktopLayout>
   );
 }

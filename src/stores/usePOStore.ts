@@ -10,7 +10,6 @@ import {
   type UpdatePOStatusRequest,
 } from '@/services/sales';
 import { getErrorMessage } from '@/utils/errorUtils';
-import { useMemo } from 'react';
 
 type POState = {
   // PO data
@@ -21,6 +20,16 @@ type POState = {
   currentPO: PurchaseOrder | undefined;
   isLoading: boolean;
   error: string | undefined;
+  // Request tracking for race condition prevention
+  pendingRequests: Map<string, { requestId: string; timestamp: number; action: string }>;
+  requestCounter: number;
+
+  // Request tracking helpers
+  _generateRequestId: () => string;
+  _startRequest: (poId: string, action: string) => string;
+  _finishRequest: (poId: string, requestId: string) => boolean;
+  _isRequestPending: (poId: string) => boolean;
+  _cleanupStaleRequests: () => void;
 
   // Actions
   setCurrentPO: (po: PurchaseOrder | undefined) => void;
@@ -56,6 +65,67 @@ export const usePOStore = create<POState>()(
       currentPO: undefined,
       isLoading: false,
       error: undefined,
+      pendingRequests: new Map(),
+      requestCounter: 0,
+
+      // Request tracking helpers
+      _generateRequestId() {
+        const state = get();
+        const requestId = `req_${state.requestCounter}_${Date.now()}`;
+        set({ requestCounter: state.requestCounter + 1 });
+        return requestId;
+      },
+
+      _startRequest(poId: string, action: string) {
+        const state = get();
+        const requestId = get()._generateRequestId();
+        const newPendingRequests = new Map(state.pendingRequests);
+        newPendingRequests.set(poId, {
+          requestId,
+          timestamp: Date.now(),
+          action,
+        });
+        set({ pendingRequests: newPendingRequests });
+        return requestId;
+      },
+
+      _finishRequest(poId: string, requestId: string) {
+        const state = get();
+        const pendingRequest = state.pendingRequests.get(poId);
+        if (pendingRequest?.requestId === requestId) {
+          const newPendingRequests = new Map(state.pendingRequests);
+          newPendingRequests.delete(poId);
+          set({ pendingRequests: newPendingRequests });
+          return true;
+        }
+        return false;
+      },
+
+      _isRequestPending(poId: string) {
+        // Clean up stale requests first
+        get()._cleanupStaleRequests();
+        const state = get();
+        return state.pendingRequests.has(poId);
+      },
+
+      _cleanupStaleRequests() {
+        const state = get();
+        const now = Date.now();
+        const TIMEOUT_MS = 30000; // 30 second timeout
+        const newPendingRequests = new Map(state.pendingRequests);
+        let hasChanges = false;
+
+        for (const [poId, request] of newPendingRequests) {
+          if (now - request.timestamp > TIMEOUT_MS) {
+            newPendingRequests.delete(poId);
+            hasChanges = true;
+          }
+        }
+
+        if (hasChanges) {
+          set({ pendingRequests: newPendingRequests });
+        }
+      },
 
       // Actions
       setCurrentPO(po) {
@@ -180,6 +250,14 @@ export const usePOStore = create<POState>()(
       },
 
       async confirmPO(id) {
+        // Check if request is already pending
+        if (get()._isRequestPending(id)) {
+          throw new Error('Confirm request already pending for this PO');
+        }
+
+        // Start request tracking
+        const requestId = get()._startRequest(id, 'confirm');
+
         // Optimistically update the status
         set((state) => ({
           purchaseOrders: state.purchaseOrders.map((po) =>
@@ -194,12 +272,18 @@ export const usePOStore = create<POState>()(
 
         try {
           const updatedPO = await purchaseOrderService.confirmPO(id);
-          // Update with server response
-          set((state) => ({
-            purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-          }));
+
+          // Only update if this request is still valid (prevent race conditions)
+          if (get()._finishRequest(id, requestId)) {
+            set((state) => ({
+              purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
+              currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+            }));
+          }
         } catch (error) {
+          // Finish request tracking even on error
+          get()._finishRequest(id, requestId);
+
           // Rollback on error
           await get().refreshPOs();
           set({
@@ -210,6 +294,14 @@ export const usePOStore = create<POState>()(
       },
 
       async processPO(id) {
+        // Check if request is already pending
+        if (get()._isRequestPending(id)) {
+          throw new Error('Process request already pending for this PO');
+        }
+
+        // Start request tracking
+        const requestId = get()._startRequest(id, 'process');
+
         // Optimistically update the status
         set((state) => ({
           purchaseOrders: state.purchaseOrders.map((po) =>
@@ -224,12 +316,18 @@ export const usePOStore = create<POState>()(
 
         try {
           const updatedPO = await purchaseOrderService.processPO(id);
-          // Update with server response
-          set((state) => ({
-            purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-          }));
+
+          // Only update if this request is still valid (prevent race conditions)
+          if (get()._finishRequest(id, requestId)) {
+            set((state) => ({
+              purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
+              currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+            }));
+          }
         } catch (error) {
+          // Finish request tracking even on error
+          get()._finishRequest(id, requestId);
+
           // Rollback on error
           await get().refreshPOs();
           set({
@@ -240,6 +338,14 @@ export const usePOStore = create<POState>()(
       },
 
       async shipPO(id, data) {
+        // Check if request is already pending
+        if (get()._isRequestPending(id)) {
+          throw new Error('Ship request already pending for this PO');
+        }
+
+        // Start request tracking
+        const requestId = get()._startRequest(id, 'ship');
+
         // Optimistically update the status
         set((state) => ({
           purchaseOrders: state.purchaseOrders.map((po) =>
@@ -254,12 +360,18 @@ export const usePOStore = create<POState>()(
 
         try {
           const updatedPO = await purchaseOrderService.shipPO(id, data);
-          // Update with server response
-          set((state) => ({
-            purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-          }));
+
+          // Only update if this request is still valid (prevent race conditions)
+          if (get()._finishRequest(id, requestId)) {
+            set((state) => ({
+              purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
+              currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+            }));
+          }
         } catch (error) {
+          // Finish request tracking even on error
+          get()._finishRequest(id, requestId);
+
           // Rollback on error
           await get().refreshPOs();
           set({
@@ -270,6 +382,14 @@ export const usePOStore = create<POState>()(
       },
 
       async deliverPO(id) {
+        // Check if request is already pending
+        if (get()._isRequestPending(id)) {
+          throw new Error('Deliver request already pending for this PO');
+        }
+
+        // Start request tracking
+        const requestId = get()._startRequest(id, 'deliver');
+
         // Optimistically update the status
         set((state) => ({
           purchaseOrders: state.purchaseOrders.map((po) =>
@@ -284,12 +404,18 @@ export const usePOStore = create<POState>()(
 
         try {
           const updatedPO = await purchaseOrderService.deliverPO(id);
-          // Update with server response
-          set((state) => ({
-            purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-          }));
+
+          // Only update if this request is still valid (prevent race conditions)
+          if (get()._finishRequest(id, requestId)) {
+            set((state) => ({
+              purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
+              currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+            }));
+          }
         } catch (error) {
+          // Finish request tracking even on error
+          get()._finishRequest(id, requestId);
+
           // Rollback on error
           await get().refreshPOs();
           set({
@@ -300,6 +426,14 @@ export const usePOStore = create<POState>()(
       },
 
       async cancelPO(id, data) {
+        // Check if request is already pending
+        if (get()._isRequestPending(id)) {
+          throw new Error('Cancel request already pending for this PO');
+        }
+
+        // Start request tracking
+        const requestId = get()._startRequest(id, 'cancel');
+
         // Optimistically update the status
         set((state) => ({
           purchaseOrders: state.purchaseOrders.map((po) =>
@@ -314,12 +448,18 @@ export const usePOStore = create<POState>()(
 
         try {
           const updatedPO = await purchaseOrderService.cancelPO(id, data);
-          // Update with server response
-          set((state) => ({
-            purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-          }));
+
+          // Only update if this request is still valid (prevent race conditions)
+          if (get()._finishRequest(id, requestId)) {
+            set((state) => ({
+              purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
+              currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+            }));
+          }
         } catch (error) {
+          // Finish request tracking even on error
+          get()._finishRequest(id, requestId);
+
           // Rollback on error
           await get().refreshPOs();
           set({
@@ -330,6 +470,14 @@ export const usePOStore = create<POState>()(
       },
 
       async refundPO(id, data) {
+        // Check if request is already pending
+        if (get()._isRequestPending(id)) {
+          throw new Error('Refund request already pending for this PO');
+        }
+
+        // Start request tracking
+        const requestId = get()._startRequest(id, 'refund');
+
         // Optimistically update the status
         set((state) => ({
           purchaseOrders: state.purchaseOrders.map((po) =>
@@ -344,12 +492,18 @@ export const usePOStore = create<POState>()(
 
         try {
           const updatedPO = await purchaseOrderService.refundPO(id, data);
-          // Update with server response
-          set((state) => ({
-            purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-          }));
+
+          // Only update if this request is still valid (prevent race conditions)
+          if (get()._finishRequest(id, requestId)) {
+            set((state) => ({
+              purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
+              currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+            }));
+          }
         } catch (error) {
+          // Finish request tracking even on error
+          get()._finishRequest(id, requestId);
+
           // Rollback on error
           await get().refreshPOs();
           set({
@@ -385,71 +539,54 @@ export const usePOStore = create<POState>()(
   ),
 );
 
-// Convenience hooks
-export const usePurchaseOrderList = () => usePOStore((state) => state.purchaseOrders);
-export const useCustomerList = () => usePOStore((state) => state.customers);
-export const useProductList = () => usePOStore((state) => state.products);
+// Empty constants to prevent re-renders when data is undefined
+const EMPTY_ARRAY: PurchaseOrder[] = [];
+const EMPTY_CUSTOMERS: Customer[] = [];
+const EMPTY_PRODUCTS: Product[] = [];
+
+// Convenience hooks with stable references
+export const usePurchaseOrderList = () =>
+  usePOStore((state) => state.purchaseOrders) || EMPTY_ARRAY;
+export const useCustomerList = () => usePOStore((state) => state.customers) || EMPTY_CUSTOMERS;
+export const useProductList = () => usePOStore((state) => state.products) || EMPTY_PRODUCTS;
 export const usePOLoading = () => usePOStore((state) => state.isLoading);
 export const usePOError = () => usePOStore((state) => state.error);
-// Export individual action hooks to avoid object creation
-export const usePOActions = () => {
-  const loadPOs = usePOStore((state) => state.loadPOs);
-  const loadCustomers = usePOStore((state) => state.loadCustomers);
-  const loadProducts = usePOStore((state) => state.loadProducts);
-  const refreshPOs = usePOStore((state) => state.refreshPOs);
-  const loadPO = usePOStore((state) => state.loadPO);
-  const createPO = usePOStore((state) => state.createPO);
-  const updatePO = usePOStore((state) => state.updatePO);
-  const confirmPO = usePOStore((state) => state.confirmPO);
-  const processPO = usePOStore((state) => state.processPO);
-  const shipPO = usePOStore((state) => state.shipPO);
-  const deliverPO = usePOStore((state) => state.deliverPO);
-  const cancelPO = usePOStore((state) => state.cancelPO);
-  const refundPO = usePOStore((state) => state.refundPO);
-  const clearError = usePOStore((state) => state.clearError);
+// Selector for getting all actions with stable reference
+const getPOActions = (state: POState) => ({
+  loadPOs: state.loadPOs,
+  loadCustomers: state.loadCustomers,
+  loadProducts: state.loadProducts,
+  refreshPOs: state.refreshPOs,
+  loadPO: state.loadPO,
+  createPO: state.createPO,
+  updatePO: state.updatePO,
+  confirmPO: state.confirmPO,
+  processPO: state.processPO,
+  shipPO: state.shipPO,
+  deliverPO: state.deliverPO,
+  cancelPO: state.cancelPO,
+  refundPO: state.refundPO,
+  clearError: state.clearError,
+  // Aliases for consistency with page usage
+  refreshPurchaseOrders: state.refreshPOs,
+  createPurchaseOrder: state.createPO,
+  updatePurchaseOrder: state.updatePO,
+  confirmPurchaseOrder: state.confirmPO,
+  processPurchaseOrder: state.processPO,
+  shipPurchaseOrder: state.shipPO,
+  deliverPurchaseOrder: state.deliverPO,
+  cancelPurchaseOrder: state.cancelPO,
+  refundPurchaseOrder: state.refundPO,
+});
 
-  return useMemo(
-    () => ({
-      loadPOs,
-      loadCustomers,
-      loadProducts,
-      refreshPOs,
-      loadPO,
-      createPO,
-      updatePO,
-      confirmPO,
-      processPO,
-      shipPO,
-      deliverPO,
-      cancelPO,
-      refundPO,
-      clearError,
-      // Aliases for consistency with page usage
-      refreshPurchaseOrders: refreshPOs,
-      createPurchaseOrder: createPO,
-      updatePurchaseOrder: updatePO,
-      confirmPurchaseOrder: confirmPO,
-      processPurchaseOrder: processPO,
-      shipPurchaseOrder: shipPO,
-      deliverPurchaseOrder: deliverPO,
-      cancelPurchaseOrder: cancelPO,
-      refundPurchaseOrder: refundPO,
-    }),
-    [
-      loadPOs,
-      loadCustomers,
-      loadProducts,
-      refreshPOs,
-      loadPO,
-      createPO,
-      updatePO,
-      confirmPO,
-      processPO,
-      shipPO,
-      deliverPO,
-      cancelPO,
-      refundPO,
-      clearError,
-    ],
-  );
-};
+// Export hook with stable reference - no more infinite loops!
+export const usePOActions = () => usePOStore(getPOActions);
+
+// Selector hooks for getting POs by criteria
+export const usePOById = (id: string) => usePOStore((state) => state.getPOById(id));
+export const usePOsByStatus = (status: string) =>
+  usePOStore((state) => state.getPOsByStatus(status)) || EMPTY_ARRAY;
+export const usePOsByCustomer = (customerId: string) =>
+  usePOStore((state) => state.getPOsByCustomer(customerId)) || EMPTY_ARRAY;
+export const useCurrentPO = () => usePOStore((state) => state.currentPO);
+export const useSetCurrentPO = () => usePOStore((state) => state.setCurrentPO);

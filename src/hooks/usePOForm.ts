@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getBasicValidators } from '@/utils/validation';
-import type { POItem } from '@/lib/api/schemas/sales.schemas';
+import type { POItem } from '@/services/sales/purchaseOrder';
 
 export type POFormValues = {
   customerId: string;

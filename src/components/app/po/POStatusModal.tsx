@@ -23,7 +23,7 @@ import { useState, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { DRAWER_BODY_PADDING_BOTTOM, DRAWER_HEADER_PADDING } from '@/constants/po.constants';
-import type { PurchaseOrder } from '@/lib/api/schemas/sales.schemas';
+import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { formatCurrency } from '@/utils/number';
 import { formatDate } from '@/utils/time';
 

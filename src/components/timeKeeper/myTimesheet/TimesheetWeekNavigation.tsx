@@ -42,7 +42,7 @@ export function TimesheetWeekNavigation({
             size="lg"
             onClick={onPreviousWeek}
             c="var(--mantine-color-black)"
-            aria-label="Previous week"
+            aria-label={t('common.previousWeek')}
           >
             <IconChevronLeft size={20} />
           </ActionIcon>
@@ -67,7 +67,7 @@ export function TimesheetWeekNavigation({
             size="lg"
             c="var(--mantine-color-black)"
             onClick={onNextWeek}
-            aria-label="Next week"
+            aria-label={t('common.nextWeek')}
           >
             <IconChevronRight size={20} />
           </ActionIcon>
@@ -80,7 +80,7 @@ export function TimesheetWeekNavigation({
             size="lg"
             c="var(--mantine-color-black)"
             onClick={onCurrentWeek}
-            aria-label="This week"
+            aria-label={t('common.thisWeek')}
           >
             <IconCalendar size={20} />
           </ActionIcon>
@@ -105,7 +105,12 @@ export function TimesheetWeekNavigation({
   // Desktop variant
   return (
     <Group gap="md" style={style} className={className}>
-      <ActionIcon variant="subtle" size="lg" onClick={onPreviousWeek} aria-label="Previous week">
+      <ActionIcon
+        variant="subtle"
+        size="lg"
+        onClick={onPreviousWeek}
+        aria-label={t('common.previousWeek')}
+      >
         <IconChevronLeft size={20} />
       </ActionIcon>
 
@@ -115,7 +120,7 @@ export function TimesheetWeekNavigation({
         </Text>
       </Card>
 
-      <ActionIcon variant="subtle" size="lg" onClick={onNextWeek} aria-label="Next week">
+      <ActionIcon variant="subtle" size="lg" onClick={onNextWeek} aria-label={t('common.nextWeek')}>
         <IconChevronRight size={20} />
       </ActionIcon>
 

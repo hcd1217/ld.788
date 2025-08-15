@@ -6,7 +6,7 @@ import { IconAlertCircle } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { AppPageTitle, AppMobileLayout, AppDesktopLayout } from '@/components/common';
-import { POForm } from '@/components/app/po/POForm';
+import { POForm, POErrorBoundary } from '@/components/app/po';
 import { usePOActions, useCustomerList, usePOLoading, usePOError } from '@/stores/usePOStore';
 import { purchaseOrderService } from '@/services/sales/purchaseOrder';
 import { ROUTERS } from '@/config/routeConfig';
@@ -14,7 +14,7 @@ import { getPODetailRoute } from '@/config/routeConfig';
 import { useAction } from '@/hooks/useAction';
 import { useOnce } from '@/hooks/useOnce';
 import { type POFormValues, usePOForm } from '@/hooks/usePOForm';
-import type { PurchaseOrder } from '@/lib/api/schemas/sales.schemas';
+import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { logError } from '@/utils/logger';
 
 type PageMode = 'create' | 'edit';
@@ -170,25 +170,27 @@ export function POFormPage({ mode }: POFormPageProps) {
 
   const pageContent = (
     <Container fluid w="100%">
-      {isEditMode && isLoadingPO ? (
-        <Center h={400}>
-          <Loader size="lg" />
-        </Center>
-      ) : isEditMode && !currentPO ? (
-        <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
-          {t('po.notFound')}
-        </Alert>
-      ) : (
-        <POForm
-          form={form}
-          customers={customers}
-          isLoading={isLoading}
-          error={error}
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-          isEditMode={isEditMode}
-        />
-      )}
+      <POErrorBoundary componentName="POFormPage">
+        {isEditMode && isLoadingPO ? (
+          <Center h={400}>
+            <Loader size="lg" />
+          </Center>
+        ) : isEditMode && !currentPO ? (
+          <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
+            {t('po.notFound')}
+          </Alert>
+        ) : (
+          <POForm
+            form={form}
+            customers={customers}
+            isLoading={isLoading}
+            error={error}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            isEditMode={isEditMode}
+          />
+        )}
+      </POErrorBoundary>
     </Container>
   );
 

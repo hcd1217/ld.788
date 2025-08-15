@@ -13,6 +13,7 @@ import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 
 type POActionZoneProps = {
   readonly purchaseOrder: PurchaseOrder;
+  readonly isLoading?: boolean;
   readonly onConfirm: () => void;
   readonly onProcess: () => void;
   readonly onShip: () => void;
@@ -23,6 +24,7 @@ type POActionZoneProps = {
 
 export function POActionZone({
   purchaseOrder,
+  isLoading = false,
   onConfirm,
   onProcess,
   onShip,
@@ -41,6 +43,7 @@ export function POActionZone({
           <Button
             key="confirm"
             color="green"
+            loading={isLoading}
             leftSection={<IconCheck size={16} />}
             onClick={onConfirm}
           >
@@ -50,6 +53,7 @@ export function POActionZone({
             key="cancel"
             color="red"
             variant="outline"
+            loading={isLoading}
             leftSection={<IconX size={16} />}
             onClick={onCancel}
           >
@@ -63,6 +67,7 @@ export function POActionZone({
           <Button
             key="process"
             color="blue"
+            loading={isLoading}
             leftSection={<IconPackage size={16} />}
             onClick={onProcess}
           >
@@ -72,6 +77,7 @@ export function POActionZone({
             key="cancel"
             color="red"
             variant="outline"
+            loading={isLoading}
             leftSection={<IconX size={16} />}
             onClick={onCancel}
           >
@@ -82,7 +88,13 @@ export function POActionZone({
 
       case 'PROCESSING':
         actions.push(
-          <Button key="ship" color="indigo" leftSection={<IconTruck size={16} />} onClick={onShip}>
+          <Button
+            key="ship"
+            color="indigo"
+            loading={isLoading}
+            leftSection={<IconTruck size={16} />}
+            onClick={onShip}
+          >
             {t('po.markShipped')}
           </Button>,
         );
@@ -93,6 +105,7 @@ export function POActionZone({
           <Button
             key="deliver"
             color="green"
+            loading={isLoading}
             leftSection={<IconPackageExport size={16} />}
             onClick={onDeliver}
           >
@@ -102,6 +115,7 @@ export function POActionZone({
             key="refund"
             color="orange"
             variant="outline"
+            loading={isLoading}
             leftSection={<IconReceipt size={16} />}
             onClick={onRefund}
           >
@@ -116,6 +130,7 @@ export function POActionZone({
             key="refund"
             color="orange"
             variant="outline"
+            loading={isLoading}
             leftSection={<IconReceipt size={16} />}
             onClick={onRefund}
           >

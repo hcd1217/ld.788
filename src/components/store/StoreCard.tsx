@@ -36,6 +36,7 @@ export function StoreCard({ store, isSelected, onSelect, onEdit, onDelete }: Sto
         <ActionIcon
           variant="light"
           size="sm"
+          aria-label={t('store.editStoreTooltip')}
           title={t('store.editStoreTooltip')}
           onClick={(e) => {
             e.stopPropagation();
@@ -48,6 +49,7 @@ export function StoreCard({ store, isSelected, onSelect, onEdit, onDelete }: Sto
           color="red"
           variant="light"
           size="sm"
+          aria-label={t('store.deleteStoreTooltip')}
           title={t('store.deleteStoreTooltip')}
           onClick={(e) => {
             e.stopPropagation();
@@ -68,7 +70,7 @@ export function StoreCard({ store, isSelected, onSelect, onEdit, onDelete }: Sto
             </Text>
           </Group>
           <Group gap="xs" c="dimmed" justify="left" wrap="nowrap">
-            <IconMapPin size={14} style={{ flexShrink: 0 }} />
+            <IconMapPin size={14} style={{ flexShrink: 0 }} aria-hidden="true" />
             <Text
               size="sm"
               style={{
@@ -84,7 +86,7 @@ export function StoreCard({ store, isSelected, onSelect, onEdit, onDelete }: Sto
           </Group>
           {store.phoneNumber ? (
             <Group gap="xs" c="dimmed">
-              <IconPhone size={14} />
+              <IconPhone size={14} aria-hidden="true" />
               <Text size="sm">{store.phoneNumber}</Text>
             </Group>
           ) : null}

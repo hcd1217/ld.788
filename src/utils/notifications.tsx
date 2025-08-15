@@ -24,7 +24,7 @@ export function showSuccessNotification(
     message,
     color: 'green',
     icon: <IconCheck size={16} />,
-    autoClose: 5000,
+    autoClose: 3000,
     ...options,
   });
 }
@@ -43,7 +43,7 @@ export function showErrorNotification(
     message,
     color: 'red',
     icon: <IconAlertCircle size={16} />,
-    autoClose: 7000,
+    autoClose: 4000,
     ...options,
   });
 }
@@ -61,7 +61,7 @@ export function showInfoNotification(
     message,
     color: 'blue',
     icon: <IconInfoCircle size={16} />,
-    autoClose: 5000,
+    autoClose: 3000,
     ...options,
   });
 }

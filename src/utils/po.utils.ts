@@ -1,4 +1,4 @@
-import type { PurchaseOrder, POItem } from '@/lib/api/schemas/sales.schemas';
+import type { PurchaseOrder, POItem } from '@/services/sales/purchaseOrder';
 
 // PO Status flow validation
 export const PO_STATUS_FLOW = {

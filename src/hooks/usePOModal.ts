@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { PurchaseOrder } from '@/lib/api/schemas/sales.schemas';
+import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 
 type ModalType = 'confirm' | 'cancel' | 'process' | 'ship' | 'deliver' | 'refund';
 

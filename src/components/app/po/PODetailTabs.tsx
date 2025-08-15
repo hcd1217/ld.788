@@ -21,6 +21,7 @@ import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 
 type PODetailTabsProps = {
   readonly purchaseOrder: PurchaseOrder;
+  readonly isLoading?: boolean;
   readonly onEdit: () => void;
   readonly onConfirm: () => void;
   readonly onProcess: () => void;
@@ -32,6 +33,7 @@ type PODetailTabsProps = {
 
 export function PODetailTabs({
   purchaseOrder,
+  isLoading = false,
   onEdit,
   onConfirm,
   onProcess,
@@ -106,6 +108,7 @@ export function PODetailTabs({
               </POErrorBoundary>
               <POActionZone
                 purchaseOrder={purchaseOrder}
+                isLoading={isLoading}
                 onConfirm={onConfirm}
                 onProcess={onProcess}
                 onShip={onShip}

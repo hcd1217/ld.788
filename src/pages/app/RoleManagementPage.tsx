@@ -307,7 +307,13 @@ export function RoleManagementPage() {
               </Stack>
 
               <Tooltip label={t('common.refresh')}>
-                <ActionIcon variant="light" size="lg" loading={isLoading} onClick={loadRoles}>
+                <ActionIcon
+                  variant="light"
+                  size="lg"
+                  loading={isLoading}
+                  onClick={loadRoles}
+                  aria-label={t('common.refresh')}
+                >
                   <IconRefresh size={16} />
                 </ActionIcon>
               </Tooltip>
@@ -396,7 +402,7 @@ export function RoleManagementPage() {
 
               <Box visibleFrom="md">
                 <ScrollArea>
-                  <Table striped highlightOnHover>
+                  <Table striped highlightOnHover aria-label={t('common.rolesTableAriaLabel')}>
                     <Table.Thead>
                       <Table.Tr>
                         <Table.Th>{t('common.displayName')}</Table.Th>

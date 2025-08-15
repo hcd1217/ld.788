@@ -22,7 +22,7 @@ export function POItemsList({ purchaseOrder }: POItemsListProps) {
           </Badge>
         </Group>
 
-        <Table withTableBorder withColumnBorders>
+        <Table withTableBorder withColumnBorders aria-label={t('po.itemsTableAriaLabel')}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>{t('po.productCode')}</Table.Th>

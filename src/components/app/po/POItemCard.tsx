@@ -2,7 +2,7 @@ import { Card, Group, Text, ActionIcon, NumberInput, Stack, Badge } from '@manti
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { formatCurrency } from '@/utils/number';
-import type { POItem } from '@/lib/api/schemas/sales.schemas';
+import type { POItem } from '@/services/sales/purchaseOrder';
 
 type POItemCardProps = {
   readonly item: POItem;

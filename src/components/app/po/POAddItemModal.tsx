@@ -25,7 +25,7 @@ import {
   DRAWER_HEADER_PADDING,
   DRAWER_HEIGHT_CALC,
 } from '@/constants/po.constants';
-import type { POItem } from '@/lib/api/schemas/sales.schemas';
+import type { POItem } from '@/services/sales/purchaseOrder';
 import type { Product } from '@/services/sales/product';
 
 type POAddItemModalProps = {

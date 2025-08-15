@@ -232,6 +232,7 @@ export function StaffList({ staffs, onEdit, onDelete, onToggleStatus }: StaffLis
                           variant="light"
                           color="blue"
                           size="sm"
+                          aria-label={t('staff.viewQrCode')}
                           onClick={() => {
                             handleShowQrCode(staffMember);
                           }}
@@ -247,6 +248,7 @@ export function StaffList({ staffs, onEdit, onDelete, onToggleStatus }: StaffLis
                               variant="light"
                               color={copied ? 'green' : 'gray'}
                               size="sm"
+                              aria-label={copied ? t('staff.copied') : t('staff.copyClockInUrl')}
                               onClick={copy}
                             >
                               {copied ? <IconCheck size={22} /> : <IconCopy size={22} />}
@@ -270,6 +272,7 @@ export function StaffList({ staffs, onEdit, onDelete, onToggleStatus }: StaffLis
                         color="red"
                         variant="light"
                         size="sm"
+                        aria-label={t('staff.deleteStaffTooltip')}
                         onClick={() => {
                           onDelete(staffMember);
                         }}
@@ -355,7 +358,7 @@ export function StaffList({ staffs, onEdit, onDelete, onToggleStatus }: StaffLis
         </Group>
 
         <ScrollArea>
-          <Table highlightOnHover>
+          <Table highlightOnHover aria-label={t('staff.tableAriaLabel')}>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>{t('staff.staffMemberHeader')}</Table.Th>
@@ -426,6 +429,7 @@ export function StaffList({ staffs, onEdit, onDelete, onToggleStatus }: StaffLis
                             variant="light"
                             color="blue"
                             size="sm"
+                            aria-label={t('staff.viewQrCode')}
                             onClick={() => {
                               handleShowQrCode(staffMember);
                             }}
@@ -441,6 +445,7 @@ export function StaffList({ staffs, onEdit, onDelete, onToggleStatus }: StaffLis
                                 variant="light"
                                 color={copied ? 'green' : 'gray'}
                                 size="sm"
+                                aria-label={copied ? t('staff.copied') : t('staff.copyUrl')}
                                 onClick={copy}
                               >
                                 {copied ? <IconCheck size={22} /> : <IconCopy size={22} />}
@@ -458,6 +463,7 @@ export function StaffList({ staffs, onEdit, onDelete, onToggleStatus }: StaffLis
                             variant="light"
                             color="blue"
                             size="sm"
+                            aria-label={t('staff.editStaff')}
                             onClick={() => {
                               onEdit(staffMember);
                             }}
@@ -471,6 +477,7 @@ export function StaffList({ staffs, onEdit, onDelete, onToggleStatus }: StaffLis
                             variant="light"
                             color="red"
                             size="sm"
+                            aria-label={t('staff.deleteStaffTooltip')}
                             onClick={() => {
                               onDelete(staffMember);
                             }}

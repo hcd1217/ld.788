@@ -39,7 +39,7 @@ export function NotFound() {
         }}
       >
         <Stack gap="lg" align="center">
-          <IconError404 size={120} color="var(--mantine-color-red-6)" />
+          <IconError404 size={120} color="var(--mantine-color-red-6)" aria-hidden="true" />
 
           <Title order={1} size="h2">
             {t('errors.notFound')}

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { POItem } from '@/lib/api/schemas/sales.schemas';
+import type { POItem } from '@/services/sales/purchaseOrder';
 
 /**
  * Calculates the total price for a PO item with optional discount

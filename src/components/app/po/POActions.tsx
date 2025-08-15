@@ -20,6 +20,7 @@ type POActionsProps = {
   readonly status: POStatus;
   readonly gap?: number;
   readonly style?: MantineStyleProp;
+  readonly isLoading?: boolean;
   readonly onConfirm?: () => void;
   readonly onProcess?: () => void;
   readonly onShip?: () => void;
@@ -31,6 +32,7 @@ type POActionsProps = {
 export function POActions({
   purchaseOrderId,
   status,
+  isLoading = false,
   onConfirm,
   onProcess,
   onShip,
@@ -62,6 +64,7 @@ export function POActions({
             variant="subtle"
             color="gray"
             size="sm"
+            disabled={isLoading}
             aria-label={t('common.edit')}
             onClick={handleEdit}
           >
@@ -73,6 +76,7 @@ export function POActions({
             variant="subtle"
             color="green"
             size="sm"
+            disabled={isLoading}
             aria-label={t('po.confirm')}
             onClick={handleAction(onConfirm)}
           >
@@ -84,6 +88,7 @@ export function POActions({
             variant="subtle"
             color="red"
             size="sm"
+            disabled={isLoading}
             aria-label={t('po.cancel')}
             onClick={handleAction(onCancel)}
           >
@@ -101,6 +106,7 @@ export function POActions({
             variant="subtle"
             color="blue"
             size="sm"
+            disabled={isLoading}
             aria-label={t('po.process')}
             onClick={handleAction(onProcess)}
           >
@@ -112,6 +118,7 @@ export function POActions({
             variant="subtle"
             color="red"
             size="sm"
+            disabled={isLoading}
             aria-label={t('po.cancel')}
             onClick={handleAction(onCancel)}
           >
@@ -128,6 +135,7 @@ export function POActions({
           variant="subtle"
           color="indigo"
           size="sm"
+          disabled={isLoading}
           aria-label={t('po.ship')}
           onClick={handleAction(onShip)}
         >
@@ -144,6 +152,7 @@ export function POActions({
             variant="subtle"
             color="green"
             size="sm"
+            disabled={isLoading}
             aria-label={t('po.markDelivered')}
             onClick={handleAction(onDeliver)}
           >
@@ -155,6 +164,7 @@ export function POActions({
             variant="subtle"
             color="orange"
             size="sm"
+            disabled={isLoading}
             aria-label={t('po.refund')}
             onClick={handleAction(onRefund)}
           >
@@ -171,6 +181,7 @@ export function POActions({
           variant="subtle"
           color="orange"
           size="sm"
+          disabled={isLoading}
           aria-label={t('po.refund')}
           onClick={handleAction(onRefund)}
         >

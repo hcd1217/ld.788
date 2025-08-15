@@ -231,7 +231,12 @@ export function PermissionManagementPage() {
               <Box style={{ flex: 1 }} />
 
               <Tooltip label={t('common.refresh')}>
-                <ActionIcon variant="light" size="lg" onClick={loadPermissions}>
+                <ActionIcon
+                  variant="light"
+                  size="lg"
+                  onClick={loadPermissions}
+                  aria-label={t('common.refresh')}
+                >
                   <IconRefresh size={16} />
                 </ActionIcon>
               </Tooltip>
@@ -246,7 +251,7 @@ export function PermissionManagementPage() {
 
               <Box visibleFrom="md">
                 <ScrollArea>
-                  <Table striped highlightOnHover>
+                  <Table striped highlightOnHover aria-label={t('permission.tableAriaLabel')}>
                     <Table.Thead>
                       <Table.Tr>
                         <Table.Th>{t('permission.resource')}</Table.Th>

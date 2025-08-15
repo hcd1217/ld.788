@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { Card, Group, Box, Text, Badge, type MantineStyleProp } from '@mantine/core';
 import { useNavigate } from 'react-router';
 import { POActions } from './POActions';
@@ -10,6 +11,7 @@ import { formatDate } from '@/utils/time';
 
 type POCardProps = {
   readonly purchaseOrder: PurchaseOrder;
+  readonly isLoading?: boolean;
   readonly onConfirm?: () => void;
   readonly onProcess?: () => void;
   readonly onShip?: () => void;
@@ -28,6 +30,7 @@ type POCardProps = {
 
 export function POCard({
   purchaseOrder,
+  isLoading = false,
   onConfirm,
   onProcess,
   onShip,
@@ -41,6 +44,11 @@ export function POCard({
 }: POCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  // Memoized navigation handler
+  const handleCardClick = useCallback(() => {
+    navigate(getPODetailRoute(purchaseOrder.id));
+  }, [navigate, purchaseOrder.id]);
 
   const defaultActionIconsStyle: MantineStyleProp = {
     position: 'absolute',
@@ -65,7 +73,7 @@ export function POCard({
       aria-label={t('po.poCard', {
         number: purchaseOrder.poNumber,
       })}
-      onClick={() => navigate(getPODetailRoute(purchaseOrder.id))}
+      onClick={handleCardClick}
     >
       <Group justify="space-between" align="flex-start" style={{ position: 'relative' }}>
         <Box>
@@ -87,6 +95,7 @@ export function POCard({
             style={defaultActionIconsStyle}
             purchaseOrderId={purchaseOrder.id}
             status={purchaseOrder.status}
+            isLoading={isLoading}
             onConfirm={onConfirm}
             onProcess={onProcess}
             onShip={onShip}

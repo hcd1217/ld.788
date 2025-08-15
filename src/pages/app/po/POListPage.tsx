@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { Stack, Group, Box, SimpleGrid, Select, Button, Affix, ActionIcon } from '@mantine/core';
 import { IconFileInvoice, IconClearAll, IconPlus } from '@tabler/icons-react';
@@ -31,6 +31,7 @@ import {
   POCustomerDrawer,
   POStatusDrawer,
   PODateDrawer,
+  POErrorBoundary,
 } from '@/components/app/po';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { ROUTERS } from '@/config/routeConfig';
@@ -99,6 +100,26 @@ export function POListPage() {
 
   const hasDateFilter = !!(filters.dateRange.start || filters.dateRange.end);
 
+  // Memoized navigation handlers
+  const handleNavigateToAdd = useCallback(() => {
+    navigate(ROUTERS.PO_ADD);
+  }, [navigate]);
+
+  // Memoized filter handlers
+  const handleCustomerChange = useCallback(
+    (value: string | null) => {
+      filterHandlers.setCustomerId(value || undefined);
+    },
+    [filterHandlers],
+  );
+
+  const handleStatusChange = useCallback(
+    (value: string | null) => {
+      filterHandlers.setStatus(value as (typeof PO_STATUS)[keyof typeof PO_STATUS]);
+    },
+    [filterHandlers],
+  );
+
   useOnce(() => {
     void refreshPurchaseOrders();
     void loadCustomers();
@@ -113,185 +134,185 @@ export function POListPage() {
         clearError={clearError}
         header={<AppPageTitle title={t('po.title')} />}
       >
-        {/* Filter Bar */}
-        <POFilterBar
-          searchQuery={searchInput}
-          customerId={filters.customerId}
-          status={filters.status}
-          hasDateFilter={hasDateFilter}
-          customers={customers}
-          hasActiveFilters={hasActiveFilters}
-          onSearchChange={setSearchInput}
-          onCustomerClick={openCustomerDrawer}
-          onStatusClick={openStatusDrawer}
-          onDateClick={openDateDrawer}
-          onClearFilters={clearAllFilters}
-        />
+        <POErrorBoundary componentName="POListPage">
+          {/* Filter Bar */}
+          <POFilterBar
+            searchQuery={searchInput}
+            customerId={filters.customerId}
+            status={filters.status}
+            hasDateFilter={hasDateFilter}
+            customers={customers}
+            hasActiveFilters={hasActiveFilters}
+            onSearchChange={setSearchInput}
+            onCustomerClick={openCustomerDrawer}
+            onStatusClick={openStatusDrawer}
+            onDateClick={openDateDrawer}
+            onClearFilters={clearAllFilters}
+          />
 
-        {/* Customer Selection Drawer */}
-        <POCustomerDrawer
-          opened={customerDrawerOpened}
-          customers={customers}
-          selectedCustomerId={filters.customerId}
-          onClose={closeCustomerDrawer}
-          onCustomerSelect={filterHandlers.setCustomerId}
-        />
+          {/* Customer Selection Drawer */}
+          <POCustomerDrawer
+            opened={customerDrawerOpened}
+            customers={customers}
+            selectedCustomerId={filters.customerId}
+            onClose={closeCustomerDrawer}
+            onCustomerSelect={filterHandlers.setCustomerId}
+          />
 
-        {/* Status Selection Drawer */}
-        <POStatusDrawer
-          opened={statusDrawerOpened}
-          selectedStatus={filters.status}
-          onClose={closeStatusDrawer}
-          onStatusSelect={filterHandlers.setStatus}
-        />
+          {/* Status Selection Drawer */}
+          <POStatusDrawer
+            opened={statusDrawerOpened}
+            selectedStatus={filters.status}
+            onClose={closeStatusDrawer}
+            onStatusSelect={filterHandlers.setStatus}
+          />
 
-        {/* Date Range Selection Drawer */}
-        <PODateDrawer
-          opened={dateDrawerOpened}
-          startDate={filters.dateRange.start}
-          endDate={filters.dateRange.end}
-          onClose={closeDateDrawer}
-          onDateRangeSelect={filterHandlers.setDateRange}
-        />
+          {/* Date Range Selection Drawer */}
+          <PODateDrawer
+            opened={dateDrawerOpened}
+            startDate={filters.dateRange.start}
+            endDate={filters.dateRange.end}
+            onClose={closeDateDrawer}
+            onDateRangeSelect={filterHandlers.setDateRange}
+          />
 
-        <BlankState
-          hidden={paginationState.totalItems > 0 || isLoading}
-          icon={
-            <IconFileInvoice size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />
-          }
-          title={hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound')}
-          description={
-            hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription')
-          }
-        />
-        <Box mt="md">
-          {isLoading && purchaseOrders.length === 0 ? (
-            <POListSkeleton count={5} />
-          ) : (
-            <Stack gap="sm" px="sm">
-              {paginatedPOs.map((po) => (
-                <POCard key={po.id} noActions purchaseOrder={po} />
-              ))}
-            </Stack>
+          <BlankState
+            hidden={paginationState.totalItems > 0 || isLoading}
+            icon={
+              <IconFileInvoice size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />
+            }
+            title={hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound')}
+            description={
+              hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription')
+            }
+          />
+          <Box mt="md">
+            {isLoading && purchaseOrders.length === 0 ? (
+              <POListSkeleton count={5} />
+            ) : (
+              <Stack gap="sm" px="sm">
+                {paginatedPOs.map((po) => (
+                  <POCard key={po.id} noActions isLoading={isLoading} purchaseOrder={po} />
+                ))}
+              </Stack>
+            )}
+          </Box>
+
+          {/* Floating Action Button for Add PO */}
+          {!isLoading && (
+            <Affix position={{ bottom: 80, right: 20 }}>
+              <ActionIcon
+                size="xl"
+                radius="xl"
+                color="blue"
+                onClick={handleNavigateToAdd}
+                aria-label={t('po.addPO')}
+              >
+                <IconPlus size={24} />
+              </ActionIcon>
+            </Affix>
           )}
-        </Box>
-
-        {/* Floating Action Button for Add PO */}
-        {!isLoading && (
-          <Affix position={{ bottom: 80, right: 20 }}>
-            <ActionIcon
-              size="xl"
-              radius="xl"
-              color="blue"
-              onClick={() => navigate(ROUTERS.PO_ADD)}
-              aria-label={t('po.addPO')}
-            >
-              <IconPlus size={24} />
-            </ActionIcon>
-          </Affix>
-        )}
+        </POErrorBoundary>
       </AppMobileLayout>
     );
   }
 
   return (
     <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
-      <AppPageTitle
-        title={t('po.title')}
-        button={{
-          label: t('po.addPO'),
-          onClick() {
-            navigate(ROUTERS.PO_ADD);
-          },
-        }}
-      />
+      <POErrorBoundary componentName="POListPage">
+        <AppPageTitle
+          title={t('po.title')}
+          button={{
+            label: t('po.addPO'),
+            onClick: handleNavigateToAdd,
+          }}
+        />
 
-      {/* Search Bar and View Mode Selector */}
-      <Group justify="space-between" align="flex-end">
-        <SearchBar
-          placeholder={t('po.searchPlaceholder')}
-          searchQuery={searchInput}
-          setSearchQuery={setSearchInput}
-        />
-        <Select
-          clearable
-          searchable
-          placeholder={t('po.selectCustomer')}
-          data={[{ value: '', label: t('po.allCustomers') }, ...customerOptions]}
-          value={filters.customerId || ''}
-          style={{ flex: 1, maxWidth: 300 }}
-          onChange={(value) => filterHandlers.setCustomerId(value || undefined)}
-        />
-        {/* Filter Controls */}
-        <Group justify="space-between" align="center" gap="xl">
+        {/* Search Bar and View Mode Selector */}
+        <Group justify="space-between" align="flex-end">
+          <SearchBar
+            placeholder={t('po.searchPlaceholder')}
+            searchQuery={searchInput}
+            setSearchQuery={setSearchInput}
+          />
           <Select
             clearable
-            placeholder={t('po.selectStatus')}
-            data={statusOptions}
-            value={filters.status}
-            style={{ width: 180 }}
-            onChange={(value) =>
-              filterHandlers.setStatus(value as (typeof PO_STATUS)[keyof typeof PO_STATUS])
+            searchable
+            placeholder={t('po.selectCustomer')}
+            data={[{ value: '', label: t('po.allCustomers') }, ...customerOptions]}
+            value={filters.customerId || ''}
+            style={{ flex: 1, maxWidth: 300 }}
+            onChange={handleCustomerChange}
+          />
+          {/* Filter Controls */}
+          <Group justify="space-between" align="center" gap="xl">
+            <Select
+              clearable
+              placeholder={t('po.selectStatus')}
+              data={statusOptions}
+              value={filters.status}
+              style={{ width: 180 }}
+              onChange={handleStatusChange}
+            />
+            <Button
+              disabled={!hasActiveFilters}
+              variant="subtle"
+              leftSection={<IconClearAll size={16} />}
+              onClick={clearAllFilters}
+            >
+              {t('common.clear')}
+            </Button>
+            <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
+          </Group>
+        </Group>
+
+        <div>
+          <BlankState
+            hidden={paginationState.totalItems > 0 || isLoading}
+            icon={
+              <IconFileInvoice size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />
+            }
+            title={hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound')}
+            description={
+              hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription')
+            }
+            button={
+              hasActiveFilters
+                ? undefined
+                : {
+                    label: t('po.createFirstPO'),
+                    onClick: handleNavigateToAdd,
+                  }
             }
           />
-          <Button
-            disabled={!hasActiveFilters}
-            variant="subtle"
-            leftSection={<IconClearAll size={16} />}
-            onClick={clearAllFilters}
-          >
-            {t('common.clear')}
-          </Button>
-          <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
-        </Group>
-      </Group>
 
-      <div>
-        <BlankState
-          hidden={paginationState.totalItems > 0 || isLoading}
-          icon={
-            <IconFileInvoice size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />
-          }
-          title={hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound')}
-          description={
-            hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription')
-          }
-          button={
-            hasActiveFilters
-              ? undefined
-              : {
-                  label: t('po.createFirstPO'),
-                  onClick: () => navigate(ROUTERS.PO_ADD),
-                }
-          }
+          {paginationState.totalItems === 0 && !isLoading ? null : (
+            <>
+              {/* Desktop View - Table or Grid based on selection */}
+              {isLoading && purchaseOrders.length === 0 ? (
+                <POListSkeleton viewMode={viewMode} count={10} />
+              ) : isTableView ? (
+                <PODataTable noAction isLoading={isLoading} purchaseOrders={paginatedPOs} />
+              ) : (
+                <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
+                  {paginatedPOs.map((po) => (
+                    <POGridCard key={po.id} purchaseOrder={po} />
+                  ))}
+                </SimpleGrid>
+              )}
+            </>
+          )}
+        </div>
+
+        <Pagination
+          hidden={paginationState.totalItems === 0}
+          totalPages={paginationState.totalPages}
+          pageSize={paginationState.pageSize}
+          currentPage={paginationState.currentPage}
+          onPageSizeChange={paginationHandlers.setPageSize}
+          onPageChange={paginationHandlers.setCurrentPage}
         />
-
-        {paginationState.totalItems === 0 && !isLoading ? null : (
-          <>
-            {/* Desktop View - Table or Grid based on selection */}
-            {isLoading && purchaseOrders.length === 0 ? (
-              <POListSkeleton viewMode={viewMode} count={10} />
-            ) : isTableView ? (
-              <PODataTable noAction purchaseOrders={paginatedPOs} />
-            ) : (
-              <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
-                {paginatedPOs.map((po) => (
-                  <POGridCard key={po.id} purchaseOrder={po} />
-                ))}
-              </SimpleGrid>
-            )}
-          </>
-        )}
-      </div>
-
-      <Pagination
-        hidden={paginationState.totalItems === 0}
-        totalPages={paginationState.totalPages}
-        pageSize={paginationState.pageSize}
-        currentPage={paginationState.currentPage}
-        onPageSizeChange={paginationHandlers.setPageSize}
-        onPageChange={paginationHandlers.setCurrentPage}
-      />
+      </POErrorBoundary>
     </AppDesktopLayout>
   );
 }
