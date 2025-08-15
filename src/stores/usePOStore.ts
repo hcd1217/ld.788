@@ -551,36 +551,51 @@ export const useCustomerList = () => usePOStore((state) => state.customers) || E
 export const useProductList = () => usePOStore((state) => state.products) || EMPTY_PRODUCTS;
 export const usePOLoading = () => usePOStore((state) => state.isLoading);
 export const usePOError = () => usePOStore((state) => state.error);
-// Selector for getting all actions with stable reference
-const getPOActions = (state: POState) => ({
-  loadPOs: state.loadPOs,
-  loadCustomers: state.loadCustomers,
-  loadProducts: state.loadProducts,
-  refreshPOs: state.refreshPOs,
-  loadPO: state.loadPO,
-  createPO: state.createPO,
-  updatePO: state.updatePO,
-  confirmPO: state.confirmPO,
-  processPO: state.processPO,
-  shipPO: state.shipPO,
-  deliverPO: state.deliverPO,
-  cancelPO: state.cancelPO,
-  refundPO: state.refundPO,
-  clearError: state.clearError,
-  // Aliases for consistency with page usage
-  refreshPurchaseOrders: state.refreshPOs,
-  createPurchaseOrder: state.createPO,
-  updatePurchaseOrder: state.updatePO,
-  confirmPurchaseOrder: state.confirmPO,
-  processPurchaseOrder: state.processPO,
-  shipPurchaseOrder: state.shipPO,
-  deliverPurchaseOrder: state.deliverPO,
-  cancelPurchaseOrder: state.cancelPO,
-  refundPurchaseOrder: state.refundPO,
-});
+// Export hook with stable reference by calling the store multiple times
+// This pattern prevents infinite re-renders as each function reference is stable
+export const usePOActions = () => {
+  const loadPOs = usePOStore((state) => state.loadPOs);
+  const loadCustomers = usePOStore((state) => state.loadCustomers);
+  const loadProducts = usePOStore((state) => state.loadProducts);
+  const refreshPOs = usePOStore((state) => state.refreshPOs);
+  const loadPO = usePOStore((state) => state.loadPO);
+  const createPO = usePOStore((state) => state.createPO);
+  const updatePO = usePOStore((state) => state.updatePO);
+  const confirmPO = usePOStore((state) => state.confirmPO);
+  const processPO = usePOStore((state) => state.processPO);
+  const shipPO = usePOStore((state) => state.shipPO);
+  const deliverPO = usePOStore((state) => state.deliverPO);
+  const cancelPO = usePOStore((state) => state.cancelPO);
+  const refundPO = usePOStore((state) => state.refundPO);
+  const clearError = usePOStore((state) => state.clearError);
 
-// Export hook with stable reference - no more infinite loops!
-export const usePOActions = () => usePOStore(getPOActions);
+  return {
+    loadPOs,
+    loadCustomers,
+    loadProducts,
+    refreshPOs,
+    loadPO,
+    createPO,
+    updatePO,
+    confirmPO,
+    processPO,
+    shipPO,
+    deliverPO,
+    cancelPO,
+    refundPO,
+    clearError,
+    // Aliases for consistency with page usage
+    refreshPurchaseOrders: refreshPOs,
+    createPurchaseOrder: createPO,
+    updatePurchaseOrder: updatePO,
+    confirmPurchaseOrder: confirmPO,
+    processPurchaseOrder: processPO,
+    shipPurchaseOrder: shipPO,
+    deliverPurchaseOrder: deliverPO,
+    cancelPurchaseOrder: cancelPO,
+    refundPurchaseOrder: refundPO,
+  };
+};
 
 // Selector hooks for getting POs by criteria
 export const usePOById = (id: string) => usePOStore((state) => state.getPOById(id));

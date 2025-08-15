@@ -105,12 +105,12 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOve
         po.customer?.companyName ?? '',
         po.notes ?? '',
       ];
-      
+
       const searchText = searchParts
         .filter(Boolean) // Remove empty strings
         .join(' ')
         .toLowerCase();
-      
+
       return { po, searchText };
     });
   }, [purchaseOrders]);
@@ -123,7 +123,7 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOve
 
   const filteredPOs = useMemo(() => {
     const { customerId, status, dateRange } = filters;
-    
+
     // Early exit if no filters are applied
     if (!hasActiveFilters && !normalizedSearchQuery) {
       return purchaseOrders;
@@ -132,7 +132,7 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOve
     // Filter the pre-computed POs with optimized checks
     const filtered = posWithSearchText.filter(({ po, searchText }) => {
       // Perform cheapest checks first for early exits
-      
+
       // Status filter (simple enum comparison - very fast)
       if (status !== PO_STATUS.ALL && po.status !== status) {
         return false;
@@ -161,7 +161,7 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOve
 
     // Extract just the PO objects from the filtered results
     return filtered.map(({ po }) => po);
-  }, [posWithSearchText, filters.customerId, filters.status, filters.dateRange, normalizedSearchQuery, hasActiveFilters, purchaseOrders]);
+  }, [filters, hasActiveFilters, normalizedSearchQuery, posWithSearchText, purchaseOrders]);
 
   const clearAllFilters = useCallback(() => {
     setSearchQuery('');

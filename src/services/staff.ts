@@ -2,6 +2,7 @@
 import CryptoJS from 'crypto-js';
 import QRCode from 'qrcode';
 import { logError } from '@/utils/logger';
+import { formatCurrency } from '@/utils/number';
 
 export interface Staff {
   id: string;
@@ -613,9 +614,9 @@ export const staffService = {
       (data.hourlyRate < VALIDATION_RULES.hourlyRate.min ||
         data.hourlyRate > VALIDATION_RULES.hourlyRate.max)
     ) {
-      errors.push(
-        `Hourly rate must be between $${VALIDATION_RULES.hourlyRate.min} and $${VALIDATION_RULES.hourlyRate.max}`,
-      );
+      const minRate = formatCurrency(VALIDATION_RULES.hourlyRate.min);
+      const maxRate = formatCurrency(VALIDATION_RULES.hourlyRate.max);
+      errors.push(`Hourly rate must be between ${minRate} and ${maxRate}`);
     }
 
     if ('weeklyContractedHours' in data && data.weeklyContractedHours !== undefined) {

@@ -246,7 +246,13 @@ export function PODetailPage() {
   if (isMobile) {
     if (isLoading || !purchaseOrder) {
       return (
-        <AppMobileLayout showLogo isLoading={isLoading} error={error} clearError={clearError} header={<AppPageTitle title={title} />}>
+        <AppMobileLayout
+          showLogo
+          isLoading={isLoading}
+          error={error}
+          clearError={clearError}
+          header={<AppPageTitle title={title} />}
+        >
           {isLoading ? (
             <LoadingOverlay visible />
           ) : (
