@@ -1,33 +1,40 @@
-import React from 'react';
-import { Stack, Alert, Transition, Card, Text, Box } from '@mantine/core';
-import { modals } from '@mantine/modals';
+import {
+  Stack,
+  Card,
+  Text,
+  Box,
+  Group,
+  ActionIcon,
+  Tooltip,
+  TextInput,
+  Textarea,
+  SimpleGrid,
+} from '@mantine/core';
+import { DateInput, DatesProvider } from '@mantine/dates';
 import type { UseFormReturnType } from '@mantine/form';
-import { IconAlertCircle } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { POItemsEditor, type POItemsEditorRef } from './POItemsEditor';
+import { POItemsEditor } from './POItemsEditor';
 import { POCustomerSelection } from './POCustomerSelection';
-import { POAddressFields } from './POAddressFields';
 import { POAdditionalInfo } from './POAdditionalInfo';
 import { POFormActions } from './POFormActions';
-import {
-  createAddressFromCustomer,
-  prepareSubmissionValues,
-  calculateCreditStatus,
-} from './POFormHelpers';
+import { createAddressFromCustomer } from './POFormHelpers';
 import {
   FIXED_BUTTON_AREA_HEIGHT,
   MOBILE_FORM_ACTIONS_Z_INDEX,
   DESKTOP_FORM_ACTIONS_Z_INDEX,
 } from '@/constants/po.constants';
 import type { POItem } from '@/services/sales/purchaseOrder';
-import type { Customer } from '@/services/sales/customer';
-import { formatCurrency } from '@/utils/number';
-import { useMemo, useEffect, useCallback, useRef, useState } from 'react';
+import { useMemo, useEffect, useCallback } from 'react';
+import { ErrorAlert } from '@/components/common';
+import { IconMapPin } from '@tabler/icons-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { CustomerOverview as Customer } from '@/services/client/overview';
 
 export type POFormValues = {
   customerId: string;
   items: POItem[];
+  orderDate?: Date;
+  deliveryDate?: Date;
   shippingAddress: {
     oneLineAddress?: string;
     street?: string;
@@ -35,18 +42,9 @@ export type POFormValues = {
     state?: string;
     postalCode?: string;
     country?: string;
+    googleMapsUrl?: string;
   };
-  billingAddress?: {
-    oneLineAddress?: string;
-    street?: string;
-    city?: string;
-    state?: string;
-    postalCode?: string;
-    country?: string;
-  };
-  paymentTerms?: string;
   notes?: string;
-  useSameAddress?: boolean;
 };
 
 type POFormProps = {
@@ -68,10 +66,7 @@ export function POForm({
   onCancel,
   isEditMode = false,
 }: POFormProps) {
-  const { t } = useTranslation();
   const { isMobile } = useDeviceType();
-  const itemsEditorRef = useRef<POItemsEditorRef>(null);
-  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
 
   // Computed values
   const selectedCustomer = useMemo(
@@ -79,103 +74,59 @@ export function POForm({
     [customers, form.values.customerId],
   );
 
-  const totalAmount = useMemo(
-    () => form.values.items.reduce((sum, item) => sum + item.totalPrice, 0),
-    [form.values.items],
-  );
-
-  const creditStatus = useMemo(
-    () => calculateCreditStatus(selectedCustomer, totalAmount),
-    [selectedCustomer, totalAmount],
-  );
+  const isDisabled = useMemo(() => {
+    if (form.values.items.length === 0) {
+      return true;
+    }
+    if (!form.values.customerId) {
+      return true;
+    }
+    return false;
+  }, [form.values]);
 
   // Auto-fill shipping address when customer is selected
   useEffect(() => {
     if (selectedCustomer?.address && !isEditMode) {
-      const address = createAddressFromCustomer(selectedCustomer.address);
+      const address = createAddressFromCustomer(
+        selectedCustomer.address,
+        selectedCustomer.googleMapsUrl,
+      );
       form.setFieldValue('shippingAddress', address);
-      form.setFieldValue('useSameAddress', true);
-      form.setFieldValue('billingAddress', address);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCustomer?.id, isEditMode]);
 
-  // Handle pending item confirmation
-  const handlePendingItemConfirmation = useCallback(
-    (values: POFormValues, pendingItem: any) => {
-      modals.openConfirmModal({
-        title: t('po.unsavedItem'),
-        children: <PendingItemMessage pendingItem={pendingItem} />,
-        labels: {
-          confirm: t('po.addAndContinue'),
-          cancel: t('po.continueWithoutAdding'),
-        },
-        confirmProps: { color: 'blue' },
-        onConfirm: () => {
-          const newItem = itemsEditorRef.current?.buildPendingItem();
-          if (newItem) {
-            const submissionValues = prepareSubmissionValues({
-              ...values,
-              items: [...values.items, newItem],
-            });
-            itemsEditorRef.current?.clearPendingItem();
-            onSubmit(submissionValues);
-          } else {
-            onSubmit(prepareSubmissionValues(values));
-          }
-        },
-        onCancel: () => {
-          itemsEditorRef.current?.clearPendingItem();
-          onSubmit(prepareSubmissionValues(values));
-        },
-      });
-    },
-    [onSubmit, t],
-  );
-
-  // Handle form submission
-  const handleSubmit = useCallback(
-    (values: POFormValues) => {
-      if (itemsEditorRef.current?.hasPendingItem()) {
-        const pendingItem = itemsEditorRef.current.getPendingItemDetails();
-        handlePendingItemConfirmation(values, pendingItem);
-      } else {
-        onSubmit(prepareSubmissionValues(values));
-      }
-    },
-    [handlePendingItemConfirmation, onSubmit],
-  );
+  // Handle form submission - directly pass values to parent
+  const handleSubmit = useCallback(onSubmit, [onSubmit]);
 
   // Form content without actions
   const formContent = (
-    <Stack gap="lg">
-      {/* Error Alert */}
-      <ErrorAlert error={error} />
+    <DatesProvider settings={{ locale: 'en', firstDayOfWeek: 0, weekendDays: [0, 6] }}>
+      <Stack gap="lg">
+        {/* Error Alert */}
+        <ErrorAlert error={error} />
 
-      {/* Customer Selection */}
-      <POCustomerSelection
-        form={form}
-        customers={customers}
-        selectedCustomer={selectedCustomer}
-        creditStatus={creditStatus}
-        isEditMode={isEditMode}
-      />
+        {/* Customer Selection */}
+        <POCustomerSelection
+          form={form}
+          customers={customers}
+          selectedCustomer={selectedCustomer}
+          isEditMode={isEditMode}
+        />
 
-      {/* Order Items */}
-      <OrderItemsSection
-        form={form}
-        itemsEditorRef={itemsEditorRef}
-        isLoading={isLoading}
-        totalAmount={totalAmount}
-        onModalStateChange={setIsAddItemModalOpen}
-      />
+        {/* Date Fields */}
+        <PODateSection form={form} isLoading={isLoading} />
 
-      {/* Shipping Address */}
-      <ShippingAddressSection form={form} selectedCustomer={selectedCustomer} />
+        {/* Order Items */}
+        <OrderItemsSection form={form} isLoading={isLoading} />
 
-      {/* Additional Information */}
-      <POAdditionalInfo form={form} />
-    </Stack>
+        {/* Shipping Address */}
+        <ShippingAddressSection form={form} selectedCustomer={selectedCustomer} />
+
+        {/* Additional Information */}
+        <POAdditionalInfo form={form} />
+      </Stack>
+    </DatesProvider>
   );
 
   // Mobile layout with fixed buttons
@@ -203,12 +154,13 @@ export function POForm({
           }}
         >
           <POFormActions
+            isDisabled={isDisabled}
             onCancel={onCancel}
             isLoading={isLoading}
             isEditMode={isEditMode}
             isMobile={true}
             formId="po-form"
-            isHidden={isAddItemModalOpen}
+            isHidden={false}
           />
         </Box>
       </>
@@ -224,7 +176,6 @@ export function POForm({
           {formContent}
         </Box>
       </form>
-
       {/* Fixed buttons at bottom of viewport for desktop */}
       <Box
         style={{
@@ -238,54 +189,68 @@ export function POForm({
           zIndex: DESKTOP_FORM_ACTIONS_Z_INDEX,
         }}
       >
-        <Box style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <POFormActions
-            onCancel={onCancel}
-            isLoading={isLoading}
-            isEditMode={isEditMode}
-            isMobile={false}
-            formId="po-form-desktop"
-          />
-        </Box>
+        <POFormActions
+          isDisabled={isDisabled}
+          onCancel={onCancel}
+          isLoading={isLoading}
+          isEditMode={isEditMode}
+          isMobile={false}
+          formId="po-form-desktop"
+        />
       </Box>
     </>
   );
 }
 
-// Sub-components for cleaner organization
-function ErrorAlert({ error }: { error?: string | null }) {
+function PODateSection({
+  form,
+  isLoading,
+}: {
+  form: UseFormReturnType<POFormValues>;
+  isLoading: boolean;
+}) {
   const { t } = useTranslation();
+  const { isMobile } = useDeviceType();
 
   return (
-    <Transition mounted={Boolean(error)} transition="fade">
-      {(styles) => (
-        <Alert
-          withCloseButton
-          style={styles}
-          icon={<IconAlertCircle size={16} />}
-          color="red"
-          variant="light"
-          onClose={() => {}}
-        >
-          {error || t('common.checkFormErrors')}
-        </Alert>
-      )}
-    </Transition>
+    <Card withBorder radius="md" p="xl">
+      <Stack gap="md">
+        <Text fw={500} size="lg">
+          {t('po.orderDates')}
+        </Text>
+        <SimpleGrid cols={isMobile ? 1 : 2}>
+          <DateInput
+            label={t('po.orderDate')}
+            placeholder={t('po.selectOrderDate')}
+            clearable
+            disabled={isLoading}
+            value={form.values.orderDate}
+            onChange={(date) => form.setFieldValue('orderDate', date ? new Date(date) : undefined)}
+            maxDate={form.values.deliveryDate || undefined}
+          />
+          <DateInput
+            label={t('po.deliveryDate')}
+            placeholder={t('po.selectDeliveryDate')}
+            clearable
+            disabled={isLoading}
+            value={form.values.deliveryDate}
+            onChange={(date) =>
+              form.setFieldValue('deliveryDate', date ? new Date(date) : undefined)
+            }
+            minDate={form.values.orderDate || undefined}
+          />
+        </SimpleGrid>
+      </Stack>
+    </Card>
   );
 }
 
 function OrderItemsSection({
   form,
-  itemsEditorRef,
   isLoading,
-  totalAmount,
-  onModalStateChange,
 }: {
   form: UseFormReturnType<POFormValues>;
-  itemsEditorRef: React.RefObject<POItemsEditorRef | null>;
   isLoading: boolean;
-  totalAmount: number;
-  onModalStateChange?: (isOpen: boolean) => void;
 }) {
   const { t } = useTranslation();
 
@@ -296,15 +261,10 @@ function OrderItemsSection({
           {t('po.orderItems')}
         </Text>
         <POItemsEditor
-          ref={itemsEditorRef}
           items={form.values.items}
           onChange={(items) => form.setFieldValue('items', items)}
-          disabled={isLoading}
-          onModalStateChange={onModalStateChange}
+          isReadOnly={isLoading}
         />
-        <Text size="lg" fw={600} ta="right">
-          {t('po.totalAmount')}: {formatCurrency(totalAmount)}
-        </Text>
       </Stack>
     </Card>
   );
@@ -319,11 +279,29 @@ function ShippingAddressSection({
 }) {
   const { t } = useTranslation();
 
+  const customerGoogleMapsUrl = selectedCustomer?.googleMapsUrl;
+  const formGoogleMapsUrl = form.values.shippingAddress?.googleMapsUrl;
+  const displayGoogleMapsUrl = formGoogleMapsUrl || customerGoogleMapsUrl;
+
   return (
     <Card withBorder radius="md" p="xl">
       <Stack gap="md">
         <Text fw={500} size="lg">
           {t('po.shippingAddress')}
+          {displayGoogleMapsUrl && (
+            <Tooltip label={t('customer.viewOnMap')}>
+              <ActionIcon
+                ml="sm"
+                size="sm"
+                variant="subtle"
+                onClick={() => {
+                  window.open(displayGoogleMapsUrl, '_blank', 'noopener,noreferrer');
+                }}
+              >
+                <IconMapPin size={16} />
+              </ActionIcon>
+            </Tooltip>
+          )}
         </Text>
         <POAddressFields form={form} fieldPrefix="shippingAddress" />
         {selectedCustomer?.address && (
@@ -336,30 +314,68 @@ function ShippingAddressSection({
   );
 }
 
-function PendingItemMessage({ pendingItem }: { pendingItem: any }) {
+function POAddressFields({
+  form,
+  noDetail = true,
+  fieldPrefix,
+}: {
+  readonly form: UseFormReturnType<any>;
+  readonly fieldPrefix: string;
+  readonly noDetail?: boolean;
+}) {
   const { t } = useTranslation();
 
   return (
-    <Stack gap="sm">
-      <Text size="sm">{t('po.unsavedItemMessage')}</Text>
-      {pendingItem && (
-        <Stack gap="xs">
-          <Text size="sm" fw={500}>
-            {t('po.pendingItemDetails')}:
-          </Text>
-          <Text size="sm">
-            • {t('po.productCode')}: {pendingItem.productCode || '-'}
-          </Text>
-          <Text size="sm">
-            • {t('po.description')}: {pendingItem.description || '-'}
-          </Text>
-          <Text size="sm">
-            • {t('po.quantity')}: {pendingItem.quantity || 0}
-          </Text>
-          <Text size="sm">
-            • {t('po.unitPrice')}: {formatCurrency(pendingItem.unitPrice || 0)}
-          </Text>
-        </Stack>
+    <Stack gap="md">
+      <Textarea
+        label={t('po.address')}
+        placeholder={t('po.addressPlaceholder')}
+        // leftSection={<IconMapPin size={16} />}
+        minRows={4}
+        autosize
+        maxRows={4}
+        {...form.getInputProps(`${fieldPrefix}.oneLineAddress`)}
+      />
+
+      <TextInput
+        label={t('customer.googleMapsUrl')}
+        placeholder={t('customer.googleMapsUrlPlaceholder')}
+        {...form.getInputProps(`${fieldPrefix}.googleMapsUrl`)}
+      />
+
+      {noDetail ? null : (
+        <>
+          <TextInput
+            label={t('po.street')}
+            placeholder={t('po.streetPlaceholder')}
+            {...form.getInputProps(`${fieldPrefix}.street`)}
+          />
+          <Group grow>
+            <TextInput
+              label={t('po.city')}
+              placeholder={t('po.cityPlaceholder')}
+              {...form.getInputProps(`${fieldPrefix}.city`)}
+            />
+            <TextInput
+              label={t('po.state')}
+              placeholder={t('po.statePlaceholder')}
+              {...form.getInputProps(`${fieldPrefix}.state`)}
+            />
+          </Group>
+
+          <Group grow>
+            <TextInput
+              label={t('po.postalCode')}
+              placeholder={t('po.postalCodePlaceholder')}
+              {...form.getInputProps(`${fieldPrefix}.postalCode`)}
+            />
+            <TextInput
+              label={t('po.country')}
+              placeholder={t('po.countryPlaceholder')}
+              {...form.getInputProps(`${fieldPrefix}.country`)}
+            />
+          </Group>
+        </>
       )}
     </Stack>
   );

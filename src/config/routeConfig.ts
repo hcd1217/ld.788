@@ -95,6 +95,19 @@ const ROUTE_DEFINITIONS = {
   ADMIN_MONITORING: { id: 'admin-monitoring', path: '/admin/monitoring' },
   ADMIN_SETTINGS: { id: 'admin-settings', path: '/admin/settings' },
 
+  // Procurement management
+  PROCUREMENT_MANAGEMENT: { id: 'procurement-management', path: '/procurement-management' },
+  PROCUREMENT_REQUESTS: { id: 'procurement-requests', path: '/procurement-requests' },
+  PROCUREMENT_ADD: { id: 'procurement-add', path: '/procurement/add' },
+  PROCUREMENT_DETAIL: { id: 'procurement-detail', path: '/procurement/:requestId' },
+  PROCUREMENT_EDIT: { id: 'procurement-edit', path: '/procurement/edit/:requestId' },
+
+  // Delivery management
+  DELIVERY_MANAGEMENT: { id: 'delivery-management', path: '/delivery-management' },
+  DELIVERY_SCHEDULE: { id: 'delivery-schedule', path: '/delivery-schedule' },
+  DELIVERY_TRACKING: { id: 'delivery-tracking', path: '/delivery-tracking' },
+  DELIVERY_DETAIL: { id: 'delivery-detail', path: '/delivery/:deliveryId' },
+
   // Sample/Error routes
   SAMPLE_ERRORS: { id: 'sample-errors', path: '/sample/errors' },
 } as const;

@@ -5,157 +5,239 @@ import {
   Button,
   Card,
   Group,
-  Box,
   Stack,
   Badge,
-  Alert,
-  LoadingOverlay,
-  Transition,
+  Divider,
+  Avatar,
+  SimpleGrid,
+  Center,
 } from '@mantine/core';
 import { useNavigate } from 'react-router';
-import { useState } from 'react';
-import { IconAlertCircle } from '@tabler/icons-react';
+import {
+  IconUser,
+  IconLogout,
+  // IconShieldCheck,
+  // IconBriefcase,
+  IconIdBadge2,
+  IconBuilding,
+} from '@tabler/icons-react';
 import { useAppStore } from '@/stores/useAppStore';
 import { useTranslation } from '@/hooks/useTranslation';
-import { authApi, type GetMeResponse } from '@/lib/api';
 import { GoBack } from '@/components/common';
 import { ROUTERS } from '@/config/routeConfig';
-import { useOnce } from '@/hooks/useOnce';
+import { renderFullName } from '@/utils/string';
 
 export function ProfilePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { isAuthenticated, logout } = useAppStore();
-  const [userData, setUserData] = useState<GetMeResponse | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | undefined>(undefined);
-  const [showAlert, setShowAlert] = useState(false);
-
-  const fetchUserData = async () => {
-    try {
-      setIsLoading(true);
-      setError(undefined);
-      const response = await authApi.getMe();
-      setUserData(response);
-    } catch {
-      setError(t('profile.fetchError'));
-      setShowAlert(true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useOnce(() => {
-    fetchUserData();
-  });
+  const { user, logout } = useAppStore();
 
   const handleLogout = () => {
     logout();
-    navigate(ROUTERS.ROOT);
+    navigate(ROUTERS.LOGIN);
   };
 
-  if (!isAuthenticated) {
+  // If no user data, show login prompt
+  if (!user) {
     return (
-      <Container size="md" mt="xl">
-        <Card shadow="sm" padding="lg">
-          <Title order={2}>{t('profile.notLoggedIn')}</Title>
-          <Text mt="md">{t('profile.pleaseLogin')}</Text>
-          <Button mt="md" onClick={() => navigate(ROUTERS.ROOT)}>
-            {t('common.goToHome')}
-          </Button>
+      <Container size="xs" px="xs" mt="xl">
+        <Card shadow="sm" padding="lg" radius="md">
+          <Stack gap="md" ta="center">
+            <IconUser size={48} stroke={1.5} />
+            <Title order={3}>{t('profile.notLoggedIn')}</Title>
+            <Text size="sm" c="dimmed">
+              {t('profile.pleaseLogin')}
+            </Text>
+            <Button fullWidth onClick={() => navigate(ROUTERS.LOGIN)}>
+              {t('auth.signIn')}
+            </Button>
+          </Stack>
         </Card>
       </Container>
     );
   }
 
+  const userInitial = user.userName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase();
+
   return (
-    <Container size="md" mt="xl">
-      <Stack gap="xl">
+    <Container fluid p="lg">
+      <Stack gap="md">
+        {/* Header with GoBack */}
         <Group justify="space-between">
           <GoBack />
-          <Button color="red" onClick={handleLogout}>
-            {t('common.logout')}
-          </Button>
         </Group>
 
-        <Title order={1} ta="center">
-          {t('profile.title')}
-        </Title>
-
-        <Box pos="relative">
-          <LoadingOverlay
-            visible={isLoading}
-            overlayProps={{ blur: 2 }}
-            transitionProps={{ duration: 300 }}
-          />
-
-          <Transition mounted={showAlert ? Boolean(error) : false} transition="fade">
-            {(styles) => (
-              <Alert
-                withCloseButton
-                style={styles}
-                icon={<IconAlertCircle size={16} />}
-                color="red"
-                variant="light"
-                mb="md"
-                onClose={() => {
-                  setShowAlert(false);
-                }}
-              >
-                {error}
-              </Alert>
-            )}
-          </Transition>
-
-          {userData ? (
-            <Stack gap="lg">
-              {/* Basic Information */}
-              <Card shadow="sm" padding="xl" radius="md">
-                <Title order={3} mb="md">
-                  {t('profile.basicInfo')}
-                </Title>
-                <Stack gap="sm">
-                  <Group>
-                    <Text fw={500}>{t('profile.email')}:</Text>
-                    <Text>{userData.email}</Text>
-                  </Group>
-                  <Group>
-                    <Text fw={500}>{t('profile.username')}:</Text>
-                    <Text>{userData.userName || t('common.notSet')}</Text>
-                  </Group>
-                  <Group>
-                    <Text fw={500}>{t('profile.clientCode')}:</Text>
-                    <Badge variant="light">{userData.clientCode}</Badge>
-                  </Group>
-                  {userData.isRoot ? (
-                    <Badge color="red" variant="filled">
-                      {t('profile.rootUser')}
-                    </Badge>
-                  ) : null}
-                </Stack>
-              </Card>
-
-              {/* Roles Section */}
-              <Card shadow="sm" padding="xl" radius="md">
-                <Title order={3} mb="md">
-                  {t('profile.roles')}
-                </Title>
-                <Stack gap="sm">
-                  {userData.roles.map((role) => (
-                    <Group key={role.id} justify="space-between">
-                      <Badge size="lg" variant="light">
-                        {role.name}
-                      </Badge>
-                      <Text size="sm" c="dimmed">
-                        {t('profile.level')}: {role.level}
-                      </Text>
-                    </Group>
-                  ))}
-                </Stack>
-              </Card>
+        {/* Profile Header Card */}
+        <Card shadow="sm" padding="lg" radius="md">
+          <Stack gap="md" align="center">
+            <Avatar size="xl" radius="xl" color="brand">
+              {userInitial}
+            </Avatar>
+            <Stack gap={4} ta="center">
+              {user.employee ? <Title order={3}>{renderFullName(user.employee)}</Title> : null}
+              <Text size="sm" c="dimmed">
+                {user.email ?? '-'}
+              </Text>
+              {user.isRoot && (
+                <Badge color="red" variant="filled" size="sm">
+                  {t('profile.rootUser')}
+                </Badge>
+              )}
             </Stack>
-          ) : null}
-        </Box>
+          </Stack>
+        </Card>
+
+        {/* Account Information */}
+        {/* <Card shadow="sm" padding="lg" radius="md">
+          <Stack gap="xs">
+            <Group gap="xs" mb="xs">
+              <IconBriefcase size={20} stroke={1.5} />
+              <Text fw={600}>{t('profile.accountInfo')}</Text>
+            </Group>
+            <Divider />
+            <SimpleGrid cols={1} spacing="xs" mt="xs">
+              <Group justify="space-between">
+                <Text size="sm" c="dimmed">
+                  {t('profile.clientCode')}
+                </Text>
+                <Badge variant="light" size="md">
+                  {user.clientCode}
+                </Badge>
+              </Group>
+              <Group justify="space-between">
+                <Text size="sm" c="dimmed">
+                  {t('profile.accountId')}
+                </Text>
+                <Text size="sm" fw={500}>
+                  {user.id}
+                </Text>
+              </Group>
+            </SimpleGrid>
+          </Stack>
+        </Card> */}
+
+        {/* Employee Information */}
+        {user.employee && (
+          <Card shadow="sm" padding="lg" radius="md">
+            <Stack gap="xs">
+              <Group gap="xs" mb="xs">
+                <IconIdBadge2 size={20} stroke={1.5} />
+                <Text fw={600}>{t('profile.employeeInfo')}</Text>
+              </Group>
+              <Divider />
+              <SimpleGrid cols={1} spacing="xs" mt="xs">
+                <Group justify="space-between">
+                  <Text size="sm" c="dimmed">
+                    {t('profile.employeeCode')}
+                  </Text>
+                  <Text size="sm" fw={500}>
+                    {user.employee.employeeCode}
+                  </Text>
+                </Group>
+                {user.employee.email && (
+                  <Group justify="space-between">
+                    <Text size="sm" c="dimmed">
+                      {t('profile.workEmail')}
+                    </Text>
+                    <Text size="sm" fw={500}>
+                      {user.employee.email}
+                    </Text>
+                  </Group>
+                )}
+                <Group justify="space-between">
+                  <Text size="sm" c="dimmed">
+                    {t('profile.phone')}
+                  </Text>
+                  <Text size="sm" fw={500}>
+                    {user.employee.phoneNumber}
+                  </Text>
+                </Group>
+                <Group justify="space-between">
+                  <Text size="sm" c="dimmed">
+                    {t('profile.employmentType')}
+                  </Text>
+                  <Badge variant="light" size="md">
+                    {user.employee.employmentType === 'FULL_TIME'
+                      ? t('profile.fullTime')
+                      : t('profile.partTime')}
+                  </Badge>
+                </Group>
+              </SimpleGrid>
+            </Stack>
+          </Card>
+        )}
+
+        {/* Department Information */}
+        {user.department && (
+          <Card shadow="sm" padding="lg" radius="md">
+            <Stack gap="xs">
+              <Group gap="xs" mb="xs">
+                <IconBuilding size={20} stroke={1.5} />
+                <Text fw={600}>{t('profile.departmentInfo')}</Text>
+              </Group>
+              <Divider />
+              <SimpleGrid cols={1} spacing="xs" mt="xs">
+                <Group justify="space-between">
+                  <Text size="sm" c="dimmed">
+                    {t('profile.departmentName')}
+                  </Text>
+                  <Text size="sm" fw={500}>
+                    {user.department.name}
+                  </Text>
+                </Group>
+                <Group justify="space-between">
+                  <Text size="sm" c="dimmed">
+                    {t('profile.departmentCode')}
+                  </Text>
+                  <Badge variant="light" size="md">
+                    {user.department.code}
+                  </Badge>
+                </Group>
+              </SimpleGrid>
+            </Stack>
+          </Card>
+        )}
+
+        {/* Roles & Permissions */}
+        {/* {user.roles.length > 0 && (
+          <Card shadow="sm" padding="lg" radius="md">
+            <Stack gap="xs">
+              <Group gap="xs" mb="xs">
+                <IconShieldCheck size={20} stroke={1.5} />
+                <Text fw={600}>{t('profile.roles')}</Text>
+              </Group>
+              <Divider />
+              <Stack gap="xs" mt="xs">
+                {user.roles.map((role) => (
+                  <Group key={role.name} justify="space-between">
+                    <Badge variant="light" size="md">
+                      {role.name}
+                    </Badge>
+                    <Text size="xs" c="dimmed">
+                      {t('profile.level')} {role.level}
+                    </Text>
+                  </Group>
+                ))}
+              </Stack>
+            </Stack>
+          </Card>
+        )} */}
+
+        {/* Actions */}
+        <Stack gap="xs">
+          <Center>
+            <Button
+              w="20rem"
+              variant="light"
+              mt="md"
+              leftSection={<IconLogout size={20} />}
+              color="red"
+              onClick={handleLogout}
+            >
+              {t('common.logout')}
+            </Button>
+          </Center>
+        </Stack>
       </Stack>
     </Container>
   );

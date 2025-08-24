@@ -1,6 +1,6 @@
 import { unitService } from './unit';
 import { positionService } from './position';
-import { hrApi } from '@/lib/api';
+import { hrApi, userApi } from '@/lib/api';
 import { renderFullName } from '@/utils/string';
 
 export type WorkType = 'FULL_TIME' | 'PART_TIME';
@@ -138,7 +138,14 @@ export const employeeService = {
   },
 
   async deactivateEmployee(id: string) {
+    // First deactivate the employee
     await hrApi.deactivateEmployee(id);
+
+    // Get employee details to find userId
+    const employee = await this.getEmployee(id);
+    if (employee?.userId) {
+      await userApi.revokeUserSessions(employee.userId);
+    }
   },
 
   async activateEmployee(id: string) {

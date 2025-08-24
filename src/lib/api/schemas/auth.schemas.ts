@@ -10,6 +10,8 @@ import {
   stringSchema,
 } from './common.schemas';
 import { ClientConfigSchema, RouteConfigSchema } from './clientConfig.schemas';
+import { DepartmentSchema, EmployeeSchema } from './hr.schemas';
+import { renderFullName } from '@/utils/string';
 
 // Schemas
 export const LoginRequestSchema = z.object({
@@ -42,9 +44,9 @@ export const RenewTokenResponseSchema = z.object({
 });
 
 export const JWTPayloadSchema = z.object({
-  email: emailSchema,
   sub: stringSchema,
-  isRoot: booleanSchema.optional(),
+  clientId: stringSchema,
+  sessionId: stringSchema,
   iat: numberSchema,
   exp: numberSchema,
 });
@@ -84,24 +86,39 @@ export const RegisterResponseSchema = z.object({
 
 // Schema for role object
 export const RoleSchema = z.object({
-  id: idSchema,
   name: stringSchema,
   level: numberSchema,
 });
 
 // Schema for GET /auth/me response
-export const GetMeResponseSchema = z.object({
-  id: idSchema,
-  email: emailSchema,
-  userName: optionalStringSchema,
-  clientId: idSchema,
-  clientCode: stringSchema,
-  isRoot: booleanSchema,
-  roles: z.array(RoleSchema),
-  // DynamicFeatureFlags: DynamicFeatureFlagsSchema,
-  clientConfig: ClientConfigSchema.optional(),
-  routeConfig: RouteConfigSchema.optional(),
-});
+export const GetMeResponseSchema = z
+  .object({
+    id: idSchema,
+    email: emailSchema.optional(),
+    userName: optionalStringSchema,
+    clientId: idSchema,
+    clientCode: stringSchema,
+    isRoot: booleanSchema,
+    roles: z.array(RoleSchema),
+    clientConfig: ClientConfigSchema.optional(),
+    routeConfig: RouteConfigSchema.optional(),
+    employee: EmployeeSchema.optional(),
+    department: DepartmentSchema.optional(),
+  })
+  .transform((val) => {
+    if (val.userName) {
+      return val;
+    }
+    if (val.employee) {
+      val.userName = renderFullName(val.employee);
+      return val;
+    }
+
+    return {
+      ...val,
+      userName: 'User',
+    };
+  });
 
 // Types derived from schemas
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;

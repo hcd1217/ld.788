@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { Container, Loader, Center, Alert } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -7,7 +7,8 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { AppPageTitle, AppMobileLayout, AppDesktopLayout } from '@/components/common';
 import { POForm, POErrorBoundary } from '@/components/app/po';
-import { usePOActions, useCustomerList, usePOLoading, usePOError } from '@/stores/usePOStore';
+import { usePOActions, usePOLoading, usePOError } from '@/stores/usePOStore';
+import { useCustomers } from '@/stores/useAppStore';
 import { purchaseOrderService } from '@/services/sales/purchaseOrder';
 import { ROUTERS } from '@/config/routeConfig';
 import { getPODetailRoute } from '@/config/routeConfig';
@@ -28,10 +29,11 @@ export function POFormPage({ mode }: POFormPageProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
-  const customers = useCustomerList();
+  const customers = useCustomers();
+
   const isLoading = usePOLoading();
   const error = usePOError();
-  const { loadCustomers, clearError, createPurchaseOrder, updatePurchaseOrder } = usePOActions();
+  const { clearError, createPurchaseOrder, updatePurchaseOrder } = usePOActions();
 
   const [isLoadingPO, setIsLoadingPO] = useState(mode === 'edit');
   const [currentPO, setCurrentPO] = useState<PurchaseOrder | null>(null);
@@ -74,11 +76,16 @@ export function POFormPage({ mode }: POFormPageProps) {
       form.setValues({
         customerId: po.customerId,
         items: po.items,
-        shippingAddress: po.shippingAddress || initialValues.shippingAddress,
-        billingAddress: po.billingAddress,
-        paymentTerms: po.paymentTerms || 'Net 30',
+        orderDate: po.orderDate ? new Date(po.orderDate) : undefined,
+        deliveryDate: po.deliveryDate ? new Date(po.deliveryDate) : undefined,
+        shippingAddress:
+          po.address || po.googleMapsUrl
+            ? {
+                oneLineAddress: po.address,
+                googleMapsUrl: po.googleMapsUrl,
+              }
+            : initialValues.shippingAddress,
         notes: po.notes || '',
-        useSameAddress: !po.billingAddress,
       });
     } catch (error) {
       logError('Failed to load PO:', error, {
@@ -93,7 +100,6 @@ export function POFormPage({ mode }: POFormPageProps) {
 
   // Load initial data
   useOnce(() => {
-    void loadCustomers();
     if (isEditMode) {
       void loadPO();
     }
@@ -110,35 +116,21 @@ export function POFormPage({ mode }: POFormPageProps) {
       if (!values) return;
       if (isEditMode && (!id || !currentPO)) return;
 
-      // Validate customer and credit limit
+      // Validate customer
       const customer = customers.find((c) => c.id === values.customerId);
       if (!customer) {
         throw new Error(t('po.customerNotFound'));
-      }
-
-      const totalAmount = values.items.reduce((sum, item) => sum + item.totalPrice, 0);
-
-      if (customer.creditLimit && totalAmount > customer.creditLimit) {
-        const overAmount = totalAmount - customer.creditLimit;
-        throw new Error(
-          t('po.exceedsCreditLimit', {
-            amount: new Intl.NumberFormat('vi-VN', {
-              style: 'currency',
-              currency: 'VND',
-            }).format(overAmount),
-          }),
-        );
       }
 
       // Prepare PO data
       const poData = {
         customerId: values.customerId,
         customer,
-        totalAmount,
         items: values.items,
-        shippingAddress: values.shippingAddress,
-        billingAddress: values.useSameAddress ? undefined : values.billingAddress,
-        paymentTerms: values.paymentTerms,
+        orderDate: values.orderDate,
+        deliveryDate: values.deliveryDate,
+        address: values.shippingAddress?.oneLineAddress,
+        googleMapsUrl: values.shippingAddress?.googleMapsUrl,
         notes: values.notes,
       };
 
@@ -148,50 +140,47 @@ export function POFormPage({ mode }: POFormPageProps) {
         const newPO = {
           ...poData,
           status: 'NEW' as const,
-          orderDate: new Date(),
-          createdBy: 'Current User', // In real app, get from auth context
-          poNumber: `PO-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`,
+          orderDate: poData.orderDate || new Date(),
         };
-        await createPurchaseOrder(newPO as Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt'>);
+        await createPurchaseOrder(newPO);
       }
     },
   });
 
-  // Page title - memoized
-  const pageTitle = useMemo(() => t(isEditMode ? 'po.editPO' : 'po.createPO'), [isEditMode, t]);
+  // Page title
+  const pageTitle = t(isEditMode ? 'po.editPO' : 'po.createPO');
 
-  // Cancel navigation - memoized callback
-  const handleCancel = useMemo(() => {
+  // Cancel navigation
+  const handleCancel = () => {
     if (isEditMode && id) {
-      return () => navigate(getPODetailRoute(id));
+      navigate(getPODetailRoute(id));
+    } else {
+      navigate(ROUTERS.PO_MANAGEMENT);
     }
-    return () => navigate(ROUTERS.PO_MANAGEMENT);
-  }, [isEditMode, id, navigate]);
+  };
 
-  const pageContent = (
-    <Container fluid w="100%">
-      <POErrorBoundary componentName="POFormPage">
-        {isEditMode && isLoadingPO ? (
-          <Center h={400}>
-            <Loader size="lg" />
-          </Center>
-        ) : isEditMode && !currentPO ? (
-          <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
-            {t('po.notFound')}
-          </Alert>
-        ) : (
-          <POForm
-            form={form}
-            customers={customers}
-            isLoading={isLoading}
-            error={error}
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-            isEditMode={isEditMode}
-          />
-        )}
-      </POErrorBoundary>
-    </Container>
+  const content = (
+    <POErrorBoundary componentName="POFormPage">
+      {isEditMode && isLoadingPO ? (
+        <Center h={400}>
+          <Loader size="lg" />
+        </Center>
+      ) : isEditMode && !currentPO ? (
+        <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
+          {t('po.notFound')}
+        </Alert>
+      ) : (
+        <POForm
+          form={form}
+          customers={customers}
+          isLoading={isLoading}
+          error={error}
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+          isEditMode={isEditMode}
+        />
+      )}
+    </POErrorBoundary>
   );
 
   if (isMobile) {
@@ -204,7 +193,7 @@ export function POFormPage({ mode }: POFormPageProps) {
         clearError={clearError}
         header={<AppPageTitle title={pageTitle} />}
       >
-        {pageContent}
+        {content}
       </AppMobileLayout>
     );
   }
@@ -212,7 +201,9 @@ export function POFormPage({ mode }: POFormPageProps) {
   return (
     <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
       <AppPageTitle title={pageTitle} />
-      {pageContent}
+      <Container fluid mt="lg">
+        {content}
+      </Container>
     </AppDesktopLayout>
   );
 }

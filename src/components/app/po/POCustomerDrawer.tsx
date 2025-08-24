@@ -1,7 +1,7 @@
 import { Stack, Button, TextInput } from '@mantine/core';
 import { Drawer } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { Customer } from '@/services/sales/customer';
+import type { CustomerOverview as Customer } from '@/services/client/overview';
 import { useState, useMemo } from 'react';
 import { IconSearch } from '@tabler/icons-react';
 
@@ -33,11 +33,7 @@ export function POCustomerDrawer({
     if (!searchValue.trim()) return customers;
 
     const searchLower = searchValue.toLowerCase();
-    return customers.filter(
-      (customer) =>
-        customer.name.toLowerCase().includes(searchLower) ||
-        (customer.companyName && customer.companyName.toLowerCase().includes(searchLower)),
-    );
+    return customers.filter((customer) => customer.name.toLowerCase().includes(searchLower));
   }, [customers, searchValue]);
 
   return (
@@ -78,7 +74,6 @@ export function POCustomerDrawer({
               styles={{ label: { textAlign: 'left' } }}
             >
               {customer.name}
-              {customer.companyName && ` (${customer.companyName})`}
             </Button>
           ))}
         </Stack>

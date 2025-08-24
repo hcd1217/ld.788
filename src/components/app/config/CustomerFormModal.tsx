@@ -3,14 +3,14 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { ModalOrDrawer } from '@/components/common';
 import type { UseFormReturnType } from '@mantine/form';
 
-type CustomerFormValues = {
+export type CustomerFormValues = {
   name: string;
   companyName?: string;
   contactEmail?: string;
   contactPhone?: string;
   address?: string;
+  googleMapsUrl?: string;
   taxCode?: string;
-  creditLimit?: number;
   isActive?: boolean;
 };
 
@@ -81,6 +81,13 @@ export function CustomerFormModal({
               error={form.errors.address}
               disabled={isLoading}
               {...form.getInputProps('address')}
+            />
+            <TextInput
+              label={t('customer.googleMapsUrl')}
+              placeholder={t('customer.googleMapsUrlPlaceholder')}
+              error={form.errors.googleMapsUrl}
+              disabled={isLoading}
+              {...form.getInputProps('googleMapsUrl')}
             />
             <TextInput
               label={t('customer.taxCode')}

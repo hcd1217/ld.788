@@ -44,12 +44,22 @@ export const EmployeeSchema = z.object({
   positionId: idSchema.optional(),
   isActive: z.boolean(),
   metadata: z
-    .object({
+    .looseObject({
       displayOrder: numberSchema.optional(),
       hourRate: numberSchema.optional(),
       monthlySalary: numberSchema.optional(),
     })
     .optional(),
+  createdAt: timestampSchema,
+  updatedAt: timestampSchema,
+});
+
+export const DepartmentSchema = z.object({
+  id: idSchema,
+  clientId: idSchema,
+  name: stringSchema,
+  code: stringSchema,
+  isActive: z.boolean(),
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
 });

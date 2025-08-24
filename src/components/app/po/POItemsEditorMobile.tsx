@@ -1,16 +1,23 @@
 import { memo, useState, useEffect, useImperativeHandle, forwardRef, useCallback } from 'react';
-import { Stack, Text, Affix, ActionIcon, Group, Card, Button } from '@mantine/core';
+import { Stack, Text, Affix, ActionIcon, Card, Button } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from '@/hooks/useTranslation';
-import { formatCurrency } from '@/utils/number';
 import { useProductList, usePOActions } from '@/stores/usePOStore';
 import { POItemCard } from './POItemCard';
 import { POAddItemModal } from './POAddItemModal';
-import { createPOItem, calculateItemTotal } from '@/utils/poItemUtils';
+import { createPOItem } from '@/utils/poItemUtils';
 import { FAB_BOTTOM_OFFSET, FAB_RIGHT_OFFSET, FAB_Z_INDEX } from '@/constants/po.constants';
 import type { POItem } from '@/services/sales/purchaseOrder';
-import type { POItemsEditorRef } from './POItemsEditor';
+
+// Define POItemsEditorRef locally since it's not exported from POItemsEditor
+export type POItemsEditorRef = {
+  hasPendingItem: () => boolean;
+  getPendingItemDetails: () => Partial<POItem> | null;
+  buildPendingItem: () => POItem | null;
+  addPendingItem: () => POItem | null;
+  clearPendingItem: () => void;
+};
 
 type POItemsEditorMobileProps = {
   readonly items: POItem[];
@@ -40,13 +47,11 @@ const POItemsEditorMobileComponent = forwardRef<POItemsEditorRef, POItemsEditorM
     }, [modalOpened, onModalStateChange]);
 
     const handleAddItem = useCallback(
-      (newItemData: Omit<POItem, 'id' | 'purchaseOrderId' | 'createdAt' | 'updatedAt'>) => {
+      (newItemData: Omit<POItem, 'id' | 'purchaseOrderId'>) => {
         const item: POItem = {
           id: uuidv4(),
           purchaseOrderId: '',
           ...newItemData,
-          createdAt: new Date(),
-          updatedAt: new Date(),
         };
 
         onChange([...items, item]);
@@ -67,15 +72,6 @@ const POItemsEditorMobileComponent = forwardRef<POItemsEditorRef, POItemsEditorM
         const updatedItems = items.map((item) => {
           if (item.id === id) {
             const updated = { ...item, [field]: value };
-
-            // Recalculate total if quantity, price, or discount changed
-            if (field === 'quantity' || field === 'unitPrice' || field === 'discount') {
-              const quantity = field === 'quantity' ? value : updated.quantity;
-              const unitPrice = field === 'unitPrice' ? value : updated.unitPrice;
-              const discount = field === 'discount' ? value || 0 : updated.discount || 0;
-              updated.totalPrice = calculateItemTotal(quantity, unitPrice, discount);
-            }
-
             return updated;
           }
           return item;
@@ -85,8 +81,6 @@ const POItemsEditorMobileComponent = forwardRef<POItemsEditorRef, POItemsEditorM
       },
       [items, onChange],
     );
-
-    const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
 
     // Helper to build a POItem from pending item without adding it
     const buildItemFromPendingItem = useCallback(() => {
@@ -120,9 +114,6 @@ const POItemsEditorMobileComponent = forwardRef<POItemsEditorRef, POItemsEditorM
                 productCode: item.productCode,
                 description: item.description,
                 quantity: item.quantity,
-                unitPrice: item.unitPrice,
-                totalPrice: item.totalPrice,
-                discount: item.discount,
                 category: item.category,
               });
               return item;
@@ -167,25 +158,6 @@ const POItemsEditorMobileComponent = forwardRef<POItemsEditorRef, POItemsEditorM
                 disabled={disabled}
               />
             ))
-          )}
-
-          {/* Subtotal */}
-          {items.length > 0 && (
-            <Card
-              withBorder
-              radius="md"
-              p="md"
-              style={{ backgroundColor: 'var(--mantine-color-blue-0)' }}
-            >
-              <Group justify="space-between">
-                <Text fw={600} size="lg">
-                  {t('po.subtotal')}:
-                </Text>
-                <Text fw={700} size="xl" c="blue">
-                  {formatCurrency(subtotal)}
-                </Text>
-              </Group>
-            </Card>
           )}
         </Stack>
 

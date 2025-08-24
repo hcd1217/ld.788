@@ -1,6 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
 import type { PurchaseOrder } from '@/services/sales';
 import { PO_STATUS, type POStatusType } from '@/constants/purchaseOrder';
+import { getCustomerNameByCustomerId } from '@/utils/overview';
+import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 
 export interface POFilters {
   searchQuery: string;
@@ -39,7 +41,7 @@ interface POWithSearchText {
 
 export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOverride?: string) {
   const [filters, setFilters] = useState<POFilters>(defaultFilters);
-
+  const customerMapByCustomerId = useCustomerMapByCustomerId();
   const hasActiveFilters = useMemo(() => {
     if (filters.customerId) {
       return true;
@@ -101,8 +103,7 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOve
       // Combine all searchable fields into a single lowercase string
       const searchParts: string[] = [
         po.poNumber,
-        po.customer?.name ?? '',
-        po.customer?.companyName ?? '',
+        getCustomerNameByCustomerId(customerMapByCustomerId, po.customerId),
         po.notes ?? '',
       ];
 
@@ -113,7 +114,7 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOve
 
       return { po, searchText };
     });
-  }, [purchaseOrders]);
+  }, [customerMapByCustomerId, purchaseOrders]);
 
   // Memoize the normalized search query to avoid repeated toLowerCase() calls
   const normalizedSearchQuery = useMemo(() => {

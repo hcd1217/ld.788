@@ -1,7 +1,6 @@
 import {
   Stack,
   TextInput,
-  NumberInput,
   Select,
   Textarea,
   Group,
@@ -20,12 +19,7 @@ export type ProductFormValues = {
   color?: string;
   description?: string;
   category?: string;
-  unitPrice: number;
-  costPrice?: number;
   status: ProductStatus;
-  stockLevel?: number;
-  minStock?: number;
-  maxStock?: number;
   unit?: string;
   sku?: string;
   barcode?: string;
@@ -123,45 +117,14 @@ export function ProductFormModal({
               />
             </Group>
 
-            {/* Stock information */}
-            <Group grow>
-              <NumberInput
-                label={t('product.stockLevel')}
-                placeholder={t('product.stockLevelPlaceholder')}
-                error={form.errors.stockLevel}
-                disabled={isLoading}
-                {...form.getInputProps('stockLevel')}
-              />
-              <NumberInput
-                label={t('product.minStock')}
-                placeholder={t('product.minStockPlaceholder')}
-                error={form.errors.minStock}
-                disabled={isLoading}
-                {...form.getInputProps('minStock')}
-              />
-            </Group>
-
-            {/* Pricing */}
-            <Group grow>
-              <NumberInput
-                required
-                label={t('product.unitPrice')}
-                step={1000}
-                placeholder={t('product.unitPricePlaceholder')}
-                error={form.errors.unitPrice}
-                disabled={isLoading}
-                decimalScale={2}
-                min={0}
-                {...form.getInputProps('unitPrice')}
-              />
-              <TextInput
-                label={t('product.unit')}
-                placeholder={t('product.unitPlaceholder')}
-                error={form.errors.unit}
-                disabled={isLoading}
-                {...form.getInputProps('unit')}
-              />
-            </Group>
+            {/* Unit */}
+            <TextInput
+              label={t('product.unit')}
+              placeholder={t('product.unitPlaceholder')}
+              error={form.errors.unit}
+              disabled={isLoading}
+              {...form.getInputProps('unit')}
+            />
 
             {/* Action Buttons */}
             <Group justify="space-between" mt="md">

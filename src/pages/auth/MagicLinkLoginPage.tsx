@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { Stack, Space, Button, Text, Alert, TextInput, Group } from '@mantine/core';
 import { IconX, IconCheck, IconQrcode, IconForms } from '@tabler/icons-react';
@@ -9,7 +9,6 @@ import { GuestLayout } from '@/components/layouts/GuestLayout';
 import { FormContainer } from '@/components/form/FormContainer';
 import { AuthHeader, QrScannerModal } from '@/components/auth';
 import { ROUTERS } from '@/config/routeConfig';
-import { authService } from '@/services/auth';
 import { logError } from '@/utils/logger';
 
 const MAGIC_LINK_STORAGE_KEY = 'magicLinkParams';
@@ -17,7 +16,7 @@ const MAGIC_LINK_STORAGE_KEY = 'magicLinkParams';
 export function MagicLinkLoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { setUser, fetchUserProfile } = useAppStore();
+  const { loginWithMagicLink } = useAppStore();
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -26,6 +25,7 @@ export function MagicLinkLoginPage() {
   const [manualCode, setManualCode] = useState('');
   const [showOptions, setShowOptions] = useState(false);
   const { t } = useTranslation();
+  const verificationInProgress = useRef(false);
 
   useEffect(() => {
     setMounted(true);
@@ -61,6 +61,12 @@ export function MagicLinkLoginPage() {
       delay: 1000,
     },
     async actionHandler() {
+      // Prevent double execution (React StrictMode in dev)
+      if (verificationInProgress.current) {
+        return;
+      }
+      verificationInProgress.current = true;
+
       // Get stored params from sessionStorage
       const storedParams = sessionStorage.getItem(MAGIC_LINK_STORAGE_KEY);
       if (!storedParams) {
@@ -80,11 +86,8 @@ export function MagicLinkLoginPage() {
       }
 
       setIsLoading(true);
-      const { user } = await authService.loginWithMagicToken(clientCode, token);
-
-      setUser(user);
-      // Fetch user profile after successful magic link login
-      await fetchUserProfile();
+      // Use the new store function that properly sets isAuthenticated
+      await loginWithMagicLink({ clientCode, token });
       setError(undefined);
     },
     errorHandler(error) {
@@ -93,6 +96,7 @@ export function MagicLinkLoginPage() {
         action: 'if',
       });
       setError(t('auth.magicLink.verificationFailed'));
+      verificationInProgress.current = false;
     },
     cleanupHandler() {
       // Clear stored params on error or after successful verification
@@ -116,15 +120,16 @@ export function MagicLinkLoginPage() {
 
     // Check if we have stored params (means we've redirected to clean URL)
     const storedParams = sessionStorage.getItem(MAGIC_LINK_STORAGE_KEY);
-    if (storedParams) {
+    if (storedParams && !verificationInProgress.current) {
       void verifyMagicLink();
-    } else {
+    } else if (!storedParams) {
       // No params found - show QR/manual entry options instead of error
       setShowOptions(true);
       setIsLoading(false);
       setError(undefined);
     }
-  }, [mounted, searchParams, verifyMagicLink, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, searchParams]);
 
   const handleRetryLogin = () => {
     navigate(ROUTERS.LOGIN);
@@ -133,6 +138,8 @@ export function MagicLinkLoginPage() {
   const handleQrScan = (data: string) => {
     try {
       const trimmedData = data.trim();
+      // Reset the flag to allow new verification attempt
+      verificationInProgress.current = false;
 
       // Try to parse as URL first
       if (trimmedData.includes('?') || trimmedData.startsWith('http')) {
@@ -169,6 +176,8 @@ export function MagicLinkLoginPage() {
   const handleManualCodeSubmit = () => {
     try {
       const trimmedCode = manualCode.trim();
+      // Reset the flag to allow new verification attempt
+      verificationInProgress.current = false;
 
       // If it looks like a URL, try parsing it
       if (trimmedCode.includes('?') || trimmedCode.startsWith('http')) {

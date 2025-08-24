@@ -3,6 +3,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 
 type POFormActionsProps = {
   readonly onCancel: () => void;
+  readonly isDisabled: boolean;
   readonly isLoading: boolean;
   readonly isEditMode: boolean;
   readonly isMobile: boolean;
@@ -12,6 +13,7 @@ type POFormActionsProps = {
 
 export function POFormActions({
   onCancel,
+  isDisabled,
   isLoading,
   isEditMode,
   isMobile,
@@ -38,6 +40,7 @@ export function POFormActions({
 
   const submitButton = (
     <Button
+      disabled={isDisabled}
       type="submit"
       form={formId}
       loading={isLoading}
@@ -48,19 +51,8 @@ export function POFormActions({
     </Button>
   );
 
-  // Desktop layout
-  if (!isMobile) {
-    return (
-      <Group justify="flex-end">
-        {cancelButton}
-        {submitButton}
-      </Group>
-    );
-  }
-
-  // Mobile layout
   return (
-    <Group justify="space-between">
+    <Group justify={isMobile ? 'space-between' : 'flex-end'}>
       {cancelButton}
       {submitButton}
     </Group>

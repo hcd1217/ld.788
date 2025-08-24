@@ -1,4 +1,4 @@
-import { Box, Stack, ScrollArea, Group, Button } from '@mantine/core';
+import { Stack, ScrollArea, Group, Button } from '@mantine/core';
 import {
   IconInfoCircle,
   IconClipboardList,
@@ -94,105 +94,57 @@ export function PODetailTabs({
       </ScrollArea>
 
       <Tabs.Panel value="info" pt="xl">
-        <Box
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-          }}
-        >
-          <Box w="100%">
-            <Stack gap="xl">
-              <POErrorBoundary componentName="POBasicInfoCard">
-                <POBasicInfoCard purchaseOrder={purchaseOrder} onEdit={onEdit} />
-              </POErrorBoundary>
-              <POActionZone
-                purchaseOrder={purchaseOrder}
-                isLoading={isLoading}
-                onConfirm={onConfirm}
-                onProcess={onProcess}
-                onShip={onShip}
-                onDeliver={onDeliver}
-                onCancel={onCancel}
-                onRefund={onRefund}
-              />
-            </Stack>
-          </Box>
-        </Box>
+        <Stack gap="xl">
+          <POErrorBoundary componentName="POBasicInfoCard">
+            <POBasicInfoCard purchaseOrder={purchaseOrder} onEdit={onEdit} />
+          </POErrorBoundary>
+          <POActionZone
+            purchaseOrder={purchaseOrder}
+            isLoading={isLoading}
+            onConfirm={onConfirm}
+            onProcess={onProcess}
+            onShip={onShip}
+            onDeliver={onDeliver}
+            onCancel={onCancel}
+            onRefund={onRefund}
+          />
+        </Stack>
       </Tabs.Panel>
 
       <Tabs.Panel value="items" pt="xl">
-        <Box
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-          }}
-        >
-          <Box w="100%">
-            <POItemsList purchaseOrder={purchaseOrder} />
-          </Box>
-        </Box>
+        <POItemsList purchaseOrder={purchaseOrder} />
       </Tabs.Panel>
 
       <Tabs.Panel value="timeline" pt="xl">
-        <Box
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-          }}
-        >
-          <Box w="100%">
-            <POTimeline purchaseOrder={purchaseOrder} />
-          </Box>
-        </Box>
+        <POTimeline purchaseOrder={purchaseOrder} />
       </Tabs.Panel>
 
       <Tabs.Panel value="documents" pt="xl">
-        <Box
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-          }}
-        >
-          <Box w="100%">
-            <Stack gap="lg">
-              <Group justify="space-between">
-                <div>
-                  <Stack gap="xs">
-                    <Box>
-                      <Group gap="sm">
-                        <Button leftSection={<IconPrinter size={16} />} onClick={handlePrint}>
-                          {t('po.print')}
-                        </Button>
-                        <Button
-                          variant="light"
-                          leftSection={<IconFileTypePdf size={16} />}
-                          onClick={handleExportPDF}
-                        >
-                          {t('po.exportPDF')}
-                        </Button>
-                        <Button
-                          variant="light"
-                          leftSection={<IconFileExport size={16} />}
-                          onClick={handleExportExcel}
-                        >
-                          {t('po.exportExcel')}
-                        </Button>
-                      </Group>
-                    </Box>
-                  </Stack>
-                </div>
-              </Group>
-              <ComingSoonCard
-                icon={<IconFileInvoice size={48} color="var(--mantine-color-gray-5)" />}
-                title={t('po.documentsComingSoon')}
-              />
-            </Stack>
-          </Box>
-        </Box>
+        <Stack gap="lg">
+          <Group gap="sm">
+            <Button leftSection={<IconPrinter size={16} />} onClick={handlePrint}>
+              {t('po.print')}
+            </Button>
+            <Button
+              variant="light"
+              leftSection={<IconFileTypePdf size={16} />}
+              onClick={handleExportPDF}
+            >
+              {t('po.exportPDF')}
+            </Button>
+            <Button
+              variant="light"
+              leftSection={<IconFileExport size={16} />}
+              onClick={handleExportExcel}
+            >
+              {t('po.exportExcel')}
+            </Button>
+          </Group>
+          <ComingSoonCard
+            icon={<IconFileInvoice size={48} color="var(--mantine-color-gray-5)" />}
+            title={t('po.documentsComingSoon')}
+          />
+        </Stack>
       </Tabs.Panel>
 
       <Tabs.Panel value="communication" pt="xl">

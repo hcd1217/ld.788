@@ -1,4 +1,14 @@
-import { Accordion, Stack, Group, Text, Button, Badge, Grid } from '@mantine/core';
+import {
+  Accordion,
+  Stack,
+  Group,
+  Text,
+  Button,
+  Badge,
+  Grid,
+  ActionIcon,
+  Tooltip,
+} from '@mantine/core';
 import {
   IconEdit,
   IconCheck,
@@ -14,8 +24,9 @@ import {
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { formatDate } from '@/utils/time';
-import { formatCurrency } from '@/utils/number';
 import { POStatusBadge } from './POStatusBadge';
+import { getCustomerNameByCustomerId } from '@/utils/overview';
+import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 
 type PODetailAccordionProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -41,7 +52,7 @@ export function PODetailAccordion({
   onRefund,
 }: PODetailAccordionProps) {
   const { t } = useTranslation();
-
+  const customerMapByCustomerId = useCustomerMapByCustomerId();
   const getActionButtons = () => {
     const buttons = [];
 
@@ -187,14 +198,8 @@ export function PODetailAccordion({
                   <Text size="xs" fw={500} c="dimmed">
                     {t('po.customer')}
                   </Text>
-                  <Text size="sm">{purchaseOrder.customer?.name || '-'}</Text>
-                </Grid.Col>
-                <Grid.Col span={6}>
-                  <Text size="xs" fw={500} c="dimmed">
-                    {t('po.totalAmount')}
-                  </Text>
-                  <Text size="sm" fw={600} c="blue">
-                    {formatCurrency(purchaseOrder.totalAmount)}
+                  <Text size="sm">
+                    {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
                   </Text>
                 </Grid.Col>
                 <Grid.Col span={6}>
@@ -239,10 +244,7 @@ export function PODetailAccordion({
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <Text size="sm">
-                      {item.quantity} × {formatCurrency(item.unitPrice)}
-                    </Text>
-                    <Text size="xs" fw={500}>
-                      {formatCurrency(item.totalPrice)}
+                      {t('po.quantity')}: {item.quantity}
                     </Text>
                   </div>
                 </Group>
@@ -251,22 +253,33 @@ export function PODetailAccordion({
           </Accordion.Panel>
         </Accordion.Item>
 
-        {purchaseOrder.shippingAddress && (
+        {purchaseOrder.address && (
           <Accordion.Item value="address">
             <Accordion.Control icon={<IconMapPin size={16} />}>
-              {t('po.shippingAddress')}
+              <Group justify="start" align="center" gap="sm">
+                <Text size="sm">{t('po.shippingAddress')}</Text>
+                {purchaseOrder.googleMapsUrl && (
+                  <Tooltip label={t('customer.viewOnMap')}>
+                    <ActionIcon
+                      size="sm"
+                      variant="subtle"
+                      onClick={() => {
+                        const googleMapsUrl = purchaseOrder.googleMapsUrl;
+                        if (googleMapsUrl) {
+                          window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+                        }
+                      }}
+                    >
+                      <IconMapPin size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+                )}
+              </Group>
             </Accordion.Control>
             <Accordion.Panel>
-              <Text size="sm">
-                {purchaseOrder.shippingAddress.street}
-                <br />
-                {purchaseOrder.shippingAddress.city}
-                {purchaseOrder.shippingAddress.state && `, ${purchaseOrder.shippingAddress.state}`}
-                {purchaseOrder.shippingAddress.postalCode &&
-                  ` ${purchaseOrder.shippingAddress.postalCode}`}
-                <br />
-                {purchaseOrder.shippingAddress.country}
-              </Text>
+              <Group justify="space-between" align="flex-start">
+                <Text size="sm">{purchaseOrder.address}</Text>
+              </Group>
             </Accordion.Panel>
           </Accordion.Item>
         )}

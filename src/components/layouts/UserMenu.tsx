@@ -7,6 +7,7 @@ import { LAYOUT_CONFIG } from '@/config/layoutConfig';
 import { ROUTERS } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/stores/useAppStore';
+import { renderFullName } from '@/utils/string';
 
 interface UserMenuProps {
   readonly c?: string;
@@ -22,7 +23,7 @@ export function UserMenu({ c }: UserMenuProps) {
     navigate(ROUTERS.LOGIN);
   };
 
-  const userInitials = user ? `${user.email.charAt(0).toUpperCase()}` : 'U';
+  const userInitials = user ? user.userName?.charAt(0).toUpperCase() : 'U';
 
   return (
     <Menu
@@ -42,7 +43,7 @@ export function UserMenu({ c }: UserMenuProps) {
               {userInitials}
             </Avatar>
             <Text fw={500} size="sm" lh={1} mr={3} c={c}>
-              {user?.email}
+              {user?.employee ? renderFullName(user.employee) : (user?.email ?? '-')}
             </Text>
             <IconCaretDownFilled
               color={c}

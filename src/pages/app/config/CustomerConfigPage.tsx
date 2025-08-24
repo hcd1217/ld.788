@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
-import { Paper, Text, Group } from '@mantine/core';
+import { Paper, Text, Group, Button, Stack, ActionIcon, Tooltip } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
-import { IconPlus } from '@tabler/icons-react';
+import { IconPlus, IconUpload, IconMapPin } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAction } from '@/hooks/useAction';
 import {
@@ -14,72 +14,48 @@ import {
   Pagination,
   ActiveBadge,
   ContactInfo,
+  BulkImportModalContent,
 } from '@/components/common';
-import { CustomerFormModal } from '@/components/app/config';
+import { CustomerFormModal, type CustomerFormValues } from '@/components/app/config';
 import {
   customerService,
   type Customer,
   type CreateCustomerRequest,
   type UpdateCustomerRequest,
+  type BulkUpsertCustomersRequest,
 } from '@/services/sales/customer';
-import { showSuccessNotification } from '@/utils/notifications';
+import { showSuccessNotification, showErrorNotification } from '@/utils/notifications';
 import { validateEmail } from '@/utils/validation';
-import { isDevelopment } from '@/utils/env';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { useOnce } from '@/hooks/useOnce';
 import { logError } from '@/utils/logger';
+import { parseCustomerExcelFile, generateCustomerExcelTemplate } from '@/utils/excelParser';
 
-export type CustomerFormValues = {
-  name: string;
-  companyName?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  address?: string;
-  taxCode?: string;
-  isActive?: boolean;
-};
+// Form values type will be imported from CustomerFormModal
 
 export function CustomerConfigPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState('');
-  const [editOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
+  const [editOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false);
 
   const form = useForm<CustomerFormValues>({
-    initialValues: isDevelopment
-      ? {
-          // cspell:disable
-          name: 'CARMALL TYRE',
-          companyName: 'CÔNG TY CỔ PHẦN CARMALL TYRE',
-          contactEmail: '',
-          contactPhone: '03-1234-2211',
-          address:
-            'Số 3 Đường số 32, Phường An Phú, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, Việt Nam',
-          taxCode: '0316162825',
-          isActive: true,
-          // cspell:enable
-        }
-      : {
-          name: '',
-          companyName: '',
-          contactEmail: '',
-          contactPhone: '',
-          address: '',
-          taxCode: '',
-          isActive: true,
-        },
+    initialValues: {
+      name: '',
+      companyName: '',
+      contactEmail: '',
+      contactPhone: '',
+      address: '',
+      googleMapsUrl: '',
+      taxCode: '',
+      isActive: true,
+    },
     validate: {
-      // name: (value) => (!value ? t('common.error') : null),
-      contactEmail: (value) => {
-        if (value && value.length > 0) {
-          return validateEmail(value, t);
-        }
-        return null;
-      },
+      name: (value) => (!value?.trim() ? t('validation.fieldRequired') : null),
+      contactEmail: (value) => (value && value.length > 0 ? validateEmail(value, t) : null),
     },
   });
 
@@ -102,23 +78,21 @@ export function CustomerConfigPage() {
     defaultPageSize: 20,
   });
 
-  const loadCustomers = useAction<Record<string, never>>({
+  const loadCustomers = useAction({
     options: {
       errorTitle: t('common.error'),
       errorMessage: t('common.loadingFailed'),
     },
     async actionHandler() {
       setIsLoading(true);
-      setError(undefined);
       const data = await customerService.getAllCustomers();
       setCustomers(data);
     },
     errorHandler(err) {
       logError('Failed to load customers:', err, {
-        module: 'CustomerConfigPagePage',
-        action: 'actionHandler',
+        module: 'CustomerConfigPage',
+        action: 'loadCustomers',
       });
-      setError(t('common.loadingFailed'));
     },
     cleanupHandler() {
       setIsLoading(false);
@@ -135,9 +109,8 @@ export function CustomerConfigPage() {
       errorMessage: t('common.addFailed'),
     },
     async actionHandler(values) {
-      if (!values) {
-        throw new Error(t('common.addFailed'));
-      }
+      if (!values) return;
+
       setIsLoading(true);
       const data: CreateCustomerRequest = {
         name: values.name,
@@ -145,8 +118,12 @@ export function CustomerConfigPage() {
         contactEmail: values.contactEmail || undefined,
         contactPhone: values.contactPhone || undefined,
         address: values.address || undefined,
+        metadata: {
+          googleMapsUrl: values.googleMapsUrl || undefined,
+        },
         taxCode: values.taxCode || undefined,
       };
+
       await customerService.createCustomer(data);
       showSuccessNotification(
         t('customer.created'),
@@ -158,8 +135,8 @@ export function CustomerConfigPage() {
     },
     errorHandler(error) {
       logError('Failed to create customer:', error, {
-        module: 'CustomerConfigPagePage',
-        action: 'errorHandler',
+        module: 'CustomerConfigPage',
+        action: 'handleCreateCustomer',
       });
     },
     cleanupHandler() {
@@ -173,9 +150,8 @@ export function CustomerConfigPage() {
       errorMessage: t('common.updateFailed'),
     },
     async actionHandler(values) {
-      if (!values || !selectedCustomer) {
-        throw new Error(t('po.customerNotFound'));
-      }
+      if (!values || !selectedCustomer) return;
+
       setIsLoading(true);
       const data: UpdateCustomerRequest = {
         name: values.name,
@@ -183,9 +159,13 @@ export function CustomerConfigPage() {
         contactEmail: values.contactEmail || undefined,
         contactPhone: values.contactPhone || undefined,
         address: values.address || undefined,
+        metadata: {
+          googleMapsUrl: values.googleMapsUrl || undefined,
+        },
         taxCode: values.taxCode || undefined,
         isActive: values.isActive,
       };
+
       await customerService.updateCustomer(selectedCustomer.id, data);
       showSuccessNotification(
         t('customer.updated'),
@@ -196,8 +176,8 @@ export function CustomerConfigPage() {
     },
     errorHandler(error) {
       logError('Failed to update customer:', error, {
-        module: 'CustomerConfigPagePage',
-        action: 'errorHandler',
+        module: 'CustomerConfigPage',
+        action: 'handleUpdateCustomer',
       });
     },
     cleanupHandler() {
@@ -205,45 +185,32 @@ export function CustomerConfigPage() {
     },
   });
 
-  const confirmDeleteCustomer = useAction<{ customer: Customer }>({
+  const handleDelete = useAction<Customer>({
     options: {
-      successTitle: t('customer.deleted'),
       errorTitle: t('common.error'),
       errorMessage: t('common.deleteFailed'),
     },
-    async actionHandler(values) {
-      if (!values?.customer) {
-        throw new Error(t('po.customerNotFound'));
-      }
+    async actionHandler(customer) {
+      if (!customer) return;
+
       setIsLoading(true);
-      await customerService.deleteCustomer(values.customer.id);
-      // Success message is handled by options with dynamic customer name
+      await customerService.deleteCustomer(customer.id);
       showSuccessNotification(
         t('customer.deleted'),
-        t('customer.deletedMessage', { name: values.customer.name }),
+        t('customer.deletedMessage', { name: customer.name }),
       );
       await loadCustomers();
     },
     errorHandler(error) {
       logError('Failed to delete customer:', error, {
-        module: 'CustomerConfigPagePage',
-        action: 'actionHandler',
+        module: 'CustomerConfigPage',
+        action: 'handleDelete',
       });
     },
     cleanupHandler() {
       setIsLoading(false);
     },
   });
-
-  const handleDeleteCustomer = (customer: Customer) => {
-    modals.openConfirmModal({
-      title: t('common.confirmDelete'),
-      children: <Text size="sm">{t('common.confirmDeleteMessage', { name: customer.name })}</Text>,
-      labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
-      confirmProps: { color: 'red' },
-      onConfirm: () => confirmDeleteCustomer({ customer }),
-    });
-  };
 
   const openEditModal = (customer: Customer) => {
     setSelectedCustomer(customer);
@@ -253,6 +220,7 @@ export function CustomerConfigPage() {
       contactEmail: customer.contactEmail || '',
       contactPhone: customer.contactPhone || '',
       address: customer.address || '',
+      googleMapsUrl: customer.metadata?.googleMapsUrl || '',
       taxCode: customer.taxCode || '',
       isActive: customer.isActive,
     });
@@ -264,23 +232,128 @@ export function CustomerConfigPage() {
     openCreate();
   };
 
+  const confirmDelete = (customer: Customer) => {
+    modals.openConfirmModal({
+      title: t('common.confirmDelete'),
+      children: <Text size="sm">{t('common.confirmDeleteMessage', { name: customer.name })}</Text>,
+      labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
+      confirmProps: { color: 'red' },
+      onConfirm: () => handleDelete(customer),
+    });
+  };
+
+  // Open bulk import modal
+  const openBulkImportModal = () => {
+    let selectedFile: File | undefined;
+
+    modals.openConfirmModal({
+      title: t('customer.bulkImport'),
+      size: 'lg',
+      children: (
+        <BulkImportModalContent
+          onFileSelect={(file) => {
+            selectedFile = file;
+          }}
+          onDownloadTemplate={() => generateCustomerExcelTemplate(i18n.language)}
+          entityType="customer"
+          language={i18n.language}
+        />
+      ),
+      labels: {
+        confirm: t('common.import'),
+        cancel: t('common.cancel'),
+      },
+      confirmProps: {
+        loading: isLoading,
+        leftSection: <IconUpload size={16} />,
+      },
+      onConfirm: () => {
+        if (selectedFile) {
+          handleExcelImport({ file: selectedFile });
+        } else {
+          showErrorNotification(t('common.error'), t('common.selectFile'));
+        }
+      },
+    });
+  };
+
+  // Handle Excel file import
+  const handleExcelImport = useAction<{ file: File }>({
+    options: {
+      errorTitle: t('common.error'),
+      errorMessage: t('auth.importFailed'),
+    },
+    async actionHandler(data) {
+      if (!data?.file) return;
+      const { file } = data;
+
+      setIsLoading(true);
+
+      // Parse Excel file
+      const customers = await parseCustomerExcelFile(file);
+
+      if (customers.length === 0) {
+        throw new Error(t('customer.noValidDataFound'));
+      }
+
+      // Prepare request
+      const request: BulkUpsertCustomersRequest = {
+        customers: customers.map((c) => ({
+          name: c.name,
+          companyName: c.companyName,
+          contactEmail: c.contactEmail,
+          contactPhone: c.contactPhone,
+          address: c.address,
+          metadata: {
+            googleMapsUrl: c.googleMapsUrl,
+          },
+          taxCode: c.taxCode,
+        })),
+        skipInvalid: false,
+      };
+
+      const result = await customerService.bulkUpsertCustomers(request);
+
+      // Show results
+      const message = t('customer.bulkImportSuccess', {
+        created: result.created,
+        updated: result.updated,
+        failed: result.failed,
+      });
+
+      showSuccessNotification(t('auth.importSuccess'), message);
+      modals.closeAll();
+      await loadCustomers();
+    },
+    errorHandler(error) {
+      logError('Failed to import customers from Excel:', error, {
+        module: 'CustomerConfigPage',
+        action: 'handleExcelImport',
+      });
+    },
+    cleanupHandler() {
+      setIsLoading(false);
+    },
+  });
+
   return (
-    <AppDesktopLayout
-      isLoading={isLoading && !createOpened && !editOpened}
-      error={error}
-      clearError={() => {
-        setError(undefined);
-      }}
-    >
+    <AppDesktopLayout isLoading={isLoading && !createOpened && !editOpened}>
       {/* Page Title with Actions */}
-      <AppPageTitle
-        title={t('common.pages.customerManagement')}
-        button={{
-          label: t('common.add'),
-          onClick: openCreateModal,
-          icon: <IconPlus size={16} />,
-        }}
-      />
+      <Group justify="space-between" align="center">
+        <AppPageTitle title={t('common.pages.customerManagement')} />
+        <Group gap="sm">
+          <Button
+            variant="light"
+            leftSection={<IconUpload size={16} />}
+            onClick={openBulkImportModal}
+          >
+            {t('customer.bulkImport')}
+          </Button>
+          <Button leftSection={<IconPlus size={16} />} onClick={openCreateModal}>
+            {t('common.add')}
+          </Button>
+        </Group>
+      </Group>
 
       {/* Search Bar */}
       <SearchBar
@@ -293,17 +366,6 @@ export function CustomerConfigPage() {
       {/* Data Table */}
       <Paper withBorder shadow="md" p="md" radius="md">
         <DataTable
-          /**
-           *  🎯 Minor Observations (Not Issues)
-           *
-           *  1. Type Assertion vs Type Guard
-           *
-           *  data={paginatedCustomers as Customer[]}
-           *  While the type assertion works, a more robust approach would be:
-           *  // Alternative: Type guard or proper typing in hook
-           *  data={paginatedCustomers}
-           *  Verdict: Acceptable given the hook's readonly constraint
-           */
           data={paginatedCustomers as Customer[]}
           isLoading={false}
           emptyMessage={t('common.noDataFound')}
@@ -318,18 +380,42 @@ export function CustomerConfigPage() {
             {
               key: 'companyName',
               header: t('customer.company'),
-              render: (customer: Customer) => (
-                <Group gap="xs">
-                  {customer.companyName || '-'}
-                  {customer.taxCode ? (
-                    <Text c="dimmed" ml={2} size="xs" fw={600}>
-                      (MST: {customer.taxCode})
-                    </Text>
-                  ) : (
-                    ''
-                  )}
-                </Group>
-              ),
+              render: (customer: Customer) => {
+                const googleMapsUrl = customer.metadata?.googleMapsUrl || customer.googleMapsUrl;
+                return (
+                  <Stack gap={4}>
+                    <Group gap="xs">
+                      <Text>{customer.companyName || '-'}</Text>
+                      {customer.taxCode && (
+                        <Text c="dimmed" size="xs" fw={600}>
+                          (MST: {customer.taxCode})
+                        </Text>
+                      )}
+                      {googleMapsUrl && (
+                        <Tooltip label={t('customer.viewOnMap')}>
+                          <ActionIcon
+                            size="xs"
+                            variant="subtle"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+                            }}
+                          >
+                            <IconMapPin size={14} />
+                          </ActionIcon>
+                        </Tooltip>
+                      )}
+                    </Group>
+                    {customer.address && (
+                      <Group gap={4}>
+                        <Text size="sm" c="dimmed">
+                          {customer.address}
+                        </Text>
+                      </Group>
+                    )}
+                  </Stack>
+                );
+              },
             },
             {
               key: 'contact',
@@ -357,7 +443,6 @@ export function CustomerConfigPage() {
         onPageChange={paginationHandlers.setCurrentPage}
       />
 
-      {/* Create Customer Modal */}
       <CustomerFormModal
         opened={createOpened}
         onClose={closeCreate}
@@ -367,7 +452,6 @@ export function CustomerConfigPage() {
         isLoading={isLoading}
       />
 
-      {/* Edit Customer Modal */}
       <CustomerFormModal
         opened={editOpened}
         onClose={closeEdit}
@@ -376,7 +460,7 @@ export function CustomerConfigPage() {
         onSubmit={handleUpdateCustomer}
         onDelete={() => {
           if (selectedCustomer) {
-            handleDeleteCustomer(selectedCustomer);
+            confirmDelete(selectedCustomer);
             closeEdit();
           }
         }}

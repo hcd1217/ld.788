@@ -43,13 +43,12 @@ export function PODetailPage() {
   // Use the centralized modal hook
   const { modals, selectedPO, closeModal, handlers } = usePOModals();
 
-  // Memoized modal close handlers
-  const handleCloseConfirmModal = useCallback(() => closeModal('confirm'), [closeModal]);
-  const handleCloseProcessModal = useCallback(() => closeModal('process'), [closeModal]);
-  const handleCloseShipModal = useCallback(() => closeModal('ship'), [closeModal]);
-  const handleCloseDeliverModal = useCallback(() => closeModal('deliver'), [closeModal]);
-  const handleCloseCancelModal = useCallback(() => closeModal('cancel'), [closeModal]);
-  const handleCloseRefundModal = useCallback(() => closeModal('refund'), [closeModal]);
+  // Memoized modal close handler
+  const handleCloseModal = useCallback(
+    (modalType: 'confirm' | 'process' | 'ship' | 'deliver' | 'cancel' | 'refund') => () =>
+      closeModal(modalType),
+    [closeModal],
+  );
 
   const handleEdit = () => {
     if (purchaseOrder && purchaseOrder.status === 'NEW') {
@@ -180,7 +179,7 @@ export function PODetailPage() {
       errorTitle: t('common.error'),
       errorMessage: t('po.refundFailed'),
     },
-    async actionHandler(data?: { reason?: string; refundAmount?: number }) {
+    async actionHandler(data?: { refundReason?: string }) {
       if (!selectedPO) {
         throw new Error(t('po.refundFailed'));
       }
@@ -200,42 +199,42 @@ export function PODetailPage() {
         opened={modals.confirmModalOpened}
         purchaseOrder={selectedPO}
         mode="confirm"
-        onClose={handleCloseConfirmModal}
+        onClose={handleCloseModal('confirm')}
         onConfirm={confirmPOAction}
       />
       <POStatusModal
         opened={modals.processModalOpened}
         purchaseOrder={selectedPO}
         mode="process"
-        onClose={handleCloseProcessModal}
+        onClose={handleCloseModal('process')}
         onConfirm={processPOAction}
       />
       <POStatusModal
         opened={modals.shipModalOpened}
         purchaseOrder={selectedPO}
         mode="ship"
-        onClose={handleCloseShipModal}
+        onClose={handleCloseModal('ship')}
         onConfirm={shipPOAction}
       />
       <POStatusModal
         opened={modals.deliverModalOpened}
         purchaseOrder={selectedPO}
         mode="deliver"
-        onClose={handleCloseDeliverModal}
+        onClose={handleCloseModal('deliver')}
         onConfirm={deliverPOAction}
       />
       <POStatusModal
         opened={modals.cancelModalOpened}
         purchaseOrder={selectedPO}
         mode="cancel"
-        onClose={handleCloseCancelModal}
+        onClose={handleCloseModal('cancel')}
         onConfirm={cancelPOAction}
       />
       <POStatusModal
         opened={modals.refundModalOpened}
         purchaseOrder={selectedPO}
         mode="refund"
-        onClose={handleCloseRefundModal}
+        onClose={handleCloseModal('refund')}
         onConfirm={refundPOAction}
       />
     </>
@@ -292,29 +291,27 @@ export function PODetailPage() {
   return (
     <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
       <AppPageTitle title={title} />
+
       {isLoading ? (
-        <Stack gap="md">
-          <PODetailTabsSkeleton />
-        </Stack>
+        <PODetailTabsSkeleton />
       ) : purchaseOrder ? (
-        <Stack gap="md">
-          <POErrorBoundary componentName="PODetailTabs">
-            <PODetailTabs
-              purchaseOrder={purchaseOrder}
-              isLoading={isLoading}
-              onEdit={handleEdit}
-              onConfirm={handleConfirm}
-              onProcess={handleProcess}
-              onShip={handleShip}
-              onDeliver={handleDeliver}
-              onCancel={handleCancel}
-              onRefund={handleRefund}
-            />
-          </POErrorBoundary>
-        </Stack>
+        <POErrorBoundary componentName="PODetailTabs">
+          <PODetailTabs
+            purchaseOrder={purchaseOrder}
+            isLoading={isLoading}
+            onEdit={handleEdit}
+            onConfirm={handleConfirm}
+            onProcess={handleProcess}
+            onShip={handleShip}
+            onDeliver={handleDeliver}
+            onCancel={handleCancel}
+            onRefund={handleRefund}
+          />
+        </POErrorBoundary>
       ) : (
         <ResourceNotFound message={t('po.notFound')} />
       )}
+
       {modalComponents}
     </AppDesktopLayout>
   );

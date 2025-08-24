@@ -8,7 +8,6 @@ import {
   Stack,
   Alert,
   Textarea,
-  NumberInput,
   TextInput,
 } from '@mantine/core';
 import {
@@ -24,8 +23,9 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { DRAWER_BODY_PADDING_BOTTOM, DRAWER_HEADER_PADDING } from '@/constants/po.constants';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { formatCurrency } from '@/utils/number';
 import { formatDate } from '@/utils/time';
+import { getCustomerNameByCustomerId } from '@/utils/overview';
+import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 
 export type POModalMode = 'confirm' | 'cancel' | 'process' | 'ship' | 'deliver' | 'refund';
 
@@ -113,11 +113,10 @@ export function POStatusModal({
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
   const [reason, setReason] = useState('');
-  const [refundAmount, setRefundAmount] = useState<number | undefined>(undefined);
   const [deliveryNotes, setDeliveryNotes] = useState('');
   const [trackingNumber, setTrackingNumber] = useState('');
   const [carrier, setCarrier] = useState('');
-
+  const customerMapByCustomerId = useCustomerMapByCustomerId();
   // Get modal configuration - memoized
   const config = useMemo(() => getModalConfig(mode, t), [mode, t]);
 
@@ -128,7 +127,6 @@ export function POStatusModal({
     if (mode === 'refund') {
       data = {
         refundReason: reason.trim(),
-        refundAmount: refundAmount || purchaseOrder.totalAmount,
       };
     } else if (mode === 'cancel') {
       data = { cancelReason: reason.trim() };
@@ -143,7 +141,6 @@ export function POStatusModal({
 
   const handleClose = () => {
     setReason('');
-    setRefundAmount(undefined);
     setDeliveryNotes('');
     setTrackingNumber('');
     setCarrier('');
@@ -176,10 +173,8 @@ export function POStatusModal({
           {t('po.poNumber')}: {purchaseOrder.poNumber}
         </Text>
         <Text size="sm" c="dimmed">
-          {t('po.customer')}: {purchaseOrder.customer?.name}
-        </Text>
-        <Text size="sm" c="dimmed">
-          {t('po.totalAmount')}: {formatCurrency(purchaseOrder.totalAmount)}
+          {t('po.customer')}:{' '}
+          {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
         </Text>
         <Text size="sm" c="dimmed">
           {t('po.items')}: {purchaseOrder.items.length} {t('po.itemsCount')}
@@ -195,30 +190,14 @@ export function POStatusModal({
       </div>
 
       {mode === 'refund' && (
-        <>
-          <NumberInput
-            label={t('po.refundAmount')}
-            step={1000}
-            placeholder={t('po.enterRefundAmount')}
-            value={refundAmount}
-            onChange={(value) => setRefundAmount(typeof value === 'number' ? value : undefined)}
-            min={0}
-            max={purchaseOrder.totalAmount}
-            decimalScale={2}
-            prefix="$"
-            thousandSeparator=","
-            defaultValue={purchaseOrder.totalAmount}
-            description={`${t('po.maxRefundAmount')}: ${formatCurrency(purchaseOrder.totalAmount)}`}
-          />
-          <Textarea
-            label={t('po.refundReason')}
-            placeholder={t('po.enterRefundReason')}
-            value={reason}
-            onChange={(event) => setReason(event.currentTarget.value)}
-            rows={3}
-            required
-          />
-        </>
+        <Textarea
+          label={t('po.refundReason')}
+          placeholder={t('po.enterRefundReason')}
+          value={reason}
+          onChange={(event) => setReason(event.currentTarget.value)}
+          rows={3}
+          required
+        />
       )}
       {mode === 'cancel' && (
         <Textarea

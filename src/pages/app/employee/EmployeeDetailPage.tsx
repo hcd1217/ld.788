@@ -36,7 +36,7 @@ export function EmployeeDetailPage() {
   );
 
   const handleEdit = () => {
-    if (employee) {
+    if (employee && employee.isActive) {
       navigate(getEmployeeEditRoute(employee.id));
     }
   };

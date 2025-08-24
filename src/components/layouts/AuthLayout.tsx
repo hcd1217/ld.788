@@ -15,8 +15,8 @@ export function AuthLayout() {
 
   // Check if user profile is loading
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
-  const userProfile = useAppStore((state) => state.userProfile);
-  const isProfileLoading = isAuthenticated && !userProfile;
+  const user = useAppStore((state) => state.user);
+  const isProfileLoading = isAuthenticated && !user;
 
   if (isMobile) {
     return <Outlet />;

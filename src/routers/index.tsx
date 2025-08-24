@@ -17,6 +17,8 @@ import { authRouteObjects } from './auth';
 import { adminRouteObjects } from './admin';
 import { configRouteObjects } from './config';
 import { salesRouteObjects } from './sales';
+import { procurementRouteObjects } from './procurement';
+import { deliveryRouteObjects } from './delivery';
 import { appRouteObjects } from './app';
 import { userRouteObjects } from './user';
 import { storeRouteObjects } from './store';
@@ -76,6 +78,8 @@ export const routeObjects: ThemeRouteObject[] = [
       ...configRouteObjects,
       ...managementRouteObjects,
       ...salesRouteObjects,
+      ...procurementRouteObjects,
+      ...deliveryRouteObjects,
     ],
   },
   // Old APP routes (with ResponsiveAuthLayout) - elegant theme

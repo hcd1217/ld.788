@@ -24,6 +24,7 @@ export const trueBooleanSchema = z
   .optional()
   .transform(() => true);
 export const numberSchema = z.number();
+export const optionalNumberSchema = z.number().optional();
 export const stringSchema = z.string();
 export const idSchema = z.string();
 export const emailSchema = z.email();

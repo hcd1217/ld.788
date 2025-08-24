@@ -1,6 +1,6 @@
 import { salesApi } from '@/lib/api';
 import {
-  type PurchaseOrder,
+  type PurchaseOrder as ApiPurchaseOrder,
   type CreatePurchaseOrderRequest,
   type UpdatePurchaseOrderRequest,
   type UpdatePOStatusRequest,
@@ -14,11 +14,53 @@ export type {
   POStatus,
   POItem,
   Address,
-  PurchaseOrder,
   UpdatePOStatusRequest,
 } from '@/lib/api/schemas/sales.schemas';
 
+export type PurchaseOrder = Omit<ApiPurchaseOrder, 'metadata'> & {
+  address?: string;
+  googleMapsUrl?: string;
+  createdBy?: string;
+  createdAt?: Date;
+  confirmedBy?: string;
+  confirmedAt?: Date;
+  processedBy?: string;
+  processedAt?: Date;
+  shippedBy?: string;
+  shippedAt?: Date;
+  deliveredBy?: string;
+  deliveredAt?: Date;
+  cancelledBy?: string;
+  cancelledAt?: Date;
+  refundedBy?: string;
+  refundedAt?: Date;
+};
+
 export type { Customer } from './customer';
+
+/**
+ * Transform API PurchaseOrder to Frontend PurchaseOrder
+ */
+function transformApiToFrontend(apiPO: ApiPurchaseOrder): Omit<PurchaseOrder, 'customer'> {
+  const { metadata, ...rest } = apiPO;
+  const statusHistory = metadata?.statusHistory || [];
+  const statusHistoryMap = new Map(statusHistory.map((status) => [status.status, status]));
+  return {
+    ...rest,
+    customerId: apiPO.customerId,
+    address: metadata?.shippingAddress?.oneLineAddress,
+    googleMapsUrl: metadata?.shippingAddress?.googleMapsUrl,
+    createdBy: statusHistoryMap.get('NEW')?.userId,
+    createdAt: statusHistoryMap.get('NEW')?.timestamp || rest.createdAt,
+    confirmedBy: statusHistoryMap.get('CONFIRMED')?.userId,
+    confirmedAt: statusHistoryMap.get('CONFIRMED')?.timestamp,
+    processedBy: statusHistoryMap.get('PROCESSING')?.userId,
+    processedAt: statusHistoryMap.get('PROCESSING')?.timestamp,
+    shippedBy: statusHistoryMap.get('SHIPPED')?.userId,
+    shippedAt: statusHistoryMap.get('SHIPPED')?.timestamp,
+    deliveredBy: statusHistoryMap.get('DELIVERED')?.userId,
+  };
+}
 
 /**
  * Simple retry helper for critical operations only
@@ -140,31 +182,14 @@ export const purchaseOrderService = {
 
   async getAllPOs(): Promise<PurchaseOrder[]> {
     const response = await salesApi.getPurchaseOrders();
-    const purchaseOrders = response.purchaseOrders;
-
-    // Fetch customers and attach to POs
-    const customers = await customerService.getAllCustomers();
-    const customerMap = new Map(customers.map((c) => [c.id, c]));
-
-    // Update the customer cache for future use
-    this.updateCustomerCache(customers);
-
-    return purchaseOrders.map((po) => ({
-      ...po,
-      customer: customerMap.get(po.customerId),
-    }));
+    return response.purchaseOrders.map(transformApiToFrontend);
   },
 
   async getPOById(id: string): Promise<PurchaseOrder | undefined> {
     try {
       const po = await salesApi.getPurchaseOrderById(id);
       if (po) {
-        // Attach customer data using cache
-        const customer = await this.getCustomerWithCache(po.customerId);
-        return {
-          ...po,
-          customer,
-        };
+        return transformApiToFrontend(po);
       }
       return undefined;
     } catch (error) {
@@ -178,49 +203,43 @@ export const purchaseOrderService = {
   },
 
   async createPO(
-    data: Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt'>,
+    data: Omit<CreatePurchaseOrderRequest, 'orderDate' | 'deliveryDate' | 'completedDate'> & {
+      address?: string;
+      googleMapsUrl?: string;
+      orderDate?: Date;
+      deliveryDate?: Date;
+    },
     enableRetry: boolean = false,
-  ): Promise<PurchaseOrder> {
+  ): Promise<void> {
     const createRequest: CreatePurchaseOrderRequest = {
       customerId: data.customerId,
-      orderDate:
-        data.orderDate instanceof Date ? data.orderDate.toISOString() : String(data.orderDate),
+      orderDate: data.orderDate ? data.orderDate.toISOString() : new Date().toISOString(),
+      deliveryDate: data.deliveryDate ? data.deliveryDate.toISOString() : undefined,
       items: data.items.map((item) => ({
         productCode: item.productCode,
         description: item.description,
         color: item.color,
         quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        discount: item.discount,
         category: item.category,
-        metadata: item.metadata,
       })),
-      shippingAddress: data.shippingAddress,
-      billingAddress: data.billingAddress,
-      paymentTerms: data.paymentTerms,
       notes: data.notes,
-      metadata: data.metadata,
+      metadata: {
+        shippingAddress: {
+          oneLineAddress: data.address,
+          googleMapsUrl: data.googleMapsUrl,
+        },
+      },
     };
 
     // Only critical operations get retry capability
-    const newPO = await retryOnServerError(
-      () => salesApi.createPurchaseOrder(createRequest),
-      enableRetry,
-    );
-
-    // Attach customer data using cache
-    const customer = await this.getCustomerWithCache(newPO.customerId);
-    return {
-      ...newPO,
-      customer,
-    };
+    await retryOnServerError(() => salesApi.createPurchaseOrder(createRequest), enableRetry);
   },
 
   async updatePO(
     id: string,
     data: Partial<PurchaseOrder>,
     enableRetry: boolean = false,
-  ): Promise<PurchaseOrder> {
+  ): Promise<void> {
     const updateRequest: UpdatePurchaseOrderRequest = {
       status: data.status,
       items: data.items,
@@ -242,81 +261,45 @@ export const purchaseOrderService = {
           : data.completedDate
             ? String(data.completedDate)
             : undefined,
-      shippingAddress: data.shippingAddress,
-      billingAddress: data.billingAddress,
-      paymentTerms: data.paymentTerms,
       notes: data.notes,
-      metadata: data.metadata,
+      metadata:
+        data.address || data.googleMapsUrl
+          ? {
+              shippingAddress: {
+                oneLineAddress: data.address,
+                googleMapsUrl: data.googleMapsUrl,
+              },
+            }
+          : undefined,
     };
 
     // Only critical operations get retry capability
-    const updatedPO = await retryOnServerError(
-      () => salesApi.updatePurchaseOrder(id, updateRequest),
-      enableRetry,
-    );
-
-    // Attach customer data using cache
-    const customer = await this.getCustomerWithCache(updatedPO.customerId);
-    return {
-      ...updatedPO,
-      customer,
-    };
+    await retryOnServerError(() => salesApi.updatePurchaseOrder(id, updateRequest), enableRetry);
   },
 
-  async confirmPO(id: string): Promise<PurchaseOrder> {
-    const updatedPO = await salesApi.confirmPurchaseOrder(id);
-    const customer = await this.getCustomerWithCache(updatedPO.customerId);
-    return {
-      ...updatedPO,
-      customer,
-    };
+  async confirmPO(id: string): Promise<void> {
+    await salesApi.confirmPurchaseOrder(id);
   },
 
-  async processPO(id: string): Promise<PurchaseOrder> {
-    const updatedPO = await salesApi.processPurchaseOrder(id);
-    const customer = await this.getCustomerWithCache(updatedPO.customerId);
-    return {
-      ...updatedPO,
-      customer,
-    };
+  async processPO(id: string): Promise<void> {
+    await salesApi.processPurchaseOrder(id);
   },
 
-  async shipPO(id: string, data?: UpdatePOStatusRequest): Promise<PurchaseOrder> {
-    const updatedPO = await salesApi.shipPurchaseOrder(id, data);
-    const customer = await this.getCustomerWithCache(updatedPO.customerId);
-    return {
-      ...updatedPO,
-      customer,
-    };
+  async shipPO(id: string, data?: UpdatePOStatusRequest): Promise<void> {
+    await salesApi.shipPurchaseOrder(id, data);
   },
 
-  async deliverPO(id: string): Promise<PurchaseOrder> {
-    const updatedPO = await salesApi.deliverPurchaseOrder(id);
-    const customer = await this.getCustomerWithCache(updatedPO.customerId);
-    return {
-      ...updatedPO,
-      customer,
-    };
+  async deliverPO(id: string): Promise<void> {
+    await salesApi.deliverPurchaseOrder(id);
   },
 
-  async cancelPO(id: string, data?: UpdatePOStatusRequest): Promise<PurchaseOrder> {
-    const updatedPO = await salesApi.cancelPurchaseOrder(id, data);
-    const customer = await this.getCustomerWithCache(updatedPO.customerId);
-    return {
-      ...updatedPO,
-      customer,
-    };
+  async cancelPO(id: string, data?: UpdatePOStatusRequest): Promise<void> {
+    await salesApi.cancelPurchaseOrder(id, data);
   },
 
-  async refundPO(
-    id: string,
-    data?: { refundReason?: string; refundAmount?: number },
-  ): Promise<PurchaseOrder> {
-    const updatedPO = await salesApi.refundPurchaseOrder(id, data);
-    const customer = await this.getCustomerWithCache(updatedPO.customerId);
-    return {
-      ...updatedPO,
-      customer,
-    };
+  async refundPO(id: string, data?: { refundReason?: string }): Promise<void> {
+    await salesApi.refundPurchaseOrder(id, {
+      refundReason: data?.refundReason,
+    });
   },
 };

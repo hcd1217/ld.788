@@ -1,4 +1,7 @@
 # Local only
+bruno/
+swagger-modules/
+swagger-chunks/
 swagger-*.json
 scripts/i18n-cleanup-report.json
 scripts/i18n-analysis-report.json

@@ -1,8 +1,8 @@
-import { Alert } from '@mantine/core';
+import { Alert, Transition } from '@mantine/core';
 import { IconAlertTriangle } from '@tabler/icons-react';
 
 type ErrorAlertProps = {
-  readonly error?: string;
+  readonly error?: string | null | undefined;
   readonly clearError?: () => void;
 };
 export function ErrorAlert({ error, clearError }: ErrorAlertProps) {
@@ -11,14 +11,19 @@ export function ErrorAlert({ error, clearError }: ErrorAlertProps) {
   }
 
   return (
-    <Alert
-      withCloseButton
-      icon={<IconAlertTriangle size={16} />}
-      color="red"
-      variant="light"
-      onClose={clearError}
-    >
-      {error}
-    </Alert>
+    <Transition mounted={Boolean(error)} transition="fade">
+      {(styles) => (
+        <Alert
+          withCloseButton={Boolean(clearError)}
+          style={styles}
+          icon={<IconAlertTriangle size={16} />}
+          color="red"
+          variant="light"
+          onClose={clearError}
+        >
+          {error}
+        </Alert>
+      )}
+    </Transition>
   );
 }

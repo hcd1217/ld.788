@@ -1,10 +1,12 @@
 export type { BaseMobileFooterItem, BaseMobileFooterProps } from './BaseMobileFooter';
+export type { BulkImportModalContentProps } from './BulkImportModal';
 export { ActionIcons } from './ActionIcons';
 export { ActiveBadge } from './ActiveBadge';
 export { AppPageTitle } from './AppPageTitle';
 export { BaseMobileFooter } from './BaseMobileFooter';
 export { BlankContainer } from './BlankContainer';
 export { BlankState } from './BlankState';
+export { BulkImportModalContent } from './BulkImportModal';
 export { ComingSoonCard } from './ComingSoonCard';
 export { CommonMobileFooter } from './CommonMobileFooter';
 export { CommonMobileFooterSkeleton } from './CommonMobileFooterSkeleton';

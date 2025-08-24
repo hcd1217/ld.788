@@ -1,38 +1,32 @@
 import { salesApi } from '@/lib/api';
-import { type Product, type ProductStatus } from '@/lib/api/schemas/sales.schemas';
+import {
+  type Product,
+  type ProductStatus,
+  type CreateProductRequest,
+  type UpdateProductRequest,
+  type BulkUpsertProductsRequest,
+  type BulkUpsertProductsResponse,
+} from '@/lib/api/schemas/sales.schemas';
 import { logError } from '@/utils/logger';
 
 // Re-export Product types for compatibility
-export type { Product, ProductStatus } from '@/lib/api/schemas/sales.schemas';
+export type {
+  Product,
+  ProductStatus,
+  CreateProductRequest,
+  UpdateProductRequest,
+  BulkUpsertProductsRequest,
+  BulkUpsertProductsResponse,
+} from '@/lib/api/schemas/sales.schemas';
 
-export type CreateProductRequest = {
+// Legacy type for backward compatibility with Excel import
+export type BulkUpsertProductItem = {
   productCode: string;
   name: string;
   description?: string;
   category?: string;
   color?: string;
-  unitPrice: number;
-  costPrice?: number;
   status?: ProductStatus;
-  stockLevel?: number;
-  minStock?: number;
-  maxStock?: number;
-  unit?: string;
-  sku?: string;
-  barcode?: string;
-};
-
-export type UpdateProductRequest = {
-  name?: string;
-  description?: string;
-  category?: string;
-  color?: string;
-  unitPrice?: number;
-  costPrice?: number;
-  status?: ProductStatus;
-  stockLevel?: number;
-  minStock?: number;
-  maxStock?: number;
   unit?: string;
   sku?: string;
   barcode?: string;
@@ -45,8 +39,6 @@ export const productService = {
     search?: string;
     category?: string;
     status?: ProductStatus;
-    minPrice?: number;
-    maxPrice?: number;
     lowStock?: boolean;
   }): Promise<Product[]> {
     const response = await salesApi.getProducts({
@@ -100,5 +92,9 @@ export const productService = {
 
   async deleteProduct(id: string): Promise<void> {
     await salesApi.deleteProduct(id);
+  },
+
+  async bulkUpsertProducts(data: BulkUpsertProductsRequest): Promise<BulkUpsertProductsResponse> {
+    return salesApi.bulkUpsertProducts(data);
   },
 };

@@ -7,14 +7,8 @@ import {
   type ResetPasswordResponse,
 } from '@/lib/api';
 import { logError } from '@/utils/logger';
-import { decodeJWT, isTokenExpired } from '@/utils/jwt';
+import { isTokenExpired } from '@/utils/jwt';
 import { delay } from '@/utils/time';
-
-export type User = {
-  id: string;
-  email: string;
-  isRoot?: boolean;
-};
 
 export const authService = {
   async loginWithMagicToken(clientCode: string, token: string) {
@@ -23,7 +17,10 @@ export const authService = {
       const response = await authApi.verifyMagicLink({
         token,
       });
-      return await resolveAuthResponse(response);
+      saveTokens({
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      });
     } catch (error) {
       logError('Login failed', error, {
         module: 'AuthService',
@@ -34,11 +31,14 @@ export const authService = {
     }
   },
 
-  async login(credentials: LoginRequest): Promise<{ user: User }> {
+  async login(credentials: LoginRequest): Promise<void> {
     try {
       saveClientCode(credentials.clientCode);
       const response = await authApi.login(credentials);
-      return await resolveAuthResponse(response);
+      saveTokens({
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      });
     } catch (error) {
       logError('Login failed', error, {
         module: 'AuthService',
@@ -54,7 +54,7 @@ export const authService = {
   },
 
   getAccessToken() {
-    return localStorage.getItem('accessToken') ?? undefined;
+    return sessionStorage.getItem('accessToken') ?? undefined;
   },
 
   getRefreshToken() {
@@ -63,6 +63,11 @@ export const authService = {
 
   getClientCode() {
     return localStorage.getItem('clientCode') ?? undefined;
+  },
+
+  hasValidToken() {
+    const token = this.getAccessToken();
+    return Boolean(token && !isTokenExpired(token));
   },
 
   async isAuthenticated() {
@@ -90,24 +95,6 @@ export const authService = {
     }
 
     return true;
-  },
-
-  getCurrentUser(): User | undefined {
-    const token = this.getAccessToken();
-    if (!token) {
-      return undefined;
-    }
-
-    const payload = decodeJWT(token);
-    if (!payload) {
-      return undefined;
-    }
-
-    return {
-      id: payload.sub,
-      email: payload.email,
-      isRoot: payload.isRoot,
-    };
   },
 
   async forgotPassword(data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
@@ -143,32 +130,11 @@ function saveClientCode(clientCode: string) {
 }
 
 function saveTokens({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) {
-  localStorage.setItem('accessToken', accessToken);
+  sessionStorage.setItem('accessToken', accessToken);
   localStorage.setItem('refreshToken', refreshToken);
 }
 
 function clearTokens() {
-  localStorage.removeItem('accessToken');
+  sessionStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
-}
-
-async function resolveAuthResponse(response: { accessToken: string; refreshToken: string }) {
-  saveTokens({
-    accessToken: response.accessToken,
-    refreshToken: response.refreshToken,
-  });
-
-  // Extract user info from JWT
-  const payload = decodeJWT(response.accessToken);
-  if (!payload) {
-    throw new Error('Invalid token received');
-  }
-
-  const user: User = {
-    id: payload.sub,
-    email: payload.email,
-    isRoot: payload.isRoot,
-  };
-
-  return { user };
 }

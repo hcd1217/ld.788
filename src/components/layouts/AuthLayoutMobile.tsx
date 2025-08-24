@@ -9,8 +9,8 @@ import { useAppStore } from '@/stores/useAppStore';
 export function AuthLayoutMobile() {
   // Check if user profile is loading
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
-  const userProfile = useAppStore((state) => state.userProfile);
-  const isProfileLoading = isAuthenticated && !userProfile;
+  const user = useAppStore((state) => state.user);
+  const isProfileLoading = isAuthenticated && !user;
   return (
     <AppShell
       header={{ height: 60 }}

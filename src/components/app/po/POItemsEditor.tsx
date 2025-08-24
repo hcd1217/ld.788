@@ -1,516 +1,491 @@
-import {
-  memo,
-  useState,
-  useMemo,
-  useEffect,
-  useImperativeHandle,
-  forwardRef,
-  useCallback,
-} from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   Table,
   TextInput,
   NumberInput,
-  Select,
   ActionIcon,
+  Button,
+  Box,
+  Group,
   Stack,
+  Card,
+  Title,
   Text,
   Autocomplete,
 } from '@mantine/core';
-import { IconTrash, IconPlus } from '@tabler/icons-react';
+import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { POItemsEditorMobile } from './POItemsEditorMobile';
-import { formatCurrency } from '@/utils/number';
 import { showErrorNotification } from '@/utils/notifications';
-import { useProductList, usePOActions, usePOLoading } from '@/stores/usePOStore';
-import { createPOItem, calculateItemTotal } from '@/utils/poItemUtils';
-import { PRODUCT_CATEGORIES } from '@/constants/purchaseOrder';
-import type { POItem } from '@/services/sales/purchaseOrder';
+import type { POItem } from '@/lib/api/schemas/sales.schemas';
+import { usePOActions, useProductList } from '@/stores/usePOStore';
+import { createPOItem } from '@/utils/poItemUtils';
 
 type POItemsEditorProps = {
   readonly items: POItem[];
   readonly onChange: (items: POItem[]) => void;
-  readonly disabled?: boolean;
-  readonly onModalStateChange?: (isOpen: boolean) => void;
+  readonly isReadOnly?: boolean;
 };
 
-export type POItemsEditorRef = {
-  hasPendingItem: () => boolean;
-  getPendingItemDetails: () => Partial<POItem> | null;
-  buildPendingItem: () => POItem | null;
-  addPendingItem: () => POItem | null;
-  clearPendingItem: () => void;
-};
+export function POItemsEditor({ items, onChange, isReadOnly = false }: POItemsEditorProps) {
+  const { t } = useTranslation();
+  const { isMobile } = useDeviceType();
 
-const POItemsEditorDesktop = forwardRef<POItemsEditorRef, POItemsEditorProps>(
-  ({ items, onChange, disabled = false }, ref) => {
-    const { t } = useTranslation();
+  // Get products from store
+  const products = useProductList();
+  const { loadProducts } = usePOActions();
+  const [productSearch, setProductSearch] = useState('');
 
-    // Get products from store
-    const products = useProductList();
-    const isProductsLoading = usePOLoading();
-    const { loadProducts } = usePOActions();
-    const [productSearch, setProductSearch] = useState('');
+  const [newItem, setNewItem] = useState<Partial<POItem>>({
+    productCode: '',
+    description: '',
+    quantity: 1,
+    category: '',
+  });
 
-    const [newItem, setNewItem] = useState<Partial<POItem>>({
-      productCode: '',
-      description: '',
-      quantity: 1,
-      unitPrice: 0,
-      discount: 0,
-      category: '',
-    });
+  // Load products on mount if not already loaded
+  useEffect(() => {
+    if (products.length === 0) {
+      loadProducts();
+    }
+  }, [products.length, loadProducts]);
 
-    // Load products on mount if not already loaded
-    useEffect(() => {
-      if (products.length === 0) {
-        loadProducts();
-      }
-    }, [products.length, loadProducts]);
+  // Generate autocomplete data from products with search filter
+  const productOptions = useMemo(() => {
+    // For Mantine Autocomplete, we need to return an array of strings
+    // We'll create a map to look up products by their display label
+    return products.map((p) => `${p.productCode} - ${p.name}`);
+  }, [products]);
 
-    // Generate autocomplete data from products with search filter
-    const productOptions = useMemo(() => {
-      // For Mantine Autocomplete, we need to return an array of strings
-      // We'll create a map to look up products by their display label
-      return products.map((p) => `${p.productCode} - ${p.name}`);
-    }, [products]);
+  const handleAddItem = useCallback(() => {
+    const result = createPOItem(newItem, items);
 
-    const handleAddItem = useCallback(() => {
-      const result = createPOItem(newItem, items);
-
-      if (result.error) {
-        showErrorNotification(t('common.error'), result.error);
-        return null;
-      }
-
-      if (result.item) {
-        onChange([...items, result.item]);
-
-        // Reset form
-        setNewItem({
-          productCode: '',
-          description: '',
-          quantity: 1,
-          unitPrice: 0,
-          discount: 0,
-          category: '',
-        });
-        setProductSearch('');
-        return result.item;
-      }
-
+    if (result.error) {
+      showErrorNotification(t('common.error'), result.error);
       return null;
-    }, [items, newItem, onChange, t]);
+    }
 
-    const handleRemoveItem = useCallback(
-      (id: string) => {
-        onChange(items.filter((item) => item.id !== id));
-      },
-      [items, onChange],
-    );
+    if (result.item) {
+      onChange([...items, result.item]);
 
-    const handleUpdateItem = useCallback(
-      (id: string, field: keyof POItem, value: any) => {
-        const updatedItems = items.map((item) => {
+      // Reset form
+      setNewItem({
+        productCode: '',
+        description: '',
+        quantity: 1,
+        category: '',
+      });
+      setProductSearch('');
+      return result.item;
+    }
+
+    return null;
+  }, [items, newItem, onChange, t]);
+
+  const handleRemoveItem = useCallback(
+    (id: string) => {
+      onChange(items.filter((item) => item.id !== id));
+    },
+    [items, onChange],
+  );
+
+  const handleUpdateItem = useCallback(
+    (id: string, field: keyof POItem, value: string | number | undefined) => {
+      onChange(
+        items.map((item) => {
           if (item.id === id) {
             const updated = { ...item, [field]: value };
-
-            // Recalculate total if quantity, price, or discount changed
-            if (field === 'quantity' || field === 'unitPrice' || field === 'discount') {
-              const quantity = field === 'quantity' ? value : updated.quantity;
-              const unitPrice = field === 'unitPrice' ? value : updated.unitPrice;
-              const discount = field === 'discount' ? value || 0 : updated.discount || 0;
-              updated.totalPrice = calculateItemTotal(quantity, unitPrice, discount);
-            }
-
             return updated;
           }
           return item;
-        });
+        }),
+      );
+    },
+    [items, onChange],
+  );
 
-        onChange(updatedItems);
-      },
-      [items, onChange],
-    );
+  const handleQuantityChange = useCallback(
+    (id: string, value: string | number) => {
+      handleUpdateItem(id, 'quantity', value || 1);
+    },
+    [handleUpdateItem],
+  );
 
-    // Memoized handler creators for table row updates to prevent re-renders
-    const handleProductCodeChange = useCallback(
-      (id: string, value: string) => {
-        handleUpdateItem(id, 'productCode', value);
-      },
-      [handleUpdateItem],
-    );
+  const handleProductSelection = useCallback(
+    (itemId: string | 'new', value: string) => {
+      // Parse the selection to get product code
+      const productCode = value.split(' - ')[0];
+      const product = products.find((p) => p.productCode === productCode);
 
-    const handleDescriptionChange = useCallback(
-      (id: string, value: string) => {
-        handleUpdateItem(id, 'description', value);
-      },
-      [handleUpdateItem],
-    );
-
-    const handleCategoryChange = useCallback(
-      (id: string, value: string | null) => {
-        handleUpdateItem(id, 'category', value);
-      },
-      [handleUpdateItem],
-    );
-
-    const handleQuantityChange = useCallback(
-      (id: string, value: string | number) => {
-        handleUpdateItem(id, 'quantity', value || 0);
-      },
-      [handleUpdateItem],
-    );
-
-    const handleUnitPriceChange = useCallback(
-      (id: string, value: string | number) => {
-        handleUpdateItem(id, 'unitPrice', value || 0);
-      },
-      [handleUpdateItem],
-    );
-
-    const handleDiscountChange = useCallback(
-      (id: string, value: string | number) => {
-        handleUpdateItem(id, 'discount', value || 0);
-      },
-      [handleUpdateItem],
-    );
-
-    // Handle product selection from autocomplete dropdown
-    const handleProductSelection = useCallback(
-      (itemId: string, value: string) => {
-        // value is the selected option from dropdown (format: "CODE - Name")
-        const productCode = value.split(' - ')[0];
-        const product = products.find((p) => p.productCode === productCode);
-        if (product) {
-          // Update all fields at once
-          const updatedItems = items.map((currentItem) => {
-            if (currentItem.id === itemId) {
-              const quantity = currentItem.quantity;
-              const discount = currentItem.discount || 0;
-              const unitPrice = product.unitPrice;
-              const totalPrice = calculateItemTotal(quantity, unitPrice, discount);
-
-              return {
-                ...currentItem,
-                productCode: product.productCode,
-                description: product.name,
-                unitPrice: product.unitPrice,
-                category: product.category || currentItem.category,
-                totalPrice,
-              };
-            }
-            return currentItem;
-          });
-          onChange(updatedItems);
-        }
-      },
-      [items, products, onChange],
-    );
-
-    const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
-
-    // Helper to build a POItem from newItem without adding it
-    const buildItemFromNewItem = useCallback(() => {
-      const result = createPOItem(newItem, items);
-      return result.item;
-    }, [newItem, items]);
-
-    // Expose methods via ref
-    useImperativeHandle(
-      ref,
-      () => ({
-        hasPendingItem: () => {
-          return Boolean(
-            newItem.productCode ||
-              newItem.description ||
-              (newItem.quantity && newItem.quantity !== 1) ||
-              (newItem.unitPrice && newItem.unitPrice !== 0) ||
-              (newItem.discount && newItem.discount !== 0) ||
-              newItem.category,
-          );
-        },
-        getPendingItemDetails: () => {
-          if (
-            !newItem.productCode &&
-            !newItem.description &&
-            (!newItem.quantity || newItem.quantity === 1) &&
-            (!newItem.unitPrice || newItem.unitPrice === 0)
-          ) {
-            return null;
-          }
-          return newItem;
-        },
-        buildPendingItem: () => {
-          return buildItemFromNewItem();
-        },
-        addPendingItem: () => {
-          return handleAddItem();
-        },
-        clearPendingItem: () => {
+      if (product) {
+        if (itemId === 'new') {
           setNewItem({
-            productCode: '',
-            description: '',
-            quantity: 1,
-            unitPrice: 0,
-            discount: 0,
-            category: '',
+            ...newItem,
+            productCode: product.productCode,
+            description: product.name,
+            category: product.category || newItem.category || '',
           });
-          setProductSearch('');
-        },
-      }),
-      [newItem, handleAddItem, buildItemFromNewItem],
-    );
+        } else {
+          // Find current item to preserve quantity and other fields
+          const currentItem = items.find((i) => i.id === itemId);
+          if (currentItem) {
+            handleUpdateItem(itemId, 'productCode', product.productCode);
+            handleUpdateItem(itemId, 'description', product.name);
+            handleUpdateItem(itemId, 'category', product.category || currentItem.category);
+          }
+        }
+      }
+    },
+    [products, newItem, items, handleUpdateItem],
+  );
 
+  // Empty state
+  if (!isReadOnly && items.length === 0) {
     return (
-      <Stack gap="md">
-        <Table withTableBorder withColumnBorders aria-label={t('po.itemsTableAriaLabel')}>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th style={{ width: 150 }}>{t('po.productCode')}</Table.Th>
-              <Table.Th>{t('po.description')}</Table.Th>
-              <Table.Th style={{ width: 120 }}>{t('po.category')}</Table.Th>
-              <Table.Th style={{ width: 80 }}>{t('po.quantity')}</Table.Th>
-              <Table.Th style={{ width: 120 }}>{t('po.unitPrice')}</Table.Th>
-              <Table.Th style={{ width: 80 }}>{t('po.discount')}</Table.Th>
-              <Table.Th style={{ width: 120 }}>{t('po.total')}</Table.Th>
-              <Table.Th style={{ width: 60 }}></Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {items.map((item) => (
-              <Table.Tr key={item.id}>
-                <Table.Td>
-                  <Autocomplete
-                    size="xs"
-                    value={item.productCode}
-                    onChange={(value) => handleProductCodeChange(item.id, value)}
-                    onOptionSubmit={(value) => handleProductSelection(item.id, value)}
-                    data={productOptions}
-                    disabled={disabled || isProductsLoading}
-                    limit={10}
-                    placeholder={isProductsLoading ? t('common.downloading') : undefined}
-                  />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput
-                    size="xs"
-                    value={item.description}
-                    onChange={(e) => handleDescriptionChange(item.id, e.target.value)}
-                    disabled={disabled}
-                  />
-                </Table.Td>
-                <Table.Td>
-                  <Select
-                    size="xs"
-                    value={item.category || ''}
-                    onChange={(value) => handleCategoryChange(item.id, value)}
-                    data={PRODUCT_CATEGORIES}
-                    clearable
-                    disabled={disabled}
-                  />
-                </Table.Td>
-                <Table.Td>
-                  <NumberInput
-                    size="xs"
-                    value={item.quantity}
-                    onChange={(value) => handleQuantityChange(item.id, value)}
-                    min={1}
-                    disabled={disabled}
-                  />
-                </Table.Td>
-                <Table.Td>
-                  <NumberInput
-                    size="xs"
-                    value={item.unitPrice}
-                    step={1000}
-                    onChange={(value) => handleUnitPriceChange(item.id, value)}
-                    min={0}
-                    thousandSeparator=","
-                    disabled={disabled}
-                  />
-                </Table.Td>
-                <Table.Td>
-                  <NumberInput
-                    size="xs"
-                    value={item.discount || 0}
-                    onChange={(value) => handleDiscountChange(item.id, value)}
-                    min={0}
-                    max={100}
-                    suffix="%"
-                    disabled={disabled}
-                  />
-                </Table.Td>
-                <Table.Td>
-                  <Text size="sm" ta="right">
-                    {formatCurrency(item.totalPrice)}
-                  </Text>
-                </Table.Td>
-                <Table.Td>
-                  <ActionIcon
-                    color="red"
-                    variant="subtle"
-                    size="sm"
-                    onClick={() => handleRemoveItem(item.id)}
-                    disabled={disabled}
-                    aria-label={t('common.delete')}
-                  >
-                    <IconTrash size={16} />
-                  </ActionIcon>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-
-            {/* Add new item row */}
-            <Table.Tr>
-              <Table.Td>
-                <Autocomplete
-                  size="xs"
-                  placeholder={isProductsLoading ? t('common.downloading') : t('po.enterCode')}
-                  value={productSearch}
-                  onChange={(value) => {
-                    setProductSearch(value);
-                    // Only update productCode if no product is selected from dropdown
-                    // The auto-fill happens in onOptionSubmit
-                    if (!value.includes(' - ')) {
-                      setNewItem({ ...newItem, productCode: value });
-                    }
-                  }}
-                  onOptionSubmit={(value) => {
-                    // value is the selected option from dropdown (format: "CODE - Name")
-                    const productCode = value.split(' - ')[0];
-                    const product = products.find((p) => p.productCode === productCode);
-                    if (product) {
-                      // Update all fields at once for new item
-                      setNewItem({
-                        ...newItem,
-                        productCode: product.productCode,
-                        description: product.name,
-                        unitPrice: product.unitPrice,
-                        category: product.category || newItem.category || '',
-                      });
-                      setProductSearch(product.productCode);
-                    }
-                  }}
-                  data={productOptions}
-                  disabled={disabled || isProductsLoading}
-                  limit={10}
-                />
-              </Table.Td>
-              <Table.Td>
-                <TextInput
-                  size="xs"
-                  placeholder={t('po.enterDescription')}
-                  value={newItem.description || ''}
-                  onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                  disabled={disabled}
-                />
-              </Table.Td>
-              <Table.Td>
-                <Select
-                  size="xs"
-                  placeholder={t('po.selectCategory')}
-                  value={newItem.category || ''}
-                  onChange={(value) => setNewItem({ ...newItem, category: value || '' })}
-                  data={PRODUCT_CATEGORIES}
-                  clearable
-                  disabled={disabled}
-                />
-              </Table.Td>
-              <Table.Td>
-                <NumberInput
-                  size="xs"
-                  value={newItem.quantity || 1}
-                  onChange={(value) =>
-                    setNewItem({ ...newItem, quantity: typeof value === 'number' ? value : 1 })
-                  }
-                  min={1}
-                  disabled={disabled}
-                />
-              </Table.Td>
-              <Table.Td>
-                <NumberInput
-                  size="xs"
-                  value={newItem.unitPrice || 0}
-                  step={1000}
-                  onChange={(value) =>
-                    setNewItem({ ...newItem, unitPrice: typeof value === 'number' ? value : 0 })
-                  }
-                  min={0}
-                  thousandSeparator=","
-                  disabled={disabled}
-                />
-              </Table.Td>
-              <Table.Td>
-                <NumberInput
-                  size="xs"
-                  value={newItem.discount || 0}
-                  onChange={(value) =>
-                    setNewItem({ ...newItem, discount: typeof value === 'number' ? value : 0 })
-                  }
-                  min={0}
-                  max={100}
-                  suffix="%"
-                  disabled={disabled}
-                />
-              </Table.Td>
-              <Table.Td>
-                <Text size="sm" ta="right">
-                  {formatCurrency(
-                    (newItem.quantity || 0) *
-                      (newItem.unitPrice || 0) *
-                      (1 - (newItem.discount || 0) / 100),
-                  )}
-                </Text>
-              </Table.Td>
-              <Table.Td>
-                <ActionIcon
-                  color="green"
-                  variant="subtle"
-                  size="sm"
-                  onClick={handleAddItem}
-                  disabled={disabled || !newItem.productCode || !newItem.description}
-                  aria-label={t('common.add')}
-                >
-                  <IconPlus size={16} />
-                </ActionIcon>
-              </Table.Td>
-            </Table.Tr>
-          </Table.Tbody>
-          <Table.Tfoot>
-            <Table.Tr>
-              <Table.Td colSpan={6} ta="right">
-                <Text fw={600}>{t('po.subtotal')}:</Text>
-              </Table.Td>
-              <Table.Td>
-                <Text fw={600} ta="right">
-                  {formatCurrency(subtotal)}
-                </Text>
-              </Table.Td>
-              <Table.Td></Table.Td>
-            </Table.Tr>
-          </Table.Tfoot>
-        </Table>
-      </Stack>
+      <Card shadow="sm" padding="xl" radius="md">
+        <Stack gap="lg">
+          <Title order={3}>{t('po.orderItems')}</Title>
+          <Text c="dimmed" ta="center" py="xl">
+            {t('po.noItemsMessage')}
+          </Text>
+          {/* Add first item form */}
+          <Box>
+            <Text size="sm" fw={500} mb="sm">
+              {t('po.addFirstItem')}
+            </Text>
+            <Stack gap="sm">
+              <Autocomplete
+                placeholder={t('po.searchProduct')}
+                data={productOptions}
+                value={productSearch}
+                onChange={(value) => {
+                  setProductSearch(value);
+                  handleProductSelection('new', value);
+                }}
+                limit={10}
+              />
+              <TextInput
+                placeholder={t('po.description')}
+                value={newItem.description || ''}
+                onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+              />
+              <NumberInput
+                placeholder={t('po.quantity')}
+                value={newItem.quantity || 1}
+                min={1}
+                onChange={(value) =>
+                  setNewItem({ ...newItem, quantity: typeof value === 'number' ? value : 1 })
+                }
+              />
+              <Button
+                leftSection={<IconPlus size={16} />}
+                onClick={handleAddItem}
+                disabled={
+                  !newItem.productCode ||
+                  !newItem.description ||
+                  !newItem.quantity ||
+                  newItem.quantity <= 0
+                }
+              >
+                {t('po.addItem')}
+              </Button>
+            </Stack>
+          </Box>
+        </Stack>
+      </Card>
     );
-  },
-);
-
-POItemsEditorDesktop.displayName = 'POItemsEditorDesktop';
-
-const POItemsEditorComponent = forwardRef<POItemsEditorRef, POItemsEditorProps>((props, ref) => {
-  const { isMobile } = useDeviceType();
-
-  if (isMobile) {
-    return <POItemsEditorMobile ref={ref} {...props} />;
   }
 
-  // Desktop doesn't need modal state change callback
-  const { onModalStateChange, ...desktopProps } = props;
-  return <POItemsEditorDesktop ref={ref} {...desktopProps} />;
-});
+  // Mobile layout with cards
+  if (isMobile) {
+    return (
+      <Card shadow="sm" padding="xl" radius="md">
+        <Stack gap="lg">
+          <Title order={3}>{t('po.orderItems')}</Title>
 
-POItemsEditorComponent.displayName = 'POItemsEditor';
+          {/* Existing items as cards */}
+          <Stack gap="md">
+            {items.map((item) => (
+              <Card key={item.id} withBorder padding="md" radius="md">
+                <Stack gap="sm">
+                  <Group justify="space-between" align="flex-start">
+                    <Text size="sm" fw={500}>
+                      #{item.id.slice(-4)}
+                    </Text>
+                    {!isReadOnly && (
+                      <ActionIcon
+                        color="red"
+                        variant="subtle"
+                        size="sm"
+                        onClick={() => handleRemoveItem(item.id)}
+                        aria-label={t('common.delete')}
+                      >
+                        <IconTrash size={14} />
+                      </ActionIcon>
+                    )}
+                  </Group>
 
-export const POItemsEditor = memo(POItemsEditorComponent);
+                  {/* Product Code */}
+                  <Box>
+                    <Text size="xs" c="dimmed" mb={4}>
+                      {t('po.productCode')}
+                    </Text>
+                    {isReadOnly ? (
+                      <Text size="sm">{item.productCode}</Text>
+                    ) : (
+                      <Autocomplete
+                        data={productOptions}
+                        value={`${item.productCode} - ${item.description}`}
+                        onChange={(value) => handleProductSelection(item.id, value)}
+                        size="sm"
+                        limit={5}
+                      />
+                    )}
+                  </Box>
+
+                  {/* Description */}
+                  <Box>
+                    <Text size="xs" c="dimmed" mb={4}>
+                      {t('po.description')}
+                    </Text>
+                    {isReadOnly ? (
+                      <Text size="sm">{item.description}</Text>
+                    ) : (
+                      <TextInput
+                        value={item.description}
+                        onChange={(e) => handleUpdateItem(item.id, 'description', e.target.value)}
+                        size="sm"
+                      />
+                    )}
+                  </Box>
+
+                  {/* Quantity */}
+                  <Box>
+                    <Text size="xs" c="dimmed" mb={4}>
+                      {t('po.quantity')}
+                    </Text>
+                    {isReadOnly ? (
+                      <Text size="sm">{item.quantity}</Text>
+                    ) : (
+                      <NumberInput
+                        value={item.quantity}
+                        min={1}
+                        onChange={(value) => handleQuantityChange(item.id, value)}
+                        size="sm"
+                        style={{ maxWidth: 120 }}
+                      />
+                    )}
+                  </Box>
+                </Stack>
+              </Card>
+            ))}
+          </Stack>
+
+          {/* Add new item form */}
+          {!isReadOnly && (
+            <Card
+              withBorder
+              padding="md"
+              radius="md"
+              style={{ backgroundColor: 'var(--mantine-color-gray-0)' }}
+            >
+              <Stack gap="sm">
+                <Text size="sm" fw={500} c="blue">
+                  {t('po.addItem')}
+                </Text>
+
+                <Box>
+                  <Text size="xs" c="dimmed" mb={4}>
+                    {t('po.searchProduct')}
+                  </Text>
+                  <Autocomplete
+                    placeholder={t('po.searchProduct')}
+                    data={productOptions}
+                    value={productSearch}
+                    onChange={(value) => {
+                      setProductSearch(value);
+                      handleProductSelection('new', value);
+                    }}
+                    size="sm"
+                    limit={5}
+                  />
+                </Box>
+
+                <Box>
+                  <Text size="xs" c="dimmed" mb={4}>
+                    {t('po.description')}
+                  </Text>
+                  <TextInput
+                    placeholder={t('po.description')}
+                    value={newItem.description || ''}
+                    onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                    size="sm"
+                  />
+                </Box>
+
+                <Group>
+                  <Box style={{ flex: 1 }}>
+                    <Text size="xs" c="dimmed" mb={4}>
+                      {t('po.quantity')}
+                    </Text>
+                    <NumberInput
+                      placeholder={t('po.quantity')}
+                      value={newItem.quantity || 1}
+                      min={1}
+                      onChange={(value) =>
+                        setNewItem({ ...newItem, quantity: typeof value === 'number' ? value : 1 })
+                      }
+                      size="sm"
+                    />
+                  </Box>
+                  <Button
+                    leftSection={<IconPlus size={16} />}
+                    onClick={handleAddItem}
+                    disabled={
+                      !newItem.productCode ||
+                      !newItem.description ||
+                      !newItem.quantity ||
+                      newItem.quantity <= 0
+                    }
+                    size="sm"
+                    style={{ alignSelf: 'flex-end' }}
+                  >
+                    {t('common.add')}
+                  </Button>
+                </Group>
+              </Stack>
+            </Card>
+          )}
+        </Stack>
+      </Card>
+    );
+  }
+
+  // Desktop layout with table
+  return (
+    <Card shadow="sm" padding="xl" radius="md">
+      <Stack gap="lg">
+        <Title order={3}>{t('po.orderItems')}</Title>
+        <Box style={{ overflowX: 'auto' }}>
+          <Table withTableBorder withColumnBorders aria-label={t('po.itemsTableAriaLabel')}>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th style={{ width: 200 }}>{t('po.productCode')}</Table.Th>
+                <Table.Th style={{ minWidth: 200 }}>{t('po.description')}</Table.Th>
+                <Table.Th style={{ width: 80 }}>{t('po.quantity')}</Table.Th>
+                {!isReadOnly && <Table.Th style={{ width: 60 }}>{t('common.actions')}</Table.Th>}
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {items.map((item) => (
+                <Table.Tr key={item.id}>
+                  <Table.Td>
+                    {isReadOnly ? (
+                      <Text size="sm">{item.productCode}</Text>
+                    ) : (
+                      <Autocomplete
+                        data={productOptions}
+                        value={`${item.productCode} - ${item.description}`}
+                        onChange={(value) => handleProductSelection(item.id, value)}
+                        size="xs"
+                        limit={5}
+                      />
+                    )}
+                  </Table.Td>
+                  <Table.Td>
+                    {isReadOnly ? (
+                      <Text size="sm">{item.description}</Text>
+                    ) : (
+                      <TextInput
+                        value={item.description}
+                        onChange={(e) => handleUpdateItem(item.id, 'description', e.target.value)}
+                        size="xs"
+                      />
+                    )}
+                  </Table.Td>
+                  <Table.Td>
+                    {isReadOnly ? (
+                      <Text size="sm" ta="center">
+                        {item.quantity}
+                      </Text>
+                    ) : (
+                      <NumberInput
+                        value={item.quantity}
+                        min={1}
+                        onChange={(value) => handleQuantityChange(item.id, value)}
+                        size="xs"
+                      />
+                    )}
+                  </Table.Td>
+                  {!isReadOnly && (
+                    <Table.Td>
+                      <ActionIcon
+                        color="red"
+                        variant="subtle"
+                        onClick={() => handleRemoveItem(item.id)}
+                        aria-label={t('common.delete')}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Table.Td>
+                  )}
+                </Table.Tr>
+              ))}
+              {!isReadOnly && (
+                <Table.Tr>
+                  <Table.Td>
+                    <Autocomplete
+                      placeholder={t('po.searchProduct' as any)}
+                      data={productOptions}
+                      value={productSearch}
+                      onChange={(value) => {
+                        setProductSearch(value);
+                        handleProductSelection('new', value);
+                      }}
+                      size="xs"
+                      limit={5}
+                    />
+                  </Table.Td>
+                  <Table.Td>
+                    <TextInput
+                      placeholder={t('po.description')}
+                      value={newItem.description || ''}
+                      onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                      size="xs"
+                    />
+                  </Table.Td>
+                  <Table.Td>
+                    <NumberInput
+                      placeholder={t('po.quantity')}
+                      value={newItem.quantity || 1}
+                      min={1}
+                      onChange={(value) =>
+                        setNewItem({ ...newItem, quantity: typeof value === 'number' ? value : 1 })
+                      }
+                      size="xs"
+                    />
+                  </Table.Td>
+                  <Table.Td>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      onClick={handleAddItem}
+                      disabled={
+                        !newItem.productCode ||
+                        !newItem.description ||
+                        !newItem.quantity ||
+                        newItem.quantity <= 0
+                      }
+                    >
+                      {t('common.add')}
+                    </Button>
+                  </Table.Td>
+                </Table.Tr>
+              )}
+            </Table.Tbody>
+          </Table>
+        </Box>
+      </Stack>
+    </Card>
+  );
+}

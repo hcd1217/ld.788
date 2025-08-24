@@ -6,8 +6,9 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { PO_STATUS_COLORS } from '@/constants/purchaseOrder';
-import { formatCurrency } from '@/utils/number';
 import { formatDate } from '@/utils/time';
+import { getCustomerNameByCustomerId } from '@/utils/overview';
+import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 
 type POCardProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -44,7 +45,7 @@ export function POCard({
 }: POCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
+  const customerMapByCustomerId = useCustomerMapByCustomerId();
   // Memoized navigation handler
   const handleCardClick = useCallback(() => {
     navigate(getPODetailRoute(purchaseOrder.id));
@@ -81,13 +82,11 @@ export function POCard({
             {purchaseOrder.poNumber}
           </Text>
           <Text size="xs" c="dimmed">
-            {t('po.customer')}: {purchaseOrder.customer?.name ?? '-'}
+            {t('po.customer')}:{' '}
+            {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
           </Text>
           <Text size="xs" c="dimmed">
             {t('po.orderDate')}: {formatDate(purchaseOrder.orderDate)}
-          </Text>
-          <Text size="xs" fw={500}>
-            {t('po.total')}: {formatCurrency(purchaseOrder.totalAmount)}
           </Text>
         </Box>
         {noActions ? null : (

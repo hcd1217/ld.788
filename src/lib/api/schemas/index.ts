@@ -24,3 +24,6 @@ export * from './hr.schemas';
 
 // Sales management schemas
 export * from './sales.schemas';
+
+// Overview schemas
+export * from './overview.schemas';

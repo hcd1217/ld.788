@@ -6,13 +6,9 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { useOnce } from '@/hooks/useOnce';
 import { usePOFilters } from '@/hooks/usePOFilters';
-import {
-  usePurchaseOrderList,
-  useCustomerList,
-  usePOLoading,
-  usePOError,
-  usePOActions,
-} from '@/stores/usePOStore';
+import { usePurchaseOrderList, usePOLoading, usePOError, usePOActions } from '@/stores/usePOStore';
+import { useCustomers } from '@/stores/useAppStore';
+import type { CustomerOverview } from '@/services/client/overview';
 import {
   Pagination,
   AppPageTitle,
@@ -44,10 +40,10 @@ export function POListPage() {
   const { isMobile, isDesktop } = useDeviceType();
   const { t } = useTranslation();
   const purchaseOrders = usePurchaseOrderList();
-  const customers = useCustomerList();
+  const customers = useCustomers();
   const isLoading = usePOLoading();
   const error = usePOError();
-  const { refreshPurchaseOrders, clearError, loadCustomers } = usePOActions();
+  const { refreshPurchaseOrders, clearError } = usePOActions();
 
   // Search input state with debounce
   const [searchInput, setSearchInput] = useState('');
@@ -77,9 +73,9 @@ export function POListPage() {
   // Prepare customer options for select
   const customerOptions = useMemo(
     () =>
-      customers.map((customer) => ({
+      customers.map((customer: CustomerOverview) => ({
         value: customer.id,
-        label: customer.name + (customer.companyName ? ` (${customer.companyName})` : ''),
+        label: customer.name,
       })),
     [customers],
   );
@@ -122,7 +118,6 @@ export function POListPage() {
 
   useOnce(() => {
     void refreshPurchaseOrders();
-    void loadCustomers();
   });
 
   if (isMobile) {
@@ -228,24 +223,23 @@ export function POListPage() {
           }}
         />
 
-        {/* Search Bar and View Mode Selector */}
-        <Group justify="space-between" align="flex-end">
-          <SearchBar
-            placeholder={t('po.searchPlaceholder')}
-            searchQuery={searchInput}
-            setSearchQuery={setSearchInput}
-          />
-          <Select
-            clearable
-            searchable
-            placeholder={t('po.selectCustomer')}
-            data={[{ value: '', label: t('po.allCustomers') }, ...customerOptions]}
-            value={filters.customerId || ''}
-            style={{ flex: 1, maxWidth: 300 }}
-            onChange={handleCustomerChange}
-          />
-          {/* Filter Controls */}
-          <Group justify="space-between" align="center" gap="xl">
+        {/* Search and Filter Controls */}
+        <Stack gap="md" mt="lg">
+          <Group justify="space-between" align="flex-end">
+            <SearchBar
+              placeholder={t('po.searchPlaceholder')}
+              searchQuery={searchInput}
+              setSearchQuery={setSearchInput}
+            />
+            <Select
+              clearable
+              searchable
+              placeholder={t('po.selectCustomer')}
+              data={[{ value: '', label: t('po.allCustomers') }, ...customerOptions]}
+              value={filters.customerId || ''}
+              style={{ flex: 1, maxWidth: 300 }}
+              onChange={handleCustomerChange}
+            />
             <Select
               clearable
               placeholder={t('po.selectStatus')}
@@ -264,45 +258,44 @@ export function POListPage() {
             </Button>
             <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
           </Group>
-        </Group>
+        </Stack>
 
-        <div>
-          <BlankState
-            hidden={paginationState.totalItems > 0 || isLoading}
-            icon={
-              <IconFileInvoice size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />
-            }
-            title={hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound')}
-            description={
-              hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription')
-            }
-            button={
-              hasActiveFilters
-                ? undefined
-                : {
-                    label: t('po.createFirstPO'),
-                    onClick: handleNavigateToAdd,
-                  }
-            }
-          />
+        {/* Content Area */}
+        <BlankState
+          hidden={paginationState.totalItems > 0 || isLoading}
+          icon={
+            <IconFileInvoice size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />
+          }
+          title={hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound')}
+          description={
+            hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription')
+          }
+          button={
+            hasActiveFilters
+              ? undefined
+              : {
+                  label: t('po.createFirstPO'),
+                  onClick: handleNavigateToAdd,
+                }
+          }
+        />
 
-          {paginationState.totalItems === 0 && !isLoading ? null : (
-            <>
-              {/* Desktop View - Table or Grid based on selection */}
-              {isLoading && purchaseOrders.length === 0 ? (
-                <POListSkeleton viewMode={viewMode} count={10} />
-              ) : isTableView ? (
-                <PODataTable noAction isLoading={isLoading} purchaseOrders={paginatedPOs} />
-              ) : (
-                <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
-                  {paginatedPOs.map((po) => (
-                    <POGridCard key={po.id} purchaseOrder={po} />
-                  ))}
-                </SimpleGrid>
-              )}
-            </>
-          )}
-        </div>
+        {/* Data Display */}
+        {(paginationState.totalItems > 0 || isLoading) && (
+          <>
+            {isLoading && purchaseOrders.length === 0 ? (
+              <POListSkeleton viewMode={viewMode} count={10} />
+            ) : isTableView ? (
+              <PODataTable noAction isLoading={isLoading} purchaseOrders={paginatedPOs} />
+            ) : (
+              <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
+                {paginatedPOs.map((po) => (
+                  <POGridCard key={po.id} purchaseOrder={po} />
+                ))}
+              </SimpleGrid>
+            )}
+          </>
+        )}
 
         <Pagination
           hidden={paginationState.totalItems === 0}

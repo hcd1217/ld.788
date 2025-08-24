@@ -38,14 +38,32 @@ type POState = {
   loadProducts: () => Promise<void>;
   refreshPOs: () => Promise<void>;
   loadPO: (id: string) => Promise<void>;
-  createPO: (po: Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  createPO: (
+    po: Omit<
+      PurchaseOrder,
+      | 'id'
+      | 'createdAt'
+      | 'updatedAt'
+      | 'createdBy'
+      | 'clientId'
+      | 'poNumber'
+      | 'processedBy'
+      | 'shippedBy'
+      | 'deliveredBy'
+      | 'cancelledBy'
+      | 'cancelReason'
+      | 'refundedBy'
+      | 'refundReason'
+      | 'completedDate'
+    >,
+  ) => Promise<void>;
   updatePO: (id: string, data: Partial<PurchaseOrder>) => Promise<void>;
   confirmPO: (id: string) => Promise<void>;
   processPO: (id: string) => Promise<void>;
   shipPO: (id: string, data?: UpdatePOStatusRequest) => Promise<void>;
   deliverPO: (id: string) => Promise<void>;
   cancelPO: (id: string, data?: { cancelReason?: string }) => Promise<void>;
-  refundPO: (id: string, data?: { refundReason?: string; refundAmount?: number }) => Promise<void>;
+  refundPO: (id: string, data?: { refundReason?: string }) => Promise<void>;
   clearError: () => void;
 
   // Selectors
@@ -217,11 +235,40 @@ export const usePOStore = create<POState>()(
       async createPO(poData) {
         set({ isLoading: true, error: undefined });
         try {
-          const newPO = await purchaseOrderService.createPO(poData);
-          set((state) => ({
-            isLoading: false,
-            purchaseOrders: [newPO, ...state.purchaseOrders],
-          }));
+          // Convert the PurchaseOrder type to what the service expects
+          const createData = {
+            customerId: poData.customerId,
+            items: poData.items.map((item) => ({
+              productCode: item.productCode,
+              description: item.description,
+              color: item.color,
+              quantity: item.quantity,
+              category: item.category,
+            })),
+            metadata: {
+              shippingAddress: {
+                oneLineAddress: poData.address,
+                googleMapsUrl: poData.googleMapsUrl,
+              },
+            },
+            address: poData.address,
+            googleMapsUrl: poData.googleMapsUrl,
+            notes: poData.notes,
+            orderDate:
+              poData.orderDate instanceof Date
+                ? poData.orderDate
+                : poData.orderDate
+                  ? new Date(poData.orderDate)
+                  : undefined,
+            deliveryDate:
+              poData.deliveryDate instanceof Date
+                ? poData.deliveryDate
+                : poData.deliveryDate
+                  ? new Date(poData.deliveryDate)
+                  : undefined,
+          };
+          await purchaseOrderService.createPO(createData);
+          await get().refreshPOs();
         } catch (error) {
           set({
             isLoading: false,
@@ -234,12 +281,8 @@ export const usePOStore = create<POState>()(
       async updatePO(id, data) {
         set({ isLoading: true, error: undefined });
         try {
-          const updatedPO = await purchaseOrderService.updatePO(id, data);
-          set((state) => ({
-            isLoading: false,
-            purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-          }));
+          await purchaseOrderService.updatePO(id, data);
+          await get().refreshPOs();
         } catch (error) {
           set({
             isLoading: false,
@@ -271,14 +314,11 @@ export const usePOStore = create<POState>()(
         }));
 
         try {
-          const updatedPO = await purchaseOrderService.confirmPO(id);
+          await purchaseOrderService.confirmPO(id);
 
           // Only update if this request is still valid (prevent race conditions)
           if (get()._finishRequest(id, requestId)) {
-            set((state) => ({
-              purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-              currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-            }));
+            await get().refreshPOs();
           }
         } catch (error) {
           // Finish request tracking even on error
@@ -315,14 +355,11 @@ export const usePOStore = create<POState>()(
         }));
 
         try {
-          const updatedPO = await purchaseOrderService.processPO(id);
+          await purchaseOrderService.processPO(id);
 
           // Only update if this request is still valid (prevent race conditions)
           if (get()._finishRequest(id, requestId)) {
-            set((state) => ({
-              purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-              currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-            }));
+            await get().refreshPOs();
           }
         } catch (error) {
           // Finish request tracking even on error
@@ -359,14 +396,11 @@ export const usePOStore = create<POState>()(
         }));
 
         try {
-          const updatedPO = await purchaseOrderService.shipPO(id, data);
+          await purchaseOrderService.shipPO(id, data);
 
           // Only update if this request is still valid (prevent race conditions)
           if (get()._finishRequest(id, requestId)) {
-            set((state) => ({
-              purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-              currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-            }));
+            await get().refreshPOs();
           }
         } catch (error) {
           // Finish request tracking even on error
@@ -403,14 +437,11 @@ export const usePOStore = create<POState>()(
         }));
 
         try {
-          const updatedPO = await purchaseOrderService.deliverPO(id);
+          await purchaseOrderService.deliverPO(id);
 
           // Only update if this request is still valid (prevent race conditions)
           if (get()._finishRequest(id, requestId)) {
-            set((state) => ({
-              purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-              currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-            }));
+            await get().refreshPOs();
           }
         } catch (error) {
           // Finish request tracking even on error
@@ -447,14 +478,11 @@ export const usePOStore = create<POState>()(
         }));
 
         try {
-          const updatedPO = await purchaseOrderService.cancelPO(id, data);
+          await purchaseOrderService.cancelPO(id, data);
 
           // Only update if this request is still valid (prevent race conditions)
           if (get()._finishRequest(id, requestId)) {
-            set((state) => ({
-              purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-              currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-            }));
+            await get().refreshPOs();
           }
         } catch (error) {
           // Finish request tracking even on error
@@ -491,14 +519,11 @@ export const usePOStore = create<POState>()(
         }));
 
         try {
-          const updatedPO = await purchaseOrderService.refundPO(id, data);
+          await purchaseOrderService.refundPO(id, data);
 
           // Only update if this request is still valid (prevent race conditions)
           if (get()._finishRequest(id, requestId)) {
-            set((state) => ({
-              purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
-              currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
-            }));
+            await get().refreshPOs();
           }
         } catch (error) {
           // Finish request tracking even on error

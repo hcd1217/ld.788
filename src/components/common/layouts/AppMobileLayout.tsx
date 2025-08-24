@@ -40,8 +40,8 @@ export function AppMobileLayout({
 
   // Check if user profile is loading
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
-  const userProfile = useAppStore((state) => state.userProfile);
-  const isProfileLoading = isAuthenticated && !userProfile;
+  const user = useAppStore((state) => state.user);
+  const isProfileLoading = isAuthenticated && !user;
   return (
     <AppShell
       header={noHeader ? undefined : { height: 60, offset: false }}

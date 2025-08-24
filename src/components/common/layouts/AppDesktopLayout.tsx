@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, LoadingOverlay, Stack } from '@mantine/core';
+import { Container, LoadingOverlay } from '@mantine/core';
 import { ErrorAlert } from '../feedback';
 
 type AppDesktopLayoutProps = {
@@ -15,14 +15,14 @@ export function AppDesktopLayout({
   clearError,
 }: AppDesktopLayoutProps) {
   return (
-    <Container fluid px="sm" mt="sm">
+    <Container fluid p="sm" mt="sm">
       <ErrorAlert error={error} clearError={clearError} />
       <LoadingOverlay
         visible={isLoading}
         overlayProps={{ blur: 2 }}
         transitionProps={{ duration: 300 }}
       />
-      <Stack gap="xl">{children}</Stack>
+      {children}
     </Container>
   );
 }

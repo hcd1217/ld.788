@@ -9,15 +9,12 @@ import {
   Button,
   Group,
   Stack,
-  Text,
   ScrollArea,
 } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { formatCurrency } from '@/utils/number';
 import { showErrorNotification } from '@/utils/notifications';
-import { calculateItemTotal } from '@/utils/poItemUtils';
 import { PRODUCT_CATEGORIES } from '@/constants/purchaseOrder';
 import {
   FOCUS_DELAY_MS,
@@ -54,14 +51,9 @@ export function POAddItemModal({
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<string | undefined>(undefined);
   const [quantity, setQuantity] = useState<number>(1);
-  const [unitPrice, setUnitPrice] = useState<number>(0);
-  const [discount, setDiscount] = useState<number>(0);
 
   // Generate autocomplete options
   const productOptions = products.map((p) => `${p.productCode} - ${p.name}`);
-
-  // Calculate total
-  const totalPrice = calculateItemTotal(quantity, unitPrice, discount);
 
   // Reset form when modal closes and handle focus when modal opens
   useEffect(() => {
@@ -71,8 +63,6 @@ export function POAddItemModal({
       setDescription('');
       setCategory(undefined);
       setQuantity(1);
-      setUnitPrice(0);
-      setDiscount(0);
     } else if (!isMobile) {
       // Only auto-focus on desktop to avoid disruptive keyboard/dropdown on mobile
       // Small delay to ensure modal is fully rendered
@@ -91,7 +81,6 @@ export function POAddItemModal({
     if (product) {
       setProductCode(product.productCode);
       setDescription(product.name);
-      setUnitPrice(product.unitPrice);
       setCategory(product.category || undefined);
       setProductSearch(product.productCode);
     }
@@ -104,8 +93,8 @@ export function POAddItemModal({
       return;
     }
 
-    if (quantity <= 0 || unitPrice < 0) {
-      showErrorNotification(t('common.error'), t('po.invalidQuantityOrPrice'));
+    if (quantity <= 0) {
+      showErrorNotification(t('common.error'), t('po.invalidQuantity'));
       return;
     }
 
@@ -121,9 +110,6 @@ export function POAddItemModal({
       productCode,
       description,
       quantity,
-      unitPrice,
-      totalPrice,
-      discount: discount > 0 ? discount : undefined,
       category: category || undefined,
     };
 
@@ -175,54 +161,15 @@ export function POAddItemModal({
         size="md"
       />
 
-      {/* Quantity and Price */}
-      <Group grow>
-        <NumberInput
-          label={t('po.quantity')}
-          value={quantity}
-          onChange={(val) => setQuantity(typeof val === 'number' ? val : 1)}
-          min={1}
-          size="md"
-          required
-        />
-        <NumberInput
-          label={t('po.unitPrice')}
-          value={unitPrice}
-          onChange={(val) => setUnitPrice(typeof val === 'number' ? val : 0)}
-          min={0}
-          step={1000}
-          thousandSeparator=","
-          prefix="₫"
-          size="md"
-          required
-        />
-      </Group>
-
-      {/* Discount */}
+      {/* Quantity */}
       <NumberInput
-        label={t('po.discount')}
-        value={discount}
-        onChange={(val) => setDiscount(typeof val === 'number' ? val : 0)}
-        min={0}
-        max={100}
-        suffix="%"
+        label={t('po.quantity')}
+        value={quantity}
+        onChange={(val) => setQuantity(typeof val === 'number' ? val : 1)}
+        min={1}
         size="md"
+        required
       />
-
-      {/* Total */}
-      <Group
-        justify="space-between"
-        p="md"
-        style={{
-          backgroundColor: 'var(--mantine-color-gray-0)',
-          borderRadius: 'var(--mantine-radius-md)',
-        }}
-      >
-        <Text fw={500}>{t('po.total')}:</Text>
-        <Text size="xl" fw={600} c="blue">
-          {formatCurrency(totalPrice)}
-        </Text>
-      </Group>
 
       {/* Actions */}
       <Group justify="flex-end">

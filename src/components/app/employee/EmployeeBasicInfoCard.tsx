@@ -69,7 +69,7 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
               {t('employee.basicInformation')}
             </Title>
             <Group gap="xs">
-              {employee.userId ? (
+              {employee.userId && employee.isActive ? (
                 <Tooltip label={t('employee.getMagicLink')}>
                   <Button
                     leftSection={<IconQrcode size={16} />}
@@ -80,7 +80,12 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
                   </Button>
                 </Tooltip>
               ) : null}
-              <Button leftSection={<IconEdit size={16} />} variant="subtle" onClick={onEdit}>
+              <Button
+                leftSection={<IconEdit size={16} />}
+                variant="subtle"
+                onClick={onEdit}
+                disabled={!employee.isActive}
+              >
                 {t('common.edit')}
               </Button>
             </Group>

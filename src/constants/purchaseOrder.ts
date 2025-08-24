@@ -9,14 +9,6 @@ export const PO_STATUS = {
   REFUNDED: 'REFUNDED',
 } as const;
 
-export const PAYMENT_TERMS = {
-  NET30: 'Net 30',
-  NET60: 'Net 60',
-  DUE_ON_RECEIPT: 'Due on Receipt',
-  TWO_TEN_NET30: '2/10 Net 30',
-  COD: 'COD',
-} as const;
-
 export const PO_ACTIONS = {
   CONFIRM: 'confirm',
   PROCESS: 'process',
@@ -35,7 +27,6 @@ export const PRODUCT_CATEGORIES = [
 ] as const;
 
 export type POStatusType = (typeof PO_STATUS)[keyof typeof PO_STATUS];
-export type PaymentTermsType = (typeof PAYMENT_TERMS)[keyof typeof PAYMENT_TERMS];
 export type POActionType = (typeof PO_ACTIONS)[keyof typeof PO_ACTIONS];
 export type ProductCategoryType = (typeof PRODUCT_CATEGORIES)[number];
 

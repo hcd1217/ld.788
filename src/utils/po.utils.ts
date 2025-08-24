@@ -49,11 +49,6 @@ export function getAvailableActions(status: PurchaseOrder['status']): string[] {
   return actions;
 }
 
-// Calculate total amount from items
-export function calculatePOTotal(items: POItem[]): number {
-  return items.reduce((sum, item) => sum + item.totalPrice, 0);
-}
-
 // Validate PO items
 export function validatePOItems(items: POItem[]): {
   isValid: boolean;
@@ -72,9 +67,6 @@ export function validatePOItems(items: POItem[]): {
     }
     if (!item.quantity || item.quantity <= 0) {
       errors.push(`Item ${index + 1}: Quantity must be greater than 0`);
-    }
-    if (!item.unitPrice || item.unitPrice <= 0) {
-      errors.push(`Item ${index + 1}: Unit price must be greater than 0`);
     }
   });
 
@@ -197,8 +189,6 @@ export function groupPOsByStatus(orders: PurchaseOrder[]): Record<string, Purcha
 export function calculatePOStatistics(orders: PurchaseOrder[]) {
   const stats = {
     total: orders.length,
-    totalAmount: 0,
-    averageAmount: 0,
     byStatus: {} as Record<string, number>,
     overdue: 0,
     thisMonth: 0,
@@ -212,9 +202,6 @@ export function calculatePOStatistics(orders: PurchaseOrder[]) {
   const lastMonthYear = thisMonth === 0 ? thisYear - 1 : thisYear;
 
   orders.forEach((order) => {
-    // Total amount
-    stats.totalAmount += order.totalAmount;
-
     // By status
     stats.byStatus[order.status] = (stats.byStatus[order.status] || 0) + 1;
 
@@ -231,9 +218,6 @@ export function calculatePOStatistics(orders: PurchaseOrder[]) {
       stats.lastMonth++;
     }
   });
-
-  // Average amount
-  stats.averageAmount = stats.total > 0 ? stats.totalAmount / stats.total : 0;
 
   return stats;
 }

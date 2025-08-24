@@ -3,7 +3,7 @@ import { IconChevronDown, IconClearAll } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { SearchBar } from '@/components/common';
 import { PO_STATUS } from '@/constants/purchaseOrder';
-import type { Customer } from '@/services/sales/customer';
+import type { CustomerOverview as Customer } from '@/services/client/overview';
 
 interface POFilterBarProps {
   readonly searchQuery: string;

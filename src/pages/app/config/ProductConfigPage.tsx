@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
-import { Paper, Text } from '@mantine/core';
+import { Paper, Text, Group, Button } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
-import { IconPlus } from '@tabler/icons-react';
+import { IconPlus, IconUpload } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAction } from '@/hooks/useAction';
 import { useOnce } from '@/hooks/useOnce';
@@ -13,27 +13,28 @@ import {
   AppPageTitle,
   SearchBar,
   Pagination,
+  BulkImportModalContent,
 } from '@/components/common';
 import {
   ProductFormModal,
   type ProductFormValues,
   ProductStatusBadge,
-  ProductStockInfo,
 } from '@/components/app/config';
 import {
   productService,
   type Product,
   type CreateProductRequest,
   type UpdateProductRequest,
+  type BulkUpsertProductsRequest,
+  type ProductStatus,
 } from '@/services/sales/product';
-import { showSuccessNotification } from '@/utils/notifications';
-import { formatCurrency } from '@/utils/string';
-import { isDevelopment } from '@/utils/env';
+import { showSuccessNotification, showErrorNotification } from '@/utils/notifications';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { logError } from '@/utils/logger';
+import { parseProductExcelFile, generateProductExcelTemplate } from '@/utils/excelParser';
 
 export function ProductConfigPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -43,36 +44,18 @@ export function ProductConfigPage() {
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
 
   const form = useForm<ProductFormValues>({
-    initialValues: isDevelopment
-      ? {
-          // cspell:disable
-          productCode: 'MX_800',
-          name: 'Mâm xoay bàn nhôm 800mm',
-          description: '',
-          category: '',
-          color: 'Trắng',
-          unitPrice: 1350000,
-          status: 'ACTIVE',
-          unit: 'Cái',
-        }
-      : {
-          productCode: '',
-          name: '',
-          description: '',
-          category: '',
-          color: '',
-          unitPrice: 0,
-          status: 'ACTIVE',
-          unit: '',
-        },
+    initialValues: {
+      productCode: '',
+      name: '',
+      description: '',
+      category: '',
+      color: '',
+      status: 'ACTIVE',
+      unit: '',
+    },
     validate: {
       productCode: (value) => (!value ? t('common.error') : null),
       name: (value) => (!value ? t('common.error') : null),
-      unitPrice: (value) => {
-        if (value === undefined || value === null) return t('common.error');
-        if (value < 0) return t('product.priceCannotBeNegative');
-        return null;
-      },
     },
   });
 
@@ -138,10 +121,7 @@ export function ProductConfigPage() {
         description: values.description || undefined,
         category: values.category || undefined,
         color: values.color || undefined,
-        unitPrice: values.unitPrice,
-        costPrice: values.costPrice || undefined,
         status: values.status,
-        stockLevel: values.stockLevel ?? 0,
         unit: values.unit || undefined,
       };
       await productService.createProduct(data);
@@ -179,12 +159,7 @@ export function ProductConfigPage() {
         description: values.description || undefined,
         category: values.category || undefined,
         color: values.color || undefined,
-        unitPrice: values.unitPrice,
-        costPrice: values.costPrice || undefined,
         status: values.status,
-        stockLevel: values.stockLevel,
-        minStock: values.minStock || undefined,
-        maxStock: values.maxStock || undefined,
         unit: values.unit || undefined,
         sku: values.sku || undefined,
         barcode: values.barcode || undefined,
@@ -255,12 +230,7 @@ export function ProductConfigPage() {
       description: product.description || '',
       category: product.category || '',
       color: product.color || '',
-      unitPrice: product.unitPrice,
-      costPrice: product.costPrice || undefined,
       status: product.status,
-      stockLevel: product.stockLevel,
-      minStock: product.minStock || 0,
-      maxStock: product.maxStock || undefined,
       unit: product.unit || 'pcs',
       sku: product.sku || '',
       barcode: product.barcode || '',
@@ -273,6 +243,100 @@ export function ProductConfigPage() {
     openCreate();
   };
 
+  // Open bulk import modal
+  const openBulkImportModal = () => {
+    let selectedFile: File | undefined;
+
+    modals.openConfirmModal({
+      title: t('product.bulkImport'),
+      size: 'lg',
+      children: (
+        <BulkImportModalContent
+          onFileSelect={(file) => {
+            selectedFile = file;
+          }}
+          onDownloadTemplate={() => generateProductExcelTemplate(i18n.language)}
+          entityType="product"
+          language={i18n.language}
+        />
+      ),
+      labels: {
+        confirm: t('common.import'),
+        cancel: t('common.cancel'),
+      },
+      confirmProps: {
+        loading: isLoading,
+        leftSection: <IconUpload size={16} />,
+      },
+      onConfirm: () => {
+        if (selectedFile) {
+          handleExcelImport({ file: selectedFile });
+        } else {
+          showErrorNotification(t('common.error'), t('common.selectFile'));
+        }
+      },
+    });
+  };
+
+  // Handle Excel file import
+  const handleExcelImport = useAction<{ file: File }>({
+    options: {
+      errorTitle: t('common.error'),
+      errorMessage: t('auth.importFailed'),
+    },
+    async actionHandler(data) {
+      if (!data?.file) return;
+      const { file } = data;
+
+      setIsLoading(true);
+
+      // Parse Excel file
+      const products = await parseProductExcelFile(file);
+
+      if (products.length === 0) {
+        throw new Error(t('product.noValidDataFound'));
+      }
+
+      // Prepare request - convert parsed products to API format
+      const request: BulkUpsertProductsRequest = {
+        products: products.map((p) => ({
+          productCode: p.productCode,
+          name: p.name,
+          description: p.description || undefined,
+          category: p.category || undefined,
+          color: p.color || undefined,
+          status: (p.status as ProductStatus) || 'ACTIVE',
+          unit: p.unit || undefined,
+          sku: p.sku || undefined,
+          barcode: p.barcode || undefined,
+        })),
+        skipInvalid: false,
+      };
+
+      const result = await productService.bulkUpsertProducts(request);
+
+      // Show results
+      const message = t('product.bulkImportSuccess', {
+        created: result.created,
+        updated: result.updated,
+        failed: result.failed,
+      });
+
+      showSuccessNotification(t('auth.importSuccess'), message);
+      modals.closeAll();
+      await loadProducts();
+    },
+    errorHandler(error) {
+      logError('Failed to import products from Excel:', error, {
+        module: 'ProductConfigPage',
+        action: 'handleExcelImport',
+      });
+    },
+    cleanupHandler() {
+      setIsLoading(false);
+    },
+  });
+
   return (
     <AppDesktopLayout
       isLoading={isLoading && !createOpened && !editOpened}
@@ -281,14 +345,22 @@ export function ProductConfigPage() {
         setError(undefined);
       }}
     >
-      <AppPageTitle
-        title={t('common.pages.productManagement')}
-        button={{
-          label: t('common.add'),
-          onClick: openCreateModal,
-          icon: <IconPlus size={16} />,
-        }}
-      />
+      {/* Page Title with Actions */}
+      <Group justify="space-between" align="center">
+        <AppPageTitle title={t('common.pages.productManagement')} />
+        <Group gap="sm">
+          <Button
+            variant="light"
+            leftSection={<IconUpload size={16} />}
+            onClick={openBulkImportModal}
+          >
+            {t('product.bulkImport')}
+          </Button>
+          <Button leftSection={<IconPlus size={16} />} onClick={openCreateModal}>
+            {t('common.add')}
+          </Button>
+        </Group>
+      </Group>
 
       <SearchBar
         hidden={products.length < 20}
@@ -325,19 +397,6 @@ export function ProductConfigPage() {
               key: 'color',
               header: t('product.color'),
               render: (product: Product) => product.color || '-',
-            },
-            {
-              key: 'unitPrice',
-              header: t('product.unitPrice'),
-              width: '120px',
-              render: (product: Product) =>
-                product.unitPrice !== undefined ? formatCurrency(product.unitPrice) : '-',
-            },
-            {
-              key: 'stock',
-              header: t('product.stock'),
-              width: '150px',
-              render: (product: Product) => <ProductStockInfo product={product} />,
             },
             {
               key: 'status',

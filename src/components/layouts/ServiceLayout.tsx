@@ -13,6 +13,8 @@ export function ServiceLayout() {
   useOnce(() => {
     run();
     async function run() {
+      // Always check auth on initial load to ensure proper initialization
+      // checkAuth() will preserve existing authenticated state
       await checkAuth();
       setReady(true);
     }

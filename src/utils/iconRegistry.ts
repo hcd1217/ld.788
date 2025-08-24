@@ -17,6 +17,8 @@ import {
   type Icon,
   IconError404,
   IconDatabaseCog,
+  IconClipboardList,
+  IconTruck,
 } from '@tabler/icons-react';
 
 // Type-safe icon component type from Tabler
@@ -40,6 +42,8 @@ export const IconIdentifiers = {
   USERS_GROUP: 'users-group',
   HOME: 'home',
   DOTS: 'dots',
+  CLIPBOARD: 'clipboard',
+  TRUCK: 'truck',
 } as const;
 
 export type IconIdentifier = (typeof IconIdentifiers)[keyof typeof IconIdentifiers];
@@ -62,6 +66,8 @@ const iconRegistry: Record<IconIdentifier, TablerIconComponent> = {
   [IconIdentifiers.USERS_GROUP]: IconUsersGroup,
   [IconIdentifiers.HOME]: IconHome,
   [IconIdentifiers.DOTS]: IconDots,
+  [IconIdentifiers.CLIPBOARD]: IconClipboardList,
+  [IconIdentifiers.TRUCK]: IconTruck,
 };
 
 // Default fallback icon

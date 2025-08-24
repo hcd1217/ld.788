@@ -1,10 +1,23 @@
-import { Card, Stack, Group, Title, Button, Divider, Grid, Text, Badge } from '@mantine/core';
+import {
+  Card,
+  Stack,
+  Group,
+  Title,
+  Button,
+  Divider,
+  Grid,
+  Text,
+  Badge,
+  ActionIcon,
+  Tooltip,
+} from '@mantine/core';
 import { IconEdit, IconBuilding, IconMapPin, IconCalendar } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { formatDate } from '@/utils/time';
-import { formatCurrency } from '@/utils/number';
 import { POStatusBadge } from './POStatusBadge';
+import { useCustomerMapByCustomerId, useEmployeeMapByUserId } from '@/stores/useAppStore';
+import { getEmployeeNameByUserId, getCustomerNameByCustomerId } from '@/utils/overview';
 
 type POBasicInfoCardProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -13,7 +26,8 @@ type POBasicInfoCardProps = {
 
 export function POBasicInfoCard({ purchaseOrder, onEdit }: POBasicInfoCardProps) {
   const { t } = useTranslation();
-
+  const employeeMapByUserId = useEmployeeMapByUserId();
+  const customerMapByCustomerId = useCustomerMapByCustomerId();
   const canEdit = purchaseOrder.status === 'NEW';
 
   return (
@@ -94,23 +108,14 @@ export function POBasicInfoCard({ purchaseOrder, onEdit }: POBasicInfoCardProps)
                 <Group gap="xs">
                   <IconBuilding size={16} color="var(--mantine-color-gray-6)" />
                   <div>
-                    <Text fw={500}>{purchaseOrder.customer?.name || '-'}</Text>
-                    {purchaseOrder.customer?.companyName && (
-                      <Text size="sm" c="dimmed">
-                        {purchaseOrder.customer.companyName}
-                      </Text>
-                    )}
+                    <Text fw={500}>
+                      {getCustomerNameByCustomerId(
+                        customerMapByCustomerId,
+                        purchaseOrder.customerId,
+                      )}
+                    </Text>
                   </div>
                 </Group>
-              </div>
-
-              <div>
-                <Text size="sm" fw={500} c="dimmed">
-                  {t('po.totalAmount')}
-                </Text>
-                <Text size="xl" fw={700} c="blue">
-                  {formatCurrency(purchaseOrder.totalAmount)}
-                </Text>
               </div>
 
               <div>
@@ -121,74 +126,40 @@ export function POBasicInfoCard({ purchaseOrder, onEdit }: POBasicInfoCardProps)
                   {purchaseOrder.items.length} {t('po.itemsCount')}
                 </Badge>
               </div>
-
-              {purchaseOrder.paymentTerms && (
-                <div>
-                  <Text size="sm" fw={500} c="dimmed">
-                    {t('po.paymentTerms')}
-                  </Text>
-                  <Text>{purchaseOrder.paymentTerms}</Text>
-                </div>
-              )}
             </Stack>
           </Grid.Col>
         </Grid>
 
-        {(purchaseOrder.shippingAddress || purchaseOrder.billingAddress) && (
+        {purchaseOrder.address && (
           <>
             <Divider />
             <Grid>
-              {purchaseOrder.shippingAddress && (
-                <Grid.Col span={{ base: 12, md: 6 }}>
-                  <div>
-                    <Text size="sm" fw={500} c="dimmed" mb="xs">
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <div>
+                  <Group justify="start" align="center" mb="xs">
+                    <Text size="sm" fw={500} c="dimmed">
                       {t('po.shippingAddress')}
                     </Text>
-                    <Group gap="xs" align="flex-start">
-                      <IconMapPin size={16} color="var(--mantine-color-gray-6)" />
-                      <div>
-                        <Text size="sm">{purchaseOrder.shippingAddress.street}</Text>
-                        <Text size="sm" c="dimmed">
-                          {purchaseOrder.shippingAddress.city}
-                          {purchaseOrder.shippingAddress.state &&
-                            `, ${purchaseOrder.shippingAddress.state}`}
-                          {purchaseOrder.shippingAddress.postalCode &&
-                            ` ${purchaseOrder.shippingAddress.postalCode}`}
-                        </Text>
-                        <Text size="sm" c="dimmed">
-                          {purchaseOrder.shippingAddress.country}
-                        </Text>
-                      </div>
-                    </Group>
-                  </div>
-                </Grid.Col>
-              )}
-
-              {purchaseOrder.billingAddress && (
-                <Grid.Col span={{ base: 12, md: 6 }}>
-                  <div>
-                    <Text size="sm" fw={500} c="dimmed" mb="xs">
-                      {t('po.billingAddress')}
-                    </Text>
-                    <Group gap="xs" align="flex-start">
-                      <IconMapPin size={16} color="var(--mantine-color-gray-6)" />
-                      <div>
-                        <Text size="sm">{purchaseOrder.billingAddress.street}</Text>
-                        <Text size="sm" c="dimmed">
-                          {purchaseOrder.billingAddress.city}
-                          {purchaseOrder.billingAddress.state &&
-                            `, ${purchaseOrder.billingAddress.state}`}
-                          {purchaseOrder.billingAddress.postalCode &&
-                            ` ${purchaseOrder.billingAddress.postalCode}`}
-                        </Text>
-                        <Text size="sm" c="dimmed">
-                          {purchaseOrder.billingAddress.country}
-                        </Text>
-                      </div>
-                    </Group>
-                  </div>
-                </Grid.Col>
-              )}
+                    {purchaseOrder.googleMapsUrl && (
+                      <Tooltip label={t('customer.viewOnMap')}>
+                        <ActionIcon
+                          size="sm"
+                          variant="subtle"
+                          onClick={() => {
+                            const googleMapsUrl = purchaseOrder.googleMapsUrl;
+                            if (googleMapsUrl) {
+                              window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+                            }
+                          }}
+                        >
+                          <IconMapPin size={16} />
+                        </ActionIcon>
+                      </Tooltip>
+                    )}
+                  </Group>
+                  <Text size="sm">{purchaseOrder.address}</Text>
+                </div>
+              </Grid.Col>
             </Grid>
           </>
         )}
@@ -213,7 +184,7 @@ export function POBasicInfoCard({ purchaseOrder, onEdit }: POBasicInfoCardProps)
               <Text size="sm" fw={500} c="dimmed">
                 {t('po.createdBy')}
               </Text>
-              <Text>{purchaseOrder.createdBy}</Text>
+              <Text>{getEmployeeNameByUserId(employeeMapByUserId, purchaseOrder.createdBy)}</Text>
             </div>
           </Grid.Col>
 
@@ -223,7 +194,9 @@ export function POBasicInfoCard({ purchaseOrder, onEdit }: POBasicInfoCardProps)
                 <Text size="sm" fw={500} c="dimmed">
                   {t('po.processedBy')}
                 </Text>
-                <Text>{purchaseOrder.processedBy}</Text>
+                <Text>
+                  {getEmployeeNameByUserId(employeeMapByUserId, purchaseOrder.processedBy)}
+                </Text>
               </div>
             </Grid.Col>
           )}

@@ -1,44 +1,56 @@
 import { salesApi } from '@/lib/api';
 import {
-  type Customer,
   type CreateCustomerRequest,
   type UpdateCustomerRequest,
+  type BulkUpsertCustomersRequest,
+  type BulkUpsertCustomersResponse,
 } from '@/lib/api/schemas/sales.schemas';
-import { logError } from '@/utils/logger';
 
 // Re-export Customer type for compatibility
 export type {
-  Customer,
   CreateCustomerRequest,
   UpdateCustomerRequest,
+  BulkUpsertCustomersRequest,
+  BulkUpsertCustomersResponse,
 } from '@/lib/api/schemas/sales.schemas';
+
+export type Customer = {
+  id: string;
+  clientId: string;
+  name: string;
+  companyName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  address?: string;
+  googleMapsUrl?: string;
+  taxCode?: string;
+  isActive: boolean;
+  metadata: {
+    googleMapsUrl?: string;
+    [key: string]: unknown;
+  };
+};
 
 export const customerService = {
   customers: [] as Customer[],
 
   async getAllCustomers(): Promise<Customer[]> {
-    const debug = false;
-    if (debug) {
-      throw new Error('Not implemented');
+    if (this.customers.length > 0) {
+      return this.customers;
     }
     const response = await salesApi.getCustomers({
       limit: 1000, // Get all customers
     });
-    return response.customers;
+    this.customers = response.customers.map((customer) => ({
+      ...customer,
+      googleMapsUrl: customer.metadata.googleMapsUrl,
+    }));
+    return this.customers;
   },
 
   async getCustomer(id: string): Promise<Customer | undefined> {
-    try {
-      const customer = await salesApi.getCustomerById(id);
-      return customer;
-    } catch (error) {
-      logError('Failed to get customer by ID', error, {
-        module: 'CustomerService',
-        action: 'getCustomer',
-        metadata: { id },
-      });
-      return undefined;
-    }
+    const customers = await this.getAllCustomers();
+    return customers.find((customer) => customer.id === id);
   },
 
   async getActiveCustomers(): Promise<Customer[]> {
@@ -46,28 +58,55 @@ export const customerService = {
       isActive: true,
       limit: 1000,
     });
-    return response.customers;
+    return response.customers.map((customer) => ({
+      ...customer,
+      googleMapsUrl: customer.metadata.googleMapsUrl,
+    }));
   },
 
   async createCustomer(data: CreateCustomerRequest): Promise<Customer> {
     const customer = await salesApi.createCustomer(data);
-    return customer;
+    // Clear cache to ensure fresh data on next fetch
+    this.customers = [];
+    return {
+      ...customer,
+      googleMapsUrl: customer.metadata.googleMapsUrl,
+    };
   },
 
   async updateCustomer(id: string, data: UpdateCustomerRequest): Promise<Customer> {
     const customer = await salesApi.updateCustomer(id, data);
-    return customer;
+    // Clear cache to ensure fresh data on next fetch
+    this.customers = [];
+    return {
+      ...customer,
+      googleMapsUrl: customer.metadata.googleMapsUrl,
+    };
   },
 
   async deleteCustomer(id: string): Promise<void> {
     await salesApi.deleteCustomer(id);
+    // Clear cache to ensure fresh data on next fetch
+    this.customers = [];
+  },
+
+  async bulkUpsertCustomers(
+    data: BulkUpsertCustomersRequest,
+  ): Promise<BulkUpsertCustomersResponse> {
+    const result = await salesApi.bulkUpsertCustomers(data);
+    // Clear cache to ensure fresh data on next fetch
+    this.customers = [];
+    return result;
   },
 
   async searchCustomers(searchTerm: string): Promise<Customer[]> {
     const response = await salesApi.getCustomers({
-      name: searchTerm,
+      search: searchTerm,
       limit: 1000,
     });
-    return response.customers;
+    return response.customers.map((customer) => ({
+      ...customer,
+      googleMapsUrl: customer.metadata.googleMapsUrl,
+    }));
   },
 };

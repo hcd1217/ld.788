@@ -21,16 +21,18 @@ export const CustomerSchema = z.object({
   contactEmail: optionalStringSchema,
   contactPhone: phoneNumberSchema,
   address: optionalStringSchema,
+  metadata: z.looseObject({
+    googleMapsUrl: optionalStringSchema,
+  }),
   taxCode: optionalStringSchema,
-  creditLimit: numberSchema.optional(),
-  creditUsed: numberSchema,
   isActive: z.boolean(),
-  metadata: z.looseObject({}).optional(),
-  deletedAt: timestampSchema.optional(),
-  deletedBy: optionalStringSchema,
-  createdAt: timestampSchema,
-  updatedAt: timestampSchema,
 });
+
+const BulkUpsertCustomerMetadataSchema = z
+  .looseObject({
+    googleMapsUrl: optionalStringSchema,
+  })
+  .optional();
 
 // Customer request schemas
 export const CreateCustomerRequestSchema = z.object({
@@ -39,9 +41,8 @@ export const CreateCustomerRequestSchema = z.object({
   contactEmail: emailSchema.optional(),
   contactPhone: optionalStringSchema,
   address: optionalStringSchema,
+  metadata: BulkUpsertCustomerMetadataSchema,
   taxCode: optionalStringSchema,
-  creditLimit: numberSchema.min(0).optional(),
-  metadata: z.looseObject({}).optional(),
 });
 
 export const UpdateCustomerRequestSchema = z.object({
@@ -50,10 +51,39 @@ export const UpdateCustomerRequestSchema = z.object({
   contactEmail: emailSchema.optional(),
   contactPhone: optionalStringSchema,
   address: optionalStringSchema,
+  metadata: BulkUpsertCustomerMetadataSchema,
   taxCode: optionalStringSchema,
-  creditLimit: numberSchema.min(0).optional(),
   isActive: z.boolean().optional(),
-  metadata: z.looseObject({}).optional(),
+});
+
+// Bulk upsert schema for customers
+export const BulkUpsertCustomerItemSchema = z.object({
+  name: stringSchema,
+  companyName: optionalStringSchema,
+  contactEmail: emailSchema.optional(),
+  contactPhone: optionalStringSchema,
+  address: optionalStringSchema,
+  taxCode: optionalStringSchema,
+  metadata: BulkUpsertCustomerMetadataSchema,
+});
+
+export const BulkUpsertCustomersRequestSchema = z.object({
+  customers: z.array(BulkUpsertCustomerItemSchema),
+  skipInvalid: z.boolean().optional().default(false),
+});
+
+export const BulkUpsertCustomersResponseSchema = z.object({
+  created: numberSchema,
+  updated: numberSchema,
+  failed: numberSchema,
+  errors: z
+    .array(
+      z.object({
+        customer: BulkUpsertCustomerItemSchema.optional(),
+        error: stringSchema,
+      }),
+    )
+    .optional(),
 });
 
 // Customer response schemas
@@ -64,18 +94,13 @@ export const GetCustomersResponseSchema = z.object({
 
 export const CreateCustomerResponseSchema = CustomerSchema;
 export const UpdateCustomerResponseSchema = CustomerSchema;
-export const GetCustomerResponseSchema = CustomerSchema;
 
 // ========== Purchase Order Schemas ==========
 
 // Address schema
-export const AddressSchema = z.object({
+const AddressSchema = z.object({
   oneLineAddress: optionalStringSchema,
-  street: optionalStringSchema,
-  city: optionalStringSchema,
-  state: optionalStringSchema,
-  postalCode: optionalStringSchema,
-  country: optionalStringSchema,
+  googleMapsUrl: optionalStringSchema,
 });
 
 // PO Item schemas
@@ -86,28 +111,19 @@ export const POItemSchema = z.object({
   description: stringSchema,
   color: optionalStringSchema,
   quantity: numberSchema,
-  unitPrice: numberSchema,
-  totalPrice: numberSchema,
-  discount: numberSchema.optional(),
   category: optionalStringSchema,
-  metadata: z.looseObject({}).optional(),
-  createdAt: timestampSchema,
-  updatedAt: timestampSchema,
 });
 
-export const CreatePOItemSchema = z.object({
+const CreatePOItemSchema = z.object({
   productCode: stringSchema,
   description: stringSchema,
   color: optionalStringSchema,
   quantity: numberSchema.min(0),
-  unitPrice: numberSchema.min(0),
-  discount: numberSchema.min(0).optional(),
   category: optionalStringSchema,
-  metadata: z.looseObject({}).optional(),
 });
 
 // PO Status enum
-export const POStatusSchema = z.enum([
+const POStatusSchema = z.enum([
   'NEW',
   'CONFIRMED',
   'PROCESSING',
@@ -117,33 +133,33 @@ export const POStatusSchema = z.enum([
   'REFUNDED',
 ]);
 
+// PO Status History schema
+const POStatusHistorySchema = z.object({
+  status: POStatusSchema,
+  timestamp: timestampSchema,
+  userId: idSchema,
+});
+
 // Purchase Order schema
-export const PurchaseOrderSchema = z.object({
+const PurchaseOrderSchema = z.object({
   id: idSchema,
   clientId: idSchema,
   poNumber: stringSchema,
   customerId: idSchema,
-  customer: CustomerSchema.optional(),
   status: POStatusSchema,
-  totalAmount: numberSchema,
   orderDate: timestampSchema,
   deliveryDate: timestampSchema.optional(),
   completedDate: timestampSchema.optional(),
-  shippingAddress: AddressSchema.optional(),
-  billingAddress: AddressSchema.optional(),
-  paymentTerms: optionalStringSchema,
   notes: optionalStringSchema,
-  createdBy: stringSchema,
-  processedBy: optionalStringSchema,
-  shippedBy: optionalStringSchema,
-  deliveredBy: optionalStringSchema,
-  cancelledBy: optionalStringSchema,
   cancelReason: optionalStringSchema,
-  refundedBy: optionalStringSchema,
   refundReason: optionalStringSchema,
-  refundAmount: numberSchema.optional(),
   items: z.array(POItemSchema),
-  metadata: z.looseObject({}).optional(),
+  metadata: z
+    .looseObject({
+      shippingAddress: AddressSchema.optional(),
+      statusHistory: z.array(POStatusHistorySchema).optional(),
+    })
+    .optional(),
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
 });
@@ -151,14 +167,13 @@ export const PurchaseOrderSchema = z.object({
 // Purchase Order request schemas
 export const CreatePurchaseOrderRequestSchema = z.object({
   customerId: idSchema,
-  orderDate: stringSchema,
+  orderDate: optionalStringSchema,
   deliveryDate: optionalStringSchema,
   items: z.array(CreatePOItemSchema).min(1),
-  shippingAddress: AddressSchema.optional(),
-  billingAddress: AddressSchema.optional(),
-  paymentTerms: optionalStringSchema,
   notes: optionalStringSchema,
-  metadata: z.looseObject({}).optional(),
+  metadata: z.looseObject({
+    shippingAddress: AddressSchema.optional(),
+  }),
 });
 
 export const UpdatePurchaseOrderRequestSchema = z.object({
@@ -168,17 +183,17 @@ export const UpdatePurchaseOrderRequestSchema = z.object({
   deliveryDate: optionalStringSchema,
   completedDate: optionalStringSchema,
   items: z.array(CreatePOItemSchema).optional(),
-  shippingAddress: AddressSchema.optional(),
-  billingAddress: AddressSchema.optional(),
-  paymentTerms: optionalStringSchema,
   notes: optionalStringSchema,
-  metadata: z.looseObject({}).optional(),
+  metadata: z
+    .looseObject({
+      shippingAddress: AddressSchema.optional(),
+    })
+    .optional(),
 });
 
 export const UpdatePOStatusRequestSchema = z.object({
   cancelReason: optionalStringSchema,
   refundReason: optionalStringSchema,
-  refundAmount: numberSchema.optional(),
   trackingNumber: optionalStringSchema,
   carrier: optionalStringSchema,
   deliveryNotes: optionalStringSchema,
@@ -213,12 +228,7 @@ export const ProductSchema = z.object({
   description: optionalStringSchema,
   category: optionalStringSchema,
   color: optionalStringSchema,
-  unitPrice: numberSchema,
-  costPrice: numberSchema.optional(),
   status: ProductStatusSchema,
-  stockLevel: numberSchema,
-  minStock: numberSchema.optional(),
-  maxStock: numberSchema.optional(),
   unit: optionalStringSchema,
   sku: optionalStringSchema,
   barcode: optionalStringSchema,
@@ -242,12 +252,7 @@ export const CreateProductRequestSchema = z.object({
   description: optionalStringSchema,
   category: optionalStringSchema,
   color: optionalStringSchema,
-  unitPrice: numberSchema.min(0),
-  costPrice: numberSchema.min(0).optional(),
   status: ProductStatusSchema.optional(),
-  stockLevel: numberSchema.min(0).optional(),
-  minStock: numberSchema.min(0).optional(),
-  maxStock: numberSchema.min(0).optional(),
   unit: optionalStringSchema,
   sku: optionalStringSchema,
   barcode: optionalStringSchema,
@@ -268,12 +273,7 @@ export const UpdateProductRequestSchema = z.object({
   description: optionalStringSchema,
   category: optionalStringSchema,
   color: optionalStringSchema,
-  unitPrice: numberSchema.min(0).optional(),
-  costPrice: numberSchema.min(0).optional(),
   status: ProductStatusSchema.optional(),
-  stockLevel: numberSchema.min(0).optional(),
-  minStock: numberSchema.min(0).optional(),
-  maxStock: numberSchema.min(0).optional(),
   unit: optionalStringSchema,
   sku: optionalStringSchema,
   barcode: optionalStringSchema,
@@ -298,16 +298,59 @@ export const CreateProductResponseSchema = ProductSchema;
 export const UpdateProductResponseSchema = ProductSchema;
 export const GetProductResponseSchema = ProductSchema;
 
+// Bulk Upsert schemas
+export const BulkUpsertProductItemSchema = z.object({
+  productCode: stringSchema,
+  name: stringSchema,
+  description: optionalStringSchema,
+  category: optionalStringSchema,
+  color: optionalStringSchema,
+  status: ProductStatusSchema.optional(),
+  unit: optionalStringSchema,
+  sku: optionalStringSchema,
+  barcode: optionalStringSchema,
+  weight: numberSchema.min(0).optional(),
+  dimensions: z
+    .object({
+      length: numberSchema.min(0),
+      width: numberSchema.min(0),
+      height: numberSchema.min(0),
+    })
+    .optional(),
+  metadata: z.looseObject({}).optional(),
+});
+
+export const BulkUpsertProductsRequestSchema = z.object({
+  products: z.array(BulkUpsertProductItemSchema).min(1),
+  skipInvalid: z.boolean().optional().default(false),
+});
+
+export const BulkUpsertProductsResponseSchema = z.object({
+  created: numberSchema,
+  updated: numberSchema,
+  failed: numberSchema,
+  errors: z
+    .array(
+      z.object({
+        product: BulkUpsertProductItemSchema.optional(),
+        error: stringSchema,
+      }),
+    )
+    .optional(),
+});
+
 // ========== Type Exports ==========
 
 // Customer types
 export type Customer = z.infer<typeof CustomerSchema>;
 export type CreateCustomerRequest = z.infer<typeof CreateCustomerRequestSchema>;
 export type UpdateCustomerRequest = z.infer<typeof UpdateCustomerRequestSchema>;
+export type BulkUpsertCustomerItem = z.infer<typeof BulkUpsertCustomerItemSchema>;
+export type BulkUpsertCustomersRequest = z.infer<typeof BulkUpsertCustomersRequestSchema>;
+export type BulkUpsertCustomersResponse = z.infer<typeof BulkUpsertCustomersResponseSchema>;
 export type GetCustomersResponse = z.infer<typeof GetCustomersResponseSchema>;
 export type CreateCustomerResponse = z.infer<typeof CreateCustomerResponseSchema>;
 export type UpdateCustomerResponse = z.infer<typeof UpdateCustomerResponseSchema>;
-export type GetCustomerResponse = z.infer<typeof GetCustomerResponseSchema>;
 
 // Purchase Order types
 export type Address = z.infer<typeof AddressSchema>;
@@ -332,3 +375,6 @@ export type GetProductsResponse = z.infer<typeof GetProductsResponseSchema>;
 export type CreateProductResponse = z.infer<typeof CreateProductResponseSchema>;
 export type UpdateProductResponse = z.infer<typeof UpdateProductResponseSchema>;
 export type GetProductResponse = z.infer<typeof GetProductResponseSchema>;
+export type BulkUpsertProductItem = z.infer<typeof BulkUpsertProductItemSchema>;
+export type BulkUpsertProductsRequest = z.infer<typeof BulkUpsertProductsRequestSchema>;
+export type BulkUpsertProductsResponse = z.infer<typeof BulkUpsertProductsResponseSchema>;

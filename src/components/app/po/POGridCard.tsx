@@ -5,8 +5,9 @@ import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { SelectableCard } from '@/components/common';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { POStatusBadge } from './POStatusBadge';
-import { formatCurrency } from '@/utils/number';
 import { formatDate } from '@/utils/time';
+import { getCustomerNameByCustomerId } from '@/utils/overview';
+import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 
 type POGridCardProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -15,7 +16,7 @@ type POGridCardProps = {
 export function POGridCard({ purchaseOrder }: POGridCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
+  const customerMapByCustomerId = useCustomerMapByCustomerId();
   return (
     <SelectableCard
       withBorder
@@ -47,13 +48,8 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
                   {t('po.customer')}
                 </Text>
                 <Text size="sm" c="dimmed">
-                  {purchaseOrder.customer?.name ?? '-'}
+                  {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
                 </Text>
-                {purchaseOrder.customer?.companyName && (
-                  <Text size="xs" c="dimmed">
-                    ({purchaseOrder.customer.companyName})
-                  </Text>
-                )}
               </div>
               <div>
                 <Text size="sm" fw={500}>
@@ -69,11 +65,6 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
                 </Text>
                 <Text size="sm" c="dimmed">
                   {purchaseOrder.items.length} {t('po.itemsCount')}
-                </Text>
-              </div>
-              <div>
-                <Text size="md" fw={600} c="blue">
-                  {formatCurrency(purchaseOrder.totalAmount)}
                 </Text>
               </div>
             </Stack>
