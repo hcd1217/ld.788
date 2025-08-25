@@ -1007,7 +1007,6 @@
     }
   },
   "po": {
-    "actionDescription": "Bạn có thể {{status}} đơn hàng này. Chọn hành động bên dưới để tiếp tục.",
     "addPO": "Thêm Đơn Hàng",
     "addFirstItem": "Thêm Mục Đầu Tiên",
     "addItem": "Thêm Mục",
@@ -1077,7 +1076,7 @@
     "itemsRequired": "Cần ít nhất một sản phẩm",
     "markDelivered": "Đánh Dấu Đã Giao",
     "markShipped": "Đánh Dấu Đã Gửi",
-    "noActionsAvailable": "Không có hành động nào cho trạng thái đơn hàng này",
+    "noActionsAvailable": "Không có hành động khả dụng cho đơn hàng này",
     "noItemsMessage": "Chưa có mục nào được thêm. Nhấn nút bên dưới để thêm mục đầu tiên.",
     "noPOsFound": "Không tìm thấy đơn hàng nào",
     "noPOsFoundSearch": "Không tìm thấy đơn hàng nào phù hợp với tìm kiếm của bạn",

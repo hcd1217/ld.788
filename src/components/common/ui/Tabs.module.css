@@ -34,21 +34,10 @@
   border-color: var(--mantine-color-brand-4);
   border-bottom-color: transparent;
   color: var(--mantine-color-brand-7);
+  border-top: 3px solid var(--mantine-color-brand-5);
   font-weight: 600;
   position: relative;
   z-index: 1;
-}
-
-/* Add colored top accent for active tab */
-.tab[data-active]::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: var(--mantine-color-brand-5);
-  border-radius: 8px 8px 0 0;
 }
 
 /* Hide bottom border for active tab */
@@ -63,28 +52,28 @@
 }
 
 /* Dark mode adjustments */
-[data-mantine-color-scheme="dark"] .tab {
+[data-mantine-color-scheme='dark'] .tab {
   background-color: var(--mantine-color-dark-6);
   color: var(--mantine-color-gray-3);
 }
 
-[data-mantine-color-scheme="dark"] .tab:hover {
+[data-mantine-color-scheme='dark'] .tab:hover {
   background-color: var(--mantine-color-dark-5);
   border-color: var(--mantine-color-dark-4);
   color: var(--mantine-color-gray-1);
 }
 
-[data-mantine-color-scheme="dark"] .tab[data-active] {
+[data-mantine-color-scheme='dark'] .tab[data-active] {
   background-color: var(--mantine-color-dark-7);
   border-color: var(--mantine-color-brand-4);
   color: var(--mantine-color-brand-4);
 }
 
-[data-mantine-color-scheme="dark"] .tab[data-active]::after {
+[data-mantine-color-scheme='dark'] .tab[data-active]::after {
   background-color: var(--mantine-color-dark-7);
 }
 
-[data-mantine-color-scheme="dark"] .tabsList {
+[data-mantine-color-scheme='dark'] .tabsList {
   border-bottom-color: var(--mantine-color-dark-4);
 }
 
@@ -93,6 +82,6 @@
   background-color: var(--mantine-color-white);
 }
 
-[data-mantine-color-scheme="dark"] .panel {
+[data-mantine-color-scheme='dark'] .panel {
   background-color: var(--mantine-color-dark-7);
 }

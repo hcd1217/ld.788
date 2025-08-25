@@ -1,4 +1,4 @@
-import { Card, Stack, Group, Title, Button, Text, Alert } from '@mantine/core';
+import { Card, Stack, Group, Title, Button, Alert } from '@mantine/core';
 import {
   IconCheck,
   IconPackage,
@@ -42,16 +42,6 @@ export function POActionZone({
       case 'NEW':
         actions.push(
           <Button
-            key="cancel"
-            color="red"
-            variant="outline"
-            loading={isLoading}
-            leftSection={<IconX size={16} />}
-            onClick={onCancel}
-          >
-            {t('po.cancel')}
-          </Button>,
-          <Button
             key="confirm"
             color="green"
             loading={isLoading}
@@ -60,11 +50,6 @@ export function POActionZone({
           >
             {t('po.confirm')}
           </Button>,
-        );
-        break;
-
-      case 'CONFIRMED':
-        actions.push(
           <Button
             key="cancel"
             color="red"
@@ -75,6 +60,11 @@ export function POActionZone({
           >
             {t('po.cancel')}
           </Button>,
+        );
+        break;
+
+      case 'CONFIRMED':
+        actions.push(
           <Button
             key="process"
             color="blue"
@@ -83,6 +73,16 @@ export function POActionZone({
             onClick={onProcess}
           >
             {t('po.startProcessing')}
+          </Button>,
+          <Button
+            key="cancel"
+            color="red"
+            variant="outline"
+            loading={isLoading}
+            leftSection={<IconX size={16} />}
+            onClick={onCancel}
+          >
+            {t('po.cancel')}
           </Button>,
         );
         break;
@@ -173,9 +173,6 @@ export function POActionZone({
     <Card shadow="sm" p="sx" m="0" radius="md">
       <Stack gap="sm">
         <Title order={3}>{t('po.availableActions')}</Title>
-        <Text size="sm" c="dimmed">
-          {t('po.actionDescription', { status: t(`po.status.${purchaseOrder.status}`) })}
-        </Text>
         <Group p="xs">{availableActions}</Group>
       </Stack>
     </Card>

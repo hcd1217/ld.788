@@ -14,7 +14,7 @@ export function POItemsList({ purchaseOrder }: POItemsListProps) {
       <Stack gap="lg">
         <Group justify="space-between">
           <Title order={3}>{t('po.orderItems')}</Title>
-          <Badge size="lg" variant="light">
+          <Badge size="lg" variant="transparent">
             {purchaseOrder.items.length} {t('po.itemsCount')}
           </Badge>
         </Group>

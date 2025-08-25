@@ -18,6 +18,7 @@ import { Tabs, ComingSoonCard } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import { notifications } from '@mantine/notifications';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { useState } from 'react';
 
 type PODetailTabsProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -43,6 +44,10 @@ export function PODetailTabs({
   onRefund,
 }: PODetailTabsProps) {
   const { t } = useTranslation();
+
+  const [value, setValue] = useState<'info' | 'items' | 'timeline' | 'documents' | 'communication'>(
+    'info',
+  );
 
   const handlePrint = () => {
     window.print();
@@ -72,7 +77,7 @@ export function PODetailTabs({
   };
 
   return (
-    <Tabs defaultValue="info">
+    <Tabs defaultValue="info" value={value} onChange={(value) => setValue(value as any)}>
       <ScrollArea offsetScrollbars scrollbarSize={4}>
         <Tabs.List>
           <Tabs.Tab value="info" leftSection={<IconInfoCircle size={16} />}>
@@ -106,7 +111,13 @@ export function PODetailTabs({
             onRefund={onRefund}
           />
           <POErrorBoundary componentName="POBasicInfoCard">
-            <POBasicInfoCard purchaseOrder={purchaseOrder} onEdit={onEdit} />
+            <POBasicInfoCard
+              purchaseOrder={purchaseOrder}
+              onEdit={onEdit}
+              onNavigateToItemsList={() => {
+                setValue('items');
+              }}
+            />
           </POErrorBoundary>
         </Stack>
       </Tabs.Panel>

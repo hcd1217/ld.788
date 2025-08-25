@@ -1007,7 +1007,6 @@
     }
   },
   "po": {
-    "actionDescription": "You can {{status}} this order. Select an action below to proceed.",
     "addPO": "Add Purchase Order",
     "addFirstItem": "Add First Item",
     "addItem": "Add Item",

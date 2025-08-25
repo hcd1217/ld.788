@@ -29,9 +29,14 @@ import {
 type POBasicInfoCardProps = {
   readonly purchaseOrder: PurchaseOrder;
   readonly onEdit?: () => void;
+  readonly onNavigateToItemsList?: () => void;
 };
 
-export function POBasicInfoCard({ purchaseOrder, onEdit }: POBasicInfoCardProps) {
+export function POBasicInfoCard({
+  purchaseOrder,
+  onEdit,
+  onNavigateToItemsList,
+}: POBasicInfoCardProps) {
   const { t } = useTranslation();
   const employeeMapByUserId = useEmployeeMapByUserId();
   const customerMapByCustomerId = useCustomerMapByCustomerId();
@@ -59,7 +64,11 @@ export function POBasicInfoCard({ purchaseOrder, onEdit }: POBasicInfoCardProps)
                 <Group justify="start" gap="sm" align="center">
                   <POStatusBadge status={purchaseOrder.status} size="md" />
                   {canEdit && onEdit && (
-                    <Button variant="light" leftSection={<IconEdit size={16} />} onClick={onEdit}>
+                    <Button
+                      variant="transparent"
+                      leftSection={<IconEdit size={16} />}
+                      onClick={onEdit}
+                    >
                       {t('common.edit')}
                     </Button>
                   )}
@@ -91,7 +100,12 @@ export function POBasicInfoCard({ purchaseOrder, onEdit }: POBasicInfoCardProps)
                 <Text size="sm" fw={500} c="dimmed">
                   {t('po.items')}
                 </Text>
-                <Badge variant="light" size="lg">
+                <Badge
+                  variant="transparent"
+                  size="lg"
+                  style={{ cursor: 'pointer' }}
+                  onClick={onNavigateToItemsList}
+                >
                   {purchaseOrder.items.length} {t('po.itemsCount')}
                 </Badge>
               </div>
