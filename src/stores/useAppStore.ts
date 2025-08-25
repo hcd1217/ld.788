@@ -109,10 +109,10 @@ export const useAppStore = create<AppState>()(
             desktop: {
               defaultPageSize: 12,
               pagingOptions: [
-                { value: '6', label: '6' },
-                { value: '12', label: '12' },
-                { value: '24', label: '24' },
-                { value: '48', label: '48' },
+                { value: '10', label: '10' },
+                { value: '20', label: '20' },
+                { value: '50', label: '50' },
+                { value: '100', label: '100' },
               ],
             },
           },

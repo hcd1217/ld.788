@@ -201,9 +201,7 @@ export function POFormPage({ mode }: POFormPageProps) {
   return (
     <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
       <AppPageTitle title={pageTitle} />
-      <Container fluid mt="lg">
-        {content}
-      </Container>
+      <Container fluid>{content}</Container>
     </AppDesktopLayout>
   );
 }

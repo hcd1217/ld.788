@@ -12,6 +12,8 @@ import {
 } from '@mantine/core';
 import { DateInput, DatesProvider } from '@mantine/dates';
 import type { UseFormReturnType } from '@mantine/form';
+import 'dayjs/locale/vi';
+import 'dayjs/locale/en';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { POItemsEditor } from './POItemsEditor';
 import { POCustomerSelection } from './POCustomerSelection';
@@ -67,6 +69,8 @@ export function POForm({
   isEditMode = false,
 }: POFormProps) {
   const { isMobile } = useDeviceType();
+  const { currentLanguage } = useTranslation();
+  const valueFormat = currentLanguage === 'vi' ? 'DD/MM/YYYY' : 'MMM DD, YYYY';
 
   // Computed values
   const selectedCustomer = useMemo(
@@ -101,7 +105,7 @@ export function POForm({
 
   // Form content without actions
   const formContent = (
-    <DatesProvider settings={{ locale: 'en', firstDayOfWeek: 0, weekendDays: [0, 6] }}>
+    <DatesProvider settings={{ locale: currentLanguage, firstDayOfWeek: 0, weekendDays: [0, 6] }}>
       <Stack gap="lg">
         {/* Error Alert */}
         <ErrorAlert error={error} />
@@ -115,7 +119,7 @@ export function POForm({
         />
 
         {/* Date Fields */}
-        <PODateSection form={form} isLoading={isLoading} />
+        <PODateSection form={form} isLoading={isLoading} valueFormat={valueFormat} />
 
         {/* Order Items */}
         <OrderItemsSection form={form} isLoading={isLoading} />
@@ -205,9 +209,11 @@ export function POForm({
 function PODateSection({
   form,
   isLoading,
+  valueFormat,
 }: {
   form: UseFormReturnType<POFormValues>;
   isLoading: boolean;
+  valueFormat: string;
 }) {
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
@@ -224,6 +230,7 @@ function PODateSection({
             placeholder={t('po.selectOrderDate')}
             clearable
             disabled={isLoading}
+            valueFormat={valueFormat}
             value={form.values.orderDate}
             onChange={(date) => form.setFieldValue('orderDate', date ? new Date(date) : undefined)}
             maxDate={form.values.deliveryDate || undefined}
@@ -233,6 +240,7 @@ function PODateSection({
             placeholder={t('po.selectDeliveryDate')}
             clearable
             disabled={isLoading}
+            valueFormat={valueFormat}
             value={form.values.deliveryDate}
             onChange={(date) =>
               form.setFieldValue('deliveryDate', date ? new Date(date) : undefined)
@@ -253,9 +261,9 @@ function OrderItemsSection({
   isLoading: boolean;
 }) {
   const { t } = useTranslation();
-
+  const { isMobile } = useDeviceType();
   return (
-    <Card withBorder radius="md" p="xl">
+    <Card withBorder radius="md" p={isMobile ? 'xs' : 'xl'}>
       <Stack gap="md">
         <Text fw={500} size="lg">
           {t('po.orderItems')}

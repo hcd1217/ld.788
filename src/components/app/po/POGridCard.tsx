@@ -5,7 +5,7 @@ import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { SelectableCard } from '@/components/common';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { POStatusBadge } from './POStatusBadge';
-import { formatDate } from '@/utils/time';
+import { formatDateTime } from '@/utils/time';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 
@@ -56,7 +56,7 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
                   {t('po.orderDate')}
                 </Text>
                 <Text size="sm" c="dimmed">
-                  {formatDate(purchaseOrder.orderDate)}
+                  {formatDateTime(purchaseOrder.orderDate)}
                 </Text>
               </div>
               <div>

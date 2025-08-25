@@ -1,3 +1,5 @@
+import type React from 'react';
+
 export async function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -7,13 +9,28 @@ export async function delay(ms: number): Promise<void> {
 }
 
 /**
+ * Get the proper locale format based on language code
+ * @param language - Language code (e.g., 'vi', 'en')
+ * @returns Proper locale format (e.g., 'vi-VN', 'en-US')
+ */
+export function getLocaleFormat(language: string): string {
+  const localeMap: Record<string, string> = {
+    vi: 'vi-VN',
+    en: 'en-US',
+  };
+  return localeMap[language] || 'en-US';
+}
+
+/**
  * Format a date to a readable string
  * @param date - The date to format
+ * @param locale - Optional locale string (defaults to 'vi-VN')
  * @param options - Intl.DateTimeFormat options
  * @returns Formatted date string
  */
 export function formatDate(
   date: Date | string | undefined,
+  locale?: string,
   options?: Intl.DateTimeFormatOptions,
 ): string {
   if (!date) {
@@ -24,11 +41,43 @@ export function formatDate(
 
   const defaultOptions: Intl.DateTimeFormatOptions = {
     year: 'numeric',
-    month: 'short',
+    month: 'numeric',
     day: 'numeric',
   };
 
-  return new Intl.DateTimeFormat('vi-VN', {
+  return new Intl.DateTimeFormat(locale || 'vi-VN', {
+    ...defaultOptions,
+    ...options,
+  }).format(dateObj);
+}
+
+/**
+ * Format a date with time to show hours and minutes
+ * @param date - The date to format
+ * @param locale - Optional locale string (defaults to 'vi-VN')
+ * @param options - Intl.DateTimeFormat options
+ * @returns Formatted date string with time
+ */
+export function formatDateTime(
+  date: Date | string | undefined,
+  locale?: string,
+  options?: Intl.DateTimeFormatOptions,
+): string {
+  if (!date) {
+    return '';
+  }
+
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+  const defaultOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  };
+
+  return new Intl.DateTimeFormat(locale || 'vi-VN', {
     ...defaultOptions,
     ...options,
   }).format(dateObj);
@@ -53,22 +102,17 @@ export function getEndDateStatus(
   }
 
   const today = new Date();
-  const endDateTime = new Date(endDate);
+  const endDateObj = typeof endDate === 'string' ? new Date(endDate) : endDate;
+  const diffTime = endDateObj.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  // Reset time to start of day for accurate comparison
-  today.setHours(0, 0, 0, 0);
-  endDateTime.setHours(0, 0, 0, 0);
-
-  const timeDiff = endDateTime.getTime() - today.getTime();
-  const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-
-  // Employee ended but still active
-  if (daysDiff < 0 && isActive) {
+  // End date has passed but employee is still active
+  if (diffDays < 0 && isActive) {
     return 'ended_but_active';
   }
 
-  // Employee ending soon
-  if (daysDiff >= 0 && daysDiff <= daysThreshold) {
+  // End date is approaching
+  if (diffDays >= 0 && diffDays <= daysThreshold) {
     return 'ending_soon';
   }
 
@@ -76,24 +120,27 @@ export function getEndDateStatus(
 }
 
 /**
- * Get highlight styles for employee based on end date status
+ * Get highlight styles for end date status
  * @param endDate - The employee's end date
  * @param isActive - Whether the employee is currently active
- * @returns Object with background and border color styles
+ * @returns CSS styles for highlighting based on end date status
  */
-export function getEndDateHighlightStyles(endDate: Date | undefined, isActive: boolean) {
+export function getEndDateHighlightStyles(
+  endDate: Date | undefined,
+  isActive: boolean,
+): React.CSSProperties {
   const status = getEndDateStatus(endDate, isActive);
 
   switch (status) {
-    case 'ending_soon':
-      return {
-        backgroundColor: 'var(--mantine-color-yellow-0)',
-        borderColor: 'var(--mantine-color-yellow-4)',
-      };
     case 'ended_but_active':
       return {
         backgroundColor: 'var(--mantine-color-red-0)',
-        borderColor: 'var(--mantine-color-red-4)',
+        borderColor: 'var(--mantine-color-red-3)',
+      };
+    case 'ending_soon':
+      return {
+        backgroundColor: 'var(--mantine-color-yellow-0)',
+        borderColor: 'var(--mantine-color-yellow-3)',
       };
     default:
       return {};

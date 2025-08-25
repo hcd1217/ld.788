@@ -10,6 +10,7 @@ import {
 } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { useMemo } from 'react';
 
 type POActionZoneProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -34,12 +35,22 @@ export function POActionZone({
 }: POActionZoneProps) {
   const { t } = useTranslation();
 
-  const getAvailableActions = () => {
+  const availableActions = useMemo(() => {
     const actions = [];
 
     switch (purchaseOrder.status) {
       case 'NEW':
         actions.push(
+          <Button
+            key="cancel"
+            color="red"
+            variant="outline"
+            loading={isLoading}
+            leftSection={<IconX size={16} />}
+            onClick={onCancel}
+          >
+            {t('po.cancel')}
+          </Button>,
           <Button
             key="confirm"
             color="green"
@@ -49,6 +60,11 @@ export function POActionZone({
           >
             {t('po.confirm')}
           </Button>,
+        );
+        break;
+
+      case 'CONFIRMED':
+        actions.push(
           <Button
             key="cancel"
             color="red"
@@ -59,11 +75,6 @@ export function POActionZone({
           >
             {t('po.cancel')}
           </Button>,
-        );
-        break;
-
-      case 'CONFIRMED':
-        actions.push(
           <Button
             key="process"
             color="blue"
@@ -72,16 +83,6 @@ export function POActionZone({
             onClick={onProcess}
           >
             {t('po.startProcessing')}
-          </Button>,
-          <Button
-            key="cancel"
-            color="red"
-            variant="outline"
-            loading={isLoading}
-            leftSection={<IconX size={16} />}
-            onClick={onCancel}
-          >
-            {t('po.cancel')}
           </Button>,
         );
         break;
@@ -103,15 +104,6 @@ export function POActionZone({
       case 'SHIPPED':
         actions.push(
           <Button
-            key="deliver"
-            color="green"
-            loading={isLoading}
-            leftSection={<IconPackageExport size={16} />}
-            onClick={onDeliver}
-          >
-            {t('po.markDelivered')}
-          </Button>,
-          <Button
             key="refund"
             color="orange"
             variant="outline"
@@ -120,6 +112,15 @@ export function POActionZone({
             onClick={onRefund}
           >
             {t('po.processRefund')}
+          </Button>,
+          <Button
+            key="deliver"
+            color="green"
+            loading={isLoading}
+            leftSection={<IconPackageExport size={16} />}
+            onClick={onDeliver}
+          >
+            {t('po.markDelivered')}
           </Button>,
         );
         break;
@@ -146,13 +147,21 @@ export function POActionZone({
     }
 
     return actions;
-  };
-
-  const availableActions = getAvailableActions();
+  }, [
+    purchaseOrder.status,
+    isLoading,
+    t,
+    onCancel,
+    onConfirm,
+    onProcess,
+    onShip,
+    onDeliver,
+    onRefund,
+  ]);
 
   if (availableActions.length === 0) {
     return (
-      <Card shadow="sm" padding="xl" radius="md">
+      <Card shadow="sm" p="sx" m="0" radius="md">
         <Alert icon={<IconAlertTriangle size={16} />} color="gray" variant="light">
           {t('po.noActionsAvailable')}
         </Alert>
@@ -161,15 +170,13 @@ export function POActionZone({
   }
 
   return (
-    <Card shadow="sm" padding="xl" radius="md">
-      <Stack gap="lg">
+    <Card shadow="sm" p="sx" m="0" radius="md">
+      <Stack gap="sm">
         <Title order={3}>{t('po.availableActions')}</Title>
-
         <Text size="sm" c="dimmed">
           {t('po.actionDescription', { status: t(`po.status.${purchaseOrder.status}`) })}
         </Text>
-
-        <Group>{availableActions}</Group>
+        <Group p="xs">{availableActions}</Group>
       </Stack>
     </Card>
   );

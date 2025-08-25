@@ -18,6 +18,11 @@ export function AppPageTitle({ title, button, fz }: AppPageTitleProps) {
       <Title
         order={1}
         ta="center"
+        mb={{
+          base: 0,
+          sm: 'xs',
+          md: 'lg',
+        }}
         fz={
           fz ?? {
             base: 'h4',

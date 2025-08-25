@@ -61,7 +61,7 @@ type POState = {
   confirmPO: (id: string) => Promise<void>;
   processPO: (id: string) => Promise<void>;
   shipPO: (id: string, data?: UpdatePOStatusRequest) => Promise<void>;
-  deliverPO: (id: string) => Promise<void>;
+  deliverPO: (id: string, data?: { deliveryNotes?: string }) => Promise<void>;
   cancelPO: (id: string, data?: { cancelReason?: string }) => Promise<void>;
   refundPO: (id: string, data?: { refundReason?: string }) => Promise<void>;
   clearError: () => void;
@@ -415,7 +415,7 @@ export const usePOStore = create<POState>()(
         }
       },
 
-      async deliverPO(id) {
+      async deliverPO(id, data) {
         // Check if request is already pending
         if (get()._isRequestPending(id)) {
           throw new Error('Deliver request already pending for this PO');
@@ -437,7 +437,7 @@ export const usePOStore = create<POState>()(
         }));
 
         try {
-          await purchaseOrderService.deliverPO(id);
+          await purchaseOrderService.deliverPO(id, data);
 
           // Only update if this request is still valid (prevent race conditions)
           if (get()._finishRequest(id, requestId)) {

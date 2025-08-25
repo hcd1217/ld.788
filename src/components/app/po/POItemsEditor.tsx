@@ -199,7 +199,7 @@ export function POItemsEditor({ items, onChange, isReadOnly = false }: POItemsEd
   // Mobile layout with cards
   if (isMobile) {
     return (
-      <Card shadow="sm" padding="xl" radius="md">
+      <Card shadow="sm" padding="xs" radius="md">
         <Stack gap="lg">
           <Title order={3}>{t('po.orderItems')}</Title>
 
@@ -210,7 +210,7 @@ export function POItemsEditor({ items, onChange, isReadOnly = false }: POItemsEd
                 <Stack gap="sm">
                   <Group justify="space-between" align="flex-start">
                     <Text size="sm" fw={500}>
-                      #{item.id.slice(-4)}
+                      {item.productCode}
                     </Text>
                     {!isReadOnly && (
                       <ActionIcon

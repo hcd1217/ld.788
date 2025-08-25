@@ -95,9 +95,6 @@ export function PODetailTabs({
 
       <Tabs.Panel value="info" pt="xl">
         <Stack gap="xl">
-          <POErrorBoundary componentName="POBasicInfoCard">
-            <POBasicInfoCard purchaseOrder={purchaseOrder} onEdit={onEdit} />
-          </POErrorBoundary>
           <POActionZone
             purchaseOrder={purchaseOrder}
             isLoading={isLoading}
@@ -108,6 +105,9 @@ export function PODetailTabs({
             onCancel={onCancel}
             onRefund={onRefund}
           />
+          <POErrorBoundary componentName="POBasicInfoCard">
+            <POBasicInfoCard purchaseOrder={purchaseOrder} onEdit={onEdit} />
+          </POErrorBoundary>
         </Stack>
       </Tabs.Panel>
 

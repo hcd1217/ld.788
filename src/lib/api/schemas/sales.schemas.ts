@@ -138,6 +138,10 @@ const POStatusHistorySchema = z.object({
   status: POStatusSchema,
   timestamp: timestampSchema,
   userId: idSchema,
+  reason: optionalStringSchema,
+  carrier: optionalStringSchema,
+  trackingNumber: optionalStringSchema,
+  deliveryNotes: optionalStringSchema,
 });
 
 // Purchase Order schema
@@ -151,8 +155,6 @@ const PurchaseOrderSchema = z.object({
   deliveryDate: timestampSchema.optional(),
   completedDate: timestampSchema.optional(),
   notes: optionalStringSchema,
-  cancelReason: optionalStringSchema,
-  refundReason: optionalStringSchema,
   items: z.array(POItemSchema),
   metadata: z
     .looseObject({
@@ -357,6 +359,7 @@ export type Address = z.infer<typeof AddressSchema>;
 export type POItem = z.infer<typeof POItemSchema>;
 export type CreatePOItem = z.infer<typeof CreatePOItemSchema>;
 export type POStatus = z.infer<typeof POStatusSchema>;
+export type POStatusHistory = z.infer<typeof POStatusHistorySchema>;
 export type PurchaseOrder = z.infer<typeof PurchaseOrderSchema>;
 export type CreatePurchaseOrderRequest = z.infer<typeof CreatePurchaseOrderRequestSchema>;
 export type UpdatePurchaseOrderRequest = z.infer<typeof UpdatePurchaseOrderRequestSchema>;

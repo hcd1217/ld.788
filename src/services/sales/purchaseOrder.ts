@@ -4,6 +4,7 @@ import {
   type CreatePurchaseOrderRequest,
   type UpdatePurchaseOrderRequest,
   type UpdatePOStatusRequest,
+  type POStatusHistory,
 } from '@/lib/api/schemas/sales.schemas';
 import { customerService, type Customer } from './customer';
 import { logError, logInfo } from '@/utils/logger';
@@ -20,20 +21,22 @@ export type {
 export type PurchaseOrder = Omit<ApiPurchaseOrder, 'metadata'> & {
   address?: string;
   googleMapsUrl?: string;
-  createdBy?: string;
-  createdAt?: Date;
-  confirmedBy?: string;
-  confirmedAt?: Date;
-  processedBy?: string;
-  processedAt?: Date;
-  shippedBy?: string;
-  shippedAt?: Date;
-  deliveredBy?: string;
-  deliveredAt?: Date;
-  cancelledBy?: string;
-  cancelledAt?: Date;
-  refundedBy?: string;
-  refundedAt?: Date;
+  statusHistory?: POStatusHistory[];
+  // createdBy?: string;
+  // createdAt?: Date;
+  // confirmedBy?: string;
+  // confirmedAt?: Date;
+  // processedBy?: string;
+  // processedAt?: Date;
+  // shippedBy?: string;
+  // shippedAt?: Date;
+  // deliveredBy?: string;
+  // deliveredAt?: Date;
+  // cancelledBy?: string;
+  // cancelledAt?: Date;
+  // refundedBy?: string;
+  // refundedAt?: Date;
+  // cancelReason?: string;
 };
 
 export type { Customer } from './customer';
@@ -43,22 +46,25 @@ export type { Customer } from './customer';
  */
 function transformApiToFrontend(apiPO: ApiPurchaseOrder): Omit<PurchaseOrder, 'customer'> {
   const { metadata, ...rest } = apiPO;
-  const statusHistory = metadata?.statusHistory || [];
-  const statusHistoryMap = new Map(statusHistory.map((status) => [status.status, status]));
+  // const statusHistory = metadata?.statusHistory || [];
+  // const statusHistoryMap = new Map(statusHistory.map((status) => [status.status, status]));
   return {
     ...rest,
     customerId: apiPO.customerId,
     address: metadata?.shippingAddress?.oneLineAddress,
     googleMapsUrl: metadata?.shippingAddress?.googleMapsUrl,
-    createdBy: statusHistoryMap.get('NEW')?.userId,
-    createdAt: statusHistoryMap.get('NEW')?.timestamp || rest.createdAt,
-    confirmedBy: statusHistoryMap.get('CONFIRMED')?.userId,
-    confirmedAt: statusHistoryMap.get('CONFIRMED')?.timestamp,
-    processedBy: statusHistoryMap.get('PROCESSING')?.userId,
-    processedAt: statusHistoryMap.get('PROCESSING')?.timestamp,
-    shippedBy: statusHistoryMap.get('SHIPPED')?.userId,
-    shippedAt: statusHistoryMap.get('SHIPPED')?.timestamp,
-    deliveredBy: statusHistoryMap.get('DELIVERED')?.userId,
+    statusHistory: metadata?.statusHistory,
+    // createdBy: statusHistoryMap.get('NEW')?.userId,
+    // createdAt: statusHistoryMap.get('NEW')?.timestamp || rest.createdAt,
+    // confirmedBy: statusHistoryMap.get('CONFIRMED')?.userId,
+    // confirmedAt: statusHistoryMap.get('CONFIRMED')?.timestamp,
+    // processedBy: statusHistoryMap.get('PROCESSING')?.userId,
+    // processedAt: statusHistoryMap.get('PROCESSING')?.timestamp,
+    // shippedBy: statusHistoryMap.get('SHIPPED')?.userId,
+    // shippedAt: statusHistoryMap.get('SHIPPED')?.timestamp,
+    // deliveredBy: statusHistoryMap.get('DELIVERED')?.userId,
+    // cancelReason: statusHistoryMap.get('CANCELLED')?.reason ?? rest.cancelReason,
+    // refundReason: statusHistoryMap.get('REFUNDED')?.reason ?? rest.refundReason,
   };
 }
 
@@ -289,8 +295,8 @@ export const purchaseOrderService = {
     await salesApi.shipPurchaseOrder(id, data);
   },
 
-  async deliverPO(id: string): Promise<void> {
-    await salesApi.deliverPurchaseOrder(id);
+  async deliverPO(id: string, data?: { deliveryNotes?: string }): Promise<void> {
+    await salesApi.deliverPurchaseOrder(id, data);
   },
 
   async cancelPO(id: string, data?: UpdatePOStatusRequest): Promise<void> {

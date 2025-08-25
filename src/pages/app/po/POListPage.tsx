@@ -224,7 +224,7 @@ export function POListPage() {
         />
 
         {/* Search and Filter Controls */}
-        <Stack gap="md" mt="lg">
+        <Stack gap="md">
           <Group justify="space-between" align="flex-end">
             <SearchBar
               placeholder={t('po.searchPlaceholder')}

@@ -6,7 +6,7 @@ import { POStatusBadge } from './POStatusBadge';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { getPODetailRoute } from '@/config/routeConfig';
-import { formatDate } from '@/utils/time';
+import { formatDate, getLocaleFormat } from '@/utils/time';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 
@@ -33,7 +33,7 @@ function PODataTableComponent({
   onCancelPO,
   onRefundPO,
 }: PODataTableProps) {
-  const { t } = useTranslation();
+  const { t, currentLanguage } = useTranslation();
   const navigate = useNavigate();
   const customerMapByCustomerId = useCustomerMapByCustomerId();
   // Memoized navigation handler
@@ -55,6 +55,13 @@ function PODataTableComponent({
       return actionFn ? () => actionFn(po) : undefined;
     },
     [],
+  );
+
+  const fmtDate = useCallback(
+    (date: Date | string | undefined) => {
+      return formatDate(date, getLocaleFormat(currentLanguage));
+    },
+    [currentLanguage],
   );
 
   return (
@@ -91,8 +98,8 @@ function PODataTableComponent({
                     </Text>
                   </Group>
                 </Table.Td>
-                <Table.Td>{formatDate(po.orderDate)}</Table.Td>
-                <Table.Td>{po.deliveryDate ? formatDate(po.deliveryDate) : '-'}</Table.Td>
+                <Table.Td>{fmtDate(po.orderDate)}</Table.Td>
+                <Table.Td>{po.deliveryDate ? fmtDate(po.deliveryDate) : '-'}</Table.Td>
                 <Table.Td>
                   <Text size="sm">
                     {po.items.length} {t('po.itemsCount')}

@@ -11,10 +11,11 @@ import {
 } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder, POStatus } from '@/services/sales/purchaseOrder';
-import { formatDate } from '@/utils/time';
+import { formatDate, formatDateTime } from '@/utils/time';
 import { PO_STATUS_COLORS } from '@/constants/purchaseOrder';
 import { useEmployeeMapByUserId } from '@/stores/useAppStore';
 import { getEmployeeNameByUserId } from '@/utils/overview';
+import { getStatusHistoryByStatus } from '@/utils/purchaseOrder';
 
 type POTimelineProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -104,13 +105,22 @@ export function POTimeline({ purchaseOrder }: POTimelineProps) {
     const isCancelled = currentStatus === 'CANCELLED';
     const isRefunded = currentStatus === 'REFUNDED';
 
+    // Get status history entries
+    const newEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'NEW');
+    const confirmedEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CONFIRMED');
+    const processingEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'PROCESSING');
+    const shippedEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'SHIPPED');
+    const deliveredEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'DELIVERED');
+    const cancelledEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CANCELLED');
+    const refundedEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'REFUNDED');
+
     // Always show the normal progression path
     // NEW status - always show as completed
     items.push(
       createTimelineItem(
         'NEW',
-        purchaseOrder.createdBy,
-        purchaseOrder.createdAt || purchaseOrder.orderDate,
+        newEntry?.userId,
+        newEntry?.timestamp || purchaseOrder.orderDate,
         undefined,
         true,
         currentStatus === 'NEW',
@@ -121,10 +131,10 @@ export function POTimeline({ purchaseOrder }: POTimelineProps) {
     items.push(
       createTimelineItem(
         'CONFIRMED',
-        purchaseOrder.confirmedBy,
-        purchaseOrder.confirmedAt,
+        confirmedEntry?.userId,
+        confirmedEntry?.timestamp,
         undefined,
-        !!purchaseOrder.confirmedAt,
+        !!confirmedEntry,
         currentStatus === 'CONFIRMED',
       ),
     );
@@ -133,38 +143,51 @@ export function POTimeline({ purchaseOrder }: POTimelineProps) {
     items.push(
       createTimelineItem(
         'PROCESSING',
-        purchaseOrder.processedBy,
-        purchaseOrder.processedAt,
+        processingEntry?.userId,
+        processingEntry?.timestamp,
         undefined,
-        !!purchaseOrder.processedAt,
+        !!processingEntry,
         currentStatus === 'PROCESSING',
       ),
     );
 
     // SHIPPED status - always show in normal flow
-    const shippedAdditionalInfo = purchaseOrder.deliveryDate
+    let shippedAdditionalInfo = purchaseOrder.deliveryDate
       ? `${t('po.expectedDelivery')}: ${formatDate(purchaseOrder.deliveryDate)}`
       : undefined;
+    if (shippedEntry?.trackingNumber) {
+      shippedAdditionalInfo = shippedAdditionalInfo
+        ? `${shippedAdditionalInfo} | ${t('po.trackingNumber')}: ${shippedEntry.trackingNumber}`
+        : `${t('po.trackingNumber')}: ${shippedEntry.trackingNumber}`;
+    }
+    if (shippedEntry?.carrier) {
+      shippedAdditionalInfo = shippedAdditionalInfo
+        ? `${shippedAdditionalInfo} | ${t('po.carrier')}: ${shippedEntry.carrier}`
+        : `${t('po.carrier')}: ${shippedEntry.carrier}`;
+    }
     items.push(
       createTimelineItem(
         'SHIPPED',
-        purchaseOrder.shippedBy,
-        purchaseOrder.shippedAt,
+        shippedEntry?.userId,
+        shippedEntry?.timestamp,
         shippedAdditionalInfo,
-        !!purchaseOrder.shippedAt,
+        !!shippedEntry,
         currentStatus === 'SHIPPED',
       ),
     );
 
     // DELIVERED status - show if not cancelled/refunded
     if (!isCancelled && !isRefunded) {
+      const deliveryAdditionalInfo = deliveredEntry?.deliveryNotes
+        ? `${t('po.deliveryNotes')}: ${deliveredEntry.deliveryNotes}`
+        : undefined;
       items.push(
         createTimelineItem(
           'DELIVERED',
-          purchaseOrder.deliveredBy,
-          purchaseOrder.deliveredAt || purchaseOrder.completedDate,
-          undefined,
-          !!purchaseOrder.deliveredAt || currentStatus === 'DELIVERED',
+          deliveredEntry?.userId,
+          deliveredEntry?.timestamp || purchaseOrder.completedDate,
+          deliveryAdditionalInfo,
+          !!deliveredEntry || currentStatus === 'DELIVERED',
           currentStatus === 'DELIVERED',
         ),
       );
@@ -172,14 +195,14 @@ export function POTimeline({ purchaseOrder }: POTimelineProps) {
 
     // CANCELLED status - show only if cancelled
     if (isCancelled) {
-      const additionalInfo = purchaseOrder.cancelReason
-        ? `${t('po.reason')}: ${purchaseOrder.cancelReason}`
+      const additionalInfo = cancelledEntry?.reason
+        ? `${t('po.reason')}: ${cancelledEntry.reason}`
         : undefined;
       items.push(
         createTimelineItem(
           'CANCELLED',
-          purchaseOrder.cancelledBy,
-          purchaseOrder.cancelledAt || purchaseOrder.updatedAt,
+          cancelledEntry?.userId,
+          cancelledEntry?.timestamp || purchaseOrder.updatedAt,
           additionalInfo,
           true,
           true,
@@ -189,14 +212,14 @@ export function POTimeline({ purchaseOrder }: POTimelineProps) {
 
     // REFUNDED status - show only if refunded
     if (isRefunded) {
-      const additionalInfo = purchaseOrder.refundReason
-        ? `${t('po.reason')}: ${purchaseOrder.refundReason}`
+      const additionalInfo = refundedEntry?.reason
+        ? `${t('po.reason')}: ${refundedEntry.reason}`
         : undefined;
       items.push(
         createTimelineItem(
           'REFUNDED',
-          purchaseOrder.refundedBy,
-          purchaseOrder.refundedAt || purchaseOrder.updatedAt,
+          refundedEntry?.userId,
+          refundedEntry?.timestamp || purchaseOrder.updatedAt,
           additionalInfo,
           true,
           true,
@@ -247,7 +270,7 @@ export function POTimeline({ purchaseOrder }: POTimelineProps) {
               </Text>
               {item.date && (
                 <Text size="xs" c="dimmed">
-                  {formatDate(item.date)}
+                  {formatDateTime(item.date)}
                 </Text>
               )}
             </Timeline.Item>
