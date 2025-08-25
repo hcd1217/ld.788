@@ -24,6 +24,7 @@ export const DepartmentOverviewSchema = z.object({
 export const ProductOverviewSchema = z.object({
   id: idSchema.describe('Product ID'),
   name: stringSchema.describe('Product name'),
+  code: stringSchema.describe('Product code'),
   unit: stringSchema.describe('Product unit'),
   status: ProductStatusSchema.describe('Product status'),
 });

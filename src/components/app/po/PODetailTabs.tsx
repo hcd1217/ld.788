@@ -99,7 +99,7 @@ export function PODetailTabs({
       </ScrollArea>
 
       <Tabs.Panel value="info" pt="xl">
-        <Stack gap="xl">
+        <Stack gap="sm">
           <POActionZone
             purchaseOrder={purchaseOrder}
             isLoading={isLoading}

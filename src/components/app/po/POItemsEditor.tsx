@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
   Table,
   TextInput,
@@ -18,8 +18,8 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { showErrorNotification } from '@/utils/notifications';
 import type { POItem } from '@/lib/api/schemas/sales.schemas';
-import { usePOActions, useProductList } from '@/stores/usePOStore';
 import { createPOItem } from '@/utils/poItemUtils';
+import { useAppStore } from '@/stores/useAppStore';
 
 type POItemsEditorProps = {
   readonly items: POItem[];
@@ -30,11 +30,8 @@ type POItemsEditorProps = {
 export function POItemsEditor({ items, onChange, isReadOnly = false }: POItemsEditorProps) {
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
-
-  // Get products from store
-  const products = useProductList();
-  const { loadProducts } = usePOActions();
   const [productSearch, setProductSearch] = useState('');
+  const { overviewData } = useAppStore();
 
   const [newItem, setNewItem] = useState<Partial<POItem>>({
     productCode: '',
@@ -43,19 +40,12 @@ export function POItemsEditor({ items, onChange, isReadOnly = false }: POItemsEd
     category: '',
   });
 
-  // Load products on mount if not already loaded
-  useEffect(() => {
-    if (products.length === 0) {
-      loadProducts();
-    }
-  }, [products.length, loadProducts]);
-
   // Generate autocomplete data from products with search filter
   const productOptions = useMemo(() => {
     // For Mantine Autocomplete, we need to return an array of strings
     // We'll create a map to look up products by their display label
-    return products.map((p) => `${p.productCode} - ${p.name}`);
-  }, [products]);
+    return overviewData?.products.map((p) => `${p.code} - ${p.name}`) || [];
+  }, [overviewData]);
 
   const handleAddItem = useCallback(() => {
     const result = createPOItem(newItem, items);
@@ -115,28 +105,28 @@ export function POItemsEditor({ items, onChange, isReadOnly = false }: POItemsEd
     (itemId: string | 'new', value: string) => {
       // Parse the selection to get product code
       const productCode = value.split(' - ')[0];
-      const product = products.find((p) => p.productCode === productCode);
+      const product = overviewData?.products.find((p) => p.code === productCode);
 
       if (product) {
         if (itemId === 'new') {
           setNewItem({
             ...newItem,
-            productCode: product.productCode,
+            productCode: product.code,
             description: product.name,
-            category: product.category || newItem.category || '',
+            category: newItem.category || '',
           });
         } else {
           // Find current item to preserve quantity and other fields
           const currentItem = items.find((i) => i.id === itemId);
           if (currentItem) {
-            handleUpdateItem(itemId, 'productCode', product.productCode);
+            handleUpdateItem(itemId, 'productCode', product.code);
             handleUpdateItem(itemId, 'description', product.name);
-            handleUpdateItem(itemId, 'category', product.category || currentItem.category);
+            handleUpdateItem(itemId, 'category', currentItem.category);
           }
         }
       }
     },
-    [products, newItem, items, handleUpdateItem],
+    [overviewData, newItem, items, handleUpdateItem],
   );
 
   // Empty state

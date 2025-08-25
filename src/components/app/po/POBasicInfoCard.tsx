@@ -32,6 +32,8 @@ type POBasicInfoCardProps = {
   readonly onNavigateToItemsList?: () => void;
 };
 
+const span = { base: 12, md: 6 };
+
 export function POBasicInfoCard({
   purchaseOrder,
   onEdit,
@@ -46,7 +48,7 @@ export function POBasicInfoCard({
     <Card shadow="sm" padding="xl" radius="md">
       <Stack gap="lg">
         <Grid>
-          <Grid.Col span={{ base: 12, md: 6 }}>
+          <Grid.Col span={span}>
             <Stack gap="md">
               <div>
                 <Text size="sm" fw={500} c="dimmed">
@@ -77,7 +79,7 @@ export function POBasicInfoCard({
             </Stack>
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, md: 6 }}>
+          <Grid.Col span={span}>
             <Stack gap="md">
               <div>
                 <Text size="sm" fw={500} c="dimmed">
@@ -112,21 +114,20 @@ export function POBasicInfoCard({
             </Stack>
           </Grid.Col>
         </Grid>
-
         <Divider />
-
-        <SimpleGrid cols={{ base: 1, md: 3 }}>
-          <div>
-            <Text size="sm" fw={500} c="dimmed">
-              {t('po.orderDate')}
-            </Text>
-            <Group gap="xs">
-              <IconCalendar size={16} color="var(--mantine-color-gray-6)" />
-              <Text>{formatDate(purchaseOrder.orderDate)}</Text>
-            </Group>
-          </div>
-
-          {purchaseOrder.deliveryDate && (
+        <Grid>
+          <Grid.Col span={span}>
+            <div>
+              <Text size="sm" fw={500} c="dimmed">
+                {t('po.orderDate')}
+              </Text>
+              <Group gap="xs">
+                <IconCalendar size={16} color="var(--mantine-color-gray-6)" />
+                <Text>{formatDate(purchaseOrder.orderDate)}</Text>
+              </Group>
+            </div>
+          </Grid.Col>
+          <Grid.Col span={span}>
             <div>
               <Text size="sm" fw={500} c="dimmed">
                 {t('po.deliveryDate')}
@@ -136,9 +137,8 @@ export function POBasicInfoCard({
                 <Text>{formatDate(purchaseOrder.deliveryDate)}</Text>
               </Group>
             </div>
-          )}
-
-          {purchaseOrder.completedDate && (
+          </Grid.Col>
+          <Grid.Col span={span}>
             <div>
               <Text size="sm" fw={500} c="dimmed">
                 {t('po.completedDate')}
@@ -148,54 +148,47 @@ export function POBasicInfoCard({
                 <Text>{formatDateTime(purchaseOrder.completedDate)}</Text>
               </Group>
             </div>
-          )}
-        </SimpleGrid>
-
-        {purchaseOrder.address && (
-          <>
-            <Divider />
-            <Grid>
-              <Grid.Col span={{ base: 12, md: 6 }}>
-                <div>
-                  <Group justify="start" align="center" mb="xs">
-                    <Text size="sm" fw={500} c="dimmed">
-                      {t('po.shippingAddress')}
-                    </Text>
-                    {purchaseOrder.googleMapsUrl && (
-                      <Tooltip label={t('customer.viewOnMap')}>
-                        <ActionIcon
-                          size="sm"
-                          variant="subtle"
-                          onClick={() => {
-                            const googleMapsUrl = purchaseOrder.googleMapsUrl;
-                            if (googleMapsUrl) {
-                              window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
-                            }
-                          }}
-                        >
-                          <IconMapPin size={16} />
-                        </ActionIcon>
-                      </Tooltip>
-                    )}
-                  </Group>
-                  <Text size="sm">{purchaseOrder.address}</Text>
-                </div>
-              </Grid.Col>
-            </Grid>
-          </>
-        )}
-
+          </Grid.Col>
+        </Grid>
         <Divider />
-
-        <SimpleGrid cols={{ base: 1, md: 2 }}>
-          {purchaseOrder.notes && (
+        <Grid>
+          <Grid.Col span={span}>
+            <div>
+              <Group justify="start" align="center" mb="xs">
+                <Text size="sm" fw={500} c="dimmed">
+                  {t('po.shippingAddress')}
+                </Text>
+                {purchaseOrder.googleMapsUrl && (
+                  <Tooltip label={t('customer.viewOnMap')}>
+                    <ActionIcon
+                      size="sm"
+                      variant="subtle"
+                      onClick={() => {
+                        const googleMapsUrl = purchaseOrder.googleMapsUrl;
+                        if (googleMapsUrl) {
+                          window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+                        }
+                      }}
+                    >
+                      <IconMapPin size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+                )}
+              </Group>
+              <Text size="sm">{purchaseOrder.address}</Text>
+            </div>
+          </Grid.Col>
+          <Grid.Col span={span}>
             <div>
               <Text size="sm" fw={500} c="dimmed" mb="xs">
                 {t('po.notes')}
               </Text>
               <Text size="sm">{purchaseOrder.notes}</Text>
             </div>
-          )}
+          </Grid.Col>
+        </Grid>
+        <Divider />
+        <SimpleGrid cols={{ base: 1, md: 2 }}>
           {getCancelReason(purchaseOrder.statusHistory) && (
             <div>
               <Text size="sm" fw={500} c="red" mb="xs">
@@ -242,10 +235,9 @@ export function POBasicInfoCard({
             </div>
           )}
         </SimpleGrid>
-
         <Grid>
           {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'NEW') && (
-            <Grid.Col span={{ base: 12, md: 6 }}>
+            <Grid.Col span={span}>
               <div>
                 <Text size="sm" fw={500} c="dimmed">
                   {t('po.createdBy')}
@@ -266,7 +258,7 @@ export function POBasicInfoCard({
           )}
 
           {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CONFIRMED') && (
-            <Grid.Col span={{ base: 12, md: 6 }}>
+            <Grid.Col span={span}>
               <div>
                 <Text size="sm" fw={500} c="dimmed">
                   {t('po.confirmedBy')}
@@ -287,7 +279,7 @@ export function POBasicInfoCard({
           )}
 
           {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'PROCESSING') && (
-            <Grid.Col span={{ base: 12, md: 6 }}>
+            <Grid.Col span={span}>
               <div>
                 <Text size="sm" fw={500} c="dimmed">
                   {t('po.processedBy')}
@@ -308,7 +300,7 @@ export function POBasicInfoCard({
           )}
 
           {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'SHIPPED') && (
-            <Grid.Col span={{ base: 12, md: 6 }}>
+            <Grid.Col span={span}>
               <div>
                 <Text size="sm" fw={500} c="dimmed">
                   {t('po.shippedBy')}
@@ -329,7 +321,7 @@ export function POBasicInfoCard({
           )}
 
           {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'DELIVERED') && (
-            <Grid.Col span={{ base: 12, md: 6 }}>
+            <Grid.Col span={span}>
               <div>
                 <Text size="sm" fw={500} c="dimmed">
                   {t('po.deliveredBy')}

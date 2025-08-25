@@ -2,8 +2,6 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {
   purchaseOrderService,
-  customerService,
-  productService,
   type PurchaseOrder,
   type Customer,
   type Product,
@@ -34,8 +32,6 @@ type POState = {
   // Actions
   setCurrentPO: (po: PurchaseOrder | undefined) => void;
   loadPOs: (force?: boolean) => Promise<void>;
-  loadCustomers: () => Promise<void>;
-  loadProducts: () => Promise<void>;
   refreshPOs: () => Promise<void>;
   loadPO: (id: string) => Promise<void>;
   createPO: (
@@ -144,37 +140,9 @@ export const usePOStore = create<POState>()(
           set({ pendingRequests: newPendingRequests });
         }
       },
-
       // Actions
       setCurrentPO(po) {
         set({ currentPO: po, error: undefined });
-      },
-
-      async loadCustomers() {
-        set({ error: undefined });
-        try {
-          const customers = await customerService.getAllCustomers();
-          set({
-            customers,
-            customerMap: new Map(customers.map((customer: Customer) => [customer.id, customer])),
-          });
-        } catch (error) {
-          set({
-            error: getErrorMessage(error, 'Failed to load customers'),
-          });
-        }
-      },
-
-      async loadProducts() {
-        set({ error: undefined });
-        try {
-          const products = await productService.getActiveProducts();
-          set({ products });
-        } catch (error) {
-          set({
-            error: getErrorMessage(error, 'Failed to load products'),
-          });
-        }
       },
 
       async loadPOs(force = false) {
@@ -184,18 +152,10 @@ export const usePOStore = create<POState>()(
 
         set({ isLoading: true, error: undefined });
         try {
-          // Load POs, customers and products in parallel
-          const [purchaseOrders, customers, products] = await Promise.all([
-            purchaseOrderService.getAllPOs(),
-            customerService.getAllCustomers(),
-            productService.getActiveProducts(),
-          ]);
+          const purchaseOrders = await purchaseOrderService.getAllPOs();
           set({
             isLoading: false,
             purchaseOrders,
-            customers,
-            customerMap: new Map(customers.map((customer: Customer) => [customer.id, customer])),
-            products,
           });
         } catch (error) {
           set({
@@ -580,8 +540,6 @@ export const usePOError = () => usePOStore((state) => state.error);
 // This pattern prevents infinite re-renders as each function reference is stable
 export const usePOActions = () => {
   const loadPOs = usePOStore((state) => state.loadPOs);
-  const loadCustomers = usePOStore((state) => state.loadCustomers);
-  const loadProducts = usePOStore((state) => state.loadProducts);
   const refreshPOs = usePOStore((state) => state.refreshPOs);
   const loadPO = usePOStore((state) => state.loadPO);
   const createPO = usePOStore((state) => state.createPO);
@@ -596,8 +554,6 @@ export const usePOActions = () => {
 
   return {
     loadPOs,
-    loadCustomers,
-    loadProducts,
     refreshPOs,
     loadPO,
     createPO,

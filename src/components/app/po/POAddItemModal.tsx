@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Modal,
   Drawer,
@@ -23,7 +23,7 @@ import {
   DRAWER_HEIGHT_CALC,
 } from '@/constants/po.constants';
 import type { POItem } from '@/services/sales/purchaseOrder';
-import type { Product } from '@/services/sales/product';
+import { useAppStore } from '@/stores/useAppStore';
 
 type POAddItemModalProps = {
   readonly opened: boolean;
@@ -31,20 +31,14 @@ type POAddItemModalProps = {
   readonly onAdd: (
     item: Omit<POItem, 'id' | 'purchaseOrderId' | 'createdAt' | 'updatedAt'>,
   ) => void;
-  readonly products: Product[];
   readonly existingItems: POItem[];
 };
 
-export function POAddItemModal({
-  opened,
-  onClose,
-  onAdd,
-  products,
-  existingItems,
-}: POAddItemModalProps) {
+export function POAddItemModal({ opened, onClose, onAdd, existingItems }: POAddItemModalProps) {
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
   const initialFocusRef = useRef<HTMLInputElement>(null);
+  const { overviewData } = useAppStore();
 
   const [productSearch, setProductSearch] = useState('');
   const [productCode, setProductCode] = useState('');
@@ -53,7 +47,9 @@ export function POAddItemModal({
   const [quantity, setQuantity] = useState<number>(1);
 
   // Generate autocomplete options
-  const productOptions = products.map((p) => `${p.productCode} - ${p.name}`);
+  const productOptions = useMemo(() => {
+    return overviewData?.products.map((p) => `${p.code} - ${p.name}`) || [];
+  }, [overviewData]);
 
   // Reset form when modal closes and handle focus when modal opens
   useEffect(() => {
@@ -77,12 +73,11 @@ export function POAddItemModal({
 
   const handleProductSelect = (value: string) => {
     const code = value.split(' - ')[0];
-    const product = products.find((p) => p.productCode === code);
+    const product = overviewData?.products.find((p) => p.code === code);
     if (product) {
-      setProductCode(product.productCode);
+      setProductCode(product.code);
       setDescription(product.name);
-      setCategory(product.category || undefined);
-      setProductSearch(product.productCode);
+      setProductSearch(product.code);
     }
   };
 

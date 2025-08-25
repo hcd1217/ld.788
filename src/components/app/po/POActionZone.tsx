@@ -1,4 +1,4 @@
-import { Card, Stack, Group, Title, Button, Alert } from '@mantine/core';
+import { Card, Stack, Group, Title, Button } from '@mantine/core';
 import {
   IconCheck,
   IconPackage,
@@ -6,7 +6,6 @@ import {
   IconPackageExport,
   IconX,
   IconReceipt,
-  IconAlertTriangle,
 } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
@@ -42,6 +41,16 @@ export function POActionZone({
       case 'NEW':
         actions.push(
           <Button
+            key="cancel"
+            color="red"
+            variant="outline"
+            loading={isLoading}
+            leftSection={<IconX size={16} />}
+            onClick={onCancel}
+          >
+            {t('po.cancel')}
+          </Button>,
+          <Button
             key="confirm"
             color="green"
             loading={isLoading}
@@ -50,6 +59,11 @@ export function POActionZone({
           >
             {t('po.confirm')}
           </Button>,
+        );
+        break;
+
+      case 'CONFIRMED':
+        actions.push(
           <Button
             key="cancel"
             color="red"
@@ -60,11 +74,6 @@ export function POActionZone({
           >
             {t('po.cancel')}
           </Button>,
-        );
-        break;
-
-      case 'CONFIRMED':
-        actions.push(
           <Button
             key="process"
             color="blue"
@@ -73,16 +82,6 @@ export function POActionZone({
             onClick={onProcess}
           >
             {t('po.startProcessing')}
-          </Button>,
-          <Button
-            key="cancel"
-            color="red"
-            variant="outline"
-            loading={isLoading}
-            leftSection={<IconX size={16} />}
-            onClick={onCancel}
-          >
-            {t('po.cancel')}
           </Button>,
         );
         break;
@@ -160,19 +159,13 @@ export function POActionZone({
   ]);
 
   if (availableActions.length === 0) {
-    return (
-      <Card shadow="sm" p="sx" m="0" radius="md">
-        <Alert icon={<IconAlertTriangle size={16} />} color="gray" variant="light">
-          {t('po.noActionsAvailable')}
-        </Alert>
-      </Card>
-    );
+    return null;
   }
 
   return (
-    <Card shadow="sm" p="sx" m="0" radius="md">
+    <Card shadow="sm" p="xs" m="0" radius="md">
       <Stack gap="sm">
-        <Title order={3}>{t('po.availableActions')}</Title>
+        <Title order={4}>{t('po.availableActions')}</Title>
         <Group p="xs">{availableActions}</Group>
       </Stack>
     </Card>

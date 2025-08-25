@@ -28,6 +28,7 @@ export type DepartmentOverview = {
 export type ProductOverview = {
   id: string;
   name: string;
+  code: string;
 };
 
 export type CustomerOverview = {
@@ -146,6 +147,7 @@ export const overviewService = {
     return {
       id: beProduct.id,
       name: beProduct.name,
+      code: beProduct.code,
     };
   },
 };

@@ -45,12 +45,12 @@ export function PODetailTabsSkeleton() {
         >
           <Box style={{ maxWidth: '800px', width: '100%' }}>
             <Stack gap="xl">
-              <POBasicInfoCardSkeleton />
               {/* POActionZone skeleton */}
               <Stack gap="sm">
                 <Skeleton height={20} width={150} mb="sm" />
                 <Skeleton height={36} width="100%" radius="sm" />
               </Stack>
+              <POBasicInfoCardSkeleton />
             </Stack>
           </Box>
         </Box>

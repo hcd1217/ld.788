@@ -1076,7 +1076,6 @@
     "itemsRequired": "Cần ít nhất một sản phẩm",
     "markDelivered": "Đánh Dấu Đã Giao",
     "markShipped": "Đánh Dấu Đã Gửi",
-    "noActionsAvailable": "Không có hành động khả dụng cho đơn hàng này",
     "noItemsMessage": "Chưa có mục nào được thêm. Nhấn nút bên dưới để thêm mục đầu tiên.",
     "noPOsFound": "Không tìm thấy đơn hàng nào",
     "noPOsFoundSearch": "Không tìm thấy đơn hàng nào phù hợp với tìm kiếm của bạn",

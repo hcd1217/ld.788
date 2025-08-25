@@ -34,7 +34,7 @@ export function formatDate(
   options?: Intl.DateTimeFormatOptions,
 ): string {
   if (!date) {
-    return '';
+    return '-';
   }
 
   const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -64,7 +64,7 @@ export function formatDateTime(
   options?: Intl.DateTimeFormatOptions,
 ): string {
   if (!date) {
-    return '';
+    return '-';
   }
 
   const dateObj = typeof date === 'string' ? new Date(date) : date;

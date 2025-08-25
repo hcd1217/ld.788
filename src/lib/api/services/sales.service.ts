@@ -111,26 +111,29 @@ export class SalesApi extends BaseApiClient {
 
   // ========== Purchase Order APIs ==========
   async getPurchaseOrders(params?: {
-    search?: string;
+    poNumber?: string;
     customerId?: string;
     status?: POStatus;
-    startDate?: string;
-    endDate?: string;
+    orderDateFrom?: string;
+    orderDateTo?: string;
+    cursor?: string;
     limit?: number;
-    offset?: number;
-    sortBy?: string;
+    sortBy?: 'createdAt' | 'orderDate' | 'poNumber' | 'updatedAt';
     sortOrder?: 'asc' | 'desc';
   }): Promise<GetPurchaseOrdersResponse> {
     const queryParams = new URLSearchParams();
-    if (params?.search) queryParams.append('search', params.search);
+    if (params?.poNumber) queryParams.append('poNumber', params.poNumber);
     if (params?.customerId) queryParams.append('customerId', params.customerId);
     if (params?.status) queryParams.append('status', params.status);
-    if (params?.startDate) queryParams.append('startDate', params.startDate);
-    if (params?.endDate) queryParams.append('endDate', params.endDate);
+    if (params?.orderDateFrom) queryParams.append('orderDateFrom', params.orderDateFrom);
+    if (params?.orderDateTo) queryParams.append('orderDateTo', params.orderDateTo);
+    if (params?.cursor) queryParams.append('cursor', params.cursor);
     if (params?.limit) queryParams.append('limit', String(params.limit));
-    if (params?.offset) queryParams.append('offset', String(params.offset));
     if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
     if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+
+    // Use default limit from swagger (20) or specified limit, max 1000
+    if (!params?.limit) queryParams.append('limit', '20');
 
     const url = `/api/sales/purchase-orders${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return this.get<GetPurchaseOrdersResponse, void>(

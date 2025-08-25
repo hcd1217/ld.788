@@ -3,7 +3,6 @@ import { Stack, Text, Affix, ActionIcon, Card, Button } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useProductList, usePOActions } from '@/stores/usePOStore';
 import { POItemCard } from './POItemCard';
 import { POAddItemModal } from './POAddItemModal';
 import { createPOItem } from '@/utils/poItemUtils';
@@ -29,17 +28,8 @@ type POItemsEditorMobileProps = {
 const POItemsEditorMobileComponent = forwardRef<POItemsEditorRef, POItemsEditorMobileProps>(
   ({ items, onChange, disabled = false, onModalStateChange }, ref) => {
     const { t } = useTranslation();
-    const products = useProductList();
-    const { loadProducts } = usePOActions();
     const [modalOpened, setModalOpened] = useState(false);
     const [pendingItem, setPendingItem] = useState<Partial<POItem> | undefined>(undefined);
-
-    // Load products on mount if not already loaded
-    useEffect(() => {
-      if (products.length === 0) {
-        loadProducts();
-      }
-    }, [products.length, loadProducts]);
 
     // Notify parent component when modal state changes
     useEffect(() => {
@@ -184,7 +174,6 @@ const POItemsEditorMobileComponent = forwardRef<POItemsEditorRef, POItemsEditorM
           opened={modalOpened}
           onClose={() => setModalOpened(false)}
           onAdd={handleAddItem}
-          products={products}
           existingItems={items}
         />
       </>

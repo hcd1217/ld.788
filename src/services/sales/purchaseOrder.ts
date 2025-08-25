@@ -5,8 +5,8 @@ import {
   type UpdatePurchaseOrderRequest,
   type UpdatePOStatusRequest,
   type POStatusHistory,
+  type POStatus,
 } from '@/lib/api/schemas/sales.schemas';
-import { customerService, type Customer } from './customer';
 import { logError, logInfo } from '@/utils/logger';
 import { RETRY_DELAY_MS } from '@/constants/po.constants';
 
@@ -22,21 +22,6 @@ export type PurchaseOrder = Omit<ApiPurchaseOrder, 'metadata'> & {
   address?: string;
   googleMapsUrl?: string;
   statusHistory?: POStatusHistory[];
-  // createdBy?: string;
-  // createdAt?: Date;
-  // confirmedBy?: string;
-  // confirmedAt?: Date;
-  // processedBy?: string;
-  // processedAt?: Date;
-  // shippedBy?: string;
-  // shippedAt?: Date;
-  // deliveredBy?: string;
-  // deliveredAt?: Date;
-  // cancelledBy?: string;
-  // cancelledAt?: Date;
-  // refundedBy?: string;
-  // refundedAt?: Date;
-  // cancelReason?: string;
 };
 
 export type { Customer } from './customer';
@@ -46,25 +31,12 @@ export type { Customer } from './customer';
  */
 function transformApiToFrontend(apiPO: ApiPurchaseOrder): Omit<PurchaseOrder, 'customer'> {
   const { metadata, ...rest } = apiPO;
-  // const statusHistory = metadata?.statusHistory || [];
-  // const statusHistoryMap = new Map(statusHistory.map((status) => [status.status, status]));
   return {
     ...rest,
     customerId: apiPO.customerId,
     address: metadata?.shippingAddress?.oneLineAddress,
     googleMapsUrl: metadata?.shippingAddress?.googleMapsUrl,
     statusHistory: metadata?.statusHistory,
-    // createdBy: statusHistoryMap.get('NEW')?.userId,
-    // createdAt: statusHistoryMap.get('NEW')?.timestamp || rest.createdAt,
-    // confirmedBy: statusHistoryMap.get('CONFIRMED')?.userId,
-    // confirmedAt: statusHistoryMap.get('CONFIRMED')?.timestamp,
-    // processedBy: statusHistoryMap.get('PROCESSING')?.userId,
-    // processedAt: statusHistoryMap.get('PROCESSING')?.timestamp,
-    // shippedBy: statusHistoryMap.get('SHIPPED')?.userId,
-    // shippedAt: statusHistoryMap.get('SHIPPED')?.timestamp,
-    // deliveredBy: statusHistoryMap.get('DELIVERED')?.userId,
-    // cancelReason: statusHistoryMap.get('CANCELLED')?.reason ?? rest.cancelReason,
-    // refundReason: statusHistoryMap.get('REFUNDED')?.reason ?? rest.refundReason,
   };
 }
 
@@ -103,92 +75,58 @@ async function retryOnServerError<T>(
   }
 }
 
+// Filter parameters for purchase orders
+export type POFilterParams = {
+  poNumber?: string;
+  customerId?: string;
+  status?: POStatus;
+  orderDateFrom?: string | Date;
+  orderDateTo?: string | Date;
+  cursor?: string;
+  limit?: number;
+  sortBy?: 'createdAt' | 'orderDate' | 'poNumber' | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
+};
+
 export const purchaseOrderService = {
   purchaseOrders: [] as PurchaseOrder[],
-  // Customer cache to prevent N+1 queries
-  customerCache: new Map<string, Customer>(),
-  cacheLastUpdated: 0,
-  // Cache TTL: 10 minutes
-  CACHE_TTL: 10 * 60 * 1000,
-
-  /**
-   * Get customer data from cache or API
-   * Checks cache first, falls back to API if not found
-   */
-  async getCustomerWithCache(customerId: string): Promise<Customer | undefined> {
-    // Check if we have cached data for this customer
-    if (this.customerCache.has(customerId)) {
-      const customer = this.customerCache.get(customerId);
-      if (customer) {
-        logInfo('Customer found in cache', {
-          module: 'PurchaseOrderService',
-          action: 'getCustomerWithCache',
-          metadata: { customerId, cacheSize: this.customerCache.size },
-        });
-        return customer;
-      }
-    }
-
-    // Cache miss - fetch from API
-    logInfo('Customer not in cache, fetching from API', {
-      module: 'PurchaseOrderService',
-      action: 'getCustomerWithCache',
-      metadata: { customerId, cacheSize: this.customerCache.size },
-    });
-
-    const customer = await customerService.getCustomer(customerId);
-    // Add to cache for future use only if customer exists
-    if (customer) {
-      this.customerCache.set(customerId, customer);
-    }
-    return customer;
-  },
-
-  /**
-   * Update customer cache with batch-loaded customers
-   * Called when getAllPOs() loads all customers at once
-   */
-  updateCustomerCache(customers: Customer[]): void {
-    // Clear existing cache and rebuild
-    this.customerCache.clear();
-    customers.forEach((customer) => {
-      this.customerCache.set(customer.id, customer);
-    });
-    this.cacheLastUpdated = Date.now();
-
-    logInfo('Customer cache updated', {
-      module: 'PurchaseOrderService',
-      action: 'updateCustomerCache',
-      metadata: {
-        customerCount: customers.length,
-        cacheSize: this.customerCache.size,
-        timestamp: this.cacheLastUpdated,
-      },
-    });
-  },
-
-  /**
-   * Check if cache is still valid based on TTL
-   */
-  isCacheValid(): boolean {
-    return Date.now() - this.cacheLastUpdated < this.CACHE_TTL;
-  },
-
-  /**
-   * Clear customer cache manually if needed
-   */
-  clearCustomerCache(): void {
-    this.customerCache.clear();
-    this.cacheLastUpdated = 0;
-    logInfo('Customer cache cleared', {
-      module: 'PurchaseOrderService',
-      action: 'clearCustomerCache',
-    });
-  },
 
   async getAllPOs(): Promise<PurchaseOrder[]> {
     const response = await salesApi.getPurchaseOrders();
     return response.purchaseOrders.map(transformApiToFrontend);
+  },
+
+  async getPOsWithFilter(filters?: POFilterParams): Promise<{
+    purchaseOrders: PurchaseOrder[];
+    pagination: {
+      hasNext: boolean;
+      hasPrev: boolean;
+      nextCursor?: string;
+      prevCursor?: string;
+      limit: number;
+    };
+  }> {
+    // Transform Date objects to ISO strings for API
+    const apiParams = filters
+      ? {
+          ...filters,
+          orderDateFrom:
+            filters.orderDateFrom instanceof Date
+              ? filters.orderDateFrom.toISOString()
+              : filters.orderDateFrom,
+          orderDateTo:
+            filters.orderDateTo instanceof Date
+              ? filters.orderDateTo.toISOString()
+              : filters.orderDateTo,
+        }
+      : undefined;
+
+    const response = await salesApi.getPurchaseOrders(apiParams);
+
+    return {
+      purchaseOrders: response.purchaseOrders.map(transformApiToFrontend),
+      pagination: response.pagination,
+    };
   },
 
   async getPOById(id: string): Promise<PurchaseOrder | undefined> {

@@ -1076,7 +1076,6 @@
     "itemsRequired": "At least one item is required",
     "markDelivered": "Mark as Delivered",
     "markShipped": "Mark as Shipped",
-    "noActionsAvailable": "No actions available for this order status",
     "noItemsMessage": "No items added yet. Click the button below to add your first item.",
     "noPOsFound": "No purchase orders found",
     "noPOsFoundSearch": "No purchase orders found matching your search",
