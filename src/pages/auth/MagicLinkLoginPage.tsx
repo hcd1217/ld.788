@@ -156,7 +156,7 @@ export function MagicLinkLoginPage() {
         }
       } else {
         // Treat as token-only and use clientCode from localStorage
-        const clientCode = localStorage.getItem('clientCode') ?? 'NKTU';
+        const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
 
         sessionStorage.setItem(
           MAGIC_LINK_STORAGE_KEY,
@@ -184,7 +184,7 @@ export function MagicLinkLoginPage() {
         handleQrScan(trimmedCode);
       } else {
         // Treat as token-only input and use clientCode from localStorage
-        const clientCode = localStorage.getItem('clientCode') ?? 'NKTU';
+        const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
 
         sessionStorage.setItem(
           MAGIC_LINK_STORAGE_KEY,

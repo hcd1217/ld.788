@@ -17,7 +17,6 @@ process.env.VITE_APP_BUILD = new Date(Date.now() + tzOffset)
 const APP_NAME = process.env.VITE_APP_NAME || 'Credo';
 const APP_SHORT_NAME = process.env.VITE_APP_SHORT_NAME || 'Credo';
 const APP_DESCRIPTION = process.env.VITE_APP_DESCRIPTION || 'Credo Progressive Web Application';
-const THEME_COLOR = process.env.VITE_THEME_COLOR || '#324e71';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -64,7 +63,7 @@ export default defineConfig({
         name: `${APP_NAME} App`,
         short_name: APP_SHORT_NAME,
         description: APP_DESCRIPTION,
-        theme_color: THEME_COLOR,
+        theme_color: '#26956d',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',

@@ -40,10 +40,10 @@ export function RegisterPage() {
         }
       : {
           clientCode: generateRandomString(5).toUpperCase(),
-          clientName: 'NKTU Corporation',
+          clientName: 'Acme Corporation',
           firstName: 'John',
           lastName: 'Doe',
-          email: 'admin@NKTU.com',
+          email: 'admin@acme.com',
           password: 's5cureP@s5w0rd123!!!',
           confirmPassword: 's5cureP@s5w0rd123!!!',
         },
