@@ -2,7 +2,14 @@ import { useState, useCallback } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 
-export type ModalType = 'confirm' | 'process' | 'markReady' | 'ship' | 'deliver' | 'cancel' | 'refund';
+export type ModalType =
+  | 'confirm'
+  | 'process'
+  | 'markReady'
+  | 'ship'
+  | 'deliver'
+  | 'cancel'
+  | 'refund';
 
 export function usePOModals() {
   const [selectedPO, setSelectedPO] = useState<PurchaseOrder | undefined>(undefined);

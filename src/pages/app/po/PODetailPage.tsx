@@ -45,8 +45,9 @@ export function PODetailPage() {
 
   // Memoized modal close handler
   const handleCloseModal = useCallback(
-    (modalType: 'confirm' | 'process' | 'markReady' | 'ship' | 'deliver' | 'cancel' | 'refund') => () =>
-      closeModal(modalType),
+    (modalType: 'confirm' | 'process' | 'markReady' | 'ship' | 'deliver' | 'cancel' | 'refund') =>
+      () =>
+        closeModal(modalType),
     [closeModal],
   );
 

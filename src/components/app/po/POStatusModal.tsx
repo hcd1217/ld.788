@@ -28,7 +28,14 @@ import { formatDate } from '@/utils/time';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 
-export type POModalMode = 'confirm' | 'cancel' | 'process' | 'markReady' | 'ship' | 'deliver' | 'refund';
+export type POModalMode =
+  | 'confirm'
+  | 'cancel'
+  | 'process'
+  | 'markReady'
+  | 'ship'
+  | 'deliver'
+  | 'refund';
 
 type POStatusModalProps = {
   readonly opened: boolean;

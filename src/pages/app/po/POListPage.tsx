@@ -98,6 +98,8 @@ export function POListPage() {
       orderDateTo: filters.orderDateRange.end?.toISOString(),
       deliveryDateFrom: filters.deliveryDateRange.start?.toISOString(),
       deliveryDateTo: filters.deliveryDateRange.end?.toISOString(),
+      sortBy: 'orderDate' as const, // Sort by order date (deliveryDate not available in sortBy)
+      sortOrder: 'asc' as const, // Ascending order
     }),
     [
       filters.customerId,

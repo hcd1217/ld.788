@@ -57,15 +57,18 @@ export function POFilterBarDesktop({
   ];
 
   // Status options for MultiSelect
-  const statusOptions = [
-    { value: PO_STATUS.NEW, label: t('po.status.NEW') },
-    { value: PO_STATUS.CONFIRMED, label: t('po.status.CONFIRMED') },
-    { value: PO_STATUS.PROCESSING, label: t('po.status.PROCESSING') },
-    { value: PO_STATUS.SHIPPED, label: t('po.status.SHIPPED') },
-    { value: PO_STATUS.DELIVERED, label: t('po.status.DELIVERED') },
-    { value: PO_STATUS.CANCELLED, label: t('po.status.CANCELLED') },
-    { value: PO_STATUS.REFUNDED, label: t('po.status.REFUNDED') },
-  ];
+  const statusOptions = useMemo(() => {
+    return [
+      { value: PO_STATUS.NEW, label: t('po.status.NEW') },
+      { value: PO_STATUS.CONFIRMED, label: t('po.status.CONFIRMED') },
+      { value: PO_STATUS.PROCESSING, label: t('po.status.PROCESSING') },
+      { value: PO_STATUS.READY_FOR_PICKUP, label: t('po.status.READY_FOR_PICKUP') },
+      { value: PO_STATUS.SHIPPED, label: t('po.status.SHIPPED') },
+      { value: PO_STATUS.DELIVERED, label: t('po.status.DELIVERED') },
+      { value: PO_STATUS.CANCELLED, label: t('po.status.CANCELLED') },
+      { value: PO_STATUS.REFUNDED, label: t('po.status.REFUNDED') },
+    ];
+  }, [t]);
 
   // Filter out 'all' status if present
   const filteredStatuses = selectedStatuses.filter((s) => s !== PO_STATUS.ALL);
@@ -75,10 +78,12 @@ export function POFilterBarDesktop({
     const count = filteredStatuses.length;
     if (count === 0) {
       return t('po.selectStatus');
-    } else {
-      return `${count} ${t('po.statusesSelected')}`;
     }
-  }, [filteredStatuses.length, t]);
+    if (count === 1) {
+      return statusOptions.find((s) => s.value === filteredStatuses[0])?.label;
+    }
+    return `${count} ${t('po.statusesSelected')}`;
+  }, [filteredStatuses, statusOptions, t]);
 
   return (
     <DatesProvider settings={{ locale: currentLanguage, firstDayOfWeek: 0, weekendDays: [0, 6] }}>
@@ -99,7 +104,7 @@ export function POFilterBarDesktop({
           placeholder={t('po.selectCustomer')}
           data={customerOptions}
           value={customerId || ''}
-          style={{ flex: 1, minWidth: 150 }}
+          style={{ flex: 1, minWidth: 150, borderRadius: '5px' }}
           onChange={(value) => onCustomerChange(value || undefined)}
           label={t('po.customer')}
         />
@@ -124,7 +129,6 @@ export function POFilterBarDesktop({
               display: 'none',
             },
           }}
-          hidePickedOptions={false}
         />
 
         {/* Order Date Range */}

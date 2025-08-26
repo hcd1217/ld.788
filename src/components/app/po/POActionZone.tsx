@@ -184,13 +184,14 @@ export function POActionZone({
   }, [
     purchaseOrder.status,
     isLoading,
+    onRefund,
     t,
     onCancel,
     onConfirm,
     onProcess,
+    onMarkReady,
     onShip,
     onDeliver,
-    onRefund,
     onCreateDelivery,
   ]);
 

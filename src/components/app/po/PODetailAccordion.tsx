@@ -267,10 +267,11 @@ export function PODetailAccordion({
   }, [
     purchaseOrder.status,
     isLoading,
-    t,
     onConfirm,
+    t,
     createCancelButton,
     onProcess,
+    onMarkReady,
     onShip,
     onDeliver,
     createRefundButton,
