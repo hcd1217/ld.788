@@ -22,7 +22,7 @@ type POActionZoneProps = {
   readonly onDeliver: () => void;
   readonly onCancel: () => void;
   readonly onRefund: () => void;
-  readonly onCreateDelivery?: () => void;
+  readonly onCreateDelivery: () => void;
 };
 
 export function POActionZone({
@@ -138,6 +138,16 @@ export function POActionZone({
           >
             {t('po.markShipped')}
           </Button>,
+          <Button
+            key="create-delivery"
+            color="blue"
+            variant="filled"
+            loading={isLoading}
+            leftSection={<IconClipboardList size={16} />}
+            onClick={onCreateDelivery}
+          >
+            {t('po.createDeliveryRequest')}
+          </Button>,
         );
         break;
 
@@ -158,20 +168,6 @@ export function POActionZone({
 
       case 'DELIVERED':
         actions.push(createRefundButton());
-        if (onCreateDelivery) {
-          actions.push(
-            <Button
-              key="create-delivery"
-              color="blue"
-              variant="filled"
-              loading={isLoading}
-              leftSection={<IconClipboardList size={16} />}
-              onClick={onCreateDelivery}
-            >
-              {t('po.createDeliveryRequest')}
-            </Button>,
-          );
-        }
         break;
 
       case 'CANCELLED':

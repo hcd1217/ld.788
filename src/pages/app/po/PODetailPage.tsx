@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { LoadingOverlay, Stack } from '@mantine/core';
 import { IconEdit } from '@tabler/icons-react';
@@ -15,6 +15,7 @@ import {
   POStatusModal,
   POErrorBoundary,
   PODetailTabsSkeleton,
+  DeliveryRequestModal,
 } from '@/components/app/po';
 import { getPOEditRoute, getDeliveryListRoute, ROUTERS } from '@/config/routeConfig';
 import { useAction } from '@/hooks/useAction';
@@ -43,6 +44,9 @@ export function PODetailPage() {
 
   // Use the centralized modal hook
   const { modals, selectedPO, closeModal, handlers } = usePOModals();
+
+  // Delivery modal state
+  const [deliveryModalOpened, setDeliveryModalOpened] = useState(false);
 
   // Memoized modal close handler
   const handleCloseModal = useCallback(
@@ -102,13 +106,7 @@ export function PODetailPage() {
 
   const handleCreateDelivery = () => {
     if (purchaseOrder) {
-      createDeliveryAction({
-        purchaseOrderId: purchaseOrder.id,
-        assignedTo: purchaseOrder.customerId, // Use customer ID as placeholder - should be actual user/employee ID
-        assignedType: 'USER' as const,
-        scheduledDate: new Date().toISOString(), // Default to today
-        notes: `Delivery request for PO ${purchaseOrder.poNumber}`,
-      });
+      setDeliveryModalOpened(true);
     }
   };
 
@@ -232,17 +230,18 @@ export function PODetailPage() {
       errorMessage: t('po.deliveryRequestCreateFailed'),
       navigateTo: getDeliveryListRoute(),
     },
-    async actionHandler(data?: {
-      purchaseOrderId: string;
-      assignedTo: string;
-      assignedType: 'EMPLOYEE' | 'USER';
-      scheduledDate: string;
-      notes?: string;
-    }) {
-      if (!data) {
+    async actionHandler(data?: { assignedTo: string; scheduledDate: string; notes?: string }) {
+      if (!data || !purchaseOrder) {
         throw new Error(t('po.deliveryRequestCreateFailed'));
       }
-      await deliveryRequestApi.createDeliveryRequest(data);
+      await deliveryRequestApi.createDeliveryRequest({
+        purchaseOrderId: purchaseOrder.id,
+        assignedTo: data.assignedTo,
+        assignedType: 'EMPLOYEE' as const,
+        scheduledDate: data.scheduledDate,
+        notes: data.notes,
+      });
+      setDeliveryModalOpened(false);
     },
   });
 
@@ -304,6 +303,12 @@ export function PODetailPage() {
         onClose={handleCloseModal('refund')}
         onConfirm={refundPOAction}
       />
+      <DeliveryRequestModal
+        opened={deliveryModalOpened}
+        purchaseOrder={purchaseOrder}
+        onClose={() => setDeliveryModalOpened(false)}
+        onConfirm={createDeliveryAction}
+      />
     </>
   );
 
@@ -311,9 +316,6 @@ export function PODetailPage() {
 
   // Show edit button when PO is editable (status = NEW)
   const isEditable = purchaseOrder && isPOEditable(purchaseOrder);
-
-  // Only show create delivery button for DELIVERED status POs
-  const onCreateDelivery = purchaseOrder?.status === 'DELIVERED' ? handleCreateDelivery : undefined;
 
   if (isMobile) {
     if (isLoading || !purchaseOrder) {
@@ -355,7 +357,7 @@ export function PODetailPage() {
             onDeliver={handleDeliver}
             onCancel={handleCancel}
             onRefund={handleRefund}
-            onCreateDelivery={onCreateDelivery}
+            onCreateDelivery={handleCreateDelivery}
           />
         </Stack>
         {modalComponents}
@@ -394,7 +396,7 @@ export function PODetailPage() {
             onDeliver={handleDeliver}
             onCancel={handleCancel}
             onRefund={handleRefund}
-            onCreateDelivery={onCreateDelivery}
+            onCreateDelivery={handleCreateDelivery}
           />
         </POErrorBoundary>
       ) : (

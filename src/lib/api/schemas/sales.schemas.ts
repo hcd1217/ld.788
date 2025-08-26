@@ -9,6 +9,7 @@ import {
   stringSchema,
   timestampSchema,
 } from './common.schemas';
+import { DeliveryStatusSchema, PICTypeSchema } from './deliveryRequest.schemas';
 
 // ========== Customer Schemas ==========
 
@@ -163,6 +164,14 @@ const PurchaseOrderSchema = z.object({
     .looseObject({
       shippingAddress: AddressSchema.optional(),
       statusHistory: z.array(POStatusHistorySchema).optional(),
+      deliveryRequest: z
+        .object({
+          deliveryRequestId: idSchema,
+          assignedType: PICTypeSchema,
+          status: DeliveryStatusSchema,
+          scheduledDate: timestampSchema,
+        })
+        .optional(),
     })
     .optional(),
   createdAt: timestampSchema,

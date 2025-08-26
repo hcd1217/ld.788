@@ -169,9 +169,6 @@ export function POStatusModal({
     if (mode === 'cancel' || mode === 'refund') {
       return !reason.trim();
     }
-    if (mode === 'ship') {
-      return !trackingNumber.trim();
-    }
     return false;
   };
 
@@ -242,7 +239,6 @@ export function POStatusModal({
             placeholder={t('po.enterTrackingNumber')}
             value={trackingNumber}
             onChange={(event) => setTrackingNumber(event.currentTarget.value)}
-            required
           />
           <TextInput
             label={t('po.carrier')}

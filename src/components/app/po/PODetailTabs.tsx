@@ -102,18 +102,35 @@ export function PODetailTabs({
 
       <Tabs.Panel value="info" pt="xl">
         <Stack gap="sm">
-          <POActionZone
-            purchaseOrder={purchaseOrder}
-            isLoading={isLoading}
-            onConfirm={onConfirm}
-            onProcess={onProcess}
-            onMarkReady={onMarkReady}
-            onShip={onShip}
-            onDeliver={onDeliver}
-            onCancel={onCancel}
-            onRefund={onRefund}
-            onCreateDelivery={onCreateDelivery}
-          />
+          {onCreateDelivery ? (
+            <POActionZone
+              purchaseOrder={purchaseOrder}
+              isLoading={isLoading}
+              onConfirm={onConfirm}
+              onProcess={onProcess}
+              onMarkReady={onMarkReady}
+              onShip={onShip}
+              onDeliver={onDeliver}
+              onCancel={onCancel}
+              onRefund={onRefund}
+              onCreateDelivery={onCreateDelivery}
+            />
+          ) : (
+            <POActionZone
+              purchaseOrder={purchaseOrder}
+              isLoading={isLoading}
+              onConfirm={onConfirm}
+              onProcess={onProcess}
+              onMarkReady={onMarkReady}
+              onShip={onShip}
+              onDeliver={onDeliver}
+              onCancel={onCancel}
+              onRefund={onRefund}
+              onCreateDelivery={() => {
+                /* no-op */
+              }}
+            />
+          )}
           <POErrorBoundary componentName="POBasicInfoCard">
             <POBasicInfoCard
               purchaseOrder={purchaseOrder}

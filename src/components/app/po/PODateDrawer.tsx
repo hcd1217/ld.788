@@ -31,7 +31,7 @@ export function PODateDrawer({
   const { t, currentLanguage } = useTranslation();
   const valueFormat = currentLanguage === 'vi' ? 'DD/MM/YYYY' : 'MMM DD, YYYY';
 
-  const [activeTab, setActiveTab] = useState<string>('order');
+  const [activeTab, setActiveTab] = useState<'delivery' | 'order'>('delivery');
   const [tempOrderStartDate, setTempOrderStartDate] = useState<Date | undefined>(orderDateStart);
   const [tempOrderEndDate, setTempOrderEndDate] = useState<Date | undefined>(orderDateEnd);
   const [tempDeliveryStartDate, setTempDeliveryStartDate] = useState<Date | undefined>(
@@ -62,7 +62,7 @@ export function PODateDrawer({
       setTempOrderEndDate(orderDateEnd);
       setTempDeliveryStartDate(deliveryDateStart);
       setTempDeliveryEndDate(deliveryDateEnd);
-      setActiveTab('order');
+      setActiveTab('delivery');
     }
   }, [opened, orderDateStart, orderDateEnd, deliveryDateStart, deliveryDateEnd]);
 
@@ -70,13 +70,20 @@ export function PODateDrawer({
     <Drawer opened={opened} size="360px" title={t('po.selectDateRange')} onClose={onClose}>
       <DatesProvider settings={{ locale: currentLanguage, firstDayOfWeek: 0, weekendDays: [0, 6] }}>
         <Stack gap="md">
-          <Tabs value={activeTab} onChange={(value) => setActiveTab(value || 'order')}>
+          <Tabs
+            value={activeTab}
+            onChange={(value) => {
+              if (value === 'delivery' || value === 'order') {
+                setActiveTab(value as 'delivery' | 'order');
+              }
+            }}
+          >
             <Tabs.List grow>
-              <Tabs.Tab value="order" leftSection={<IconCalendar size={16} />}>
-                {t('po.orderDate')}
-              </Tabs.Tab>
               <Tabs.Tab value="delivery" leftSection={<IconTruck size={16} />}>
                 {t('po.deliveryDate')}
+              </Tabs.Tab>
+              <Tabs.Tab value="order" leftSection={<IconCalendar size={16} />}>
+                {t('po.orderDate')}
               </Tabs.Tab>
             </Tabs.List>
 

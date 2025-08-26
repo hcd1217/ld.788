@@ -151,9 +151,7 @@
     "phone": "Điện thoại",
     "import": "Nhập",
     "download": "Tải xuống",
-    "selectFile": "Chọn file",
-    "notScheduled": "Not scheduled",
-    "notAssigned": "Not assigned"
+    "selectFile": "Chọn file"
   },
   "settings": {
     "autoUpdate": {
@@ -1147,6 +1145,10 @@
     "state": "Tỉnh/Thành Phố",
     "statePlaceholder": "Nhập tỉnh hoặc thành phố",
     "poStatus": "Trạng Thái",
+    "status": "Trạng Thái",
+    "dateRange": "Khoảng Thời Gian",
+    "selectStartDate": "Chọn Ngày Bắt Đầu",
+    "selectEndDate": "Chọn Ngày Kết Thúc",
     "status": {
       "CANCELLED": "Đã Hủy",
       "CONFIRMED": "Đã Xác Nhận",
@@ -1157,9 +1159,6 @@
       "REFUNDED": "Đã Hoàn Trả",
       "SHIPPED": "Đã Gửi"
     },
-    "dateRange": "Khoảng thời gian",
-    "selectStartDate": "Chọn ngày bắt đầu",
-    "selectEndDate": "Chọn ngày kết thúc",
     "statusLabel": "Trạng thái đơn hàng: {{status}}",
     "street": "Địa Chỉ",
     "streetPlaceholder": "Nhập địa chỉ",
@@ -1186,6 +1185,9 @@
     "searchCustomer": "Tìm kiếm khách hàng",
     "searchProduct": "Tìm kiếm sản phẩm",
     "selectDateRange": "Chọn khoảng thời gian",
+    "selectEndDate": "Chọn ngày kết thúc",
+    "selectStartDate": "Chọn ngày bắt đầu",
+    "dateRange": "Khoảng thời gian",
     "unsavedItem": "Mục chưa lưu",
     "unsavedItemMessage": "Bạn có một mục chưa lưu trong biểu mẫu. Bạn có muốn thêm nó trước khi lưu không?",
     "pendingItemDetails": "Chi tiết mục đang chờ",
@@ -1193,10 +1195,7 @@
     "continueWithoutAdding": "Lưu mà không thêm",
     "invalidQuantity": "Số lượng không hợp lệ",
     "productAlreadyAdded": "Sản phẩm {{productCode}} đã được thêm",
-    "autoFilledFromCustomerAddress": "Tự động điền từ địa chỉ khách hàng",
-    "createDeliveryRequest": "Tạo Yêu Cầu Giao Hàng",
-    "deliveryRequestCreated": "Tạo yêu cầu giao hàng thành công",
-    "deliveryRequestCreateFailed": "Không thể tạo yêu cầu giao hàng"
+    "autoFilledFromCustomerAddress": "Tự động điền từ địa chỉ khách hàng"
   },
   "delivery": {
     "list": {
@@ -1298,53 +1297,7 @@
     "markAsCompleted": "Đánh Dấu Hoàn Thành",
     "deliveryDetails": "Chi Tiết Giao Hàng",
     "deliveryId": "Mã Giao Hàng",
-    "gridCard": "Thẻ giao hàng {{id}}",
-    "customerName": "Tên Khách Hàng",
-    "currentStatus": "Trạng Thái Hiện Tại",
-    "transitNotes": "Ghi Chú Vận Chuyển",
-    "enterTransitNotes": "Nhập ghi chú vận chuyển (tùy chọn)",
-    "transitNotesDescription": "Ghi chú tùy chọn về việc bắt đầu vận chuyển",
-    "recipient": "Người Nhận",
-    "enterRecipientName": "Nhập tên người nhận",
-    "recipientDescription": "Tên người đã nhận hàng",
-    "completionNotes": "Ghi Chú Hoàn Thành",
-    "enterCompletionNotes": "Nhập ghi chú hoàn thành",
-    "completionNotesDescription": "Ghi chú về việc hoàn thành giao hàng",
-    "notFound": "Không tìm thấy yêu cầu giao hàng",
-    "photos": {
-      "camera": "Máy Ảnh",
-      "takePhoto": "Chụp Ảnh",
-      "selectFiles": "Chọn Tệp",
-      "capture": "Chụp",
-      "uploading": "Đang tải ảnh lên...",
-      "noPhotosSelected": "Chưa chọn ảnh nào",
-      "invalidFileType": "Loại tệp không hợp lệ. Vui lòng chọn tệp ảnh (JPEG, PNG, WebP)",
-      "fileTooLarge": "Tệp quá lớn. Vui lòng chọn tệp nhỏ hơn 5MB",
-      "someFilesSkipped": "Một số tệp đã bị bỏ qua do giới hạn kích thước hoặc loại tệp"
-    },
-    "workflows": {
-      "startTransit": {
-        "title": "Bắt Đầu Vận Chuyển",
-        "description": "Đánh dấu yêu cầu giao hàng này đang vận chuyển",
-        "confirmMessage": "Bạn có chắc chắn muốn bắt đầu vận chuyển cho giao hàng này?",
-        "notesPlaceholder": "Nhập ghi chú vận chuyển (tùy chọn)"
-      },
-      "complete": {
-        "title": "Hoàn Thành Giao Hàng",
-        "description": "Đánh dấu giao hàng này đã hoàn thành với ảnh chứng minh",
-        "confirmMessage": "Bạn có chắc chắn muốn đánh dấu giao hàng này đã hoàn thành?",
-        "photosRequired": "Cần ít nhất một ảnh",
-        "notesPlaceholder": "Nhập ghi chú hoàn thành",
-        "uploadPhotos": "Tải Ảnh Chứng Minh"
-      },
-      "cancel": {
-        "title": "Hủy Yêu Cầu Giao Hàng",
-        "description": "Hủy yêu cầu giao hàng này",
-        "confirmMessage": "Bạn có chắc chắn muốn hủy yêu cầu giao hàng này?",
-        "reasonRequired": "Vui lòng cung cấp lý do hủy",
-        "reasonPlaceholder": "Nhập lý do hủy"
-      }
-    }
+    "gridCard": "Thẻ giao hàng {{id}}"
   },
   "timekeeper": {
     "greeting": {

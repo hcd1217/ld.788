@@ -310,13 +310,15 @@ export function POListPage() {
   return (
     <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
       <POErrorBoundary componentName="POListPage">
-        <AppPageTitle
-          title={t('po.title')}
-          button={{
-            label: t('po.addPO'),
-            onClick: handleNavigateToAdd,
-          }}
-        />
+        <Group justify="space-between" mb="lg">
+          <AppPageTitle title={t('po.title')} />
+          <Group gap="sm">
+            <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
+            <Button leftSection={<IconPlus size={16} />} onClick={handleNavigateToAdd}>
+              {t('po.addPO')}
+            </Button>
+          </Group>
+        </Group>
 
         {/* Desktop Filter Controls */}
         <POFilterBarDesktop
@@ -336,11 +338,6 @@ export function POListPage() {
           onDeliveryDateChange={filterHandlers.setDeliveryDateRange}
           onClearFilters={clearAllFilters}
         />
-
-        {/* View Mode Switch */}
-        <Group justify="end" mb="md">
-          <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
-        </Group>
 
         {/* Content Area */}
         <BlankState

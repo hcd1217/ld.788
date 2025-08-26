@@ -25,6 +25,7 @@ export { PODetailTabsSkeleton } from './PODetailTabsSkeleton';
 
 // Action modals
 export { POStatusModal } from './POStatusModal';
+export { DeliveryRequestModal } from './DeliveryRequestModal';
 
 // Filter components
 export { POFilterBarDesktop } from './POFilterBarDesktop';

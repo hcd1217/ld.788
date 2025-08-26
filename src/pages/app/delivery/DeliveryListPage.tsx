@@ -1,7 +1,23 @@
-import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
-import { Stack, Group, SimpleGrid, Button, Loader, Text, Center } from '@mantine/core';
-import { IconPlus, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import {
+  Stack,
+  Group,
+  SimpleGrid,
+  Button,
+  Affix,
+  ActionIcon,
+  Loader,
+  Text,
+  Center,
+  Flex,
+} from '@mantine/core';
+import {
+  IconTruckDelivery,
+  IconPlus,
+  IconChevronLeft,
+  IconChevronRight,
+} from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeliveryRequestFilters } from '@/hooks/useDeliveryRequestFilters';
 import {
@@ -16,6 +32,7 @@ import {
   useCurrentPage,
   useLoadNextPage,
   useLoadPreviousPage,
+  useLoadMoreDeliveryRequests,
 } from '@/stores/useDeliveryRequestStore';
 import { useCustomers } from '@/stores/useAppStore';
 import {
@@ -25,12 +42,21 @@ import {
   AppMobileLayout,
   AppDesktopLayout,
 } from '@/components/common';
-import { DeliveryFilterBarDesktop } from '@/components/app/delivery/DeliveryFilterBarDesktop';
-import { DeliveryFilterBarMobile } from '@/components/app/delivery/DeliveryFilterBarMobile';
-import { DeliveryCard } from '@/components/app/delivery/DeliveryCard';
-import { DeliveryDataTable } from '@/components/app/delivery/DeliveryDataTable';
+import {
+  DeliveryCard,
+  DeliveryDataTable,
+  DeliveryGridCard,
+  DeliveryListSkeleton,
+  DeliveryFilterBarDesktop,
+  DeliveryFilterBarMobile,
+  DeliveryCustomerDrawer,
+  DeliveryStatusDrawer,
+  DeliveryDateDrawer,
+  DeliveryErrorBoundary,
+} from '@/components/app/delivery';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { ROUTERS } from '@/config/routeConfig';
+import { DELIVERY_STATUS } from '@/constants/deliveryRequest';
 import { useViewMode } from '@/hooks/useViewMode';
 import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
 
@@ -50,13 +76,13 @@ export function DeliveryListPage() {
   const currentPage = useCurrentPage();
   const loadNextPage = useLoadNextPage();
   const loadPreviousPage = useLoadPreviousPage();
+  const loadMoreDeliveryRequests = useLoadMoreDeliveryRequests();
 
   // Search input state with debounce
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch] = useDebouncedValue(searchInput, 300);
 
   // Use the delivery request filters hook for filter state management only
-  // Note: We don't use filteredDeliveryRequests anymore since filtering happens server-side
   const { filters, filterHandlers, hasActiveFilters, clearAllFilters } = useDeliveryRequestFilters(
     [], // Empty array since we don't need client-side filtering
   );
@@ -64,32 +90,38 @@ export function DeliveryListPage() {
   const { viewMode, isTableView, setViewMode } = useViewMode();
 
   // Drawer states using Mantine's useDisclosure directly
-  const [, { open: openCustomerDrawer }] = useDisclosure(false);
-  const [, { open: openStatusDrawer }] = useDisclosure(false);
-  const [, { open: openDateDrawer }] = useDisclosure(false);
+  const [customerDrawerOpened, { open: openCustomerDrawer, close: closeCustomerDrawer }] =
+    useDisclosure(false);
+  const [statusDrawerOpened, { open: openStatusDrawer, close: closeStatusDrawer }] =
+    useDisclosure(false);
+  const [dateDrawerOpened, { open: openDateDrawer, close: closeDateDrawer }] = useDisclosure(false);
+
+  // Scroll detection state
+  const [isNearBottom, setIsNearBottom] = useState(false);
+  const lastLoadTimeRef = useRef<number>(0);
 
   // Create stable filter params with useMemo to prevent unnecessary re-renders
   const filterParams = useMemo(
     () => ({
+      customerId: filters.customerId,
+      // Filter out 'all' status before passing to API
       status:
-        filters.statuses.length === 1 && filters.statuses[0] !== 'ALL'
+        filters.statuses.length === 1 && filters.statuses[0] !== DELIVERY_STATUS.ALL
           ? filters.statuses[0]
           : undefined,
       assignedTo: filters.assignedTo,
-      customerId: filters.customerId,
-      purchaseOrderId: debouncedSearch || undefined, // Search by PO number
+      purchaseOrderId: debouncedSearch || undefined,
       scheduledDateFrom: filters.scheduledDateRange.start?.toISOString(),
       scheduledDateTo: filters.scheduledDateRange.end?.toISOString(),
       completedDateFrom: filters.completedDateRange.start?.toISOString(),
       completedDateTo: filters.completedDateRange.end?.toISOString(),
       sortBy: 'scheduledDate' as const,
       sortOrder: 'asc' as const,
-      limit: 20,
     }),
     [
+      filters.customerId,
       filters.statuses,
       filters.assignedTo,
-      filters.customerId,
       debouncedSearch,
       filters.scheduledDateRange.start,
       filters.scheduledDateRange.end,
@@ -98,58 +130,217 @@ export function DeliveryListPage() {
     ],
   );
 
-  // Load delivery requests on mount and when filters change
+  // Effect to load delivery requests when filter params change
   useEffect(() => {
-    loadDeliveryRequestsWithFilter(filterParams, true);
-  }, [loadDeliveryRequestsWithFilter, filterParams]);
+    void loadDeliveryRequestsWithFilter(filterParams, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterParams]);
 
-  // Clear error when component unmounts
+  // Effect to detect scroll position for infinite scroll (desktop only)
   useEffect(() => {
-    return () => {
-      if (error) {
-        clearError();
+    if (!isDesktop) return;
+
+    const handleScroll = () => {
+      const element = document.documentElement;
+      const scrollTop = window.scrollY;
+      const scrollHeight = element.scrollHeight;
+      const clientHeight = window.innerHeight;
+
+      // Only trigger if there's enough content to scroll (page is taller than viewport)
+      // and user has actually scrolled down
+      if (scrollHeight > clientHeight && scrollTop > 0) {
+        // Load more when user scrolls to 80% of the content
+        const threshold = 0.8;
+        const isNear = scrollTop + clientHeight >= scrollHeight * threshold;
+        setIsNearBottom(isNear);
+      } else {
+        setIsNearBottom(false);
       }
     };
-  }, [error, clearError]);
 
-  // Handle creating new delivery request
-  const handleCreateDeliveryRequest = useCallback(() => {
+    window.addEventListener('scroll', handleScroll);
+    // Don't check initial position to prevent auto-loading on short pages
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isDesktop]);
+
+  // Effect to load more when near bottom
+  useEffect(() => {
+    if (isNearBottom && hasMoreDeliveryRequests && !isLoadingMore && !isLoading) {
+      // Prevent rapid successive loads (minimum 500ms between loads)
+      const now = Date.now();
+      const timeSinceLastLoad = now - lastLoadTimeRef.current;
+
+      if (timeSinceLastLoad >= 500) {
+        lastLoadTimeRef.current = now;
+        void loadMoreDeliveryRequests();
+      }
+    }
+  }, [isNearBottom, hasMoreDeliveryRequests, isLoadingMore, isLoading, loadMoreDeliveryRequests]);
+
+  // Memoized navigation handlers
+  const handleNavigateToAdd = useCallback(() => {
     navigate(ROUTERS.DELIVERY_MANAGEMENT + '/create');
   }, [navigate]);
 
-  // Pagination handlers
-  const handleNextPage = useCallback(() => {
-    loadNextPage();
-  }, [loadNextPage]);
+  // Common BlankState configuration to reduce duplication
+  const blankStateProps = useMemo(
+    () => ({
+      hidden: deliveryRequests.length > 0 || isLoading,
+      icon: <IconTruckDelivery size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />,
+      title: hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound'),
+      description: hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription'),
+    }),
+    [deliveryRequests.length, isLoading, hasActiveFilters, t],
+  );
 
-  const handlePreviousPage = useCallback(() => {
-    loadPreviousPage();
-  }, [loadPreviousPage]);
+  // Initial load is handled by filter effect
 
-  // Clear filters handler
-  const handleClearFilters = useCallback(() => {
-    setSearchInput('');
-    clearAllFilters();
-  }, [clearAllFilters]);
+  if (isMobile) {
+    // Date filter indicators for mobile view
+    const hasScheduledDateFilter = !!(
+      filters.scheduledDateRange.start || filters.scheduledDateRange.end
+    );
+    const hasCompletedDateFilter = !!(
+      filters.completedDateRange.start || filters.completedDateRange.end
+    );
 
-  // Main content component
-  const MainContent = () => (
-    <Stack gap="md">
-      {/* Header */}
-      <Group justify="space-between">
-        <AppPageTitle title={t('delivery.list.title')} />
-        {isDesktop && (
+    return (
+      <AppMobileLayout
+        showLogo
+        isLoading={isLoading}
+        error={error}
+        clearError={clearError}
+        header={<AppPageTitle title={t('delivery.list.title')} />}
+      >
+        <DeliveryErrorBoundary componentName="DeliveryListPage">
+          {/* Mobile Filter Bar */}
+          <DeliveryFilterBarMobile
+            searchQuery={searchInput}
+            customerId={filters.customerId}
+            selectedStatuses={filters.statuses}
+            hasScheduledDateFilter={hasScheduledDateFilter}
+            hasCompletedDateFilter={hasCompletedDateFilter}
+            customers={customers}
+            hasActiveFilters={hasActiveFilters}
+            onSearchChange={setSearchInput}
+            onCustomerClick={openCustomerDrawer}
+            onStatusClick={openStatusDrawer}
+            onDateClick={openDateDrawer}
+            onClearFilters={clearAllFilters}
+          />
+
+          {/* Customer Selection Drawer */}
+          <DeliveryCustomerDrawer
+            opened={customerDrawerOpened}
+            customers={customers}
+            selectedCustomerId={filters.customerId}
+            onClose={closeCustomerDrawer}
+            onCustomerSelect={filterHandlers.setCustomerId}
+          />
+
+          {/* Status Selection Drawer */}
+          <DeliveryStatusDrawer
+            opened={statusDrawerOpened}
+            selectedStatuses={filters.statuses}
+            onClose={closeStatusDrawer}
+            onStatusToggle={filterHandlers.toggleStatus}
+            onApply={() => closeStatusDrawer()}
+            onClear={() => {
+              filterHandlers.setStatuses([]);
+              closeStatusDrawer();
+            }}
+          />
+
+          {/* Date Range Selection Drawer */}
+          <DeliveryDateDrawer
+            opened={dateDrawerOpened}
+            scheduledDateStart={filters.scheduledDateRange.start}
+            scheduledDateEnd={filters.scheduledDateRange.end}
+            completedDateStart={filters.completedDateRange.start}
+            completedDateEnd={filters.completedDateRange.end}
+            onClose={closeDateDrawer}
+            onScheduledDateRangeSelect={filterHandlers.setScheduledDateRange}
+            onCompletedDateRangeSelect={filterHandlers.setCompletedDateRange}
+          />
+
+          <BlankState {...blankStateProps} />
+          <Stack mt="md" gap={0}>
+            {isLoading && deliveryRequests.length === 0 ? (
+              <DeliveryListSkeleton count={5} />
+            ) : (
+              <Stack gap="sm" px="sm">
+                {deliveryRequests.map((dr) => (
+                  <DeliveryCard key={dr.id} deliveryRequest={dr} />
+                ))}
+              </Stack>
+            )}
+          </Stack>
+
+          {/* Mobile Pagination Controls */}
+          {deliveryRequests.length > 0 && !isLoading && (
+            <Flex justify="space-between" align="center" px="md" py="sm" mt="md">
+              <Button
+                variant="light"
+                leftSection={<IconChevronLeft size={16} />}
+                onClick={() => void loadPreviousPage()}
+                disabled={!hasPreviousPage || isLoading}
+                size="sm"
+              >
+                {t('common.previous')}
+              </Button>
+
+              <Text size="sm" c="dimmed">
+                {t('common.page', { page: currentPage })}
+              </Text>
+
+              <Button
+                variant="light"
+                rightSection={<IconChevronRight size={16} />}
+                onClick={() => void loadNextPage()}
+                disabled={!hasMoreDeliveryRequests || isLoading}
+                size="sm"
+              >
+                {t('common.next')}
+              </Button>
+            </Flex>
+          )}
+
+          {/* Floating Action Button for Add Delivery */}
+          {!isLoading && (
+            <Affix position={{ bottom: 120, right: 20 }}>
+              <ActionIcon
+                size="xl"
+                radius="xl"
+                color="blue"
+                onClick={handleNavigateToAdd}
+                aria-label={t('delivery.actions.create')}
+              >
+                <IconPlus size={24} />
+              </ActionIcon>
+            </Affix>
+          )}
+        </DeliveryErrorBoundary>
+      </AppMobileLayout>
+    );
+  }
+
+  return (
+    <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
+      <DeliveryErrorBoundary componentName="DeliveryListPage">
+        <Group justify="space-between" mb="lg">
+          <AppPageTitle title={t('delivery.list.title')} />
           <Group gap="sm">
             <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
-            <Button leftSection={<IconPlus size={16} />} onClick={handleCreateDeliveryRequest}>
+            <Button leftSection={<IconPlus size={16} />} onClick={handleNavigateToAdd}>
               {t('delivery.actions.create')}
             </Button>
           </Group>
-        )}
-      </Group>
+        </Group>
 
-      {/* Filters */}
-      {isDesktop ? (
+        {/* Desktop Filter Controls */}
         <DeliveryFilterBarDesktop
           searchQuery={searchInput}
           customerId={filters.customerId}
@@ -165,128 +356,60 @@ export function DeliveryListPage() {
           onStatusesChange={filterHandlers.setStatuses}
           onScheduledDateChange={filterHandlers.setScheduledDateRange}
           onCompletedDateChange={filterHandlers.setCompletedDateRange}
-          onClearFilters={handleClearFilters}
+          onClearFilters={clearAllFilters}
         />
-      ) : (
-        <DeliveryFilterBarMobile
-          searchQuery={searchInput}
-          customerId={filters.customerId}
-          selectedStatuses={filters.statuses}
-          hasScheduledDateFilter={Boolean(
-            filters.scheduledDateRange.start || filters.scheduledDateRange.end,
-          )}
-          hasCompletedDateFilter={Boolean(
-            filters.completedDateRange.start || filters.completedDateRange.end,
-          )}
-          customers={customers}
-          hasActiveFilters={hasActiveFilters}
-          onSearchChange={setSearchInput}
-          onCustomerClick={openCustomerDrawer}
-          onStatusClick={openStatusDrawer}
-          onDateClick={openDateDrawer}
-          onClearFilters={handleClearFilters}
-        />
-      )}
 
-      {/* Results count */}
-      <Group justify="space-between">
-        <Text size="sm" c="dimmed">
-          {t('delivery.list.count', { count: deliveryRequests.length })}
-        </Text>
-      </Group>
-
-      {/* Content */}
-      {isLoading && deliveryRequests.length === 0 ? (
-        <Center py="xl">
-          <Loader size="md" />
-        </Center>
-      ) : error ? (
-        <Center py="xl">
-          <Text c="red">{error}</Text>
-        </Center>
-      ) : deliveryRequests.length === 0 ? (
+        {/* Content Area */}
         <BlankState
-          title={t('delivery.list.empty.title')}
-          description={t('delivery.list.empty.description')}
-          button={{
-            label: t('delivery.actions.create'),
-            onClick: handleCreateDeliveryRequest,
-            icon: <IconPlus size={16} />,
-          }}
+          {...blankStateProps}
+          button={
+            hasActiveFilters
+              ? undefined
+              : {
+                  label: t('delivery.actions.create'),
+                  onClick: handleNavigateToAdd,
+                }
+          }
         />
-      ) : (
-        <Stack gap="md">
-          {/* List/Grid View */}
-          {isTableView ? (
-            <DeliveryDataTable deliveryRequests={deliveryRequests} isLoading={isLoading} />
-          ) : (
-            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-              {deliveryRequests.map((deliveryRequest) => (
-                <DeliveryCard key={deliveryRequest.id} deliveryRequest={deliveryRequest} />
-              ))}
-            </SimpleGrid>
-          )}
 
-          {/* Pagination */}
-          {(hasMoreDeliveryRequests || hasPreviousPage) && (
-            <Group justify="center" mt="md">
-              <Button
-                variant="outline"
-                leftSection={<IconChevronLeft size={16} />}
-                onClick={handlePreviousPage}
-                disabled={!hasPreviousPage || isLoading}
-              >
-                {t('common.previous')}
-              </Button>
-              <Text size="sm" c="dimmed">
-                {t('common.page')} {currentPage}
-              </Text>
-              <Button
-                variant="outline"
-                rightSection={<IconChevronRight size={16} />}
-                onClick={handleNextPage}
-                disabled={!hasMoreDeliveryRequests || isLoading}
-              >
-                {t('common.next')}
-              </Button>
-            </Group>
-          )}
+        {/* Data Display */}
+        {(deliveryRequests.length > 0 || isLoading) && (
+          <>
+            {isLoading && deliveryRequests.length === 0 ? (
+              <DeliveryListSkeleton viewMode={viewMode} count={10} />
+            ) : isTableView ? (
+              <DeliveryDataTable deliveryRequests={deliveryRequests} isLoading={isLoading} />
+            ) : (
+              <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
+                {deliveryRequests.map((dr) => (
+                  <DeliveryGridCard key={dr.id} deliveryRequest={dr} />
+                ))}
+              </SimpleGrid>
+            )}
 
-          {/* Loading more indicator */}
-          {isLoadingMore && (
-            <Center py="sm">
-              <Loader size="sm" />
-            </Center>
-          )}
-        </Stack>
-      )}
+            {/* Loading more indicator */}
+            {isLoadingMore && (
+              <Center py="md">
+                <Loader size="sm" />
+                <Text ml="xs" size="sm" c="dimmed">
+                  {t('common.loadingMore')}
+                </Text>
+              </Center>
+            )}
 
-      {/* Mobile FAB */}
-      {isMobile && (
-        <Button
-          pos="fixed"
-          bottom={20}
-          right={20}
-          style={{ zIndex: 1000 }}
-          onClick={handleCreateDeliveryRequest}
-        >
-          <IconPlus size={16} />
-        </Button>
-      )}
-    </Stack>
-  );
+            {/* End of list message */}
+            {!hasMoreDeliveryRequests && deliveryRequests.length > 0 && (
+              <Center py="md">
+                <Text size="sm" c="dimmed">
+                  {t('po.noMorePOs')}
+                </Text>
+              </Center>
+            )}
+          </>
+        )}
 
-  return (
-    <>
-      {isMobile ? (
-        <AppMobileLayout>
-          <MainContent />
-        </AppMobileLayout>
-      ) : (
-        <AppDesktopLayout>
-          <MainContent />
-        </AppDesktopLayout>
-      )}
-    </>
+        {/* Note: Desktop now uses inline controls in DeliveryFilterBarDesktop, no drawers needed */}
+      </DeliveryErrorBoundary>
+    </AppDesktopLayout>
   );
 }

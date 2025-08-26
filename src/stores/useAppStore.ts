@@ -314,3 +314,5 @@ export const useCustomerMapByCustomerId = () =>
   useAppStore((state) => state.customerMapByCustomerId);
 // Customer selectors
 export const useCustomers = () => useAppStore((state) => state.overviewData?.customers ?? []);
+// Employee selectors
+export const useEmployees = () => useAppStore((state) => state.overviewData?.employees ?? []);

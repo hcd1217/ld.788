@@ -53,7 +53,7 @@ type PODetailAccordionProps = {
   readonly onDeliver: () => void;
   readonly onCancel: () => void;
   readonly onRefund: () => void;
-  readonly onCreateDelivery?: () => void;
+  readonly onCreateDelivery: () => void;
 };
 
 export function PODetailAccordion({
