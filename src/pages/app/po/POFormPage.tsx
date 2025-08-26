@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { Container, Loader, Center, Alert } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -50,7 +50,7 @@ export function POFormPage({ mode }: POFormPageProps) {
   });
 
   // Load PO data for edit mode
-  const loadPO = async () => {
+  const loadPO = useCallback(async () => {
     if (!id) {
       navigate(ROUTERS.PO_MANAGEMENT);
       return;
@@ -97,7 +97,7 @@ export function POFormPage({ mode }: POFormPageProps) {
     } finally {
       setIsLoadingPO(false);
     }
-  };
+  }, [id, form, navigate, initialValues]);
 
   // Load initial data
   useOnce(() => {
@@ -201,7 +201,7 @@ export function POFormPage({ mode }: POFormPageProps) {
 
   return (
     <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
-      <AppPageTitle title={pageTitle} />
+      <AppPageTitle withGoBack title={pageTitle} />
       <Container fluid>{content}</Container>
     </AppDesktopLayout>
   );

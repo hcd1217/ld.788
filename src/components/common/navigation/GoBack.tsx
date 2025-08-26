@@ -6,7 +6,7 @@ import { useCallback } from 'react';
 import { ROUTERS } from '@/config/routeConfig';
 
 type GoBackProps = {
-  readonly variant?: 'anchor' | 'mobile-header';
+  readonly variant?: 'anchor' | 'mobile-header' | 'icon';
   readonly label?: string;
   readonly route?: string;
 };
@@ -21,7 +21,7 @@ export function GoBack({ label, variant = 'anchor', route }: GoBackProps) {
       navigate(-1);
     }
   }, [location.key, navigate, route]);
-  if (variant === 'mobile-header') {
+  if (variant === 'mobile-header' || variant === 'icon') {
     const size = rem(40);
     return (
       <ActionIcon c="gray" size={size} variant="transparent" onClick={goBack}>

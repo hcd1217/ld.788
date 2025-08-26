@@ -361,7 +361,7 @@ export function PODetailPage() {
 
   return (
     <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
-      <AppPageTitle title={title} />
+      <AppPageTitle withGoBack title={title} />
 
       {isLoading ? (
         <PODetailTabsSkeleton />
