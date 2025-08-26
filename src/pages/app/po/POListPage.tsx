@@ -5,7 +5,6 @@ import {
   Group,
   Box,
   SimpleGrid,
-  Select,
   Button,
   Affix,
   ActionIcon,
@@ -14,13 +13,7 @@ import {
   Center,
   Flex,
 } from '@mantine/core';
-import {
-  IconFileInvoice,
-  IconClearAll,
-  IconPlus,
-  IconChevronLeft,
-  IconChevronRight,
-} from '@tabler/icons-react';
+import { IconFileInvoice, IconPlus, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { usePOFilters } from '@/hooks/usePOFilters';
 import {
@@ -31,10 +24,8 @@ import {
   usePOPaginationState,
 } from '@/stores/usePOStore';
 import { useCustomers } from '@/stores/useAppStore';
-import type { CustomerOverview } from '@/services/client/overview';
 import {
   AppPageTitle,
-  SearchBar,
   SwitchView,
   BlankState,
   AppMobileLayout,
@@ -45,7 +36,8 @@ import {
   PODataTable,
   POGridCard,
   POListSkeleton,
-  POFilterBar,
+  POFilterBarDesktop,
+  POFilterBarMobile,
   POCustomerDrawer,
   POStatusDrawer,
   PODateDrawer,
@@ -92,47 +84,35 @@ export function POListPage() {
   // Scroll detection state
   const [isNearBottom, setIsNearBottom] = useState(false);
   const lastLoadTimeRef = useRef<number>(0);
-  // Prepare customer options for select
-  const customerOptions = useMemo(
-    () =>
-      customers.map((customer: CustomerOverview) => ({
-        value: customer.id,
-        label: customer.name,
-      })),
-    [customers],
+
+  const hasOrderDateFilter = !!(filters.orderDateRange.start || filters.orderDateRange.end);
+  const hasDeliveryDateFilter = !!(
+    filters.deliveryDateRange.start || filters.deliveryDateRange.end
   );
-
-  // Status options for select
-  const statusOptions = useMemo(() => {
-    return [
-      { value: PO_STATUS.ALL, label: t('po.allStatus') },
-      { value: PO_STATUS.NEW, label: t('po.status.NEW') },
-      { value: PO_STATUS.CONFIRMED, label: t('po.status.CONFIRMED') },
-      { value: PO_STATUS.PROCESSING, label: t('po.status.PROCESSING') },
-      { value: PO_STATUS.SHIPPED, label: t('po.status.SHIPPED') },
-      { value: PO_STATUS.DELIVERED, label: t('po.status.DELIVERED') },
-      { value: PO_STATUS.CANCELLED, label: t('po.status.CANCELLED') },
-      { value: PO_STATUS.REFUNDED, label: t('po.status.REFUNDED') },
-    ];
-  }, [t]);
-
-  const hasDateFilter = !!(filters.dateRange.start || filters.dateRange.end);
 
   // Create stable filter params with useMemo to prevent unnecessary re-renders
   const filterParams = useMemo(
     () => ({
       customerId: filters.customerId,
-      status: filters.status === 'all' ? undefined : filters.status,
+      // Filter out 'all' status before passing to API
+      statuses:
+        filters.statuses.length > 0
+          ? filters.statuses.filter((s) => s !== PO_STATUS.ALL)
+          : undefined,
       poNumber: debouncedSearch || undefined,
-      orderDateFrom: filters.dateRange.start?.toISOString(),
-      orderDateTo: filters.dateRange.end?.toISOString(),
+      orderDateFrom: filters.orderDateRange.start?.toISOString(),
+      orderDateTo: filters.orderDateRange.end?.toISOString(),
+      deliveryDateFrom: filters.deliveryDateRange.start?.toISOString(),
+      deliveryDateTo: filters.deliveryDateRange.end?.toISOString(),
     }),
     [
       filters.customerId,
-      filters.status,
+      filters.statuses,
       debouncedSearch,
-      filters.dateRange.start,
-      filters.dateRange.end,
+      filters.orderDateRange.start,
+      filters.orderDateRange.end,
+      filters.deliveryDateRange.start,
+      filters.deliveryDateRange.end,
     ],
   );
 
@@ -191,21 +171,6 @@ export function POListPage() {
     navigate(ROUTERS.PO_ADD);
   }, [navigate]);
 
-  // Memoized filter handlers
-  const handleCustomerChange = useCallback(
-    (value: string | null) => {
-      filterHandlers.setCustomerId(value || undefined);
-    },
-    [filterHandlers],
-  );
-
-  const handleStatusChange = useCallback(
-    (value: string | null) => {
-      filterHandlers.setStatus(value as (typeof PO_STATUS)[keyof typeof PO_STATUS]);
-    },
-    [filterHandlers],
-  );
-
   // Initial load is handled by filter effect
 
   if (isMobile) {
@@ -218,12 +183,13 @@ export function POListPage() {
         header={<AppPageTitle title={t('po.title')} />}
       >
         <POErrorBoundary componentName="POListPage">
-          {/* Filter Bar */}
-          <POFilterBar
+          {/* Mobile Filter Bar */}
+          <POFilterBarMobile
             searchQuery={searchInput}
             customerId={filters.customerId}
-            status={filters.status}
-            hasDateFilter={hasDateFilter}
+            selectedStatuses={filters.statuses}
+            hasOrderDateFilter={hasOrderDateFilter}
+            hasDeliveryDateFilter={hasDeliveryDateFilter}
             customers={customers}
             hasActiveFilters={hasActiveFilters}
             onSearchChange={setSearchInput}
@@ -245,18 +211,26 @@ export function POListPage() {
           {/* Status Selection Drawer */}
           <POStatusDrawer
             opened={statusDrawerOpened}
-            selectedStatus={filters.status}
+            selectedStatuses={filters.statuses}
             onClose={closeStatusDrawer}
-            onStatusSelect={filterHandlers.setStatus}
+            onStatusToggle={filterHandlers.toggleStatus}
+            onApply={() => closeStatusDrawer()}
+            onClear={() => {
+              filterHandlers.setStatuses([]);
+              closeStatusDrawer();
+            }}
           />
 
           {/* Date Range Selection Drawer */}
           <PODateDrawer
             opened={dateDrawerOpened}
-            startDate={filters.dateRange.start}
-            endDate={filters.dateRange.end}
+            orderDateStart={filters.orderDateRange.start}
+            orderDateEnd={filters.orderDateRange.end}
+            deliveryDateStart={filters.deliveryDateRange.start}
+            deliveryDateEnd={filters.deliveryDateRange.end}
             onClose={closeDateDrawer}
-            onDateRangeSelect={filterHandlers.setDateRange}
+            onOrderDateRangeSelect={filterHandlers.setOrderDateRange}
+            onDeliveryDateRangeSelect={filterHandlers.setDeliveryDateRange}
           />
 
           <BlankState
@@ -340,42 +314,29 @@ export function POListPage() {
           }}
         />
 
-        {/* Search and Filter Controls */}
-        <Stack gap="md" mb="xl">
-          <Group justify="space-between" align="flex-end">
-            <SearchBar
-              placeholder={t('po.searchPlaceholder')}
-              searchQuery={searchInput}
-              setSearchQuery={setSearchInput}
-            />
-            <Select
-              clearable
-              searchable
-              placeholder={t('po.selectCustomer')}
-              data={[{ value: '', label: t('po.allCustomers') }, ...customerOptions]}
-              value={filters.customerId || ''}
-              style={{ flex: 1, maxWidth: 300 }}
-              onChange={handleCustomerChange}
-            />
-            <Select
-              clearable
-              placeholder={t('po.selectStatus')}
-              data={statusOptions}
-              value={filters.status}
-              style={{ width: 180 }}
-              onChange={handleStatusChange}
-            />
-            <Button
-              disabled={!hasActiveFilters}
-              variant="subtle"
-              leftSection={<IconClearAll size={16} />}
-              onClick={clearAllFilters}
-            >
-              {t('common.clear')}
-            </Button>
-            <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
-          </Group>
-        </Stack>
+        {/* Desktop Filter Controls */}
+        <POFilterBarDesktop
+          searchQuery={searchInput}
+          customerId={filters.customerId}
+          selectedStatuses={filters.statuses}
+          orderDateStart={filters.orderDateRange.start}
+          orderDateEnd={filters.orderDateRange.end}
+          deliveryDateStart={filters.deliveryDateRange.start}
+          deliveryDateEnd={filters.deliveryDateRange.end}
+          customers={customers}
+          hasActiveFilters={hasActiveFilters}
+          onSearchChange={setSearchInput}
+          onCustomerChange={filterHandlers.setCustomerId}
+          onStatusesChange={filterHandlers.setStatuses}
+          onOrderDateChange={filterHandlers.setOrderDateRange}
+          onDeliveryDateChange={filterHandlers.setDeliveryDateRange}
+          onClearFilters={clearAllFilters}
+        />
+
+        {/* View Mode Switch */}
+        <Group justify="end" mb="md">
+          <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
+        </Group>
 
         {/* Content Area */}
         <BlankState
@@ -432,6 +393,8 @@ export function POListPage() {
             )}
           </>
         )}
+
+        {/* Note: Desktop now uses inline controls in POFilterBarDesktop, no drawers needed */}
       </POErrorBoundary>
     </AppDesktopLayout>
   );

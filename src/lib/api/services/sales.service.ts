@@ -114,8 +114,11 @@ export class SalesApi extends BaseApiClient {
     poNumber?: string;
     customerId?: string;
     status?: POStatus;
+    statuses?: POStatus[];
     orderDateFrom?: string;
     orderDateTo?: string;
+    deliveryDateFrom?: string;
+    deliveryDateTo?: string;
     cursor?: string;
     limit?: number;
     sortBy?: 'createdAt' | 'orderDate' | 'poNumber' | 'updatedAt';
@@ -125,8 +128,15 @@ export class SalesApi extends BaseApiClient {
     if (params?.poNumber) queryParams.append('poNumber', params.poNumber);
     if (params?.customerId) queryParams.append('customerId', params.customerId);
     if (params?.status) queryParams.append('status', params.status);
+    if (params?.statuses) {
+      params.statuses.forEach((status) => {
+        queryParams.append('statuses', status);
+      });
+    }
     if (params?.orderDateFrom) queryParams.append('orderDateFrom', params.orderDateFrom);
     if (params?.orderDateTo) queryParams.append('orderDateTo', params.orderDateTo);
+    if (params?.deliveryDateFrom) queryParams.append('deliveryDateFrom', params.deliveryDateFrom);
+    if (params?.deliveryDateTo) queryParams.append('deliveryDateTo', params.deliveryDateTo);
     if (params?.cursor) queryParams.append('cursor', params.cursor);
     if (params?.limit) queryParams.append('limit', String(params.limit));
     if (params?.sortBy) queryParams.append('sortBy', params.sortBy);

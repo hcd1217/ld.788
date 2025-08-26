@@ -2,14 +2,14 @@ import { Stack, Group, Box, Button } from '@mantine/core';
 import { IconChevronDown, IconClearAll } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { SearchBar } from '@/components/common';
-import { PO_STATUS } from '@/constants/purchaseOrder';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
 
-interface POFilterBarProps {
+interface POFilterBarMobileProps {
   readonly searchQuery: string;
   readonly customerId?: string;
-  readonly status: (typeof PO_STATUS)[keyof typeof PO_STATUS];
-  readonly hasDateFilter: boolean;
+  readonly selectedStatuses: string[];
+  readonly hasOrderDateFilter: boolean;
+  readonly hasDeliveryDateFilter: boolean;
   readonly customers: readonly Customer[];
   readonly hasActiveFilters: boolean;
   readonly onSearchChange: (query: string) => void;
@@ -19,11 +19,12 @@ interface POFilterBarProps {
   readonly onClearFilters: () => void;
 }
 
-export function POFilterBar({
+export function POFilterBarMobile({
   searchQuery,
   customerId,
-  status,
-  hasDateFilter,
+  selectedStatuses,
+  hasOrderDateFilter,
+  hasDeliveryDateFilter,
   customers,
   hasActiveFilters,
   onSearchChange,
@@ -31,13 +32,35 @@ export function POFilterBar({
   onStatusClick,
   onDateClick,
   onClearFilters,
-}: POFilterBarProps) {
+}: POFilterBarMobileProps) {
   const { t } = useTranslation();
 
   const getCustomerLabel = () => {
     if (!customerId) return t('po.allCustomers');
     const customer = customers.find((c) => c.id === customerId);
     return customer ? customer.name : t('po.allCustomers');
+  };
+
+  const getStatusLabel = () => {
+    if (selectedStatuses.length === 0) {
+      return t('po.allStatus');
+    }
+    if (selectedStatuses.length === 1) {
+      // Translate individual status
+      const statusKey = `po.status.${selectedStatuses[0]}` as const;
+      return t(statusKey as any);
+    }
+    return `${t('po.poStatus')} (${selectedStatuses.length})`;
+  };
+
+  const getDateLabel = () => {
+    if (hasOrderDateFilter && hasDeliveryDateFilter) {
+      return `${t('po.dateRange')} (2)`;
+    }
+    if (hasOrderDateFilter || hasDeliveryDateFilter) {
+      return `${t('po.dateRange')} (1)`;
+    }
+    return t('po.dateRange');
   };
 
   return (
@@ -64,22 +87,22 @@ export function POFilterBar({
 
           <Button
             size="xs"
-            variant={status !== PO_STATUS.ALL ? 'filled' : 'light'}
+            variant={selectedStatuses.length > 0 ? 'filled' : 'light'}
             rightSection={<IconChevronDown size={16} />}
             onClick={onStatusClick}
             style={{ flex: 1 }}
           >
-            {status === PO_STATUS.ALL ? t('po.allStatus') : t(`po.status.${status}`)}
+            {getStatusLabel()}
           </Button>
 
           <Button
             size="xs"
-            variant={hasDateFilter ? 'filled' : 'light'}
+            variant={hasOrderDateFilter || hasDeliveryDateFilter ? 'filled' : 'light'}
             rightSection={<IconChevronDown size={16} />}
             onClick={onDateClick}
             style={{ flex: 1 }}
           >
-            {t('po.dateRange')}
+            {getDateLabel()}
           </Button>
 
           <Button

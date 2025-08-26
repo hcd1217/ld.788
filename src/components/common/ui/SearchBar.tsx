@@ -5,10 +5,17 @@ type SearchBarProps = {
   readonly hidden?: boolean;
   readonly searchQuery?: string;
   readonly placeholder?: string;
+  readonly maxWidth?: string | number;
   readonly setSearchQuery: (query: string) => void;
 };
 
-export function SearchBar({ hidden, placeholder, searchQuery, setSearchQuery }: SearchBarProps) {
+export function SearchBar({
+  maxWidth = 400,
+  hidden,
+  placeholder,
+  searchQuery,
+  setSearchQuery,
+}: SearchBarProps) {
   if (hidden) {
     return null;
   }
@@ -18,7 +25,7 @@ export function SearchBar({ hidden, placeholder, searchQuery, setSearchQuery }: 
       placeholder={placeholder}
       leftSection={<IconSearch size={16} />}
       value={searchQuery}
-      style={{ flex: 1, maxWidth: 400 }}
+      style={{ flex: 1, maxWidth }}
       onChange={(e) => {
         setSearchQuery(e.target.value);
       }}

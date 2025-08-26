@@ -79,9 +79,12 @@ async function retryOnServerError<T>(
 export type POFilterParams = {
   poNumber?: string;
   customerId?: string;
-  status?: POStatus;
+  status?: POStatus; // Single status for backward compatibility
+  statuses?: POStatus[]; // Multiple statuses for multi-select
   orderDateFrom?: string | Date;
   orderDateTo?: string | Date;
+  deliveryDateFrom?: string | Date;
+  deliveryDateTo?: string | Date;
   cursor?: string;
   limit?: number;
   sortBy?: 'createdAt' | 'orderDate' | 'poNumber' | 'updatedAt';
@@ -104,7 +107,12 @@ export const purchaseOrderService = {
     // Transform Date objects to ISO strings for API
     const apiParams = filters
       ? {
-          ...filters,
+          poNumber: filters.poNumber,
+          customerId: filters.customerId,
+          // Support both single status and multiple statuses
+          status: filters.statuses?.length === 1 ? filters.statuses[0] : filters.status,
+          statuses:
+            filters.statuses?.length && filters.statuses.length > 1 ? filters.statuses : undefined,
           orderDateFrom:
             filters.orderDateFrom instanceof Date
               ? filters.orderDateFrom.toISOString()
@@ -113,6 +121,18 @@ export const purchaseOrderService = {
             filters.orderDateTo instanceof Date
               ? filters.orderDateTo.toISOString()
               : filters.orderDateTo,
+          deliveryDateFrom:
+            filters.deliveryDateFrom instanceof Date
+              ? filters.deliveryDateFrom.toISOString()
+              : filters.deliveryDateFrom,
+          deliveryDateTo:
+            filters.deliveryDateTo instanceof Date
+              ? filters.deliveryDateTo.toISOString()
+              : filters.deliveryDateTo,
+          cursor: filters.cursor,
+          limit: filters.limit,
+          sortBy: filters.sortBy,
+          sortOrder: filters.sortOrder,
         }
       : undefined;
 

@@ -26,8 +26,9 @@ export { PODetailTabsSkeleton } from './PODetailTabsSkeleton';
 // Action modals
 export { POStatusModal } from './POStatusModal';
 
-// Mobile filter components
-export { POFilterBar } from './POFilterBar';
+// Filter components
+export { POFilterBarDesktop } from './POFilterBarDesktop';
+export { POFilterBarMobile } from './POFilterBarMobile';
 export { POCustomerDrawer } from './POCustomerDrawer';
 export { POStatusDrawer } from './POStatusDrawer';
 export { PODateDrawer } from './PODateDrawer';

@@ -1,30 +1,28 @@
-import { SimpleGrid, Button } from '@mantine/core';
+import { Stack, Button, Checkbox, Group } from '@mantine/core';
 import { Drawer } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
-import { PO_STATUS } from '@/constants/purchaseOrder';
+import { PO_STATUS, type POStatusType } from '@/constants/purchaseOrder';
 
 interface POStatusDrawerProps {
   readonly opened: boolean;
-  readonly selectedStatus: (typeof PO_STATUS)[keyof typeof PO_STATUS];
+  readonly selectedStatuses: POStatusType[];
   readonly onClose: () => void;
-  readonly onStatusSelect: (status: (typeof PO_STATUS)[keyof typeof PO_STATUS]) => void;
+  readonly onStatusToggle: (status: POStatusType) => void;
+  readonly onApply: () => void;
+  readonly onClear: () => void;
 }
 
 export function POStatusDrawer({
   opened,
-  selectedStatus,
+  selectedStatuses,
   onClose,
-  onStatusSelect,
+  onStatusToggle,
+  onApply,
+  onClear,
 }: POStatusDrawerProps) {
   const { t } = useTranslation();
 
-  const handleStatusSelect = (status: (typeof PO_STATUS)[keyof typeof PO_STATUS]) => {
-    onStatusSelect(status);
-    onClose();
-  };
-
   const statusOptions = [
-    { value: PO_STATUS.ALL, label: t('po.allStatus') },
     { value: PO_STATUS.NEW, label: t('po.status.NEW') },
     { value: PO_STATUS.CONFIRMED, label: t('po.status.CONFIRMED') },
     { value: PO_STATUS.PROCESSING, label: t('po.status.PROCESSING') },
@@ -34,36 +32,65 @@ export function POStatusDrawer({
     { value: PO_STATUS.REFUNDED, label: t('po.status.REFUNDED') },
   ];
 
-  // Calculate drawer height based on number of items
-  const calculateDrawerHeight = () => {
-    const itemCount = statusOptions.length;
-    const rows = Math.ceil(itemCount / 2);
-    const buttonHeight = 36;
-    const gapHeight = 8;
-    const padding = 32;
-    const headerHeight = 60;
-    const calculatedHeight = headerHeight + padding + rows * buttonHeight + (rows - 1) * gapHeight;
-    return `${Math.min(calculatedHeight, 400)}px`; // Max height 400px
+  const isAllSelected = selectedStatuses.length === 0 || selectedStatuses.includes(PO_STATUS.ALL);
+  const selectedCount = isAllSelected ? 0 : selectedStatuses.length;
+
+  const handleAllToggle = () => {
+    onStatusToggle(PO_STATUS.ALL);
+  };
+
+  const handleStatusToggle = (status: POStatusType) => {
+    onStatusToggle(status);
+  };
+
+  const handleApply = () => {
+    onApply();
+    onClose();
+  };
+
+  const handleClear = () => {
+    onClear();
+    onClose();
   };
 
   return (
     <Drawer
       opened={opened}
-      size={calculateDrawerHeight()}
-      title={t('po.selectStatus')}
+      size="360px"
+      title={
+        selectedCount > 0 ? `${t('po.selectStatus')} (${selectedCount})` : t('po.selectStatus')
+      }
       onClose={onClose}
     >
-      <SimpleGrid cols={2} spacing="xs">
-        {statusOptions.map((option) => (
-          <Button
-            key={option.value}
-            variant={selectedStatus === option.value ? 'filled' : 'light'}
-            onClick={() => handleStatusSelect(option.value)}
-          >
-            {option.label}
+      <Stack gap="md">
+        {/* All option */}
+        <Checkbox
+          label={t('po.allStatus')}
+          checked={isAllSelected}
+          onChange={() => handleAllToggle()}
+        />
+
+        {/* Individual status options */}
+        <Stack gap="xs" pl="md">
+          {statusOptions.map((option) => (
+            <Checkbox
+              key={option.value}
+              label={option.label}
+              checked={!isAllSelected && selectedStatuses.includes(option.value)}
+              disabled={isAllSelected}
+              onChange={() => handleStatusToggle(option.value)}
+            />
+          ))}
+        </Stack>
+
+        {/* Action buttons */}
+        <Group grow mt="md">
+          <Button variant="light" onClick={handleClear}>
+            {t('common.clear')}
           </Button>
-        ))}
-      </SimpleGrid>
+          <Button onClick={handleApply}>{t('common.apply')}</Button>
+        </Group>
+      </Stack>
     </Drawer>
   );
 }
