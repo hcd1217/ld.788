@@ -425,7 +425,7 @@ export function POItemsEditor({ items, onChange, isReadOnly = false }: POItemsEd
                 <Table.Tr>
                   <Table.Td>
                     <Autocomplete
-                      placeholder={t('po.searchProduct' as any)}
+                      placeholder={t('po.searchProduct')}
                       data={productOptions}
                       value={productSearch}
                       onChange={(value) => {

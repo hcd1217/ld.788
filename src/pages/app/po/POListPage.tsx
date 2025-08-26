@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router';
 import {
   Stack,
   Group,
-  Box,
   SimpleGrid,
   Button,
   Affix,
@@ -84,11 +83,6 @@ export function POListPage() {
   // Scroll detection state
   const [isNearBottom, setIsNearBottom] = useState(false);
   const lastLoadTimeRef = useRef<number>(0);
-
-  const hasOrderDateFilter = !!(filters.orderDateRange.start || filters.orderDateRange.end);
-  const hasDeliveryDateFilter = !!(
-    filters.deliveryDateRange.start || filters.deliveryDateRange.end
-  );
 
   // Create stable filter params with useMemo to prevent unnecessary re-renders
   const filterParams = useMemo(
@@ -171,9 +165,26 @@ export function POListPage() {
     navigate(ROUTERS.PO_ADD);
   }, [navigate]);
 
+  // Common BlankState configuration to reduce duplication
+  const blankStateProps = useMemo(
+    () => ({
+      hidden: purchaseOrders.length > 0 || isLoading,
+      icon: <IconFileInvoice size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />,
+      title: hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound'),
+      description: hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription'),
+    }),
+    [purchaseOrders.length, isLoading, hasActiveFilters, t],
+  );
+
   // Initial load is handled by filter effect
 
   if (isMobile) {
+    // Date filter indicators for mobile view
+    const hasOrderDateFilter = !!(filters.orderDateRange.start || filters.orderDateRange.end);
+    const hasDeliveryDateFilter = !!(
+      filters.deliveryDateRange.start || filters.deliveryDateRange.end
+    );
+
     return (
       <AppMobileLayout
         showLogo
@@ -233,17 +244,8 @@ export function POListPage() {
             onDeliveryDateRangeSelect={filterHandlers.setDeliveryDateRange}
           />
 
-          <BlankState
-            hidden={purchaseOrders.length > 0 || isLoading}
-            icon={
-              <IconFileInvoice size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />
-            }
-            title={hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound')}
-            description={
-              hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription')
-            }
-          />
-          <Box mt="md">
+          <BlankState {...blankStateProps} />
+          <Stack mt="md" gap={0}>
             {isLoading && purchaseOrders.length === 0 ? (
               <POListSkeleton count={5} />
             ) : (
@@ -253,7 +255,7 @@ export function POListPage() {
                 ))}
               </Stack>
             )}
-          </Box>
+          </Stack>
 
           {/* Mobile Pagination Controls */}
           {purchaseOrders.length > 0 && !isLoading && (
@@ -340,14 +342,7 @@ export function POListPage() {
 
         {/* Content Area */}
         <BlankState
-          hidden={purchaseOrders.length > 0 || isLoading}
-          icon={
-            <IconFileInvoice size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />
-          }
-          title={hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound')}
-          description={
-            hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription')
-          }
+          {...blankStateProps}
           button={
             hasActiveFilters
               ? undefined

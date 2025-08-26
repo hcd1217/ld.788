@@ -75,6 +75,8 @@
     "delete": "Delete",
     "error": "Error",
     "success": "Success",
+    "notScheduled": "Not scheduled",
+    "notAssigned": "Not assigned",
     "darkMode": "Dark Mode",
     "backToPreviousPage": "Back to previous page",
     "name": "Name",
@@ -1063,6 +1065,9 @@
     "delivered": "Order marked as delivered",
     "deliveryDate": "Delivery Date",
     "deliveryNotes": "Delivery Notes",
+    "createDeliveryRequest": "Create Delivery Request",
+    "deliveryRequestCreated": "Delivery request created successfully",
+    "deliveryRequestCreateFailed": "Failed to create delivery request",
     "description": "Description",
     "documents": "Documents",
     "editPO": "Edit Purchase Order",
@@ -1133,6 +1138,13 @@
     "selectStatus": "Select status",
     "statusesSelected": "statuses selected",
     "dateRange": "Date Range",
+    "markReady": "Ready for Pickup",
+    "markReadyFailed": "Failed to mark as ready for pickup",
+    "markReadyOrder": "Mark Ready for Pickup",
+    "markReadyOrderDescription": "Mark this order as ready for pickup. You can specify the pickup location and send a notification.",
+    "markedReady": "Order marked as ready for pickup",
+    "pickupLocation": "Pickup Location",
+    "notificationMessage": "Notification Message",
     "ship": "Ship",
     "shipFailed": "Failed to mark as shipped",
     "shipOrder": "Ship Order",
@@ -1156,6 +1168,7 @@
       "DELIVERED": "Delivered",
       "NEW": "New",
       "PROCESSING": "Processing",
+      "READY_FOR_PICKUP": "Ready for Pickup",
       "REFUNDED": "Refunded",
       "SHIPPED": "Shipped"
     },
@@ -1190,6 +1203,153 @@
     "invalidQuantity": "Invalid quantity",
     "productAlreadyAdded": "Product {{productCode}} has already been added",
     "autoFilledFromCustomerAddress": "Auto-filled from customer address"
+  },
+  "delivery": {
+    "list": {
+      "title": "Delivery Management",
+      "description": "Track and manage delivery requests for purchase orders",
+      "count": "{{count}} delivery requests",
+      "empty": {
+        "title": "No Delivery Requests",
+        "description": "Create your first delivery request from a delivered purchase order"
+      },
+      "tableView": "Table View"
+    },
+    "actions": {
+      "create": "Create Delivery Request",
+      "startTransit": "Start Transit",
+      "complete": "Complete Delivery",
+      "uploadPhotos": "Upload Photos",
+      "delete": "Cancel Request",
+      "edit": "Edit Request",
+      "viewDetails": "View Details"
+    },
+    "status": {
+      "pending": "Pending",
+      "inTransit": "In Transit",
+      "completed": "Completed"
+    },
+    "fields": {
+      "id": "Request ID",
+      "purchaseOrder": "Purchase Order",
+      "poNumber": "PO Number",
+      "customer": "Customer",
+      "assignedTo": "Assigned To",
+      "assignedType": "Assignment Type",
+      "scheduledDate": "Scheduled Date",
+      "completedDate": "Completed Date",
+      "status": "Status",
+      "notes": "Notes",
+      "photos": "Photos",
+      "deliveryOrder": "Delivery Order",
+      "createdAt": "Created",
+      "updatedAt": "Updated"
+    },
+    "assignmentTypes": {
+      "EMPLOYEE": "Employee",
+      "USER": "User"
+    },
+    "form": {
+      "selectPO": "Select Purchase Order",
+      "selectAssignee": "Select Assignee",
+      "selectDate": "Select Scheduled Date",
+      "enterNotes": "Enter delivery notes",
+      "poRequired": "Purchase order is required",
+      "assigneeRequired": "Assignee is required",
+      "scheduledDateRequired": "Scheduled date is required",
+      "invalidDate": "Scheduled date cannot be in the past"
+    },
+    "messages": {
+      "created": "Delivery request created successfully",
+      "updated": "Delivery request updated successfully",
+      "deleted": "Delivery request cancelled successfully",
+      "statusUpdated": "Delivery status updated to {{status}}",
+      "photosUploaded": "Photos uploaded successfully",
+      "completed": "Delivery completed successfully",
+      "createFailed": "Failed to create delivery request",
+      "updateFailed": "Failed to update delivery request",
+      "deleteFailed": "Failed to cancel delivery request",
+      "statusUpdateFailed": "Failed to update delivery status",
+      "uploadFailed": "Failed to upload photos",
+      "completeFailed": "Failed to complete delivery"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by PO number",
+      "allStatuses": "All Statuses",
+      "allAssignees": "All Assignees",
+      "selectStatus": "Select Status",
+      "selectAssignee": "Select Assignee",
+      "selectCustomer": "Select Customer",
+      "scheduledDateFrom": "Scheduled From",
+      "scheduledDateTo": "Scheduled To",
+      "clearFilters": "Clear Filters"
+    },
+    "detail": {
+      "title": "Delivery Request Details",
+      "overview": "Overview",
+      "purchaseOrderInfo": "Purchase Order Information",
+      "deliveryInfo": "Delivery Information",
+      "timeline": "Timeline",
+      "photos": "Delivery Photos",
+      "noPhotos": "No photos uploaded yet",
+      "uploadPhotos": "Upload Photos",
+      "maxPhotos": "Maximum 5 photos allowed",
+      "statusHistory": "Status History",
+      "assignmentInfo": "Assignment Information"
+    },
+    "startTransit": "Start Transit",
+    "startTransitDescription": "Mark this delivery request as in transit",
+    "completeDelivery": "Complete Delivery", 
+    "completeDeliveryDescription": "Mark this delivery as completed with proof photos",
+    "markAsCompleted": "Mark as Completed",
+    "deliveryDetails": "Delivery Details",
+    "deliveryId": "Delivery ID",
+    "customerName": "Customer Name", 
+    "currentStatus": "Current Status",
+    "transitNotes": "Transit Notes",
+    "enterTransitNotes": "Enter transit notes (optional)",
+    "transitNotesDescription": "Optional notes about starting transit",
+    "recipient": "Recipient",
+    "enterRecipientName": "Enter recipient name",
+    "recipientDescription": "Name of person who received the delivery",
+    "completionNotes": "Completion Notes", 
+    "enterCompletionNotes": "Enter completion notes",
+    "completionNotesDescription": "Notes about the completed delivery",
+    "notFound": "Delivery request not found",
+    "photos": {
+      "camera": "Camera",
+      "takePhoto": "Take Photo",
+      "selectFiles": "Select Files",
+      "capture": "Capture",
+      "uploading": "Uploading photos...",
+      "noPhotosSelected": "No photos selected",
+      "invalidFileType": "Invalid file type. Please select image files (JPEG, PNG, WebP)",
+      "fileTooLarge": "File too large. Please select files smaller than 5MB",
+      "someFilesSkipped": "Some files were skipped due to size or type restrictions"
+    },
+    "workflows": {
+      "startTransit": {
+        "title": "Start Transit",
+        "description": "Mark this delivery request as in transit",
+        "confirmMessage": "Are you sure you want to start transit for this delivery?",
+        "notesPlaceholder": "Enter transit notes (optional)"
+      },
+      "complete": {
+        "title": "Complete Delivery",
+        "description": "Mark this delivery as completed with proof photos",
+        "confirmMessage": "Are you sure you want to mark this delivery as completed?",
+        "photosRequired": "At least one photo is required",
+        "notesPlaceholder": "Enter completion notes",
+        "uploadPhotos": "Upload Proof Photos"
+      },
+      "cancel": {
+        "title": "Cancel Delivery Request",
+        "description": "Cancel this delivery request",
+        "confirmMessage": "Are you sure you want to cancel this delivery request?",
+        "reasonRequired": "Please provide a reason for cancellation",
+        "reasonPlaceholder": "Enter cancellation reason"
+      }
+    }
   },
   "timekeeper": {
     "greeting": {

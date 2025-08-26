@@ -3,6 +3,7 @@ export const PO_STATUS = {
   NEW: 'NEW',
   CONFIRMED: 'CONFIRMED',
   PROCESSING: 'PROCESSING',
+  READY_FOR_PICKUP: 'READY_FOR_PICKUP',
   SHIPPED: 'SHIPPED',
   DELIVERED: 'DELIVERED',
   CANCELLED: 'CANCELLED',
@@ -12,6 +13,7 @@ export const PO_STATUS = {
 export const PO_ACTIONS = {
   CONFIRM: 'confirm',
   PROCESS: 'process',
+  MARK_READY: 'markReady',
   SHIP: 'ship',
   DELIVER: 'deliver',
   CANCEL: 'cancel',
@@ -35,6 +37,7 @@ export const PO_STATUS_COLORS: Record<Exclude<POStatusType, 'all'>, string> = {
   [PO_STATUS.NEW]: 'blue',
   [PO_STATUS.CONFIRMED]: 'cyan',
   [PO_STATUS.PROCESSING]: 'yellow',
+  [PO_STATUS.READY_FOR_PICKUP]: 'teal',
   [PO_STATUS.SHIPPED]: 'orange',
   [PO_STATUS.DELIVERED]: 'green',
   [PO_STATUS.CANCELLED]: 'gray',

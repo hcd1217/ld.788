@@ -1,4 +1,25 @@
-import type { POStatusHistory } from '@/lib/api/schemas/sales.schemas';
+import type { POStatusHistory, PurchaseOrder } from '@/lib/api/schemas/sales.schemas';
+
+/**
+ * Check if a Purchase Order is editable (only NEW status can be edited)
+ */
+export function isPOEditable(po: Pick<PurchaseOrder, 'status'>): boolean {
+  return po.status === 'NEW';
+}
+
+/**
+ * Check if a Purchase Order status is NEW
+ */
+export function isPOStatusNew(status: PurchaseOrder['status']): boolean {
+  return status === 'NEW';
+}
+
+/**
+ * Check if a Purchase Order is not NEW (locked for editing)
+ */
+export function isPOLocked(po: Pick<PurchaseOrder, 'status'>): boolean {
+  return po.status !== 'NEW';
+}
 
 /**
  * Helper to get status history entry by status

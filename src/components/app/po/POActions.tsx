@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Tooltip } from '@/components/common';
 import { getPOEditRoute } from '@/config/routeConfig';
+import { isPOStatusNew } from '@/utils/purchaseOrder';
 import type { POStatus } from '@/services/sales/purchaseOrder';
 
 type POActionsProps = {
@@ -23,6 +24,7 @@ type POActionsProps = {
   readonly isLoading?: boolean;
   readonly onConfirm?: () => void;
   readonly onProcess?: () => void;
+  readonly onMarkReady?: () => void;
   readonly onShip?: () => void;
   readonly onDeliver?: () => void;
   readonly onCancel?: () => void;
@@ -35,6 +37,7 @@ export function POActions({
   isLoading = false,
   onConfirm,
   onProcess,
+  onMarkReady,
   onShip,
   onDeliver,
   onCancel,
@@ -58,7 +61,7 @@ export function POActions({
   return (
     <Group gap={gap} style={style}>
       {/* NEW status: Can edit, confirm, cancel */}
-      {status === 'NEW' && (
+      {isPOStatusNew(status) && (
         <>
           <ActionIcon
             variant="subtle"
@@ -129,8 +132,24 @@ export function POActions({
         </>
       )}
 
-      {/* PROCESSING status: Can ship */}
+      {/* PROCESSING status: Can mark ready for pickup */}
       {status === 'PROCESSING' && (
+        <ActionIcon
+          variant="subtle"
+          color="teal"
+          size="sm"
+          disabled={isLoading}
+          aria-label={t('po.markReady')}
+          onClick={handleAction(onMarkReady)}
+        >
+          <Tooltip label={t('po.markReady')} position="bottom">
+            <IconPackage size={16} />
+          </Tooltip>
+        </ActionIcon>
+      )}
+
+      {/* READY_FOR_PICKUP status: Can ship */}
+      {status === 'READY_FOR_PICKUP' && (
         <ActionIcon
           variant="subtle"
           color="indigo"

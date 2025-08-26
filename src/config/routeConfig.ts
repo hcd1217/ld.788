@@ -202,3 +202,8 @@ export const getProductEditRoute = (productId: string) =>
 export const getPODetailRoute = (poId: string) => replaceRouteParams(ROUTERS.PO_DETAIL, { poId });
 
 export const getPOEditRoute = (poId: string) => replaceRouteParams(ROUTERS.PO_EDIT, { poId });
+
+export const getDeliveryListRoute = () => '/delivery-management';
+
+export const getDeliveryDetailRoute = (deliveryId: string) =>
+  replaceRouteParams(ROUTERS.DELIVERY_DETAIL, { deliveryId });

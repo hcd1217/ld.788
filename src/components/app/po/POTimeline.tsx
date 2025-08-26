@@ -25,14 +25,12 @@ const statusIcons = {
   NEW: IconFileInvoice,
   CONFIRMED: IconCheck,
   PROCESSING: IconPackage,
+  READY_FOR_PICKUP: IconPackageExport,
   SHIPPED: IconTruck,
   DELIVERED: IconPackageExport,
   CANCELLED: IconX,
   REFUNDED: IconReceipt,
 };
-
-// Define the normal order flow for PO statuses
-// const statusOrder: POStatus[] = ['NEW', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
 
 type TimelineItem = {
   title: string;
@@ -61,22 +59,33 @@ export function POTimeline({ purchaseOrder }: POTimelineProps) {
 
     if (userId) {
       const userName = getEmployeeNameByUserId(employeeMapByUserId, userId);
-      const actionLabel =
-        status === 'NEW'
-          ? t('po.createdBy')
-          : status === 'CONFIRMED'
-            ? t('po.confirmedBy')
-            : status === 'PROCESSING'
-              ? t('po.processedBy')
-              : status === 'SHIPPED'
-                ? t('po.shippedBy')
-                : status === 'DELIVERED'
-                  ? t('po.deliveredBy')
-                  : status === 'CANCELLED'
-                    ? t('po.cancelledBy')
-                    : status === 'REFUNDED'
-                      ? t('po.refundedBy')
-                      : t('po.updatedBy');
+      let actionLabel = t('po.updatedBy');
+      switch (status) {
+        case 'NEW':
+          actionLabel = t('po.createdBy');
+          break;
+        case 'CONFIRMED':
+          actionLabel = t('po.confirmedBy');
+          break;
+        case 'PROCESSING':
+          actionLabel = t('po.processedBy');
+          break;
+        case 'SHIPPED':
+          actionLabel = t('po.shippedBy');
+          break;
+        case 'DELIVERED':
+          actionLabel = t('po.deliveredBy');
+          break;
+        case 'CANCELLED':
+          actionLabel = t('po.cancelledBy');
+          break;
+        case 'REFUNDED':
+          actionLabel = t('po.refundedBy');
+          break;
+        default:
+          actionLabel = t('po.updatedBy');
+          break;
+      }
       description = `${actionLabel}: ${userName}`;
     }
 
@@ -109,6 +118,10 @@ export function POTimeline({ purchaseOrder }: POTimelineProps) {
     const newEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'NEW');
     const confirmedEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CONFIRMED');
     const processingEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'PROCESSING');
+    const readyForPickupEntry = getStatusHistoryByStatus(
+      purchaseOrder.statusHistory,
+      'READY_FOR_PICKUP',
+    );
     const shippedEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'SHIPPED');
     const deliveredEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'DELIVERED');
     const cancelledEntry = getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CANCELLED');
@@ -148,6 +161,26 @@ export function POTimeline({ purchaseOrder }: POTimelineProps) {
         undefined,
         !!processingEntry,
         currentStatus === 'PROCESSING',
+      ),
+    );
+
+    // READY_FOR_PICKUP status - always show in normal flow
+    // Mark as completed if status has progressed beyond this point (SHIPPED, DELIVERED)
+    const isReadyForPickupCompleted =
+      !!readyForPickupEntry ||
+      currentStatus === 'SHIPPED' ||
+      currentStatus === 'DELIVERED' ||
+      currentStatus === 'CANCELLED' ||
+      currentStatus === 'REFUNDED';
+
+    items.push(
+      createTimelineItem(
+        'READY_FOR_PICKUP',
+        readyForPickupEntry?.userId,
+        readyForPickupEntry?.timestamp,
+        undefined,
+        isReadyForPickupCompleted,
+        currentStatus === 'READY_FOR_PICKUP',
       ),
     );
 

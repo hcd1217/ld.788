@@ -16,6 +16,7 @@ type PODataTableProps = {
   readonly isLoading?: boolean;
   readonly onConfirmPO?: (po: PurchaseOrder) => void;
   readonly onProcessPO?: (po: PurchaseOrder) => void;
+  readonly onMarkReadyPO?: (po: PurchaseOrder) => void;
   readonly onShipPO?: (po: PurchaseOrder) => void;
   readonly onDeliverPO?: (po: PurchaseOrder) => void;
   readonly onCancelPO?: (po: PurchaseOrder) => void;
@@ -28,6 +29,7 @@ function PODataTableComponent({
   isLoading = false,
   onConfirmPO,
   onProcessPO,
+  onMarkReadyPO,
   onShipPO,
   onDeliverPO,
   onCancelPO,
@@ -116,6 +118,7 @@ function PODataTableComponent({
                       isLoading={isLoading}
                       onConfirm={createActionHandler(onConfirmPO, po)}
                       onProcess={createActionHandler(onProcessPO, po)}
+                      onMarkReady={createActionHandler(onMarkReadyPO, po)}
                       onShip={createActionHandler(onShipPO, po)}
                       onDeliver={createActionHandler(onDeliverPO, po)}
                       onCancel={createActionHandler(onCancelPO, po)}

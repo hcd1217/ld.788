@@ -13,6 +13,7 @@ import { purchaseOrderService } from '@/services/sales/purchaseOrder';
 import { ROUTERS } from '@/config/routeConfig';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useAction } from '@/hooks/useAction';
+import { isPOLocked } from '@/utils/purchaseOrder';
 import { useOnce } from '@/hooks/useOnce';
 import { type POFormValues, usePOForm } from '@/hooks/usePOForm';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
@@ -65,7 +66,7 @@ export function POFormPage({ mode }: POFormPageProps) {
       }
 
       // Check if PO can be edited (only NEW status)
-      if (po.status !== 'NEW') {
+      if (isPOLocked(po)) {
         navigate(getPODetailRoute(po.id));
         return;
       }

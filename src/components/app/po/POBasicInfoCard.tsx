@@ -24,6 +24,7 @@ import {
   getRefundReason,
   getDeliveryNotes,
   getShippingInfo,
+  isPOEditable,
 } from '@/utils/purchaseOrder';
 
 type POBasicInfoCardProps = {
@@ -42,7 +43,7 @@ export function POBasicInfoCard({
   const { t } = useTranslation();
   const employeeMapByUserId = useEmployeeMapByUserId();
   const customerMapByCustomerId = useCustomerMapByCustomerId();
-  const canEdit = purchaseOrder.status === 'NEW';
+  const canEdit = isPOEditable(purchaseOrder);
 
   return (
     <Card shadow="sm" padding="xl" radius="md">
@@ -163,12 +164,9 @@ export function POBasicInfoCard({
                     <ActionIcon
                       size="sm"
                       variant="subtle"
-                      onClick={() => {
-                        const googleMapsUrl = purchaseOrder.googleMapsUrl;
-                        if (googleMapsUrl) {
-                          window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
-                        }
-                      }}
+                      onClick={() =>
+                        window.open(purchaseOrder.googleMapsUrl!, '_blank', 'noopener,noreferrer')
+                      }
                     >
                       <IconMapPin size={16} />
                     </ActionIcon>
@@ -216,130 +214,57 @@ export function POBasicInfoCard({
             </div>
           )}
 
-          {getShippingInfo(purchaseOrder.statusHistory) && (
-            <div>
-              <Text size="sm" fw={500} c="cyan" mb="xs">
-                {t('po.shippingInfo')}
-              </Text>
-              {getShippingInfo(purchaseOrder.statusHistory)?.trackingNumber && (
-                <Text size="sm">
-                  {t('po.trackingNumber')}:{' '}
-                  {getShippingInfo(purchaseOrder.statusHistory)?.trackingNumber}
+          {(() => {
+            const shippingInfo = getShippingInfo(purchaseOrder.statusHistory);
+            if (!shippingInfo) return null;
+            return (
+              <div>
+                <Text size="sm" fw={500} c="cyan" mb="xs">
+                  {t('po.shippingInfo')}
                 </Text>
-              )}
-              {getShippingInfo(purchaseOrder.statusHistory)?.carrier && (
-                <Text size="sm">
-                  {t('po.carrier')}: {getShippingInfo(purchaseOrder.statusHistory)?.carrier}
-                </Text>
-              )}
-            </div>
-          )}
+                {shippingInfo.trackingNumber && (
+                  <Text size="sm">
+                    {t('po.trackingNumber')}: {shippingInfo.trackingNumber}
+                  </Text>
+                )}
+                {shippingInfo.carrier && (
+                  <Text size="sm">
+                    {t('po.carrier')}: {shippingInfo.carrier}
+                  </Text>
+                )}
+              </div>
+            );
+          })()}
         </SimpleGrid>
         <Grid>
-          {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'NEW') && (
-            <Grid.Col span={span}>
-              <div>
-                <Text size="sm" fw={500} c="dimmed">
-                  {t('po.createdBy')}
-                </Text>
-                <Text>
-                  {getEmployeeNameByUserId(
-                    employeeMapByUserId,
-                    getStatusHistoryByStatus(purchaseOrder.statusHistory, 'NEW')?.userId,
-                  )}
-                </Text>
-                <Text size="xs" c="dimmed">
-                  {formatDateTime(
-                    getStatusHistoryByStatus(purchaseOrder.statusHistory, 'NEW')?.timestamp,
-                  )}
-                </Text>
-              </div>
-            </Grid.Col>
-          )}
+          {(() => {
+            const statusesToShow = [
+              { status: 'NEW', label: 'createdBy' },
+              { status: 'CONFIRMED', label: 'confirmedBy' },
+              { status: 'PROCESSING', label: 'processedBy' },
+              { status: 'SHIPPED', label: 'shippedBy' },
+              { status: 'DELIVERED', label: 'deliveredBy' },
+            ] as const;
 
-          {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CONFIRMED') && (
-            <Grid.Col span={span}>
-              <div>
-                <Text size="sm" fw={500} c="dimmed">
-                  {t('po.confirmedBy')}
-                </Text>
-                <Text>
-                  {getEmployeeNameByUserId(
-                    employeeMapByUserId,
-                    getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CONFIRMED')?.userId,
-                  )}
-                </Text>
-                <Text size="xs" c="dimmed">
-                  {formatDateTime(
-                    getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CONFIRMED')?.timestamp,
-                  )}
-                </Text>
-              </div>
-            </Grid.Col>
-          )}
+            return statusesToShow.map(({ status, label }) => {
+              const entry = getStatusHistoryByStatus(purchaseOrder.statusHistory, status);
+              if (!entry) return null;
 
-          {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'PROCESSING') && (
-            <Grid.Col span={span}>
-              <div>
-                <Text size="sm" fw={500} c="dimmed">
-                  {t('po.processedBy')}
-                </Text>
-                <Text>
-                  {getEmployeeNameByUserId(
-                    employeeMapByUserId,
-                    getStatusHistoryByStatus(purchaseOrder.statusHistory, 'PROCESSING')?.userId,
-                  )}
-                </Text>
-                <Text size="xs" c="dimmed">
-                  {formatDateTime(
-                    getStatusHistoryByStatus(purchaseOrder.statusHistory, 'PROCESSING')?.timestamp,
-                  )}
-                </Text>
-              </div>
-            </Grid.Col>
-          )}
-
-          {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'SHIPPED') && (
-            <Grid.Col span={span}>
-              <div>
-                <Text size="sm" fw={500} c="dimmed">
-                  {t('po.shippedBy')}
-                </Text>
-                <Text>
-                  {getEmployeeNameByUserId(
-                    employeeMapByUserId,
-                    getStatusHistoryByStatus(purchaseOrder.statusHistory, 'SHIPPED')?.userId,
-                  )}
-                </Text>
-                <Text size="xs" c="dimmed">
-                  {formatDateTime(
-                    getStatusHistoryByStatus(purchaseOrder.statusHistory, 'SHIPPED')?.timestamp,
-                  )}
-                </Text>
-              </div>
-            </Grid.Col>
-          )}
-
-          {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'DELIVERED') && (
-            <Grid.Col span={span}>
-              <div>
-                <Text size="sm" fw={500} c="dimmed">
-                  {t('po.deliveredBy')}
-                </Text>
-                <Text>
-                  {getEmployeeNameByUserId(
-                    employeeMapByUserId,
-                    getStatusHistoryByStatus(purchaseOrder.statusHistory, 'DELIVERED')?.userId,
-                  )}
-                </Text>
-                <Text size="xs" c="dimmed">
-                  {formatDateTime(
-                    getStatusHistoryByStatus(purchaseOrder.statusHistory, 'DELIVERED')?.timestamp,
-                  )}
-                </Text>
-              </div>
-            </Grid.Col>
-          )}
+              return (
+                <Grid.Col key={status} span={span}>
+                  <div>
+                    <Text size="sm" fw={500} c="dimmed">
+                      {t(`po.${label}`)}
+                    </Text>
+                    <Text>{getEmployeeNameByUserId(employeeMapByUserId, entry.userId)}</Text>
+                    <Text size="xs" c="dimmed">
+                      {formatDateTime(entry.timestamp)}
+                    </Text>
+                  </div>
+                </Grid.Col>
+              );
+            });
+          })()}
         </Grid>
       </Stack>
     </Card>

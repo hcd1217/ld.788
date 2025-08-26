@@ -15,8 +15,10 @@ import {
   POErrorBoundary,
   PODetailTabsSkeleton,
 } from '@/components/app/po';
-import { getPOEditRoute } from '@/config/routeConfig';
+import { getPOEditRoute, getDeliveryListRoute } from '@/config/routeConfig';
 import { useAction } from '@/hooks/useAction';
+import { isPOEditable } from '@/utils/purchaseOrder';
+import { deliveryRequestApi } from '@/lib/api';
 
 export function PODetailPage() {
   const { poId } = useParams<{ poId: string }>();
@@ -30,6 +32,7 @@ export function PODetailPage() {
     loadPO,
     confirmPurchaseOrder,
     processPurchaseOrder,
+    markPurchaseOrderReady,
     shipPurchaseOrder,
     deliverPurchaseOrder,
     cancelPurchaseOrder,
@@ -42,13 +45,13 @@ export function PODetailPage() {
 
   // Memoized modal close handler
   const handleCloseModal = useCallback(
-    (modalType: 'confirm' | 'process' | 'ship' | 'deliver' | 'cancel' | 'refund') => () =>
+    (modalType: 'confirm' | 'process' | 'markReady' | 'ship' | 'deliver' | 'cancel' | 'refund') => () =>
       closeModal(modalType),
     [closeModal],
   );
 
   const handleEdit = () => {
-    if (purchaseOrder && purchaseOrder.status === 'NEW') {
+    if (purchaseOrder && isPOEditable(purchaseOrder)) {
       navigate(getPOEditRoute(purchaseOrder.id));
     }
   };
@@ -62,6 +65,12 @@ export function PODetailPage() {
   const handleProcess = () => {
     if (purchaseOrder) {
       handlers.handleProcess(purchaseOrder);
+    }
+  };
+
+  const handleMarkReady = () => {
+    if (purchaseOrder) {
+      handlers.handleMarkReady(purchaseOrder);
     }
   };
 
@@ -86,6 +95,18 @@ export function PODetailPage() {
   const handleRefund = () => {
     if (purchaseOrder) {
       handlers.handleRefund(purchaseOrder);
+    }
+  };
+
+  const handleCreateDelivery = () => {
+    if (purchaseOrder) {
+      createDeliveryAction({
+        purchaseOrderId: purchaseOrder.id,
+        assignedTo: purchaseOrder.customerId, // Use customer ID as placeholder - should be actual user/employee ID
+        assignedType: 'USER' as const,
+        scheduledDate: new Date().toISOString(), // Default to today
+        notes: `Delivery request for PO ${purchaseOrder.poNumber}`,
+      });
     }
   };
 
@@ -118,6 +139,22 @@ export function PODetailPage() {
       }
       await processPurchaseOrder(selectedPO.id);
       closeModal('process');
+    },
+  });
+
+  const markReadyPOAction = useAction({
+    options: {
+      successTitle: t('common.success'),
+      successMessage: t('po.markReady'),
+      errorTitle: t('common.error'),
+      errorMessage: t('po.markReadyFailed'),
+    },
+    async actionHandler(data?: { pickupLocation?: string; notificationMessage?: string }) {
+      if (!selectedPO) {
+        throw new Error(t('po.markReadyFailed'));
+      }
+      await markPurchaseOrderReady(selectedPO.id, data);
+      closeModal('markReady');
     },
   });
 
@@ -185,6 +222,28 @@ export function PODetailPage() {
     },
   });
 
+  const createDeliveryAction = useAction({
+    options: {
+      successTitle: t('common.success'),
+      successMessage: t('po.deliveryRequestCreated'),
+      errorTitle: t('common.error'),
+      errorMessage: t('po.deliveryRequestCreateFailed'),
+      navigateTo: getDeliveryListRoute(),
+    },
+    async actionHandler(data?: {
+      purchaseOrderId: string;
+      assignedTo: string;
+      assignedType: 'EMPLOYEE' | 'USER';
+      scheduledDate: string;
+      notes?: string;
+    }) {
+      if (!data) {
+        throw new Error(t('po.deliveryRequestCreateFailed'));
+      }
+      await deliveryRequestApi.createDeliveryRequest(data);
+    },
+  });
+
   useEffect(() => {
     if (poId) {
       void loadPO(poId);
@@ -207,6 +266,13 @@ export function PODetailPage() {
         mode="process"
         onClose={handleCloseModal('process')}
         onConfirm={processPOAction}
+      />
+      <POStatusModal
+        opened={modals.markReadyModalOpened}
+        purchaseOrder={selectedPO}
+        mode="markReady"
+        onClose={handleCloseModal('markReady')}
+        onConfirm={markReadyPOAction}
       />
       <POStatusModal
         opened={modals.shipModalOpened}
@@ -240,6 +306,9 @@ export function PODetailPage() {
   );
 
   const title = purchaseOrder ? purchaseOrder.poNumber : t('po.poDetails');
+
+  // Only show create delivery button for DELIVERED status POs
+  const onCreateDelivery = purchaseOrder?.status === 'DELIVERED' ? handleCreateDelivery : undefined;
 
   if (isMobile) {
     if (isLoading || !purchaseOrder) {
@@ -276,10 +345,12 @@ export function PODetailPage() {
             onEdit={handleEdit}
             onConfirm={handleConfirm}
             onProcess={handleProcess}
+            onMarkReady={handleMarkReady}
             onShip={handleShip}
             onDeliver={handleDeliver}
             onCancel={handleCancel}
             onRefund={handleRefund}
+            onCreateDelivery={onCreateDelivery}
           />
         </Stack>
         {modalComponents}
@@ -301,10 +372,12 @@ export function PODetailPage() {
             onEdit={handleEdit}
             onConfirm={handleConfirm}
             onProcess={handleProcess}
+            onMarkReady={handleMarkReady}
             onShip={handleShip}
             onDeliver={handleDeliver}
             onCancel={handleCancel}
             onRefund={handleRefund}
+            onCreateDelivery={onCreateDelivery}
           />
         </POErrorBoundary>
       ) : (

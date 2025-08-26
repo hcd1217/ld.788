@@ -15,6 +15,7 @@ type POCardProps = {
   readonly isLoading?: boolean;
   readonly onConfirm?: () => void;
   readonly onProcess?: () => void;
+  readonly onMarkReady?: () => void;
   readonly onShip?: () => void;
   readonly onDeliver?: () => void;
   readonly onCancel?: () => void;
@@ -34,6 +35,7 @@ export function POCard({
   isLoading = false,
   onConfirm,
   onProcess,
+  onMarkReady,
   onShip,
   onDeliver,
   onCancel,
@@ -97,6 +99,7 @@ export function POCard({
             isLoading={isLoading}
             onConfirm={onConfirm}
             onProcess={onProcess}
+            onMarkReady={onMarkReady}
             onShip={onShip}
             onDeliver={onDeliver}
             onCancel={onCancel}

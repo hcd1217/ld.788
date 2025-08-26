@@ -188,74 +188,65 @@ export class SalesApi extends BaseApiClient {
     return this.delete(`/api/sales/purchase-orders/${id}`);
   }
 
-  async confirmPurchaseOrder(
-    id: string,
-    data?: UpdatePOStatusRequest,
-  ): Promise<UpdatePurchaseOrderResponse> {
-    return this.patch<UpdatePurchaseOrderResponse, UpdatePOStatusRequest | undefined>(
+  async confirmPurchaseOrder(id: string, data?: UpdatePOStatusRequest): Promise<void> {
+    return this.patch<void, UpdatePOStatusRequest | undefined>(
       `/api/sales/purchase-orders/${id}/confirm`,
       data,
-      UpdatePurchaseOrderResponseSchema,
+      undefined,
       data ? UpdatePOStatusRequestSchema : undefined,
     );
   }
 
-  async shipPurchaseOrder(
-    id: string,
-    data?: UpdatePOStatusRequest,
-  ): Promise<UpdatePurchaseOrderResponse> {
-    return this.patch<UpdatePurchaseOrderResponse, UpdatePOStatusRequest | undefined>(
+  async markPurchaseOrderReady(id: string, data?: UpdatePOStatusRequest): Promise<void> {
+    return this.patch<void, UpdatePOStatusRequest | undefined>(
+      `/api/sales/purchase-orders/${id}/ready`,
+      data,
+      undefined,
+      data ? UpdatePOStatusRequestSchema : undefined,
+    );
+  }
+
+  async shipPurchaseOrder(id: string, data?: UpdatePOStatusRequest): Promise<void> {
+    return this.patch<void, UpdatePOStatusRequest | undefined>(
       `/api/sales/purchase-orders/${id}/ship`,
       data,
-      UpdatePurchaseOrderResponseSchema,
+      undefined,
       data ? UpdatePOStatusRequestSchema : undefined,
     );
   }
 
-  async deliverPurchaseOrder(
-    id: string,
-    data?: UpdatePOStatusRequest,
-  ): Promise<UpdatePurchaseOrderResponse> {
-    return this.patch<UpdatePurchaseOrderResponse, UpdatePOStatusRequest | undefined>(
+  async deliverPurchaseOrder(id: string, data?: UpdatePOStatusRequest): Promise<void> {
+    return this.patch<void, UpdatePOStatusRequest | undefined>(
       `/api/sales/purchase-orders/${id}/deliver`,
       data,
-      UpdatePurchaseOrderResponseSchema,
+      undefined,
       data ? UpdatePOStatusRequestSchema : undefined,
     );
   }
 
-  async cancelPurchaseOrder(
-    id: string,
-    data?: UpdatePOStatusRequest,
-  ): Promise<UpdatePurchaseOrderResponse> {
-    return this.patch<UpdatePurchaseOrderResponse, UpdatePOStatusRequest | undefined>(
+  async cancelPurchaseOrder(id: string, data?: UpdatePOStatusRequest): Promise<void> {
+    return this.patch<void, UpdatePOStatusRequest | undefined>(
       `/api/sales/purchase-orders/${id}/cancel`,
       data,
-      UpdatePurchaseOrderResponseSchema,
+      undefined,
       data ? UpdatePOStatusRequestSchema : undefined,
     );
   }
 
-  async refundPurchaseOrder(
-    id: string,
-    data?: UpdatePOStatusRequest,
-  ): Promise<UpdatePurchaseOrderResponse> {
-    return this.patch<UpdatePurchaseOrderResponse, UpdatePOStatusRequest | undefined>(
+  async refundPurchaseOrder(id: string, data?: UpdatePOStatusRequest): Promise<void> {
+    return this.patch<void, UpdatePOStatusRequest | undefined>(
       `/api/sales/purchase-orders/${id}/refund`,
       data,
-      UpdatePurchaseOrderResponseSchema,
+      undefined,
       data ? UpdatePOStatusRequestSchema : undefined,
     );
   }
 
-  async processPurchaseOrder(
-    id: string,
-    data?: UpdatePOStatusRequest,
-  ): Promise<UpdatePurchaseOrderResponse> {
-    return this.patch<UpdatePurchaseOrderResponse, UpdatePOStatusRequest | undefined>(
+  async processPurchaseOrder(id: string, data?: UpdatePOStatusRequest): Promise<void> {
+    return this.patch<void, UpdatePOStatusRequest | undefined>(
       `/api/sales/purchase-orders/${id}/process`,
       data,
-      UpdatePurchaseOrderResponseSchema,
+      undefined,
       data ? UpdatePOStatusRequestSchema : undefined,
     );
   }

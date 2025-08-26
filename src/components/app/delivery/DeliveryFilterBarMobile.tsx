@@ -1,15 +1,17 @@
+import React from 'react';
 import { Stack, Group, Button } from '@mantine/core';
 import { IconChevronDown, IconClearAll } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { SearchBar } from '@/components/common';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
+import type { DeliveryStatusType } from '@/constants/deliveryRequest';
 
-interface POFilterBarMobileProps {
+interface DeliveryFilterBarMobileProps {
   readonly searchQuery: string;
   readonly customerId?: string;
-  readonly selectedStatuses: string[];
-  readonly hasOrderDateFilter: boolean;
-  readonly hasDeliveryDateFilter: boolean;
+  readonly selectedStatuses: DeliveryStatusType[];
+  readonly hasScheduledDateFilter: boolean;
+  readonly hasCompletedDateFilter: boolean;
   readonly customers: readonly Customer[];
   readonly hasActiveFilters: boolean;
   readonly onSearchChange: (query: string) => void;
@@ -19,12 +21,12 @@ interface POFilterBarMobileProps {
   readonly onClearFilters: () => void;
 }
 
-export function POFilterBarMobile({
+export function DeliveryFilterBarMobile({
   searchQuery,
   customerId,
   selectedStatuses,
-  hasOrderDateFilter,
-  hasDeliveryDateFilter,
+  hasScheduledDateFilter,
+  hasCompletedDateFilter,
   customers,
   hasActiveFilters,
   onSearchChange,
@@ -32,42 +34,42 @@ export function POFilterBarMobile({
   onStatusClick,
   onDateClick,
   onClearFilters,
-}: POFilterBarMobileProps) {
+}: DeliveryFilterBarMobileProps) {
   const { t } = useTranslation();
 
   const getCustomerLabel = () => {
-    if (!customerId) return t('po.allCustomers');
+    if (!customerId) return 'All Customers';
     const customer = customers.find((c) => c.id === customerId);
-    return customer ? customer.name : t('po.allCustomers');
+    return customer ? customer.name : 'All Customers';
   };
 
   const getStatusLabel = () => {
     if (selectedStatuses.length === 0) {
-      return t('po.allStatus');
+      return 'All Status';
     }
     if (selectedStatuses.length === 1) {
       // Translate individual status
-      const statusKey = `po.status.${selectedStatuses[0]}` as const;
+      const statusKey = `delivery.status.${selectedStatuses[0].toLowerCase()}` as const;
       return t(statusKey as any);
     }
-    return `${t('po.poStatus')} (${selectedStatuses.length})`;
+    return `${t('delivery.fields.status')} (${selectedStatuses.length})`;
   };
 
   const getDateLabel = () => {
-    if (hasOrderDateFilter && hasDeliveryDateFilter) {
-      return `${t('po.dateRange')} (2)`;
+    if (hasScheduledDateFilter && hasCompletedDateFilter) {
+      return 'Date Range (2)';
     }
-    if (hasOrderDateFilter || hasDeliveryDateFilter) {
-      return `${t('po.dateRange')} (1)`;
+    if (hasScheduledDateFilter || hasCompletedDateFilter) {
+      return 'Date Range (1)';
     }
-    return t('po.dateRange');
+    return 'Date Range';
   };
 
   return (
     <Stack p="sm" gap="sm" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
       {/* Search Input */}
       <SearchBar
-        placeholder={t('po.searchPlaceholder')}
+        placeholder={t('delivery.filters.searchPlaceholder')}
         searchQuery={searchQuery}
         setSearchQuery={onSearchChange}
       />
@@ -81,7 +83,7 @@ export function POFilterBarMobile({
           onClick={onCustomerClick}
           style={{ flex: 1 }}
         >
-          {getCustomerLabel()}
+          {getCustomerLabel() as React.ReactNode}
         </Button>
 
         <Button
@@ -96,12 +98,12 @@ export function POFilterBarMobile({
 
         <Button
           size="xs"
-          variant={hasOrderDateFilter || hasDeliveryDateFilter ? 'filled' : 'light'}
+          variant={hasScheduledDateFilter || hasCompletedDateFilter ? 'filled' : 'light'}
           rightSection={<IconChevronDown size={16} />}
           onClick={onDateClick}
           style={{ flex: 1 }}
         >
-          {getDateLabel()}
+          {getDateLabel() as React.ReactNode}
         </Button>
 
         <Button

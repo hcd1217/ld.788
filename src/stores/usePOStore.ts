@@ -30,7 +30,14 @@ type POState = {
   currentPage: number;
 
   // Request tracking for race condition prevention
-  pendingRequests: Map<string, { requestId: string; timestamp: number; action: string }>;
+  pendingRequests: Map<
+    string,
+    {
+      requestId: string;
+      staleTimestamp: number;
+      action: string;
+    }
+  >;
   requestCounter: number;
 
   // Request tracking helpers
@@ -71,6 +78,7 @@ type POState = {
   updatePO: (id: string, data: Partial<PurchaseOrder>) => Promise<void>;
   confirmPO: (id: string) => Promise<void>;
   processPO: (id: string) => Promise<void>;
+  markPOReady: (id: string, data?: UpdatePOStatusRequest) => Promise<void>;
   shipPO: (id: string, data?: UpdatePOStatusRequest) => Promise<void>;
   deliverPO: (id: string, data?: { deliveryNotes?: string }) => Promise<void>;
   cancelPO: (id: string, data?: { cancelReason?: string }) => Promise<void>;
@@ -116,9 +124,10 @@ export const usePOStore = create<POState>()(
         const state = get();
         const requestId = get()._generateRequestId();
         const newPendingRequests = new Map(state.pendingRequests);
+        const TIMEOUT_MS = 30000; // 30 seconds timeout
         newPendingRequests.set(poId, {
           requestId,
-          timestamp: Date.now(),
+          staleTimestamp: Date.now() + TIMEOUT_MS, // 30 seconds timeout
           action,
         });
         set({ pendingRequests: newPendingRequests });
@@ -147,12 +156,11 @@ export const usePOStore = create<POState>()(
       _cleanupStaleRequests() {
         const state = get();
         const now = Date.now();
-        const TIMEOUT_MS = 30000; // 30 second timeout
         const newPendingRequests = new Map(state.pendingRequests);
         let hasChanges = false;
 
         for (const [poId, request] of newPendingRequests) {
-          if (now - request.timestamp > TIMEOUT_MS) {
+          if (now > request.staleTimestamp) {
             newPendingRequests.delete(poId);
             hasChanges = true;
           }
@@ -400,6 +408,7 @@ export const usePOStore = create<POState>()(
       },
 
       async confirmPO(id) {
+        // TODO: remove this, this is over engineered for now
         // Check if request is already pending
         if (get()._isRequestPending(id)) {
           throw new Error('Confirm request already pending for this PO');
@@ -476,6 +485,48 @@ export const usePOStore = create<POState>()(
           await get().refreshPOs();
           set({
             error: getErrorMessage(error, 'Failed to process purchase order'),
+          });
+          throw error;
+        }
+      },
+
+      async markPOReady(id, data) {
+        // TODO: remove this, this is over engineered for now
+        // Check if request is already pending
+        if (get()._isRequestPending(id)) {
+          throw new Error('Mark ready request already pending for this PO');
+        }
+
+        // Start request tracking
+        const requestId = get()._startRequest(id, 'ready');
+
+        // Optimistically update the status
+        set((state) => ({
+          purchaseOrders: state.purchaseOrders.map((po) =>
+            po.id === id ? { ...po, status: 'READY_FOR_PICKUP' as const } : po,
+          ),
+          currentPO:
+            state.currentPO?.id === id
+              ? { ...state.currentPO, status: 'READY_FOR_PICKUP' as const }
+              : state.currentPO,
+          error: undefined,
+        }));
+
+        try {
+          await purchaseOrderService.markPOReady(id, data);
+
+          // Only update if this request is still valid (prevent race conditions)
+          if (get()._finishRequest(id, requestId)) {
+            await get().refreshPOs();
+          }
+        } catch (error) {
+          // Finish request tracking even on error
+          get()._finishRequest(id, requestId);
+
+          // Rollback on error
+          await get().refreshPOs();
+          set({
+            error: getErrorMessage(error, 'Failed to mark purchase order as ready for pickup'),
           });
           throw error;
         }
@@ -697,6 +748,7 @@ export const usePOActions = () => {
   const updatePO = usePOStore((state) => state.updatePO);
   const confirmPO = usePOStore((state) => state.confirmPO);
   const processPO = usePOStore((state) => state.processPO);
+  const markPOReady = usePOStore((state) => state.markPOReady);
   const shipPO = usePOStore((state) => state.shipPO);
   const deliverPO = usePOStore((state) => state.deliverPO);
   const cancelPO = usePOStore((state) => state.cancelPO);
@@ -715,6 +767,7 @@ export const usePOActions = () => {
     updatePO,
     confirmPO,
     processPO,
+    markPOReady,
     shipPO,
     deliverPO,
     cancelPO,
@@ -726,6 +779,7 @@ export const usePOActions = () => {
     updatePurchaseOrder: updatePO,
     confirmPurchaseOrder: confirmPO,
     processPurchaseOrder: processPO,
+    markPurchaseOrderReady: markPOReady,
     shipPurchaseOrder: shipPO,
     deliverPurchaseOrder: deliverPO,
     cancelPurchaseOrder: cancelPO,

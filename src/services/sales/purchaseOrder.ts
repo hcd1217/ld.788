@@ -236,12 +236,17 @@ export const purchaseOrderService = {
     await retryOnServerError(() => salesApi.updatePurchaseOrder(id, updateRequest), enableRetry);
   },
 
+  // ========== Update Purchase Order Status ==========
   async confirmPO(id: string): Promise<void> {
     await salesApi.confirmPurchaseOrder(id);
   },
 
   async processPO(id: string): Promise<void> {
     await salesApi.processPurchaseOrder(id);
+  },
+
+  async markPOReady(id: string, data?: UpdatePOStatusRequest): Promise<void> {
+    await salesApi.markPurchaseOrderReady(id, data);
   },
 
   async shipPO(id: string, data?: UpdatePOStatusRequest): Promise<void> {

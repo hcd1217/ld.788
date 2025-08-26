@@ -6,6 +6,7 @@ import { StoreApi } from './services/store.service';
 import { HrApi } from './services/hr.service';
 import { SalesApi } from './services/sales.service';
 import { OverviewApi } from './services/overview.service';
+import { DeliveryRequestApi } from './services/deliveryRequest.service';
 
 const API_BASE_URL =
   (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:3000';
@@ -43,6 +44,10 @@ export const overviewApi = new OverviewApi({
   baseURL: API_BASE_URL,
 });
 
+export const deliveryRequestApi = new DeliveryRequestApi({
+  baseURL: API_BASE_URL,
+});
+
 // Export types and schemas
 export * from './schemas';
 
@@ -55,5 +60,6 @@ export { StoreApi } from './services/store.service';
 export { HrApi } from './services/hr.service';
 export { SalesApi } from './services/sales.service';
 export { OverviewApi } from './services/overview.service';
+export { DeliveryRequestApi } from './services/deliveryRequest.service';
 
 export { ApiError } from './base';

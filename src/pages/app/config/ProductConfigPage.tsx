@@ -400,7 +400,7 @@ export function ProductConfigPage() {
             },
             {
               key: 'status',
-              width: '150px',
+              width: '200px',
               header: t('common.status'),
               render: (product: Product) => <ProductStatusBadge status={product.status} />,
             },

@@ -16,6 +16,7 @@ import {
   IconX,
   IconTruck,
   IconPackage,
+  IconPackageExport,
   IconCurrencyDollar,
 } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
@@ -27,7 +28,7 @@ import { formatDate } from '@/utils/time';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 
-export type POModalMode = 'confirm' | 'cancel' | 'process' | 'ship' | 'deliver' | 'refund';
+export type POModalMode = 'confirm' | 'cancel' | 'process' | 'markReady' | 'ship' | 'deliver' | 'refund';
 
 type POStatusModalProps = {
   readonly opened: boolean;
@@ -67,6 +68,15 @@ const getModalConfig = (mode: POModalMode, t: any) => {
       buttonColor: 'blue',
       icon: <IconPackage size={16} />,
       alertColor: 'blue',
+      requiresReason: false,
+    },
+    markReady: {
+      title: t('po.markReadyOrder'),
+      description: t('po.markReadyOrderDescription'),
+      buttonText: t('po.markReady'),
+      buttonColor: 'teal',
+      icon: <IconPackageExport size={16} />,
+      alertColor: 'teal',
       requiresReason: false,
     },
     ship: {

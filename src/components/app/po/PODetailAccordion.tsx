@@ -37,8 +37,10 @@ import {
   getDeliveryNotes,
   getShippingInfo,
   getStatusHistoryByStatus,
+  isPOEditable,
+  isPOStatusNew,
 } from '@/utils/purchaseOrder';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 type PODetailAccordionProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -46,10 +48,12 @@ type PODetailAccordionProps = {
   readonly onEdit: () => void;
   readonly onConfirm: () => void;
   readonly onProcess: () => void;
+  readonly onMarkReady: () => void;
   readonly onShip: () => void;
   readonly onDeliver: () => void;
   readonly onCancel: () => void;
   readonly onRefund: () => void;
+  readonly onCreateDelivery?: () => void;
 };
 
 export function PODetailAccordion({
@@ -58,20 +62,112 @@ export function PODetailAccordion({
   onEdit,
   onConfirm,
   onProcess,
+  onMarkReady,
   onShip,
   onDeliver,
   onCancel,
   onRefund,
+  onCreateDelivery,
 }: PODetailAccordionProps) {
   const { t } = useTranslation();
   const customerMapByCustomerId = useCustomerMapByCustomerId();
   const employeeMapByUserId = useEmployeeMapByUserId();
-  const isEditable = purchaseOrder.status === 'NEW';
+  const isEditable = isPOEditable(purchaseOrder);
+
+  // Define status history display configuration
+  const statusHistoryConfig = useMemo(
+    () => [
+      {
+        status: 'NEW' as const,
+        icon: IconFileInvoice,
+        color: 'gray',
+        labelKey: 'createdBy',
+      },
+      {
+        status: 'CONFIRMED' as const,
+        icon: IconCheck,
+        color: 'green',
+        labelKey: 'confirmedBy',
+      },
+      {
+        status: 'PROCESSING' as const,
+        icon: IconPackage,
+        color: 'blue',
+        labelKey: 'processedBy',
+      },
+      {
+        status: 'SHIPPED' as const,
+        icon: IconTruck,
+        color: 'indigo',
+        labelKey: 'shippedBy',
+      },
+      {
+        status: 'DELIVERED' as const,
+        icon: IconPackageExport,
+        color: 'green',
+        labelKey: 'deliveredBy',
+      },
+      {
+        status: 'CANCELLED' as const,
+        icon: IconX,
+        color: 'red',
+        labelKey: 'cancelledBy',
+      },
+      {
+        status: 'REFUNDED' as const,
+        icon: IconReceipt,
+        color: 'orange',
+        labelKey: 'refundedBy',
+      },
+    ],
+    [],
+  );
+
+  // Memoize shipping info to avoid multiple calls
+  const shippingInfo = useMemo(
+    () => getShippingInfo(purchaseOrder.statusHistory),
+    [purchaseOrder.statusHistory],
+  );
+
+  // Extract reusable button creators
+  const createCancelButton = useCallback(
+    () => (
+      <Button
+        key="cancel"
+        color="red"
+        variant="outline"
+        size="xs"
+        loading={isLoading}
+        leftSection={<IconX size={14} />}
+        onClick={onCancel}
+      >
+        {t('po.cancel')}
+      </Button>
+    ),
+    [isLoading, onCancel, t],
+  );
+
+  const createRefundButton = useCallback(
+    () => (
+      <Button
+        key="refund"
+        color="orange"
+        variant="outline"
+        size="xs"
+        loading={isLoading}
+        leftSection={<IconReceipt size={14} />}
+        onClick={onRefund}
+      >
+        {t('po.refund')}
+      </Button>
+    ),
+    [isLoading, onRefund, t],
+  );
 
   const buttons = useMemo(() => {
     const buttons = [];
 
-    if (purchaseOrder.status === 'NEW') {
+    if (isPOStatusNew(purchaseOrder.status)) {
       buttons.push(
         <Button
           key="confirm"
@@ -83,17 +179,7 @@ export function PODetailAccordion({
         >
           {t('po.confirm')}
         </Button>,
-        <Button
-          key="cancel"
-          color="red"
-          variant="outline"
-          size="xs"
-          loading={isLoading}
-          leftSection={<IconX size={14} />}
-          onClick={onCancel}
-        >
-          {t('po.cancel')}
-        </Button>,
+        createCancelButton(),
       );
     } else if (purchaseOrder.status === 'CONFIRMED') {
       buttons.push(
@@ -107,19 +193,32 @@ export function PODetailAccordion({
         >
           {t('po.process')}
         </Button>,
-        <Button
-          key="cancel"
-          color="red"
-          variant="outline"
-          size="xs"
-          loading={isLoading}
-          leftSection={<IconX size={14} />}
-          onClick={onCancel}
-        >
-          {t('po.cancel')}
-        </Button>,
+        createCancelButton(),
       );
     } else if (purchaseOrder.status === 'PROCESSING') {
+      buttons.push(
+        <Button
+          key="markReady"
+          color="teal"
+          size="xs"
+          loading={isLoading}
+          leftSection={<IconPackageExport size={14} />}
+          onClick={onMarkReady}
+        >
+          {t('po.markReady')}
+        </Button>,
+        <Button
+          key="ship"
+          color="indigo"
+          size="xs"
+          loading={isLoading}
+          leftSection={<IconTruck size={14} />}
+          onClick={onShip}
+        >
+          {t('po.ship')}
+        </Button>,
+      );
+    } else if (purchaseOrder.status === 'READY_FOR_PICKUP') {
       buttons.push(
         <Button
           key="ship"
@@ -144,32 +243,24 @@ export function PODetailAccordion({
         >
           {t('po.markDelivered')}
         </Button>,
-        <Button
-          key="refund"
-          color="orange"
-          variant="outline"
-          size="xs"
-          loading={isLoading}
-          leftSection={<IconReceipt size={14} />}
-          onClick={onRefund}
-        >
-          {t('po.refund')}
-        </Button>,
+        createRefundButton(),
       );
     } else if (purchaseOrder.status === 'DELIVERED') {
-      buttons.push(
-        <Button
-          key="refund"
-          color="orange"
-          variant="outline"
-          size="xs"
-          loading={isLoading}
-          leftSection={<IconReceipt size={14} />}
-          onClick={onRefund}
-        >
-          {t('po.refund')}
-        </Button>,
-      );
+      buttons.push(createRefundButton());
+      if (onCreateDelivery) {
+        buttons.push(
+          <Button
+            key="create-delivery"
+            color="blue"
+            size="xs"
+            loading={isLoading}
+            leftSection={<IconClipboardList size={14} />}
+            onClick={onCreateDelivery}
+          >
+            {t('po.createDeliveryRequest')}
+          </Button>,
+        );
+      }
     }
 
     return buttons;
@@ -178,11 +269,12 @@ export function PODetailAccordion({
     isLoading,
     t,
     onConfirm,
-    onCancel,
+    createCancelButton,
     onProcess,
     onShip,
     onDeliver,
-    onRefund,
+    createRefundButton,
+    onCreateDelivery,
   ]);
 
   return (
@@ -340,20 +432,19 @@ export function PODetailAccordion({
                 </div>
               )}
 
-              {getShippingInfo(purchaseOrder.statusHistory) && (
+              {shippingInfo && (
                 <div>
                   <Text size="xs" fw={500} c="cyan" mb={4}>
                     {t('po.shippingInfo')}
                   </Text>
-                  {getShippingInfo(purchaseOrder.statusHistory)?.trackingNumber && (
+                  {shippingInfo.trackingNumber && (
                     <Text size="sm">
-                      {t('po.trackingNumber')}:{' '}
-                      {getShippingInfo(purchaseOrder.statusHistory)?.trackingNumber}
+                      {t('po.trackingNumber')}: {shippingInfo.trackingNumber}
                     </Text>
                   )}
-                  {getShippingInfo(purchaseOrder.statusHistory)?.carrier && (
+                  {shippingInfo.carrier && (
                     <Text size="sm">
-                      {t('po.carrier')}: {getShippingInfo(purchaseOrder.statusHistory)?.carrier}
+                      {t('po.carrier')}: {shippingInfo.carrier}
                     </Text>
                   )}
                 </div>
@@ -401,163 +492,27 @@ export function PODetailAccordion({
             </Accordion.Control>
             <Accordion.Panel>
               <Stack gap="xs">
-                {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'NEW') && (
-                  <Group gap="xs" align="flex-start">
-                    <IconFileInvoice size={16} color="var(--mantine-color-gray-6)" />
-                    <div style={{ flex: 1 }}>
-                      <Text size="xs" c="dimmed">
-                        {t('po.createdBy')}:
-                      </Text>
-                      <Text size="sm">
-                        {getEmployeeNameByUserId(
-                          employeeMapByUserId,
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'NEW')?.userId,
-                        )}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {formatDateTime(
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'NEW')?.timestamp,
-                        )}
-                      </Text>
-                    </div>
-                  </Group>
-                )}
-                {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CONFIRMED') && (
-                  <Group gap="xs" align="flex-start">
-                    <IconCheck size={16} color="var(--mantine-color-green-6)" />
-                    <div style={{ flex: 1 }}>
-                      <Text size="xs" c="dimmed">
-                        {t('po.confirmedBy')}:
-                      </Text>
-                      <Text size="sm">
-                        {getEmployeeNameByUserId(
-                          employeeMapByUserId,
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CONFIRMED')
-                            ?.userId,
-                        )}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {formatDateTime(
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CONFIRMED')
-                            ?.timestamp,
-                        )}
-                      </Text>
-                    </div>
-                  </Group>
-                )}
-                {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'PROCESSING') && (
-                  <Group gap="xs" align="flex-start">
-                    <IconPackage size={16} color="var(--mantine-color-blue-6)" />
-                    <div style={{ flex: 1 }}>
-                      <Text size="xs" c="dimmed">
-                        {t('po.processedBy')}:
-                      </Text>
-                      <Text size="sm">
-                        {getEmployeeNameByUserId(
-                          employeeMapByUserId,
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'PROCESSING')
-                            ?.userId,
-                        )}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {formatDateTime(
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'PROCESSING')
-                            ?.timestamp,
-                        )}
-                      </Text>
-                    </div>
-                  </Group>
-                )}
-                {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'SHIPPED') && (
-                  <Group gap="xs" align="flex-start">
-                    <IconTruck size={16} color="var(--mantine-color-indigo-6)" />
-                    <div style={{ flex: 1 }}>
-                      <Text size="xs" c="dimmed">
-                        {t('po.shippedBy')}:
-                      </Text>
-                      <Text size="sm">
-                        {getEmployeeNameByUserId(
-                          employeeMapByUserId,
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'SHIPPED')?.userId,
-                        )}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {formatDateTime(
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'SHIPPED')
-                            ?.timestamp,
-                        )}
-                      </Text>
-                    </div>
-                  </Group>
-                )}
-                {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'DELIVERED') && (
-                  <Group gap="xs" align="flex-start">
-                    <IconPackageExport size={16} color="var(--mantine-color-green-6)" />
-                    <div style={{ flex: 1 }}>
-                      <Text size="xs" c="dimmed">
-                        {t('po.deliveredBy')}:
-                      </Text>
-                      <Text size="sm">
-                        {getEmployeeNameByUserId(
-                          employeeMapByUserId,
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'DELIVERED')
-                            ?.userId,
-                        )}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {formatDateTime(
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'DELIVERED')
-                            ?.timestamp,
-                        )}
-                      </Text>
-                    </div>
-                  </Group>
-                )}
-                {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CANCELLED') && (
-                  <Group gap="xs" align="flex-start">
-                    <IconX size={16} color="var(--mantine-color-red-6)" />
-                    <div style={{ flex: 1 }}>
-                      <Text size="xs" c="dimmed">
-                        {t('po.cancelledBy')}:
-                      </Text>
-                      <Text size="sm">
-                        {getEmployeeNameByUserId(
-                          employeeMapByUserId,
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CANCELLED')
-                            ?.userId,
-                        )}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {formatDateTime(
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'CANCELLED')
-                            ?.timestamp,
-                        )}
-                      </Text>
-                    </div>
-                  </Group>
-                )}
-                {getStatusHistoryByStatus(purchaseOrder.statusHistory, 'REFUNDED') && (
-                  <Group gap="xs" align="flex-start">
-                    <IconReceipt size={16} color="var(--mantine-color-orange-6)" />
-                    <div style={{ flex: 1 }}>
-                      <Text size="xs" c="dimmed">
-                        {t('po.refundedBy')}:
-                      </Text>
-                      <Text size="sm">
-                        {getEmployeeNameByUserId(
-                          employeeMapByUserId,
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'REFUNDED')?.userId,
-                        )}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {formatDateTime(
-                          getStatusHistoryByStatus(purchaseOrder.statusHistory, 'REFUNDED')
-                            ?.timestamp,
-                        )}
-                      </Text>
-                    </div>
-                  </Group>
-                )}
+                {statusHistoryConfig.map(({ status, icon: Icon, color, labelKey }) => {
+                  const entry = getStatusHistoryByStatus(purchaseOrder.statusHistory, status);
+                  if (!entry) return null;
+
+                  return (
+                    <Group key={status} gap="xs" align="flex-start">
+                      <Icon size={16} color={`var(--mantine-color-${color}-6)`} />
+                      <div style={{ flex: 1 }}>
+                        <Text size="xs" c="dimmed">
+                          {t(`po.${labelKey}` as any)}:
+                        </Text>
+                        <Text size="sm">
+                          {getEmployeeNameByUserId(employeeMapByUserId, entry.userId)}
+                        </Text>
+                        <Text size="xs" c="dimmed">
+                          {formatDateTime(entry.timestamp)}
+                        </Text>
+                      </div>
+                    </Group>
+                  );
+                })}
               </Stack>
             </Accordion.Panel>
           </Accordion.Item>

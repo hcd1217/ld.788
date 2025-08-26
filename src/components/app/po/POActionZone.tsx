@@ -6,6 +6,7 @@ import {
   IconPackageExport,
   IconX,
   IconReceipt,
+  IconClipboardList,
 } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
@@ -16,10 +17,12 @@ type POActionZoneProps = {
   readonly isLoading?: boolean;
   readonly onConfirm: () => void;
   readonly onProcess: () => void;
+  readonly onMarkReady: () => void;
   readonly onShip: () => void;
   readonly onDeliver: () => void;
   readonly onCancel: () => void;
   readonly onRefund: () => void;
+  readonly onCreateDelivery?: () => void;
 };
 
 export function POActionZone({
@@ -27,15 +30,30 @@ export function POActionZone({
   isLoading = false,
   onConfirm,
   onProcess,
+  onMarkReady,
   onShip,
   onDeliver,
   onCancel,
   onRefund,
+  onCreateDelivery,
 }: POActionZoneProps) {
   const { t } = useTranslation();
 
   const availableActions = useMemo(() => {
     const actions = [];
+
+    const createRefundButton = () => (
+      <Button
+        key="refund"
+        color="orange"
+        variant="outline"
+        loading={isLoading}
+        leftSection={<IconReceipt size={16} />}
+        onClick={onRefund}
+      >
+        {t('po.processRefund')}
+      </Button>
+    );
 
     switch (purchaseOrder.status) {
       case 'NEW':
@@ -89,6 +107,29 @@ export function POActionZone({
       case 'PROCESSING':
         actions.push(
           <Button
+            key="markReady"
+            color="teal"
+            loading={isLoading}
+            leftSection={<IconPackageExport size={16} />}
+            onClick={onMarkReady}
+          >
+            {t('po.markReady')}
+          </Button>,
+          <Button
+            key="ship"
+            color="indigo"
+            loading={isLoading}
+            leftSection={<IconTruck size={16} />}
+            onClick={onShip}
+          >
+            {t('po.markShipped')}
+          </Button>,
+        );
+        break;
+
+      case 'READY_FOR_PICKUP':
+        actions.push(
+          <Button
             key="ship"
             color="indigo"
             loading={isLoading}
@@ -102,16 +143,7 @@ export function POActionZone({
 
       case 'SHIPPED':
         actions.push(
-          <Button
-            key="refund"
-            color="orange"
-            variant="outline"
-            loading={isLoading}
-            leftSection={<IconReceipt size={16} />}
-            onClick={onRefund}
-          >
-            {t('po.processRefund')}
-          </Button>,
+          createRefundButton(),
           <Button
             key="deliver"
             color="green"
@@ -125,18 +157,21 @@ export function POActionZone({
         break;
 
       case 'DELIVERED':
-        actions.push(
-          <Button
-            key="refund"
-            color="orange"
-            variant="outline"
-            loading={isLoading}
-            leftSection={<IconReceipt size={16} />}
-            onClick={onRefund}
-          >
-            {t('po.processRefund')}
-          </Button>,
-        );
+        actions.push(createRefundButton());
+        if (onCreateDelivery) {
+          actions.push(
+            <Button
+              key="create-delivery"
+              color="blue"
+              variant="filled"
+              loading={isLoading}
+              leftSection={<IconClipboardList size={16} />}
+              onClick={onCreateDelivery}
+            >
+              {t('po.createDeliveryRequest')}
+            </Button>,
+          );
+        }
         break;
 
       case 'CANCELLED':
@@ -156,6 +191,7 @@ export function POActionZone({
     onShip,
     onDeliver,
     onRefund,
+    onCreateDelivery,
   ]);
 
   if (availableActions.length === 0) {

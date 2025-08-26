@@ -127,6 +127,7 @@ const POStatusSchema = z.enum([
   'NEW',
   'CONFIRMED',
   'PROCESSING',
+  'READY_FOR_PICKUP',
   'SHIPPED',
   'DELIVERED',
   'CANCELLED',
@@ -142,6 +143,8 @@ const POStatusHistorySchema = z.object({
   carrier: optionalStringSchema,
   trackingNumber: optionalStringSchema,
   deliveryNotes: optionalStringSchema,
+  pickupLocation: optionalStringSchema,
+  notificationMessage: optionalStringSchema,
 });
 
 // Purchase Order schema
@@ -199,6 +202,8 @@ export const UpdatePOStatusRequestSchema = z.object({
   trackingNumber: optionalStringSchema,
   carrier: optionalStringSchema,
   deliveryNotes: optionalStringSchema,
+  pickupLocation: optionalStringSchema,
+  notificationMessage: optionalStringSchema,
 });
 
 // Purchase Order response schemas
