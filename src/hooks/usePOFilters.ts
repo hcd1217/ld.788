@@ -165,11 +165,17 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOve
   }, [filters, hasActiveFilters, normalizedSearchQuery, posWithSearchText, purchaseOrders]);
 
   const clearAllFilters = useCallback(() => {
-    setSearchQuery('');
-    setCustomerId(undefined);
-    setStatus(PO_STATUS.ALL);
-    setDateRange(undefined, undefined);
-  }, [setSearchQuery, setCustomerId, setStatus, setDateRange]);
+    // Batch all filter updates into a single state change to prevent multiple re-renders
+    setFilters({
+      searchQuery: '',
+      customerId: undefined,
+      status: PO_STATUS.ALL,
+      dateRange: {
+        start: undefined,
+        end: undefined,
+      },
+    });
+  }, []);
 
   return { filteredPOs, filters, filterHandlers, hasActiveFilters, clearAllFilters };
 }

@@ -91,11 +91,6 @@ export type POFilterParams = {
 export const purchaseOrderService = {
   purchaseOrders: [] as PurchaseOrder[],
 
-  async getAllPOs(): Promise<PurchaseOrder[]> {
-    const response = await salesApi.getPurchaseOrders();
-    return response.purchaseOrders.map(transformApiToFrontend);
-  },
-
   async getPOsWithFilter(filters?: POFilterParams): Promise<{
     purchaseOrders: PurchaseOrder[];
     pagination: {

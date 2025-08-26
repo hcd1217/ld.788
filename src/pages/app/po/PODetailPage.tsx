@@ -1,9 +1,9 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { LoadingOverlay, Stack } from '@mantine/core';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { usePurchaseOrderList, usePOActions, usePOLoading, usePOError } from '@/stores/usePOStore';
+import { useCurrentPO, usePOActions, usePOLoading, usePOError } from '@/stores/usePOStore';
 import { usePOModals } from '@/hooks/usePOModals';
 import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
 import { AppPageTitle } from '@/components/common';
@@ -16,7 +16,6 @@ import {
   PODetailTabsSkeleton,
 } from '@/components/app/po';
 import { getPOEditRoute } from '@/config/routeConfig';
-import { useOnce } from '@/hooks/useOnce';
 import { useAction } from '@/hooks/useAction';
 
 export function PODetailPage() {
@@ -24,11 +23,11 @@ export function PODetailPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
-  const purchaseOrders = usePurchaseOrderList();
+  const purchaseOrder = useCurrentPO();
   const isLoading = usePOLoading();
   const error = usePOError();
   const {
-    refreshPurchaseOrders,
+    loadPO,
     confirmPurchaseOrder,
     processPurchaseOrder,
     shipPurchaseOrder,
@@ -37,8 +36,6 @@ export function PODetailPage() {
     refundPurchaseOrder,
     clearError,
   } = usePOActions();
-
-  const purchaseOrder = purchaseOrders.find((po) => po.id === poId);
 
   // Use the centralized modal hook
   const { modals, selectedPO, closeModal, handlers } = usePOModals();
@@ -188,9 +185,11 @@ export function PODetailPage() {
     },
   });
 
-  useOnce(() => {
-    void refreshPurchaseOrders();
-  });
+  useEffect(() => {
+    if (poId) {
+      void loadPO(poId);
+    }
+  }, [poId, loadPO]);
 
   // Modal components using the enhanced POStatusModal
   const modalComponents = (

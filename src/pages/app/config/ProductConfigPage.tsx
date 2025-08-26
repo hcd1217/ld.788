@@ -346,7 +346,7 @@ export function ProductConfigPage() {
       }}
     >
       {/* Page Title with Actions */}
-      <Group justify="space-between" align="center">
+      <Group justify="space-between" align="center" mb="xl">
         <AppPageTitle title={t('common.pages.productManagement')} />
         <Group gap="sm">
           <Button

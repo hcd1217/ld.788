@@ -21,7 +21,8 @@ const APP_DESCRIPTION = process.env.VITE_APP_DESCRIPTION || 'Credo Progressive W
 // https://vite.dev/config/
 export default defineConfig({
   server: {
-    allowedHosts: ['76829e5cffeb.ngrok.ngrok-free.app'],
+    // https://efde3343abb4.ngrok-free.app
+    allowedHosts: ['efde3343abb4.ngrok-free.app'],
   },
   resolve: {
     alias: {

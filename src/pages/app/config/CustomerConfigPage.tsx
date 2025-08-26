@@ -339,7 +339,7 @@ export function CustomerConfigPage() {
   return (
     <AppDesktopLayout isLoading={isLoading && !createOpened && !editOpened}>
       {/* Page Title with Actions */}
-      <Group justify="space-between" align="center">
+      <Group justify="space-between" align="center" mb="xl">
         <AppPageTitle title={t('common.pages.customerManagement')} />
         <Group gap="sm">
           <Button

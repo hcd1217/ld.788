@@ -160,7 +160,7 @@ export function EmployeeListPage() {
       />
 
       {/* Search Bar and View Mode Selector */}
-      <Group justify="space-between" align="flex-end" mt="lg">
+      <Group justify="space-between" align="flex-end" my="xl">
         <SearchBar
           // hidden={paginationState.totalPages < 2}
           placeholder={t('employee.searchPlaceholder')}
