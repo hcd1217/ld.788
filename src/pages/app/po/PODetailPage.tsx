@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { LoadingOverlay, Stack } from '@mantine/core';
+import { IconEdit } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useCurrentPO, usePOActions, usePOLoading, usePOError } from '@/stores/usePOStore';
@@ -15,7 +16,7 @@ import {
   POErrorBoundary,
   PODetailTabsSkeleton,
 } from '@/components/app/po';
-import { getPOEditRoute, getDeliveryListRoute } from '@/config/routeConfig';
+import { getPOEditRoute, getDeliveryListRoute, ROUTERS } from '@/config/routeConfig';
 import { useAction } from '@/hooks/useAction';
 import { isPOEditable } from '@/utils/purchaseOrder';
 import { deliveryRequestApi } from '@/lib/api';
@@ -308,6 +309,9 @@ export function PODetailPage() {
 
   const title = purchaseOrder ? purchaseOrder.poNumber : t('po.poDetails');
 
+  // Show edit button when PO is editable (status = NEW)
+  const isEditable = purchaseOrder && isPOEditable(purchaseOrder);
+
   // Only show create delivery button for DELIVERED status POs
   const onCreateDelivery = purchaseOrder?.status === 'DELIVERED' ? handleCreateDelivery : undefined;
 
@@ -361,7 +365,20 @@ export function PODetailPage() {
 
   return (
     <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
-      <AppPageTitle withGoBack title={title} />
+      <AppPageTitle
+        withGoBack
+        route={ROUTERS.PO_MANAGEMENT}
+        title={title}
+        button={
+          isEditable
+            ? {
+                label: t('common.edit'),
+                onClick: handleEdit,
+                icon: <IconEdit size={16} />,
+              }
+            : undefined
+        }
+      />
 
       {isLoading ? (
         <PODetailTabsSkeleton />
@@ -370,7 +387,6 @@ export function PODetailPage() {
           <PODetailTabs
             purchaseOrder={purchaseOrder}
             isLoading={isLoading}
-            onEdit={handleEdit}
             onConfirm={handleConfirm}
             onProcess={handleProcess}
             onMarkReady={handleMarkReady}

@@ -2,7 +2,6 @@ import {
   Card,
   Stack,
   Group,
-  Button,
   Divider,
   Grid,
   Text,
@@ -11,7 +10,7 @@ import {
   Tooltip,
   SimpleGrid,
 } from '@mantine/core';
-import { IconEdit, IconBuilding, IconMapPin, IconCalendar } from '@tabler/icons-react';
+import { IconBuilding, IconMapPin, IconCalendar } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { formatDate, formatDateTime } from '@/utils/time';
@@ -24,26 +23,19 @@ import {
   getRefundReason,
   getDeliveryNotes,
   getShippingInfo,
-  isPOEditable,
 } from '@/utils/purchaseOrder';
 
 type POBasicInfoCardProps = {
   readonly purchaseOrder: PurchaseOrder;
-  readonly onEdit?: () => void;
   readonly onNavigateToItemsList?: () => void;
 };
 
 const span = { base: 12, md: 6 };
 
-export function POBasicInfoCard({
-  purchaseOrder,
-  onEdit,
-  onNavigateToItemsList,
-}: POBasicInfoCardProps) {
+export function POBasicInfoCard({ purchaseOrder, onNavigateToItemsList }: POBasicInfoCardProps) {
   const { t } = useTranslation();
   const employeeMapByUserId = useEmployeeMapByUserId();
   const customerMapByCustomerId = useCustomerMapByCustomerId();
-  const canEdit = isPOEditable(purchaseOrder);
 
   return (
     <Card shadow="sm" padding="xl" radius="md">
@@ -66,15 +58,6 @@ export function POBasicInfoCard({
                 </Text>
                 <Group justify="start" gap="sm" align="center">
                   <POStatusBadge status={purchaseOrder.status} size="md" />
-                  {canEdit && onEdit && (
-                    <Button
-                      variant="transparent"
-                      leftSection={<IconEdit size={16} />}
-                      onClick={onEdit}
-                    >
-                      {t('common.edit')}
-                    </Button>
-                  )}
                 </Group>
               </div>
             </Stack>

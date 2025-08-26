@@ -23,7 +23,6 @@ import { useState } from 'react';
 type PODetailTabsProps = {
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading?: boolean;
-  readonly onEdit: () => void;
   readonly onConfirm: () => void;
   readonly onProcess: () => void;
   readonly onMarkReady: () => void;
@@ -37,7 +36,6 @@ type PODetailTabsProps = {
 export function PODetailTabs({
   purchaseOrder,
   isLoading = false,
-  onEdit,
   onConfirm,
   onProcess,
   onMarkReady,
@@ -119,7 +117,6 @@ export function PODetailTabs({
           <POErrorBoundary componentName="POBasicInfoCard">
             <POBasicInfoCard
               purchaseOrder={purchaseOrder}
-              onEdit={onEdit}
               onNavigateToItemsList={() => {
                 setValue('items');
               }}

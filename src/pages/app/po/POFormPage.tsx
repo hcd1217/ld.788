@@ -201,7 +201,7 @@ export function POFormPage({ mode }: POFormPageProps) {
 
   return (
     <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
-      <AppPageTitle withGoBack title={pageTitle} />
+      <AppPageTitle withGoBack title={pageTitle} route={ROUTERS.PO_MANAGEMENT} />
       <Container fluid>{content}</Container>
     </AppDesktopLayout>
   );

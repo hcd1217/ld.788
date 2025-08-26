@@ -6,6 +6,7 @@ import { GoBack } from '../navigation/GoBack';
 type AppPageTitleProps = {
   readonly title: string;
   readonly withGoBack?: boolean;
+  readonly route?: string;
   readonly button?: {
     readonly label: string;
     readonly onClick?: () => void;
@@ -14,7 +15,7 @@ type AppPageTitleProps = {
   readonly fz?: string;
 };
 
-export function AppPageTitle({ title, button, fz, withGoBack }: AppPageTitleProps) {
+export function AppPageTitle({ title, button, fz, withGoBack, route }: AppPageTitleProps) {
   return (
     <Group
       justify="space-between"
@@ -26,7 +27,7 @@ export function AppPageTitle({ title, button, fz, withGoBack }: AppPageTitleProp
       }}
     >
       <Group>
-        {withGoBack ? <GoBack variant="icon" /> : null}
+        {withGoBack ? <GoBack route={route} variant="icon" /> : null}
         <Title
           order={1}
           ta="center"
