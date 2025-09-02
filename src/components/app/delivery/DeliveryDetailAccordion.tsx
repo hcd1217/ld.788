@@ -173,7 +173,7 @@ export function DeliveryDetailAccordion({
         ) : (
           <div> </div>
         )}
-        {!canStartTransit && (
+        {canStartTransit && (
           <Button
             leftSection={<IconTruck size={16} />}
             color="orange"
