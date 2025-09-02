@@ -6,6 +6,11 @@ const LoginPage = lazy(async () => {
   return { default: module.LoginPage };
 });
 
+const LogoutPage = lazy(async () => {
+  const module = await import('@/pages/auth/LogoutPage');
+  return { default: module.LogoutPage };
+});
+
 const MagicLinkLoginPage = lazy(async () => {
   const module = await import('@/pages/auth/MagicLinkLoginPage');
   return { default: module.MagicLinkLoginPage };
@@ -26,6 +31,10 @@ export const authRouteObjects = [
       {
         path: ROUTERS.CLIENT_LOGIN,
         Component: LoginPage,
+      },
+      {
+        path: ROUTERS.LOGOUT,
+        Component: LogoutPage,
       },
     ],
   },

@@ -16,6 +16,7 @@ import {
   ContactInfo,
   BulkImportModalContent,
   ViewOnMap,
+  PermissionDeniedPage,
 } from '@/components/common';
 import { CustomerFormModal, type CustomerFormValues } from '@/components/app/config';
 import {
@@ -31,6 +32,7 @@ import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { useOnce } from '@/hooks/useOnce';
 import { logError } from '@/utils/logger';
 import { parseCustomerExcelFile, generateCustomerExcelTemplate } from '@/utils/excelParser';
+import { usePermissions } from '@/stores/useAppStore';
 
 // Form values type will be imported from CustomerFormModal
 
@@ -42,6 +44,7 @@ export function CustomerConfigPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
   const [editOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false);
+  const permissions = usePermissions();
 
   const form = useForm<CustomerFormValues>({
     initialValues: {
@@ -85,6 +88,9 @@ export function CustomerConfigPage() {
       errorMessage: t('common.loadingFailed'),
     },
     async actionHandler() {
+      if (!permissions.customer.canView) {
+        return;
+      }
       setIsLoading(true);
       const data = await customerService.getAllCustomers();
       setCustomers(data);
@@ -107,10 +113,12 @@ export function CustomerConfigPage() {
   const handleCreateCustomer = useAction<CustomerFormValues>({
     options: {
       errorTitle: t('common.error'),
-      errorMessage: t('common.addFailed'),
+      errorMessage: t('common.addFailed', { entity: t('common.entity.customer') }),
     },
     async actionHandler(values) {
-      if (!values) return;
+      if (!permissions.customer.canCreate || !values) {
+        throw new Error(t('common.addFailed', { entity: t('common.entity.customer') }));
+      }
 
       setIsLoading(true);
       const data: CreateCustomerRequest = {
@@ -148,10 +156,12 @@ export function CustomerConfigPage() {
   const handleUpdateCustomer = useAction<CustomerFormValues>({
     options: {
       errorTitle: t('common.error'),
-      errorMessage: t('common.updateFailed'),
+      errorMessage: t('common.updateFailed', { entity: t('common.entity.customer') }),
     },
     async actionHandler(values) {
-      if (!values || !selectedCustomer) return;
+      if (!permissions.customer.canEdit || !values || !selectedCustomer) {
+        throw new Error(t('common.updateFailed', { entity: t('common.entity.customer') }));
+      }
 
       setIsLoading(true);
       const data: UpdateCustomerRequest = {
@@ -189,10 +199,12 @@ export function CustomerConfigPage() {
   const handleDelete = useAction<Customer>({
     options: {
       errorTitle: t('common.error'),
-      errorMessage: t('common.deleteFailed'),
+      errorMessage: t('common.deleteFailed', { entity: t('common.entity.customer') }),
     },
     async actionHandler(customer) {
-      if (!customer) return;
+      if (!permissions.customer.canDelete || !customer) {
+        throw new Error(t('common.deleteFailed', { entity: t('common.entity.customer') }));
+      }
 
       setIsLoading(true);
       await customerService.deleteCustomer(customer.id);
@@ -229,11 +241,17 @@ export function CustomerConfigPage() {
   };
 
   const openCreateModal = () => {
+    if (!permissions.customer.canCreate) {
+      return;
+    }
     form.reset();
     openCreate();
   };
 
   const confirmDelete = (customer: Customer) => {
+    if (!permissions.customer.canDelete) {
+      throw new Error(t('common.deleteFailed', { entity: t('common.entity.customer') }));
+    }
     modals.openConfirmModal({
       title: t('common.confirmDelete'),
       children: <Text size="sm">{t('common.confirmDeleteMessage', { name: customer.name })}</Text>,
@@ -245,6 +263,9 @@ export function CustomerConfigPage() {
 
   // Open bulk import modal
   const openBulkImportModal = () => {
+    if (!permissions.customer.canCreate) {
+      return;
+    }
     let selectedFile: File | undefined;
 
     modals.openConfirmModal({
@@ -285,6 +306,9 @@ export function CustomerConfigPage() {
       errorMessage: t('auth.importFailed'),
     },
     async actionHandler(data) {
+      if (!permissions.customer.canCreate) {
+        return;
+      }
       if (!data?.file) return;
       const { file } = data;
 
@@ -337,6 +361,10 @@ export function CustomerConfigPage() {
     },
   });
 
+  if (!permissions.customer.canView) {
+    return <PermissionDeniedPage />;
+  }
+
   return (
     <AppDesktopLayout isLoading={isLoading && !createOpened && !editOpened}>
       {/* Page Title with Actions */}
@@ -346,11 +374,16 @@ export function CustomerConfigPage() {
           <Button
             variant="light"
             leftSection={<IconUpload size={16} />}
+            disabled={!permissions.customer.canCreate}
             onClick={openBulkImportModal}
           >
             {t('customer.bulkImport')}
           </Button>
-          <Button leftSection={<IconPlus size={16} />} onClick={openCreateModal}>
+          <Button
+            disabled={!permissions.customer.canCreate}
+            leftSection={<IconPlus size={16} />}
+            onClick={openCreateModal}
+          >
             {t('common.add')}
           </Button>
         </Group>
@@ -435,6 +468,9 @@ export function CustomerConfigPage() {
         opened={createOpened}
         onClose={closeCreate}
         mode="create"
+        canCreate={permissions.customer.canCreate}
+        canEdit={permissions.customer.canEdit}
+        canDelete={permissions.customer.canDelete}
         form={form}
         onSubmit={handleCreateCustomer}
         isLoading={isLoading}
@@ -444,6 +480,9 @@ export function CustomerConfigPage() {
         opened={editOpened}
         onClose={closeEdit}
         mode="edit"
+        canCreate={permissions.customer.canCreate}
+        canEdit={permissions.customer.canEdit}
+        canDelete={permissions.customer.canDelete}
         form={form}
         onSubmit={handleUpdateCustomer}
         onDelete={() => {

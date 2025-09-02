@@ -61,6 +61,18 @@ export const RoleSchema = z.object({
 
 const PermissionSchema = z
   .object({
+    customer: z.object({
+      canView: booleanSchema,
+      canCreate: booleanSchema,
+      canEdit: booleanSchema,
+      canDelete: booleanSchema,
+    }),
+    product: z.object({
+      canView: booleanSchema,
+      canCreate: booleanSchema,
+      canEdit: booleanSchema,
+      canDelete: booleanSchema,
+    }),
     employee: z.object({
       canView: booleanSchema,
       canCreate: booleanSchema,
@@ -138,6 +150,18 @@ const PermissionSchema = z
             canComplete: true,
             canTakePhoto: true,
           },
+        },
+        customer: {
+          canView: true,
+          canCreate: false,
+          canEdit: false,
+          canDelete: false,
+        },
+        product: {
+          canView: true,
+          canCreate: true,
+          canEdit: true,
+          canDelete: false,
         },
         employee: {
           canView: true,

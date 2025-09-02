@@ -14,12 +14,12 @@ import { ViewOnMap } from '@/components/common';
 type DeliveryDetailTabsProps = {
   readonly deliveryRequest: DeliveryRequestDetail;
   readonly isLoading?: boolean;
-  readonly onStartTransit: () => void;
-  readonly onComplete: () => void;
-  readonly onTakePhoto: () => void;
 };
 
-export function DeliveryDetailTabs({ deliveryRequest }: DeliveryDetailTabsProps) {
+export function DeliveryDetailTabs({
+  deliveryRequest,
+  isLoading: _isLoading,
+}: DeliveryDetailTabsProps) {
   const { t } = useTranslation();
   const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
   const employeeMapByUserId = useEmployeeMapByUserId();

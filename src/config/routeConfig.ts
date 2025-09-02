@@ -7,6 +7,7 @@ const ROUTE_DEFINITIONS = {
   LOGIN: { id: 'login', path: '/login' },
   MAGIC_LINK: { id: 'magic-link', path: '/magic-link' },
   CLIENT_LOGIN: { id: 'client-login', path: '/:clientCode/login' },
+  LOGOUT: { id: 'logout', path: '/logout' },
 
   // Time keeper routes
   TIME_KEEPER_DASHBOARD: { id: 'time-keeper/dashboard', path: '/time-keeper/dashboard' },

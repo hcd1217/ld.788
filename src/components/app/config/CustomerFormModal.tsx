@@ -18,6 +18,9 @@ type CustomerFormModalProps = {
   readonly opened: boolean;
   readonly onClose: () => void;
   readonly mode: 'create' | 'edit';
+  readonly canCreate: boolean;
+  readonly canEdit: boolean;
+  readonly canDelete: boolean;
   readonly form: UseFormReturnType<CustomerFormValues>;
   readonly onSubmit: (values: CustomerFormValues) => void;
   readonly onDelete?: () => void;
@@ -28,6 +31,9 @@ export function CustomerFormModal({
   opened,
   onClose,
   mode,
+  canCreate,
+  canEdit,
+  canDelete,
   form,
   onSubmit,
   onDelete,
@@ -104,7 +110,7 @@ export function CustomerFormModal({
               />
             )}
             <Group justify="space-between" mt="md">
-              {mode === 'edit' && onDelete ? (
+              {mode === 'edit' && onDelete && canDelete ? (
                 <Button variant="light" color="red" onClick={onDelete} disabled={isLoading}>
                   {t('common.delete')}
                 </Button>
@@ -115,7 +121,13 @@ export function CustomerFormModal({
                 <Button variant="default" onClick={onClose} disabled={isLoading}>
                   {t('common.cancel')}
                 </Button>
-                <Button type="submit" loading={isLoading}>
+                <Button
+                  type="submit"
+                  loading={isLoading}
+                  disabled={
+                    isLoading || (mode === 'create' && !canCreate) || (mode === 'edit' && !canEdit)
+                  }
+                >
                   {mode === 'create' ? t('common.add') : t('common.save')}
                 </Button>
               </Group>

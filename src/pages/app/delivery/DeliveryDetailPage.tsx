@@ -82,6 +82,9 @@ export function DeliveryDetailPage() {
       errorMessage: t('delivery.messages.statusUpdateFailed'),
     },
     async actionHandler(data?: any) {
+      if (!permissions.deliveryRequest.actions?.canStartTransit) {
+        throw new Error(t('delivery.messages.statusUpdateFailed'));
+      }
       if (!selectedDeliveryRequest) {
         throw new Error(t('delivery.messages.statusUpdateFailed'));
       }
@@ -99,6 +102,9 @@ export function DeliveryDetailPage() {
       errorMessage: t('delivery.messages.completeFailed'),
     },
     async actionHandler(data?: { completionNotes?: string; recipient?: string }) {
+      if (!permissions.deliveryRequest.actions?.canComplete) {
+        throw new Error(t('delivery.messages.completeFailed'));
+      }
       if (!selectedDeliveryRequest) {
         throw new Error(t('delivery.messages.completeFailed'));
       }
@@ -119,6 +125,9 @@ export function DeliveryDetailPage() {
       errorMessage: t('delivery.messages.uploadFailed'),
     },
     async actionHandler(data?: { photoUrls: string[] }) {
+      if (!permissions.deliveryRequest.actions?.canTakePhoto) {
+        throw new Error(t('delivery.messages.uploadFailed'));
+      }
       if (!selectedDeliveryRequest || !data?.photoUrls) {
         throw new Error(t('delivery.messages.uploadFailed'));
       }
@@ -208,13 +217,7 @@ export function DeliveryDetailPage() {
       {isLoading ? (
         <LoadingOverlay visible />
       ) : deliveryRequest ? (
-        <DeliveryDetailTabs
-          deliveryRequest={deliveryRequest}
-          isLoading={isLoading}
-          onStartTransit={handleStartTransit}
-          onComplete={handleComplete}
-          onTakePhoto={handleTakeDeliveryPhoto}
-        />
+        <DeliveryDetailTabs deliveryRequest={deliveryRequest} isLoading={isLoading} />
       ) : (
         <ResourceNotFound message={t('delivery.notFound')} />
       )}

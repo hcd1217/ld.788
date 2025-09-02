@@ -280,6 +280,18 @@ export const useAppStore = create<AppState>()(
 const EMPTY_CUSTOMERS_ARRAY: readonly CustomerOverview[] = [];
 const EMPTY_EMPLOYEES_ARRAY: readonly EmployeeOverview[] = [];
 const EMPTY_PERMISSIONS: User['permissions'] = Object.freeze({
+  customer: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+  },
+  product: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+  },
   employee: {
     canView: false,
     canCreate: false,

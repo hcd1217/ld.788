@@ -14,6 +14,7 @@ import {
   SearchBar,
   Pagination,
   BulkImportModalContent,
+  PermissionDeniedPage,
 } from '@/components/common';
 import {
   ProductFormModal,
@@ -32,6 +33,7 @@ import { showSuccessNotification, showErrorNotification } from '@/utils/notifica
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { logError } from '@/utils/logger';
 import { parseProductExcelFile, generateProductExcelTemplate } from '@/utils/excelParser';
+import { usePermissions } from '@/stores/useAppStore';
 
 export function ProductConfigPage() {
   const { t, i18n } = useTranslation();
@@ -42,6 +44,7 @@ export function ProductConfigPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [editOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false);
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
+  const permissions = usePermissions();
 
   const form = useForm<ProductFormValues>({
     initialValues: {
@@ -75,7 +78,7 @@ export function ProductConfigPage() {
 
   const [paginatedProducts, paginationState, paginationHandlers] = useClientSidePagination({
     data: filteredProducts,
-    defaultPageSize: 10,
+    defaultPageSize: 15,
   });
 
   const loadProducts = useAction<Record<string, never>>({
@@ -84,6 +87,9 @@ export function ProductConfigPage() {
       errorMessage: t('common.loadingFailed'),
     },
     async actionHandler() {
+      if (!permissions.product.canView) {
+        return;
+      }
       setIsLoading(true);
       setError(undefined);
       const data = await productService.getAllProducts();
@@ -101,18 +107,16 @@ export function ProductConfigPage() {
     },
   });
 
-  useOnce(() => {
-    loadProducts();
-  });
+  useOnce(loadProducts);
 
   const handleCreateProduct = useAction<ProductFormValues>({
     options: {
       errorTitle: t('common.error'),
-      errorMessage: t('common.addFailed'),
+      errorMessage: t('common.addFailed', { entity: t('common.entity.product') }),
     },
     async actionHandler(values) {
-      if (!values) {
-        throw new Error(t('common.addFailed'));
+      if (!permissions.product.canCreate || !values) {
+        throw new Error(t('common.addFailed', { entity: t('common.entity.product') }));
       }
       setIsLoading(true);
       const data: CreateProductRequest = {
@@ -147,10 +151,10 @@ export function ProductConfigPage() {
   const handleUpdateProduct = useAction<ProductFormValues>({
     options: {
       errorTitle: t('common.error'),
-      errorMessage: t('common.updateFailed'),
+      errorMessage: t('common.updateFailed', { entity: t('common.entity.product') }),
     },
     async actionHandler(values) {
-      if (!values || !selectedProduct) {
+      if (!permissions.product.canEdit || !values || !selectedProduct) {
         throw new Error(t('common.updateFailed'));
       }
       setIsLoading(true);
@@ -187,11 +191,11 @@ export function ProductConfigPage() {
     options: {
       successTitle: t('product.deleted'),
       errorTitle: t('common.error'),
-      errorMessage: t('common.deleteFailed'),
+      errorMessage: t('common.deleteFailed', { entity: t('common.entity.product') }),
     },
     async actionHandler(values) {
-      if (!values?.product) {
-        throw new Error(t('common.deleteFailed'));
+      if (!permissions.product.canDelete || !values?.product) {
+        throw new Error(t('common.deleteFailed', { entity: t('common.entity.product') }));
       }
       setIsLoading(true);
       await productService.deleteProduct(values.product.id);
@@ -213,6 +217,9 @@ export function ProductConfigPage() {
   });
 
   const handleDeleteProduct = (product: Product) => {
+    if (!permissions.product.canDelete) {
+      throw new Error(t('common.deleteFailed', { entity: t('common.entity.product') }));
+    }
     modals.openConfirmModal({
       title: t('common.confirmDelete'),
       children: <Text size="sm">{t('common.confirmDeleteMessage', { name: product.name })}</Text>,
@@ -223,6 +230,9 @@ export function ProductConfigPage() {
   };
 
   const openEditModal = (product: Product) => {
+    if (!permissions.product.canEdit) {
+      return;
+    }
     setSelectedProduct(product);
     form.setValues({
       productCode: product.productCode,
@@ -239,12 +249,18 @@ export function ProductConfigPage() {
   };
 
   const openCreateModal = () => {
+    if (!permissions.product.canCreate) {
+      return;
+    }
     form.reset();
     openCreate();
   };
 
   // Open bulk import modal
   const openBulkImportModal = () => {
+    if (!permissions.product.canCreate) {
+      return;
+    }
     let selectedFile: File | undefined;
 
     modals.openConfirmModal({
@@ -285,6 +301,9 @@ export function ProductConfigPage() {
       errorMessage: t('auth.importFailed'),
     },
     async actionHandler(data) {
+      if (!permissions.product.canCreate) {
+        return;
+      }
       if (!data?.file) return;
       const { file } = data;
 
@@ -337,6 +356,10 @@ export function ProductConfigPage() {
     },
   });
 
+  if (!permissions.product.canView) {
+    return <PermissionDeniedPage />;
+  }
+
   return (
     <AppDesktopLayout
       isLoading={isLoading && !createOpened && !editOpened}
@@ -352,11 +375,16 @@ export function ProductConfigPage() {
           <Button
             variant="light"
             leftSection={<IconUpload size={16} />}
+            disabled={!permissions.product.canCreate}
             onClick={openBulkImportModal}
           >
             {t('product.bulkImport')}
           </Button>
-          <Button leftSection={<IconPlus size={16} />} onClick={openCreateModal}>
+          <Button
+            disabled={!permissions.product.canCreate}
+            leftSection={<IconPlus size={16} />}
+            onClick={openCreateModal}
+          >
             {t('common.add')}
           </Button>
         </Group>
@@ -418,19 +446,26 @@ export function ProductConfigPage() {
       />
 
       <ProductFormModal
+        mode="create"
+        canCreate={permissions.product.canCreate}
+        canDelete={permissions.product.canDelete}
+        canEdit={permissions.product.canEdit}
+        form={form}
+        isLoading={isLoading}
         opened={createOpened}
         onClose={closeCreate}
-        mode="create"
-        form={form}
         onSubmit={handleCreateProduct}
-        isLoading={isLoading}
       />
 
       <ProductFormModal
-        opened={editOpened}
-        onClose={closeEdit}
         mode="edit"
+        canCreate={permissions.product.canCreate}
+        canEdit={permissions.product.canEdit}
+        canDelete={permissions.product.canDelete}
+        opened={editOpened}
         form={form}
+        isLoading={isLoading}
+        onClose={closeEdit}
         onSubmit={handleUpdateProduct}
         onDelete={() => {
           if (selectedProduct) {
@@ -438,7 +473,6 @@ export function ProductConfigPage() {
             closeEdit();
           }
         }}
-        isLoading={isLoading}
       />
     </AppDesktopLayout>
   );

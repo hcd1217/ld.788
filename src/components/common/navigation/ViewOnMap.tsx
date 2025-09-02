@@ -16,7 +16,11 @@ export function ViewOnMap({ googleMapsUrl }: ViewOnMapProps) {
       <ActionIcon
         size="sm"
         variant="subtle"
-        onClick={() => window.open(googleMapsUrl, '_blank', 'noopener,noreferrer')}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+        }}
       >
         <IconExternalLink size={16} />
       </ActionIcon>

@@ -27,6 +27,9 @@ export type ProductFormValues = {
 };
 
 type ProductFormModalProps = {
+  readonly canCreate: boolean;
+  readonly canEdit: boolean;
+  readonly canDelete: boolean;
   readonly opened: boolean;
   readonly onClose: () => void;
   readonly mode: 'create' | 'edit';
@@ -37,6 +40,9 @@ type ProductFormModalProps = {
 };
 
 export function ProductFormModal({
+  canCreate,
+  canEdit,
+  canDelete,
   opened,
   onClose,
   mode,
@@ -129,7 +135,12 @@ export function ProductFormModal({
             {/* Action Buttons */}
             <Group justify="space-between" mt="md">
               {mode === 'edit' && onDelete ? (
-                <Button variant="light" color="red" onClick={onDelete} disabled={isLoading}>
+                <Button
+                  variant="light"
+                  color="red"
+                  onClick={onDelete}
+                  disabled={isLoading || !canDelete}
+                >
                   {t('common.delete')}
                 </Button>
               ) : (
@@ -139,7 +150,13 @@ export function ProductFormModal({
                 <Button variant="default" onClick={onClose} disabled={isLoading}>
                   {t('common.cancel')}
                 </Button>
-                <Button type="submit" loading={isLoading}>
+                <Button
+                  type="submit"
+                  loading={isLoading}
+                  disabled={
+                    isLoading || (mode === 'create' && !canCreate) || (mode === 'edit' && !canEdit)
+                  }
+                >
                   {mode === 'create' ? t('common.add') : t('common.save')}
                 </Button>
               </Group>
