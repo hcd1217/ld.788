@@ -369,7 +369,7 @@ export function ErrorModal({ isAutoOpen = true, autoCloseDelay }: ErrorModalProp
       link.click();
       // Use defensive removal with parentNode check
       if (link.parentNode) {
-        link.parentNode.removeChild(link);
+        link.remove();
       }
     }
 

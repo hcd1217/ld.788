@@ -100,7 +100,7 @@ export const clientManagementService = {
     // Client code validation
     if (!data.clientCode) {
       errors.push('Client code is required');
-    } else if (!/^[A-Z\d]{2,10}$/.test(data.clientCode)) {
+    } else if (!/^[\dA-Z]{2,10}$/.test(data.clientCode)) {
       errors.push('Client code must be 2-10 uppercase alphanumeric characters');
     }
 

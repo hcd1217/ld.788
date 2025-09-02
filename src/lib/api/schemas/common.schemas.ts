@@ -2,7 +2,7 @@ import z from 'zod/v4';
 import type { Dictionary } from '@/types/dictionary';
 
 const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&()^])[A-Za-z\d@#$!%*?&()^]{8,}$/;
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#$%&()*?@^])[\d!#$%&()*?@A-Z^a-z]{8,}$/;
 
 const jwtTokenRegex = /^(?:[\w-]{10,}\.){2}[\w-]{10,}$/;
 
@@ -12,7 +12,7 @@ export const clientCodeSchema = z
   .string()
   .min(3)
   .max(10)
-  .regex(/^[A-Z\d]+$/);
+  .regex(/^[\dA-Z]+$/);
 export const booleanSchema = z.boolean();
 export const optionalBooleanSchema = z.boolean().optional();
 export const falseBooleanSchema = z
@@ -39,7 +39,7 @@ export const phoneNumberSchema = optionalStringSchema
       return undefined;
     }
     // remove non-numeric and convert 09012345678 / 090123456789 to 0901-234-5678 / 0901-234-56789
-    return val?.replace(/[^0-9]/g, '').replace(/(\d{4})(\d{3})(\d+)/, '$1-$2-$3');
+    return val?.replace(/\D/g, '').replace(/(\d{4})(\d{3})(\d+)/, '$1-$2-$3');
   })
   .optional();
 export const backendPhoneNumberSchema = optionalStringSchema
@@ -47,7 +47,7 @@ export const backendPhoneNumberSchema = optionalStringSchema
     if (!val) {
       return undefined;
     }
-    return val?.replace(/[^0-9]/g, '');
+    return val?.replace(/\D/g, '');
   })
   .optional();
 
@@ -73,4 +73,10 @@ export const ClientPublicConfigSchema = z.object({
   clientCode: optionalStringSchema,
   clientName: optionalStringSchema,
   logoUrl: optionalStringSchema,
+});
+
+// Address schema
+export const AddressSchema = z.object({
+  oneLineAddress: optionalStringSchema,
+  googleMapsUrl: optionalStringSchema,
 });

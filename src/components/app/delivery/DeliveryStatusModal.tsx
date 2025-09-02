@@ -32,9 +32,9 @@ type DeliveryStatusModalProps = {
 const getModalConfig = (mode: DeliveryModalMode, t: any) => {
   const configs = {
     start_transit: {
-      title: t('delivery.startTransit'),
-      description: t('delivery.startTransitDescription'),
-      buttonText: t('delivery.startTransit'),
+      title: t('delivery.actions.startTransit'),
+      description: t('delivery.actions.startTransitDescription'),
+      buttonText: t('delivery.actions.startTransit'),
       buttonColor: 'orange',
       icon: <IconTruck size={16} />,
       alertColor: 'orange',
@@ -138,11 +138,11 @@ export function DeliveryStatusModal({
             {t('delivery.fields.scheduledDate')}: {formatDate(deliveryRequest.scheduledDate)}
           </Text>
         )}
-        {deliveryRequest.assignedName && (
+        {/* {deliveryRequest.assignedName && (
           <Text size="sm" c="dimmed">
             {t('delivery.fields.assignedTo')}: {deliveryRequest.assignedName}
           </Text>
-        )}
+        )} */}
       </div>
 
       {mode === 'start_transit' && (

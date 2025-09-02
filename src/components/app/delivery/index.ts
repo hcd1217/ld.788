@@ -8,6 +8,7 @@ export { DeliveryStatusModal } from './DeliveryStatusModal';
 export { DeliveryDetailTabs } from './DeliveryDetailTabs';
 export { DeliveryDetailAccordion } from './DeliveryDetailAccordion';
 export { DeliveryPhotoUpload } from './DeliveryPhotoUpload';
+export { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
 export { DeliveryErrorBoundary } from './DeliveryErrorBoundary';
 export { DeliveryListSkeleton } from './DeliveryListSkeleton';
 export { DeliveryCustomerDrawer } from './DeliveryCustomerDrawer';

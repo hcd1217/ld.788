@@ -77,8 +77,8 @@ export function QrScannerModal({ opened, onClose, onScan }: QrScannerModalProps)
       const url = URL.createObjectURL(file);
 
       await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error('Failed to load image'));
+        img.addEventListener('load', () => resolve());
+        img.addEventListener('error', () => reject(new Error('Failed to load image')));
         img.src = url;
       });
 
@@ -101,6 +101,7 @@ export function QrScannerModal({ opened, onClose, onScan }: QrScannerModalProps)
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
       // Dynamically import jsQR to reduce initial bundle size
+      // eslint-disable-next-line unicorn/no-await-expression-member
       const jsQR = (await import('jsqr')).default;
 
       // Decode QR code using jsQR
@@ -116,8 +117,8 @@ export function QrScannerModal({ opened, onClose, onScan }: QrScannerModalProps)
       } else {
         setError(t('auth.magicLink.noQrCodeFound'));
       }
-    } catch (err) {
-      logError('Error processing image:', err, {
+    } catch (error_) {
+      logError('Error processing image:', error_, {
         module: 'QrScannerModal',
         action: 'jsQR',
       });
@@ -155,8 +156,8 @@ export function QrScannerModal({ opened, onClose, onScan }: QrScannerModalProps)
       } else {
         setError(t('auth.magicLink.noQrCodeFound'));
       }
-    } catch (err) {
-      logError('Error reading clipboard:', err, {
+    } catch (error_) {
+      logError('Error reading clipboard:', error_, {
         module: 'QrScannerModal',
         action: 'blob',
       });

@@ -17,6 +17,22 @@ export function getEmployeeNameByUserId(
 }
 
 /**
+ * Get employee full name by employeeId from overview data
+ * Returns the employeeId if employee not found (fallback)
+ */
+export function getEmployeeNameByEmployeeId(
+  employeeMapByEmployeeId: Map<string, EmployeeOverview> | undefined,
+  employeeId: string | undefined | null,
+): string {
+  if (!employeeId) {
+    return '-';
+  }
+
+  const employee = employeeMapByEmployeeId?.get(employeeId);
+  return employee?.fullName ?? employeeId;
+}
+
+/**
  * Get employee full name by userId from overview data
  * Returns the userId if employee not found (fallback)
  */

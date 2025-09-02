@@ -27,16 +27,23 @@ type DeliveryRequestState = {
   activeFilters: DeliveryRequestFilterParams;
   currentPage: number;
 
-  // Request tracking for race condition prevention
-  pendingRequests: Map<string, { requestId: string; timestamp: number; action: string }>;
-  requestCounter: number;
+  // Simplified request tracking - just track pending IDs
+  pendingActions: Set<string>;
 
-  // Request tracking helpers
-  _generateRequestId: () => string;
-  _startRequest: (drId: string, action: string) => string;
-  _finishRequest: (drId: string, requestId: string) => boolean;
-  _isRequestPending: (drId: string) => boolean;
-  _cleanupStaleRequests: () => void;
+  // Internal helpers (not exposed to consumers)
+  _markPending: (id: string) => void;
+  _removePending: (id: string) => void;
+  _forceReload: (id: string) => Promise<void>;
+  _rollback: (
+    id: string,
+    previousDR: DeliveryRequest | undefined,
+    previousCurrentDR: DeliveryRequestDetail | undefined,
+    error?: string,
+  ) => void;
+  _optimisticUpdate: (
+    id: string,
+    data: { status?: DeliveryStatus } & Partial<DeliveryRequest>,
+  ) => void;
 
   // Actions
   setCurrentDeliveryRequest: (dr: DeliveryRequestDetail | undefined) => void;
@@ -55,14 +62,10 @@ type DeliveryRequestState = {
   updateDeliveryStatus: (id: string, status: DeliveryStatus, notes?: string) => Promise<void>;
   uploadPhotos: (id: string, photoUrls: string[]) => Promise<void>;
   completeDelivery: (id: string, data?: { photoUrls?: string[]; notes?: string }) => Promise<void>;
-  deleteDeliveryRequest: (id: string) => Promise<void>;
   clearError: () => void;
 
   // Selectors
   getDeliveryRequestById: (id: string) => DeliveryRequest | undefined;
-  getDeliveryRequestsByStatus: (status: DeliveryStatus) => DeliveryRequest[];
-  getDeliveryRequestsByPO: (purchaseOrderId: string) => DeliveryRequest[];
-  getDeliveryRequestsByAssignee: (assignedTo: string) => DeliveryRequest[];
 };
 
 export const useDeliveryRequestStore = create<DeliveryRequestState>()(
@@ -80,65 +83,7 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
       hasPreviousPage: false,
       activeFilters: {},
       currentPage: 1,
-      pendingRequests: new Map(),
-      requestCounter: 0,
-
-      // Request tracking helpers
-      _generateRequestId() {
-        const state = get();
-        const requestId = `req_${state.requestCounter}_${Date.now()}`;
-        set({ requestCounter: state.requestCounter + 1 });
-        return requestId;
-      },
-
-      _startRequest(drId: string, action: string) {
-        const state = get();
-        const requestId = get()._generateRequestId();
-        const newPendingRequests = new Map(state.pendingRequests);
-        newPendingRequests.set(drId, {
-          requestId,
-          timestamp: Date.now(),
-          action,
-        });
-        set({ pendingRequests: newPendingRequests });
-        return requestId;
-      },
-
-      _finishRequest(drId: string, requestId: string) {
-        const state = get();
-        const pendingRequest = state.pendingRequests.get(drId);
-        if (pendingRequest?.requestId === requestId) {
-          const newPendingRequests = new Map(state.pendingRequests);
-          newPendingRequests.delete(drId);
-          set({ pendingRequests: newPendingRequests });
-          return true;
-        }
-        return false;
-      },
-
-      _isRequestPending(drId: string) {
-        // Clean up stale requests first
-        get()._cleanupStaleRequests();
-        const state = get();
-        return state.pendingRequests.has(drId);
-      },
-
-      _cleanupStaleRequests() {
-        const state = get();
-        const now = Date.now();
-        const TIMEOUT_MS = 30000; // 30 second timeout
-        const newPendingRequests = new Map();
-
-        state.pendingRequests.forEach((request, drId) => {
-          if (now - request.timestamp < TIMEOUT_MS) {
-            newPendingRequests.set(drId, request);
-          }
-        });
-
-        if (newPendingRequests.size !== state.pendingRequests.size) {
-          set({ pendingRequests: newPendingRequests });
-        }
-      },
+      pendingActions: new Set(),
 
       // Actions
       setCurrentDeliveryRequest: (dr) => set({ currentDeliveryRequest: dr }),
@@ -323,135 +268,140 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
       },
 
       async updateDeliveryRequest(id: string, data: UpdateDeliveryRequest) {
-        if (get()._isRequestPending(id)) {
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
           return;
         }
 
-        const requestId = get()._startRequest(id, 'update');
-        set({ error: undefined });
+        // Mark as pending
+        get()._markPending(id);
+
+        // Save previous state for rollback
+        const previousDR = state.deliveryRequests.find((dr) => dr.id === id);
+        const previousCurrentDR = state.currentDeliveryRequest;
+
+        // Skip optimistic update for complex data types - just mark as pending
 
         try {
-          const updatedDR = await deliveryRequestService.updateDeliveryRequest(id, data);
-          if (get()._finishRequest(id, requestId)) {
-            set((state) => ({
-              deliveryRequests: state.deliveryRequests.map((dr) => (dr.id === id ? updatedDR : dr)),
-              currentDeliveryRequest:
-                state.currentDeliveryRequest?.id === id
-                  ? { ...state.currentDeliveryRequest, ...updatedDR }
-                  : state.currentDeliveryRequest,
-            }));
-          }
+          // Call service and use the response
+          await deliveryRequestService.updateDeliveryRequest(id, data);
+
+          // Force reload to get latest data from server
+          get()._forceReload(id);
         } catch (error) {
-          if (get()._finishRequest(id, requestId)) {
-            set({ error: getErrorMessage(error, 'Operation failed') });
-          }
+          // Rollback on failure
+          get()._rollback(
+            id,
+            previousDR,
+            previousCurrentDR,
+            getErrorMessage(error, 'Failed to update delivery request'),
+          );
           throw error;
+        } finally {
+          get()._removePending(id);
         }
       },
 
       async updateDeliveryStatus(id: string, status: DeliveryStatus, notes?: string) {
-        if (get()._isRequestPending(id)) {
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
           return;
         }
 
-        const requestId = get()._startRequest(id, 'updateStatus');
-        set({ error: undefined });
+        // Mark as pending
+        get()._markPending(id);
+
+        // Save previous state for rollback
+        const previousDR = state.deliveryRequests.find((dr) => dr.id === id);
+        const previousCurrentDR = state.currentDeliveryRequest;
+
+        // Apply optimistic update
+        get()._optimisticUpdate(id, { status });
 
         try {
-          const updatedDR = await deliveryRequestService.updateDeliveryStatus(id, status, notes);
-          if (get()._finishRequest(id, requestId)) {
-            set((state) => ({
-              deliveryRequests: state.deliveryRequests.map((dr) => (dr.id === id ? updatedDR : dr)),
-              currentDeliveryRequest:
-                state.currentDeliveryRequest?.id === id
-                  ? { ...state.currentDeliveryRequest, ...updatedDR }
-                  : state.currentDeliveryRequest,
-            }));
-          }
+          // Call service and use the response
+          await deliveryRequestService.updateDeliveryStatus(id, status, notes);
+
+          // Force reload to get latest data from server
+          get()._forceReload(id);
         } catch (error) {
-          if (get()._finishRequest(id, requestId)) {
-            set({ error: getErrorMessage(error, 'Operation failed') });
-          }
+          // Rollback on failure
+          get()._rollback(
+            id,
+            previousDR,
+            previousCurrentDR,
+            getErrorMessage(error, 'Failed to update delivery status'),
+          );
           throw error;
+        } finally {
+          get()._removePending(id);
         }
       },
 
       async uploadPhotos(id: string, photoUrls: string[]) {
-        if (get()._isRequestPending(id)) {
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
           return;
         }
 
-        const requestId = get()._startRequest(id, 'uploadPhotos');
-        set({ error: undefined });
+        // Mark as pending
+        get()._markPending(id);
 
         try {
-          const updatedDR = await deliveryRequestService.uploadPhotos(id, photoUrls);
-          if (get()._finishRequest(id, requestId)) {
-            set((state) => ({
-              deliveryRequests: state.deliveryRequests.map((dr) => (dr.id === id ? updatedDR : dr)),
-              currentDeliveryRequest:
-                state.currentDeliveryRequest?.id === id
-                  ? { ...state.currentDeliveryRequest, ...updatedDR }
-                  : state.currentDeliveryRequest,
-            }));
-          }
+          // Call service and use the response
+          await deliveryRequestService.uploadPhotos(id, photoUrls);
+
+          // Force reload to get latest data from server
+          get()._forceReload(id);
         } catch (error) {
-          if (get()._finishRequest(id, requestId)) {
-            set({ error: getErrorMessage(error, 'Operation failed') });
-          }
+          set({ error: getErrorMessage(error, 'Failed to upload photos') });
           throw error;
+        } finally {
+          get()._removePending(id);
         }
       },
 
       async completeDelivery(id: string, data?: { photoUrls?: string[]; notes?: string }) {
-        if (get()._isRequestPending(id)) {
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
           return;
         }
 
-        const requestId = get()._startRequest(id, 'complete');
-        set({ error: undefined });
+        // Mark as pending
+        get()._markPending(id);
+
+        // Save previous state for rollback
+        const previousDR = state.deliveryRequests.find((dr) => dr.id === id);
+        const previousCurrentDR = state.currentDeliveryRequest;
+
+        // Apply optimistic update
+        get()._optimisticUpdate(id, { status: 'COMPLETED' as DeliveryStatus });
 
         try {
-          const updatedDR = await deliveryRequestService.completeDelivery(id, data);
-          if (get()._finishRequest(id, requestId)) {
-            set((state) => ({
-              deliveryRequests: state.deliveryRequests.map((dr) => (dr.id === id ? updatedDR : dr)),
-              currentDeliveryRequest:
-                state.currentDeliveryRequest?.id === id
-                  ? { ...state.currentDeliveryRequest, ...updatedDR }
-                  : state.currentDeliveryRequest,
-            }));
-          }
+          // Call service and use the response
+          await deliveryRequestService.completeDelivery(id, data);
+
+          // Force reload to get latest data from server
+          get()._forceReload(id);
         } catch (error) {
-          if (get()._finishRequest(id, requestId)) {
-            set({ error: getErrorMessage(error, 'Operation failed') });
-          }
+          // Rollback on failure
+          get()._rollback(
+            id,
+            previousDR,
+            previousCurrentDR,
+            getErrorMessage(error, 'Failed to complete delivery'),
+          );
           throw error;
-        }
-      },
-
-      async deleteDeliveryRequest(id: string) {
-        if (get()._isRequestPending(id)) {
-          return;
-        }
-
-        const requestId = get()._startRequest(id, 'delete');
-        set({ error: undefined });
-
-        try {
-          await deliveryRequestService.deleteDeliveryRequest(id);
-          if (get()._finishRequest(id, requestId)) {
-            set((state) => ({
-              deliveryRequests: state.deliveryRequests.filter((dr) => dr.id !== id),
-              currentDeliveryRequest:
-                state.currentDeliveryRequest?.id === id ? undefined : state.currentDeliveryRequest,
-            }));
-          }
-        } catch (error) {
-          if (get()._finishRequest(id, requestId)) {
-            set({ error: getErrorMessage(error, 'Operation failed') });
-          }
-          throw error;
+        } finally {
+          get()._removePending(id);
         }
       },
 
@@ -462,16 +412,81 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
         return get().deliveryRequests.find((dr) => dr.id === id);
       },
 
-      getDeliveryRequestsByStatus: (status: DeliveryStatus) => {
-        return get().deliveryRequests.filter((dr) => dr.status === status);
+      // Internal helper methods
+      _markPending(id: string) {
+        set((state) => {
+          if (state.pendingActions.has(id)) {
+            return {};
+          }
+          const pendingActions = new Set(state.pendingActions);
+          pendingActions.add(id);
+          return {
+            pendingActions,
+            error: undefined,
+          };
+        });
       },
 
-      getDeliveryRequestsByPO: (purchaseOrderId: string) => {
-        return get().deliveryRequests.filter((dr) => dr.purchaseOrderId === purchaseOrderId);
+      _removePending(id: string) {
+        set((state) => {
+          const pendingActions = new Set(state.pendingActions);
+          pendingActions.delete(id);
+          return {
+            pendingActions,
+          };
+        });
       },
 
-      getDeliveryRequestsByAssignee: (assignedTo: string) => {
-        return get().deliveryRequests.filter((dr) => dr.assignedTo === assignedTo);
+      async _forceReload(id: string) {
+        const updatedDR = await deliveryRequestService.getDeliveryRequestById(id);
+        if (updatedDR) {
+          // Update in list
+          set((state) => ({
+            deliveryRequests: state.deliveryRequests.map((dr) => (dr.id === id ? updatedDR : dr)),
+          }));
+
+          // Update current if it's the same
+          if (get().currentDeliveryRequest?.id === id) {
+            set({ currentDeliveryRequest: updatedDR });
+          }
+        } else {
+          // If not found, remove from list
+          set((state) => ({
+            deliveryRequests: state.deliveryRequests.filter((dr) => dr.id !== id),
+            currentDeliveryRequest:
+              state.currentDeliveryRequest?.id === id ? undefined : state.currentDeliveryRequest,
+          }));
+        }
+      },
+
+      _rollback(
+        id: string,
+        previousDR: DeliveryRequest | undefined,
+        previousCurrentDR: DeliveryRequestDetail | undefined,
+        error?: string,
+      ) {
+        set((state) => ({
+          deliveryRequests: previousDR
+            ? state.deliveryRequests.map((dr) => (dr.id === id ? previousDR : dr))
+            : state.deliveryRequests,
+          currentDeliveryRequest:
+            state.currentDeliveryRequest?.id === id
+              ? previousCurrentDR
+              : state.currentDeliveryRequest,
+          error: error,
+        }));
+      },
+
+      _optimisticUpdate(id: string, data: { status?: DeliveryStatus } & Partial<DeliveryRequest>) {
+        set((state) => ({
+          deliveryRequests: state.deliveryRequests.map((dr) =>
+            dr.id === id ? { ...dr, ...data } : dr,
+          ),
+          currentDeliveryRequest:
+            state.currentDeliveryRequest?.id === id
+              ? { ...state.currentDeliveryRequest, ...data }
+              : state.currentDeliveryRequest,
+        }));
       },
     }),
     {
@@ -480,38 +495,72 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
   ),
 );
 
-// Export custom hooks for common use cases
-export const useDeliveryRequests = () => useDeliveryRequestStore((state) => state.deliveryRequests);
-export const useCurrentDeliveryRequest = () =>
-  useDeliveryRequestStore((state) => state.currentDeliveryRequest);
+// Empty constants to prevent re-renders when data is undefined
+const EMPTY_ARRAY: DeliveryRequest[] = [];
+
+// Convenience hooks with stable references
+export const useDeliveryRequests = () =>
+  useDeliveryRequestStore((state) => state.deliveryRequests) || EMPTY_ARRAY;
 export const useDeliveryRequestLoading = () => useDeliveryRequestStore((state) => state.isLoading);
 export const useDeliveryRequestError = () => useDeliveryRequestStore((state) => state.error);
 
-// Individual action selectors to prevent infinite loops
-export const useLoadDeliveryRequestsWithFilter = () =>
-  useDeliveryRequestStore((state) => state.loadDeliveryRequestsWithFilter);
-export const useClearDeliveryRequestError = () =>
-  useDeliveryRequestStore((state) => state.clearError);
-export const useLoadDeliveryRequest = () =>
-  useDeliveryRequestStore((state) => state.loadDeliveryRequest);
-export const useCreateDeliveryRequest = () =>
-  useDeliveryRequestStore((state) => state.createDeliveryRequest);
-export const useUpdateDeliveryRequest = () =>
-  useDeliveryRequestStore((state) => state.updateDeliveryRequest);
-export const useUpdateDeliveryStatus = () =>
-  useDeliveryRequestStore((state) => state.updateDeliveryStatus);
-export const useUploadPhotos = () => useDeliveryRequestStore((state) => state.uploadPhotos);
-export const useCompleteDelivery = () => useDeliveryRequestStore((state) => state.completeDelivery);
-export const useDeleteDeliveryRequest = () =>
-  useDeliveryRequestStore((state) => state.deleteDeliveryRequest);
+// Export hook with stable reference by calling the store multiple times
+// This pattern prevents infinite re-renders as each function reference is stable
+export const useDeliveryRequestActions = () => {
+  const loadDeliveryRequestsWithFilter = useDeliveryRequestStore(
+    (state) => state.loadDeliveryRequestsWithFilter,
+  );
+  const loadMoreDeliveryRequests = useDeliveryRequestStore(
+    (state) => state.loadMoreDeliveryRequests,
+  );
+  const loadNextPage = useDeliveryRequestStore((state) => state.loadNextPage);
+  const loadPreviousPage = useDeliveryRequestStore((state) => state.loadPreviousPage);
+  const resetPagination = useDeliveryRequestStore((state) => state.resetPagination);
+  const refreshDeliveryRequests = useDeliveryRequestStore((state) => state.refreshDeliveryRequests);
+  const loadDeliveryRequest = useDeliveryRequestStore((state) => state.loadDeliveryRequest);
+  const createDeliveryRequest = useDeliveryRequestStore((state) => state.createDeliveryRequest);
+  const updateDeliveryRequest = useDeliveryRequestStore((state) => state.updateDeliveryRequest);
+  const updateDeliveryStatus = useDeliveryRequestStore((state) => state.updateDeliveryStatus);
+  const uploadPhotos = useDeliveryRequestStore((state) => state.uploadPhotos);
+  const completeDelivery = useDeliveryRequestStore((state) => state.completeDelivery);
+  const clearError = useDeliveryRequestStore((state) => state.clearError);
 
-// Individual pagination selectors
-export const useHasMoreDeliveryRequests = () =>
-  useDeliveryRequestStore((state) => state.hasMoreDeliveryRequests);
-export const useHasPreviousPage = () => useDeliveryRequestStore((state) => state.hasPreviousPage);
-export const useIsLoadingMore = () => useDeliveryRequestStore((state) => state.isLoadingMore);
-export const useCurrentPage = () => useDeliveryRequestStore((state) => state.currentPage);
-export const useLoadMoreDeliveryRequests = () =>
-  useDeliveryRequestStore((state) => state.loadMoreDeliveryRequests);
-export const useLoadNextPage = () => useDeliveryRequestStore((state) => state.loadNextPage);
-export const useLoadPreviousPage = () => useDeliveryRequestStore((state) => state.loadPreviousPage);
+  return {
+    loadDeliveryRequestsWithFilter,
+    loadMoreDeliveryRequests,
+    loadNextPage,
+    loadPreviousPage,
+    resetPagination,
+    refreshDeliveryRequests,
+    loadDeliveryRequest,
+    createDeliveryRequest,
+    updateDeliveryRequest,
+    updateDeliveryStatus,
+    uploadPhotos,
+    completeDelivery,
+    clearError,
+  };
+};
+
+// Current delivery request hook
+export const useCurrentDeliveryRequest = () =>
+  useDeliveryRequestStore((state) => state.currentDeliveryRequest);
+
+// Pagination state hooks - consolidated into a single hook for better performance
+export const useDeliveryRequestPaginationState = () => {
+  const currentCursor = useDeliveryRequestStore((state) => state.currentCursor);
+  const hasMoreDeliveryRequests = useDeliveryRequestStore((state) => state.hasMoreDeliveryRequests);
+  const hasPreviousPage = useDeliveryRequestStore((state) => state.hasPreviousPage);
+  const isLoadingMore = useDeliveryRequestStore((state) => state.isLoadingMore);
+  const activeFilters = useDeliveryRequestStore((state) => state.activeFilters);
+  const currentPage = useDeliveryRequestStore((state) => state.currentPage);
+
+  return {
+    currentCursor,
+    hasMoreDeliveryRequests,
+    hasPreviousPage,
+    isLoadingMore,
+    activeFilters,
+    currentPage,
+  };
+};

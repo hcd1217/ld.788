@@ -91,7 +91,7 @@ export function downloadFile(content: string, filename: string, mimeType = 'text
     link.click();
     // Use defensive removal with parentNode check
     if (link.parentNode) {
-      link.parentNode.removeChild(link);
+      link.remove();
     }
   }
 

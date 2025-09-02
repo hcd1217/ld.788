@@ -5,6 +5,8 @@ import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { formatDate, getLocaleFormat } from '@/utils/time';
+import { getEmployeeNameByEmployeeId } from '@/utils/overview';
+import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
 
 type DeliveryDataTableProps = {
   readonly deliveryRequests: readonly DeliveryRequest[];
@@ -18,6 +20,8 @@ function DeliveryDataTableComponent({
 }: DeliveryDataTableProps) {
   const { t, currentLanguage } = useTranslation();
   const navigate = useNavigate();
+
+  const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
 
   // Memoized navigation handler
   const handleRowClick = useCallback(
@@ -64,13 +68,11 @@ function DeliveryDataTableComponent({
                 onClick={handleRowClick(delivery.id)}
               >
                 <Table.Td>
-                  <Text fw={500}>DR-{delivery.id.slice(-6)}</Text>
+                  <Text fw={500}>{delivery.deliveryRequestNumber}</Text>
                 </Table.Td>
                 <Table.Td>
                   <Group gap="sm" justify="start">
-                    <Text fw={400}>
-                      {/* TODO: Get customer info from purchase order relationship */}-
-                    </Text>
+                    <Text fw={400}>{delivery.customerName}</Text>
                   </Group>
                 </Table.Td>
                 <Table.Td>{fmtDate(delivery.scheduledDate)}</Table.Td>
@@ -78,7 +80,9 @@ function DeliveryDataTableComponent({
                   {delivery.completedDate ? fmtDate(delivery.completedDate) : '-'}
                 </Table.Td>
                 <Table.Td>
-                  <Text size="sm">{delivery.assignedName || '-'}</Text>
+                  <Text size="sm">
+                    {getEmployeeNameByEmployeeId(employeeMapByEmployeeId, delivery.assignedTo)}
+                  </Text>
                 </Table.Td>
                 <Table.Td>
                   <DeliveryStatusBadge status={delivery.status} />

@@ -12,6 +12,7 @@
       "salesPoManagement": "Đơn Hàng",
       "procurementManagement": "Yêu Cầu Mua Sắm",
       "deliveryManagement": "Quản Lý Giao Hàng",
+      "deliveryManagementMobile": "Giao Hàng",
       "customerManagement": "Quản Lý Khách Hàng",
       "productManagement": "Quản Lý Sản phẩm",
       "employeeConfig": "Cấu Hình Nhân Viên",
@@ -36,32 +37,40 @@
       "roleManagement": "Phân Quyền"
     },
     "pwa": {
-      "update": {
-        "newVersionAvailable": "Phiên Bản Mới Có Sẵn",
-        "newVersionAvailableForBrowser": "Phiên bản mới có sẵn",
-        "updating": "Đang cập nhật...",
-        "clickToUpdate": "Nhấn vào đây để cập nhật ngay.",
-        "clickToUpdateShort": "Nhấn để cập nhật ngay.",
-        "reloadIn3Seconds": "Ứng dụng sẽ tải lại trong 3 giây.",
-        "reloadAutomatically": "Ứng dụng sẽ tải lại tự động.",
-        "offlineReady": "Sẵn sàng hoạt động ngoại tuyến",
-        "appAvailableOffline": "Ứng dụng {{appName}} đã sẵn sàng hoạt động ngoại tuyến!",
-        "newVersionOfApp": "Phiên bản mới của ứng dụng {{appName}} có sẵn. Nhấn để cập nhật.",
-        "safari": {
-          "closeCompletelyInstructions": "Đóng Safari hoàn toàn (vuốt lên → vuốt ứng dụng đi), sau đó mở lại từ màn hình chính.",
-          "updateGuideTitle": "Cách Cập Nhật Safari PWA",
-          "updateInstructions": "Để cập nhật ứng dụng trên Safari, bạn phải đóng hoàn toàn ứng dụng:",
-          "step1": "Nhấn đôi nút home hoặc vuốt lên từ dưới cùng",
-          "step2": "Tìm ứng dụng này và vuốt LÊN để đóng hoàn toàn",
-          "step3": "Đợi 2-3 giây để Safari đóng hoàn toàn",
-          "step4": "Nhấn vào biểu tượng ứng dụng trên màn hình chính để mở lại",
-          "restartNote": "Lưu ý: Chỉ chuyển đổi giữa các ứng dụng sẽ không cập nhật Safari PWA. Cần khởi động lại hoàn toàn."
-        }
-      },
-      "settings": {
-        "autoUpdate": {}
+      "newVersionAvailable": "Phiên Bản Mới Có Sẵn",
+      "newVersionAvailableForBrowser": "Phiên bản mới có sẵn",
+      "updating": "Đang cập nhật...",
+      "clickToUpdate": "Nhấn vào đây để cập nhật ngay.",
+      "clickToUpdateShort": "Nhấn để cập nhật ngay.",
+      "reloadIn3Seconds": "Ứng dụng sẽ tải lại trong 3 giây.",
+      "reloadAutomatically": "Ứng dụng sẽ tải lại tự động.",
+      "offlineReady": "Sẵn sàng hoạt động ngoại tuyến",
+      "appAvailableOffline": "Ứng dụng {{appName}} đã sẵn sàng hoạt động ngoại tuyến!",
+      "newVersionOfApp": "Phiên bản mới của ứng dụng {{appName}} có sẵn. Nhấn để cập nhật.",
+      "safari": {
+        "closeCompletelyInstructions": "Đóng Safari hoàn toàn (vuốt lên → vuốt ứng dụng đi), sau đó mở lại từ màn hình chính.",
+        "updateGuideTitle": "Cách Cập Nhật Safari PWA",
+        "updateInstructions": "Để cập nhật ứng dụng trên Safari, bạn phải đóng hoàn toàn ứng dụng:",
+        "step1": "Nhấn đôi nút home hoặc vuốt lên từ dưới cùng",
+        "step2": "Tìm ứng dụng này và vuốt LÊN để đóng hoàn toàn",
+        "step3": "Đợi 2-3 giây để Safari đóng hoàn toàn",
+        "step4": "Nhấn vào biểu tượng ứng dụng trên màn hình chính để mở lại",
+        "restartNote": "Lưu ý: Chỉ chuyển đổi giữa các ứng dụng sẽ không cập nhật Safari PWA. Cần khởi động lại hoàn toàn."
       }
     },
+    "photos": {
+      "capture": "Chụp Ảnh",
+      "retake": "Chụp Lại",
+      "upload": "Tải lên",
+      "keep": "Sử dụng ảnh này",
+      "uploading": "Đang tải ảnh lên",
+      "permissionDenied": "Không có quyền truy cập máy ảnh",
+      "tryAgain": "Thử lại"
+    },
+    "upload": "Tải lên",
+    "viewOnMap": "Xem trên Google Maps",
+    "googleMapsUrl": "Liên Kết Google Maps",
+    "googleMapsUrlPlaceholder": "https://maps.app.goo.gl/...",
     "contact": "Liên Hệ",
     "firstName": "Tên",
     "lastName": "Họ",
@@ -766,16 +775,13 @@
   "customer": {
     "company": "Công Ty",
     "address": "Địa Chỉ",
-    "googleMapsUrl": "Liên Kết Google Maps",
     "taxCode": "Mã Số Thuế",
-    "viewOnMap": "Xem trên Google Maps",
     "searchPlaceholder": "Tìm khách hàng theo tên, công ty, email hoặc điện thoại...",
     "namePlaceholder": "Tên khách hàng",
     "companyPlaceholder": "Tên công ty",
     "emailPlaceholder": "khachhang@example.com",
     "phonePlaceholder": "+84901234567",
     "addressPlaceholder": "Địa chỉ",
-    "googleMapsUrlPlaceholder": "https://maps.app.goo.gl/...",
     "taxCodePlaceholder": "Mã Số Thuế (Tùy Chọn)",
     "created": "Đã Tạo Khách Hàng",
     "createdMessage": "Khách hàng '{{name}}' đã được tạo thành công",
@@ -1194,29 +1200,22 @@
     "invalidQuantity": "Số lượng không hợp lệ",
     "productAlreadyAdded": "Sản phẩm {{productCode}} đã được thêm",
     "autoFilledFromCustomerAddress": "Tự động điền từ địa chỉ khách hàng",
+    "deliveryRequest": "Yêu Cầu Giao Hàng",
     "createDeliveryRequest": "Tạo Yêu Cầu Giao Hàng",
     "deliveryRequestCreated": "Tạo yêu cầu giao hàng thành công",
     "deliveryRequestCreateFailed": "Không thể tạo yêu cầu giao hàng"
   },
   "delivery": {
     "list": {
-      "title": "Quản Lý Giao Hàng",
-      "description": "Theo dõi và quản lý yêu cầu giao hàng cho đơn đặt hàng",
-      "count": "{{count}} yêu cầu giao hàng",
-      "empty": {
-        "title": "Không Có Yêu Cầu Giao Hàng",
-        "description": "Tạo yêu cầu giao hàng đầu tiên từ đơn hàng đã giao"
-      },
-      "tableView": "Xem Dạng Bảng"
+      "title": "Quản Lý Giao Hàng"
     },
     "actions": {
       "create": "Tạo Yêu Cầu Giao Hàng",
       "startTransit": "Bắt Đầu Vận Chuyển",
+      "startTransitDescription": "Đánh dấu yêu cầu giao hàng này đang vận chuyển",
+      "takePhoto": "Chụp Ảnh",
       "complete": "Hoàn Thành Giao Hàng",
-      "uploadPhotos": "Tải Ảnh Lên",
-      "delete": "Hủy Yêu Cầu",
-      "edit": "Sửa Yêu Cầu",
-      "viewDetails": "Xem Chi Tiết"
+      "cancel": "Hủy Yêu Cầu"
     },
     "status": {
       "pending": "Chờ Xử Lý",
@@ -1279,20 +1278,16 @@
       "clearFilters": "Xóa Bộ Lọc"
     },
     "detail": {
-      "title": "Chi Tiết Yêu Cầu Giao Hàng",
+      "title": "Chi Tiết Giao Hàng",
       "overview": "Tổng Quan",
       "purchaseOrderInfo": "Thông Tin Đơn Đặt Hàng",
       "deliveryInfo": "Thông Tin Giao Hàng",
       "timeline": "Dòng Thời Gian",
       "photos": "Ảnh Giao Hàng",
       "noPhotos": "Chưa có ảnh nào được tải lên",
-      "uploadPhotos": "Tải Ảnh Lên",
-      "maxPhotos": "Tối đa 5 ảnh",
       "statusHistory": "Lịch Sử Trạng Thái",
       "assignmentInfo": "Thông Tin Phân Công"
     },
-    "startTransit": "Bắt Đầu Vận Chuyển",
-    "startTransitDescription": "Đánh dấu yêu cầu giao hàng này đang vận chuyển",
     "completeDelivery": "Hoàn Thành Giao Hàng",
     "completeDeliveryDescription": "Đánh dấu giao hàng này đã hoàn thành với ảnh chứng minh",
     "markAsCompleted": "Đánh Dấu Hoàn Thành",
@@ -1311,17 +1306,6 @@
     "enterCompletionNotes": "Nhập ghi chú hoàn thành",
     "completionNotesDescription": "Ghi chú về việc hoàn thành giao hàng",
     "notFound": "Không tìm thấy yêu cầu giao hàng",
-    "photos": {
-      "camera": "Máy Ảnh",
-      "takePhoto": "Chụp Ảnh",
-      "selectFiles": "Chọn Tệp",
-      "capture": "Chụp",
-      "uploading": "Đang tải ảnh lên...",
-      "noPhotosSelected": "Chưa chọn ảnh nào",
-      "invalidFileType": "Loại tệp không hợp lệ. Vui lòng chọn tệp ảnh (JPEG, PNG, WebP)",
-      "fileTooLarge": "Tệp quá lớn. Vui lòng chọn tệp nhỏ hơn 5MB",
-      "someFilesSkipped": "Một số tệp đã bị bỏ qua do giới hạn kích thước hoặc loại tệp"
-    },
     "workflows": {
       "startTransit": {
         "title": "Bắt Đầu Vận Chuyển",
@@ -1334,8 +1318,7 @@
         "description": "Đánh dấu giao hàng này đã hoàn thành với ảnh chứng minh",
         "confirmMessage": "Bạn có chắc chắn muốn đánh dấu giao hàng này đã hoàn thành?",
         "photosRequired": "Cần ít nhất một ảnh",
-        "notesPlaceholder": "Nhập ghi chú hoàn thành",
-        "uploadPhotos": "Tải Ảnh Chứng Minh"
+        "notesPlaceholder": "Nhập ghi chú hoàn thành"
       },
       "cancel": {
         "title": "Hủy Yêu Cầu Giao Hàng",
@@ -1344,7 +1327,12 @@
         "reasonRequired": "Vui lòng cung cấp lý do hủy",
         "reasonPlaceholder": "Nhập lý do hủy"
       }
-    }
+    },
+    "noDeliveryRequestsFoundSearch": "Không tìm thấy yêu cầu giao hàng phù hợp với tìm kiếm",
+    "noDeliveryRequestsFound": "Không có yêu cầu giao hàng",
+    "tryDifferentSearch": "Thử điều chỉnh tiêu chí tìm kiếm",
+    "createFirstDeliveryRequestDescription": "Tạo yêu cầu giao hàng đầu tiên từ đơn đặt hàng",
+    "noMoreDeliveryRequests": "Không còn yêu cầu giao hàng nào để tải"
   },
   "timekeeper": {
     "greeting": {

@@ -83,8 +83,8 @@ export function CustomerFormModal({
               {...form.getInputProps('address')}
             />
             <TextInput
-              label={t('customer.googleMapsUrl')}
-              placeholder={t('customer.googleMapsUrlPlaceholder')}
+              label={t('common.googleMapsUrl')}
+              placeholder={t('common.googleMapsUrlPlaceholder')}
               error={form.errors.googleMapsUrl}
               disabled={isLoading}
               {...form.getInputProps('googleMapsUrl')}

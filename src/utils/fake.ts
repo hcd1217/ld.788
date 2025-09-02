@@ -293,6 +293,8 @@ export function nameAndGender() {
 export function fakeEmail(name: string) {
   const domains = ['gmail.com', 'yahoo.com', 'company.com', 'business.com', 'corp.com'];
   return (
-    normalizeVietnameseChars(name).toLowerCase().replace(/\s+/g, '.') + '@' + randomElement(domains)
+    normalizeVietnameseChars(name).toLowerCase().replaceAll(/\s+/g, '.') +
+    '@' +
+    randomElement(domains)
   );
 }

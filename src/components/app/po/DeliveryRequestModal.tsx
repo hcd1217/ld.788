@@ -9,6 +9,7 @@ import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { formatDate } from '@/utils/time';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
+import type { PICType } from '@/services/sales/deliveryRequest';
 
 type DeliveryRequestModalProps = {
   readonly opened: boolean;
@@ -16,7 +17,7 @@ type DeliveryRequestModalProps = {
   readonly onClose: () => void;
   readonly onConfirm: (data: {
     assignedTo: string;
-    assignedType: 'EMPLOYEE' | 'USER';
+    assignedType: PICType;
     scheduledDate: string;
     notes: string;
   }) => Promise<void>;
@@ -126,7 +127,7 @@ export function DeliveryRequestModal({
         label={t('delivery.fields.scheduledDate')}
         placeholder={t('delivery.form.selectDate')}
         value={scheduledDate}
-        onChange={(value) => setScheduledDate(typeof value === 'string' ? null : value)}
+        onChange={(date) => setScheduledDate(date ? new Date(date) : null)}
         required
         minDate={new Date()}
         leftSection={<IconCalendar size={16} />}
@@ -182,7 +183,10 @@ export function DeliveryRequestModal({
         if (opened) handleOpen();
       }}
       title={t('delivery.actions.create')}
+      centered
       size="md"
+      trapFocus
+      returnFocus
     >
       {content}
     </Modal>

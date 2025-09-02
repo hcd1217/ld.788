@@ -5,7 +5,7 @@ import type { UseFormReturnType } from '@mantine/form';
 
 type POCustomerSelectionProps = {
   readonly form: UseFormReturnType<any>;
-  readonly customers: Customer[];
+  readonly customers: readonly Customer[];
   readonly selectedCustomer: Customer | undefined;
   readonly isEditMode?: boolean;
 };

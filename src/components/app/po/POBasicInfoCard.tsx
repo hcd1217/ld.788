@@ -1,165 +1,49 @@
-import {
-  Card,
-  Stack,
-  Group,
-  Divider,
-  Grid,
-  Text,
-  Badge,
-  ActionIcon,
-  Tooltip,
-  SimpleGrid,
-} from '@mantine/core';
-import { IconBuilding, IconMapPin, IconCalendar } from '@tabler/icons-react';
+import { Card, Stack, Group, Divider, Grid, Text, SimpleGrid } from '@mantine/core';
 import { useTranslation } from '@/hooks/useTranslation';
+import { POInfoSection } from './POInfoSection';
+import { PODatesSection } from './PODatesSection';
+import { POStatusHistorySection } from './POStatusHistorySection';
+import { PODeliverySection } from './PODeliverySection';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { formatDate, formatDateTime } from '@/utils/time';
-import { POStatusBadge } from './POStatusBadge';
-import { useCustomerMapByCustomerId, useEmployeeMapByUserId } from '@/stores/useAppStore';
-import { getEmployeeNameByUserId, getCustomerNameByCustomerId } from '@/utils/overview';
 import {
-  getStatusHistoryByStatus,
   getCancelReason,
   getRefundReason,
   getDeliveryNotes,
   getShippingInfo,
 } from '@/utils/purchaseOrder';
+import { ViewOnMap } from '@/components/common';
 
 type POBasicInfoCardProps = {
   readonly purchaseOrder: PurchaseOrder;
   readonly onNavigateToItemsList?: () => void;
 };
 
-const span = { base: 12, md: 6 };
-
 export function POBasicInfoCard({ purchaseOrder, onNavigateToItemsList }: POBasicInfoCardProps) {
   const { t } = useTranslation();
-  const employeeMapByUserId = useEmployeeMapByUserId();
-  const customerMapByCustomerId = useCustomerMapByCustomerId();
 
   return (
     <Card shadow="sm" padding="xl" radius="md">
       <Stack gap="lg">
-        <Grid>
-          <Grid.Col span={span}>
-            <Stack gap="md">
-              <div>
-                <Text size="sm" fw={500} c="dimmed">
-                  {t('po.poNumber')}
-                </Text>
-                <Text size="lg" fw={600}>
-                  {purchaseOrder.poNumber}
-                </Text>
-              </div>
-
-              <div>
-                <Text size="sm" fw={500} c="dimmed">
-                  {t('po.poStatus')}
-                </Text>
-                <Group justify="start" gap="sm" align="center">
-                  <POStatusBadge status={purchaseOrder.status} size="md" />
-                </Group>
-              </div>
-            </Stack>
-          </Grid.Col>
-
-          <Grid.Col span={span}>
-            <Stack gap="md">
-              <div>
-                <Text size="sm" fw={500} c="dimmed">
-                  {t('po.customer')}
-                </Text>
-                <Group gap="xs">
-                  <IconBuilding size={16} color="var(--mantine-color-gray-6)" />
-                  <div>
-                    <Text fw={500}>
-                      {getCustomerNameByCustomerId(
-                        customerMapByCustomerId,
-                        purchaseOrder.customerId,
-                      )}
-                    </Text>
-                  </div>
-                </Group>
-              </div>
-
-              <div>
-                <Text size="sm" fw={500} c="dimmed">
-                  {t('po.items')}
-                </Text>
-                <Badge
-                  variant="transparent"
-                  size="lg"
-                  style={{ cursor: 'pointer' }}
-                  onClick={onNavigateToItemsList}
-                >
-                  {purchaseOrder.items.length} {t('po.itemsCount')}
-                </Badge>
-              </div>
-            </Stack>
-          </Grid.Col>
-        </Grid>
+        <POInfoSection
+          purchaseOrder={purchaseOrder}
+          onNavigateToItemsList={onNavigateToItemsList}
+        />
+        <Divider />
+        <PODatesSection purchaseOrder={purchaseOrder} />
         <Divider />
         <Grid>
-          <Grid.Col span={span}>
-            <div>
-              <Text size="sm" fw={500} c="dimmed">
-                {t('po.orderDate')}
-              </Text>
-              <Group gap="xs">
-                <IconCalendar size={16} color="var(--mantine-color-gray-6)" />
-                <Text>{formatDate(purchaseOrder.orderDate)}</Text>
-              </Group>
-            </div>
-          </Grid.Col>
-          <Grid.Col span={span}>
-            <div>
-              <Text size="sm" fw={500} c="dimmed">
-                {t('po.deliveryDate')}
-              </Text>
-              <Group gap="xs">
-                <IconCalendar size={16} color="var(--mantine-color-gray-6)" />
-                <Text>{formatDate(purchaseOrder.deliveryDate)}</Text>
-              </Group>
-            </div>
-          </Grid.Col>
-          <Grid.Col span={span}>
-            <div>
-              <Text size="sm" fw={500} c="dimmed">
-                {t('po.completedDate')}
-              </Text>
-              <Group gap="xs">
-                <IconCalendar size={16} color="var(--mantine-color-gray-6)" />
-                <Text>{formatDateTime(purchaseOrder.completedDate)}</Text>
-              </Group>
-            </div>
-          </Grid.Col>
-        </Grid>
-        <Divider />
-        <Grid>
-          <Grid.Col span={span}>
+          <Grid.Col span={{ base: 12, md: 6 }}>
             <div>
               <Group justify="start" align="center" mb="xs">
                 <Text size="sm" fw={500} c="dimmed">
                   {t('po.shippingAddress')}
                 </Text>
-                {purchaseOrder.googleMapsUrl && (
-                  <Tooltip label={t('customer.viewOnMap')}>
-                    <ActionIcon
-                      size="sm"
-                      variant="subtle"
-                      onClick={() =>
-                        window.open(purchaseOrder.googleMapsUrl!, '_blank', 'noopener,noreferrer')
-                      }
-                    >
-                      <IconMapPin size={16} />
-                    </ActionIcon>
-                  </Tooltip>
-                )}
+                <ViewOnMap googleMapsUrl={purchaseOrder.googleMapsUrl} />
               </Group>
               <Text size="sm">{purchaseOrder.address}</Text>
             </div>
           </Grid.Col>
-          <Grid.Col span={span}>
+          <Grid.Col span={{ base: 12, md: 6 }}>
             <div>
               <Text size="sm" fw={500} c="dimmed" mb="xs">
                 {t('po.notes')}
@@ -197,6 +81,8 @@ export function POBasicInfoCard({ purchaseOrder, onNavigateToItemsList }: POBasi
             </div>
           )}
 
+          <PODeliverySection purchaseOrder={purchaseOrder} />
+
           {(() => {
             const shippingInfo = getShippingInfo(purchaseOrder.statusHistory);
             if (!shippingInfo) return null;
@@ -219,36 +105,7 @@ export function POBasicInfoCard({ purchaseOrder, onNavigateToItemsList }: POBasi
             );
           })()}
         </SimpleGrid>
-        <Grid>
-          {(() => {
-            const statusesToShow = [
-              { status: 'NEW', label: 'createdBy' },
-              { status: 'CONFIRMED', label: 'confirmedBy' },
-              { status: 'PROCESSING', label: 'processedBy' },
-              { status: 'SHIPPED', label: 'shippedBy' },
-              { status: 'DELIVERED', label: 'deliveredBy' },
-            ] as const;
-
-            return statusesToShow.map(({ status, label }) => {
-              const entry = getStatusHistoryByStatus(purchaseOrder.statusHistory, status);
-              if (!entry) return null;
-
-              return (
-                <Grid.Col key={status} span={span}>
-                  <div>
-                    <Text size="sm" fw={500} c="dimmed">
-                      {t(`po.${label}`)}
-                    </Text>
-                    <Text>{getEmployeeNameByUserId(employeeMapByUserId, entry.userId)}</Text>
-                    <Text size="xs" c="dimmed">
-                      {formatDateTime(entry.timestamp)}
-                    </Text>
-                  </div>
-                </Grid.Col>
-              );
-            });
-          })()}
-        </Grid>
+        <POStatusHistorySection purchaseOrder={purchaseOrder} />
       </Stack>
     </Card>
   );

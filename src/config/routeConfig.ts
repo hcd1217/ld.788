@@ -104,8 +104,6 @@ const ROUTE_DEFINITIONS = {
 
   // Delivery management
   DELIVERY_MANAGEMENT: { id: 'delivery-management', path: '/delivery-management' },
-  DELIVERY_SCHEDULE: { id: 'delivery-schedule', path: '/delivery-schedule' },
-  DELIVERY_TRACKING: { id: 'delivery-tracking', path: '/delivery-tracking' },
   DELIVERY_DETAIL: { id: 'delivery-detail', path: '/delivery/:deliveryId' },
 
   // Sample/Error routes

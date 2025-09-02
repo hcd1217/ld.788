@@ -5,14 +5,12 @@ import {
   type CreateDeliveryRequest,
   type UpdateDeliveryRequest,
   type DeliveryStatus,
-  type DeliveryStatusHistory,
 } from '@/lib/api/schemas/deliveryRequest.schemas';
 import { logError, logInfo } from '@/utils/logger';
 
 // Re-export types for compatibility
 export type {
   DeliveryStatus,
-  DeliveryStatusHistory,
   PICType,
   CreateDeliveryRequest,
   UpdateDeliveryRequest,
@@ -21,36 +19,22 @@ export type {
 
 // Frontend types with transformed metadata
 export type DeliveryRequest = Omit<ApiDeliveryRequest, 'metadata'> & {
-  deliveryOrder?: number;
-  statusHistory?: DeliveryStatusHistory[];
+  deliveryRequestNumber: string;
+  purchaseOrderNumber?: string;
 };
 
 export type DeliveryRequestDetail = Omit<ApiDeliveryRequestDetail, 'metadata'> & {
-  deliveryOrder?: number;
-  statusHistory?: DeliveryStatusHistory[];
+  purchaseOrderNumber?: string;
 };
 
 /**
  * Transform API DeliveryRequest to Frontend DeliveryRequest
  */
 function transformApiToFrontend(apiDR: ApiDeliveryRequest): DeliveryRequest {
-  const { metadata, ...rest } = apiDR;
+  const { ...rest } = apiDR;
   return {
     ...rest,
-    deliveryOrder: metadata?.deliveryOrder,
-    statusHistory: metadata?.statusHistory,
-  };
-}
-
-/**
- * Transform API DeliveryRequestDetail to Frontend DeliveryRequestDetail
- */
-function transformApiDetailToFrontend(apiDR: ApiDeliveryRequestDetail): DeliveryRequestDetail {
-  const { metadata, ...rest } = apiDR;
-  return {
-    ...rest,
-    deliveryOrder: metadata?.deliveryOrder,
-    statusHistory: metadata?.statusHistory,
+    purchaseOrderNumber: apiDR.poNumber,
   };
 }
 
@@ -118,7 +102,7 @@ export const deliveryRequestService = {
     try {
       const dr = await deliveryRequestApi.getDeliveryRequestById(id);
       if (dr) {
-        return transformApiDetailToFrontend(dr);
+        return transformApiToFrontend(dr);
       }
     } catch (error) {
       logError('Failed to get delivery request by ID', {
@@ -150,7 +134,7 @@ export const deliveryRequestService = {
     }
   },
 
-  async updateDeliveryRequest(id: string, data: UpdateDeliveryRequest): Promise<DeliveryRequest> {
+  async updateDeliveryRequest(id: string, data: UpdateDeliveryRequest): Promise<void> {
     try {
       logInfo('Updating delivery request', {
         module: 'DeliveryRequestService',
@@ -158,8 +142,7 @@ export const deliveryRequestService = {
         metadata: { id, data },
       });
 
-      const response = await deliveryRequestApi.updateDeliveryRequest(id, data);
-      return transformApiToFrontend(response);
+      await deliveryRequestApi.updateDeliveryRequest(id, data);
     } catch (error) {
       logError('Failed to update delivery request', {
         module: 'DeliveryRequestService',
@@ -170,30 +153,7 @@ export const deliveryRequestService = {
     }
   },
 
-  async deleteDeliveryRequest(id: string): Promise<void> {
-    try {
-      logInfo('Deleting delivery request', {
-        module: 'DeliveryRequestService',
-        action: 'deleteDeliveryRequest',
-        metadata: { id },
-      });
-
-      await deliveryRequestApi.deleteDeliveryRequest(id);
-    } catch (error) {
-      logError('Failed to delete delivery request', {
-        module: 'DeliveryRequestService',
-        action: 'deleteDeliveryRequest',
-        metadata: { id, error },
-      });
-      throw error;
-    }
-  },
-
-  async updateDeliveryStatus(
-    id: string,
-    status: DeliveryStatus,
-    notes?: string,
-  ): Promise<DeliveryRequest> {
+  async updateDeliveryStatus(id: string, status: DeliveryStatus, notes?: string): Promise<void> {
     try {
       logInfo('Updating delivery status', {
         module: 'DeliveryRequestService',
@@ -201,8 +161,7 @@ export const deliveryRequestService = {
         metadata: { id, status, notes },
       });
 
-      const response = await deliveryRequestApi.updateDeliveryStatus(id, { status, notes });
-      return transformApiToFrontend(response);
+      await deliveryRequestApi.updateDeliveryStatus(id, { status, notes });
     } catch (error) {
       logError('Failed to update delivery status', {
         module: 'DeliveryRequestService',
@@ -213,7 +172,7 @@ export const deliveryRequestService = {
     }
   },
 
-  async uploadPhotos(id: string, photoUrls: string[]): Promise<DeliveryRequest> {
+  async uploadPhotos(id: string, photoUrls: string[]): Promise<void> {
     try {
       logInfo('Uploading delivery photos', {
         module: 'DeliveryRequestService',
@@ -221,8 +180,7 @@ export const deliveryRequestService = {
         metadata: { id, photoCount: photoUrls.length },
       });
 
-      const response = await deliveryRequestApi.uploadDeliveryPhotos(id, { photoUrls });
-      return transformApiToFrontend(response);
+      await deliveryRequestApi.uploadDeliveryPhotos(id, { photoUrls });
     } catch (error) {
       logError('Failed to upload delivery photos', {
         module: 'DeliveryRequestService',
@@ -236,7 +194,7 @@ export const deliveryRequestService = {
   async completeDelivery(
     id: string,
     data?: { photoUrls?: string[]; notes?: string },
-  ): Promise<DeliveryRequest> {
+  ): Promise<void> {
     try {
       logInfo('Completing delivery', {
         module: 'DeliveryRequestService',
@@ -244,8 +202,7 @@ export const deliveryRequestService = {
         metadata: { id, hasPhotos: !!data?.photoUrls, hasNotes: !!data?.notes },
       });
 
-      const response = await deliveryRequestApi.completeDelivery(id, data || {});
-      return transformApiToFrontend(response);
+      await deliveryRequestApi.completeDelivery(id, data || {});
     } catch (error) {
       logError('Failed to complete delivery', {
         module: 'DeliveryRequestService',

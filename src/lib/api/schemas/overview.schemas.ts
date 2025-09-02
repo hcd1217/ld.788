@@ -1,6 +1,6 @@
 import * as z from 'zod/v4';
 import { idSchema, numberSchema, optionalStringSchema, stringSchema } from './common.schemas';
-import { ProductStatusSchema } from './sales.schemas';
+import { ProductStatusSchema } from './product.schemas';
 
 // Employee overview schema
 export const EmployeeOverviewSchema = z.object({

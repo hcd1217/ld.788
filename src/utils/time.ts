@@ -132,17 +132,20 @@ export function getEndDateHighlightStyles(
   const status = getEndDateStatus(endDate, isActive);
 
   switch (status) {
-    case 'ended_but_active':
+    case 'ended_but_active': {
       return {
         backgroundColor: 'var(--mantine-color-red-0)',
         borderColor: 'var(--mantine-color-red-3)',
       };
-    case 'ending_soon':
+    }
+    case 'ending_soon': {
       return {
         backgroundColor: 'var(--mantine-color-yellow-0)',
         borderColor: 'var(--mantine-color-yellow-3)',
       };
-    default:
+    }
+    default: {
       return {};
+    }
   }
 }

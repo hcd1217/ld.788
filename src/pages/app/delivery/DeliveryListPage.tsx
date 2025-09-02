@@ -1,38 +1,14 @@
-import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router';
-import {
-  Stack,
-  Group,
-  SimpleGrid,
-  Button,
-  Affix,
-  ActionIcon,
-  Loader,
-  Text,
-  Center,
-  Flex,
-} from '@mantine/core';
-import {
-  IconTruckDelivery,
-  IconPlus,
-  IconChevronLeft,
-  IconChevronRight,
-} from '@tabler/icons-react';
+import { useMemo, useState, useEffect, useRef } from 'react';
+import { Stack, Group, SimpleGrid, Button, Loader, Text, Center, Flex } from '@mantine/core';
+import { IconTruckDelivery, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeliveryRequestFilters } from '@/hooks/useDeliveryRequestFilters';
 import {
   useDeliveryRequests,
   useDeliveryRequestLoading,
   useDeliveryRequestError,
-  useLoadDeliveryRequestsWithFilter,
-  useClearDeliveryRequestError,
-  useHasMoreDeliveryRequests,
-  useHasPreviousPage,
-  useIsLoadingMore,
-  useCurrentPage,
-  useLoadNextPage,
-  useLoadPreviousPage,
-  useLoadMoreDeliveryRequests,
+  useDeliveryRequestActions,
+  useDeliveryRequestPaginationState,
 } from '@/stores/useDeliveryRequestStore';
 import { useCustomers } from '@/stores/useAppStore';
 import {
@@ -55,28 +31,26 @@ import {
   DeliveryErrorBoundary,
 } from '@/components/app/delivery';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { ROUTERS } from '@/config/routeConfig';
 import { DELIVERY_STATUS } from '@/constants/deliveryRequest';
 import { useViewMode } from '@/hooks/useViewMode';
 import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
 
 export function DeliveryListPage() {
-  const navigate = useNavigate();
   const { isMobile, isDesktop } = useDeviceType();
   const { t } = useTranslation();
   const deliveryRequests = useDeliveryRequests();
   const customers = useCustomers();
   const isLoading = useDeliveryRequestLoading();
   const error = useDeliveryRequestError();
-  const loadDeliveryRequestsWithFilter = useLoadDeliveryRequestsWithFilter();
-  const clearError = useClearDeliveryRequestError();
-  const hasMoreDeliveryRequests = useHasMoreDeliveryRequests();
-  const hasPreviousPage = useHasPreviousPage();
-  const isLoadingMore = useIsLoadingMore();
-  const currentPage = useCurrentPage();
-  const loadNextPage = useLoadNextPage();
-  const loadPreviousPage = useLoadPreviousPage();
-  const loadMoreDeliveryRequests = useLoadMoreDeliveryRequests();
+  const {
+    loadDeliveryRequestsWithFilter,
+    loadMoreDeliveryRequests,
+    loadNextPage,
+    loadPreviousPage,
+    clearError,
+  } = useDeliveryRequestActions();
+  const { hasMoreDeliveryRequests, hasPreviousPage, isLoadingMore, currentPage } =
+    useDeliveryRequestPaginationState();
 
   // Search input state with debounce
   const [searchInput, setSearchInput] = useState('');
@@ -180,18 +154,17 @@ export function DeliveryListPage() {
     }
   }, [isNearBottom, hasMoreDeliveryRequests, isLoadingMore, isLoading, loadMoreDeliveryRequests]);
 
-  // Memoized navigation handlers
-  const handleNavigateToAdd = useCallback(() => {
-    navigate(ROUTERS.DELIVERY_MANAGEMENT + '/create');
-  }, [navigate]);
-
   // Common BlankState configuration to reduce duplication
   const blankStateProps = useMemo(
     () => ({
       hidden: deliveryRequests.length > 0 || isLoading,
       icon: <IconTruckDelivery size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />,
-      title: hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound'),
-      description: hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription'),
+      title: hasActiveFilters
+        ? t('delivery.noDeliveryRequestsFoundSearch')
+        : t('delivery.noDeliveryRequestsFound'),
+      description: hasActiveFilters
+        ? t('delivery.tryDifferentSearch')
+        : t('delivery.createFirstDeliveryRequestDescription'),
     }),
     [deliveryRequests.length, isLoading, hasActiveFilters, t],
   );
@@ -308,20 +281,7 @@ export function DeliveryListPage() {
             </Flex>
           )}
 
-          {/* Floating Action Button for Add Delivery */}
-          {!isLoading && (
-            <Affix position={{ bottom: 120, right: 20 }}>
-              <ActionIcon
-                size="xl"
-                radius="xl"
-                color="blue"
-                onClick={handleNavigateToAdd}
-                aria-label={t('delivery.actions.create')}
-              >
-                <IconPlus size={24} />
-              </ActionIcon>
-            </Affix>
-          )}
+          {/* Note: Delivery requests are created from PO pages, not directly */}
         </DeliveryErrorBoundary>
       </AppMobileLayout>
     );
@@ -334,9 +294,7 @@ export function DeliveryListPage() {
           <AppPageTitle title={t('delivery.list.title')} />
           <Group gap="sm">
             <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
-            <Button leftSection={<IconPlus size={16} />} onClick={handleNavigateToAdd}>
-              {t('delivery.actions.create')}
-            </Button>
+            {/* Note: Delivery requests are created from PO pages, not directly */}
           </Group>
         </Group>
 
@@ -362,14 +320,7 @@ export function DeliveryListPage() {
         {/* Content Area */}
         <BlankState
           {...blankStateProps}
-          button={
-            hasActiveFilters
-              ? undefined
-              : {
-                  label: t('delivery.actions.create'),
-                  onClick: handleNavigateToAdd,
-                }
-          }
+          // Note: Delivery requests are created from PO pages, not directly
         />
 
         {/* Data Display */}
@@ -401,7 +352,7 @@ export function DeliveryListPage() {
             {!hasMoreDeliveryRequests && deliveryRequests.length > 0 && (
               <Center py="md">
                 <Text size="sm" c="dimmed">
-                  {t('po.noMorePOs')}
+                  {t('delivery.noMoreDeliveryRequests')}
                 </Text>
               </Center>
             )}

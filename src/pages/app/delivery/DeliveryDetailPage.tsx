@@ -8,11 +8,7 @@ import {
   useCurrentDeliveryRequest,
   useDeliveryRequestLoading,
   useDeliveryRequestError,
-  useLoadDeliveryRequest,
-  useClearDeliveryRequestError,
-  useUpdateDeliveryStatus,
-  useCompleteDelivery,
-  useUploadPhotos,
+  useDeliveryRequestActions,
 } from '@/stores/useDeliveryRequestStore';
 import { useDeliveryModals } from '@/hooks/useDeliveryModals';
 import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
@@ -34,11 +30,8 @@ export function DeliveryDetailPage() {
   const error = useDeliveryRequestError();
 
   // Store actions
-  const loadDeliveryRequest = useLoadDeliveryRequest();
-  const clearError = useClearDeliveryRequestError();
-  const updateDeliveryStatus = useUpdateDeliveryStatus();
-  const completeDelivery = useCompleteDelivery();
-  const uploadPhotos = useUploadPhotos();
+  const { loadDeliveryRequest, clearError, updateDeliveryStatus, completeDelivery, uploadPhotos } =
+    useDeliveryRequestActions();
 
   // Modal management
   const { modals, selectedDeliveryRequest, closeModal, handlers } = useDeliveryModals();
@@ -69,9 +62,9 @@ export function DeliveryDetailPage() {
     }
   };
 
-  const handleUploadPhotos = () => {
+  const handleTakeDeliveryPhoto = () => {
     if (deliveryRequest) {
-      handlers.handleUploadPhotos(deliveryRequest);
+      handlers.handleTakeDeliveryPhoto(deliveryRequest);
     }
   };
 
@@ -131,9 +124,7 @@ export function DeliveryDetailPage() {
     },
   });
 
-  const title = deliveryRequest
-    ? `DR-${deliveryRequest.id.slice(-6)}`
-    : t('delivery.detail.title' as any);
+  const title = deliveryRequest ? `DR-${deliveryRequest.id.slice(-6)}` : t('delivery.detail.title');
 
   // Mobile layout
   if (isMobile) {
@@ -170,7 +161,7 @@ export function DeliveryDetailPage() {
             isLoading={isLoading}
             onStartTransit={handleStartTransit}
             onComplete={handleComplete}
-            onUploadPhotos={handleUploadPhotos}
+            onTakePhoto={handleTakeDeliveryPhoto}
           />
         </Stack>
 
@@ -193,7 +184,6 @@ export function DeliveryDetailPage() {
           opened={modals.uploadPhotos}
           onClose={handleCloseModal('uploadPhotos')}
           onUpload={uploadPhotosAction}
-          existingPhotos={selectedDeliveryRequest?.photoUrls}
         />
       </AppMobileLayout>
     );
@@ -212,33 +202,11 @@ export function DeliveryDetailPage() {
           isLoading={isLoading}
           onStartTransit={handleStartTransit}
           onComplete={handleComplete}
-          onUploadPhotos={handleUploadPhotos}
+          onTakePhoto={handleTakeDeliveryPhoto}
         />
       ) : (
         <ResourceNotFound message={t('delivery.notFound')} />
       )}
-
-      {/* Modal components */}
-      <DeliveryStatusModal
-        opened={modals.startTransit}
-        mode="start_transit"
-        deliveryRequest={selectedDeliveryRequest}
-        onClose={handleCloseModal('startTransit')}
-        onConfirm={startTransitAction}
-      />
-      <DeliveryStatusModal
-        opened={modals.complete}
-        mode="complete"
-        deliveryRequest={selectedDeliveryRequest}
-        onClose={handleCloseModal('complete')}
-        onConfirm={completeDeliveryAction}
-      />
-      <DeliveryPhotoUpload
-        opened={modals.uploadPhotos}
-        onClose={handleCloseModal('uploadPhotos')}
-        onUpload={uploadPhotosAction}
-        existingPhotos={selectedDeliveryRequest?.photoUrls}
-      />
     </AppDesktopLayout>
   );
 }

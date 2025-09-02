@@ -18,6 +18,7 @@
       "salesPoManagement": "[Sales] Purchase Orders",
       "procurementManagement": "Procurement Requests",
       "deliveryManagement": "Delivery Management",
+      "deliveryManagementMobile": "Delivery",
       "masterData": "Master Data",
       "configuration": "Configuration",
       "staffManagement": "Staff Management",
@@ -36,32 +37,40 @@
       "roleManagement": "Role Management"
     },
     "pwa": {
-      "update": {
-        "newVersionAvailable": "New Version Available",
-        "newVersionAvailableForBrowser": "New version available",
-        "updating": "Updating...",
-        "clickToUpdate": "Click here to update now.",
-        "clickToUpdateShort": "Click to update now.",
-        "reloadIn3Seconds": "The app will reload in 3 seconds.",
-        "reloadAutomatically": "The app will reload automatically.",
-        "offlineReady": "Ready to work offline",
-        "appAvailableOffline": "{{appName}} App is now available offline!",
-        "newVersionOfApp": "A new version of {{appName}} App is available. Click to update.",
-        "safari": {
-          "closeCompletelyInstructions": "Close Safari completely (swipe up → swipe app away), then reopen from home screen.",
-          "updateGuideTitle": "How to Update Safari PWA",
-          "updateInstructions": "To update the app on Safari, you must completely close the app:",
-          "step1": "Double-tap home button or swipe up from bottom",
-          "step2": "Find this app and swipe UP to close completely",
-          "step3": "Wait 2-3 seconds for Safari to fully close",
-          "step4": "Tap the app icon on home screen to reopen",
-          "restartNote": "Note: Simply switching between apps won't update Safari PWAs. A complete restart is required."
-        }
-      },
-      "settings": {
-        "autoUpdate": {}
+      "newVersionAvailable": "New Version Available",
+      "newVersionAvailableForBrowser": "New version available",
+      "updating": "Updating...",
+      "clickToUpdate": "Click here to update now.",
+      "clickToUpdateShort": "Click to update now.",
+      "reloadIn3Seconds": "The app will reload in 3 seconds.",
+      "reloadAutomatically": "The app will reload automatically.",
+      "offlineReady": "Ready to work offline",
+      "appAvailableOffline": "{{appName}} App is now available offline!",
+      "newVersionOfApp": "A new version of {{appName}} App is available. Click to update.",
+      "safari": {
+        "closeCompletelyInstructions": "Close Safari completely (swipe up → swipe app away), then reopen from home screen.",
+        "updateGuideTitle": "How to Update Safari PWA",
+        "updateInstructions": "To update the app on Safari, you must completely close the app:",
+        "step1": "Double-tap home button or swipe up from bottom",
+        "step2": "Find this app and swipe UP to close completely",
+        "step3": "Wait 2-3 seconds for Safari to fully close",
+        "step4": "Tap the app icon on home screen to reopen",
+        "restartNote": "Note: Simply switching between apps won't update Safari PWAs. A complete restart is required."
       }
     },
+    "photos": {
+      "capture": "Capture",
+      "retake": "Retake",
+      "upload": "Upload",
+      "keep": "Use this photo",
+      "uploading": "Uploading photos...",
+      "permissionDenied": "Permission denied",
+      "tryAgain": "Try again"
+    },
+    "upload": "Upload",
+    "viewOnMap": "View on Google Maps",
+    "googleMapsUrl": "Google Maps URL",
+    "googleMapsUrlPlaceholder": "https://maps.app.goo.gl/...",
     "contact": "Contact",
     "firstName": "First name",
     "lastName": "Last name",
@@ -766,16 +775,13 @@
   "customer": {
     "company": "Company",
     "address": "Address",
-    "googleMapsUrl": "Google Maps URL",
     "taxCode": "Tax Code",
-    "viewOnMap": "View on Google Maps",
     "searchPlaceholder": "Search customers by name, company, email, or phone...",
     "namePlaceholder": "Customer Name",
     "companyPlaceholder": "Company Name",
     "emailPlaceholder": "customer@example.com",
     "phonePlaceholder": "+84901234567",
     "addressPlaceholder": "Address",
-    "googleMapsUrlPlaceholder": "https://maps.app.goo.gl/...",
     "taxCodePlaceholder": "Tax Code (Optional)",
     "created": "Customer Created",
     "createdMessage": "Customer '{{name}}' has been successfully created",
@@ -1065,6 +1071,7 @@
     "delivered": "Order marked as delivered",
     "deliveryDate": "Delivery Date",
     "deliveryNotes": "Delivery Notes",
+    "deliveryRequest": "Delivery Request",
     "createDeliveryRequest": "Create Delivery Request",
     "deliveryRequestCreated": "Delivery request created successfully",
     "deliveryRequestCreateFailed": "Failed to create delivery request",
@@ -1200,23 +1207,15 @@
   },
   "delivery": {
     "list": {
-      "title": "Delivery Management",
-      "description": "Track and manage delivery requests for purchase orders",
-      "count": "{{count}} delivery requests",
-      "empty": {
-        "title": "No Delivery Requests",
-        "description": "Create your first delivery request from a delivered purchase order"
-      },
-      "tableView": "Table View"
+      "title": "Delivery Management"
     },
     "actions": {
       "create": "Create Delivery Request",
       "startTransit": "Start Transit",
+      "startTransitDescription": "Mark this delivery request as in transit",
+      "takePhoto": "Take Photo",
       "complete": "Complete Delivery",
-      "uploadPhotos": "Upload Photos",
-      "delete": "Cancel Request",
-      "edit": "Edit Request",
-      "viewDetails": "View Details"
+      "cancel": "Cancel Request"
     },
     "status": {
       "pending": "Pending",
@@ -1279,20 +1278,16 @@
       "clearFilters": "Clear Filters"
     },
     "detail": {
-      "title": "Delivery Request Details",
+      "title": "Delivery Details",
       "overview": "Overview",
       "purchaseOrderInfo": "Purchase Order Information",
       "deliveryInfo": "Delivery Information",
       "timeline": "Timeline",
       "photos": "Delivery Photos",
       "noPhotos": "No photos uploaded yet",
-      "uploadPhotos": "Upload Photos",
-      "maxPhotos": "Maximum 5 photos allowed",
       "statusHistory": "Status History",
       "assignmentInfo": "Assignment Information"
     },
-    "startTransit": "Start Transit",
-    "startTransitDescription": "Mark this delivery request as in transit",
     "completeDelivery": "Complete Delivery",
     "completeDeliveryDescription": "Mark this delivery as completed with proof photos",
     "markAsCompleted": "Mark as Completed",
@@ -1335,17 +1330,6 @@
     "enterCompletionNotes": "Enter completion notes",
     "completionNotesDescription": "Notes about the completed delivery",
     "notFound": "Delivery request not found",
-    "photos": {
-      "camera": "Camera",
-      "takePhoto": "Take Photo",
-      "selectFiles": "Select Files",
-      "capture": "Capture",
-      "uploading": "Uploading photos...",
-      "noPhotosSelected": "No photos selected",
-      "invalidFileType": "Invalid file type. Please select image files (JPEG, PNG, WebP)",
-      "fileTooLarge": "File too large. Please select files smaller than 5MB",
-      "someFilesSkipped": "Some files were skipped due to size or type restrictions"
-    },
     "workflows": {
       "startTransit": {
         "title": "Start Transit",
@@ -1358,8 +1342,7 @@
         "description": "Mark this delivery as completed with proof photos",
         "confirmMessage": "Are you sure you want to mark this delivery as completed?",
         "photosRequired": "At least one photo is required",
-        "notesPlaceholder": "Enter completion notes",
-        "uploadPhotos": "Upload Proof Photos"
+        "notesPlaceholder": "Enter completion notes"
       },
       "cancel": {
         "title": "Cancel Delivery Request",

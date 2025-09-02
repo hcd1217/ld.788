@@ -116,8 +116,8 @@ export function usePWA() {
           // Safari in standalone mode - requires complete app restart
           notifications.show({
             id: 'safari-update',
-            title: t('common.pwa.update.newVersionAvailable'),
-            message: t('common.pwa.update.safari.closeCompletelyInstructions'),
+            title: t('common.pwa.newVersionAvailable'),
+            message: t('common.pwa.safari.closeCompletelyInstructions'),
             color: 'blue',
             autoClose: false,
             withCloseButton: true,
@@ -130,8 +130,8 @@ export function usePWA() {
           // Chrome with auto-update enabled
           notifications.show({
             id: 'auto-update',
-            title: t('common.pwa.update.updating'),
-            message: t('common.pwa.update.reloadIn3Seconds'),
+            title: t('common.pwa.updating'),
+            message: t('common.pwa.reloadIn3Seconds'),
             color: 'blue',
             autoClose: 3000,
           });
@@ -146,8 +146,8 @@ export function usePWA() {
           // Manual update for other cases
           notifications.show({
             id: 'manual-update',
-            title: t('common.pwa.update.newVersionAvailable'),
-            message: t('common.pwa.update.clickToUpdate'),
+            title: t('common.pwa.newVersionAvailable'),
+            message: t('common.pwa.clickToUpdate'),
             color: 'blue',
             autoClose: false,
             onClick() {
@@ -215,8 +215,8 @@ export function usePWA() {
 
           notifications.show({
             id: 'pwa-updating',
-            title: t('common.pwa.update.updating'),
-            message: t('common.pwa.update.reloadAutomatically'),
+            title: t('common.pwa.updating'),
+            message: t('common.pwa.reloadAutomatically'),
             color: 'blue',
             autoClose: 3000,
           });
@@ -224,8 +224,8 @@ export function usePWA() {
           // Manual update prompt
           notifications.show({
             id: 'pwa-update-sw',
-            title: t('common.pwa.update.newVersionAvailableForBrowser'),
-            message: t('common.pwa.update.clickToUpdateShort'),
+            title: t('common.pwa.newVersionAvailableForBrowser'),
+            message: t('common.pwa.clickToUpdateShort'),
             color: 'blue',
             autoClose: false,
             onClick: async () => {
@@ -243,8 +243,8 @@ export function usePWA() {
         // For non-Chromium browsers
         notifications.show({
           id: 'pwa-update-sw',
-          title: t('common.pwa.update.newVersionAvailableForBrowser'),
-          message: t('common.pwa.update.newVersionOfApp', {
+          title: t('common.pwa.newVersionAvailableForBrowser'),
+          message: t('common.pwa.newVersionOfApp', {
             appName: import.meta.env.VITE_APP_NAME || 'Credo',
           }),
           color: 'blue',
@@ -270,8 +270,8 @@ export function usePWA() {
   useEffect(() => {
     if (offlineReady) {
       showSuccessNotification(
-        t('common.pwa.update.offlineReady'),
-        t('common.pwa.update.appAvailableOffline', {
+        t('common.pwa.offlineReady'),
+        t('common.pwa.appAvailableOffline', {
           appName: import.meta.env.VITE_APP_NAME || 'Credo',
         }),
       );

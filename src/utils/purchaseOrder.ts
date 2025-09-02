@@ -40,7 +40,7 @@ export function getLatestStatusHistory(
 ): POStatusHistory | undefined {
   if (!statusHistory || statusHistory.length === 0) return undefined;
   // StatusHistory is already sorted by timestamp from backend
-  return statusHistory[statusHistory.length - 1];
+  return statusHistory.at(-1);
 }
 
 /**
@@ -75,6 +75,7 @@ export function getShippingInfo(
 ): { trackingNumber?: string; carrier?: string } | undefined {
   const shippedEntry = getStatusHistoryByStatus(statusHistory, 'SHIPPED');
   if (!shippedEntry) return undefined;
+  if (!shippedEntry.trackingNumber || !shippedEntry.carrier) return undefined;
   return {
     trackingNumber: shippedEntry.trackingNumber,
     carrier: shippedEntry.carrier,

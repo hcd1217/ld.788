@@ -20,7 +20,7 @@ import {
 import { getPOEditRoute, getDeliveryListRoute, ROUTERS } from '@/config/routeConfig';
 import { useAction } from '@/hooks/useAction';
 import { isPOEditable } from '@/utils/purchaseOrder';
-import { deliveryRequestApi } from '@/lib/api';
+import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
 
 export function PODetailPage() {
   const { poId } = useParams<{ poId: string }>();
@@ -222,6 +222,8 @@ export function PODetailPage() {
     },
   });
 
+  const { createDeliveryRequest } = useDeliveryRequestActions();
+
   const createDeliveryAction = useAction({
     options: {
       successTitle: t('common.success'),
@@ -234,7 +236,7 @@ export function PODetailPage() {
       if (!data || !purchaseOrder) {
         throw new Error(t('po.deliveryRequestCreateFailed'));
       }
-      await deliveryRequestApi.createDeliveryRequest({
+      await createDeliveryRequest({
         purchaseOrderId: purchaseOrder.id,
         assignedTo: data.assignedTo,
         assignedType: 'EMPLOYEE' as const,
@@ -314,7 +316,7 @@ export function PODetailPage() {
 
   const title = purchaseOrder ? purchaseOrder.poNumber : t('po.poDetails');
 
-  // Show edit button when PO is editable (status = NEW)
+  // Show edit button when PO is editable (status = NEW) - moved before early returns
   const isEditable = purchaseOrder && isPOEditable(purchaseOrder);
 
   if (isMobile) {

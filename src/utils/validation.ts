@@ -3,7 +3,7 @@ import type { TranslationFunction } from '@/hooks/useTranslation';
 // Validation regex patterns
 export const VALIDATION_PATTERNS = {
   email: /^\S+@\S+\.\S+$/,
-  password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&()^])[A-Za-z\d@#$!%*?&()^]{8,}$/,
+  password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#$%&()*?@^])[\d!#$%&()*?@A-Z^a-z]{8,}$/,
 } as const;
 
 // Validation constraints

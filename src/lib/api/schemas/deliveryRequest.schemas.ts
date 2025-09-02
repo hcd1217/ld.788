@@ -6,6 +6,7 @@ import {
   stringSchema,
   timestampSchema,
   numberSchema,
+  AddressSchema,
 } from './common.schemas';
 
 // ========== Delivery Request Schemas ==========
@@ -18,32 +19,22 @@ export type DeliveryStatus = z.infer<typeof DeliveryStatusSchema>;
 export const PICTypeSchema = z.enum(['EMPLOYEE', 'USER']);
 export type PICType = z.infer<typeof PICTypeSchema>;
 
-// Status History schema
-const DeliveryStatusHistorySchema = z.object({
-  status: DeliveryStatusSchema,
-  timestamp: timestampSchema,
-  userId: idSchema,
-  notes: optionalStringSchema,
-});
-
 // Delivery Request base schema
 export const DeliveryRequestSchema = z.object({
   id: idSchema,
-  purchaseOrderId: idSchema,
+  deliveryRequestNumber: stringSchema,
   status: DeliveryStatusSchema,
-  assignedTo: optionalStringSchema,
+  purchaseOrderId: idSchema,
+  poNumber: optionalStringSchema,
+  customerId: idSchema.optional(),
+  customerName: stringSchema.optional(),
+  assignedTo: idSchema.optional(),
   assignedType: PICTypeSchema.optional(),
-  assignedName: optionalStringSchema,
   scheduledDate: timestampSchema,
   completedDate: timestampSchema.optional(),
-  notes: optionalStringSchema,
+  notes: stringSchema.optional(),
   photoUrls: z.array(stringSchema).optional(),
-  metadata: z
-    .looseObject({
-      statusHistory: z.array(DeliveryStatusHistorySchema).optional(),
-      deliveryOrder: numberSchema.optional(),
-    })
-    .optional(),
+  deliveryAddress: AddressSchema.optional(),
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
 });
@@ -118,7 +109,6 @@ export const GetDeliveryRequestResponseSchema = DeliveryRequestDetailSchema;
 
 export type DeliveryRequest = z.infer<typeof DeliveryRequestSchema>;
 export type DeliveryRequestDetail = z.infer<typeof DeliveryRequestDetailSchema>;
-export type DeliveryStatusHistory = z.infer<typeof DeliveryStatusHistorySchema>;
 
 export type CreateDeliveryRequest = z.infer<typeof CreateDeliveryRequestSchema>;
 export type UpdateDeliveryRequest = z.infer<typeof UpdateDeliveryRequestSchema>;

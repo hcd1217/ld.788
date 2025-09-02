@@ -1,16 +1,21 @@
-import { Stack, Accordion, Group, Button, Text, Badge, Grid } from '@mantine/core';
-import { IconTruck, IconCheck, IconPhoto, IconPackage, IconUser } from '@tabler/icons-react';
+import { Stack, Accordion, Group, Button, Text, Grid } from '@mantine/core';
+import { IconTruck, IconCheck, IconPhoto, IconPackage, IconMapPin } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequestDetail } from '@/services/sales/deliveryRequest';
 import { formatDate } from '@/utils/time';
-import { DELIVERY_STATUS_COLORS } from '@/constants/deliveryRequest';
+import { useMemo } from 'react';
+import { useEmployeeMapByEmployeeId, useEmployeeMapByUserId } from '@/stores/useAppStore';
+import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
+import { DeliveryStatusBadge } from './DeliveryStatusBadge';
+import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
+import { ViewOnMap } from '@/components/common';
 
 type DeliveryDetailAccordionProps = {
   readonly deliveryRequest: DeliveryRequestDetail;
   readonly isLoading?: boolean;
   readonly onStartTransit: () => void;
   readonly onComplete: () => void;
-  readonly onUploadPhotos: () => void;
+  readonly onTakePhoto: () => void;
 };
 
 export function DeliveryDetailAccordion({
@@ -18,62 +23,81 @@ export function DeliveryDetailAccordion({
   isLoading,
   onStartTransit,
   onComplete,
-  onUploadPhotos,
+  onTakePhoto,
 }: DeliveryDetailAccordionProps) {
   const { t } = useTranslation();
+  const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
+  const employeeMapByUserId = useEmployeeMapByUserId();
+  const { canStartTransit, canComplete, canTakePhoto } = useMemo(() => {
+    const canStartTransit = deliveryRequest.status === 'PENDING';
+    const canComplete = deliveryRequest.status === 'IN_TRANSIT';
+    const canTakePhoto = deliveryRequest.status !== 'PENDING';
+    return {
+      canStartTransit,
+      canComplete,
+      canTakePhoto,
+    };
+  }, [deliveryRequest.status]);
 
-  const canStartTransit = deliveryRequest.status === 'PENDING';
-  const canComplete = deliveryRequest.status === 'IN_TRANSIT';
-  const canUploadPhotos = deliveryRequest.status !== 'PENDING';
+  const assignedName = useMemo(() => {
+    if (!deliveryRequest.assignedTo) {
+      return t('common.notAssigned');
+    }
+    if (deliveryRequest.assignedType === 'EMPLOYEE') {
+      return getEmployeeNameByEmployeeId(employeeMapByEmployeeId, deliveryRequest.assignedTo);
+    }
+    return getEmployeeNameByUserId(employeeMapByUserId, deliveryRequest.assignedTo);
+  }, [
+    t,
+    deliveryRequest.assignedTo,
+    deliveryRequest.assignedType,
+    employeeMapByEmployeeId,
+    employeeMapByUserId,
+  ]);
+
+  // Delivery info fields for cleaner rendering
+  const deliveryInfoFields = useMemo(
+    () => [
+      {
+        label: t('delivery.fields.status'),
+        value: <DeliveryStatusBadge status={deliveryRequest.status} />,
+      },
+      {
+        label: t('delivery.fields.poNumber'),
+        value: deliveryRequest.purchaseOrder?.poNumber,
+      },
+      {
+        label: t('delivery.fields.customer'),
+        value: deliveryRequest.purchaseOrder?.customer?.name,
+      },
+      {
+        label: t('delivery.fields.scheduledDate'),
+        value: deliveryRequest.scheduledDate
+          ? formatDate(deliveryRequest.scheduledDate)
+          : t('common.notScheduled'),
+      },
+      ...(deliveryRequest.completedDate
+        ? [
+            {
+              label: t('delivery.fields.completedDate'),
+              value: formatDate(deliveryRequest.completedDate),
+            },
+          ]
+        : []),
+      {
+        label: t('delivery.fields.notes'),
+        value: deliveryRequest.notes || '-',
+      },
+      {
+        label: t('delivery.fields.assignedTo'),
+        value: assignedName,
+      },
+    ],
+    [t, deliveryRequest, assignedName],
+  );
 
   return (
     <Stack gap="md">
-      {/* Status and Actions */}
-      <Group justify="center">
-        <Badge color={DELIVERY_STATUS_COLORS[deliveryRequest.status]} size="lg">
-          {t(`delivery.status.${deliveryRequest.status.toLowerCase()}` as any)}
-        </Badge>
-      </Group>
-
-      {/* Action Buttons */}
-      <Group justify="center">
-        {canStartTransit && (
-          <Button
-            leftSection={<IconTruck size={16} />}
-            color="orange"
-            onClick={onStartTransit}
-            disabled={isLoading}
-            fullWidth
-          >
-            {t('delivery.actions.startTransit')}
-          </Button>
-        )}
-
-        {canComplete && (
-          <Button
-            leftSection={<IconCheck size={16} />}
-            color="green"
-            onClick={onComplete}
-            disabled={isLoading}
-            fullWidth
-          >
-            {t('delivery.actions.complete')}
-          </Button>
-        )}
-
-        {canUploadPhotos && (
-          <Button
-            leftSection={<IconPhoto size={16} />}
-            variant="outline"
-            onClick={onUploadPhotos}
-            disabled={isLoading}
-            fullWidth
-          >
-            {t('delivery.actions.uploadPhotos')}
-          </Button>
-        )}
-      </Group>
-
       {/* Details Accordion */}
       <Accordion defaultValue="delivery-info">
         {/* Delivery Information */}
@@ -83,109 +107,40 @@ export function DeliveryDetailAccordion({
           </Accordion.Control>
           <Accordion.Panel>
             <Stack gap="sm">
-              <Grid>
-                <Grid.Col span={4}>
-                  <Text size="xs" c="dimmed">
-                    {t('delivery.fields.poNumber')}
-                  </Text>
-                </Grid.Col>
-                <Grid.Col span={8}>
-                  <Text size="sm" fw={500}>
-                    {deliveryRequest.purchaseOrder?.poNumber}
-                  </Text>
-                </Grid.Col>
-              </Grid>
-
-              <Grid>
-                <Grid.Col span={4}>
-                  <Text size="xs" c="dimmed">
-                    {t('delivery.fields.customer')}
-                  </Text>
-                </Grid.Col>
-                <Grid.Col span={8}>
-                  <Text size="sm" fw={500}>
-                    {deliveryRequest.purchaseOrder?.customer?.name}
-                  </Text>
-                </Grid.Col>
-              </Grid>
-
-              <Grid>
-                <Grid.Col span={4}>
-                  <Text size="xs" c="dimmed">
-                    {t('delivery.fields.scheduledDate')}
-                  </Text>
-                </Grid.Col>
-                <Grid.Col span={8}>
-                  <Text size="sm" fw={500}>
-                    {deliveryRequest.scheduledDate
-                      ? formatDate(deliveryRequest.scheduledDate)
-                      : t('common.notScheduled')}
-                  </Text>
-                </Grid.Col>
-              </Grid>
-
-              {deliveryRequest.completedDate && (
-                <Grid>
+              {deliveryInfoFields.map((field, index) => (
+                <Grid key={index}>
                   <Grid.Col span={4}>
                     <Text size="xs" c="dimmed">
-                      {t('delivery.fields.completedDate')}
+                      {field.label}
                     </Text>
                   </Grid.Col>
                   <Grid.Col span={8}>
-                    <Text size="sm" fw={500}>
-                      {formatDate(deliveryRequest.completedDate)}
-                    </Text>
+                    {typeof field.value === 'string' || !field.value ? (
+                      <Text size="sm" fw={500}>
+                        {field.value}
+                      </Text>
+                    ) : (
+                      field.value
+                    )}
                   </Grid.Col>
                 </Grid>
-              )}
-
-              {deliveryRequest.notes && (
-                <div>
-                  <Text size="xs" c="dimmed" mb="xs">
-                    {t('delivery.fields.notes')}
-                  </Text>
-                  <Text size="sm">{deliveryRequest.notes}</Text>
-                </div>
-              )}
+              ))}
             </Stack>
           </Accordion.Panel>
         </Accordion.Item>
 
-        {/* Assignment Information */}
-        <Accordion.Item value="assignment-info">
-          <Accordion.Control icon={<IconUser size={20} />}>
-            {t('delivery.detail.assignmentInfo')}
+        {/* Delivery Address */}
+        <Accordion.Item value="address">
+          <Accordion.Control icon={<IconMapPin size={20} />}>
+            <Group justify="start" align="center" gap="sm">
+              <Text size="sm">{t('po.shippingAddress')}</Text>
+              <ViewOnMap googleMapsUrl={deliveryRequest.deliveryAddress?.googleMapsUrl} />
+            </Group>
           </Accordion.Control>
           <Accordion.Panel>
-            <Stack gap="sm">
-              <Grid>
-                <Grid.Col span={4}>
-                  <Text size="xs" c="dimmed">
-                    {t('delivery.fields.assignedTo')}
-                  </Text>
-                </Grid.Col>
-                <Grid.Col span={8}>
-                  <Text size="sm" fw={500}>
-                    {deliveryRequest.assignedName || t('common.notAssigned')}
-                  </Text>
-                </Grid.Col>
-              </Grid>
-
-              {deliveryRequest.assignedType && (
-                <Grid>
-                  <Grid.Col span={4}>
-                    <Text size="xs" c="dimmed">
-                      {t('delivery.fields.assignedType')}
-                    </Text>
-                  </Grid.Col>
-                  <Grid.Col span={8}>
-                    <Text size="sm" fw={500}>
-                      {t(`delivery.assignmentTypes.${deliveryRequest.assignedType}`)}
-                    </Text>
-                  </Grid.Col>
-                </Grid>
-              )}
-            </Stack>
+            <Group justify="space-between" align="flex-start">
+              <Text size="sm">{deliveryRequest.deliveryAddress?.oneLineAddress || '-'}</Text>
+            </Group>
           </Accordion.Panel>
         </Accordion.Item>
 
@@ -195,30 +150,52 @@ export function DeliveryDetailAccordion({
             {t('delivery.detail.photos')}
           </Accordion.Control>
           <Accordion.Panel>
-            {deliveryRequest.photoUrls && deliveryRequest.photoUrls.length > 0 ? (
-              <Stack gap="xs">
-                {deliveryRequest.photoUrls.map((url, index) => (
-                  <img
-                    key={index}
-                    src={url}
-                    alt={`Delivery photo ${index + 1}`}
-                    style={{
-                      width: '100%',
-                      height: '200px',
-                      objectFit: 'cover',
-                      borderRadius: '4px',
-                    }}
-                  />
-                ))}
-              </Stack>
-            ) : (
-              <Text size="sm" c="dimmed" ta="center" py="xl">
-                {t('delivery.detail.noPhotos')}
-              </Text>
-            )}
+            <DeliveryPhotoGallery
+              photoUrls={deliveryRequest.photoUrls}
+              withScrollArea
+              scrollAreaHeight="50vh"
+            />
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion>
+
+      {/* Action Buttons */}
+      <Group justify="space-between" m="lg">
+        {canTakePhoto ? (
+          <Button
+            leftSection={<IconPhoto size={16} />}
+            variant="outline"
+            onClick={onTakePhoto}
+            disabled={isLoading}
+          >
+            {t('delivery.actions.takePhoto')}
+          </Button>
+        ) : (
+          <div> </div>
+        )}
+        {!canStartTransit && (
+          <Button
+            leftSection={<IconTruck size={16} />}
+            color="orange"
+            onClick={onStartTransit}
+            disabled={isLoading}
+            w="50%"
+          >
+            {t('delivery.actions.startTransit')}
+          </Button>
+        )}
+        {canComplete && (
+          <Button
+            leftSection={<IconCheck size={16} />}
+            color="green"
+            onClick={onComplete}
+            disabled={isLoading}
+            w="50%"
+          >
+            {t('delivery.actions.complete')}
+          </Button>
+        )}
+      </Group>
     </Stack>
   );
 }

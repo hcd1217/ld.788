@@ -5,15 +5,18 @@ import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { SelectableCard } from '@/components/common';
 import { getDeliveryDetailRoute } from '@/config/routeConfig';
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
-import { formatDateTime } from '@/utils/time';
+import { formatDate, formatDateTime, getLocaleFormat } from '@/utils/time';
+import { getEmployeeNameByEmployeeId } from '@/utils/overview';
+import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
 
 type DeliveryGridCardProps = {
   readonly deliveryRequest: DeliveryRequest;
 };
 
 export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
-  const { t } = useTranslation();
+  const { t, currentLanguage } = useTranslation();
   const navigate = useNavigate();
+  const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
 
   return (
     <SelectableCard
@@ -38,15 +41,25 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
         <Group justify="space-between" align="flex-start">
           <div>
             <Text fw={500} size="lg">
-              DR-{deliveryRequest.id.slice(-6)}
+              {deliveryRequest.deliveryRequestNumber}
             </Text>
             <Stack gap="xs" mt="xs">
+              {deliveryRequest.customerName && (
+                <div>
+                  <Text size="sm" fw={500}>
+                    {t('delivery.fields.customer')}
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    {deliveryRequest.customerName}
+                  </Text>
+                </div>
+              )}
               <div>
                 <Text size="sm" fw={500}>
                   {t('delivery.fields.purchaseOrder')}
                 </Text>
                 <Text size="sm" c="dimmed">
-                  {deliveryRequest.purchaseOrderId}
+                  {deliveryRequest.purchaseOrderNumber || '-'}
                 </Text>
               </div>
               <div>
@@ -54,16 +67,19 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
                   {t('delivery.fields.scheduledDate')}
                 </Text>
                 <Text size="sm" c="dimmed">
-                  {formatDateTime(deliveryRequest.scheduledDate)}
+                  {formatDate(deliveryRequest.scheduledDate, getLocaleFormat(currentLanguage))}
                 </Text>
               </div>
-              {deliveryRequest.assignedName && (
+              {deliveryRequest.assignedTo && (
                 <div>
                   <Text size="sm" fw={500}>
                     {t('delivery.fields.assignedTo')}
                   </Text>
                   <Text size="sm" c="dimmed">
-                    {deliveryRequest.assignedName}
+                    {getEmployeeNameByEmployeeId(
+                      employeeMapByEmployeeId,
+                      deliveryRequest.assignedTo,
+                    )}
                   </Text>
                 </div>
               )}
@@ -73,7 +89,10 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
                     {t('delivery.fields.completedDate')}
                   </Text>
                   <Text size="sm" c="dimmed">
-                    {formatDateTime(deliveryRequest.completedDate)}
+                    {formatDateTime(
+                      deliveryRequest.completedDate,
+                      getLocaleFormat(currentLanguage),
+                    )}
                   </Text>
                 </div>
               )}

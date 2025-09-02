@@ -184,10 +184,6 @@ export class SalesApi extends BaseApiClient {
     );
   }
 
-  async deletePurchaseOrder(id: string): Promise<void> {
-    return this.delete(`/api/sales/purchase-orders/${id}`);
-  }
-
   async confirmPurchaseOrder(id: string, data?: UpdatePOStatusRequest): Promise<void> {
     return this.patch<void, UpdatePOStatusRequest | undefined>(
       `/api/sales/purchase-orders/${id}/confirm`,

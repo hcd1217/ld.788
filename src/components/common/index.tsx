@@ -29,7 +29,7 @@ export {
   PWAInstallPrompt,
   SafariPWAGuide,
 } from './features';
-export { AppLogo, GoBack, MobileUserMenu } from './navigation';
+export { AppLogo, GoBack, MobileUserMenu, ViewOnMap } from './navigation';
 export { AppLoader, ErrorAlert, ErrorBoundary, ErrorModal, VersionInformation } from './feedback';
 export {
   AppDesktopLayout,

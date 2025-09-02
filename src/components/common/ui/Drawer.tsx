@@ -37,18 +37,13 @@ export function Drawer({
     return expanded ? '90vh' : size || '300px';
   };
 
-  // Calculate opacity for backdrop during drag
-  const getBackdropOpacity = () => {
-    return 0.8;
-  };
-
   return (
     <MantineDrawer
       ref={drawerRef}
       position={position}
       size={getDrawerSize()}
       overlayProps={{
-        opacity: getBackdropOpacity(),
+        opacity: 0.8,
       }}
       transitionProps={{
         transition: 'slide-up',

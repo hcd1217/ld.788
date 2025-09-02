@@ -4,7 +4,6 @@ import {
   CreateDeliveryRequestSchema,
   CreateDeliveryRequestResponseSchema,
   UpdateDeliveryRequestSchema,
-  UpdateDeliveryRequestResponseSchema,
   GetDeliveryRequestResponseSchema,
   UpdateDeliveryStatusSchema,
   UploadPhotosSchema,
@@ -13,7 +12,6 @@ import {
   type CreateDeliveryRequest,
   type CreateDeliveryRequestResponse,
   type UpdateDeliveryRequest,
-  type UpdateDeliveryRequestResponse,
   type GetDeliveryRequestResponse,
   type UpdateDeliveryStatus,
   type UploadPhotos,
@@ -79,54 +77,38 @@ export class DeliveryRequestApi extends BaseApiClient {
     );
   }
 
-  async updateDeliveryRequest(
-    id: string,
-    data: UpdateDeliveryRequest,
-  ): Promise<UpdateDeliveryRequestResponse> {
-    return this.patch<UpdateDeliveryRequestResponse, UpdateDeliveryRequest>(
+  async updateDeliveryRequest(id: string, data: UpdateDeliveryRequest): Promise<void> {
+    return this.patch<void, UpdateDeliveryRequest>(
       `/api/sales/delivery-requests/${id}`,
       data,
-      UpdateDeliveryRequestResponseSchema,
+      undefined,
       UpdateDeliveryRequestSchema,
     );
   }
 
-  async deleteDeliveryRequest(id: string): Promise<void> {
-    return this.delete(`/api/sales/delivery-requests/${id}`);
-  }
-
-  async updateDeliveryStatus(
-    id: string,
-    data: UpdateDeliveryStatus,
-  ): Promise<UpdateDeliveryRequestResponse> {
-    return this.patch<UpdateDeliveryRequestResponse, UpdateDeliveryStatus>(
+  async updateDeliveryStatus(id: string, data: UpdateDeliveryStatus): Promise<void> {
+    return this.patch<void, UpdateDeliveryStatus>(
       `/api/sales/delivery-requests/${id}/status`,
       data,
-      UpdateDeliveryRequestResponseSchema,
+      undefined,
       UpdateDeliveryStatusSchema,
     );
   }
 
-  async uploadDeliveryPhotos(
-    id: string,
-    data: UploadPhotos,
-  ): Promise<UpdateDeliveryRequestResponse> {
-    return this.post<UpdateDeliveryRequestResponse, UploadPhotos>(
+  async uploadDeliveryPhotos(id: string, data: UploadPhotos): Promise<void> {
+    return this.post<void, UploadPhotos>(
       `/api/sales/delivery-requests/${id}/photos`,
       data,
-      UpdateDeliveryRequestResponseSchema,
+      undefined,
       UploadPhotosSchema,
     );
   }
 
-  async completeDelivery(
-    id: string,
-    data: CompleteDelivery,
-  ): Promise<UpdateDeliveryRequestResponse> {
-    return this.post<UpdateDeliveryRequestResponse, CompleteDelivery>(
+  async completeDelivery(id: string, data: CompleteDelivery): Promise<void> {
+    return this.post<void, CompleteDelivery>(
       `/api/sales/delivery-requests/${id}/complete`,
       data,
-      UpdateDeliveryRequestResponseSchema,
+      undefined,
       CompleteDeliverySchema,
     );
   }

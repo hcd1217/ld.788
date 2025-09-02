@@ -85,7 +85,7 @@ export function LocationInput({
         const pacContainers = document.querySelectorAll('.pac-container');
         pacContainers.forEach((container) => {
           if (container && container.parentNode) {
-            container.parentNode.removeChild(container);
+            container.remove();
           }
         });
 

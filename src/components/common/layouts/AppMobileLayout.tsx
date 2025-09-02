@@ -1,11 +1,15 @@
 import React from 'react';
-import { AppShell, Container, Group, LoadingOverlay } from '@mantine/core';
+import { AppShell, Container, Group, LoadingOverlay, ActionIcon, Tooltip } from '@mantine/core';
+import { IconHome } from '@tabler/icons-react';
+import { useNavigate } from 'react-router';
 import { CommonMobileHeader } from '../ui/CommonMobileHeader';
 import { CommonMobileFooter } from '../ui';
 import { CommonMobileFooterSkeleton } from '../ui/CommonMobileFooterSkeleton';
 import { useAppStore } from '@/stores/useAppStore';
 import { AppLogo, GoBack } from '../navigation';
 import { ErrorAlert } from '../feedback';
+import { useTranslation } from '@/hooks/useTranslation';
+import { ROUTERS } from '@/config/routeConfig';
 import classes from './AppLayoutMobile.module.css';
 
 type AppMobileLayoutProps = {
@@ -37,11 +41,17 @@ export function AppMobileLayout({
   clearError,
 }: AppMobileLayoutProps) {
   const isDefaultHeader = !header && !noHeader;
+  const { t } = useTranslation();
+  const navigate = useNavigate();
 
   // Check if user profile is loading
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
   const user = useAppStore((state) => state.user);
   const isProfileLoading = isAuthenticated && !user;
+
+  const handleHomeClick = () => {
+    navigate(ROUTERS.HOME);
+  };
   return (
     <AppShell
       header={noHeader ? undefined : { height: 60, offset: false }}
@@ -81,7 +91,26 @@ export function AppMobileLayout({
           {children}
         </Container>
       </AppShell.Main>
-      {!noFooter && (
+      {noFooter ? (
+        /* Floating Home Button - always visible on mobile layouts */
+        <Tooltip label={t('common.pages.home')} position="top">
+          <ActionIcon
+            onClick={handleHomeClick}
+            size="lg"
+            radius="xl"
+            variant="filled"
+            color="var(--mantine-color-primary-filled)"
+            style={{
+              position: 'fixed',
+              bottom: 20,
+              left: 10,
+              zIndex: 100,
+            }}
+          >
+            <IconHome size={20} />
+          </ActionIcon>
+        </Tooltip>
+      ) : (
         <AppShell.Footer className={classes.footer}>
           {footer ?? (isProfileLoading ? <CommonMobileFooterSkeleton /> : <CommonMobileFooter />)}
         </AppShell.Footer>

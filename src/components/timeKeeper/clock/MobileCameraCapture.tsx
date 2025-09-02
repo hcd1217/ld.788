@@ -64,8 +64,8 @@ export function MobileCameraCapture({
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
-    } catch (err) {
-      logError('Camera access denied:', err, {
+    } catch (error_) {
+      logError('Camera access denied:', error_, {
         module: 'MobileCameraCapture',
         action: 'startCamera',
       });

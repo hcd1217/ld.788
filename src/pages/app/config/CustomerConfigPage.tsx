@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
-import { Paper, Text, Group, Button, Stack, ActionIcon, Tooltip } from '@mantine/core';
+import { Paper, Text, Group, Button, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
-import { IconPlus, IconUpload, IconMapPin } from '@tabler/icons-react';
+import { IconPlus, IconUpload } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAction } from '@/hooks/useAction';
 import {
@@ -15,6 +15,7 @@ import {
   ActiveBadge,
   ContactInfo,
   BulkImportModalContent,
+  ViewOnMap,
 } from '@/components/common';
 import { CustomerFormModal, type CustomerFormValues } from '@/components/app/config';
 import {
@@ -391,20 +392,7 @@ export function CustomerConfigPage() {
                           (MST: {customer.taxCode})
                         </Text>
                       )}
-                      {googleMapsUrl && (
-                        <Tooltip label={t('customer.viewOnMap')}>
-                          <ActionIcon
-                            size="xs"
-                            variant="subtle"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
-                            }}
-                          >
-                            <IconMapPin size={14} />
-                          </ActionIcon>
-                        </Tooltip>
-                      )}
+                      <ViewOnMap googleMapsUrl={googleMapsUrl} />
                     </Group>
                     {customer.address && (
                       <Group gap={4}>

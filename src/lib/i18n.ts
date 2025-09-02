@@ -99,7 +99,10 @@ function unFlattenTranslations(flatTranslations: string | Dictionary): Dictionar
       current = current[part] as Dictionary;
     }
 
-    current[parts[parts.length - 1]] = value;
+    const lastPart = parts.at(-1);
+    if (lastPart !== undefined) {
+      current[lastPart] = value;
+    }
   }
 
   return result;

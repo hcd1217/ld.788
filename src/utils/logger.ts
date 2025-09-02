@@ -11,9 +11,10 @@ console.ignore = () => {
 
 export function registerLogger() {
   const debug = false;
-  if (!debug && !isDevelopment) {
+  if (debug) {
     return;
   }
+
   const colorMap = {
     debug: 'green',
     info: 'blue',

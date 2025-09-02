@@ -62,7 +62,7 @@ export function ClientCreatePage() {
           return t('validation.fieldRequired');
         }
 
-        if (!/^[A-Z\d]{2,10}$/.test(value)) {
+        if (!/^[\dA-Z]{2,10}$/.test(value)) {
           return t('admin.clients.validation.clientCodeFormat');
         }
 

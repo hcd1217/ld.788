@@ -33,7 +33,7 @@ export function useDeliveryModals() {
       setModals((prev) => ({ ...prev, complete: true }));
     },
 
-    handleUploadPhotos: (dr: DeliveryRequestDetail) => {
+    handleTakeDeliveryPhoto: (dr: DeliveryRequestDetail) => {
       setSelectedDeliveryRequest(dr);
       setModals((prev) => ({ ...prev, uploadPhotos: true }));
     },

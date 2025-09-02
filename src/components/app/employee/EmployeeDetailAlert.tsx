@@ -19,22 +19,25 @@ export function EmployeeDetailAlert({ endDate, isActive }: EmployeeDetailAlertPr
 
   const getAlertProps = () => {
     switch (status) {
-      case 'ending_soon':
+      case 'ending_soon': {
         return {
           color: 'yellow',
           icon: <IconClock size={16} />,
           title: t('employee.endingSoon'),
           message: t('employee.endingSoonMessage'),
         };
-      case 'ended_but_active':
+      }
+      case 'ended_but_active': {
         return {
           color: 'red',
           icon: <IconAlertTriangle size={16} />,
           title: t('employee.endedButActive'),
           message: t('employee.endedButActiveMessage'),
         };
-      default:
+      }
+      default: {
         return null;
+      }
     }
   };
 

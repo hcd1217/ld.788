@@ -164,8 +164,8 @@ export function MagicLinkLoginPage() {
         );
         void verifyMagicLink();
       }
-    } catch (err) {
-      logError('Invalid QR code:', err, {
+    } catch (error_) {
+      logError('Invalid QR code:', error_, {
         module: 'MagicLinkLoginPagePage',
         action: 'clientCode',
       });
@@ -192,8 +192,8 @@ export function MagicLinkLoginPage() {
         );
         void verifyMagicLink();
       }
-    } catch (err) {
-      logError('Invalid manual code:', err, {
+    } catch (error_) {
+      logError('Invalid manual code:', error_, {
         module: 'MagicLinkLoginPagePage',
         action: 'clientCode',
       });

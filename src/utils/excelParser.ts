@@ -76,29 +76,37 @@ export const parseCustomerExcelFile = async (file: File): Promise<BulkCustomer[]
             if (!fieldName) continue;
 
             switch (fieldName) {
-              case 'name':
+              case 'name': {
                 customer.name = value;
                 break;
-              case 'companyName':
+              }
+              case 'companyName': {
                 customer.companyName = value;
                 break;
-              case 'contactEmail':
+              }
+              case 'contactEmail': {
                 customer.contactEmail = value;
                 break;
-              case 'contactPhone':
+              }
+              case 'contactPhone': {
                 customer.contactPhone = value;
                 break;
-              case 'address':
+              }
+              case 'address': {
                 customer.address = value;
                 break;
-              case 'googleMapsUrl':
+              }
+              case 'googleMapsUrl': {
                 customer.googleMapsUrl = value;
                 break;
-              case 'taxCode':
+              }
+              case 'taxCode': {
                 customer.taxCode = value;
                 break;
-              default:
+              }
+              default: {
                 break;
+              }
             }
           }
 
@@ -287,35 +295,45 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
             if (!fieldName) continue;
 
             switch (fieldName) {
-              case 'productCode':
+              case 'productCode': {
                 product.productCode = value;
                 break;
-              case 'name':
+              }
+              case 'name': {
                 product.name = value;
                 break;
-              case 'description':
+              }
+              case 'description': {
                 product.description = value;
                 break;
-              case 'category':
+              }
+              case 'category': {
                 product.category = value;
                 break;
-              case 'color':
+              }
+              case 'color': {
                 product.color = value;
                 break;
-              case 'status':
+              }
+              case 'status': {
                 product.status = value.toUpperCase();
                 break;
-              case 'unit':
+              }
+              case 'unit': {
                 product.unit = value;
                 break;
-              case 'sku':
+              }
+              case 'sku': {
                 product.sku = value;
                 break;
-              case 'barcode':
+              }
+              case 'barcode': {
                 product.barcode = value;
                 break;
-              default:
+              }
+              default: {
                 break;
+              }
             }
           }
 

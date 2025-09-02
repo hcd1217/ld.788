@@ -56,7 +56,7 @@ export function POActionZone({
     );
 
     switch (purchaseOrder.status) {
-      case 'NEW':
+      case 'NEW': {
         actions.push(
           <Button
             key="cancel"
@@ -79,8 +79,9 @@ export function POActionZone({
           </Button>,
         );
         break;
+      }
 
-      case 'CONFIRMED':
+      case 'CONFIRMED': {
         actions.push(
           <Button
             key="cancel"
@@ -103,8 +104,9 @@ export function POActionZone({
           </Button>,
         );
         break;
+      }
 
-      case 'PROCESSING':
+      case 'PROCESSING': {
         actions.push(
           <Button
             key="markReady"
@@ -115,19 +117,11 @@ export function POActionZone({
           >
             {t('po.markReady')}
           </Button>,
-          <Button
-            key="ship"
-            color="indigo"
-            loading={isLoading}
-            leftSection={<IconTruck size={16} />}
-            onClick={onShip}
-          >
-            {t('po.markShipped')}
-          </Button>,
         );
         break;
+      }
 
-      case 'READY_FOR_PICKUP':
+      case 'READY_FOR_PICKUP': {
         actions.push(
           <Button
             key="ship"
@@ -143,6 +137,7 @@ export function POActionZone({
             color="blue"
             variant="filled"
             loading={isLoading}
+            disabled={!!purchaseOrder.deliveryRequest}
             leftSection={<IconClipboardList size={16} />}
             onClick={onCreateDelivery}
           >
@@ -150,8 +145,9 @@ export function POActionZone({
           </Button>,
         );
         break;
+      }
 
-      case 'SHIPPED':
+      case 'SHIPPED': {
         actions.push(
           createRefundButton(),
           <Button
@@ -165,30 +161,34 @@ export function POActionZone({
           </Button>,
         );
         break;
+      }
 
-      case 'DELIVERED':
+      case 'DELIVERED': {
         actions.push(createRefundButton());
         break;
+      }
 
       case 'CANCELLED':
-      case 'REFUNDED':
+      case 'REFUNDED': {
         // No actions available
         break;
+      }
     }
 
     return actions;
   }, [
     purchaseOrder.status,
+    purchaseOrder.deliveryRequest,
     isLoading,
-    onRefund,
     t,
+    onRefund,
     onCancel,
     onConfirm,
     onProcess,
     onMarkReady,
     onShip,
-    onDeliver,
     onCreateDelivery,
+    onDeliver,
   ]);
 
   if (availableActions.length === 0) {

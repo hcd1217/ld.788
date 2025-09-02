@@ -303,9 +303,7 @@ export const demoTimesheetEntries = generateTimesheetEntries();
 // Log demo data initialization
 const startDate = demoTimesheetEntries.length > 0 ? demoTimesheetEntries[0].date : new Date();
 const endDate =
-  demoTimesheetEntries.length > 0
-    ? demoTimesheetEntries[demoTimesheetEntries.length - 1].date
-    : new Date();
+  demoTimesheetEntries.length > 0 ? (demoTimesheetEntries.at(-1)?.date ?? new Date()) : new Date();
 console.log('Demo timesheet data initialized:', {
   entriesCount: demoTimesheetEntries.length,
   dateRange: `${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`,

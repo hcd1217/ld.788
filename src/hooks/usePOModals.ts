@@ -37,27 +37,34 @@ export function usePOModals() {
       setActiveModal(type);
 
       switch (type) {
-        case 'confirm':
+        case 'confirm': {
           openConfirmModal();
           break;
-        case 'process':
+        }
+        case 'process': {
           openProcessModal();
           break;
-        case 'markReady':
+        }
+        case 'markReady': {
           openMarkReadyModal();
           break;
-        case 'ship':
+        }
+        case 'ship': {
           openShipModal();
           break;
-        case 'deliver':
+        }
+        case 'deliver': {
           openDeliverModal();
           break;
-        case 'cancel':
+        }
+        case 'cancel': {
           openCancelModal();
           break;
-        case 'refund':
+        }
+        case 'refund': {
           openRefundModal();
           break;
+        }
       }
     },
     [
@@ -77,27 +84,34 @@ export function usePOModals() {
       setActiveModal(null);
 
       switch (type) {
-        case 'confirm':
+        case 'confirm': {
           closeConfirmModal();
           break;
-        case 'process':
+        }
+        case 'process': {
           closeProcessModal();
           break;
-        case 'markReady':
+        }
+        case 'markReady': {
           closeMarkReadyModal();
           break;
-        case 'ship':
+        }
+        case 'ship': {
           closeShipModal();
           break;
-        case 'deliver':
+        }
+        case 'deliver': {
           closeDeliverModal();
           break;
-        case 'cancel':
+        }
+        case 'cancel': {
           closeCancelModal();
           break;
-        case 'refund':
+        }
+        case 'refund': {
           closeRefundModal();
           break;
+        }
       }
     },
     [

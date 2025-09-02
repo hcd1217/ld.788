@@ -1,80 +1,53 @@
-import { Stack, Group, Button, Card, Text, Grid, Badge } from '@mantine/core';
-import { IconTruck, IconCheck, IconPhoto } from '@tabler/icons-react';
+import { Stack, Group, Card, Text, Grid } from '@mantine/core';
+import { IconMapPin } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequestDetail } from '@/services/sales/deliveryRequest';
 import { formatDate } from '@/utils/time';
-import { DELIVERY_STATUS_COLORS } from '@/constants/deliveryRequest';
+import { useMemo } from 'react';
+import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
+import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
+import { useEmployeeMapByUserId } from '@/stores/useAppStore';
+import { DeliveryStatusBadge } from './DeliveryStatusBadge';
+import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
+import { ViewOnMap } from '@/components/common';
 
 type DeliveryDetailTabsProps = {
   readonly deliveryRequest: DeliveryRequestDetail;
   readonly isLoading?: boolean;
   readonly onStartTransit: () => void;
   readonly onComplete: () => void;
-  readonly onUploadPhotos: () => void;
+  readonly onTakePhoto: () => void;
 };
 
-export function DeliveryDetailTabs({
-  deliveryRequest,
-  isLoading,
-  onStartTransit,
-  onComplete,
-  onUploadPhotos,
-}: DeliveryDetailTabsProps) {
+export function DeliveryDetailTabs({ deliveryRequest }: DeliveryDetailTabsProps) {
   const { t } = useTranslation();
+  const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
+  const employeeMapByUserId = useEmployeeMapByUserId();
 
-  const canStartTransit = deliveryRequest.status === 'PENDING';
-  const canComplete = deliveryRequest.status === 'IN_TRANSIT';
-  const canUploadPhotos = deliveryRequest.status !== 'PENDING';
+  const assignedName = useMemo(() => {
+    if (!deliveryRequest.assignedTo) {
+      return t('common.notAssigned');
+    }
+    if (deliveryRequest.assignedType === 'EMPLOYEE') {
+      return getEmployeeNameByEmployeeId(employeeMapByEmployeeId, deliveryRequest.assignedTo);
+    }
+    return getEmployeeNameByUserId(employeeMapByUserId, deliveryRequest.assignedTo);
+  }, [
+    t,
+    deliveryRequest.assignedTo,
+    deliveryRequest.assignedType,
+    employeeMapByEmployeeId,
+    employeeMapByUserId,
+  ]);
 
   return (
     <Stack gap="lg">
       {/* Header with Actions */}
-      <Group justify="space-between">
-        <div>
-          <Text size="xl" fw={600}>
-            {t('delivery.deliveryId')}: DR-{deliveryRequest.id.slice(-6)}
-          </Text>
-          <Group gap="xs" mt="xs">
-            <Badge color={DELIVERY_STATUS_COLORS[deliveryRequest.status]} size="sm">
-              {t(`delivery.status.${deliveryRequest.status.toLowerCase()}` as any)}
-            </Badge>
-          </Group>
-        </div>
-
-        <Group gap="sm">
-          {canStartTransit && (
-            <Button
-              leftSection={<IconTruck size={16} />}
-              color="orange"
-              onClick={onStartTransit}
-              disabled={isLoading}
-            >
-              {t('delivery.actions.startTransit')}
-            </Button>
-          )}
-
-          {canComplete && (
-            <Button
-              leftSection={<IconCheck size={16} />}
-              color="green"
-              onClick={onComplete}
-              disabled={isLoading}
-            >
-              {t('delivery.actions.complete')}
-            </Button>
-          )}
-
-          {canUploadPhotos && (
-            <Button
-              leftSection={<IconPhoto size={16} />}
-              variant="outline"
-              onClick={onUploadPhotos}
-              disabled={isLoading}
-            >
-              {t('delivery.actions.uploadPhotos')}
-            </Button>
-          )}
-        </Group>
+      <Group justify="start" align="center" gap="md">
+        <Text size="xl" fw={600}>
+          {t('delivery.deliveryId')}: DR-{deliveryRequest.id.slice(-6)}
+        </Text>
+        <DeliveryStatusBadge status={deliveryRequest.status} />
       </Group>
 
       {/* Main Content */}
@@ -110,7 +83,7 @@ export function DeliveryDetailTabs({
                         {t('delivery.fields.assignedTo')}
                       </Text>
                       <Text size="sm" fw={500}>
-                        {deliveryRequest.assignedName || t('common.notAssigned')}
+                        {assignedName}
                       </Text>
                     </div>
                   </Stack>
@@ -141,9 +114,7 @@ export function DeliveryDetailTabs({
                       <Text size="sm" c="dimmed">
                         {t('delivery.fields.status')}
                       </Text>
-                      <Badge color={DELIVERY_STATUS_COLORS[deliveryRequest.status]} size="sm">
-                        {t(`delivery.status.${deliveryRequest.status.toLowerCase()}` as any)}
-                      </Badge>
+                      <DeliveryStatusBadge status={deliveryRequest.status} />
                     </div>
                   </Stack>
                 </Grid.Col>
@@ -158,6 +129,18 @@ export function DeliveryDetailTabs({
                 </div>
               )}
             </Card>
+
+            {/* Delivery Address */}
+            <Card withBorder>
+              <Group justify="space-between" mb="md">
+                <Group gap="xs">
+                  <IconMapPin size={20} />
+                  <Text fw={500}>{t('po.shippingAddress')}</Text>
+                </Group>
+                <ViewOnMap googleMapsUrl={deliveryRequest.deliveryAddress?.googleMapsUrl} />
+              </Group>
+              <Text size="sm">{deliveryRequest.deliveryAddress?.oneLineAddress || '-'}</Text>
+            </Card>
           </Stack>
         </Grid.Col>
 
@@ -167,27 +150,11 @@ export function DeliveryDetailTabs({
             <Text fw={500} mb="md">
               {t('delivery.detail.photos')}
             </Text>
-            {deliveryRequest.photoUrls && deliveryRequest.photoUrls.length > 0 ? (
-              <Stack gap="xs">
-                {deliveryRequest.photoUrls.map((url, index) => (
-                  <img
-                    key={index}
-                    src={url}
-                    alt={`Delivery photo ${index + 1}`}
-                    style={{
-                      width: '100%',
-                      height: '120px',
-                      objectFit: 'cover',
-                      borderRadius: '4px',
-                    }}
-                  />
-                ))}
-              </Stack>
-            ) : (
-              <Text size="sm" c="dimmed" ta="center" py="xl">
-                {t('delivery.detail.noPhotos')}
-              </Text>
-            )}
+            <DeliveryPhotoGallery
+              photoUrls={deliveryRequest.photoUrls}
+              columns={12}
+              imageHeight={120}
+            />
           </Card>
         </Grid.Col>
       </Grid>

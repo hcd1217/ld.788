@@ -1,10 +1,12 @@
 import { useCallback } from 'react';
-import { Card, Group, Box, Text, Badge, type MantineStyleProp } from '@mantine/core';
+import { Card, Group, Box, Text, type MantineStyleProp } from '@mantine/core';
 import { useNavigate } from 'react-router';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
-import { DELIVERY_STATUS_COLORS } from '@/constants/deliveryRequest';
-import { formatDate } from '@/utils/time';
+import { formatDate, getLocaleFormat } from '@/utils/time';
+import { getEmployeeNameByEmployeeId } from '@/utils/overview';
+import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
+import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 
 type DeliveryCardProps = {
   readonly deliveryRequest: DeliveryRequest;
@@ -15,15 +17,14 @@ type DeliveryCardProps = {
 };
 
 export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCardProps) {
-  const { t } = useTranslation();
+  const { t, currentLanguage } = useTranslation();
   const navigate = useNavigate();
+  const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
 
   // Memoized navigation handler
   const handleCardClick = useCallback(() => {
     navigate(`/delivery/${deliveryRequest.id}`);
   }, [navigate, deliveryRequest.id]);
-
-  const statusColor = DELIVERY_STATUS_COLORS[deliveryRequest.status] || 'gray';
 
   return (
     <Card
@@ -41,14 +42,21 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
       <Group justify="space-between" align="flex-start" style={{ position: 'relative' }}>
         <Box style={{ flex: 1 }}>
           <Text fw={500} size="sm">
-            DR-{deliveryRequest.id.slice(-6)}
+            {deliveryRequest.deliveryRequestNumber}
           </Text>
+          {deliveryRequest.customerName && (
+            <Text size="xs" c="dimmed">
+              {t('delivery.fields.customer')}: {deliveryRequest.customerName}
+            </Text>
+          )}
           <Text size="xs" c="dimmed">
-            {t('delivery.fields.scheduledDate')}: {formatDate(deliveryRequest.scheduledDate)}
+            {t('delivery.fields.scheduledDate')}:{' '}
+            {formatDate(deliveryRequest.scheduledDate, getLocaleFormat(currentLanguage))}
           </Text>
-          {deliveryRequest.assignedName && (
+          {deliveryRequest.assignedTo && (
             <Text size="xs" c="dimmed" mt="xs">
-              {t('delivery.fields.assignedTo')}: {deliveryRequest.assignedName}
+              {t('delivery.fields.assignedTo')}:{' '}
+              {getEmployeeNameByEmployeeId(employeeMapByEmployeeId, deliveryRequest.assignedTo)}
             </Text>
           )}
           {deliveryRequest.notes && (
@@ -58,11 +66,7 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
           )}
         </Box>
 
-        <Badge color={statusColor} size="sm">
-          {deliveryRequest.status === 'PENDING' && t('delivery.status.pending')}
-          {deliveryRequest.status === 'IN_TRANSIT' && t('delivery.status.inTransit')}
-          {deliveryRequest.status === 'COMPLETED' && t('delivery.status.completed')}
-        </Badge>
+        <DeliveryStatusBadge status={deliveryRequest.status} />
       </Group>
     </Card>
   );

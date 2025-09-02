@@ -3,19 +3,15 @@ import { devtools } from 'zustand/middleware';
 import {
   purchaseOrderService,
   type PurchaseOrder,
-  type Customer,
-  type Product,
   type UpdatePOStatusRequest,
   type POFilterParams,
+  type POStatus,
 } from '@/services/sales';
 import { getErrorMessage } from '@/utils/errorUtils';
 
 type POState = {
   // PO data
   purchaseOrders: PurchaseOrder[];
-  customers: Customer[];
-  customerMap: Map<string, Customer>;
-  products: Product[];
   currentPO: PurchaseOrder | undefined;
   isLoading: boolean;
   isLoadingMore: boolean;
@@ -29,23 +25,27 @@ type POState = {
   activeFilters: POFilterParams;
   currentPage: number;
 
-  // Request tracking for race condition prevention
-  pendingRequests: Map<
-    string,
-    {
-      requestId: string;
-      staleTimestamp: number;
-      action: string;
-    }
-  >;
-  requestCounter: number;
+  // Simplified request tracking - just track pending IDs
+  pendingActions: Set<string>;
 
-  // Request tracking helpers
-  _generateRequestId: () => string;
-  _startRequest: (poId: string, action: string) => string;
-  _finishRequest: (poId: string, requestId: string) => boolean;
-  _isRequestPending: (poId: string) => boolean;
-  _cleanupStaleRequests: () => void;
+  // Internal helpers (not exposed to consumers)
+  _markPending: (id: string) => void;
+  _forceReload: (id: string) => Promise<void>;
+  _rollback: (
+    id: string,
+    previousPO: PurchaseOrder | undefined,
+    previousCurrentPO: PurchaseOrder | undefined,
+    error?: string,
+  ) => void;
+  _removePending: (id: string) => void;
+  _optimisticUpdate: (id: string, data: { status?: POStatus } & Partial<PurchaseOrder>) => void;
+  _updatePOStatus: (
+    id: string,
+    status: POStatus,
+    serviceMethod: (id: string, data?: UpdatePOStatusRequest) => Promise<void>,
+    data?: UpdatePOStatusRequest,
+    errorMessage?: string,
+  ) => Promise<void>;
 
   // Actions
   setCurrentPO: (po: PurchaseOrder | undefined) => void;
@@ -57,23 +57,7 @@ type POState = {
   resetPagination: () => void;
   loadPO: (id: string) => Promise<void>;
   createPO: (
-    po: Omit<
-      PurchaseOrder,
-      | 'id'
-      | 'createdAt'
-      | 'updatedAt'
-      | 'createdBy'
-      | 'clientId'
-      | 'poNumber'
-      | 'processedBy'
-      | 'shippedBy'
-      | 'deliveredBy'
-      | 'cancelledBy'
-      | 'cancelReason'
-      | 'refundedBy'
-      | 'refundReason'
-      | 'completedDate'
-    >,
+    po: Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber'>,
   ) => Promise<void>;
   updatePO: (id: string, data: Partial<PurchaseOrder>) => Promise<void>;
   confirmPO: (id: string) => Promise<void>;
@@ -87,8 +71,6 @@ type POState = {
 
   // Selectors
   getPOById: (id: string) => PurchaseOrder | undefined;
-  getPOsByStatus: (status: string) => PurchaseOrder[];
-  getPOsByCustomer: (customerId: string) => PurchaseOrder[];
 };
 
 export const usePOStore = create<POState>()(
@@ -96,9 +78,6 @@ export const usePOStore = create<POState>()(
     (set, get) => ({
       // Initial state
       purchaseOrders: [],
-      customers: [],
-      customerMap: new Map(),
-      products: [],
       currentPO: undefined,
       isLoading: false,
       isLoadingMore: false,
@@ -109,67 +88,8 @@ export const usePOStore = create<POState>()(
       hasPreviousPage: false,
       activeFilters: {},
       currentPage: 1,
-      pendingRequests: new Map(),
-      requestCounter: 0,
+      pendingActions: new Set(),
 
-      // Request tracking helpers
-      _generateRequestId() {
-        const state = get();
-        const requestId = `req_${state.requestCounter}_${Date.now()}`;
-        set({ requestCounter: state.requestCounter + 1 });
-        return requestId;
-      },
-
-      _startRequest(poId: string, action: string) {
-        const state = get();
-        const requestId = get()._generateRequestId();
-        const newPendingRequests = new Map(state.pendingRequests);
-        const TIMEOUT_MS = 30000; // 30 seconds timeout
-        newPendingRequests.set(poId, {
-          requestId,
-          staleTimestamp: Date.now() + TIMEOUT_MS, // 30 seconds timeout
-          action,
-        });
-        set({ pendingRequests: newPendingRequests });
-        return requestId;
-      },
-
-      _finishRequest(poId: string, requestId: string) {
-        const state = get();
-        const pendingRequest = state.pendingRequests.get(poId);
-        if (pendingRequest?.requestId === requestId) {
-          const newPendingRequests = new Map(state.pendingRequests);
-          newPendingRequests.delete(poId);
-          set({ pendingRequests: newPendingRequests });
-          return true;
-        }
-        return false;
-      },
-
-      _isRequestPending(poId: string) {
-        // Clean up stale requests first
-        get()._cleanupStaleRequests();
-        const state = get();
-        return state.pendingRequests.has(poId);
-      },
-
-      _cleanupStaleRequests() {
-        const state = get();
-        const now = Date.now();
-        const newPendingRequests = new Map(state.pendingRequests);
-        let hasChanges = false;
-
-        for (const [poId, request] of newPendingRequests) {
-          if (now > request.staleTimestamp) {
-            newPendingRequests.delete(poId);
-            hasChanges = true;
-          }
-        }
-
-        if (hasChanges) {
-          set({ pendingRequests: newPendingRequests });
-        }
-      },
       // Actions
       setCurrentPO(po) {
         set({ currentPO: po, error: undefined });
@@ -382,8 +302,14 @@ export const usePOStore = create<POState>()(
                   ? new Date(poData.deliveryDate)
                   : undefined,
           };
+
+          // Call service and get created PO (ignore response, we'll refresh)
           await purchaseOrderService.createPO(createData);
+
+          // Force refresh to get the latest list with the new PO
           await get().refreshPOs();
+
+          set({ isLoading: false });
         } catch (error) {
           set({
             isLoading: false,
@@ -394,306 +320,113 @@ export const usePOStore = create<POState>()(
       },
 
       async updatePO(id, data) {
-        set({ isLoading: true, error: undefined });
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
+          return;
+        }
+
+        // Mark as pending
+        get()._markPending(id);
+
+        // Save previous state for rollback
+        const previousPO = state.purchaseOrders.find((po) => po.id === id);
+        const previousCurrentPO = state.currentPO;
+
+        // Apply optimistic update
+        get()._optimisticUpdate(id, {
+          ...data,
+        });
+
         try {
+          // Call service (ignore response - we'll force reload)
           await purchaseOrderService.updatePO(id, data);
-          await get().refreshPOs();
+
+          // Force reload to get latest data
+          get()._forceReload(id);
         } catch (error) {
-          set({
-            isLoading: false,
-            error: getErrorMessage(error, 'Failed to update purchase order'),
-          });
+          // Rollback on failure
+          get()._rollback(
+            id,
+            previousPO,
+            previousCurrentPO,
+            getErrorMessage(error, 'Failed to update purchase order'),
+          );
           throw error;
+        } finally {
+          get()._removePending(id);
         }
       },
 
       async confirmPO(id) {
-        // TODO: remove this, this is over engineered for now
-        // Check if request is already pending
-        if (get()._isRequestPending(id)) {
-          throw new Error('Confirm request already pending for this PO');
-        }
-
-        // Start request tracking
-        const requestId = get()._startRequest(id, 'confirm');
-
-        // Optimistically update the status
-        set((state) => ({
-          purchaseOrders: state.purchaseOrders.map((po) =>
-            po.id === id ? { ...po, status: 'CONFIRMED' as const } : po,
-          ),
-          currentPO:
-            state.currentPO?.id === id
-              ? { ...state.currentPO, status: 'CONFIRMED' as const }
-              : state.currentPO,
-          error: undefined,
-        }));
-
-        try {
-          await purchaseOrderService.confirmPO(id);
-
-          // Only update if this request is still valid (prevent race conditions)
-          if (get()._finishRequest(id, requestId)) {
-            await get().refreshPOs();
-          }
-        } catch (error) {
-          // Finish request tracking even on error
-          get()._finishRequest(id, requestId);
-
-          // Rollback on error
-          await get().refreshPOs();
-          set({
-            error: getErrorMessage(error, 'Failed to confirm purchase order'),
-          });
-          throw error;
-        }
+        return get()._updatePOStatus(
+          id,
+          'CONFIRMED',
+          purchaseOrderService.confirmPO,
+          undefined,
+          'Failed to confirm purchase order',
+        );
       },
 
       async processPO(id) {
-        // Check if request is already pending
-        if (get()._isRequestPending(id)) {
-          throw new Error('Process request already pending for this PO');
-        }
-
-        // Start request tracking
-        const requestId = get()._startRequest(id, 'process');
-
-        // Optimistically update the status
-        set((state) => ({
-          purchaseOrders: state.purchaseOrders.map((po) =>
-            po.id === id ? { ...po, status: 'PROCESSING' as const } : po,
-          ),
-          currentPO:
-            state.currentPO?.id === id
-              ? { ...state.currentPO, status: 'PROCESSING' as const }
-              : state.currentPO,
-          error: undefined,
-        }));
-
-        try {
-          await purchaseOrderService.processPO(id);
-
-          // Only update if this request is still valid (prevent race conditions)
-          if (get()._finishRequest(id, requestId)) {
-            await get().refreshPOs();
-          }
-        } catch (error) {
-          // Finish request tracking even on error
-          get()._finishRequest(id, requestId);
-
-          // Rollback on error
-          await get().refreshPOs();
-          set({
-            error: getErrorMessage(error, 'Failed to process purchase order'),
-          });
-          throw error;
-        }
+        return get()._updatePOStatus(
+          id,
+          'PROCESSING',
+          purchaseOrderService.processPO,
+          undefined,
+          'Failed to process purchase order',
+        );
       },
 
       async markPOReady(id, data) {
-        // TODO: remove this, this is over engineered for now
-        // Check if request is already pending
-        if (get()._isRequestPending(id)) {
-          throw new Error('Mark ready request already pending for this PO');
-        }
-
-        // Start request tracking
-        const requestId = get()._startRequest(id, 'ready');
-
-        // Optimistically update the status
-        set((state) => ({
-          purchaseOrders: state.purchaseOrders.map((po) =>
-            po.id === id ? { ...po, status: 'READY_FOR_PICKUP' as const } : po,
-          ),
-          currentPO:
-            state.currentPO?.id === id
-              ? { ...state.currentPO, status: 'READY_FOR_PICKUP' as const }
-              : state.currentPO,
-          error: undefined,
-        }));
-
-        try {
-          await purchaseOrderService.markPOReady(id, data);
-
-          // Only update if this request is still valid (prevent race conditions)
-          if (get()._finishRequest(id, requestId)) {
-            await get().refreshPOs();
-          }
-        } catch (error) {
-          // Finish request tracking even on error
-          get()._finishRequest(id, requestId);
-
-          // Rollback on error
-          await get().refreshPOs();
-          set({
-            error: getErrorMessage(error, 'Failed to mark purchase order as ready for pickup'),
-          });
-          throw error;
-        }
+        return get()._updatePOStatus(
+          id,
+          'READY_FOR_PICKUP',
+          purchaseOrderService.markPOReady,
+          data,
+          'Failed to mark purchase order as ready for pickup',
+        );
       },
 
       async shipPO(id, data) {
-        // Check if request is already pending
-        if (get()._isRequestPending(id)) {
-          throw new Error('Ship request already pending for this PO');
-        }
-
-        // Start request tracking
-        const requestId = get()._startRequest(id, 'ship');
-
-        // Optimistically update the status
-        set((state) => ({
-          purchaseOrders: state.purchaseOrders.map((po) =>
-            po.id === id ? { ...po, status: 'SHIPPED' as const } : po,
-          ),
-          currentPO:
-            state.currentPO?.id === id
-              ? { ...state.currentPO, status: 'SHIPPED' as const }
-              : state.currentPO,
-          error: undefined,
-        }));
-
-        try {
-          await purchaseOrderService.shipPO(id, data);
-
-          // Only update if this request is still valid (prevent race conditions)
-          if (get()._finishRequest(id, requestId)) {
-            await get().refreshPOs();
-          }
-        } catch (error) {
-          // Finish request tracking even on error
-          get()._finishRequest(id, requestId);
-
-          // Rollback on error
-          await get().refreshPOs();
-          set({
-            error: getErrorMessage(error, 'Failed to ship purchase order'),
-          });
-          throw error;
-        }
+        return get()._updatePOStatus(
+          id,
+          'SHIPPED',
+          purchaseOrderService.shipPO,
+          data,
+          'Failed to ship purchase order',
+        );
       },
 
       async deliverPO(id, data) {
-        // Check if request is already pending
-        if (get()._isRequestPending(id)) {
-          throw new Error('Deliver request already pending for this PO');
-        }
-
-        // Start request tracking
-        const requestId = get()._startRequest(id, 'deliver');
-
-        // Optimistically update the status
-        set((state) => ({
-          purchaseOrders: state.purchaseOrders.map((po) =>
-            po.id === id ? { ...po, status: 'DELIVERED' as const } : po,
-          ),
-          currentPO:
-            state.currentPO?.id === id
-              ? { ...state.currentPO, status: 'DELIVERED' as const }
-              : state.currentPO,
-          error: undefined,
-        }));
-
-        try {
-          await purchaseOrderService.deliverPO(id, data);
-
-          // Only update if this request is still valid (prevent race conditions)
-          if (get()._finishRequest(id, requestId)) {
-            await get().refreshPOs();
-          }
-        } catch (error) {
-          // Finish request tracking even on error
-          get()._finishRequest(id, requestId);
-
-          // Rollback on error
-          await get().refreshPOs();
-          set({
-            error: getErrorMessage(error, 'Failed to deliver purchase order'),
-          });
-          throw error;
-        }
+        return get()._updatePOStatus(
+          id,
+          'DELIVERED',
+          purchaseOrderService.deliverPO,
+          data,
+          'Failed to deliver purchase order',
+        );
       },
 
       async cancelPO(id, data) {
-        // Check if request is already pending
-        if (get()._isRequestPending(id)) {
-          throw new Error('Cancel request already pending for this PO');
-        }
-
-        // Start request tracking
-        const requestId = get()._startRequest(id, 'cancel');
-
-        // Optimistically update the status
-        set((state) => ({
-          purchaseOrders: state.purchaseOrders.map((po) =>
-            po.id === id ? { ...po, status: 'CANCELLED' as const } : po,
-          ),
-          currentPO:
-            state.currentPO?.id === id
-              ? { ...state.currentPO, status: 'CANCELLED' as const }
-              : state.currentPO,
-          error: undefined,
-        }));
-
-        try {
-          await purchaseOrderService.cancelPO(id, data);
-
-          // Only update if this request is still valid (prevent race conditions)
-          if (get()._finishRequest(id, requestId)) {
-            await get().refreshPOs();
-          }
-        } catch (error) {
-          // Finish request tracking even on error
-          get()._finishRequest(id, requestId);
-
-          // Rollback on error
-          await get().refreshPOs();
-          set({
-            error: getErrorMessage(error, 'Failed to cancel purchase order'),
-          });
-          throw error;
-        }
+        return get()._updatePOStatus(
+          id,
+          'CANCELLED',
+          purchaseOrderService.cancelPO,
+          data,
+          'Failed to cancel purchase order',
+        );
       },
 
       async refundPO(id, data) {
-        // Check if request is already pending
-        if (get()._isRequestPending(id)) {
-          throw new Error('Refund request already pending for this PO');
-        }
-
-        // Start request tracking
-        const requestId = get()._startRequest(id, 'refund');
-
-        // Optimistically update the status
-        set((state) => ({
-          purchaseOrders: state.purchaseOrders.map((po) =>
-            po.id === id ? { ...po, status: 'REFUNDED' as const } : po,
-          ),
-          currentPO:
-            state.currentPO?.id === id
-              ? { ...state.currentPO, status: 'REFUNDED' as const }
-              : state.currentPO,
-          error: undefined,
-        }));
-
-        try {
-          await purchaseOrderService.refundPO(id, data);
-
-          // Only update if this request is still valid (prevent race conditions)
-          if (get()._finishRequest(id, requestId)) {
-            await get().refreshPOs();
-          }
-        } catch (error) {
-          // Finish request tracking even on error
-          get()._finishRequest(id, requestId);
-
-          // Rollback on error
-          await get().refreshPOs();
-          set({
-            error: getErrorMessage(error, 'Failed to refund purchase order'),
-          });
-          throw error;
-        }
+        return get()._updatePOStatus(
+          id,
+          'REFUNDED',
+          purchaseOrderService.refundPO,
+          data,
+          'Failed to refund purchase order',
+        );
       },
 
       clearError() {
@@ -705,15 +438,119 @@ export const usePOStore = create<POState>()(
         return get().purchaseOrders.find((po) => po.id === id);
       },
 
-      getPOsByStatus(status) {
-        if (status === 'all') {
-          return get().purchaseOrders;
+      // Generic status update helper - simplified and DRY
+      async _updatePOStatus(
+        id: string,
+        status: PurchaseOrder['status'],
+        serviceMethod: (id: string, data?: UpdatePOStatusRequest) => Promise<void>,
+        data?: UpdatePOStatusRequest,
+        errorMessage?: string,
+      ) {
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
+          return; // Simply return, no need to throw
         }
-        return get().purchaseOrders.filter((po) => po.status === status);
+
+        // Mark as pending
+        get()._markPending(id);
+
+        // Save previous state for rollback
+        const previousPO = state.purchaseOrders.find((po) => po.id === id);
+        const previousCurrentPO = state.currentPO;
+
+        // Apply optimistic update immediately
+        get()._optimisticUpdate(id, { status });
+
+        try {
+          // Call service (ignore response - we'll force reload)
+          await serviceMethod(id, data);
+
+          // Force reload to get latest data from server
+          await get()._forceReload(id);
+        } catch (error) {
+          // Rollback to previous state on failure
+          get()._rollback(
+            id,
+            previousPO,
+            previousCurrentPO,
+            getErrorMessage(error, errorMessage || 'Failed to update purchase order status'),
+          );
+          throw error;
+        } finally {
+          get()._removePending(id);
+        }
       },
 
-      getPOsByCustomer(customerId) {
-        return get().purchaseOrders.filter((po) => po.customerId === customerId);
+      _optimisticUpdate(
+        id: string,
+        data: {
+          status?: POStatus;
+        } & Partial<PurchaseOrder>,
+      ) {
+        set((state) => ({
+          purchaseOrders: state.purchaseOrders.map((po) =>
+            po.id === id ? { ...po, ...data, status: data.status ?? po.status } : po,
+          ),
+          currentPO:
+            state.currentPO?.id === id
+              ? { ...state.currentPO, ...data, status: data.status ?? state.currentPO.status }
+              : state.currentPO,
+        }));
+      },
+
+      async _forceReload(id: string) {
+        const updatedPO = await purchaseOrderService.getPOById(id);
+        if (updatedPO) {
+          set((state) => ({
+            purchaseOrders: state.purchaseOrders.map((po) => (po.id === id ? updatedPO : po)),
+            currentPO: state.currentPO?.id === id ? updatedPO : state.currentPO,
+          }));
+        } else {
+          set((state) => ({
+            purchaseOrders: state.purchaseOrders.filter((po) => po.id !== id),
+            currentPO: state.currentPO?.id === id ? undefined : state.currentPO,
+          }));
+        }
+      },
+
+      _rollback(
+        id: string,
+        previousPO: PurchaseOrder | undefined,
+        previousCurrentPO: PurchaseOrder | undefined,
+        error?: string,
+      ) {
+        set((state) => ({
+          purchaseOrders: state.purchaseOrders.map((po) =>
+            po.id === id && previousPO ? previousPO : po,
+          ),
+          currentPO: state.currentPO?.id === id ? previousCurrentPO : state.currentPO,
+          error: error,
+        }));
+      },
+
+      _markPending(id: string) {
+        set((state) => {
+          if (state.pendingActions.has(id)) {
+            return {};
+          }
+          const pendingActions = new Set(state.pendingActions);
+          pendingActions.add(id);
+          return {
+            pendingActions,
+          };
+        });
+      },
+
+      _removePending(id: string) {
+        set((state) => {
+          const pendingActions = new Set(state.pendingActions);
+          pendingActions.delete(id);
+          return {
+            pendingActions,
+          };
+        });
       },
     }),
     {
@@ -724,16 +561,13 @@ export const usePOStore = create<POState>()(
 
 // Empty constants to prevent re-renders when data is undefined
 const EMPTY_ARRAY: PurchaseOrder[] = [];
-const EMPTY_CUSTOMERS: Customer[] = [];
-const EMPTY_PRODUCTS: Product[] = [];
 
 // Convenience hooks with stable references
 export const usePurchaseOrderList = () =>
   usePOStore((state) => state.purchaseOrders) || EMPTY_ARRAY;
-export const useCustomerList = () => usePOStore((state) => state.customers) || EMPTY_CUSTOMERS;
-export const useProductList = () => usePOStore((state) => state.products) || EMPTY_PRODUCTS;
 export const usePOLoading = () => usePOStore((state) => state.isLoading);
 export const usePOError = () => usePOStore((state) => state.error);
+
 // Export hook with stable reference by calling the store multiple times
 // This pattern prevents infinite re-renders as each function reference is stable
 export const usePOActions = () => {
@@ -741,7 +575,6 @@ export const usePOActions = () => {
   const loadMorePOs = usePOStore((state) => state.loadMorePOs);
   const loadNextPage = usePOStore((state) => state.loadNextPage);
   const loadPreviousPage = usePOStore((state) => state.loadPreviousPage);
-  const refreshPOs = usePOStore((state) => state.refreshPOs);
   const resetPagination = usePOStore((state) => state.resetPagination);
   const loadPO = usePOStore((state) => state.loadPO);
   const createPO = usePOStore((state) => state.createPO);
@@ -760,21 +593,10 @@ export const usePOActions = () => {
     loadMorePOs,
     loadNextPage,
     loadPreviousPage,
-    refreshPOs,
     resetPagination,
     loadPO,
-    createPO,
-    updatePO,
-    confirmPO,
-    processPO,
-    markPOReady,
-    shipPO,
-    deliverPO,
-    cancelPO,
-    refundPO,
     clearError,
-    // Aliases for consistency with page usage
-    refreshPurchaseOrders: refreshPOs,
+    // Longer names for better readability in components
     createPurchaseOrder: createPO,
     updatePurchaseOrder: updatePO,
     confirmPurchaseOrder: confirmPO,
@@ -787,14 +609,8 @@ export const usePOActions = () => {
   };
 };
 
-// Selector hooks for getting POs by criteria
-export const usePOById = (id: string) => usePOStore((state) => state.getPOById(id));
-export const usePOsByStatus = (status: string) =>
-  usePOStore((state) => state.getPOsByStatus(status)) || EMPTY_ARRAY;
-export const usePOsByCustomer = (customerId: string) =>
-  usePOStore((state) => state.getPOsByCustomer(customerId)) || EMPTY_ARRAY;
+// Current PO hook
 export const useCurrentPO = () => usePOStore((state) => state.currentPO);
-export const useSetCurrentPO = () => usePOStore((state) => state.setCurrentPO);
 
 // Pagination state hooks
 export const usePOPaginationState = () => {

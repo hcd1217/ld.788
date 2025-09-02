@@ -11,6 +11,11 @@ import { WorkTypeBadge } from './WorkTypeBadge';
 import { getEndDateHighlightStyles } from '@/utils/time';
 import { useMemo } from 'react';
 
+// Event handler to prevent propagation on action cells
+const handleActionCellClick = (e: React.MouseEvent) => {
+  e.stopPropagation();
+};
+
 type EmployeeDataTableProps = {
   readonly employees: readonly Employee[];
   readonly noAction?: boolean;
@@ -104,10 +109,6 @@ export function EmployeeDataTable({
           }
         />
       );
-
-  const handleActionCellClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
 
   return (
     <DataTable
