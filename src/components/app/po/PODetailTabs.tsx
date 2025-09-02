@@ -21,6 +21,7 @@ import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { useState } from 'react';
 
 type PODetailTabsProps = {
+  readonly canEdit: boolean;
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading?: boolean;
   readonly onConfirm: () => void;
@@ -34,6 +35,7 @@ type PODetailTabsProps = {
 };
 
 export function PODetailTabs({
+  canEdit,
   purchaseOrder,
   isLoading = false,
   onConfirm,
@@ -102,35 +104,19 @@ export function PODetailTabs({
 
       <Tabs.Panel value="info" pt="xl">
         <Stack gap="sm">
-          {onCreateDelivery ? (
-            <POActionZone
-              purchaseOrder={purchaseOrder}
-              isLoading={isLoading}
-              onConfirm={onConfirm}
-              onProcess={onProcess}
-              onMarkReady={onMarkReady}
-              onShip={onShip}
-              onDeliver={onDeliver}
-              onCancel={onCancel}
-              onRefund={onRefund}
-              onCreateDelivery={onCreateDelivery}
-            />
-          ) : (
-            <POActionZone
-              purchaseOrder={purchaseOrder}
-              isLoading={isLoading}
-              onConfirm={onConfirm}
-              onProcess={onProcess}
-              onMarkReady={onMarkReady}
-              onShip={onShip}
-              onDeliver={onDeliver}
-              onCancel={onCancel}
-              onRefund={onRefund}
-              onCreateDelivery={() => {
-                /* no-op */
-              }}
-            />
-          )}
+          <POActionZone
+            canEdit={canEdit}
+            purchaseOrder={purchaseOrder}
+            isLoading={isLoading}
+            onConfirm={onConfirm}
+            onProcess={onProcess}
+            onMarkReady={onMarkReady}
+            onShip={onShip}
+            onDeliver={onDeliver}
+            onCancel={onCancel}
+            onRefund={onRefund}
+            onCreateDelivery={onCreateDelivery}
+          />
           <POErrorBoundary componentName="POBasicInfoCard">
             <POBasicInfoCard
               purchaseOrder={purchaseOrder}

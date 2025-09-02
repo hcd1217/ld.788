@@ -38,5 +38,6 @@ export {
   ModalOrDrawer,
   NoPermission,
   ResourceNotFound,
+  PermissionDeniedPage,
   TimekeeperLayout,
 } from './layouts';

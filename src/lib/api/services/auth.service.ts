@@ -3,21 +3,11 @@ import { logError } from '@/utils/logger';
 import {
   LoginRequestSchema,
   LoginResponseSchema,
-  ForgotPasswordResponseSchema,
-  ResetPasswordResponseSchema,
-  RegisterRequestSchema,
-  RegisterResponseSchema,
   RenewTokenRequestSchema,
   RenewTokenResponseSchema,
   GetMeResponseSchema,
   type LoginRequest,
   type LoginResponse,
-  type ForgotPasswordRequest,
-  type ForgotPasswordResponse,
-  type ResetPasswordRequest,
-  type ResetPasswordResponse,
-  type RegisterRequest,
-  type RegisterResponse,
   type RenewTokenRequest,
   type RenewTokenResponse,
   type GetMeResponse,
@@ -45,31 +35,6 @@ export class AuthApi extends BaseApiClient {
       VerifyMagicLinkResponseSchema,
       VerifyMagicLinkRequestSchema,
       { noError: true },
-    );
-  }
-
-  async forgotPassword(data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
-    return this.post<ForgotPasswordResponse, ForgotPasswordRequest>(
-      '/auth/forgot-password',
-      data,
-      ForgotPasswordResponseSchema,
-    );
-  }
-
-  async resetPassword(data: ResetPasswordRequest): Promise<ResetPasswordResponse> {
-    return this.post<ResetPasswordResponse, ResetPasswordRequest>(
-      '/auth/reset-password',
-      data,
-      ResetPasswordResponseSchema,
-    );
-  }
-
-  async register(data: RegisterRequest): Promise<RegisterResponse> {
-    return this.post<RegisterResponse, RegisterRequest>(
-      '/auth/register',
-      data,
-      RegisterResponseSchema,
-      RegisterRequestSchema,
     );
   }
 

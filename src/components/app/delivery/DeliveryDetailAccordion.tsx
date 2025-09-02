@@ -13,6 +13,9 @@ import { ViewOnMap } from '@/components/common';
 type DeliveryDetailAccordionProps = {
   readonly deliveryRequest: DeliveryRequestDetail;
   readonly isLoading?: boolean;
+  readonly canStartTransit?: boolean;
+  readonly canComplete?: boolean;
+  readonly canTakePhoto?: boolean;
   readonly onStartTransit: () => void;
   readonly onComplete: () => void;
   readonly onTakePhoto: () => void;
@@ -21,6 +24,9 @@ type DeliveryDetailAccordionProps = {
 export function DeliveryDetailAccordion({
   deliveryRequest,
   isLoading,
+  canStartTransit = false,
+  canComplete = false,
+  canTakePhoto = false,
   onStartTransit,
   onComplete,
   onTakePhoto,
@@ -28,14 +34,14 @@ export function DeliveryDetailAccordion({
   const { t } = useTranslation();
   const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
   const employeeMapByUserId = useEmployeeMapByUserId();
-  const { canStartTransit, canComplete, canTakePhoto } = useMemo(() => {
-    const canStartTransit = deliveryRequest.status === 'PENDING';
-    const canComplete = deliveryRequest.status === 'IN_TRANSIT';
-    const canTakePhoto = deliveryRequest.status !== 'PENDING';
+  const { canStartTransitBased, canCompleteBased, canTakePhotoBased } = useMemo(() => {
+    const canStartTransitBased = deliveryRequest.status === 'PENDING';
+    const canCompleteBased = deliveryRequest.status === 'IN_TRANSIT';
+    const canTakePhotoBased = deliveryRequest.status !== 'PENDING';
     return {
-      canStartTransit,
-      canComplete,
-      canTakePhoto,
+      canStartTransitBased,
+      canCompleteBased,
+      canTakePhotoBased,
     };
   }, [deliveryRequest.status]);
 
@@ -161,7 +167,7 @@ export function DeliveryDetailAccordion({
 
       {/* Action Buttons */}
       <Group justify="space-between" m="lg">
-        {canTakePhoto ? (
+        {canTakePhotoBased && canTakePhoto ? (
           <Button
             leftSection={<IconPhoto size={16} />}
             variant="outline"
@@ -173,7 +179,7 @@ export function DeliveryDetailAccordion({
         ) : (
           <div> </div>
         )}
-        {canStartTransit && (
+        {canStartTransitBased && canStartTransit && (
           <Button
             leftSection={<IconTruck size={16} />}
             color="orange"
@@ -184,7 +190,7 @@ export function DeliveryDetailAccordion({
             {t('delivery.actions.startTransit')}
           </Button>
         )}
-        {canComplete && (
+        {canCompleteBased && canComplete && (
           <Button
             leftSection={<IconCheck size={16} />}
             color="green"

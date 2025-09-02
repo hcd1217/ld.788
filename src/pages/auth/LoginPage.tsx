@@ -1,16 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import {
-  Group,
-  Anchor,
-  Stack,
-  Space,
-  Button,
-  TextInput,
-  PasswordInput,
-  Divider,
-  Text,
-} from '@mantine/core';
+import { Stack, Space, Button, TextInput, PasswordInput, Divider, Text } from '@mantine/core';
 import { IconQrcode } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
 import { useAppStore } from '@/stores/useAppStore';
@@ -19,7 +9,7 @@ import { useAuthForm } from '@/hooks/useAuthForm';
 import { GuestLayout } from '@/components/layouts/GuestLayout';
 import { getFormValidators } from '@/utils/validation';
 import { FormContainer } from '@/components/form/FormContainer';
-import { AuthHeader, AuthAlert, AuthFormLink } from '@/components/auth';
+import { AuthHeader, AuthAlert } from '@/components/auth';
 import { useClientCode } from '@/hooks/useClientCode';
 import { isDevelopment } from '@/utils/env';
 import { ROUTERS } from '@/config/routeConfig';
@@ -132,18 +122,6 @@ export function LoginPage() {
               onClose={clearErrors}
             />
 
-            <Group justify="flex-end">
-              <Anchor
-                component="button"
-                type="button"
-                size="sm"
-                disabled={isLoading}
-                onClick={() => navigate(ROUTERS.FORGOT_PASSWORD)}
-              >
-                {t('auth.forgotPassword')}
-              </Anchor>
-            </Group>
-
             <Button variant="auth-form" type="submit">
               {t('auth.signIn')}
             </Button>
@@ -170,12 +148,6 @@ export function LoginPage() {
             {t('auth.magicLink.useMagicLink')}
           </Button>
         </Stack>
-
-        <AuthFormLink
-          text={t('auth.noAccount')}
-          linkText={t('auth.createAccount')}
-          href={ROUTERS.REGISTER}
-        />
       </FormContainer>
     </GuestLayout>
   );

@@ -1,7 +1,6 @@
 import { AuthApi } from './services/auth.service';
 import { ClientApi } from './services/client.service';
 import { UserApi } from './services/user.service';
-import { AdminApi } from './services/admin.service';
 import { StoreApi } from './services/store.service';
 import { HrApi } from './services/hr.service';
 import { SalesApi } from './services/sales.service';
@@ -22,10 +21,6 @@ export const clientApi = new ClientApi({
 });
 
 export const userApi = new UserApi({
-  baseURL: API_BASE_URL,
-});
-
-export const adminApi = new AdminApi({
   baseURL: API_BASE_URL,
 });
 
@@ -60,7 +55,6 @@ export * from './schemas';
 export { AuthApi } from './services/auth.service';
 export { ClientApi } from './services/client.service';
 export { UserApi } from './services/user.service';
-export { AdminApi } from './services/admin.service';
 export { StoreApi } from './services/store.service';
 export { HrApi } from './services/hr.service';
 export { SalesApi } from './services/sales.service';

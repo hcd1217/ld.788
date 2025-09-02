@@ -1,13 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { authService } from '@/services/auth';
-import { adminService } from '@/services/admin';
-import {
-  storeAdminSession,
-  clearAdminSession,
-  isAdminAuthenticated,
-  restoreAdminSession,
-} from '@/utils/adminSessionManager';
 import { authApi, clientApi, type ClientPublicConfigResponse } from '@/lib/api';
 import { updateClientTranslations, clearClientTranslations } from '@/lib/i18n';
 import type { GetMeResponse } from '@/lib/api/schemas/auth.schemas';
@@ -33,10 +26,7 @@ type AppState = {
   customerMapByCustomerId: Map<string, CustomerOverview>; // Stable Map for customer lookup
   isAuthenticated: boolean;
   authInitialized: boolean;
-  adminAuthenticated: boolean;
   isLoading: boolean;
-  adminApiLoading: boolean;
-  adminApiLoadingMessage: string;
   permissionError: boolean;
   theme: 'light' | 'dark';
   config: {
@@ -55,24 +45,17 @@ type AppState = {
   fetchUserProfile: () => Promise<void>;
   fetchOverviewData: () => Promise<void>;
   setTheme: (theme: 'light' | 'dark') => void;
-  setAdminAuth: (authenticated: boolean) => void;
-  setAdminApiLoading: (loading: boolean, message?: string) => void;
   setPermissionError: (hasError: boolean) => void;
   fetchPublicClientConfig: (clientCode: string) => Promise<void>;
   login: (params: { identifier: string; password: string; clientCode: string }) => Promise<void>;
   loginWithMagicLink: (params: { clientCode: string; token: string }) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<boolean>;
-  adminLogin: (accessKey: string) => Promise<void>;
-  adminLogout: () => void;
 };
 
 export const useAppStore = create<AppState>()(
   devtools(
     (set, get) => {
-      // Restore admin session on initialization
-      restoreAdminSession();
-
       // Load public client config on initialization
       const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
       clientApi
@@ -96,10 +79,7 @@ export const useAppStore = create<AppState>()(
         customerMapByCustomerId: new Map(), // Initialize empty Map
         isAuthenticated: authService.hasValidToken(),
         authInitialized: false,
-        adminAuthenticated: isAdminAuthenticated(),
         isLoading: false,
-        adminApiLoading: false,
-        adminApiLoadingMessage: '',
         permissionError: false,
         theme: 'light',
         config: {
@@ -136,6 +116,8 @@ export const useAppStore = create<AppState>()(
               clearClientTranslations();
               updateClientTranslations(user.clientConfig.translations);
             }
+
+            console.log('USER PERMISSIONS', JSON.stringify(user.permissions, null, 2));
 
             // Fetch overview data after getting user profile
             await get().fetchOverviewData();
@@ -183,9 +165,6 @@ export const useAppStore = create<AppState>()(
           }
         },
         setTheme: (theme) => set({ theme }),
-        setAdminAuth: (authenticated) => set({ adminAuthenticated: authenticated }),
-        setAdminApiLoading: (loading, message = '') =>
-          set({ adminApiLoading: loading, adminApiLoadingMessage: message }),
         setPermissionError: (hasError) => set({ permissionError: hasError }),
         async fetchPublicClientConfig(clientCode: string) {
           try {
@@ -289,28 +268,6 @@ export const useAppStore = create<AppState>()(
           set({ authInitialized: true });
           return isAuthenticated;
         },
-        async adminLogin(accessKey: string) {
-          set({ isLoading: true });
-          try {
-            const response = await adminService.login({ accessKey });
-            if (response.success) {
-              storeAdminSession(accessKey);
-              set({ adminAuthenticated: true, isLoading: false });
-            } else {
-              set({ isLoading: false });
-              throw new Error('Invalid access key');
-            }
-          } catch (error) {
-            set({ isLoading: false });
-            clearAdminSession();
-            throw error;
-          }
-        },
-        adminLogout() {
-          clearAdminSession();
-          adminService.logout();
-          set({ adminAuthenticated: false });
-        },
       };
     },
     {
@@ -319,12 +276,43 @@ export const useAppStore = create<AppState>()(
   ),
 );
 
-// Computed selectors for convenience
-export const useClientConfig = () => useAppStore((state) => state.user?.clientConfig);
-export const usePublicClientConfig = () => useAppStore((state) => state.publicClientConfig);
 // Stable empty arrays to avoid infinite re-renders (as per CLAUDE.md line 52)
 const EMPTY_CUSTOMERS_ARRAY: readonly CustomerOverview[] = [];
 const EMPTY_EMPLOYEES_ARRAY: readonly EmployeeOverview[] = [];
+const EMPTY_PERMISSIONS: User['permissions'] = Object.freeze({
+  employee: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+  },
+  purchaseOrder: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+    actions: {
+      canConfirm: false,
+      canProcess: false,
+      canShip: false,
+      canMarkReady: false,
+      canDeliver: false,
+      canRefund: false,
+      canCancel: false,
+    },
+  },
+  deliveryRequest: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+    actions: {
+      canStartTransit: false,
+      canComplete: false,
+      canTakePhoto: false,
+    },
+  },
+});
 
 // Return stable Map reference to avoid infinite re-renders
 export const useEmployeeMapByUserId = () => useAppStore((state) => state.employeeMapByUserId);
@@ -338,3 +326,6 @@ export const useCustomers = () =>
 // Employee selectors - use stable empty array reference
 export const useEmployees = () =>
   useAppStore((state) => state.overviewData?.employees ?? EMPTY_EMPLOYEES_ARRAY);
+
+export const usePermissions = () =>
+  useAppStore((state) => state.user?.permissions ?? EMPTY_PERMISSIONS);

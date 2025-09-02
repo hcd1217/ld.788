@@ -10,7 +10,7 @@ import {
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useEmployeeForm } from '@/hooks/useEmployeeForm';
-import { Tabs } from '@/components/common';
+import { Tabs, PermissionDeniedPage } from '@/components/common';
 import { SingleEmployeeForm, BulkImportForm, EmployeeFormLayout } from '@/components/app/employee';
 import { useHrActions, useUnitList, useHrLoading, useHrError } from '@/stores/useHrStore';
 import { employeeService } from '@/services/hr/employee';
@@ -25,6 +25,7 @@ import {
   validateFileType,
   parseExcelFile,
 } from '@/utils/employee.utils';
+import { usePermissions } from '@/stores/useAppStore';
 
 type EmployeeFormPageProps = {
   readonly mode: 'create' | 'edit';
@@ -35,11 +36,11 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { isMobile } = useDeviceType();
+  const permissions = usePermissions();
   const units = useUnitList();
   const isLoading = useHrLoading();
   const error = useHrError();
   const { loadUnits, clearError, addEmployee, addBulkEmployees } = useHrActions();
-
   // Mode-specific state
   const isEditMode = mode === 'edit';
   const [activeTab, setActiveTab] = useState<string | undefined>('single');
@@ -321,6 +322,16 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
     onCancel: navigateToList,
     isEditMode,
   };
+
+  if (!permissions.employee.canView) {
+    return <PermissionDeniedPage />;
+  }
+  if (isEditMode && !permissions.employee.canEdit) {
+    return <PermissionDeniedPage />;
+  }
+  if (!isEditMode && !permissions.employee.canCreate) {
+    return <PermissionDeniedPage />;
+  }
 
   return (
     <EmployeeFormLayout

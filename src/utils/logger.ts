@@ -11,9 +11,16 @@ console.ignore = () => {
 
 export function registerLogger() {
   const debug = false;
-  if (debug) {
+  if (debug && isDevelopment) {
     return;
   }
+
+  const originalConsoleLog = console.log;
+  console.log = isDevelopment ? log.bind(null, 'info') : productionLog;
+  console.warn = isDevelopment ? log.bind(null, 'warn') : productionLog;
+  console.error = isDevelopment ? log.bind(null, 'error') : productionLog;
+  console.info = isDevelopment ? log.bind(null, 'info') : productionLog;
+  console.debug = isDevelopment ? log.bind(null, 'debug') : productionLog;
 
   const colorMap = {
     debug: 'green',
@@ -27,13 +34,6 @@ export function registerLogger() {
     warn: '20px',
     error: '36px',
   };
-
-  const originalConsoleLog = console.log;
-  console.log = isDevelopment ? log.bind(null, 'info') : productionLog;
-  console.warn = isDevelopment ? log.bind(null, 'warn') : productionLog;
-  console.error = isDevelopment ? log.bind(null, 'error') : productionLog;
-  console.info = isDevelopment ? log.bind(null, 'info') : productionLog;
-  console.debug = isDevelopment ? log.bind(null, 'debug') : productionLog;
 
   function log(level: 'info' | 'warn' | 'error' | 'debug', message: unknown, ...args: unknown[]) {
     if (level === 'debug') {

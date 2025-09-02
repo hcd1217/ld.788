@@ -9,8 +9,9 @@ type AppPageTitleProps = {
   readonly route?: string;
   readonly button?: {
     readonly label: string;
-    readonly onClick?: () => void;
+    readonly disabled?: boolean;
     readonly icon?: React.ReactNode;
+    readonly onClick?: () => void;
   };
   readonly fz?: string;
 };
@@ -44,7 +45,11 @@ export function AppPageTitle({ title, button, fz, withGoBack, route }: AppPageTi
       </Group>
 
       {button ? (
-        <Button leftSection={button.icon ?? <IconPlus size={16} />} onClick={button.onClick}>
+        <Button
+          disabled={button.disabled}
+          leftSection={button.icon ?? <IconPlus size={16} />}
+          onClick={button.onClick}
+        >
           {button.label}
         </Button>
       ) : (

@@ -4,6 +4,7 @@ import { LoadingOverlay, Stack } from '@mantine/core';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useAction } from '@/hooks/useAction';
+import { usePermissions } from '@/stores/useAppStore';
 import {
   useCurrentDeliveryRequest,
   useDeliveryRequestLoading,
@@ -12,6 +13,7 @@ import {
 } from '@/stores/useDeliveryRequestStore';
 import { useDeliveryModals } from '@/hooks/useDeliveryModals';
 import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
+import { PermissionDeniedPage } from '@/components/common/layouts/PermissionDeniedPage';
 import { AppPageTitle } from '@/components/common';
 import { AppMobileLayout, AppDesktopLayout } from '@/components/common';
 import { DeliveryDetailTabs } from '@/components/app/delivery/DeliveryDetailTabs';
@@ -23,6 +25,7 @@ export function DeliveryDetailPage() {
   const { deliveryId } = useParams<{ deliveryId: string }>();
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
+  const permissions = usePermissions();
 
   // Store selectors
   const deliveryRequest = useCurrentDeliveryRequest();
@@ -126,6 +129,11 @@ export function DeliveryDetailPage() {
 
   const title = deliveryRequest ? `DR-${deliveryRequest.id.slice(-6)}` : t('delivery.detail.title');
 
+  // Check view permission
+  if (!permissions.deliveryRequest.canView) {
+    return <PermissionDeniedPage />;
+  }
+
   // Mobile layout
   if (isMobile) {
     if (isLoading || !deliveryRequest) {
@@ -159,6 +167,9 @@ export function DeliveryDetailPage() {
           <DeliveryDetailAccordion
             deliveryRequest={deliveryRequest}
             isLoading={isLoading}
+            canStartTransit={permissions.deliveryRequest.actions?.canStartTransit}
+            canComplete={permissions.deliveryRequest.actions?.canComplete}
+            canTakePhoto={permissions.deliveryRequest.actions?.canTakePhoto}
             onStartTransit={handleStartTransit}
             onComplete={handleComplete}
             onTakePhoto={handleTakeDeliveryPhoto}

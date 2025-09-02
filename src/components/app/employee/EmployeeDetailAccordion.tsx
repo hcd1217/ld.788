@@ -13,6 +13,7 @@ import type { Employee } from '@/services/hr/employee';
 
 type EmployeeDetailAccordionProps = {
   readonly employee: Employee;
+  readonly canEdit: boolean;
   readonly onActivate: () => void;
   readonly onDeactivate: () => void;
   readonly onEdit: () => void;
@@ -20,6 +21,7 @@ type EmployeeDetailAccordionProps = {
 
 export function EmployeeDetailAccordion({
   employee,
+  canEdit,
   onActivate,
   onDeactivate,
   onEdit,
@@ -34,7 +36,7 @@ export function EmployeeDetailAccordion({
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap="xl" pt="md">
-            <EmployeeBasicInfoCard employee={employee} onEdit={onEdit} />
+            <EmployeeBasicInfoCard employee={employee} canEdit={canEdit} onEdit={onEdit} />
           </Stack>
         </Accordion.Panel>
       </Accordion.Item>
@@ -88,6 +90,7 @@ export function EmployeeDetailAccordion({
         <Accordion.Panel>
           <Stack gap="xl" pt="md">
             <EmployeeDangerZone
+              canEdit={canEdit}
               employee={employee}
               onActivate={onActivate}
               onDeactivate={onDeactivate}

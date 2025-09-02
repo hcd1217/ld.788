@@ -21,6 +21,14 @@ type POActionsProps = {
   readonly status: POStatus;
   readonly gap?: number;
   readonly style?: MantineStyleProp;
+  readonly canEdit: boolean;
+  readonly canConfirm?: boolean;
+  readonly canProcess?: boolean;
+  readonly canShip?: boolean;
+  readonly canMarkReady?: boolean;
+  readonly canDeliver?: boolean;
+  readonly canRefund?: boolean;
+  readonly canCancel?: boolean;
   readonly isLoading?: boolean;
   readonly onConfirm?: () => void;
   readonly onProcess?: () => void;
@@ -34,6 +42,14 @@ type POActionsProps = {
 export function POActions({
   purchaseOrderId,
   status,
+  canEdit = false,
+  canConfirm = false,
+  canProcess = false,
+  canShip = false,
+  canMarkReady = false,
+  canDeliver = false,
+  canRefund = false,
+  canCancel = false,
   isLoading = false,
   onConfirm,
   onProcess,
@@ -67,7 +83,7 @@ export function POActions({
             variant="subtle"
             color="gray"
             size="sm"
-            disabled={isLoading}
+            disabled={isLoading || !canEdit}
             aria-label={t('common.edit')}
             onClick={handleEdit}
           >
@@ -79,7 +95,7 @@ export function POActions({
             variant="subtle"
             color="green"
             size="sm"
-            disabled={isLoading}
+            disabled={isLoading || !canConfirm}
             aria-label={t('po.confirm')}
             onClick={handleAction(onConfirm)}
           >
@@ -91,7 +107,7 @@ export function POActions({
             variant="subtle"
             color="red"
             size="sm"
-            disabled={isLoading}
+            disabled={isLoading || !canCancel}
             aria-label={t('po.cancel')}
             onClick={handleAction(onCancel)}
           >
@@ -109,7 +125,7 @@ export function POActions({
             variant="subtle"
             color="blue"
             size="sm"
-            disabled={isLoading}
+            disabled={isLoading || !canProcess}
             aria-label={t('po.process')}
             onClick={handleAction(onProcess)}
           >
@@ -121,7 +137,7 @@ export function POActions({
             variant="subtle"
             color="red"
             size="sm"
-            disabled={isLoading}
+            disabled={isLoading || !canCancel}
             aria-label={t('po.cancel')}
             onClick={handleAction(onCancel)}
           >
@@ -138,7 +154,7 @@ export function POActions({
           variant="subtle"
           color="teal"
           size="sm"
-          disabled={isLoading}
+          disabled={isLoading || !canMarkReady}
           aria-label={t('po.markReady')}
           onClick={handleAction(onMarkReady)}
         >
@@ -154,7 +170,7 @@ export function POActions({
           variant="subtle"
           color="indigo"
           size="sm"
-          disabled={isLoading}
+          disabled={isLoading || !canShip}
           aria-label={t('po.ship')}
           onClick={handleAction(onShip)}
         >
@@ -171,7 +187,7 @@ export function POActions({
             variant="subtle"
             color="green"
             size="sm"
-            disabled={isLoading}
+            disabled={isLoading || !canDeliver}
             aria-label={t('po.markDelivered')}
             onClick={handleAction(onDeliver)}
           >
@@ -183,7 +199,7 @@ export function POActions({
             variant="subtle"
             color="orange"
             size="sm"
-            disabled={isLoading}
+            disabled={isLoading || !canRefund}
             aria-label={t('po.refund')}
             onClick={handleAction(onRefund)}
           >
@@ -200,7 +216,7 @@ export function POActions({
           variant="subtle"
           color="orange"
           size="sm"
-          disabled={isLoading}
+          disabled={isLoading || !canEdit}
           aria-label={t('po.refund')}
           onClick={handleAction(onRefund)}
         >

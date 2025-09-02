@@ -11,6 +11,14 @@ import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 
 type PODataTableProps = {
+  readonly canEdit: boolean;
+  readonly canConfirm?: boolean;
+  readonly canProcess?: boolean;
+  readonly canShip?: boolean;
+  readonly canMarkReady?: boolean;
+  readonly canDeliver?: boolean;
+  readonly canRefund?: boolean;
+  readonly canCancel?: boolean;
   readonly purchaseOrders: readonly PurchaseOrder[];
   readonly noAction?: boolean;
   readonly isLoading?: boolean;
@@ -26,6 +34,14 @@ type PODataTableProps = {
 function PODataTableComponent({
   purchaseOrders,
   noAction = false,
+  canEdit = false,
+  canConfirm = false,
+  canProcess = false,
+  canShip = false,
+  canMarkReady = false,
+  canDeliver = false,
+  canRefund = false,
+  canCancel = false,
   isLoading = false,
   onConfirmPO,
   onProcessPO,
@@ -113,6 +129,14 @@ function PODataTableComponent({
                 {noAction ? null : (
                   <Table.Td onClick={handleStopPropagation}>
                     <POActions
+                      canEdit={canEdit}
+                      canConfirm={canConfirm}
+                      canProcess={canProcess}
+                      canShip={canShip}
+                      canMarkReady={canMarkReady}
+                      canDeliver={canDeliver}
+                      canRefund={canRefund}
+                      canCancel={canCancel}
                       purchaseOrderId={po.id}
                       status={po.status}
                       isLoading={isLoading}

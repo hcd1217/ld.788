@@ -12,7 +12,7 @@ import {
   Center,
   Flex,
 } from '@mantine/core';
-import { IconFileInvoice, IconPlus, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { IconPlus, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { usePOFilters } from '@/hooks/usePOFilters';
 import {
@@ -22,13 +22,14 @@ import {
   usePOActions,
   usePOPaginationState,
 } from '@/stores/usePOStore';
-import { useCustomers } from '@/stores/useAppStore';
+import { useCustomers, usePermissions } from '@/stores/useAppStore';
 import {
   AppPageTitle,
   SwitchView,
   BlankState,
   AppMobileLayout,
   AppDesktopLayout,
+  PermissionDeniedPage,
 } from '@/components/common';
 import {
   POCard,
@@ -52,6 +53,7 @@ export function POListPage() {
   const navigate = useNavigate();
   const { isMobile, isDesktop } = useDeviceType();
   const { t } = useTranslation();
+  const permissions = usePermissions();
   const purchaseOrders = usePurchaseOrderList();
   const customers = useCustomers();
   const isLoading = usePOLoading();
@@ -164,19 +166,25 @@ export function POListPage() {
 
   // Memoized navigation handlers
   const handleNavigateToAdd = useCallback(() => {
+    if (!permissions.purchaseOrder.canCreate) {
+      return;
+    }
     navigate(ROUTERS.PO_ADD);
-  }, [navigate]);
+  }, [navigate, permissions.purchaseOrder.canCreate]);
 
   // Common BlankState configuration to reduce duplication
   const blankStateProps = useMemo(
     () => ({
       hidden: purchaseOrders.length > 0 || isLoading,
-      icon: <IconFileInvoice size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />,
       title: hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound'),
       description: hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription'),
     }),
     [purchaseOrders.length, isLoading, hasActiveFilters, t],
   );
+
+  if (!permissions.purchaseOrder.canView) {
+    return <PermissionDeniedPage />;
+  }
 
   // Initial load is handled by filter effect
 
@@ -253,7 +261,13 @@ export function POListPage() {
             ) : (
               <Stack gap="sm" px="sm">
                 {purchaseOrders.map((po) => (
-                  <POCard key={po.id} noActions isLoading={isLoading} purchaseOrder={po} />
+                  <POCard
+                    canEdit={permissions.purchaseOrder.canEdit}
+                    key={po.id}
+                    noActions
+                    isLoading={isLoading}
+                    purchaseOrder={po}
+                  />
                 ))}
               </Stack>
             )}
@@ -266,7 +280,7 @@ export function POListPage() {
                 variant="light"
                 leftSection={<IconChevronLeft size={16} />}
                 onClick={() => void loadPreviousPage()}
-                disabled={!hasPreviousPage || isLoading}
+                disabled={!hasPreviousPage || isLoading || !permissions.purchaseOrder.canView}
                 size="sm"
               >
                 {t('common.previous')}
@@ -289,8 +303,8 @@ export function POListPage() {
           )}
 
           {/* Floating Action Button for Add PO */}
-          {!isLoading && (
-            <Affix position={{ bottom: 120, right: 20 }}>
+          {!isLoading && permissions.purchaseOrder.canCreate && (
+            <Affix position={{ bottom: 80, right: 10 }}>
               <ActionIcon
                 size="xl"
                 radius="xl"
@@ -314,7 +328,11 @@ export function POListPage() {
           <AppPageTitle title={t('po.title')} />
           <Group gap="sm">
             <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
-            <Button leftSection={<IconPlus size={16} />} onClick={handleNavigateToAdd}>
+            <Button
+              leftSection={<IconPlus size={16} />}
+              onClick={handleNavigateToAdd}
+              disabled={!permissions.purchaseOrder.canCreate}
+            >
               {t('po.addPO')}
             </Button>
           </Group>
@@ -348,6 +366,7 @@ export function POListPage() {
               : {
                   label: t('po.createFirstPO'),
                   onClick: handleNavigateToAdd,
+                  disabled: !permissions.purchaseOrder.canCreate,
                 }
           }
         />
@@ -358,7 +377,12 @@ export function POListPage() {
             {isLoading && purchaseOrders.length === 0 ? (
               <POListSkeleton viewMode={viewMode} count={10} />
             ) : isTableView ? (
-              <PODataTable noAction isLoading={isLoading} purchaseOrders={purchaseOrders} />
+              <PODataTable
+                canEdit={permissions.purchaseOrder.canEdit}
+                noAction={isLoading}
+                isLoading={isLoading}
+                purchaseOrders={purchaseOrders}
+              />
             ) : (
               <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
                 {purchaseOrders.map((po) => (

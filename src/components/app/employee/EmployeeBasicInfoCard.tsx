@@ -17,9 +17,10 @@ import { logError } from '@/utils/logger';
 type EmployeeBasicInfoCardProps = {
   readonly employee: Employee;
   readonly onEdit?: () => void;
+  readonly canEdit: boolean;
 };
 
-export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCardProps) {
+export function EmployeeBasicInfoCard({ employee, canEdit, onEdit }: EmployeeBasicInfoCardProps) {
   const { t } = useTranslation();
   const [opened, { open, close }] = useDisclosure(false);
   const clientCode = useClientCode();
@@ -75,6 +76,7 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
                     leftSection={<IconQrcode size={16} />}
                     variant="subtle"
                     onClick={() => handleGetMagicLink()}
+                    disabled={!employee.isActive || !canEdit}
                   >
                     {t('employee.magicLink')}
                   </Button>
@@ -84,7 +86,7 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
                 leftSection={<IconEdit size={16} />}
                 variant="subtle"
                 onClick={onEdit}
-                disabled={!employee.isActive}
+                disabled={!employee.isActive || !canEdit}
               >
                 {t('common.edit')}
               </Button>

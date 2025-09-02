@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { Stack, Group, Box, SimpleGrid, Select, SegmentedControl, Button } from '@mantine/core';
-import { IconClearAll, IconUser } from '@tabler/icons-react';
+import { IconClearAll } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { useOnce } from '@/hooks/useOnce';
@@ -21,6 +21,7 @@ import {
   BlankState,
   AppMobileLayout,
   AppDesktopLayout,
+  PermissionDeniedPage,
 } from '@/components/common';
 import {
   EmployeeCard,
@@ -36,11 +37,13 @@ import { ROUTERS } from '@/config/routeConfig';
 import { EMPLOYEE_STATUS } from '@/constants/employee';
 import { useDisclosure } from '@mantine/hooks';
 import { useViewMode } from '@/hooks/useViewMode';
+import { usePermissions } from '@/stores/useAppStore';
 
 export function EmployeeListPage() {
   const navigate = useNavigate();
   const { isMobile } = useDeviceType();
   const { t } = useTranslation();
+  const permissions = usePermissions();
   const employees = useEmployeeList();
   const units = useUnitList();
   const isLoading = useHrLoading();
@@ -78,6 +81,10 @@ export function EmployeeListPage() {
     void refreshEmployees();
     void loadUnits();
   });
+
+  if (!permissions.employee.canView) {
+    return <PermissionDeniedPage />;
+  }
 
   if (isMobile) {
     return (
@@ -120,7 +127,6 @@ export function EmployeeListPage() {
 
         <BlankState
           hidden={paginationState.totalItems > 0 || isLoading}
-          icon={<IconUser size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />}
           title={
             filters.searchQuery
               ? t('employee.noEmployeesFoundSearch')
@@ -153,6 +159,7 @@ export function EmployeeListPage() {
         title={t('employee.title')}
         button={{
           label: t('employee.addEmployee'),
+          disabled: !permissions.employee.canCreate,
           onClick() {
             navigate(ROUTERS.EMPLOYEES_ADD);
           },
@@ -206,7 +213,6 @@ export function EmployeeListPage() {
       <div>
         <BlankState
           hidden={paginationState.totalItems > 0 || isLoading}
-          icon={<IconUser size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />}
           title={
             hasActiveFilters ? t('employee.noEmployeesFoundSearch') : t('employee.noEmployeesFound')
           }
@@ -220,6 +226,7 @@ export function EmployeeListPage() {
               ? undefined
               : {
                   label: t('employee.createFirstEmployee'),
+                  disabled: !permissions.employee.canCreate,
                   onClick: () => navigate(ROUTERS.EMPLOYEES_ADD),
                 }
           }

@@ -5,10 +5,15 @@ import { useForm } from '@mantine/form';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { AppPageTitle, AppMobileLayout, AppDesktopLayout } from '@/components/common';
+import {
+  AppPageTitle,
+  AppMobileLayout,
+  AppDesktopLayout,
+  PermissionDeniedPage,
+} from '@/components/common';
 import { POForm, POErrorBoundary } from '@/components/app/po';
 import { usePOActions, usePOLoading, usePOError } from '@/stores/usePOStore';
-import { useCustomers } from '@/stores/useAppStore';
+import { useCustomers, usePermissions } from '@/stores/useAppStore';
 import { purchaseOrderService } from '@/services/sales/purchaseOrder';
 import { ROUTERS } from '@/config/routeConfig';
 import { getPODetailRoute } from '@/config/routeConfig';
@@ -30,8 +35,8 @@ export function POFormPage({ mode }: POFormPageProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
+  const permissions = usePermissions();
   const customers = useCustomers();
-
   const isLoading = usePOLoading();
   const error = usePOError();
   const { clearError, createPurchaseOrder, updatePurchaseOrder } = usePOActions();
@@ -183,6 +188,14 @@ export function POFormPage({ mode }: POFormPageProps) {
       )}
     </POErrorBoundary>
   );
+
+  if (isEditMode && !permissions.purchaseOrder.canEdit) {
+    return <PermissionDeniedPage />;
+  }
+
+  if (!isEditMode && !permissions.purchaseOrder.canCreate) {
+    return <PermissionDeniedPage />;
+  }
 
   if (isMobile) {
     return (

@@ -6,11 +6,13 @@ import type { Employee } from '@/services/hr/employee';
 
 type EmployeeDangerZoneProps = {
   readonly employee: Employee;
+  readonly canEdit: boolean;
   readonly onActivate: () => void;
   readonly onDeactivate: () => void;
 };
 
 export function EmployeeDangerZone({
+  canEdit,
   employee,
   onActivate,
   onDeactivate,
@@ -87,6 +89,7 @@ export function EmployeeDangerZone({
                   <Button
                     color="green"
                     leftSection={<IconUserCheck size={16} />}
+                    disabled={!canEdit}
                     onClick={onActivate}
                   >
                     {t('employee.activate')}
@@ -104,6 +107,7 @@ export function EmployeeDangerZone({
                     fullWidth
                     color="green"
                     leftSection={<IconUserCheck size={16} />}
+                    disabled={!canEdit}
                     onClick={onActivate}
                   >
                     {t('employee.activate')}

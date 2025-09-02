@@ -1,12 +1,6 @@
 import * as z from 'zod/v4';
 import { BaseApiClient } from '../base';
 import {
-  RegisterClientRequestSchema,
-  RegisterClientResponseSchema,
-  RegisterUserByRootUserRequestSchema,
-  RegisterUserByRootUserResponseSchema,
-  RegisterBulkUsersByRootUserRequestSchema,
-  RegisterBulkUsersByRootUserResponseSchema,
   GetAllRolesResponseSchema,
   AddRoleRequestSchema,
   AddRoleResponseSchema,
@@ -26,12 +20,6 @@ import {
   GetMyRolesResponseSchema,
   GetUserPermissionsResponseSchema,
   GetUserRolesResponseSchema,
-  type RegisterClientRequest,
-  type RegisterClientResponse,
-  type RegisterUserByRootUserRequest,
-  type RegisterUserByRootUserResponse,
-  type RegisterBulkUsersByRootUserRequest,
-  type RegisterBulkUsersByRootUserResponse,
   type GetAllRolesResponse,
   type AddRoleRequest,
   type AddRoleResponse,
@@ -56,37 +44,6 @@ import {
 import { ClientPublicConfigSchema } from '../schemas';
 
 export class ClientApi extends BaseApiClient {
-  async register(data: RegisterClientRequest): Promise<RegisterClientResponse> {
-    return this.post<RegisterClientResponse, RegisterClientRequest>(
-      '/clients/register',
-      data,
-      RegisterClientResponseSchema,
-      RegisterClientRequestSchema,
-    );
-  }
-
-  async registerUserByRootUser(
-    data: RegisterUserByRootUserRequest,
-  ): Promise<RegisterUserByRootUserResponse> {
-    return this.post<RegisterUserByRootUserResponse, RegisterUserByRootUserRequest>(
-      '/clients/user/register',
-      data,
-      RegisterUserByRootUserResponseSchema,
-      RegisterUserByRootUserRequestSchema,
-    );
-  }
-
-  async registerBulkUsersByRootUser(
-    data: RegisterBulkUsersByRootUserRequest,
-  ): Promise<RegisterBulkUsersByRootUserResponse> {
-    return this.post<RegisterBulkUsersByRootUserResponse, RegisterBulkUsersByRootUserRequest>(
-      '/clients/user/register/bulk',
-      data,
-      RegisterBulkUsersByRootUserResponseSchema,
-      RegisterBulkUsersByRootUserRequestSchema,
-    );
-  }
-
   async getAllRoles(): Promise<GetAllRolesResponse> {
     return this.get<GetAllRolesResponse, void>('/api/roles', undefined, GetAllRolesResponseSchema);
   }

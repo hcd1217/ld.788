@@ -6,7 +6,6 @@ import { ROUTERS } from '@/config/routeConfig';
 import {
   TimekeeperDashboardPage,
   ServiceLayout,
-  RootUserLayout,
   NotFound,
   HomePage,
   MobileOnlyLayout,
@@ -14,16 +13,11 @@ import {
   MyTimesheetPage,
 } from './components';
 import { authRouteObjects } from './auth';
-import { adminRouteObjects } from './admin';
 import { configRouteObjects } from './config';
 import { salesRouteObjects } from './sales';
-import { procurementRouteObjects } from './procurement';
 import { deliveryRouteObjects } from './delivery';
 import { appRouteObjects } from './app';
-import { userRouteObjects } from './user';
-import { storeRouteObjects } from './store';
 import { managementRouteObjects } from './management';
-import { Sample } from '@/pages/Sample';
 
 // Type for route with theme metadata
 export type ThemeRouteObject = RouteObject & {
@@ -32,11 +26,6 @@ export type ThemeRouteObject = RouteObject & {
 };
 
 export const routeObjects: ThemeRouteObject[] = [
-  // Sample route
-  {
-    path: '/sample',
-    Component: Sample,
-  },
   // Root route
   {
     path: ROUTERS.ROOT,
@@ -78,7 +67,6 @@ export const routeObjects: ThemeRouteObject[] = [
       ...configRouteObjects,
       ...managementRouteObjects,
       ...salesRouteObjects,
-      ...procurementRouteObjects,
       ...deliveryRouteObjects,
     ],
   },
@@ -91,17 +79,8 @@ export const routeObjects: ThemeRouteObject[] = [
         <ResponsiveAuthLayout />
       </ProtectedRoute>
     ),
-    children: [
-      ...appRouteObjects,
-      {
-        path: '',
-        Component: RootUserLayout,
-        children: [...storeRouteObjects, ...userRouteObjects],
-      },
-    ],
+    children: [...appRouteObjects],
   },
-  // ADMIN routes (default elegant theme)
-  ...adminRouteObjects,
 ];
 
 export const router = createBrowserRouter([

@@ -13,6 +13,7 @@ import type { Employee } from '@/services/hr/employee';
 
 type EmployeeDetailTabsProps = {
   readonly employee: Employee;
+  readonly canEdit: boolean;
   readonly onEdit: () => void;
   readonly onActivate: () => void;
   readonly onDeactivate: () => void;
@@ -20,6 +21,7 @@ type EmployeeDetailTabsProps = {
 
 export function EmployeeDetailTabs({
   employee,
+  canEdit,
   onEdit,
   onActivate,
   onDeactivate,
@@ -55,9 +57,10 @@ export function EmployeeDetailTabs({
         >
           <Box style={{ maxWidth: '800px', width: '100%' }}>
             <Stack gap="xl">
-              <EmployeeBasicInfoCard employee={employee} onEdit={onEdit} />
+              <EmployeeBasicInfoCard employee={employee} canEdit={canEdit} onEdit={onEdit} />
               <EmployeeDangerZone
                 employee={employee}
+                canEdit={canEdit}
                 onActivate={onActivate}
                 onDeactivate={onDeactivate}
               />

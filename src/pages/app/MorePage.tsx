@@ -1,249 +1,151 @@
+import { Text, Card, Stack, Group, Button, Divider, rem, Box } from '@mantine/core';
 import {
-  Title,
-  Text,
-  Container,
-  Card,
-  Stack,
-  Group,
-  Button,
-  Divider,
-  rem,
-  Box,
-} from '@mantine/core';
-import {
-  IconHome,
-  IconSearch,
   IconBell,
   IconUser,
-  IconBugOff,
   IconExternalLink,
-  IconInfoCircle,
   IconLogout,
-  IconUserPlus,
-  IconBuildingStore,
   IconUsersGroup,
   IconClock,
+  IconPackage,
+  IconSettings,
 } from '@tabler/icons-react';
 import { Navigate, useNavigate } from 'react-router';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/stores/useAppStore';
-import { useIsDarkMode } from '@/hooks/useIsDarkMode';
-import { isDevelopment } from '@/utils/env';
 import { ROUTERS } from '@/config/routeConfig';
+import { useCallback, useMemo } from 'react';
+import { isDevelopment } from '@/utils/env';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { AppMobileLayout } from '@/components/common';
 
 export function MorePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user, logout } = useAppStore();
-  const isDarkMode = useIsDarkMode();
+  const { isDesktop } = useDeviceType();
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logout();
     navigate(ROUTERS.ROOT);
-  };
+  }, [logout, navigate]);
 
-  const menuItems = [
-    {
-      title: t('common.pages.dashboard'),
-      description: 'Main dashboard overview',
-      icon: IconHome,
-      onClick: () => navigate(ROUTERS.HOME),
-      color: 'blue',
-    },
-    {
-      title: 'Timekeeper',
-      description: 'Manage timekeeping and attendance',
-      icon: IconClock,
-      onClick: () => navigate(ROUTERS.TIME_KEEPER_DASHBOARD),
-      color: 'green',
-    },
-    {
-      title: 'Store Management',
-      description: 'Manage your stores and locations',
-      icon: IconBuildingStore,
-      onClick: () => navigate(ROUTERS.STORES),
-      color: 'indigo',
-    },
-    {
-      title: 'Staff Management',
-      description: 'Manage staff members and permissions',
-      icon: IconUsersGroup,
-      onClick: () => navigate(ROUTERS.STAFF),
-      color: 'violet',
-    },
-    {
-      title: t('common.pages.explore'),
-      description: 'Discover new content',
-      icon: IconSearch,
-      onClick: () => navigate(ROUTERS.EXPLORE),
-      color: 'teal',
-    },
-    {
-      title: t('common.pages.notifications'),
-      description: 'Your notifications and alerts',
-      icon: IconBell,
-      onClick: () => navigate(ROUTERS.NOTIFICATIONS),
-      color: 'orange',
-    },
-    {
-      title: t('common.pages.profile'),
-      description: 'Manage your profile',
-      icon: IconUser,
-      onClick: () => navigate(ROUTERS.PROFILE),
-      color: 'grape',
-    },
-  ];
-
-  const utilityItems = [
-    {
-      title: t('common.pages.addUser'),
-      description: 'Add new users to the system',
-      icon: IconUserPlus,
-      onClick: () => navigate(ROUTERS.ADD_USER),
-      color: 'blue',
-      hidden: !user?.isRoot,
-    },
-    {
-      title: 'Error Testing',
-      description: 'Test error handling (Dev only)',
-      icon: IconBugOff,
-      onClick: () => navigate(ROUTERS.SAMPLE_ERRORS),
-      color: 'red',
-      devOnly: true,
-    },
-    {
-      title: t('common.pages.about'),
-      description: 'About this application',
-      icon: IconInfoCircle,
-      onClick: () => navigate(ROUTERS.ROOT),
-      color: 'cyan',
-    },
-  ].filter((item) => !item.hidden);
+  const menuItems = useMemo(() => {
+    return [
+      {
+        title: t('common.pages.timeKeeper'),
+        description: t('common.pages.timeKeeperDescription'),
+        icon: IconClock,
+        onClick: () => navigate(ROUTERS.TIME_KEEPER_DASHBOARD),
+        color: 'green',
+        hidden: !isDevelopment,
+      },
+      {
+        title: t('common.pages.employeeManagement'),
+        description: t('common.pages.employeeManagementDescription'),
+        icon: IconUsersGroup,
+        onClick: () => navigate(ROUTERS.EMPLOYEE_MANAGEMENT),
+        color: 'cyan',
+      },
+      {
+        title: t('common.pages.productConfig'),
+        description: t('common.pages.productConfigDescription'),
+        icon: IconPackage,
+        onClick: () => navigate(ROUTERS.PRODUCT_CONFIG),
+        color: 'pink',
+      },
+      {
+        title: t('common.pages.customerConfig'),
+        description: t('common.pages.customerConfigDescription'),
+        icon: IconSettings,
+        onClick: () => navigate(ROUTERS.CUSTOMER_CONFIG),
+        color: 'lime',
+      },
+      {
+        title: t('common.pages.notifications'),
+        description: t('common.pages.notificationsDescription'),
+        icon: IconBell,
+        onClick: () => navigate(ROUTERS.NOTIFICATIONS),
+        color: 'orange',
+      },
+      {
+        title: t('common.pages.profile'),
+        description: t('common.pages.profileDescription'),
+        icon: IconUser,
+        onClick: () => navigate(ROUTERS.PROFILE),
+        color: 'grape',
+      },
+    ].filter((item) => !item.hidden);
+  }, [t, navigate]);
 
   if (!user) {
     return <Navigate to={ROUTERS.LOGIN} />;
   }
 
+  if (isDesktop) {
+    return <Navigate to={ROUTERS.HOME} />;
+  }
+
   return (
-    <Container fluid mt="xl">
-      <Stack gap="xl">
-        <Box
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-            padding: '0 16px',
-          }}
-        >
-          <Box style={{ maxWidth: '600px', width: '100%' }}>
-            <Card shadow="sm" padding="lg" radius="md">
-              <Title order={1} mb="lg">
-                {t('common.pages.more')}
-              </Title>
-
-              <Card withBorder p="md" mb="lg" bg={isDarkMode ? 'dark.6' : 'gray.0'}>
-                <Group>
-                  <IconUser size={20} />
-                  <div>
-                    <Text fw={500}>{user.email}</Text>
-                    <Text size="sm" c="dimmed">
-                      {t('common.pages.account')}
-                    </Text>
-                  </div>
-                </Group>
-              </Card>
-
-              <Stack gap="md">
-                <div>
-                  <Text fw={600} mb="sm">
-                    Navigation
-                  </Text>
-                  <Stack gap="xs">
-                    {menuItems.map((item) => (
-                      <Card
-                        key={item.title}
-                        withBorder
-                        p="md"
-                        style={{ cursor: 'pointer' }}
-                        onClick={item.onClick}
-                      >
-                        <Group justify="space-between">
-                          <Group gap="sm">
-                            <item.icon
-                              size={20}
-                              style={{
-                                color: `var(--mantine-color-${item.color}-6)`,
-                              }}
-                            />
-                            <div>
-                              <Text fw={500}>{item.title}</Text>
-                              <Text size="sm" c="dimmed">
-                                {item.description}
-                              </Text>
-                            </div>
-                          </Group>
-                          <IconExternalLink
-                            size={16}
-                            style={{ color: 'var(--mantine-color-gray-5)' }}
-                          />
-                        </Group>
-                      </Card>
-                    ))}
-                  </Stack>
-                </div>
-
-                <Divider />
-
-                <div>
-                  <Text fw={600} mb="sm">
-                    Utilities
-                  </Text>
-                  <Stack gap="xs">
-                    {utilityItems
-                      .filter((item) => !item.devOnly || isDevelopment)
-                      .map((item) => (
-                        <Card
-                          key={item.title}
-                          withBorder
-                          p="md"
-                          style={{ cursor: 'pointer' }}
-                          onClick={item.onClick}
-                        >
-                          <Group justify="space-between">
-                            <Group gap="sm">
-                              <item.icon
-                                size={20}
-                                style={{
-                                  color: `var(--mantine-color-${item.color}-6)`,
-                                }}
-                              />
-                              <div>
-                                <Text fw={500}>{item.title}</Text>
-                                <Text size="sm" c="dimmed">
-                                  {item.description}
-                                </Text>
-                              </div>
-                            </Group>
-                            <IconExternalLink
-                              size={16}
-                              style={{ color: 'var(--mantine-color-gray-5)' }}
-                            />
-                          </Group>
-                        </Card>
-                      ))}
-                  </Stack>
-                </div>
-
-                <Divider />
-                <Button fullWidth color="red" variant="light" onClick={handleLogout}>
-                  <IconLogout size={rem(16)} />
-                  <Text ml="xs">{t('common.logout')}</Text>
-                </Button>
+    <AppMobileLayout noHeader>
+      <Box style={{ maxWidth: '600px', width: '100%' }}>
+        <Card shadow="sm" padding="lg" radius="md">
+          <Stack gap="md">
+            <div>
+              <Text fw={600} mb="sm">
+                {t('common.navigation')}
+              </Text>
+              <Stack gap="xs">
+                {menuItems.map((item) => (
+                  <Card
+                    key={item.title}
+                    withBorder
+                    p="md"
+                    style={{ cursor: 'pointer' }}
+                    onClick={item.onClick}
+                  >
+                    <Group
+                      justify="space-between"
+                      style={{
+                        position: 'relative',
+                      }}
+                    >
+                      <Group gap="sm">
+                        <item.icon
+                          size={20}
+                          style={{
+                            color: `var(--mantine-color-${item.color}-6)`,
+                          }}
+                        />
+                        <div>
+                          <Text fw={500}>{item.title}</Text>
+                          <Text size="sm" c="dimmed">
+                            {item.description}
+                          </Text>
+                        </div>
+                      </Group>
+                      <IconExternalLink
+                        size={16}
+                        style={{
+                          position: 'absolute',
+                          right: 0,
+                          top: -3,
+                          color: 'var(--mantine-color-gray-5)',
+                        }}
+                      />
+                    </Group>
+                  </Card>
+                ))}
               </Stack>
-            </Card>
-          </Box>
-        </Box>
-      </Stack>
-    </Container>
+            </div>
+
+            <Divider />
+            <Button fullWidth color="red" variant="light" onClick={handleLogout}>
+              <IconLogout size={rem(16)} />
+              <Text ml="xs">{t('common.logout')}</Text>
+            </Button>
+          </Stack>
+        </Card>
+      </Box>
+    </AppMobileLayout>
   );
 }

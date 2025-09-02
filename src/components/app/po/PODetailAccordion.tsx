@@ -11,6 +11,14 @@ import { ViewOnMap } from '@/components/common';
 type PODetailAccordionProps = {
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading?: boolean;
+  readonly canEdit: boolean;
+  readonly canConfirm?: boolean;
+  readonly canProcess?: boolean;
+  readonly canShip?: boolean;
+  readonly canMarkReady?: boolean;
+  readonly canDeliver?: boolean;
+  readonly canRefund?: boolean;
+  readonly canCancel?: boolean;
   readonly onEdit: () => void;
   readonly onConfirm: () => void;
   readonly onProcess: () => void;
@@ -24,6 +32,14 @@ type PODetailAccordionProps = {
 
 export function PODetailAccordion({
   purchaseOrder,
+  canEdit = false,
+  canConfirm = false,
+  canProcess = false,
+  canShip = false,
+  canMarkReady = false,
+  canDeliver = false,
+  canRefund = false,
+  canCancel = false,
   isLoading = false,
   onEdit,
   onConfirm,
@@ -48,6 +64,7 @@ export function PODetailAccordion({
             <POAccordionInfoPanel
               purchaseOrder={purchaseOrder}
               isLoading={isLoading}
+              canEdit={canEdit}
               onEdit={onEdit}
             />
           </Accordion.Panel>
@@ -91,6 +108,14 @@ export function PODetailAccordion({
       </Accordion>
 
       <POAccordionActions
+        canEdit={canEdit}
+        canConfirm={canConfirm}
+        canProcess={canProcess}
+        canShip={canShip}
+        canMarkReady={canMarkReady}
+        canDeliver={canDeliver}
+        canRefund={canRefund}
+        canCancel={canCancel}
         purchaseOrder={purchaseOrder}
         isLoading={isLoading}
         onConfirm={onConfirm}

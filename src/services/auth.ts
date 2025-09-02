@@ -1,11 +1,4 @@
-import {
-  authApi,
-  type LoginRequest,
-  type ForgotPasswordRequest,
-  type ForgotPasswordResponse,
-  type ResetPasswordRequest,
-  type ResetPasswordResponse,
-} from '@/lib/api';
+import { authApi, type LoginRequest } from '@/lib/api';
 import { logError } from '@/utils/logger';
 import { isTokenExpired } from '@/utils/jwt';
 import { delay } from '@/utils/time';
@@ -95,33 +88,6 @@ export const authService = {
     }
 
     return true;
-  },
-
-  async forgotPassword(data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
-    try {
-      const response = await authApi.forgotPassword(data);
-      return response;
-    } catch (error) {
-      logError('Failed to send password reset email', error, {
-        module: 'AuthService',
-        action: 'forgotPassword',
-        metadata: { email: data.email },
-      });
-      throw error;
-    }
-  },
-
-  async resetPassword(data: ResetPasswordRequest): Promise<ResetPasswordResponse> {
-    try {
-      const response = await authApi.resetPassword(data);
-      return response;
-    } catch (error) {
-      logError('Failed to reset password', error, {
-        module: 'AuthService',
-        action: 'resetPassword',
-      });
-      throw error;
-    }
   },
 };
 

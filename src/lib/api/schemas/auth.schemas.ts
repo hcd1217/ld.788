@@ -5,13 +5,15 @@ import {
   idSchema,
   jwtTokenSchema,
   numberSchema,
+  optionalBooleanSchema,
   optionalStringSchema,
   passwordSchema,
   stringSchema,
 } from './common.schemas';
-import { ClientConfigSchema, RouteConfigSchema } from './clientConfig.schemas';
+import { ClientConfigSchema } from './clientConfig.schemas';
 import { DepartmentSchema, EmployeeSchema } from './hr.schemas';
 import { renderFullName } from '@/utils/string';
+import { isDevelopment } from '@/utils/env';
 
 // Schemas
 export const LoginRequestSchema = z.object({
@@ -51,44 +53,102 @@ export const JWTPayloadSchema = z.object({
   exp: numberSchema,
 });
 
-export const ForgotPasswordRequestSchema = z.object({
-  email: emailSchema,
-  clientCode: z.string().min(2),
-});
-
-export const ForgotPasswordResponseSchema = z.object({
-  success: booleanSchema,
-});
-
-export const ResetPasswordRequestSchema = z.object({
-  email: emailSchema,
-  token: stringSchema,
-  password: passwordSchema,
-});
-
-export const ResetPasswordResponseSchema = z.object({
-  success: booleanSchema,
-});
-
-export const RegisterRequestSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
-  firstName: stringSchema.min(1),
-  lastName: stringSchema.min(1),
-  clientCode: stringSchema.min(2),
-  clientName: stringSchema.min(5),
-});
-
-export const RegisterResponseSchema = z.object({
-  accessToken: stringSchema,
-  refreshToken: stringSchema,
-});
-
 // Schema for role object
 export const RoleSchema = z.object({
   name: stringSchema,
   level: numberSchema,
 });
+
+const PermissionSchema = z
+  .object({
+    employee: z.object({
+      canView: booleanSchema,
+      canCreate: booleanSchema,
+      canEdit: booleanSchema,
+      canDelete: booleanSchema,
+    }),
+    purchaseOrder: z.object({
+      canView: booleanSchema,
+      canCreate: booleanSchema,
+      canEdit: booleanSchema,
+      canDelete: booleanSchema,
+      actions: z
+        .object({
+          canConfirm: optionalBooleanSchema,
+          canProcess: optionalBooleanSchema,
+          canShip: optionalBooleanSchema,
+          canDeliver: optionalBooleanSchema,
+          canMarkReady: optionalBooleanSchema,
+          canRefund: optionalBooleanSchema,
+          canCancel: optionalBooleanSchema,
+        })
+        .optional(),
+    }),
+    deliveryRequest: z
+      .object({
+        canView: booleanSchema,
+        canCreate: booleanSchema,
+        canEdit: booleanSchema,
+        canDelete: booleanSchema,
+        actions: z
+          .object({
+            canStartTransit: optionalBooleanSchema,
+            canComplete: optionalBooleanSchema,
+            canTakePhoto: optionalBooleanSchema,
+          })
+          .optional(),
+      })
+      .transform((val) => {
+        return {
+          ...val,
+          actions: {
+            canStartTransit: val.canEdit,
+            canComplete: val.canEdit,
+            canTakePhoto: val.canEdit,
+          },
+        };
+      }),
+  })
+  .transform((val) => {
+    const debug = false;
+    if (debug && isDevelopment) {
+      return {
+        purchaseOrder: {
+          canView: true,
+          canCreate: true,
+          canEdit: true,
+          canDelete: true,
+          actions: {
+            canConfirm: true,
+            canProcess: true,
+            canShip: true,
+            canMarkReady: true,
+            canDeliver: true,
+            canRefund: true,
+            canCancel: true,
+          },
+        },
+        deliveryRequest: {
+          canView: true,
+          canCreate: true,
+          canEdit: true,
+          canDelete: true,
+          actions: {
+            canStartTransit: true,
+            canComplete: true,
+            canTakePhoto: true,
+          },
+        },
+        employee: {
+          canView: true,
+          canCreate: true,
+          canEdit: true,
+          canDelete: true,
+        },
+      } satisfies typeof val;
+    }
+    return val;
+  });
 
 // Schema for GET /auth/me response
 export const GetMeResponseSchema = z
@@ -101,9 +161,9 @@ export const GetMeResponseSchema = z
     isRoot: booleanSchema,
     roles: z.array(RoleSchema),
     clientConfig: ClientConfigSchema.optional(),
-    routeConfig: RouteConfigSchema.optional(),
     employee: EmployeeSchema.optional(),
     department: DepartmentSchema.optional(),
+    permissions: PermissionSchema,
   })
   .transform((val) => {
     if (val.userName) {
@@ -128,11 +188,5 @@ export type VerifyMagicLinkResponse = z.infer<typeof VerifyMagicLinkResponseSche
 export type RenewTokenRequest = z.infer<typeof RenewTokenRequestSchema>;
 export type RenewTokenResponse = z.infer<typeof RenewTokenResponseSchema>;
 export type JWTPayload = z.infer<typeof JWTPayloadSchema>;
-export type ForgotPasswordRequest = z.infer<typeof ForgotPasswordRequestSchema>;
-export type ForgotPasswordResponse = z.infer<typeof ForgotPasswordResponseSchema>;
-export type ResetPasswordRequest = z.infer<typeof ResetPasswordRequestSchema>;
-export type ResetPasswordResponse = z.infer<typeof ResetPasswordResponseSchema>;
-export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
-export type RegisterResponse = z.infer<typeof RegisterResponseSchema>;
 export type Role = z.infer<typeof RoleSchema>;
 export type GetMeResponse = z.infer<typeof GetMeResponseSchema>;

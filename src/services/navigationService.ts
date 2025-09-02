@@ -2,7 +2,6 @@ import type { NavigationItemType as BackendNavigationItem } from '@/lib/api/sche
 import type { NavigationItem as FrontendNavigationItem } from '@/components/layouts/types';
 import { getIcon } from '@/utils/iconRegistry';
 import { getRoute } from '@/config/routeConfig';
-import { NAVIGATION_STRUCTURE, MOBILE_NAVIGATION_STRUCTURE } from '@/config/navigationConfig';
 // Translation function type is 'any' to match existing NavBar.tsx pattern
 
 /**
@@ -54,82 +53,11 @@ function transformBackendNavigation(
   return sortedItems.map((item) => transformBackendItem(item, t));
 }
 
-interface StaticNavigationItem {
-  hidden?: boolean;
-  path?: string;
-  activePaths?: readonly string[];
-  id: string;
-  subs?: readonly StaticNavigationItem[];
-}
-/**
- * Transforms static navigation structure to frontend format
- * Used as fallback when backend navigation is not available
- * @param staticNav Static navigation configuration
- * @param t Translation function
- * @param routeConfig Optional route permissions
- * @param skipHiddenFilter Skip filtering of hidden items (useful when profile is loading)
- * @returns Array of frontend navigation items
- */
-export function transformStaticNavigation(
-  staticNav: readonly StaticNavigationItem[],
-  t: any,
-  routeConfig?: Record<string, boolean>,
-  skipHiddenFilter?: boolean,
-): FrontendNavigationItem[] {
-  return staticNav
-    .filter((item: StaticNavigationItem) => {
-      // Skip filtering hidden items if profile is loading to show full menu
-      if (!skipHiddenFilter && 'hidden' in item && item.hidden) {
-        return false;
-      }
-      // Filter by route permissions if available
-      if ('path' in item && item.path && routeConfig && !routeConfig[item.path]) {
-        return false;
-      }
-      return true;
-    })
-    .map((item: any) => {
-      const frontendItem: FrontendNavigationItem = {
-        id: item.id,
-        label: t(item.translationKey),
-        icon: item.icon,
-        path: 'path' in item ? item.path : undefined,
-        activePaths: 'activePaths' in item && item.activePaths ? [...item.activePaths] : undefined,
-      };
-
-      // Transform sub-items
-      if ('subs' in item && item.subs) {
-        frontendItem.subs = item.subs
-          .filter((sub: any) => {
-            // Skip filtering hidden items if profile is loading
-            if (!skipHiddenFilter && 'hidden' in sub && sub.hidden) {
-              return false;
-            }
-            if ('path' in sub && sub.path && routeConfig && !routeConfig[sub.path]) {
-              return false;
-            }
-            return true;
-          })
-          .map((sub: any) => ({
-            id: sub.id,
-            label: t(sub.translationKey),
-            icon: sub.icon,
-            path: 'path' in sub ? sub.path : undefined,
-            activePaths: 'activePaths' in sub && sub.activePaths ? [...sub.activePaths] : undefined,
-          }));
-      }
-
-      return frontendItem;
-    });
-}
-
 /**
  * Gets navigation items with backend priority and static fallback
  * @param backendNav Optional backend navigation configuration
  * @param t Translation function
- * @param routeConfig Optional route permissions for static navigation
  * @param userRoles Optional user roles for role-based filtering
- * @param isProfileLoading Whether the user profile is still loading
  * @returns Array of frontend navigation items ready for rendering
  */
 export function getNavigationItems(
@@ -143,13 +71,11 @@ export function getNavigationItems(
    *  // Get navigation items from backend or static fallback
    *  // Backend navigation takes priority if available
    *  const navigationItems = useMemo(() => {
-   *    return getNavigationItems(userProfile?.clientConfig?.navigation, t, routeConfig);
-   *  }, [userProfile, t, routeConfig]);
+   *    return getNavigationItems(userProfile?.clientConfig?.navigation, t);
+   *  }, [userProfile, t]);
    */
   t: any,
-  routeConfig?: Record<string, boolean>,
   userRoles?: string[],
-  isProfileLoading?: boolean,
 ): FrontendNavigationItem[] {
   // Use backend navigation if available
   if (backendNav?.length) {
@@ -158,9 +84,7 @@ export function getNavigationItems(
     return transformBackendNavigation(processedNav, t);
   }
 
-  // Fallback to static navigation
-  // When profile is loading, don't filter out hidden items to avoid showing minimal menu
-  return transformStaticNavigation(NAVIGATION_STRUCTURE, t, routeConfig, isProfileLoading);
+  throw new Error('No backend navigation found');
 }
 
 /**
@@ -260,17 +184,13 @@ export function filterNavigationByFeatureFlags(
  * Gets mobile navigation items with backend priority and static fallback
  * @param backendMobileNav Optional backend mobile navigation configuration
  * @param t Translation function
- * @param routeConfig Optional route permissions for static navigation
  * @param userRoles Optional user roles for role-based filtering
- * @param isProfileLoading Whether the user profile is still loading
  * @returns Array of frontend navigation items ready for mobile navigation
  */
 export function getMobileNavigationItems(
   backendMobileNav: BackendNavigationItem[] | undefined,
   t: any,
-  routeConfig?: Record<string, boolean>,
   userRoles?: string[],
-  isProfileLoading?: boolean,
 ): FrontendNavigationItem[] {
   // Use backend mobile navigation if available
   if (backendMobileNav?.length) {
@@ -281,7 +201,5 @@ export function getMobileNavigationItems(
     return transformBackendNavigation(processedNav, t);
   }
 
-  // Fallback to static mobile navigation
-  // When profile is loading, don't filter out hidden items
-  return transformStaticNavigation(MOBILE_NAVIGATION_STRUCTURE, t, routeConfig, isProfileLoading);
+  throw new Error('No backend mobile navigation found');
 }

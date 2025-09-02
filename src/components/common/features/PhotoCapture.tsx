@@ -54,7 +54,7 @@ export function PhotoCapture({ opened, onClose, onCapture, config, labels }: Pho
       keep: labels?.keep ?? t('common.photos.upload'),
       uploading: labels?.uploading ?? t('common.photos.uploading'),
       permissionDenied: labels?.permissionDenied ?? t('common.photos.permissionDenied'),
-      tryAgain: labels?.tryAgain ?? t('common.photos.tryAgain'),
+      tryAgain: labels?.tryAgain ?? t('common.tryAgain'),
     };
   }, [labels, t]);
 

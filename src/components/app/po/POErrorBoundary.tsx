@@ -109,7 +109,7 @@ function ErrorFallback({ error, componentName, onReset }: ErrorFallbackProps) {
           leftSection={<IconRefresh size={16} />}
           onClick={onReset}
         >
-          {t('admin.clients.tryAgain')}
+          {t('common.tryAgain')}
         </Button>
       </Stack>
     </Alert>

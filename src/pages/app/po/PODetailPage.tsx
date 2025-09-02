@@ -7,7 +7,7 @@ import { useDeviceType } from '@/hooks/useDeviceType';
 import { useCurrentPO, usePOActions, usePOLoading, usePOError } from '@/stores/usePOStore';
 import { usePOModals } from '@/hooks/usePOModals';
 import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
-import { AppPageTitle } from '@/components/common';
+import { AppPageTitle, PermissionDeniedPage } from '@/components/common';
 import { AppMobileLayout, AppDesktopLayout } from '@/components/common';
 import {
   PODetailTabs,
@@ -17,16 +17,18 @@ import {
   PODetailTabsSkeleton,
   DeliveryRequestModal,
 } from '@/components/app/po';
-import { getPOEditRoute, getDeliveryListRoute, ROUTERS } from '@/config/routeConfig';
+import { getPOEditRoute, ROUTERS } from '@/config/routeConfig';
 import { useAction } from '@/hooks/useAction';
 import { isPOEditable } from '@/utils/purchaseOrder';
 import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
+import { usePermissions } from '@/stores/useAppStore';
 
 export function PODetailPage() {
   const { poId } = useParams<{ poId: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
+  const permissions = usePermissions();
   const purchaseOrder = useCurrentPO();
   const isLoading = usePOLoading();
   const error = usePOError();
@@ -57,7 +59,7 @@ export function PODetailPage() {
   );
 
   const handleEdit = () => {
-    if (purchaseOrder && isPOEditable(purchaseOrder)) {
+    if (purchaseOrder && isPOEditable(purchaseOrder) && permissions.purchaseOrder.canEdit) {
       navigate(getPOEditRoute(purchaseOrder.id));
     }
   };
@@ -121,6 +123,9 @@ export function PODetailPage() {
       if (!selectedPO) {
         throw new Error(t('po.confirmFailed'));
       }
+      if (!permissions.purchaseOrder.actions?.canConfirm) {
+        throw new Error(t('po.confirmFailed'));
+      }
       await confirmPurchaseOrder(selectedPO.id);
       closeModal('confirm');
     },
@@ -137,6 +142,9 @@ export function PODetailPage() {
       if (!selectedPO) {
         throw new Error(t('po.processFailed'));
       }
+      if (!permissions.purchaseOrder.actions?.canProcess) {
+        throw new Error(t('po.processFailed'));
+      }
       await processPurchaseOrder(selectedPO.id);
       closeModal('process');
     },
@@ -151,6 +159,9 @@ export function PODetailPage() {
     },
     async actionHandler(data?: { pickupLocation?: string; notificationMessage?: string }) {
       if (!selectedPO) {
+        throw new Error(t('po.markReadyFailed'));
+      }
+      if (!permissions.purchaseOrder.actions?.canMarkReady) {
         throw new Error(t('po.markReadyFailed'));
       }
       await markPurchaseOrderReady(selectedPO.id, data);
@@ -201,6 +212,9 @@ export function PODetailPage() {
       if (!selectedPO) {
         throw new Error(t('po.cancelFailed'));
       }
+      if (!permissions.purchaseOrder.actions?.canCancel) {
+        throw new Error(t('po.cancelFailed'));
+      }
       await cancelPurchaseOrder(selectedPO.id, data);
       closeModal('cancel');
     },
@@ -217,6 +231,9 @@ export function PODetailPage() {
       if (!selectedPO) {
         throw new Error(t('po.refundFailed'));
       }
+      if (!permissions.purchaseOrder.actions?.canRefund) {
+        throw new Error(t('po.refundFailed'));
+      }
       await refundPurchaseOrder(selectedPO.id, data);
       closeModal('refund');
     },
@@ -230,10 +247,16 @@ export function PODetailPage() {
       successMessage: t('po.deliveryRequestCreated'),
       errorTitle: t('common.error'),
       errorMessage: t('po.deliveryRequestCreateFailed'),
-      navigateTo: getDeliveryListRoute(),
+      navigateTo: ROUTERS.DELIVERY_MANAGEMENT,
     },
     async actionHandler(data?: { assignedTo: string; scheduledDate: string; notes?: string }) {
       if (!data || !purchaseOrder) {
+        throw new Error(t('po.deliveryRequestCreateFailed'));
+      }
+      if (!permissions.purchaseOrder.actions?.canDeliver) {
+        throw new Error(t('po.deliveryRequestCreateFailed'));
+      }
+      if (!permissions.deliveryRequest.canCreate) {
         throw new Error(t('po.deliveryRequestCreateFailed'));
       }
       await createDeliveryRequest({
@@ -319,6 +342,10 @@ export function PODetailPage() {
   // Show edit button when PO is editable (status = NEW) - moved before early returns
   const isEditable = purchaseOrder && isPOEditable(purchaseOrder);
 
+  if (!permissions.purchaseOrder.canView) {
+    return <PermissionDeniedPage />;
+  }
+
   if (isMobile) {
     if (isLoading || !purchaseOrder) {
       return (
@@ -349,6 +376,13 @@ export function PODetailPage() {
       >
         <Stack gap="md">
           <PODetailAccordion
+            canEdit={permissions.purchaseOrder.canEdit}
+            canConfirm={permissions.purchaseOrder.actions?.canConfirm}
+            canProcess={permissions.purchaseOrder.actions?.canProcess}
+            canShip={permissions.purchaseOrder.actions?.canShip}
+            canDeliver={permissions.purchaseOrder.actions?.canDeliver}
+            canRefund={permissions.purchaseOrder.actions?.canRefund}
+            canCancel={permissions.purchaseOrder.actions?.canCancel}
             purchaseOrder={purchaseOrder}
             isLoading={isLoading}
             onEdit={handleEdit}
@@ -378,6 +412,7 @@ export function PODetailPage() {
             ? {
                 label: t('common.edit'),
                 onClick: handleEdit,
+                disabled: !permissions.purchaseOrder.canEdit,
                 icon: <IconEdit size={16} />,
               }
             : undefined
@@ -389,6 +424,7 @@ export function PODetailPage() {
       ) : purchaseOrder ? (
         <POErrorBoundary componentName="PODetailTabs">
           <PODetailTabs
+            canEdit={permissions.purchaseOrder.canEdit}
             purchaseOrder={purchaseOrder}
             isLoading={isLoading}
             onConfirm={handleConfirm}

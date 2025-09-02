@@ -11,6 +11,14 @@ import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 
 type POCardProps = {
+  readonly canEdit: boolean;
+  readonly canConfirm?: boolean;
+  readonly canProcess?: boolean;
+  readonly canShip?: boolean;
+  readonly canMarkReady?: boolean;
+  readonly canDeliver?: boolean;
+  readonly canRefund?: boolean;
+  readonly canCancel?: boolean;
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading?: boolean;
   readonly onConfirm?: () => void;
@@ -32,6 +40,14 @@ type POCardProps = {
 
 export function POCard({
   purchaseOrder,
+  canEdit = false,
+  canConfirm = false,
+  canProcess = false,
+  canShip = false,
+  canMarkReady = false,
+  canDeliver = false,
+  canRefund = false,
+  canCancel = false,
   isLoading = false,
   onConfirm,
   onProcess,
@@ -94,6 +110,14 @@ export function POCard({
         {noActions ? null : (
           <POActions
             style={defaultActionIconsStyle}
+            canEdit={canEdit}
+            canConfirm={canConfirm}
+            canProcess={canProcess}
+            canShip={canShip}
+            canMarkReady={canMarkReady}
+            canDeliver={canDeliver}
+            canRefund={canRefund}
+            canCancel={canCancel}
             purchaseOrderId={purchaseOrder.id}
             status={purchaseOrder.status}
             isLoading={isLoading}

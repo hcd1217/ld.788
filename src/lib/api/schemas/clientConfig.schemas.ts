@@ -1,10 +1,5 @@
 import * as z from 'zod/v4';
-import {
-  booleanSchema,
-  ClientPublicConfigSchema,
-  dictionarySchema,
-  numberSchema,
-} from './common.schemas';
+import { ClientPublicConfigSchema, dictionarySchema, numberSchema } from './common.schemas';
 import {
   NavigationItemSchema,
   DEFAULT_NAVIGATION_CONFIG,
@@ -14,15 +9,11 @@ import {
 
 // Re-export types from navigation and route config
 export type { NavigationItem, NavigationItemType } from './navigation.schemas';
-export type { RouteConfig } from './routeConfig.schemas';
-export { RouteConfigSchema } from './routeConfig.schemas';
 
 // Schema for client config
 export const ClientConfigSchema = z.object({
   sessionTimeoutMinutes: numberSchema.optional(),
   maxConcurrentSessions: numberSchema.optional(),
-  allowPasswordReset: booleanSchema.optional(),
-  allowSelfRegistration: booleanSchema.optional(),
   translations: dictionarySchema.optional(),
   navigation: z.array(NavigationItemSchema).optional().default(DEFAULT_NAVIGATION_CONFIG), // Backend-driven navigation
   mobileNavigation: z

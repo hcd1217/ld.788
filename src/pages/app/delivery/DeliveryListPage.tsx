@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { Stack, Group, SimpleGrid, Button, Loader, Text, Center, Flex } from '@mantine/core';
-import { IconTruckDelivery, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeliveryRequestFilters } from '@/hooks/useDeliveryRequestFilters';
 import {
@@ -10,13 +10,14 @@ import {
   useDeliveryRequestActions,
   useDeliveryRequestPaginationState,
 } from '@/stores/useDeliveryRequestStore';
-import { useCustomers } from '@/stores/useAppStore';
+import { useCustomers, usePermissions } from '@/stores/useAppStore';
 import {
   AppPageTitle,
   SwitchView,
   BlankState,
   AppMobileLayout,
   AppDesktopLayout,
+  PermissionDeniedPage,
 } from '@/components/common';
 import {
   DeliveryCard,
@@ -38,6 +39,7 @@ import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
 export function DeliveryListPage() {
   const { isMobile, isDesktop } = useDeviceType();
   const { t } = useTranslation();
+  const permissions = usePermissions();
   const deliveryRequests = useDeliveryRequests();
   const customers = useCustomers();
   const isLoading = useDeliveryRequestLoading();
@@ -158,7 +160,6 @@ export function DeliveryListPage() {
   const blankStateProps = useMemo(
     () => ({
       hidden: deliveryRequests.length > 0 || isLoading,
-      icon: <IconTruckDelivery size={48} color="var(--mantine-color-gray-5)" aria-hidden="true" />,
       title: hasActiveFilters
         ? t('delivery.noDeliveryRequestsFoundSearch')
         : t('delivery.noDeliveryRequestsFound'),
@@ -170,6 +171,11 @@ export function DeliveryListPage() {
   );
 
   // Initial load is handled by filter effect
+
+  // Check view permission
+  if (!permissions.deliveryRequest.canView) {
+    return <PermissionDeniedPage />;
+  }
 
   if (isMobile) {
     // Date filter indicators for mobile view

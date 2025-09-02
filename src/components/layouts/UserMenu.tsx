@@ -1,5 +1,5 @@
 import { Avatar, Group, Menu, Text, UnstyledButton, rem } from '@mantine/core';
-import { IconCaretDownFilled, IconLogout, IconSettings, IconUser } from '@tabler/icons-react';
+import { IconCaretDownFilled, IconLogout, IconUser } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import classes from './AuthLayout.module.css';
 import { VersionInformation } from '@/components/common';
@@ -70,20 +70,6 @@ export function UserMenu({ c }: UserMenuProps) {
           onClick={() => navigate(ROUTERS.PROFILE)}
         >
           {t('common.pages.profile')}
-        </Menu.Item>
-        <Menu.Item
-          leftSection={
-            <IconSettings
-              style={{
-                width: rem(LAYOUT_CONFIG.USER_MENU_ICON_SIZE),
-                height: rem(LAYOUT_CONFIG.USER_MENU_ICON_SIZE),
-              }}
-              aria-hidden="true"
-            />
-          }
-          onClick={() => navigate(ROUTERS.SETTINGS)}
-        >
-          {t('common.pages.settings')}
         </Menu.Item>
 
         <Menu.Divider />

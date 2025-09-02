@@ -14,6 +14,14 @@ import { isPOStatusNew } from '@/utils/purchaseOrder';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 
 type POAccordionActionsProps = {
+  readonly canEdit: boolean;
+  readonly canConfirm?: boolean;
+  readonly canProcess?: boolean;
+  readonly canShip?: boolean;
+  readonly canMarkReady?: boolean;
+  readonly canDeliver?: boolean;
+  readonly canRefund?: boolean;
+  readonly canCancel?: boolean;
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading: boolean;
   readonly onConfirm: () => void;
@@ -27,6 +35,14 @@ type POAccordionActionsProps = {
 };
 
 export function POAccordionActions({
+  canEdit,
+  canConfirm = false,
+  canProcess = false,
+  canShip = false,
+  canMarkReady = false,
+  canDeliver = false,
+  canRefund = false,
+  canCancel = false,
   purchaseOrder,
   isLoading,
   onConfirm,
@@ -48,13 +64,14 @@ export function POAccordionActions({
         variant="outline"
         size="xs"
         loading={isLoading}
+        disabled={!canCancel}
         leftSection={<IconX size={14} />}
         onClick={onCancel}
       >
         {t('po.cancel')}
       </Button>
     ),
-    [isLoading, onCancel, t],
+    [canCancel, isLoading, onCancel, t],
   );
 
   const createRefundButton = useCallback(
@@ -65,13 +82,14 @@ export function POAccordionActions({
         variant="outline"
         size="xs"
         loading={isLoading}
+        disabled={!canRefund}
         leftSection={<IconReceipt size={14} />}
         onClick={onRefund}
       >
         {t('po.refund')}
       </Button>
     ),
-    [isLoading, onRefund, t],
+    [canRefund, isLoading, onRefund, t],
   );
 
   const createShipButton = useCallback(
@@ -81,13 +99,14 @@ export function POAccordionActions({
         color="indigo"
         size="xs"
         loading={isLoading}
+        disabled={!canShip}
         leftSection={<IconTruck size={14} />}
         onClick={onShip}
       >
         {t('po.ship')}
       </Button>
     ),
-    [isLoading, onShip, t],
+    [canShip, isLoading, onShip, t],
   );
 
   const buttons = useMemo(() => {
@@ -100,6 +119,7 @@ export function POAccordionActions({
           color="green"
           size="xs"
           loading={isLoading}
+          disabled={!canConfirm}
           leftSection={<IconCheck size={14} />}
           onClick={onConfirm}
         >
@@ -114,6 +134,7 @@ export function POAccordionActions({
           color="blue"
           size="xs"
           loading={isLoading}
+          disabled={!canProcess}
           leftSection={<IconPackage size={14} />}
           onClick={onProcess}
         >
@@ -128,6 +149,7 @@ export function POAccordionActions({
           color="teal"
           size="xs"
           loading={isLoading}
+          disabled={!canMarkReady}
           leftSection={<IconPackageExport size={14} />}
           onClick={onMarkReady}
         >
@@ -144,7 +166,7 @@ export function POAccordionActions({
             color="blue"
             size="xs"
             loading={isLoading}
-            disabled={!!purchaseOrder.deliveryRequest}
+            disabled={!!purchaseOrder.deliveryRequest || !canEdit}
             leftSection={<IconClipboardList size={14} />}
             onClick={onCreateDelivery}
           >
@@ -159,6 +181,7 @@ export function POAccordionActions({
           color="green"
           size="xs"
           loading={isLoading}
+          disabled={!canDeliver}
           leftSection={<IconPackageExport size={14} />}
           onClick={onDeliver}
         >
@@ -174,6 +197,11 @@ export function POAccordionActions({
   }, [
     purchaseOrder.status,
     purchaseOrder.deliveryRequest,
+    canEdit,
+    canConfirm,
+    canProcess,
+    canMarkReady,
+    canDeliver,
     isLoading,
     t,
     onConfirm,

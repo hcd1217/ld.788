@@ -6,7 +6,7 @@ import { useDeviceType } from '@/hooks/useDeviceType';
 import { useEmployeeList, useHrActions, useHrLoading } from '@/stores/useHrStore';
 import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
 import { DetailPageLayout } from '@/components/common/layouts/DetailPageLayout';
-import { AppPageTitle } from '@/components/common';
+import { AppPageTitle, PermissionDeniedPage } from '@/components/common';
 import { AppMobileLayout } from '@/components/common';
 import {
   EmployeeStatusModal,
@@ -18,12 +18,14 @@ import { getEmployeeEditRoute } from '@/config/routeConfig';
 import { useOnce } from '@/hooks/useOnce';
 import { useAction } from '@/hooks/useAction';
 import { useEmployeeModal } from '@/hooks/useEmployeeModal';
+import { usePermissions } from '@/stores/useAppStore';
 
 export function EmployeeDetailPage() {
   const { employeeId } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
+  const permissions = usePermissions();
   const employees = useEmployeeList();
   const isLoading = useHrLoading();
   const { loadEmployees, deactivateEmployee, activateEmployee } = useHrActions();
@@ -36,19 +38,19 @@ export function EmployeeDetailPage() {
   );
 
   const handleEdit = () => {
-    if (employee && employee.isActive) {
+    if (employee && employee.isActive && permissions.employee.canEdit) {
       navigate(getEmployeeEditRoute(employee.id));
     }
   };
 
   const handleDeactivate = () => {
-    if (employee) {
+    if (employee && permissions.employee.canEdit) {
       deactivateModal.open(employee);
     }
   };
 
   const handleActivate = () => {
-    if (employee) {
+    if (employee && permissions.employee.canEdit) {
       activateModal.open(employee);
     }
   };
@@ -113,6 +115,10 @@ export function EmployeeDetailPage() {
 
   const title = employee ? employee.fullName : t('employee.employeeDetails');
 
+  if (!permissions.employee.canView) {
+    return <PermissionDeniedPage />;
+  }
+
   if (isMobile) {
     if (isLoading || !employee) {
       return (
@@ -136,6 +142,7 @@ export function EmployeeDetailPage() {
         <Stack gap="md">
           <EmployeeDetailAlert endDate={employee.endDate} isActive={employee.isActive} />
           <EmployeeDetailAccordion
+            canEdit={permissions.employee.canEdit}
             employee={employee}
             onActivate={handleActivate}
             onDeactivate={handleDeactivate}
@@ -153,6 +160,7 @@ export function EmployeeDetailPage() {
         <Stack gap="md">
           <EmployeeDetailAlert endDate={employee.endDate} isActive={employee.isActive} />
           <EmployeeDetailTabs
+            canEdit={permissions.employee.canEdit}
             employee={employee}
             onEdit={handleEdit}
             onActivate={handleActivate}

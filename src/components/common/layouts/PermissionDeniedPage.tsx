@@ -1,0 +1,54 @@
+import { Center, Container, Stack, Paper, Title, Text, Button, Group } from '@mantine/core';
+import { IconLock } from '@tabler/icons-react';
+import { useNavigate } from 'react-router';
+import { ROUTERS } from '@/config/routeConfig';
+import { useIsDarkMode } from '@/hooks/useIsDarkMode';
+import { useTranslation } from '@/hooks/useTranslation';
+
+type PermissionDeniedPageProps = {
+  readonly message?: string;
+  readonly withGoBack?: boolean;
+};
+
+export function PermissionDeniedPage({ message }: PermissionDeniedPageProps) {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const isDarkMode = useIsDarkMode();
+
+  const handleGoHome = () => {
+    navigate(ROUTERS.ROOT);
+  };
+
+  return (
+    <Container size="sm" mt="xl" h="90vh">
+      <Center h="100%">
+        <Paper
+          withBorder
+          shadow="sm"
+          p="xl"
+          radius="md"
+          style={{
+            textAlign: 'center',
+            backgroundColor: isDarkMode
+              ? 'var(--mantine-color-dark-6)'
+              : 'var(--mantine-color-gray-0)',
+          }}
+        >
+          <Stack gap="lg" align="center">
+            <IconLock size={64} color="var(--mantine-color-red-6)" />
+
+            <Title order={2}>{t('noPermission.title')}</Title>
+
+            <Text c="dimmed" ta="center" maw={400}>
+              {message || t('noPermission.description')}
+            </Text>
+
+            <Group justify="center" mt="md">
+              <Button onClick={handleGoHome}>{t('common.goToHome')}</Button>
+            </Group>
+          </Stack>
+        </Paper>
+      </Center>
+    </Container>
+  );
+}

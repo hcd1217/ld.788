@@ -5,12 +5,6 @@ import {
   type GetAllRolesResponse,
   type UpdateRoleRequest,
   type UpdateRoleResponse,
-  type RegisterBulkUsersByRootUserRequest,
-  type RegisterBulkUsersByRootUserResponse,
-  type RegisterClientRequest,
-  type RegisterClientResponse,
-  type RegisterUserByRootUserRequest,
-  type RegisterUserByRootUserResponse,
   type GetAllPermissionsResponse,
   type AddPermissionRequest,
   type AddPermissionResponse,
@@ -25,22 +19,6 @@ export type Client = {
 };
 
 export const clientService = {
-  async registerNewClient(data: RegisterClientRequest): Promise<RegisterClientResponse> {
-    return clientApi.register(data);
-  },
-
-  async registerUserByRootUser(
-    data: RegisterUserByRootUserRequest,
-  ): Promise<RegisterUserByRootUserResponse> {
-    return clientApi.registerUserByRootUser(data);
-  },
-
-  async registerBulkUsersByRootUser(
-    data: RegisterBulkUsersByRootUserRequest,
-  ): Promise<RegisterBulkUsersByRootUserResponse> {
-    return clientApi.registerBulkUsersByRootUser(data);
-  },
-
   async getAllRoles(): Promise<GetAllRolesResponse> {
     return clientApi.getAllRoles();
   },

@@ -13,6 +13,7 @@ import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { useMemo } from 'react';
 
 type POActionZoneProps = {
+  readonly canEdit: boolean;
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading?: boolean;
   readonly onConfirm: () => void;
@@ -22,11 +23,12 @@ type POActionZoneProps = {
   readonly onDeliver: () => void;
   readonly onCancel: () => void;
   readonly onRefund: () => void;
-  readonly onCreateDelivery: () => void;
+  readonly onCreateDelivery?: () => void;
 };
 
 export function POActionZone({
   purchaseOrder,
+  canEdit = false,
   isLoading = false,
   onConfirm,
   onProcess,
@@ -48,6 +50,7 @@ export function POActionZone({
         color="orange"
         variant="outline"
         loading={isLoading}
+        disabled={!canEdit}
         leftSection={<IconReceipt size={16} />}
         onClick={onRefund}
       >
@@ -63,6 +66,7 @@ export function POActionZone({
             color="red"
             variant="outline"
             loading={isLoading}
+            disabled={!canEdit}
             leftSection={<IconX size={16} />}
             onClick={onCancel}
           >
@@ -72,6 +76,7 @@ export function POActionZone({
             key="confirm"
             color="green"
             loading={isLoading}
+            disabled={!canEdit}
             leftSection={<IconCheck size={16} />}
             onClick={onConfirm}
           >
@@ -88,6 +93,7 @@ export function POActionZone({
             color="red"
             variant="outline"
             loading={isLoading}
+            disabled={!canEdit}
             leftSection={<IconX size={16} />}
             onClick={onCancel}
           >
@@ -97,6 +103,7 @@ export function POActionZone({
             key="process"
             color="blue"
             loading={isLoading}
+            disabled={!canEdit}
             leftSection={<IconPackage size={16} />}
             onClick={onProcess}
           >
@@ -112,6 +119,7 @@ export function POActionZone({
             key="markReady"
             color="teal"
             loading={isLoading}
+            disabled={!canEdit}
             leftSection={<IconPackageExport size={16} />}
             onClick={onMarkReady}
           >
@@ -127,6 +135,7 @@ export function POActionZone({
             key="ship"
             color="indigo"
             loading={isLoading}
+            disabled={!canEdit}
             leftSection={<IconTruck size={16} />}
             onClick={onShip}
           >
@@ -137,7 +146,7 @@ export function POActionZone({
             color="blue"
             variant="filled"
             loading={isLoading}
-            disabled={!!purchaseOrder.deliveryRequest}
+            disabled={!!purchaseOrder.deliveryRequest || !canEdit}
             leftSection={<IconClipboardList size={16} />}
             onClick={onCreateDelivery}
           >
@@ -154,6 +163,7 @@ export function POActionZone({
             key="deliver"
             color="green"
             loading={isLoading}
+            disabled={!canEdit}
             leftSection={<IconPackageExport size={16} />}
             onClick={onDeliver}
           >
@@ -177,6 +187,7 @@ export function POActionZone({
 
     return actions;
   }, [
+    canEdit,
     purchaseOrder.status,
     purchaseOrder.deliveryRequest,
     isLoading,

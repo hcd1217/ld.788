@@ -1,75 +1,10 @@
 import * as z from 'zod/v4';
 import {
   timestampSchema,
-  passwordSchema,
-  emailSchema,
   optionalStringSchema,
   idSchema,
   type ClientPublicConfigSchema,
 } from './common.schemas';
-
-export const RegisterClientRequestSchema = z.object({
-  clientCode: z.string(),
-  clientName: z.string(),
-  rootUserEmail: emailSchema,
-  rootUserPassword: z.string(),
-  rootUserFirstName: z.string(),
-  rootUserLastName: z.string(),
-});
-
-export const RegisterClientResponseSchema = z.object({
-  client: z.object({
-    id: idSchema,
-    name: z.string(),
-    code: z.string(),
-  }),
-  rootUser: z.object({
-    id: idSchema,
-    email: emailSchema,
-    firstName: z.string(),
-    lastName: z.string(),
-  }),
-});
-
-export const RegisterUserByRootUserRequestSchema = z.object({
-  email: emailSchema.optional(),
-  userName: optionalStringSchema,
-  firstName: z.string(),
-  lastName: z.string(),
-  password: passwordSchema,
-});
-
-export const RegisterUserByRootUserResponseSchema = z.object({
-  id: idSchema,
-});
-
-export const RegisterBulkUsersByRootUserRequestSchema = z.array(
-  RegisterUserByRootUserRequestSchema,
-);
-
-export const RegisterBulkUsersByRootUserResponseSchema = z.object({
-  summary: z.object({
-    total: z.number(),
-    success: z.number(),
-    failed: z.number(),
-  }),
-  success: z.array(
-    z.object({
-      id: idSchema,
-      email: optionalStringSchema,
-      userName: optionalStringSchema,
-      firstName: z.string(),
-      lastName: z.string(),
-      password: optionalStringSchema,
-    }),
-  ),
-  errors: z.array(
-    z.object({
-      user: RegisterUserByRootUserRequestSchema,
-      error: z.string(),
-    }),
-  ),
-});
 
 export const GetAllRolesResponseSchema = z.array(
   z.object({
@@ -221,19 +156,6 @@ export const GetUserRolesResponseSchema = z.array(UserRoleSchema);
 export const GrantPermissionToRoleRequestSchema = z.object({
   permissionId: idSchema,
 });
-
-export type RegisterClientRequest = z.infer<typeof RegisterClientRequestSchema>;
-export type RegisterClientResponse = z.infer<typeof RegisterClientResponseSchema>;
-
-export type RegisterUserByRootUserRequest = z.infer<typeof RegisterUserByRootUserRequestSchema>;
-export type RegisterUserByRootUserResponse = z.infer<typeof RegisterUserByRootUserResponseSchema>;
-
-export type RegisterBulkUsersByRootUserRequest = z.infer<
-  typeof RegisterBulkUsersByRootUserRequestSchema
->;
-export type RegisterBulkUsersByRootUserResponse = z.infer<
-  typeof RegisterBulkUsersByRootUserResponseSchema
->;
 
 export type GetAllRolesResponse = z.infer<typeof GetAllRolesResponseSchema>;
 

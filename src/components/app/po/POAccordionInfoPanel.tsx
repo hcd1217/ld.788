@@ -35,12 +35,14 @@ import { DeliveryStatusBadge } from '../delivery/DeliveryStatusBadge';
 type POAccordionInfoPanelProps = {
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading: boolean;
+  readonly canEdit: boolean;
   readonly onEdit: () => void;
 };
 
 export function POAccordionInfoPanel({
   purchaseOrder,
   isLoading,
+  canEdit,
   onEdit,
 }: POAccordionInfoPanelProps) {
   const { t } = useTranslation();
@@ -82,6 +84,7 @@ export function POAccordionInfoPanel({
               size="xs"
               ml="xs"
               loading={isLoading}
+              disabled={!canEdit}
               leftSection={<IconEdit size={14} />}
               onClick={onEdit}
             >
