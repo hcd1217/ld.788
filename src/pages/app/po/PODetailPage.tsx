@@ -177,7 +177,7 @@ export function PODetailPage() {
       errorMessage: t('po.shipFailed'),
     },
     async actionHandler(data?: any) {
-      if (!selectedPO) {
+      if (!selectedPO || !permissions.purchaseOrder.actions?.canShip) {
         throw new Error(t('po.shipFailed'));
       }
       await shipPurchaseOrder(selectedPO.id, data);
@@ -193,7 +193,7 @@ export function PODetailPage() {
       errorMessage: t('po.deliverFailed'),
     },
     async actionHandler(data?: { deliveryNotes?: string }) {
-      if (!selectedPO) {
+      if (!selectedPO || !permissions.purchaseOrder.actions?.canDeliver) {
         throw new Error(t('po.deliverFailed'));
       }
       await deliverPurchaseOrder(selectedPO.id, data);

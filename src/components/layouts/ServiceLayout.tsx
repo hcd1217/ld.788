@@ -6,6 +6,8 @@ import { PWAInstallPrompt, SafariPWAGuide } from '@/components/common';
 import { RouteChangeProvider } from '@/components/providers/RouteChangeProvider';
 import { useOnce } from '@/hooks/useOnce';
 
+const debug = true;
+
 export function ServiceLayout() {
   const [ready, setReady] = useState(false);
   const { checkAuth, authInitialized } = useAppStore();
@@ -31,8 +33,12 @@ export function ServiceLayout() {
   return (
     <RouteChangeProvider>
       <Outlet />
-      <PWAInstallPrompt />
-      <SafariPWAGuide />
+      {debug && (
+        <>
+          <PWAInstallPrompt />
+          <SafariPWAGuide />
+        </>
+      )}
     </RouteChangeProvider>
   );
 }
