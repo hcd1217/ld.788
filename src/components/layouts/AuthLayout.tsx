@@ -8,6 +8,7 @@ import { ColorSchemeToggle, LanguageSwitcher, AppLogo } from '@/components/commo
 import { LAYOUT_CONFIG } from '@/config/layoutConfig';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useAppStore } from '@/stores/useAppStore';
+import { RoleSelector } from '@/components/debug/RoleSelector';
 
 export function AuthLayout() {
   const [isMenuOpen, { toggle: toggleMenu }] = useDisclosure(true);
@@ -51,6 +52,7 @@ export function AuthLayout() {
           </Group>
           <Group>
             <Group visibleFrom="sm">
+              <RoleSelector />
               <LanguageSwitcher />
               <ColorSchemeToggle />
             </Group>

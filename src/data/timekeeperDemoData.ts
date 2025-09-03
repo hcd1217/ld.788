@@ -14,7 +14,7 @@ import type {
 const getRelativeDate = (daysOffset: number, hours = 0, minutes = 0): Date => {
   const date = new Date();
   date.setDate(date.getDate() + daysOffset);
-  date.setHours(hours, minutes, 0, 0);
+  date.setHours(hours, minutes, 0, 1);
   return date;
 };
 

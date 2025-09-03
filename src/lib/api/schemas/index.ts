@@ -13,9 +13,6 @@ export * from './client.schemas';
 // Client configuration schemas
 export * from './clientConfig.schemas';
 
-// Store management schemas
-export * from './store.schemas';
-
 // HR management schemas
 export * from './hr.schemas';
 

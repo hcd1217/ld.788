@@ -13,7 +13,7 @@ import {
 import { ClientConfigSchema } from './clientConfig.schemas';
 import { DepartmentSchema, EmployeeSchema } from './hr.schemas';
 import { renderFullName } from '@/utils/string';
-import { isDevelopment } from '@/utils/env';
+import { isDebug } from '@/utils/env';
 
 // Schemas
 export const LoginRequestSchema = z.object({
@@ -59,120 +59,70 @@ export const RoleSchema = z.object({
   level: numberSchema,
 });
 
-const PermissionSchema = z
-  .object({
-    customer: z.object({
-      canView: booleanSchema,
-      canCreate: booleanSchema,
-      canEdit: booleanSchema,
-      canDelete: booleanSchema,
-    }),
-    product: z.object({
-      canView: booleanSchema,
-      canCreate: booleanSchema,
-      canEdit: booleanSchema,
-      canDelete: booleanSchema,
-    }),
-    employee: z.object({
-      canView: booleanSchema,
-      canCreate: booleanSchema,
-      canEdit: booleanSchema,
-      canDelete: booleanSchema,
-    }),
-    purchaseOrder: z.object({
+const PermissionSchema = z.object({
+  customer: z.object({
+    canView: booleanSchema,
+    canCreate: booleanSchema,
+    canEdit: booleanSchema,
+    canDelete: booleanSchema,
+  }),
+  product: z.object({
+    canView: booleanSchema,
+    canCreate: booleanSchema,
+    canEdit: booleanSchema,
+    canDelete: booleanSchema,
+  }),
+  employee: z.object({
+    canView: booleanSchema,
+    canCreate: booleanSchema,
+    canEdit: booleanSchema,
+    canDelete: booleanSchema,
+  }),
+  purchaseOrder: z.object({
+    canView: booleanSchema,
+    canCreate: booleanSchema,
+    canEdit: booleanSchema,
+    canDelete: booleanSchema,
+    actions: z
+      .object({
+        canConfirm: optionalBooleanSchema,
+        canProcess: optionalBooleanSchema,
+        canShip: optionalBooleanSchema,
+        canDeliver: optionalBooleanSchema,
+        canMarkReady: optionalBooleanSchema,
+        canRefund: optionalBooleanSchema,
+        canCancel: optionalBooleanSchema,
+      })
+      .optional(),
+  }),
+  deliveryRequest: z
+    .object({
       canView: booleanSchema,
       canCreate: booleanSchema,
       canEdit: booleanSchema,
       canDelete: booleanSchema,
       actions: z
         .object({
-          canConfirm: optionalBooleanSchema,
-          canProcess: optionalBooleanSchema,
-          canShip: optionalBooleanSchema,
-          canDeliver: optionalBooleanSchema,
-          canMarkReady: optionalBooleanSchema,
-          canRefund: optionalBooleanSchema,
-          canCancel: optionalBooleanSchema,
+          canStartTransit: optionalBooleanSchema,
+          canComplete: optionalBooleanSchema,
+          canTakePhoto: optionalBooleanSchema,
         })
         .optional(),
-    }),
-    deliveryRequest: z
-      .object({
-        canView: booleanSchema,
-        canCreate: booleanSchema,
-        canEdit: booleanSchema,
-        canDelete: booleanSchema,
-        actions: z
-          .object({
-            canStartTransit: optionalBooleanSchema,
-            canComplete: optionalBooleanSchema,
-            canTakePhoto: optionalBooleanSchema,
-          })
-          .optional(),
-      })
-      .transform((val) => {
-        return {
-          ...val,
-          actions: {
-            canStartTransit: val.canEdit,
-            canComplete: val.canEdit,
-            canTakePhoto: val.canEdit,
-          },
-        };
-      }),
-  })
-  .transform((val) => {
-    const debug = false;
-    if (debug && isDevelopment) {
+    })
+    .transform((val) => {
+      if (!val.canEdit) {
+        return val;
+      }
       return {
-        purchaseOrder: {
-          canView: true,
-          canCreate: true,
-          canEdit: true,
-          canDelete: true,
-          actions: {
-            canConfirm: true,
-            canProcess: true,
-            canShip: true,
-            canMarkReady: true,
-            canDeliver: true,
-            canRefund: true,
-            canCancel: true,
-          },
+        ...val,
+        actions: {
+          canStartTransit: val.canEdit ?? undefined,
+          canComplete: val.canEdit ?? undefined,
+          canTakePhoto: val.canEdit ?? undefined,
         },
-        deliveryRequest: {
-          canView: true,
-          canCreate: true,
-          canEdit: true,
-          canDelete: true,
-          actions: {
-            canStartTransit: true,
-            canComplete: true,
-            canTakePhoto: true,
-          },
-        },
-        customer: {
-          canView: true,
-          canCreate: false,
-          canEdit: false,
-          canDelete: false,
-        },
-        product: {
-          canView: true,
-          canCreate: true,
-          canEdit: true,
-          canDelete: false,
-        },
-        employee: {
-          canView: true,
-          canCreate: true,
-          canEdit: true,
-          canDelete: true,
-        },
-      } satisfies typeof val;
-    }
-    return val;
-  });
+      };
+    }),
+});
 
 // Schema for GET /auth/me response
 export const GetMeResponseSchema = z
@@ -202,6 +152,29 @@ export const GetMeResponseSchema = z
       ...val,
       userName: 'User',
     };
+  })
+  .transform((val) => {
+    if (!isDebug) {
+      return val;
+    }
+    const role: DepartmentCode = localStorage.getItem('__DEBUG_CURRENT_ROLE__') as DepartmentCode;
+    if (!role) {
+      return val;
+    }
+    val.permissions = fakePermission(role);
+    val.isRoot = false;
+    val.department = {
+      id: role,
+      code: role,
+      name: 'Department',
+    };
+    val.roles = [
+      {
+        name: role,
+        level: 1,
+      },
+    ];
+    return val;
   });
 
 // Types derived from schemas
@@ -214,3 +187,163 @@ export type RenewTokenResponse = z.infer<typeof RenewTokenResponseSchema>;
 export type JWTPayload = z.infer<typeof JWTPayloadSchema>;
 export type Role = z.infer<typeof RoleSchema>;
 export type GetMeResponse = z.infer<typeof GetMeResponseSchema>;
+
+type DepartmentCode = 'sales' | 'delivery' | 'warehouse' | 'accounting' | 'manager';
+function fakePermission(code: DepartmentCode) {
+  const basePermission = {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+  };
+
+  function generateDefaultPermission(): GetMeResponse['permissions'] {
+    return {
+      customer: {
+        ...basePermission,
+      },
+      product: {
+        ...basePermission,
+      },
+      employee: {
+        ...basePermission,
+      },
+      purchaseOrder: {
+        ...basePermission,
+        actions: {
+          canConfirm: false,
+          canProcess: false,
+          canShip: false,
+          canMarkReady: false,
+          canDeliver: false,
+          canCancel: false,
+        },
+      },
+      deliveryRequest: {
+        ...basePermission,
+        actions: {
+          canStartTransit: false,
+          canComplete: false,
+          canTakePhoto: false,
+        },
+      },
+    };
+  }
+
+  const permissions = generateDefaultPermission();
+
+  switch (code) {
+    case 'manager': {
+      return {
+        customer: {
+          canView: true,
+          canCreate: true,
+          canEdit: true,
+          canDelete: true,
+        },
+        product: {
+          canView: true,
+          canCreate: true,
+          canEdit: true,
+          canDelete: true,
+        },
+        employee: {
+          canView: true,
+          canCreate: true,
+          canEdit: true,
+          canDelete: true,
+        },
+        purchaseOrder: {
+          canView: true,
+          canCreate: true,
+          canEdit: true,
+          canDelete: true,
+          actions: {
+            canConfirm: true,
+            canProcess: true,
+            canShip: true,
+            canMarkReady: true,
+            canDeliver: true,
+            canCancel: true,
+          },
+        },
+        deliveryRequest: {
+          canView: true,
+          canCreate: true,
+          canEdit: true,
+          canDelete: true,
+          actions: {
+            canStartTransit: true,
+            canComplete: true,
+            canTakePhoto: true,
+          },
+        },
+      };
+    }
+    case 'sales': {
+      permissions.purchaseOrder = {
+        ...permissions.purchaseOrder,
+        canView: true,
+        canCreate: true,
+        canEdit: true,
+        actions: {
+          ...permissions.purchaseOrder.actions,
+          canConfirm: true,
+          canCancel: true,
+        },
+      };
+      permissions.deliveryRequest = {
+        ...permissions.deliveryRequest,
+        canView: true,
+      };
+      return permissions;
+    }
+    case 'delivery': {
+      permissions.deliveryRequest = {
+        ...permissions.deliveryRequest,
+        canView: true,
+        actions: {
+          canStartTransit: true,
+          canComplete: true,
+          canTakePhoto: true,
+        },
+      };
+      return permissions;
+    }
+    case 'warehouse': {
+      permissions.purchaseOrder = {
+        ...permissions.purchaseOrder,
+        canView: true,
+        actions: {
+          canProcess: true,
+          canMarkReady: true,
+          canDeliver: true,
+          canShip: true,
+        },
+      };
+      permissions.deliveryRequest = {
+        ...permissions.deliveryRequest,
+        canView: true,
+        canCreate: true,
+      };
+      return permissions;
+    }
+    case 'accounting': {
+      permissions.purchaseOrder = {
+        ...permissions.purchaseOrder,
+        canView: true,
+        actions: {
+          canRefund: true,
+        },
+      };
+      permissions.deliveryRequest = {
+        ...permissions.deliveryRequest,
+        canView: true,
+      };
+      return permissions;
+    }
+    default: {
+      return permissions;
+    }
+  }
+}

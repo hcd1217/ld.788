@@ -15,7 +15,7 @@ import { logError } from '@/utils/logger';
 
 type ClientPublicConfig = ClientPublicConfigResponse;
 type User = GetMeResponse; // Unified user type from /auth/me
-
+type Permission = User['permissions'];
 type AppState = {
   publicClientConfig?: ClientPublicConfig;
   clientCode: string;
@@ -279,7 +279,7 @@ export const useAppStore = create<AppState>()(
 // Stable empty arrays to avoid infinite re-renders (as per CLAUDE.md line 52)
 const EMPTY_CUSTOMERS_ARRAY: readonly CustomerOverview[] = [];
 const EMPTY_EMPLOYEES_ARRAY: readonly EmployeeOverview[] = [];
-const EMPTY_PERMISSIONS: User['permissions'] = Object.freeze({
+const EMPTY_PERMISSIONS: Permission = Object.freeze({
   customer: {
     canView: false,
     canCreate: false,

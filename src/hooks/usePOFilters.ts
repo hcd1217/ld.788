@@ -31,24 +31,6 @@ export interface POFilterHandlers {
   resetFilters: () => void;
 }
 
-// Calculate default date range (today to end of next week)
-const getDefaultDeliveryDateRange = () => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // Calculate end of next week (next Sunday)
-  const endOfNextWeek = new Date(today);
-  const daysUntilSunday = 7 - endOfNextWeek.getDay(); // Days until this Sunday
-  const daysToAdd = daysUntilSunday + 7; // Add another week
-  endOfNextWeek.setDate(endOfNextWeek.getDate() + daysToAdd);
-  endOfNextWeek.setHours(23, 59, 59, 999);
-
-  return {
-    start: today,
-    end: endOfNextWeek,
-  };
-};
-
 const defaultFilters: POFilters = {
   searchQuery: '',
   customerId: undefined,
@@ -63,7 +45,10 @@ const defaultFilters: POFilters = {
     start: undefined,
     end: undefined,
   },
-  deliveryDateRange: getDefaultDeliveryDateRange(),
+  deliveryDateRange: {
+    start: undefined,
+    end: undefined,
+  },
 };
 
 // Pre-computed searchable text for each PO to avoid repeated toLowerCase() calls
@@ -72,7 +57,7 @@ interface POWithSearchText {
   searchText: string;
 }
 
-export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOverride?: string) {
+export function usePOFilters(purchaseOrders: readonly PurchaseOrder[]) {
   const [filters, setFilters] = useState<POFilters>(defaultFilters);
   const customerMapByCustomerId = useCustomerMapByCustomerId();
   const hasActiveFilters = useMemo(() => {
@@ -145,7 +130,19 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOve
   }, []);
 
   const resetFilters = useCallback(() => {
-    setFilters(defaultFilters);
+    setFilters({
+      searchQuery: '',
+      customerId: undefined,
+      statuses: [],
+      orderDateRange: {
+        start: undefined,
+        end: undefined,
+      },
+      deliveryDateRange: {
+        start: undefined,
+        end: undefined,
+      },
+    });
   }, []);
 
   const filterHandlers: POFilterHandlers = useMemo(() => {
@@ -192,9 +189,8 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOve
 
   // Memoize the normalized search query to avoid repeated toLowerCase() calls
   const normalizedSearchQuery = useMemo(() => {
-    const query = searchOverride !== undefined ? searchOverride : filters.searchQuery;
-    return query.trim().toLowerCase();
-  }, [filters.searchQuery, searchOverride]);
+    return filters.searchQuery.trim().toLowerCase();
+  }, [filters.searchQuery]);
 
   const filteredPOs = useMemo(() => {
     const { customerId, statuses, orderDateRange, deliveryDateRange } = filters;
@@ -256,22 +252,5 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[], searchOve
     return filtered.map(({ po }) => po);
   }, [filters, hasActiveFilters, normalizedSearchQuery, posWithSearchText, purchaseOrders]);
 
-  const clearAllFilters = useCallback(() => {
-    // Batch all filter updates into a single state change to prevent multiple re-renders
-    setFilters({
-      searchQuery: '',
-      customerId: undefined,
-      statuses: [],
-      orderDateRange: {
-        start: undefined,
-        end: undefined,
-      },
-      deliveryDateRange: {
-        start: undefined,
-        end: undefined,
-      },
-    });
-  }, []);
-
-  return { filteredPOs, filters, filterHandlers, hasActiveFilters, clearAllFilters };
+  return { filteredPOs, filters, filterHandlers, hasActiveFilters };
 }

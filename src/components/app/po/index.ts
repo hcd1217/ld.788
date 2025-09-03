@@ -1,4 +1,3 @@
-export { POActions } from './POActions';
 export { POCard } from './POCard';
 export { PODataTable } from './PODataTable';
 export { POGridCard } from './POGridCard';

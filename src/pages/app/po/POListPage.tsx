@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import type { Timeout } from '@/types';
 import { useNavigate } from 'react-router';
 import {
   Stack,
@@ -62,16 +63,20 @@ export function POListPage() {
     usePOActions();
   const { hasMorePOs, hasPreviousPage, isLoadingMore, currentPage } = usePOPaginationState();
 
-  // Search input state with debounce
-  const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch] = useDebouncedValue(searchInput, 300);
-
-  // Use the PO filters hook for filter state management only
+  // Use the PO filters hook for filter state management
   // Note: We don't use filteredPOs anymore since filtering happens server-side
-  const { filters, filterHandlers, hasActiveFilters, clearAllFilters } = usePOFilters(
-    [], // Empty array since we don't need client-side filtering
-    debouncedSearch,
-  );
+  const { filters, filterHandlers, hasActiveFilters } = usePOFilters([]);
+
+  // Debounce the search query for API calls (1 second delay)
+  const [debouncedSearch] = useDebouncedValue(filters.searchQuery, 1000);
+
+  // Filter loading state for UI lock
+  const [isFilterLoading, setIsFilterLoading] = useState(false);
+  const filterTimeoutRef = useRef<Timeout | undefined>(undefined);
+
+  // Track previous date ranges to detect incomplete changes
+  const prevOrderDateRangeRef = useRef(filters.orderDateRange);
+  const prevDeliveryDateRangeRef = useRef(filters.deliveryDateRange);
 
   const { viewMode, isTableView, setViewMode } = useViewMode();
 
@@ -114,9 +119,55 @@ export function POListPage() {
     ],
   );
 
-  // Effect to load POs when filter params change
+  // Effect to load POs when filter params change with forced delay for ALL filters
   useEffect(() => {
-    void loadPOsWithFilter(filterParams, true);
+    // Check if date range change is incomplete
+    const prevOrderDate = prevOrderDateRangeRef.current;
+    const prevDeliveryDate = prevDeliveryDateRangeRef.current;
+    const currOrderDate = filters.orderDateRange;
+    const currDeliveryDate = filters.deliveryDateRange;
+
+    // Check if this is just setting the first date of a range (incomplete)
+    const isSettingOrderDateStart =
+      !prevOrderDate.start && currOrderDate.start && !currOrderDate.end;
+    const isSettingOrderDateEnd = !prevOrderDate.end && currOrderDate.end && !currOrderDate.start;
+    const isSettingDeliveryDateStart =
+      !prevDeliveryDate.start && currDeliveryDate.start && !currDeliveryDate.end;
+    const isSettingDeliveryDateEnd =
+      !prevDeliveryDate.end && currDeliveryDate.end && !currDeliveryDate.start;
+
+    // Update refs for next comparison
+    prevOrderDateRangeRef.current = currOrderDate;
+    prevDeliveryDateRangeRef.current = currDeliveryDate;
+
+    // Skip API call if setting incomplete date range
+    if (
+      isSettingOrderDateStart ||
+      isSettingOrderDateEnd ||
+      isSettingDeliveryDateStart ||
+      isSettingDeliveryDateEnd
+    ) {
+      setIsFilterLoading(false);
+      return;
+    }
+
+    // Clear any existing timeout
+    if (filterTimeoutRef.current) {
+      clearTimeout(filterTimeoutRef.current);
+    }
+
+    // Apply delay with UI lock for all filter changes
+    setIsFilterLoading(true);
+    filterTimeoutRef.current = setTimeout(() => {
+      void loadPOsWithFilter(filterParams, true);
+      setIsFilterLoading(false);
+    }, 1500);
+
+    return () => {
+      if (filterTimeoutRef.current) {
+        clearTimeout(filterTimeoutRef.current);
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterParams]);
 
@@ -198,7 +249,7 @@ export function POListPage() {
     return (
       <AppMobileLayout
         showLogo
-        isLoading={isLoading}
+        isLoading={isLoading || isFilterLoading}
         error={error}
         clearError={clearError}
         header={<AppPageTitle title={t('po.title')} />}
@@ -206,18 +257,18 @@ export function POListPage() {
         <POErrorBoundary componentName="POListPage">
           {/* Mobile Filter Bar */}
           <POFilterBarMobile
-            searchQuery={searchInput}
+            searchQuery={filters.searchQuery}
             customerId={filters.customerId}
             selectedStatuses={filters.statuses}
             hasOrderDateFilter={hasOrderDateFilter}
             hasDeliveryDateFilter={hasDeliveryDateFilter}
             customers={customers}
             hasActiveFilters={hasActiveFilters}
-            onSearchChange={setSearchInput}
+            onSearchChange={filterHandlers.setSearchQuery}
             onCustomerClick={openCustomerDrawer}
             onStatusClick={openStatusDrawer}
             onDateClick={openDateDrawer}
-            onClearFilters={clearAllFilters}
+            onClearFilters={filterHandlers.resetFilters}
           />
 
           {/* Customer Selection Drawer */}
@@ -261,13 +312,7 @@ export function POListPage() {
             ) : (
               <Stack gap="sm" px="sm">
                 {purchaseOrders.map((po) => (
-                  <POCard
-                    canEdit={permissions.purchaseOrder.canEdit}
-                    key={po.id}
-                    noActions
-                    isLoading={isLoading}
-                    purchaseOrder={po}
-                  />
+                  <POCard key={po.id} isLoading={isLoading} purchaseOrder={po} />
                 ))}
               </Stack>
             )}
@@ -322,7 +367,11 @@ export function POListPage() {
   }
 
   return (
-    <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
+    <AppDesktopLayout
+      isLoading={isLoading || isFilterLoading}
+      error={error}
+      clearError={clearError}
+    >
       <POErrorBoundary componentName="POListPage">
         <Group justify="space-between" mb="lg">
           <AppPageTitle title={t('po.title')} />
@@ -340,7 +389,7 @@ export function POListPage() {
 
         {/* Desktop Filter Controls */}
         <POFilterBarDesktop
-          searchQuery={searchInput}
+          searchQuery={filters.searchQuery}
           customerId={filters.customerId}
           selectedStatuses={filters.statuses}
           orderDateStart={filters.orderDateRange.start}
@@ -349,12 +398,12 @@ export function POListPage() {
           deliveryDateEnd={filters.deliveryDateRange.end}
           customers={customers}
           hasActiveFilters={hasActiveFilters}
-          onSearchChange={setSearchInput}
+          onSearchChange={filterHandlers.setSearchQuery}
           onCustomerChange={filterHandlers.setCustomerId}
           onStatusesChange={filterHandlers.setStatuses}
           onOrderDateChange={filterHandlers.setOrderDateRange}
           onDeliveryDateChange={filterHandlers.setDeliveryDateRange}
-          onClearFilters={clearAllFilters}
+          onClearFilters={filterHandlers.resetFilters}
         />
 
         {/* Content Area */}
@@ -372,19 +421,23 @@ export function POListPage() {
         />
 
         {/* Data Display */}
-        {(purchaseOrders.length > 0 || isLoading) && (
+        {(purchaseOrders.length > 0 || isLoading || isFilterLoading) && (
           <>
-            {isLoading && purchaseOrders.length === 0 ? (
+            {(isLoading || isFilterLoading) && purchaseOrders.length === 0 ? (
               <POListSkeleton viewMode={viewMode} count={10} />
             ) : isTableView ? (
               <PODataTable
                 canEdit={permissions.purchaseOrder.canEdit}
-                noAction={isLoading}
-                isLoading={isLoading}
+                noAction={isLoading || isFilterLoading}
+                isLoading={isLoading || isFilterLoading}
                 purchaseOrders={purchaseOrders}
               />
             ) : (
-              <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
+              <SimpleGrid
+                cols={{ base: 1, md: 2, lg: 3 }}
+                spacing="lg"
+                style={{ opacity: isFilterLoading ? 0.5 : 1 }}
+              >
                 {purchaseOrders.map((po) => (
                   <POGridCard key={po.id} purchaseOrder={po} />
                 ))}

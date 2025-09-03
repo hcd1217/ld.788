@@ -1,7 +1,6 @@
 import { Stack, Button, Group, Tabs } from '@mantine/core';
-import { Drawer } from '@/components/common';
+import { DateInput, Drawer } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
-import { DatePickerInput, DatesProvider } from '@mantine/dates';
 import { useState, useEffect } from 'react';
 import { IconCalendar, IconCheckupList } from '@tabler/icons-react';
 import 'dayjs/locale/vi';
@@ -74,80 +73,78 @@ export function DeliveryDateDrawer({
 
   return (
     <Drawer opened={opened} size="360px" title={t('po.selectDateRange')} onClose={onClose}>
-      <DatesProvider settings={{ locale: currentLanguage, firstDayOfWeek: 0, weekendDays: [0, 6] }}>
-        <Stack gap="md">
-          <Tabs
-            value={activeTab}
-            onChange={(value) => {
-              if (value === 'scheduled' || value === 'completed') {
-                setActiveTab(value as 'scheduled' | 'completed');
-              }
-            }}
-          >
-            <Tabs.List grow>
-              <Tabs.Tab value="scheduled" leftSection={<IconCalendar size={16} />}>
-                {t('po.deliveryDate')}
-              </Tabs.Tab>
-              <Tabs.Tab value="completed" leftSection={<IconCheckupList size={16} />}>
-                {t('po.orderDate')}
-              </Tabs.Tab>
-            </Tabs.List>
+      <Stack gap="md">
+        <Tabs
+          value={activeTab}
+          onChange={(value) => {
+            if (value === 'scheduled' || value === 'completed') {
+              setActiveTab(value as 'scheduled' | 'completed');
+            }
+          }}
+        >
+          <Tabs.List grow>
+            <Tabs.Tab value="scheduled" leftSection={<IconCalendar size={16} />}>
+              {t('po.deliveryDate')}
+            </Tabs.Tab>
+            <Tabs.Tab value="completed" leftSection={<IconCheckupList size={16} />}>
+              {t('po.orderDate')}
+            </Tabs.Tab>
+          </Tabs.List>
 
-            <Tabs.Panel value="scheduled" pt="md">
-              <Stack gap="md">
-                <DatePickerInput
-                  label={t('po.startDate')}
-                  placeholder={t('po.selectStartDate')}
-                  clearable
-                  valueFormat={valueFormat}
-                  value={tempScheduledStartDate}
-                  onChange={(date) => setTempScheduledStartDate(date ? new Date(date) : undefined)}
-                  maxDate={tempScheduledEndDate}
-                />
-                <DatePickerInput
-                  label={t('po.endDate')}
-                  placeholder={t('po.selectEndDate')}
-                  clearable
-                  valueFormat={valueFormat}
-                  value={tempScheduledEndDate}
-                  onChange={(date) => setTempScheduledEndDate(date ? new Date(date) : undefined)}
-                  minDate={tempScheduledStartDate}
-                />
-              </Stack>
-            </Tabs.Panel>
+          <Tabs.Panel value="scheduled" pt="md">
+            <Stack gap="md">
+              <DateInput
+                label={t('po.startDate')}
+                placeholder={t('po.selectStartDate')}
+                clearable
+                valueFormat={valueFormat}
+                value={tempScheduledStartDate}
+                onChange={(date) => setTempScheduledStartDate(date ? new Date(date) : undefined)}
+                maxDate={tempScheduledEndDate}
+              />
+              <DateInput
+                label={t('po.endDate')}
+                placeholder={t('po.selectEndDate')}
+                clearable
+                valueFormat={valueFormat}
+                value={tempScheduledEndDate}
+                onChange={(date) => setTempScheduledEndDate(date ? new Date(date) : undefined)}
+                minDate={tempScheduledStartDate}
+              />
+            </Stack>
+          </Tabs.Panel>
 
-            <Tabs.Panel value="completed" pt="md">
-              <Stack gap="md">
-                <DatePickerInput
-                  label={t('po.startDate')}
-                  placeholder={t('po.selectStartDate')}
-                  clearable
-                  valueFormat={valueFormat}
-                  value={tempCompletedStartDate}
-                  onChange={(date) => setTempCompletedStartDate(date ? new Date(date) : undefined)}
-                  maxDate={tempCompletedEndDate}
-                />
-                <DatePickerInput
-                  label={t('po.endDate')}
-                  placeholder={t('po.selectEndDate')}
-                  clearable
-                  valueFormat={valueFormat}
-                  value={tempCompletedEndDate}
-                  onChange={(date) => setTempCompletedEndDate(date ? new Date(date) : undefined)}
-                  minDate={tempCompletedStartDate}
-                />
-              </Stack>
-            </Tabs.Panel>
-          </Tabs>
+          <Tabs.Panel value="completed" pt="md">
+            <Stack gap="md">
+              <DateInput
+                label={t('po.startDate')}
+                placeholder={t('po.selectStartDate')}
+                clearable
+                valueFormat={valueFormat}
+                value={tempCompletedStartDate}
+                onChange={(date) => setTempCompletedStartDate(date ? new Date(date) : undefined)}
+                maxDate={tempCompletedEndDate}
+              />
+              <DateInput
+                label={t('po.endDate')}
+                placeholder={t('po.selectEndDate')}
+                clearable
+                valueFormat={valueFormat}
+                value={tempCompletedEndDate}
+                onChange={(date) => setTempCompletedEndDate(date ? new Date(date) : undefined)}
+                minDate={tempCompletedStartDate}
+              />
+            </Stack>
+          </Tabs.Panel>
+        </Tabs>
 
-          <Group grow mt="md">
-            <Button variant="light" onClick={handleClearAll}>
-              {t('common.clearAll')}
-            </Button>
-            <Button onClick={handleApply}>{t('common.apply')}</Button>
-          </Group>
-        </Stack>
-      </DatesProvider>
+        <Group grow mt="md">
+          <Button variant="light" onClick={handleClearAll}>
+            {t('common.clearAll')}
+          </Button>
+          <Button onClick={handleApply}>{t('common.apply')}</Button>
+        </Group>
+      </Stack>
     </Drawer>
   );
 }

@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { Stack, Group, SimpleGrid, Button, Loader, Text, Center, Flex } from '@mantine/core';
+import type { Timeout } from '@/types';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeliveryRequestFilters } from '@/hooks/useDeliveryRequestFilters';
@@ -54,14 +55,19 @@ export function DeliveryListPage() {
   const { hasMoreDeliveryRequests, hasPreviousPage, isLoadingMore, currentPage } =
     useDeliveryRequestPaginationState();
 
-  // Search input state with debounce
-  const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch] = useDebouncedValue(searchInput, 300);
+  // Use the delivery request filters hook for filter state management
+  const { filters, filterHandlers, hasActiveFilters } = useDeliveryRequestFilters([]);
 
-  // Use the delivery request filters hook for filter state management only
-  const { filters, filterHandlers, hasActiveFilters, clearAllFilters } = useDeliveryRequestFilters(
-    [], // Empty array since we don't need client-side filtering
-  );
+  // Debounce the search query for API calls (1 second delay)
+  const [debouncedSearch] = useDebouncedValue(filters.searchQuery, 1000);
+
+  // Filter loading state for UI lock
+  const [isFilterLoading, setIsFilterLoading] = useState(false);
+  const filterTimeoutRef = useRef<Timeout | undefined>(undefined);
+
+  // Track previous date ranges to detect incomplete changes
+  const prevScheduledDateRangeRef = useRef(filters.scheduledDateRange);
+  const prevCompletedDateRangeRef = useRef(filters.completedDateRange);
 
   const { viewMode, isTableView, setViewMode } = useViewMode();
 
@@ -106,9 +112,56 @@ export function DeliveryListPage() {
     ],
   );
 
-  // Effect to load delivery requests when filter params change
+  // Effect to load delivery requests when filter params change with forced delay for ALL filters
   useEffect(() => {
-    void loadDeliveryRequestsWithFilter(filterParams, true);
+    // Check if date range change is incomplete
+    const prevScheduledDate = prevScheduledDateRangeRef.current;
+    const prevCompletedDate = prevCompletedDateRangeRef.current;
+    const currScheduledDate = filters.scheduledDateRange;
+    const currCompletedDate = filters.completedDateRange;
+
+    // Check if this is just setting the first date of a range (incomplete)
+    const isSettingScheduledDateStart =
+      !prevScheduledDate.start && currScheduledDate.start && !currScheduledDate.end;
+    const isSettingScheduledDateEnd =
+      !prevScheduledDate.end && currScheduledDate.end && !currScheduledDate.start;
+    const isSettingCompletedDateStart =
+      !prevCompletedDate.start && currCompletedDate.start && !currCompletedDate.end;
+    const isSettingCompletedDateEnd =
+      !prevCompletedDate.end && currCompletedDate.end && !currCompletedDate.start;
+
+    // Update refs for next comparison
+    prevScheduledDateRangeRef.current = currScheduledDate;
+    prevCompletedDateRangeRef.current = currCompletedDate;
+
+    // Skip API call if setting incomplete date range
+    if (
+      isSettingScheduledDateStart ||
+      isSettingScheduledDateEnd ||
+      isSettingCompletedDateStart ||
+      isSettingCompletedDateEnd
+    ) {
+      setIsFilterLoading(false);
+      return;
+    }
+
+    // Clear any existing timeout
+    if (filterTimeoutRef.current) {
+      clearTimeout(filterTimeoutRef.current);
+    }
+
+    // Apply delay with UI lock for all filter changes
+    setIsFilterLoading(true);
+    filterTimeoutRef.current = setTimeout(() => {
+      void loadDeliveryRequestsWithFilter(filterParams, true);
+      setIsFilterLoading(false);
+    }, 1500);
+
+    return () => {
+      if (filterTimeoutRef.current) {
+        clearTimeout(filterTimeoutRef.current);
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterParams]);
 
@@ -189,7 +242,7 @@ export function DeliveryListPage() {
     return (
       <AppMobileLayout
         showLogo
-        isLoading={isLoading}
+        isLoading={isLoading || isFilterLoading}
         error={error}
         clearError={clearError}
         header={<AppPageTitle title={t('delivery.list.title')} />}
@@ -197,18 +250,18 @@ export function DeliveryListPage() {
         <DeliveryErrorBoundary componentName="DeliveryListPage">
           {/* Mobile Filter Bar */}
           <DeliveryFilterBarMobile
-            searchQuery={searchInput}
+            searchQuery={filters.searchQuery}
             customerId={filters.customerId}
             selectedStatuses={filters.statuses}
             hasScheduledDateFilter={hasScheduledDateFilter}
             hasCompletedDateFilter={hasCompletedDateFilter}
             customers={customers}
             hasActiveFilters={hasActiveFilters}
-            onSearchChange={setSearchInput}
+            onSearchChange={filterHandlers.setSearchQuery}
             onCustomerClick={openCustomerDrawer}
             onStatusClick={openStatusDrawer}
             onDateClick={openDateDrawer}
-            onClearFilters={clearAllFilters}
+            onClearFilters={filterHandlers.resetFilters}
           />
 
           {/* Customer Selection Drawer */}
@@ -294,7 +347,11 @@ export function DeliveryListPage() {
   }
 
   return (
-    <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
+    <AppDesktopLayout
+      isLoading={isLoading || isFilterLoading}
+      error={error}
+      clearError={clearError}
+    >
       <DeliveryErrorBoundary componentName="DeliveryListPage">
         <Group justify="space-between" mb="lg">
           <AppPageTitle title={t('delivery.list.title')} />
@@ -306,7 +363,7 @@ export function DeliveryListPage() {
 
         {/* Desktop Filter Controls */}
         <DeliveryFilterBarDesktop
-          searchQuery={searchInput}
+          searchQuery={filters.searchQuery}
           customerId={filters.customerId}
           selectedStatuses={filters.statuses}
           scheduledDateStart={filters.scheduledDateRange.start}
@@ -315,12 +372,12 @@ export function DeliveryListPage() {
           completedDateEnd={filters.completedDateRange.end}
           customers={customers}
           hasActiveFilters={hasActiveFilters}
-          onSearchChange={setSearchInput}
+          onSearchChange={filterHandlers.setSearchQuery}
           onCustomerChange={filterHandlers.setCustomerId}
           onStatusesChange={filterHandlers.setStatuses}
           onScheduledDateChange={filterHandlers.setScheduledDateRange}
           onCompletedDateChange={filterHandlers.setCompletedDateRange}
-          onClearFilters={clearAllFilters}
+          onClearFilters={filterHandlers.resetFilters}
         />
 
         {/* Content Area */}
@@ -330,14 +387,21 @@ export function DeliveryListPage() {
         />
 
         {/* Data Display */}
-        {(deliveryRequests.length > 0 || isLoading) && (
+        {(deliveryRequests.length > 0 || isLoading || isFilterLoading) && (
           <>
-            {isLoading && deliveryRequests.length === 0 ? (
+            {(isLoading || isFilterLoading) && deliveryRequests.length === 0 ? (
               <DeliveryListSkeleton viewMode={viewMode} count={10} />
             ) : isTableView ? (
-              <DeliveryDataTable deliveryRequests={deliveryRequests} isLoading={isLoading} />
+              <DeliveryDataTable
+                deliveryRequests={deliveryRequests}
+                isLoading={isLoading || isFilterLoading}
+              />
             ) : (
-              <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
+              <SimpleGrid
+                cols={{ base: 1, md: 2, lg: 3 }}
+                spacing="lg"
+                style={{ opacity: isFilterLoading ? 0.5 : 1 }}
+              >
                 {deliveryRequests.map((dr) => (
                   <DeliveryGridCard key={dr.id} deliveryRequest={dr} />
                 ))}

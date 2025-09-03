@@ -1,5 +1,5 @@
 import { Card, Stack, Text, SimpleGrid } from '@mantine/core';
-import { DateInput } from '@mantine/dates';
+import { DateInput } from '@/components/common';
 import type { UseFormReturnType } from '@mantine/form';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';

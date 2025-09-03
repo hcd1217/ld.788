@@ -114,10 +114,21 @@ export function useDeliveryRequestFilters(deliveryRequests: readonly DeliveryReq
   }, []);
 
   const resetFilters = useCallback(() => {
-    setFilters(defaultFilters);
+    setFilters({
+      searchQuery: '',
+      statuses: [],
+      assignedTo: undefined,
+      customerId: undefined,
+      scheduledDateRange: {
+        start: undefined,
+        end: undefined,
+      },
+      completedDateRange: {
+        start: undefined,
+        end: undefined,
+      },
+    });
   }, []);
-
-  const clearAllFilters = resetFilters;
 
   const filterHandlers: DeliveryRequestFilterHandlers = useMemo(
     () => ({
@@ -153,6 +164,5 @@ export function useDeliveryRequestFilters(deliveryRequests: readonly DeliveryReq
     filterHandlers,
     filteredDeliveryRequests,
     hasActiveFilters,
-    clearAllFilters,
   };
 }

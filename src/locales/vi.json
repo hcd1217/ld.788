@@ -626,7 +626,7 @@
     "componentErrorTitle": "Lỗi trong {{component}}",
     "componentErrorDescription": "Đã xảy ra lỗi khi tải thành phần này. Vui lòng thử lại.",
     "thisComponent": "thành phần này",
-    "noMorePOs": "Không còn đơn hàng nào để tải",
+    "noMorePOs": "Tất cả đơn hàng đã được tải",
     "documentsComingSoon": "Tài liệu đơn hàng sẽ được hiển thị ở đây",
     "communicationLog": "Nhật Ký Liên Lạc",
     "communicationLogComingSoon": "Lịch sử liên lạc sẽ được hiển thị ở đây",

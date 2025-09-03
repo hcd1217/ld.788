@@ -1,5 +1,4 @@
 import { Stack, Box } from '@mantine/core';
-import { DatesProvider } from '@mantine/dates';
 import type { UseFormReturnType } from '@mantine/form';
 import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
@@ -95,32 +94,30 @@ export function POForm({
 
   // Form content without actions
   const formContent = (
-    <DatesProvider settings={{ locale: currentLanguage, firstDayOfWeek: 0, weekendDays: [0, 6] }}>
-      <Stack gap="lg">
-        {/* Error Alert */}
-        <ErrorAlert error={error} />
+    <Stack gap="lg">
+      {/* Error Alert */}
+      <ErrorAlert error={error} />
 
-        {/* Customer Selection */}
-        <POCustomerSelection
-          form={form}
-          customers={customers}
-          selectedCustomer={selectedCustomer}
-          isEditMode={isEditMode}
-        />
+      {/* Customer Selection */}
+      <POCustomerSelection
+        form={form}
+        customers={customers}
+        selectedCustomer={selectedCustomer}
+        isEditMode={isEditMode}
+      />
 
-        {/* Date Fields */}
-        <POFormDateSection form={form} isLoading={isLoading} valueFormat={valueFormat} />
+      {/* Date Fields */}
+      <POFormDateSection form={form} isLoading={isLoading} valueFormat={valueFormat} />
 
-        {/* Order Items */}
-        <POFormItemsSection form={form} isLoading={isLoading} />
+      {/* Order Items */}
+      <POFormItemsSection form={form} isLoading={isLoading} />
 
-        {/* Shipping Address */}
-        <POFormAddressSection form={form} selectedCustomer={selectedCustomer} />
+      {/* Shipping Address */}
+      <POFormAddressSection form={form} selectedCustomer={selectedCustomer} />
 
-        {/* Additional Information */}
-        <POAdditionalInfo form={form} />
-      </Stack>
-    </DatesProvider>
+      {/* Additional Information */}
+      <POAdditionalInfo form={form} />
+    </Stack>
   );
 
   // Mobile layout with fixed buttons

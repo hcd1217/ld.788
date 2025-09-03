@@ -29,8 +29,8 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
     () => ({
       customerId: '',
       items: [],
-      orderDate: new Date(),
-      deliveryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      orderDate: new Date(new Date().setHours(0, 0, 0, 1)),
+      deliveryDate: undefined,
       shippingAddress: {
         // cspell:disable-next-line
         oneLineAddress: isDevelopment ? '123 Main St, Anytown, USA' : undefined,

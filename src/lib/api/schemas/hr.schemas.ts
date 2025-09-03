@@ -56,12 +56,8 @@ export const EmployeeSchema = z.object({
 
 export const DepartmentSchema = z.object({
   id: idSchema,
-  clientId: idSchema,
   name: stringSchema,
   code: stringSchema,
-  isActive: z.boolean(),
-  createdAt: timestampSchema,
-  updatedAt: timestampSchema,
 });
 
 // Request schemas

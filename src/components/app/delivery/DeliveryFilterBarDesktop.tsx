@@ -1,5 +1,5 @@
 import { Group, Select, MultiSelect, Button } from '@mantine/core';
-import { DatePickerInput, DatesProvider } from '@mantine/dates';
+import { DatePickerInput } from '@/components/common';
 import { IconClearAll } from '@tabler/icons-react';
 import { useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -77,104 +77,98 @@ export function DeliveryFilterBarDesktop({
   }, [filteredStatuses.length, t]);
 
   return (
-    <DatesProvider settings={{ locale: currentLanguage, firstDayOfWeek: 0, weekendDays: [0, 6] }}>
-      <Group justify="start" align="flex-end" gap="sm" wrap="nowrap" mb="xl">
-        {/* Search Bar - flex 2 */}
-        <div style={{ flex: 2, minWidth: 200 }}>
-          <SearchBar
-            placeholder={t('delivery.filters.searchPlaceholder')}
-            searchQuery={searchQuery}
-            setSearchQuery={onSearchChange}
-          />
-        </div>
-
-        {/* Customer Select - flex 1 */}
-        <Select
-          clearable
-          searchable
-          placeholder={t('delivery.filters.selectCustomer')}
-          data={customerOptions}
-          value={customerId || ''}
-          style={{ flex: 1, minWidth: 150 }}
-          onChange={(value) => onCustomerChange(value || undefined)}
-          label={t('delivery.fields.customer') as string}
+    <Group justify="start" align="flex-end" gap="sm" wrap="nowrap" mb="xl">
+      {/* Search Bar - flex 2 */}
+      <div style={{ flex: 2, minWidth: 200 }}>
+        <SearchBar
+          placeholder={t('delivery.filters.searchPlaceholder')}
+          searchQuery={searchQuery}
+          setSearchQuery={onSearchChange}
         />
+      </div>
 
-        {/* Status MultiSelect - flex 1 */}
-        <MultiSelect
-          clearable
-          searchable
-          placeholder={statusPlaceholder}
-          data={statusOptions}
-          value={filteredStatuses}
-          style={{ flex: 1, minWidth: 180 }}
-          onChange={(values) => onStatusesChange(values as DeliveryStatusType[])}
-          label={t('delivery.fields.status') as string}
-          maxDropdownHeight={280}
-          styles={{
-            input: {
-              minHeight: 36,
-              height: 'auto',
-            },
-            pill: {
-              display: 'none',
-            },
-          }}
-          hidePickedOptions={false}
-        />
+      {/* Customer Select - flex 1 */}
+      <Select
+        clearable
+        searchable
+        placeholder={t('delivery.filters.selectCustomer')}
+        data={customerOptions}
+        value={customerId || ''}
+        style={{ flex: 1, minWidth: 150 }}
+        onChange={(value) => onCustomerChange(value || undefined)}
+        label={t('delivery.fields.customer') as string}
+      />
 
-        {/* Scheduled Date Range */}
-        <DatePickerInput
-          clearable
-          type="range"
-          label={t('delivery.fields.scheduledDate')}
-          placeholder={t('delivery.filters.selectStatus')}
-          value={[scheduledDateStart || null, scheduledDateEnd || null]}
-          valueFormat={valueFormat}
-          style={{ flex: 1.5, minWidth: 220 }}
-          onChange={(dates) => {
-            if (!dates) {
-              onScheduledDateChange(undefined, undefined);
-            } else {
-              const [start, end] = dates;
-              const startDate = start ? new Date(start) : undefined;
-              const endDate = end ? new Date(end) : undefined;
-              onScheduledDateChange(startDate, endDate);
-            }
-          }}
-        />
+      {/* Status MultiSelect - flex 1 */}
+      <MultiSelect
+        clearable
+        searchable
+        placeholder={statusPlaceholder}
+        data={statusOptions}
+        value={filteredStatuses}
+        style={{ flex: 1, minWidth: 180 }}
+        onChange={(values) => onStatusesChange(values as DeliveryStatusType[])}
+        label={t('delivery.fields.status') as string}
+        maxDropdownHeight={280}
+        styles={{
+          input: {
+            minHeight: 36,
+            height: 'auto',
+          },
+          pill: {
+            display: 'none',
+          },
+        }}
+        hidePickedOptions={false}
+      />
 
-        {/* Completed Date Range */}
-        <DatePickerInput
-          clearable
-          type="range"
-          label={t('delivery.fields.completedDate')}
-          placeholder={t('delivery.filters.selectStatus')}
-          value={[completedDateStart || null, completedDateEnd || null]}
-          valueFormat={valueFormat}
-          style={{ flex: 1.5, minWidth: 220 }}
-          onChange={(dates) => {
-            if (!dates) {
-              onCompletedDateChange(undefined, undefined);
-            } else {
-              const [start, end] = dates;
-              const startDate = start ? new Date(start) : undefined;
-              const endDate = end ? new Date(end) : undefined;
-              onCompletedDateChange(startDate, endDate);
-            }
-          }}
-        />
+      {/* Scheduled Date Range */}
+      <DatePickerInput
+        label={t('delivery.fields.scheduledDate')}
+        placeholder={t('delivery.filters.selectStatus')}
+        value={[scheduledDateStart, scheduledDateEnd]}
+        valueFormat={valueFormat}
+        style={{ flex: 1.5, minWidth: 220 }}
+        onChange={(dates) => {
+          if (!dates) {
+            onScheduledDateChange(undefined, undefined);
+          } else {
+            const [start, end] = dates;
+            const startDate = start ? new Date(start) : undefined;
+            const endDate = end ? new Date(end) : undefined;
+            onScheduledDateChange(startDate, endDate);
+          }
+        }}
+      />
 
-        {/* Clear Button */}
-        <Button
-          disabled={!hasActiveFilters}
-          variant="subtle"
-          leftSection={<IconClearAll size={16} />}
-          onClick={onClearFilters}
-        >
-          {t('common.clear')}
-        </Button>
-      </Group>
-    </DatesProvider>
+      {/* Completed Date Range */}
+      <DatePickerInput
+        label={t('delivery.fields.completedDate')}
+        placeholder={t('delivery.filters.selectStatus')}
+        value={[completedDateStart, completedDateEnd]}
+        valueFormat={valueFormat}
+        style={{ flex: 1.5, minWidth: 220 }}
+        onChange={(dates) => {
+          if (!dates) {
+            onCompletedDateChange(undefined, undefined);
+          } else {
+            const [start, end] = dates;
+            const startDate = start ? new Date(start) : undefined;
+            const endDate = end ? new Date(end) : undefined;
+            onCompletedDateChange(startDate, endDate);
+          }
+        }}
+      />
+
+      {/* Clear Button */}
+      <Button
+        disabled={!hasActiveFilters}
+        variant="subtle"
+        leftSection={<IconClearAll size={16} />}
+        onClick={onClearFilters}
+      >
+        {t('common.clear')}
+      </Button>
+    </Group>
   );
 }

@@ -13,6 +13,8 @@ export { CommonMobileFooterSkeleton } from './CommonMobileFooterSkeleton';
 export { CommonMobileHeader } from './CommonMobileHeader';
 export { ContactInfo } from './ContactInfo';
 export { DataTable } from './DataTable';
+export { DateInput } from './DateInput';
+export { DatePickerInput } from './DatePickerInput';
 export { Drawer } from './Drawer';
 export { SearchBar } from './SearchBar';
 export { SelectableCard } from './SelectableCard';

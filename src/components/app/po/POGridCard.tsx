@@ -38,37 +38,47 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
         }}
       >
         <Group justify="space-between" align="flex-start">
-          <div>
-            <Text fw={500} size="lg">
-              {purchaseOrder.poNumber}
-            </Text>
-            <Stack gap="xs" mt="xs">
+          <Text fw={500} size="lg">
+            {purchaseOrder.poNumber}
+          </Text>
+          <Stack gap="xs" mt="xs" w="100%">
+            <Group justify="space-between" w="100%">
               <div>
-                <Text size="sm" fw={500}>
+                <Text size="sm" c="dimmed">
                   {t('po.customer')}
                 </Text>
-                <Text size="sm" c="dimmed">
+                <Text size="sm" fw={500}>
                   {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
                 </Text>
               </div>
               <div>
+                <Text size="sm" c="dimmed">
+                  {t('po.items')}
+                </Text>
                 <Text size="sm" fw={500}>
+                  {purchaseOrder.items.length} {t('po.itemsCount')}
+                </Text>
+              </div>
+            </Group>
+            <Group justify="space-between" w="100%">
+              <div>
+                <Text size="sm" c="dimmed">
                   {t('po.orderDate')}
                 </Text>
-                <Text size="sm" c="dimmed">
+                <Text size="sm" fw={500}>
                   {formatDateTime(purchaseOrder.orderDate)}
                 </Text>
               </div>
               <div>
-                <Text size="sm" fw={500}>
-                  {t('po.items')}
-                </Text>
                 <Text size="sm" c="dimmed">
-                  {purchaseOrder.items.length} {t('po.itemsCount')}
+                  {t('po.deliveryDate')}
+                </Text>
+                <Text size="sm" fw={500}>
+                  {formatDateTime(purchaseOrder.deliveryRequest?.scheduledDate)}
                 </Text>
               </div>
-            </Stack>
-          </div>
+            </Group>
+          </Stack>
           <div
             style={{
               position: 'absolute',

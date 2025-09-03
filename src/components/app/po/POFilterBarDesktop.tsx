@@ -1,9 +1,8 @@
 import { Group, Select, MultiSelect, Button } from '@mantine/core';
-import { DatePickerInput, DatesProvider } from '@mantine/dates';
 import { IconClearAll } from '@tabler/icons-react';
 import { useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { SearchBar } from '@/components/common';
+import { SearchBar, DatePickerInput } from '@/components/common';
 import { PO_STATUS, type POStatusType } from '@/constants/purchaseOrder';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
 import 'dayjs/locale/vi';
@@ -86,103 +85,97 @@ export function POFilterBarDesktop({
   }, [filteredStatuses, statusOptions, t]);
 
   return (
-    <DatesProvider settings={{ locale: currentLanguage, firstDayOfWeek: 0, weekendDays: [0, 6] }}>
-      <Group justify="start" align="flex-end" gap="sm" wrap="nowrap" mb="xl">
-        {/* Search Bar - flex 2 */}
-        <div style={{ flex: 2, minWidth: 200 }}>
-          <SearchBar
-            placeholder={t('po.searchPlaceholder')}
-            searchQuery={searchQuery}
-            setSearchQuery={onSearchChange}
-          />
-        </div>
-
-        {/* Customer Select - flex 1 */}
-        <Select
-          clearable
-          searchable
-          placeholder={t('po.selectCustomer')}
-          data={customerOptions}
-          value={customerId || ''}
-          style={{ flex: 1, minWidth: 150, borderRadius: '5px' }}
-          onChange={(value) => onCustomerChange(value || undefined)}
-          label={t('po.customer')}
+    <Group justify="start" align="flex-end" gap="sm" wrap="nowrap" mb="xl">
+      {/* Search Bar - flex 2 */}
+      <div style={{ flex: 2, minWidth: 200 }}>
+        <SearchBar
+          placeholder={t('po.searchPlaceholder')}
+          searchQuery={searchQuery}
+          setSearchQuery={onSearchChange}
         />
+      </div>
 
-        {/* Status MultiSelect - flex 1 */}
-        <MultiSelect
-          clearable
-          searchable
-          placeholder={statusPlaceholder}
-          data={statusOptions}
-          value={filteredStatuses}
-          style={{ flex: 1, minWidth: 180 }}
-          onChange={(values) => onStatusesChange(values as POStatusType[])}
-          label={t('po.poStatus')}
-          maxDropdownHeight={280}
-          styles={{
-            input: {
-              minHeight: 36,
-              height: 'auto',
-            },
-            pill: {
-              display: 'none',
-            },
-          }}
-        />
+      {/* Customer Select - flex 1 */}
+      <Select
+        clearable
+        searchable
+        placeholder={t('po.selectCustomer')}
+        data={customerOptions}
+        value={customerId || ''}
+        style={{ flex: 1, minWidth: 150, borderRadius: '5px' }}
+        onChange={(value) => onCustomerChange(value || undefined)}
+        label={t('po.customer')}
+      />
 
-        {/* Order Date Range */}
-        <DatePickerInput
-          clearable
-          type="range"
-          label={t('po.orderDate')}
-          placeholder={t('po.selectDateRange')}
-          value={[orderDateStart || null, orderDateEnd || null]}
-          valueFormat={valueFormat}
-          style={{ flex: 1.5, minWidth: 220 }}
-          onChange={(dates) => {
-            if (!dates) {
-              onOrderDateChange(undefined, undefined);
-            } else {
-              const [start, end] = dates;
-              const startDate = start ? new Date(start) : undefined;
-              const endDate = end ? new Date(end) : undefined;
-              onOrderDateChange(startDate, endDate);
-            }
-          }}
-        />
+      {/* Status MultiSelect - flex 1 */}
+      <MultiSelect
+        clearable
+        searchable
+        placeholder={statusPlaceholder}
+        data={statusOptions}
+        value={filteredStatuses}
+        style={{ flex: 1, minWidth: 180 }}
+        onChange={(values) => onStatusesChange(values as POStatusType[])}
+        label={t('po.poStatus')}
+        maxDropdownHeight={280}
+        styles={{
+          input: {
+            minHeight: 36,
+            height: 'auto',
+          },
+          pill: {
+            display: 'none',
+          },
+        }}
+      />
 
-        {/* Delivery Date Range */}
-        <DatePickerInput
-          clearable
-          type="range"
-          label={t('po.deliveryDate')}
-          placeholder={t('po.selectDateRange')}
-          value={[deliveryDateStart || null, deliveryDateEnd || null]}
-          valueFormat={valueFormat}
-          style={{ flex: 1.5, minWidth: 220 }}
-          onChange={(dates) => {
-            if (!dates) {
-              onDeliveryDateChange(undefined, undefined);
-            } else {
-              const [start, end] = dates;
-              const startDate = start ? new Date(start) : undefined;
-              const endDate = end ? new Date(end) : undefined;
-              onDeliveryDateChange(startDate, endDate);
-            }
-          }}
-        />
+      {/* Order Date Range */}
+      <DatePickerInput
+        label={t('po.orderDate')}
+        placeholder={t('po.selectDateRange')}
+        value={[orderDateStart, orderDateEnd]}
+        valueFormat={valueFormat}
+        style={{ flex: 1.5, minWidth: 220 }}
+        onChange={(dates) => {
+          if (!dates) {
+            onOrderDateChange(undefined, undefined);
+          } else {
+            const [start, end] = dates;
+            const startDate = start ? new Date(start) : undefined;
+            const endDate = end ? new Date(end) : undefined;
+            onOrderDateChange(startDate, endDate);
+          }
+        }}
+      />
 
-        {/* Clear Button */}
-        <Button
-          disabled={!hasActiveFilters}
-          variant="subtle"
-          leftSection={<IconClearAll size={16} />}
-          onClick={onClearFilters}
-        >
-          {t('common.clear')}
-        </Button>
-      </Group>
-    </DatesProvider>
+      {/* Delivery Date Range */}
+      <DatePickerInput
+        label={t('po.deliveryDate')}
+        placeholder={t('po.selectDateRange')}
+        value={[deliveryDateStart, deliveryDateEnd]}
+        valueFormat={valueFormat}
+        style={{ flex: 1.5, minWidth: 220 }}
+        onChange={(dates) => {
+          if (!dates) {
+            onDeliveryDateChange(undefined, undefined);
+          } else {
+            const [start, end] = dates;
+            const startDate = start ? new Date(start) : undefined;
+            const endDate = end ? new Date(end) : undefined;
+            onDeliveryDateChange(startDate, endDate);
+          }
+        }}
+      />
+
+      {/* Clear Button */}
+      <Button
+        disabled={!hasActiveFilters}
+        variant="subtle"
+        leftSection={<IconClearAll size={16} />}
+        onClick={onClearFilters}
+      >
+        {t('common.clear')}
+      </Button>
+    </Group>
   );
 }

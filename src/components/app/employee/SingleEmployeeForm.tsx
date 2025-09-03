@@ -14,7 +14,7 @@ import {
 } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { IconAlertCircle, IconUser, IconMail, IconPhone } from '@tabler/icons-react';
-import { DateInput, DatesProvider } from '@mantine/dates';
+import { DateInput } from '@/components/common';
 import { useMemo } from 'react';
 import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
@@ -74,125 +74,118 @@ export function SingleEmployeeForm({
   const locale = i18n.language;
   const valueFormat = locale === 'vi' ? 'DD/MM/YYYY' : 'MMM DD, YYYY';
   return (
-    <DatesProvider
-      settings={{
-        locale,
-        firstDayOfWeek: 1,
-      }}
-    >
-      <Card withBorder radius="md" p="xl">
-        <form onSubmit={form.onSubmit(onSubmit)}>
-          <Stack gap="lg">
-            <Transition mounted={showAlert} transition="fade">
-              {(styles) => (
-                <Alert
-                  withCloseButton
-                  style={styles}
-                  icon={<IconAlertCircle size={16} />}
-                  color="red"
-                  variant="light"
-                  onClose={() => {
-                    setShowAlert(false);
-                  }}
-                >
-                  {error || t('common.checkFormErrors')}
-                </Alert>
-              )}
-            </Transition>
-            <FirstNameAndLastNameInForm
-              form={form}
-              isLoading={isLoading}
-              setShowAlert={setShowAlert}
+    <Card withBorder radius="md" p="xl">
+      <form onSubmit={form.onSubmit(onSubmit)}>
+        <Stack gap="lg">
+          <Transition mounted={showAlert} transition="fade">
+            {(styles) => (
+              <Alert
+                withCloseButton
+                style={styles}
+                icon={<IconAlertCircle size={16} />}
+                color="red"
+                variant="light"
+                onClose={() => {
+                  setShowAlert(false);
+                }}
+              >
+                {error || t('common.checkFormErrors')}
+              </Alert>
+            )}
+          </Transition>
+          <FirstNameAndLastNameInForm
+            form={form}
+            isLoading={isLoading}
+            setShowAlert={setShowAlert}
+          />
+          <Select
+            searchable
+            clearable
+            label={t('employee.unit')}
+            placeholder={t('employee.selectUnit')}
+            data={unitOptions}
+            {...form.getInputProps('unitId')}
+          />
+          <TextInput
+            label={t('employee.email')}
+            placeholder="an@company.com"
+            leftSection={<IconMail size={16} />}
+            {...form.getInputProps('email')}
+          />
+          <TextInput
+            label={t('employee.phone')}
+            placeholder="0901-234-567"
+            leftSection={<IconPhone size={16} />}
+            {...form.getInputProps('phone')}
+          />
+          <Stack gap="xs">
+            <Text size="sm" fw={500}>
+              {t('employee.workType')}
+            </Text>
+            <SegmentedControl
+              data={[
+                { label: t('employee.fullTime'), value: 'FULL_TIME' },
+                { label: t('employee.partTime'), value: 'PART_TIME' },
+              ]}
+              {...form.getInputProps('workType')}
             />
-            <Select
-              searchable
-              clearable
-              label={t('employee.unit')}
-              placeholder={t('employee.selectUnit')}
-              data={unitOptions}
-              {...form.getInputProps('unitId')}
-            />
-            <TextInput
-              label={t('employee.email')}
-              placeholder="john.doe@example.com"
-              leftSection={<IconMail size={16} />}
-              {...form.getInputProps('email')}
-            />
-            <TextInput
-              label={t('employee.phone')}
-              placeholder="0901-234-567"
-              leftSection={<IconPhone size={16} />}
-              {...form.getInputProps('phone')}
-            />
-            <Stack gap="xs">
-              <Text size="sm" fw={500}>
-                {t('employee.workType')}
-              </Text>
-              <SegmentedControl
-                data={[
-                  { label: t('employee.fullTime'), value: 'FULL_TIME' },
-                  { label: t('employee.partTime'), value: 'PART_TIME' },
-                ]}
-                {...form.getInputProps('workType')}
-              />
-            </Stack>
+          </Stack>
 
-            {form.values.workType === 'FULL_TIME' && (
-              <NumberInput
-                label={t('employee.monthlySalary')}
-                placeholder="12,000,000"
-                min={0}
-                step={1000000}
-                thousandSeparator=","
-                leftSection="₫"
-                {...form.getInputProps('monthlySalary')}
-              />
-            )}
-            {form.values.workType === 'PART_TIME' && (
-              <NumberInput
-                label={t('employee.hourlyRate')}
-                placeholder="25,000"
-                min={0}
-                step={1000}
-                thousandSeparator=","
-                leftSection="₫"
-                {...form.getInputProps('hourlyRate')}
-              />
-            )}
+          {form.values.workType === 'FULL_TIME' && (
+            <NumberInput
+              label={t('employee.monthlySalary')}
+              placeholder="12,000,000"
+              min={0}
+              step={1000000}
+              thousandSeparator=","
+              leftSection="₫"
+              {...form.getInputProps('monthlySalary')}
+            />
+          )}
+          {form.values.workType === 'PART_TIME' && (
+            <NumberInput
+              label={t('employee.hourlyRate')}
+              placeholder="25,000"
+              min={0}
+              step={1000}
+              thousandSeparator=","
+              leftSection="₫"
+              {...form.getInputProps('hourlyRate')}
+            />
+          )}
+          <DateInput
+            label={t('employee.startDate')}
+            placeholder={t('employee.startDatePlaceholder')}
+            clearable
+            valueFormat={valueFormat}
+            {...form.getInputProps('startDate')}
+          />
+          {isEditMode && (
+            <Switch
+              label={t('employee.updateEndDate')}
+              description={t('employee.updateEndDateDescription')}
+              {...form.getInputProps('isEndDateEnabled', { type: 'checkbox' })}
+            />
+          )}
+          {isEditMode && form.values.isEndDateEnabled && (
             <DateInput
-              label={t('employee.startDate')}
-              placeholder={t('employee.startDatePlaceholder')}
+              label={t('employee.endDate')}
+              placeholder={t('employee.endDatePlaceholder')}
               clearable
               valueFormat={valueFormat}
-              {...form.getInputProps('startDate')}
+              {...form.getInputProps('endDate')}
             />
-            {isEditMode && (
-              <Switch
-                label={t('employee.updateEndDate')}
-                description={t('employee.updateEndDateDescription')}
-                {...form.getInputProps('isEndDateEnabled', { type: 'checkbox' })}
-              />
-            )}
-            {isEditMode && form.values.isEndDateEnabled && (
-              <DateInput
-                label={t('employee.endDate')}
-                placeholder={t('employee.endDatePlaceholder')}
-                clearable
-                valueFormat={valueFormat}
-                {...form.getInputProps('endDate')}
-              />
-            )}
-            <Group justify="flex-end">
-              <Button variant="light" disabled={isLoading} onClick={onCancel}>
-                {t('common.cancel')}
-              </Button>
-              <Button type="submit" loading={isLoading} leftSection={<IconUser size={16} />}>
-                {isEditMode ? t('employee.updateEmployee') : t('employee.addEmployee')}
-              </Button>
-            </Group>
-          </Stack>
-        </form>
-      </Card>
-    </DatesProvider>
+          )}
+          <Group justify="flex-end">
+            <Button variant="light" disabled={isLoading} onClick={onCancel}>
+              {t('common.cancel')}
+            </Button>
+            <Button type="submit" loading={isLoading} leftSection={<IconUser size={16} />}>
+              {isEditMode ? t('employee.updateEmployee') : t('employee.addEmployee')}
+            </Button>
+          </Group>
+        </Stack>
+      </form>
+    </Card>
   );
 }
