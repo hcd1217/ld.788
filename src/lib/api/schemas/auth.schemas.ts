@@ -14,6 +14,7 @@ import { ClientConfigSchema } from './clientConfig.schemas';
 import { DepartmentSchema, EmployeeSchema } from './hr.schemas';
 import { renderFullName } from '@/utils/string';
 import { isDebug } from '@/utils/env';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 // Schemas
 export const LoginRequestSchema = z.object({
@@ -157,7 +158,9 @@ export const GetMeResponseSchema = z
     if (!isDebug) {
       return val;
     }
-    const role: DepartmentCode = localStorage.getItem('__DEBUG_CURRENT_ROLE__') as DepartmentCode;
+    const role: DepartmentCode = localStorage.getItem(
+      STORAGE_KEYS.DEBUG.CURRENT_ROLE,
+    ) as DepartmentCode;
     if (!role) {
       return val;
     }
@@ -265,6 +268,7 @@ function fakePermission(code: DepartmentCode) {
             canMarkReady: true,
             canDeliver: true,
             canCancel: true,
+            canRefund: true,
           },
         },
         deliveryRequest: {
@@ -329,6 +333,7 @@ function fakePermission(code: DepartmentCode) {
       return permissions;
     }
     case 'accounting': {
+      permissions.employee.canView = true;
       permissions.purchaseOrder = {
         ...permissions.purchaseOrder,
         canView: true,

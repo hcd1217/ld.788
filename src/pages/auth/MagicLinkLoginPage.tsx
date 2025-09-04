@@ -10,6 +10,7 @@ import { FormContainer } from '@/components/form/FormContainer';
 import { AuthHeader, QrScannerModal } from '@/components/auth';
 import { ROUTERS } from '@/config/routeConfig';
 import { logError } from '@/utils/logger';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 const MAGIC_LINK_STORAGE_KEY = 'magicLinkParams';
 
@@ -156,7 +157,7 @@ export function MagicLinkLoginPage() {
         }
       } else {
         // Treat as token-only and use clientCode from localStorage
-        const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
+        const clientCode = localStorage.getItem(STORAGE_KEYS.AUTH.CLIENT_CODE) ?? 'ACME';
 
         sessionStorage.setItem(
           MAGIC_LINK_STORAGE_KEY,
@@ -184,7 +185,7 @@ export function MagicLinkLoginPage() {
         handleQrScan(trimmedCode);
       } else {
         // Treat as token-only input and use clientCode from localStorage
-        const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
+        const clientCode = localStorage.getItem(STORAGE_KEYS.AUTH.CLIENT_CODE) ?? 'ACME';
 
         sessionStorage.setItem(
           MAGIC_LINK_STORAGE_KEY,

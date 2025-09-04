@@ -4,7 +4,7 @@ import { IconTruck, IconCalendar } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { useEmployees } from '@/stores/useAppStore';
+import { useEmployees, useClientConfig } from '@/stores/useAppStore';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { formatDate } from '@/utils/time';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
@@ -32,6 +32,7 @@ export function DeliveryRequestModal({
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
   const employees = useEmployees();
+  const clientConfig = useClientConfig();
   const customerMapByCustomerId = useCustomerMapByCustomerId();
 
   // Form state
@@ -40,15 +41,21 @@ export function DeliveryRequestModal({
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Employee options for select
-  const employeeOptions = useMemo(
-    () =>
-      employees.map((employee) => ({
-        value: employee.id,
-        label: `${employee.fullName} (${employee.employeeCode})`,
-      })),
-    [employees],
-  );
+  // Employee options for select - filtered by assigneeIds from clientConfig
+  const employeeOptions = useMemo(() => {
+    const assigneeIds = clientConfig.features.deliveryRequest.assigneeIds;
+
+    // Filter employees based on assigneeIds if configured, otherwise show all
+    const filteredEmployees =
+      assigneeIds.length > 0
+        ? employees.filter((employee) => assigneeIds.includes(employee.id))
+        : employees;
+
+    return filteredEmployees.map((employee) => ({
+      value: employee.id,
+      label: employee.fullName,
+    }));
+  }, [employees, clientConfig.features.deliveryRequest.assigneeIds]);
 
   // Reset form when modal opens
   const handleOpen = () => {

@@ -4,6 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en from '@/locales/en.json';
 import vi from '@/locales/vi.json';
 import { isDevelopment } from '@/utils/env';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 import type { ClientConfig } from '@/lib/api/schemas/clientConfig.schemas';
 import type { Dictionary } from '@/types/dictionary';
 
@@ -21,7 +22,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources: baseResources,
-    lng: localStorage.getItem('language') ?? 'vi',
+    lng: localStorage.getItem(STORAGE_KEYS.USER.LANGUAGE) ?? 'vi',
     fallbackLng: 'en',
     debug: isDevelopment,
     interpolation: {

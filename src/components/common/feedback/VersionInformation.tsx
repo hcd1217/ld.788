@@ -1,11 +1,12 @@
 import { Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 export function VersionInformation() {
   const [clientCode, setClientCode] = useState('');
   useEffect(() => {
     setTimeout(() => {
-      setClientCode(localStorage.getItem('clientCode') ?? '');
+      setClientCode(localStorage.getItem(STORAGE_KEYS.AUTH.CLIENT_CODE) ?? '');
     }, 200);
   }, []);
   if (!clientCode) {

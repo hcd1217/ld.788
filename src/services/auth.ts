@@ -2,6 +2,7 @@ import { authApi, type LoginRequest } from '@/lib/api';
 import { logError } from '@/utils/logger';
 import { isTokenExpired } from '@/utils/jwt';
 import { delay } from '@/utils/time';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 export const authService = {
   async loginWithMagicToken(clientCode: string, token: string) {
@@ -47,15 +48,15 @@ export const authService = {
   },
 
   getAccessToken() {
-    return sessionStorage.getItem('accessToken') ?? undefined;
+    return sessionStorage.getItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN) ?? undefined;
   },
 
   getRefreshToken() {
-    return localStorage.getItem('refreshToken') ?? undefined;
+    return localStorage.getItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN) ?? undefined;
   },
 
   getClientCode() {
-    return localStorage.getItem('clientCode') ?? undefined;
+    return localStorage.getItem(STORAGE_KEYS.AUTH.CLIENT_CODE) ?? undefined;
   },
 
   hasValidToken() {
@@ -92,15 +93,15 @@ export const authService = {
 };
 
 function saveClientCode(clientCode: string) {
-  localStorage.setItem('clientCode', clientCode);
+  localStorage.setItem(STORAGE_KEYS.AUTH.CLIENT_CODE, clientCode);
 }
 
 function saveTokens({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) {
-  sessionStorage.setItem('accessToken', accessToken);
-  localStorage.setItem('refreshToken', refreshToken);
+  sessionStorage.setItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN, accessToken);
+  localStorage.setItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN, refreshToken);
 }
 
 function clearTokens() {
-  sessionStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
+  sessionStorage.removeItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN);
+  localStorage.removeItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN);
 }

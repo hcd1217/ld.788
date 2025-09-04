@@ -1,16 +1,6 @@
-import { useMemo, useCallback } from 'react';
 import { Button, Group } from '@mantine/core';
-import {
-  IconCheck,
-  IconPackage,
-  IconTruck,
-  IconPackageExport,
-  IconX,
-  IconReceipt,
-  IconClipboardList,
-} from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { isPOStatusNew } from '@/utils/purchaseOrder';
+import { usePOActions } from '@/hooks/usePOActions';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 
 type POAccordionActionsProps = {
@@ -36,13 +26,13 @@ type POAccordionActionsProps = {
 
 export function POAccordionActions({
   canEdit,
-  canConfirm = false,
-  canProcess = false,
-  canShip = false,
-  canMarkReady = false,
-  canDeliver = false,
-  canRefund = false,
-  canCancel = false,
+  canConfirm,
+  canProcess,
+  canShip,
+  canMarkReady,
+  canDeliver,
+  canRefund,
+  canCancel,
   purchaseOrder,
   isLoading,
   onConfirm,
@@ -56,169 +46,57 @@ export function POAccordionActions({
 }: POAccordionActionsProps) {
   const { t } = useTranslation();
 
-  const createCancelButton = useCallback(
-    () => (
-      <Button
-        key="cancel"
-        color="red"
-        variant="outline"
-        size="xs"
-        loading={isLoading}
-        disabled={!canCancel}
-        leftSection={<IconX size={14} />}
-        onClick={onCancel}
-      >
-        {t('po.cancel')}
-      </Button>
-    ),
-    [canCancel, isLoading, onCancel, t],
-  );
-
-  const createRefundButton = useCallback(
-    () => (
-      <Button
-        key="refund"
-        color="orange"
-        variant="outline"
-        size="xs"
-        loading={isLoading}
-        disabled={!canRefund}
-        leftSection={<IconReceipt size={14} />}
-        onClick={onRefund}
-      >
-        {t('po.refund')}
-      </Button>
-    ),
-    [canRefund, isLoading, onRefund, t],
-  );
-
-  const createShipButton = useCallback(
-    () => (
-      <Button
-        key="ship"
-        color="indigo"
-        size="xs"
-        loading={isLoading}
-        disabled={!canShip}
-        leftSection={<IconTruck size={14} />}
-        onClick={onShip}
-      >
-        {t('po.ship')}
-      </Button>
-    ),
-    [canShip, isLoading, onShip, t],
-  );
-
-  const buttons = useMemo(() => {
-    const buttons = [];
-
-    if (isPOStatusNew(purchaseOrder.status)) {
-      buttons.push(
-        <Button
-          key="confirm"
-          color="green"
-          size="xs"
-          loading={isLoading}
-          disabled={!canConfirm}
-          leftSection={<IconCheck size={14} />}
-          onClick={onConfirm}
-        >
-          {t('po.confirm')}
-        </Button>,
-        createCancelButton(),
-      );
-    } else if (purchaseOrder.status === 'CONFIRMED') {
-      buttons.push(
-        <Button
-          key="process"
-          color="blue"
-          size="xs"
-          loading={isLoading}
-          disabled={!canProcess}
-          leftSection={<IconPackage size={14} />}
-          onClick={onProcess}
-        >
-          {t('po.process')}
-        </Button>,
-        createCancelButton(),
-      );
-    } else if (purchaseOrder.status === 'PROCESSING') {
-      buttons.push(
-        <Button
-          key="markReady"
-          color="teal"
-          size="xs"
-          loading={isLoading}
-          disabled={!canMarkReady}
-          leftSection={<IconPackageExport size={14} />}
-          onClick={onMarkReady}
-        >
-          {t('po.markReady')}
-        </Button>,
-        createShipButton(),
-      );
-    } else if (purchaseOrder.status === 'READY_FOR_PICKUP') {
-      buttons.push(createShipButton());
-      if (onCreateDelivery) {
-        buttons.push(
-          <Button
-            key="create-delivery"
-            color="blue"
-            size="xs"
-            loading={isLoading}
-            disabled={!!purchaseOrder.deliveryRequest || !canEdit}
-            leftSection={<IconClipboardList size={14} />}
-            onClick={onCreateDelivery}
-          >
-            {t('po.createDeliveryRequest')}
-          </Button>,
-        );
-      }
-    } else if (purchaseOrder.status === 'SHIPPED') {
-      buttons.push(
-        <Button
-          key="deliver"
-          color="green"
-          size="xs"
-          loading={isLoading}
-          disabled={!canDeliver}
-          leftSection={<IconPackageExport size={14} />}
-          onClick={onDeliver}
-        >
-          {t('po.markDelivered')}
-        </Button>,
-        createRefundButton(),
-      );
-    } else if (purchaseOrder.status === 'DELIVERED') {
-      buttons.push(createRefundButton());
-    }
-
-    return buttons;
-  }, [
-    purchaseOrder.status,
-    purchaseOrder.deliveryRequest,
-    canEdit,
-    canConfirm,
-    canProcess,
-    canMarkReady,
-    canDeliver,
+  // Use the centralized hook for action logic
+  const actions = usePOActions({
+    purchaseOrder,
     isLoading,
-    t,
-    onConfirm,
-    createCancelButton,
-    onProcess,
-    onMarkReady,
-    createShipButton,
-    onDeliver,
-    createRefundButton,
-    onCreateDelivery,
-  ]);
+    canEdit,
+    permissions: {
+      canConfirm: canConfirm ?? false,
+      canCancel: canCancel ?? false,
+      canProcess: canProcess ?? false,
+      canMarkReady: canMarkReady ?? false,
+      canShip: canShip ?? false,
+      canDeliver: canDeliver ?? false,
+      canRefund: canRefund ?? false,
+    },
+    callbacks: {
+      onConfirm,
+      onCancel,
+      onProcess,
+      onMarkReady,
+      onShip,
+      onDeliver,
+      onRefund,
+      onCreateDelivery,
+    },
+    options: {
+      iconSize: 14,
+      buttonSize: 'xs',
+    },
+  });
 
-  if (buttons.length === 0) return null;
+  if (actions.length === 0) return null;
 
   return (
     <Group ml="sm" gap="xs">
-      {buttons}
+      {actions.map((action) => {
+        const Icon = action.icon;
+        return (
+          <Button
+            key={action.key}
+            color={action.color}
+            variant={action.variant}
+            size="xs"
+            loading={isLoading}
+            disabled={action.isDisabled}
+            leftSection={<Icon size={14} />}
+            onClick={action.onClick}
+          >
+            {t(action.translationKey as any)}
+          </Button>
+        );
+      })}
     </Group>
   );
 }

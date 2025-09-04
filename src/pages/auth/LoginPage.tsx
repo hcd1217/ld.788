@@ -15,6 +15,7 @@ import { isDevelopment } from '@/utils/env';
 import { ROUTERS } from '@/config/routeConfig';
 import { useOnce } from '@/hooks/useOnce';
 import { logInfo } from '@/utils/logger';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 type LoginFormValues = {
   identifier: string;
@@ -41,7 +42,7 @@ export function LoginPage() {
 
     // Use client code from URL if available
     if (clientCodeFromUrl && clientCodeFromUrl !== clientCode) {
-      localStorage.setItem('clientCode', clientCodeFromUrl);
+      localStorage.setItem(STORAGE_KEYS.AUTH.CLIENT_CODE, clientCodeFromUrl);
     }
 
     if (clientCodeFromUrl) {
@@ -53,8 +54,10 @@ export function LoginPage() {
   const form = useForm<LoginFormValues>({
     initialValues: {
       identifier:
-        (isDevelopment ? 'admin' : '') || localStorage.getItem('rememberedIdentifier') || '',
-      password: isDevelopment ? (localStorage.getItem('__PASSWORD__') ?? '') : '',
+        (isDevelopment ? 'admin' : '') ||
+        localStorage.getItem(STORAGE_KEYS.USER.REMEMBERED_IDENTIFIER) ||
+        '',
+      password: isDevelopment ? (localStorage.getItem(STORAGE_KEYS.DEBUG.PASSWORD) ?? '') : '',
       clientCode,
     },
     validate: getFormValidators(t, ['identifier', 'password', 'clientCode']),
@@ -80,7 +83,7 @@ export function LoginPage() {
   }, []);
 
   const onSubmit = handleSubmit(async (values: LoginFormValues) => {
-    localStorage.setItem('rememberedIdentifier', values.identifier);
+    localStorage.setItem(STORAGE_KEYS.USER.REMEMBERED_IDENTIFIER, values.identifier);
     await login({
       identifier: values.identifier,
       password: values.password,

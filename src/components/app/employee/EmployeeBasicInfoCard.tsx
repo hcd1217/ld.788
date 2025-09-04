@@ -13,6 +13,7 @@ import { useClientCode } from '@/hooks/useClientCode';
 import { ActiveBadge } from '@/components/common/ui';
 import { WorkTypeBadge } from './WorkTypeBadge';
 import { logError } from '@/utils/logger';
+import { useClientConfig } from '@/stores/useAppStore';
 
 type EmployeeBasicInfoCardProps = {
   readonly employee: Employee;
@@ -24,6 +25,7 @@ export function EmployeeBasicInfoCard({ employee, canEdit, onEdit }: EmployeeBas
   const { t } = useTranslation();
   const [opened, { open, close }] = useDisclosure(false);
   const clientCode = useClientCode();
+  const clientConfig = useClientConfig();
   const [magicLink, setMagicLink] = useState<string>('');
   const [qrCodeData, setQrCodeData] = useState<string>('');
 
@@ -153,60 +155,63 @@ export function EmployeeBasicInfoCard({ employee, canEdit, onEdit }: EmployeeBas
                 </Stack>
               </Grid.Col>
             ) : null}
+            {clientConfig.features.employee.workType ? (
+              <>
+                {employee.workType ? (
+                  <Grid.Col span={{ base: 6 }}>
+                    <Stack gap="xs">
+                      <Text c="dimmed" size="sm">
+                        {t('employee.workType')}
+                      </Text>
+                      <WorkTypeBadge workType={employee.workType} />
+                    </Stack>
+                  </Grid.Col>
+                ) : null}
 
-            {employee.workType ? (
-              <Grid.Col span={{ base: 6 }}>
-                <Stack gap="xs">
-                  <Text c="dimmed" size="sm">
-                    {t('employee.workType')}
-                  </Text>
-                  <WorkTypeBadge workType={employee.workType} />
-                </Stack>
-              </Grid.Col>
-            ) : null}
+                {employee.startDate ? (
+                  <Grid.Col span={{ base: 6 }}>
+                    <Stack gap="xs">
+                      <Text c="dimmed" size="sm">
+                        {t('employee.startDate')}
+                      </Text>
+                      <Text fw={500}>{formatDate(employee.startDate.toString())}</Text>
+                    </Stack>
+                  </Grid.Col>
+                ) : null}
 
-            {employee.startDate ? (
-              <Grid.Col span={{ base: 6 }}>
-                <Stack gap="xs">
-                  <Text c="dimmed" size="sm">
-                    {t('employee.startDate')}
-                  </Text>
-                  <Text fw={500}>{formatDate(employee.startDate.toString())}</Text>
-                </Stack>
-              </Grid.Col>
-            ) : null}
+                {employee.endDate ? (
+                  <Grid.Col span={{ base: 6 }}>
+                    <Stack gap="xs">
+                      <Text c="dimmed" size="sm">
+                        {t('employee.endDate')}
+                      </Text>
+                      <Text fw={500}>{formatDate(employee.endDate.toString())}</Text>
+                    </Stack>
+                  </Grid.Col>
+                ) : null}
 
-            {employee.endDate ? (
-              <Grid.Col span={{ base: 6 }}>
-                <Stack gap="xs">
-                  <Text c="dimmed" size="sm">
-                    {t('employee.endDate')}
-                  </Text>
-                  <Text fw={500}>{formatDate(employee.endDate.toString())}</Text>
-                </Stack>
-              </Grid.Col>
-            ) : null}
+                {employee.monthlySalary ? (
+                  <Grid.Col span={{ base: 6 }}>
+                    <Stack gap="xs">
+                      <Text c="dimmed" size="sm">
+                        {t('employee.monthlySalary')}
+                      </Text>
+                      <Text fw={500}>{formatCurrency(employee.monthlySalary)}</Text>
+                    </Stack>
+                  </Grid.Col>
+                ) : null}
 
-            {employee.monthlySalary ? (
-              <Grid.Col span={{ base: 6 }}>
-                <Stack gap="xs">
-                  <Text c="dimmed" size="sm">
-                    {t('employee.monthlySalary')}
-                  </Text>
-                  <Text fw={500}>{formatCurrency(employee.monthlySalary)}</Text>
-                </Stack>
-              </Grid.Col>
-            ) : null}
-
-            {employee.hourlyRate ? (
-              <Grid.Col span={{ base: 6 }}>
-                <Stack gap="xs">
-                  <Text c="dimmed" size="sm">
-                    {t('employee.hourlyRate')}
-                  </Text>
-                  <Text fw={500}>{formatCurrency(employee.hourlyRate)}</Text>
-                </Stack>
-              </Grid.Col>
+                {employee.hourlyRate ? (
+                  <Grid.Col span={{ base: 6 }}>
+                    <Stack gap="xs">
+                      <Text c="dimmed" size="sm">
+                        {t('employee.hourlyRate')}
+                      </Text>
+                      <Text fw={500}>{formatCurrency(employee.hourlyRate)}</Text>
+                    </Stack>
+                  </Grid.Col>
+                ) : null}
+              </>
             ) : null}
 
             <Grid.Col span={{ base: 6 }} visibleFrom="sm">

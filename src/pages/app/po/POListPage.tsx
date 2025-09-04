@@ -16,6 +16,7 @@ import {
 import { IconPlus, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { usePOFilters } from '@/hooks/usePOFilters';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 import {
   usePurchaseOrderList,
   usePOLoading,
@@ -158,10 +159,14 @@ export function POListPage() {
 
     // Apply delay with UI lock for all filter changes
     setIsFilterLoading(true);
+    let delay = Number(localStorage.getItem(STORAGE_KEYS.CLIENT.API_DELAY) ?? 1500);
+    if (Number.isNaN(delay)) {
+      delay = 1500;
+    }
     filterTimeoutRef.current = setTimeout(() => {
       void loadPOsWithFilter(filterParams, true);
       setIsFilterLoading(false);
-    }, 1500);
+    }, delay);
 
     return () => {
       if (filterTimeoutRef.current) {

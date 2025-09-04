@@ -8,6 +8,7 @@ import { ActiveBadge, ContactInfo } from '@/components/common/ui';
 import { WorkTypeBadge } from './WorkTypeBadge';
 import { formatDate } from '@/utils/string';
 import { getEndDateHighlightStyles } from '@/utils/time';
+import { useClientConfig } from '@/stores/useAppStore';
 
 type EmployeeGridCardProps = {
   readonly employee: Employee;
@@ -16,6 +17,7 @@ type EmployeeGridCardProps = {
 export function EmployeeGridCard({ employee }: EmployeeGridCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const clientConfig = useClientConfig();
 
   const highlightStyles = getEndDateHighlightStyles(employee.endDate, employee.isActive);
 
@@ -74,39 +76,42 @@ export function EmployeeGridCard({ employee }: EmployeeGridCardProps) {
           </Text>
           <ContactInfo email={employee.email} phoneNumber={employee.phone} />
         </Group>
-
-        {/* Work Type */}
-        <Group wrap="nowrap">
-          <Text size="xs" c="dimmed" fw={500} mb={4}>
-            {t('employee.workType')}:
-          </Text>
-          <WorkTypeBadge workType={employee.workType} />
-        </Group>
-
-        {/* Dates Row */}
-        <Group gap="md" wrap="wrap">
-          {/* Start Date */}
-          {employee.startDate ? (
-            <div>
+        {clientConfig.features.employee.workType ? (
+          <>
+            {/* Work Type */}
+            <Group wrap="nowrap">
               <Text size="xs" c="dimmed" fw={500} mb={4}>
-                {t('employee.startDate')}:
+                {t('employee.workType')}:
               </Text>
-              <Text size="sm">{formatDate(employee.startDate)}</Text>
-            </div>
-          ) : null}
+              <WorkTypeBadge workType={employee.workType} />
+            </Group>
 
-          {/* End Date */}
-          {employee.endDate ? (
-            <div>
-              <Text size="xs" c="dimmed" fw={500} mb={4}>
-                {t('employee.endDate')}:
-              </Text>
-              <Text size="sm" c="red.6">
-                {formatDate(employee.endDate)}
-              </Text>
-            </div>
-          ) : null}
-        </Group>
+            {/* Dates Row */}
+            <Group gap="md" wrap="wrap">
+              {/* Start Date */}
+              {employee.startDate ? (
+                <div>
+                  <Text size="xs" c="dimmed" fw={500} mb={4}>
+                    {t('employee.startDate')}:
+                  </Text>
+                  <Text size="sm">{formatDate(employee.startDate)}</Text>
+                </div>
+              ) : null}
+
+              {/* End Date */}
+              {employee.endDate ? (
+                <div>
+                  <Text size="xs" c="dimmed" fw={500} mb={4}>
+                    {t('employee.endDate')}:
+                  </Text>
+                  <Text size="sm" c="red.6">
+                    {formatDate(employee.endDate)}
+                  </Text>
+                </div>
+              ) : null}
+            </Group>
+          </>
+        ) : null}
       </Stack>
     </SelectableCard>
   );

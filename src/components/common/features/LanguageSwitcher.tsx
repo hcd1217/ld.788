@@ -2,6 +2,7 @@ import { Select } from '@mantine/core';
 import { IconLanguage } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/stores/useAppStore';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 const languages = [
   { value: 'en', label: 'English' },
@@ -32,7 +33,7 @@ export function LanguageSwitcher() {
       onChange={(value) => {
         if (value) {
           changeLanguage(value);
-          localStorage.setItem('language', value);
+          localStorage.setItem(STORAGE_KEYS.USER.LANGUAGE, value);
         }
       }}
     />

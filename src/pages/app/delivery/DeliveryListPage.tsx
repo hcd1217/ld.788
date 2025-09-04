@@ -4,6 +4,7 @@ import type { Timeout } from '@/types';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeliveryRequestFilters } from '@/hooks/useDeliveryRequestFilters';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 import {
   useDeliveryRequests,
   useDeliveryRequestLoading,
@@ -152,10 +153,14 @@ export function DeliveryListPage() {
 
     // Apply delay with UI lock for all filter changes
     setIsFilterLoading(true);
+    let delay = Number(localStorage.getItem(STORAGE_KEYS.CLIENT.API_DELAY) ?? 1500);
+    if (Number.isNaN(delay)) {
+      delay = 1500;
+    }
     filterTimeoutRef.current = setTimeout(() => {
       void loadDeliveryRequestsWithFilter(filterParams, true);
       setIsFilterLoading(false);
-    }, 1500);
+    }, delay);
 
     return () => {
       if (filterTimeoutRef.current) {

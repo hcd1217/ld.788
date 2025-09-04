@@ -238,7 +238,7 @@ export function EmployeeListPage() {
             {isLoading && employees.length === 0 ? (
               <EmployeeListSkeleton viewMode={viewMode} count={10} />
             ) : isTableView ? (
-              <EmployeeDataTable noAction employees={paginatedEmployees} />
+              <EmployeeDataTable employees={paginatedEmployees} />
             ) : (
               <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
                 {paginatedEmployees.map((employee) => (

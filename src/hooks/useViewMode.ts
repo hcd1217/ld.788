@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { getViewModeKey } from '@/utils/storageKeys';
 
 export const VIEW_MODE = {
   TABLE: 'table',
@@ -31,12 +32,8 @@ export function useViewMode(key = 'DEFAULT') {
   return { viewMode, setViewMode, toggleViewMode, isTableView: viewMode === VIEW_MODE.TABLE };
 }
 
-function getStorageKey(key = 'DEFAULT') {
-  return `__VIEW_MODE_${key}__`.toLocaleUpperCase();
-}
-
 function loadViewModeFromLocalStorage(key = 'DEFAULT'): ViewModeType {
-  const viewMode = localStorage.getItem(getStorageKey(key)) as ViewModeType | undefined;
+  const viewMode = localStorage.getItem(getViewModeKey(key)) as ViewModeType | undefined;
   if (viewMode && Object.values(VIEW_MODE).includes(viewMode)) {
     return viewMode;
   }
@@ -44,5 +41,5 @@ function loadViewModeFromLocalStorage(key = 'DEFAULT'): ViewModeType {
 }
 
 function saveViewModeToLocalStorage(viewMode: ViewModeType, key = 'DEFAULT') {
-  localStorage.setItem(getStorageKey(key), viewMode);
+  localStorage.setItem(getViewModeKey(key), viewMode);
 }

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { authService } from '@/services/auth';
-import { authApi, clientApi, type ClientPublicConfigResponse } from '@/lib/api';
+import { authApi, clientApi, type ClientConfig, type ClientPublicConfigResponse } from '@/lib/api';
 import { updateClientTranslations, clearClientTranslations } from '@/lib/i18n';
 import type { GetMeResponse } from '@/lib/api/schemas/auth.schemas';
 import {
@@ -12,6 +12,7 @@ import {
 } from '@/services/client/overview';
 import { cacheNavigationConfig, clearNavigationCache } from '@/utils/navigationCache';
 import { logError } from '@/utils/logger';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 type ClientPublicConfig = ClientPublicConfigResponse;
 type User = GetMeResponse; // Unified user type from /auth/me
@@ -57,7 +58,7 @@ export const useAppStore = create<AppState>()(
   devtools(
     (set, get) => {
       // Load public client config on initialization
-      const clientCode = localStorage.getItem('clientCode') ?? 'ACME';
+      const clientCode = localStorage.getItem(STORAGE_KEYS.AUTH.CLIENT_CODE) ?? 'ACME';
       clientApi
         .getPubicClientConfig(clientCode)
         .then((config) => {
@@ -103,6 +104,11 @@ export const useAppStore = create<AppState>()(
         async fetchUserProfile() {
           try {
             const user = await authApi.getMe();
+            let delay = Number(user.clientConfig?.features.apiCall.delay);
+            if (!Number.isNaN(delay)) {
+              delay = Math.max(delay, 0) ?? 1500;
+              localStorage.setItem(STORAGE_KEYS.CLIENT.API_DELAY, delay.toString());
+            }
             set({ user, permissionError: false });
 
             // Cache navigation config if available
@@ -326,6 +332,25 @@ const EMPTY_PERMISSIONS: Permission = Object.freeze({
   },
 });
 
+const EMPTY_CLIENT_CONFIG: ClientConfig = {
+  navigation: [],
+  mobileNavigation: [],
+  translations: {},
+  features: {
+    apiCall: {
+      delay: 1500,
+    },
+    deliveryRequest: {
+      assigneeIds: [],
+    },
+    employee: {
+      workType: false,
+    },
+    language: false,
+    darkMode: false,
+  },
+};
+
 // Return stable Map reference to avoid infinite re-renders
 export const useEmployeeMapByUserId = () => useAppStore((state) => state.employeeMapByUserId);
 export const useEmployeeMapByEmployeeId = () =>
@@ -341,3 +366,6 @@ export const useEmployees = () =>
 
 export const usePermissions = () =>
   useAppStore((state) => state.user?.permissions ?? EMPTY_PERMISSIONS);
+
+export const useClientConfig = () =>
+  useAppStore((state) => state.user?.clientConfig ?? EMPTY_CLIENT_CONFIG);

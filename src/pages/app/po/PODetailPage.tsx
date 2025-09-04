@@ -381,6 +381,7 @@ export function PODetailPage() {
             canProcess={permissions.purchaseOrder.actions?.canProcess}
             canShip={permissions.purchaseOrder.actions?.canShip}
             canDeliver={permissions.purchaseOrder.actions?.canDeliver}
+            canMarkReady={permissions.purchaseOrder.actions?.canMarkReady}
             canRefund={permissions.purchaseOrder.actions?.canRefund}
             canCancel={permissions.purchaseOrder.actions?.canCancel}
             purchaseOrder={purchaseOrder}

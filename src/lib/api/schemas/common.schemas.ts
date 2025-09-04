@@ -60,16 +60,19 @@ export const paginationSchema = z.object({
 });
 
 export const ClientPublicConfigSchema = z.object({
-  features: z
-    .object({
-      language: z.boolean(),
-      darkMode: z.boolean(),
-    })
-    .optional()
-    .default({
-      language: false,
-      darkMode: false,
+  features: z.object({
+    language: z.boolean(),
+    darkMode: z.boolean(),
+    apiCall: z.object({
+      delay: z.number(),
     }),
+    deliveryRequest: z.object({
+      assigneeIds: z.array(idSchema),
+    }),
+    employee: z.object({
+      workType: z.boolean(),
+    }),
+  }),
   clientCode: optionalStringSchema,
   clientName: optionalStringSchema,
   logoUrl: optionalStringSchema,
