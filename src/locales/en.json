@@ -62,6 +62,14 @@
       "product": "Product",
       "customer": "Customer"
     },
+    "form": {
+      "memo": "Memo",
+      "memoPlaceholder": "Enter memo",
+      "email": "Email",
+      "emailPlaceholder": "Enter email",
+      "pic": "Contact Person",
+      "picPlaceholder": "Enter Contact Person"
+    },
     "tryAgain": "Try again",
     "navigation": "Navigation",
     "viewOnMap": "View on Google Maps",
@@ -130,7 +138,6 @@
     "mainNavigation": "Main Navigation",
     "active": "Active",
     "status": "Status",
-    "email": "Email",
     "phone": "Phone"
   },
   "settings": {
@@ -270,7 +277,6 @@
     "qrCodeCopied": "QR code copied to clipboard",
     "copyQrCodeFailed": "Failed to copy QR code",
     "copyQrCodeNotSupported": "Your browser doesn't support copying images",
-    "email": "Email",
     "phone": "Phone",
     "workType": "Work Type",
     "fullTime": "Full Time",
@@ -398,7 +404,6 @@
     "searchPlaceholder": "Search customers by name, company, email, or phone...",
     "namePlaceholder": "Customer Name",
     "companyPlaceholder": "Company Name",
-    "emailPlaceholder": "customer@example.com",
     "phonePlaceholder": "+84901234567",
     "addressPlaceholder": "Address",
     "taxCodePlaceholder": "Tax Code (Optional)",

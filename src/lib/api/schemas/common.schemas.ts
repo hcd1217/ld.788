@@ -72,6 +72,13 @@ export const ClientPublicConfigSchema = z.object({
     employee: z.object({
       workType: z.boolean(),
     }),
+    customer: z
+      .object({
+        noTaxCode: z.boolean().optional(),
+        noEmail: z.boolean().optional(),
+      })
+      .optional()
+      .default({ noTaxCode: true, noEmail: true }),
   }),
   clientCode: optionalStringSchema,
   clientName: optionalStringSchema,

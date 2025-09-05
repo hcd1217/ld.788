@@ -11,6 +11,14 @@ import {
 
 // ========== Customer Schemas ==========
 
+const CustomerMetadataSchema = z
+  .looseObject({
+    pic: optionalStringSchema,
+    googleMapsUrl: optionalStringSchema,
+    memo: optionalStringSchema,
+  })
+  .optional();
+
 // Customer base schema
 export const CustomerSchema = z.object({
   id: idSchema,
@@ -20,18 +28,10 @@ export const CustomerSchema = z.object({
   contactEmail: optionalStringSchema,
   contactPhone: phoneNumberSchema,
   address: optionalStringSchema,
-  metadata: z.looseObject({
-    googleMapsUrl: optionalStringSchema,
-  }),
+  metadata: CustomerMetadataSchema,
   taxCode: optionalStringSchema,
   isActive: z.boolean(),
 });
-
-const BulkUpsertCustomerMetadataSchema = z
-  .looseObject({
-    googleMapsUrl: optionalStringSchema,
-  })
-  .optional();
 
 // Customer request schemas
 export const CreateCustomerRequestSchema = z.object({
@@ -40,7 +40,7 @@ export const CreateCustomerRequestSchema = z.object({
   contactEmail: emailSchema.optional(),
   contactPhone: optionalStringSchema,
   address: optionalStringSchema,
-  metadata: BulkUpsertCustomerMetadataSchema,
+  metadata: CustomerMetadataSchema,
   taxCode: optionalStringSchema,
 });
 
@@ -50,7 +50,7 @@ export const UpdateCustomerRequestSchema = z.object({
   contactEmail: emailSchema.optional(),
   contactPhone: optionalStringSchema,
   address: optionalStringSchema,
-  metadata: BulkUpsertCustomerMetadataSchema,
+  metadata: CustomerMetadataSchema,
   taxCode: optionalStringSchema,
   isActive: z.boolean().optional(),
 });
@@ -63,7 +63,7 @@ export const BulkUpsertCustomerItemSchema = z.object({
   contactPhone: optionalStringSchema,
   address: optionalStringSchema,
   taxCode: optionalStringSchema,
-  metadata: BulkUpsertCustomerMetadataSchema,
+  metadata: CustomerMetadataSchema,
 });
 
 export const BulkUpsertCustomersRequestSchema = z.object({

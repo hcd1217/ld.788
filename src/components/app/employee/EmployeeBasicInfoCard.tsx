@@ -138,7 +138,7 @@ export function EmployeeBasicInfoCard({ employee, canEdit, onEdit }: EmployeeBas
               <Grid.Col span={{ base: 6 }}>
                 <Stack gap="xs">
                   <Text c="dimmed" size="sm">
-                    {t('employee.email')}
+                    {t('common.form.email')}
                   </Text>
                   <Text fw={500}>{employee.email}</Text>
                 </Stack>

@@ -22,8 +22,6 @@ import { CustomerFormModal, type CustomerFormValues } from '@/components/app/con
 import {
   customerService,
   type Customer,
-  type CreateCustomerRequest,
-  type UpdateCustomerRequest,
   type BulkUpsertCustomersRequest,
 } from '@/services/sales/customer';
 import { showSuccessNotification, showErrorNotification } from '@/utils/notifications';
@@ -54,8 +52,10 @@ export function CustomerConfigPage() {
       contactPhone: '',
       address: '',
       googleMapsUrl: '',
+      pic: '',
       taxCode: '',
       isActive: true,
+      memo: '',
     },
     validate: {
       name: (value) => (!value?.trim() ? t('validation.fieldRequired') : null),
@@ -121,16 +121,16 @@ export function CustomerConfigPage() {
       }
 
       setIsLoading(true);
-      const data: CreateCustomerRequest = {
+      const data = {
         name: values.name,
         companyName: values.companyName || undefined,
         contactEmail: values.contactEmail || undefined,
         contactPhone: values.contactPhone || undefined,
         address: values.address || undefined,
-        metadata: {
-          googleMapsUrl: values.googleMapsUrl || undefined,
-        },
+        googleMapsUrl: values.googleMapsUrl || undefined,
         taxCode: values.taxCode || undefined,
+        isActive: true,
+        memo: values.memo || undefined,
       };
 
       await customerService.createCustomer(data);
@@ -164,15 +164,15 @@ export function CustomerConfigPage() {
       }
 
       setIsLoading(true);
-      const data: UpdateCustomerRequest = {
+      const data = {
         name: values.name,
         companyName: values.companyName || undefined,
         contactEmail: values.contactEmail || undefined,
         contactPhone: values.contactPhone || undefined,
         address: values.address || undefined,
-        metadata: {
-          googleMapsUrl: values.googleMapsUrl || undefined,
-        },
+        googleMapsUrl: values.googleMapsUrl || undefined,
+        memo: values.memo || undefined,
+        pic: values.pic || undefined,
         taxCode: values.taxCode || undefined,
         isActive: values.isActive,
       };
@@ -233,9 +233,11 @@ export function CustomerConfigPage() {
       contactEmail: customer.contactEmail || '',
       contactPhone: customer.contactPhone || '',
       address: customer.address || '',
-      googleMapsUrl: customer.metadata?.googleMapsUrl || '',
+      googleMapsUrl: customer?.googleMapsUrl || '',
       taxCode: customer.taxCode || '',
       isActive: customer.isActive,
+      memo: customer?.memo || '',
+      pic: customer?.pic || '',
     });
     openEdit();
   };
@@ -415,7 +417,7 @@ export function CustomerConfigPage() {
               key: 'companyName',
               header: t('customer.company'),
               render: (customer: Customer) => {
-                const googleMapsUrl = customer.metadata?.googleMapsUrl || customer.googleMapsUrl;
+                const googleMapsUrl = customer?.googleMapsUrl || customer?.googleMapsUrl;
                 return (
                   <Stack gap={4}>
                     <Group gap="xs">

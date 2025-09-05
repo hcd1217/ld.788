@@ -346,6 +346,10 @@ const EMPTY_CLIENT_CONFIG: ClientConfig = {
     employee: {
       workType: false,
     },
+    customer: {
+      noTaxCode: false,
+      noEmail: false,
+    },
     language: false,
     darkMode: false,
   },

@@ -73,7 +73,7 @@ export function EmployeeCard({
           ) : null}
           {employee.email ? (
             <Text size="xs" c="dimmed">
-              {t('employee.email')}: {employee.email}
+              {t('common.form.email')}: {employee.email}
             </Text>
           ) : null}
           {employee.phone ? (

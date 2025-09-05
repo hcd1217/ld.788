@@ -1,7 +1,5 @@
-import { salesApi } from '@/lib/api';
+import { salesApi, type Customer as APICustomer } from '@/lib/api';
 import {
-  type CreateCustomerRequest,
-  type UpdateCustomerRequest,
   type BulkUpsertCustomersRequest,
   type BulkUpsertCustomersResponse,
 } from '@/lib/api/schemas/sales.schemas';
@@ -23,12 +21,10 @@ export type Customer = {
   contactPhone?: string;
   address?: string;
   googleMapsUrl?: string;
+  memo?: string;
+  pic?: string;
   taxCode?: string;
   isActive: boolean;
-  metadata: {
-    googleMapsUrl?: string;
-    [key: string]: unknown;
-  };
 };
 
 export const customerService = {
@@ -41,10 +37,7 @@ export const customerService = {
     const response = await salesApi.getCustomers({
       limit: 1000, // Get all customers
     });
-    this.customers = response.customers.map((customer) => ({
-      ...customer,
-      googleMapsUrl: customer.metadata.googleMapsUrl,
-    }));
+    this.customers = response.customers.map(transformCustomer);
     return this.customers;
   },
 
@@ -58,30 +51,43 @@ export const customerService = {
       isActive: true,
       limit: 1000,
     });
-    return response.customers.map((customer) => ({
-      ...customer,
-      googleMapsUrl: customer.metadata.googleMapsUrl,
-    }));
+    return response.customers.map(transformCustomer);
   },
 
-  async createCustomer(data: CreateCustomerRequest): Promise<Customer> {
-    const customer = await salesApi.createCustomer(data);
+  async createCustomer({
+    googleMapsUrl,
+    memo,
+    pic,
+    ...data
+  }: Omit<Customer, 'metadata' | 'id' | 'clientId'>): Promise<Customer> {
+    const customer = await salesApi.createCustomer({
+      ...data,
+      metadata: {
+        pic: pic || undefined,
+        googleMapsUrl: googleMapsUrl || undefined,
+        memo: memo || undefined,
+      },
+    });
     // Clear cache to ensure fresh data on next fetch
     this.customers = [];
-    return {
-      ...customer,
-      googleMapsUrl: customer.metadata.googleMapsUrl,
-    };
+    return transformCustomer(customer);
   },
 
-  async updateCustomer(id: string, data: UpdateCustomerRequest): Promise<Customer> {
-    const customer = await salesApi.updateCustomer(id, data);
+  async updateCustomer(
+    id: string,
+    { pic, googleMapsUrl, memo, ...data }: Omit<Customer, 'metadata' | 'id' | 'clientId'>,
+  ): Promise<Customer> {
+    const customer = await salesApi.updateCustomer(id, {
+      ...data,
+      metadata: {
+        pic: pic || undefined,
+        googleMapsUrl: googleMapsUrl || undefined,
+        memo: memo || undefined,
+      },
+    });
     // Clear cache to ensure fresh data on next fetch
     this.customers = [];
-    return {
-      ...customer,
-      googleMapsUrl: customer.metadata.googleMapsUrl,
-    };
+    return transformCustomer(customer);
   },
 
   async deleteCustomer(id: string): Promise<void> {
@@ -104,9 +110,15 @@ export const customerService = {
       search: searchTerm,
       limit: 1000,
     });
-    return response.customers.map((customer) => ({
-      ...customer,
-      googleMapsUrl: customer.metadata.googleMapsUrl,
-    }));
+    return response.customers.map(transformCustomer);
   },
 };
+
+function transformCustomer(customer: APICustomer): Customer {
+  return {
+    ...customer,
+    googleMapsUrl: customer.metadata?.googleMapsUrl,
+    memo: customer.metadata?.memo,
+    pic: customer.metadata?.pic as string | undefined,
+  };
+}

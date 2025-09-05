@@ -62,6 +62,14 @@
       "product": "Sản Phẩm",
       "customer": "Khách Hàng"
     },
+    "form": {
+      "memo": "Ghi Chú",
+      "memoPlaceholder": "Nhập ghi chú",
+      "email": "Email",
+      "emailPlaceholder": "Nhập email",
+      "pic": "Người Phụ Trách",
+      "picPlaceholder": "Nhập Thông Tin Người Phụ Trách"
+    },
     "tryAgain": "Thử lại",
     "navigation": "Điều Hướng",
     "viewOnMap": "Xem trên Google Maps",
@@ -125,7 +133,6 @@
     "apply": "Áp dụng",
     "active": "Hoạt động",
     "status": "Trạng thái",
-    "email": "Email",
     "phone": "Điện thoại",
     "import": "Nhập",
     "download": "Tải xuống",
@@ -270,7 +277,6 @@
     "qrCodeCopied": "Đã sao chép mã QR vào clipboard",
     "copyQrCodeFailed": "Không thể sao chép mã QR",
     "copyQrCodeNotSupported": "Trình duyệt của bạn không hỗ trợ sao chép hình ảnh",
-    "email": "Email",
     "phone": "Số Điện Thoại",
     "workType": "Loại Hình Công Việc",
     "fullTime": "Toàn Thời Gian",
@@ -398,7 +404,6 @@
     "searchPlaceholder": "Tìm khách hàng theo tên, công ty, email hoặc điện thoại...",
     "namePlaceholder": "Tên khách hàng",
     "companyPlaceholder": "Tên công ty",
-    "emailPlaceholder": "khachhang@example.com",
     "phonePlaceholder": "+84901234567",
     "addressPlaceholder": "Địa chỉ",
     "taxCodePlaceholder": "Mã Số Thuế (Tùy Chọn)",

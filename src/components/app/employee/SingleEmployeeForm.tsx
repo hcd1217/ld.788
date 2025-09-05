@@ -107,7 +107,7 @@ export function SingleEmployeeForm({
             {...form.getInputProps('unitId')}
           />
           <TextInput
-            label={t('employee.email')}
+            label={t('common.form.email')}
             placeholder="an@company.com"
             leftSection={<IconMail size={16} />}
             {...form.getInputProps('email')}
