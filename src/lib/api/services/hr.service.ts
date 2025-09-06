@@ -10,12 +10,8 @@ import {
   type CreateEmployeesResponse,
   type UpdateEmployeeRequest,
   type UpdateEmployeeResponse,
-  type GetUnitsResponse,
-  GetUnitsResponseSchema,
   type CreateBulkEmployeesRequest,
   CreateBulkEmployeesRequestSchema,
-  type GetPositionsResponse,
-  GetPositionsResponseSchema,
 } from '../schemas/hr.schemas';
 
 export class HrApi extends BaseApiClient {
@@ -66,22 +62,5 @@ export class HrApi extends BaseApiClient {
 
   async removeEmployee(employeeId: string): Promise<void> {
     await this.delete(`/api/hr/employees/${employeeId}`);
-  }
-
-  async getUnits(): Promise<GetUnitsResponse['departments']> {
-    const queryParams = new URLSearchParams();
-    queryParams.append('limit', '1000');
-    const url = `/api/hr/departments${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-
-    const response = await this.get<GetUnitsResponse, void>(url, undefined, GetUnitsResponseSchema);
-    return response.departments;
-  }
-
-  async getPositions(): Promise<GetPositionsResponse> {
-    const queryParams = new URLSearchParams();
-    queryParams.append('limit', '1000');
-    const url = `/api/hr/positions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-
-    return this.get<GetPositionsResponse, void>(url, undefined, GetPositionsResponseSchema);
   }
 }

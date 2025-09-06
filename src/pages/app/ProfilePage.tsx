@@ -87,35 +87,6 @@ export function ProfilePage() {
           </Stack>
         </Card>
 
-        {/* Account Information */}
-        {/* <Card shadow="sm" padding="lg" radius="md">
-          <Stack gap="xs">
-            <Group gap="xs" mb="xs">
-              <IconBriefcase size={20} stroke={1.5} />
-              <Text fw={600}>{t('profile.accountInfo')}</Text>
-            </Group>
-            <Divider />
-            <SimpleGrid cols={1} spacing="xs" mt="xs">
-              <Group justify="space-between">
-                <Text size="sm" c="dimmed">
-                  {t('profile.clientCode')}
-                </Text>
-                <Badge variant="light" size="md">
-                  {user.clientCode}
-                </Badge>
-              </Group>
-              <Group justify="space-between">
-                <Text size="sm" c="dimmed">
-                  {t('profile.accountId')}
-                </Text>
-                <Text size="sm" fw={500}>
-                  {user.id}
-                </Text>
-              </Group>
-            </SimpleGrid>
-          </Stack>
-        </Card> */}
-
         {/* Employee Information */}
         {user.employee && (
           <Card shadow="sm" padding="lg" radius="md">

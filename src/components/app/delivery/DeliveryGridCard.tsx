@@ -59,6 +59,7 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
                   {t('delivery.fields.purchaseOrder')}
                 </Text>
                 <Text size="sm" c="dimmed">
+                  {/* LINK TO PURCHASE ORDER */}
                   {deliveryRequest.purchaseOrderNumber || '-'}
                 </Text>
               </div>

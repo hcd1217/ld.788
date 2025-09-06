@@ -4,8 +4,8 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { getFormValidators } from '@/utils/validation';
 import { isDevelopment } from '@/utils/env';
 import { firstName, lastName, randomElement } from '@/utils/fake';
-import type { Unit } from '@/services/hr/unit';
 import type { SingleEmployeeFormValues } from '@/utils/employee.utils';
+import type { Unit } from '@/services/hr/employee';
 
 type UseEmployeeFormProps = {
   readonly isEditMode: boolean;

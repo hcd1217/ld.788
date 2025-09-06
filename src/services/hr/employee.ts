@@ -1,9 +1,13 @@
-import { unitService } from './unit';
-import { positionService } from './position';
 import { hrApi, userApi } from '@/lib/api';
 import { renderFullName } from '@/utils/string';
+import { overviewService } from '../client/overview';
 
 export type WorkType = 'FULL_TIME' | 'PART_TIME';
+
+export type Unit = {
+  id: string;
+  name: string;
+};
 
 export type Employee = {
   id: string;
@@ -12,7 +16,6 @@ export type Employee = {
   lastName: string;
   employeeCode: string;
   fullName: string;
-  fullNameWithPosition?: string;
   email?: string;
   phone?: string;
   workType?: WorkType;
@@ -20,10 +23,6 @@ export type Employee = {
   hourlyRate?: number;
   startDate?: Date;
   endDate?: Date;
-  // isProbation?: boolean;
-  // probationEndDate?: Date;
-  // probationReason?: string;
-  // probationStatus?: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -37,6 +36,9 @@ export type Employee = {
 export const employeeService = {
   employees: [] as Employee[],
   async getAllEmployee(): Promise<Employee[]> {
+    if (this.employees.length > 0) {
+      return this.employees;
+    }
     const response = await hrApi.getEmployees();
     const employees = response.employees.sort((a, b) => {
       {
@@ -59,23 +61,24 @@ export const employeeService = {
       const _b = b.createdAt.getTime();
       return _b - _a;
     });
-    const units = await unitService.getUnits();
-    const unitMap = new Map(units.map((u) => [u.id, u.name]));
-    const positions = await positionService.getPositions();
-    const positionMap = new Map(positions.map((p) => [p.id, p.title]));
-    return employees.map((employee) => {
-      const position = positionMap.get(employee.positionId ?? '');
+
+    const overviewData = await overviewService.getOverviewData();
+    const employeeMap = new Map(overviewData.employees.map((employee) => [employee.id, employee]));
+    const departmentMap = new Map(
+      overviewData.departments.map((department) => [department.id, department.name]),
+    );
+
+    this.employees = employees.map((employee) => {
+      const position = employeeMap.get(employee.id ?? '')?.positionName;
       const fullName = renderFullName(employee);
-      const fullNameWithPosition = position ? `${fullName} (${position})` : undefined;
       const workType = employee.employmentType === 'PART_TIME' ? 'PART_TIME' : 'FULL_TIME';
       return {
         ...employee,
         startDate: employee.hireDate,
         fullName,
-        fullNameWithPosition,
         position,
         unitId: employee.departmentId,
-        unit: unitMap.get(employee.departmentId ?? ''),
+        unit: departmentMap.get(employee.departmentId ?? ''),
         workType,
         phone: employee.phoneNumber,
         monthlySalary: employee.metadata?.monthlySalary,
@@ -84,6 +87,16 @@ export const employeeService = {
         displayOrder: employee.metadata?.displayOrder,
       };
     });
+    return this.employees;
+  },
+
+  async getEmployee(id: string): Promise<Employee | undefined> {
+    const employees = await this.getAllEmployee();
+    return employees.find((emp) => emp.id === id);
+  },
+
+  clearCache() {
+    this.employees = [];
   },
 
   async addEmployee(employee: {
@@ -108,7 +121,7 @@ export const employeeService = {
         monthlySalary: employee.workType === 'FULL_TIME' ? employee.monthlySalary : undefined,
       },
     });
-    // The additional fields would be handled by the API in a real implementation
+    this.clearCache();
   },
 
   async addBulkEmployees(
@@ -135,26 +148,23 @@ export const employeeService = {
         },
       })),
     });
+    this.clearCache();
   },
 
   async deactivateEmployee(id: string) {
     // First deactivate the employee
     await hrApi.deactivateEmployee(id);
-
     // Get employee details to find userId
     const employee = await this.getEmployee(id);
     if (employee?.userId) {
       await userApi.revokeUserSessions(employee.userId);
     }
+    this.clearCache();
   },
 
   async activateEmployee(id: string) {
     await hrApi.activateEmployee(id);
-  },
-
-  async getEmployee(id: string): Promise<Employee | undefined> {
-    const employees = await this.getAllEmployee();
-    return employees.find((emp) => emp.id === id);
+    this.clearCache();
   },
 
   async updateEmployee(
@@ -188,5 +198,6 @@ export const employeeService = {
         monthlySalary: employee.workType === 'FULL_TIME' ? employee.monthlySalary : undefined,
       },
     });
+    this.clearCache();
   },
 };

@@ -14,7 +14,7 @@ import { IconAlertTriangle, IconCheck, IconTruck } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import type { DeliveryRequestDetail } from '@/services/sales/deliveryRequest';
+import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { formatDate } from '@/utils/time';
 import { DRAWER_BODY_PADDING_BOTTOM, DRAWER_HEADER_PADDING } from '@/constants/po.constants';
 
@@ -23,7 +23,7 @@ export type DeliveryModalMode = 'start_transit' | 'complete';
 type DeliveryStatusModalProps = {
   readonly opened: boolean;
   readonly mode: DeliveryModalMode;
-  readonly deliveryRequest?: DeliveryRequestDetail;
+  readonly deliveryRequest?: DeliveryRequest;
   readonly onClose: () => void;
   readonly onConfirm: (data?: any) => Promise<void>;
 };
@@ -121,13 +121,13 @@ export function DeliveryStatusModal({
           {t('delivery.deliveryDetails')}
         </Text>
         <Text size="sm" c="dimmed">
-          {t('delivery.deliveryId')}: DR-{deliveryRequest.id.slice(-6)}
+          {t('delivery.deliveryId')}: {deliveryRequest.deliveryRequestNumber}
         </Text>
         <Text size="sm" c="dimmed">
-          {t('delivery.fields.poNumber')}: {deliveryRequest.purchaseOrder?.poNumber}
+          {t('delivery.fields.poNumber')}: {deliveryRequest.purchaseOrderNumber}
         </Text>
         <Text size="sm" c="dimmed">
-          {t('delivery.customerName')}: {deliveryRequest.purchaseOrder?.customer?.name}
+          {t('delivery.customerName')}: {deliveryRequest.customerName}
         </Text>
         <Text size="sm" c="dimmed">
           {t('delivery.currentStatus')}:{' '}

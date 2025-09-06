@@ -1,5 +1,4 @@
 import { overviewApi } from '@/lib/api';
-import { logError } from '@/utils/logger';
 import type {
   EmployeeOverview as BEEmployeeOverview,
   DepartmentOverview as BEDepartmentOverview,
@@ -16,7 +15,8 @@ export type EmployeeOverview = {
   userId: string | undefined;
   employeeCode: string;
   fullName: string;
-  departmentId: string | undefined;
+  departmentName: string | undefined;
+  positionName: string | undefined;
 };
 
 export type DepartmentOverview = {
@@ -47,20 +47,17 @@ export type OverviewData = {
 
 // Service object
 export const overviewService = {
+  overviewData: undefined as OverviewData | undefined,
   /**
    * Fetch combined overview data and return it as-is
    */
   async getOverviewData(params?: OverviewParams): Promise<OverviewData> {
-    try {
-      const response = await overviewApi.getCombinedOverview(params);
-      return this.transformOverviewData(response);
-    } catch (error) {
-      logError('Failed to fetch overview data', error, {
-        module: 'OverviewService',
-        action: 'getOverviewData',
-      });
-      throw error;
+    if (this.overviewData) {
+      return this.overviewData;
     }
+    const response = await overviewApi.getCombinedOverview(params);
+    this.overviewData = this.transformOverviewData(response);
+    return this.overviewData;
   },
 
   /**
@@ -119,13 +116,14 @@ export const overviewService = {
 
     return {
       id: beEmployee.id,
-      departmentId: beEmployee.departmentId ?? undefined,
       userId:
         beEmployee.userId === null || beEmployee.userId === undefined
           ? undefined
           : String(beEmployee.userId),
       fullName,
       employeeCode: beEmployee.employeeCode ?? '',
+      departmentName: beEmployee.departmentName ?? undefined,
+      positionName: beEmployee.positionName ?? undefined,
     };
   },
 

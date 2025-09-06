@@ -39,6 +39,8 @@ export function PODeliverySection({ purchaseOrder }: PODeliverySectionProps) {
           </Text>
           <Anchor
             size="sm"
+            c="blue"
+            fw="bold"
             onClick={() =>
               handleViewDeliveryRequest(purchaseOrder.deliveryRequest?.deliveryRequestId || '-')
             }

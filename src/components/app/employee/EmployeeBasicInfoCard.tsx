@@ -155,7 +155,7 @@ export function EmployeeBasicInfoCard({ employee, canEdit, onEdit }: EmployeeBas
                 </Stack>
               </Grid.Col>
             ) : null}
-            {clientConfig.features.employee.workType ? (
+            {clientConfig.features?.employee?.workType ? (
               <>
                 {employee.workType ? (
                   <Grid.Col span={{ base: 6 }}>

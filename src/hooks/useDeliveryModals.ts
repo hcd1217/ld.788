@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { DeliveryRequestDetail } from '@/services/sales/deliveryRequest';
+import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 
 type DeliveryModalState = {
   startTransit: boolean;
@@ -14,7 +14,7 @@ export function useDeliveryModals() {
     uploadPhotos: false,
   });
   const [selectedDeliveryRequest, setSelectedDeliveryRequest] = useState<
-    DeliveryRequestDetail | undefined
+    DeliveryRequest | undefined
   >();
 
   const closeModal = (modalType: keyof DeliveryModalState) => {
@@ -23,17 +23,17 @@ export function useDeliveryModals() {
   };
 
   const handlers = {
-    handleStartTransit: (dr: DeliveryRequestDetail) => {
+    handleStartTransit: (dr: DeliveryRequest) => {
       setSelectedDeliveryRequest(dr);
       setModals((prev) => ({ ...prev, startTransit: true }));
     },
 
-    handleComplete: (dr: DeliveryRequestDetail) => {
+    handleComplete: (dr: DeliveryRequest) => {
       setSelectedDeliveryRequest(dr);
       setModals((prev) => ({ ...prev, complete: true }));
     },
 
-    handleTakeDeliveryPhoto: (dr: DeliveryRequestDetail) => {
+    handleTakeDeliveryPhoto: (dr: DeliveryRequest) => {
       setSelectedDeliveryRequest(dr);
       setModals((prev) => ({ ...prev, uploadPhotos: true }));
     },

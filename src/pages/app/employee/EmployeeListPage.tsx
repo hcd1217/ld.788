@@ -6,13 +6,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { useOnce } from '@/hooks/useOnce';
 import { useEmployeeFilters } from '@/hooks/useEmployeeFilters';
-import {
-  useEmployeeList,
-  useHrLoading,
-  useHrError,
-  useHrActions,
-  useUnitList,
-} from '@/stores/useHrStore';
+import { useEmployeeList, useHrLoading, useHrError, useHrActions } from '@/stores/useHrStore';
 import {
   Pagination,
   AppPageTitle,
@@ -37,7 +31,7 @@ import { ROUTERS } from '@/config/routeConfig';
 import { EMPLOYEE_STATUS } from '@/constants/employee';
 import { useDisclosure } from '@mantine/hooks';
 import { useViewMode } from '@/hooks/useViewMode';
-import { usePermissions } from '@/stores/useAppStore';
+import { useAppStore, usePermissions } from '@/stores/useAppStore';
 
 export function EmployeeListPage() {
   const navigate = useNavigate();
@@ -45,16 +39,16 @@ export function EmployeeListPage() {
   const { t } = useTranslation();
   const permissions = usePermissions();
   const employees = useEmployeeList();
-  const units = useUnitList();
   const isLoading = useHrLoading();
   const error = useHrError();
-  const { refreshEmployees, clearError, loadUnits } = useHrActions();
+  const { refreshEmployees, clearError } = useHrActions();
 
   // Use the new employee filters hook
   const { filteredEmployees, filters, filterHandlers, hasActiveFilters, clearAllFilters } =
     useEmployeeFilters(employees);
 
   const { viewMode, isTableView, setViewMode } = useViewMode();
+  const { overviewData } = useAppStore();
 
   // Drawer states using Mantine's useDisclosure directly
   const [unitDrawerOpened, { open: openUnitDrawer, close: closeUnitDrawer }] = useDisclosure(false);
@@ -68,18 +62,19 @@ export function EmployeeListPage() {
   });
 
   // Prepare department options for select
-  const unitOptions = useMemo(
-    () =>
-      units.map((unit) => ({
-        value: unit.id,
-        label: unit.name,
-      })),
-    [units],
-  );
+  const { units, unitOptions } = useMemo(() => {
+    return {
+      units: overviewData?.departments ?? [],
+      unitOptions:
+        overviewData?.departments.map((unit) => ({
+          value: unit.id,
+          label: unit.name,
+        })) ?? [],
+    };
+  }, [overviewData]);
 
   useOnce(() => {
     void refreshEmployees();
-    void loadUnits();
   });
 
   if (!permissions.employee.canView) {

@@ -43,7 +43,7 @@ export function DeliveryRequestModal({
 
   // Employee options for select - filtered by assigneeIds from clientConfig
   const employeeOptions = useMemo(() => {
-    const assigneeIds = clientConfig.features.deliveryRequest.assigneeIds;
+    const assigneeIds = clientConfig.features?.deliveryRequest?.assigneeIds ?? [];
 
     // Filter employees based on assigneeIds if configured, otherwise show all
     const filteredEmployees =
@@ -55,7 +55,7 @@ export function DeliveryRequestModal({
       value: employee.id,
       label: employee.fullName,
     }));
-  }, [employees, clientConfig.features.deliveryRequest.assigneeIds]);
+  }, [employees, clientConfig.features?.deliveryRequest]);
 
   // Reset form when modal opens
   const handleOpen = () => {

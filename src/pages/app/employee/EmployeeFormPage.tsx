@@ -12,7 +12,7 @@ import { useDeviceType } from '@/hooks/useDeviceType';
 import { useEmployeeForm } from '@/hooks/useEmployeeForm';
 import { Tabs, PermissionDeniedPage } from '@/components/common';
 import { SingleEmployeeForm, BulkImportForm, EmployeeFormLayout } from '@/components/app/employee';
-import { useHrActions, useUnitList, useHrLoading, useHrError } from '@/stores/useHrStore';
+import { useHrActions, useHrLoading, useHrError } from '@/stores/useHrStore';
 import { employeeService } from '@/services/hr/employee';
 import { ROUTERS } from '@/config/routeConfig';
 import { useAction } from '@/hooks/useAction';
@@ -25,7 +25,7 @@ import {
   validateFileType,
   parseExcelFile,
 } from '@/utils/employee.utils';
-import { usePermissions } from '@/stores/useAppStore';
+import { useAppStore, usePermissions } from '@/stores/useAppStore';
 
 type EmployeeFormPageProps = {
   readonly mode: 'create' | 'edit';
@@ -37,10 +37,11 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
   const { t, i18n } = useTranslation();
   const { isMobile } = useDeviceType();
   const permissions = usePermissions();
-  const units = useUnitList();
   const isLoading = useHrLoading();
   const error = useHrError();
-  const { loadUnits, clearError, addEmployee, addBulkEmployees } = useHrActions();
+  const { clearError, addEmployee, addBulkEmployees } = useHrActions();
+  const { overviewData } = useAppStore();
+
   // Mode-specific state
   const isEditMode = mode === 'edit';
   const [activeTab, setActiveTab] = useState<string | undefined>('single');
@@ -68,6 +69,10 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
     }),
     [t],
   );
+
+  const units = useMemo(() => {
+    return overviewData?.departments ?? [];
+  }, [overviewData]);
 
   // Use custom hook for form
   const form = useEmployeeForm({ isEditMode, units });
@@ -115,7 +120,6 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
 
   // Load units and employee data on mount
   useOnce(() => {
-    void loadUnits();
     if (isEditMode) {
       void loadEmployee();
     }

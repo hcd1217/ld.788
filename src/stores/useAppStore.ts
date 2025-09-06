@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { authService } from '@/services/auth';
+import { authService } from '@/services/auth/auth';
 import { authApi, clientApi, type ClientConfig, type ClientPublicConfigResponse } from '@/lib/api';
 import { updateClientTranslations, clearClientTranslations } from '@/lib/i18n';
 import type { GetMeResponse } from '@/lib/api/schemas/auth.schemas';
@@ -104,9 +104,10 @@ export const useAppStore = create<AppState>()(
         async fetchUserProfile() {
           try {
             const user = await authApi.getMe();
-            let delay = Number(user.clientConfig?.features.apiCall.delay);
+            const DEFAULT_DELAY = 500;
+            let delay = Number(user.clientConfig?.features?.apiCall?.delay ?? DEFAULT_DELAY);
             if (!Number.isNaN(delay)) {
-              delay = Math.max(delay, 0) ?? 1500;
+              delay = Math.max(delay, 0) || DEFAULT_DELAY;
               localStorage.setItem(STORAGE_KEYS.CLIENT.API_DELAY, delay.toString());
             }
             set({ user, permissionError: false });
@@ -336,22 +337,14 @@ const EMPTY_CLIENT_CONFIG: ClientConfig = {
   navigation: [],
   mobileNavigation: [],
   translations: {},
-  features: {
-    apiCall: {
-      delay: 1500,
+  publicConfig: {
+    features: {
+      language: false,
+      darkMode: false,
     },
-    deliveryRequest: {
-      assigneeIds: [],
-    },
-    employee: {
-      workType: false,
-    },
-    customer: {
-      noTaxCode: false,
-      noEmail: false,
-    },
-    language: false,
-    darkMode: false,
+    clientCode: '',
+    clientName: '',
+    logoUrl: '',
   },
 };
 

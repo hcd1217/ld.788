@@ -134,7 +134,6 @@ export const GetMeResponseSchema = z
     clientId: idSchema,
     clientCode: stringSchema,
     isRoot: booleanSchema,
-    roles: z.array(RoleSchema),
     clientConfig: ClientConfigSchema.optional(),
     employee: EmployeeSchema.optional(),
     department: DepartmentSchema.optional(),
@@ -171,12 +170,6 @@ export const GetMeResponseSchema = z
       code: role,
       name: 'Department',
     };
-    val.roles = [
-      {
-        name: role,
-        level: 1,
-      },
-    ];
     return val;
   });
 

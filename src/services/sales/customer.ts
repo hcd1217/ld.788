@@ -4,7 +4,7 @@ import {
   type BulkUpsertCustomersResponse,
 } from '@/lib/api/schemas/sales.schemas';
 
-// Re-export Customer type for compatibility
+// Re-export types for compatibility
 export type {
   CreateCustomerRequest,
   UpdateCustomerRequest,
@@ -27,31 +27,34 @@ export type Customer = {
   isActive: boolean;
 };
 
+/**
+ * Transform API Customer to Frontend Customer
+ */
+function transformCustomer(customer: APICustomer): Customer {
+  return {
+    ...customer,
+    googleMapsUrl: customer.metadata?.googleMapsUrl,
+    memo: customer.metadata?.memo,
+    pic: customer.metadata?.pic as string | undefined,
+  };
+}
+
 export const customerService = {
-  customers: [] as Customer[],
-
   async getAllCustomers(): Promise<Customer[]> {
-    if (this.customers.length > 0) {
-      return this.customers;
-    }
     const response = await salesApi.getCustomers({
-      limit: 1000, // Get all customers
-    });
-    this.customers = response.customers.map(transformCustomer);
-    return this.customers;
-  },
-
-  async getCustomer(id: string): Promise<Customer | undefined> {
-    const customers = await this.getAllCustomers();
-    return customers.find((customer) => customer.id === id);
-  },
-
-  async getActiveCustomers(): Promise<Customer[]> {
-    const response = await salesApi.getCustomers({
-      isActive: true,
       limit: 1000,
     });
     return response.customers.map(transformCustomer);
+  },
+
+  async getCustomer(id: string): Promise<Customer | undefined> {
+    try {
+      const response = await salesApi.getCustomers({ limit: 1000 });
+      const customer = response.customers.find((c) => c.id === id);
+      return customer ? transformCustomer(customer) : undefined;
+    } catch {
+      return undefined;
+    }
   },
 
   async createCustomer({
@@ -68,8 +71,6 @@ export const customerService = {
         memo: memo || undefined,
       },
     });
-    // Clear cache to ensure fresh data on next fetch
-    this.customers = [];
     return transformCustomer(customer);
   },
 
@@ -85,24 +86,17 @@ export const customerService = {
         memo: memo || undefined,
       },
     });
-    // Clear cache to ensure fresh data on next fetch
-    this.customers = [];
     return transformCustomer(customer);
   },
 
   async deleteCustomer(id: string): Promise<void> {
     await salesApi.deleteCustomer(id);
-    // Clear cache to ensure fresh data on next fetch
-    this.customers = [];
   },
 
   async bulkUpsertCustomers(
     data: BulkUpsertCustomersRequest,
   ): Promise<BulkUpsertCustomersResponse> {
-    const result = await salesApi.bulkUpsertCustomers(data);
-    // Clear cache to ensure fresh data on next fetch
-    this.customers = [];
-    return result;
+    return salesApi.bulkUpsertCustomers(data);
   },
 
   async searchCustomers(searchTerm: string): Promise<Customer[]> {
@@ -113,12 +107,3 @@ export const customerService = {
     return response.customers.map(transformCustomer);
   },
 };
-
-function transformCustomer(customer: APICustomer): Customer {
-  return {
-    ...customer,
-    googleMapsUrl: customer.metadata?.googleMapsUrl,
-    memo: customer.metadata?.memo,
-    pic: customer.metadata?.pic as string | undefined,
-  };
-}

@@ -3,7 +3,6 @@ import { devtools } from 'zustand/middleware';
 import {
   deliveryRequestService,
   type DeliveryRequest,
-  type DeliveryRequestDetail,
   type DeliveryRequestFilterParams,
   type CreateDeliveryRequest,
   type UpdateDeliveryRequest,
@@ -14,7 +13,7 @@ import { getErrorMessage } from '@/utils/errorUtils';
 type DeliveryRequestState = {
   // Delivery Request data
   deliveryRequests: DeliveryRequest[];
-  currentDeliveryRequest: DeliveryRequestDetail | undefined;
+  currentDeliveryRequest: DeliveryRequest | undefined;
   isLoading: boolean;
   isLoadingMore: boolean;
   error: string | undefined;
@@ -37,7 +36,7 @@ type DeliveryRequestState = {
   _rollback: (
     id: string,
     previousDR: DeliveryRequest | undefined,
-    previousCurrentDR: DeliveryRequestDetail | undefined,
+    previousCurrentDR: DeliveryRequest | undefined,
     error?: string,
   ) => void;
   _optimisticUpdate: (
@@ -46,7 +45,7 @@ type DeliveryRequestState = {
   ) => void;
 
   // Actions
-  setCurrentDeliveryRequest: (dr: DeliveryRequestDetail | undefined) => void;
+  setCurrentDeliveryRequest: (dr: DeliveryRequest | undefined) => void;
   loadDeliveryRequestsWithFilter: (
     filters?: DeliveryRequestFilterParams,
     reset?: boolean,
@@ -462,7 +461,7 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
       _rollback(
         id: string,
         previousDR: DeliveryRequest | undefined,
-        previousCurrentDR: DeliveryRequestDetail | undefined,
+        previousCurrentDR: DeliveryRequest | undefined,
         error?: string,
       ) {
         set((state) => ({

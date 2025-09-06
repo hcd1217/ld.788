@@ -12,6 +12,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { ModalOrDrawer } from '@/components/common';
 import type { UseFormReturnType } from '@mantine/form';
 import { useClientConfig } from '@/stores/useAppStore';
+import { useMemo } from 'react';
 
 export type CustomerFormValues = {
   name: string;
@@ -54,7 +55,9 @@ export function CustomerFormModal({
   const { t } = useTranslation();
   const title = mode === 'create' ? t('common.add') : t('common.edit');
   const clientConfig = useClientConfig();
-  const { noEmail, noTaxCode } = clientConfig.features.customer;
+  const { noEmail, noTaxCode } = useMemo(() => {
+    return clientConfig.features?.customer ?? { noEmail: false, noTaxCode: false };
+  }, [clientConfig]);
   return (
     <ModalOrDrawer title={title} opened={opened} onClose={onClose} drawerSize="md">
       <Box style={{ position: 'relative' }}>

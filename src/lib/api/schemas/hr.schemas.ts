@@ -110,16 +110,6 @@ export const GetEmployeesResponseSchema = z.object({
   pagination: paginationSchema,
 });
 
-export const GetUnitsResponseSchema = z.object({
-  departments: z.array(UnitSchema),
-  pagination: paginationSchema,
-});
-
-export const GetPositionsResponseSchema = z.object({
-  positions: z.array(PositionSchema),
-  pagination: paginationSchema,
-});
-
 export const CreateEmployeesResponseSchema = EmployeeSchema;
 
 export const UpdateEmployeeResponseSchema = EmployeeSchema;
@@ -130,7 +120,5 @@ export type CreateEmployeesRequest = z.infer<typeof CreateEmployeesRequestSchema
 export type CreateBulkEmployeesRequest = z.infer<typeof CreateBulkEmployeesRequestSchema>;
 export type UpdateEmployeeRequest = z.infer<typeof UpdateEmployeeRequestSchema>;
 export type GetEmployeesResponse = z.infer<typeof GetEmployeesResponseSchema>;
-export type GetUnitsResponse = z.infer<typeof GetUnitsResponseSchema>;
-export type GetPositionsResponse = z.infer<typeof GetPositionsResponseSchema>;
 export type CreateEmployeesResponse = z.infer<typeof CreateEmployeesResponseSchema>;
 export type UpdateEmployeeResponse = z.infer<typeof UpdateEmployeeResponseSchema>;

@@ -47,6 +47,3 @@ export const PIC_TYPE = {
 } as const;
 
 export type PICTypeEnum = (typeof PIC_TYPE)[keyof typeof PIC_TYPE];
-
-// Retry delay for failed operations (matching PO pattern)
-export const RETRY_DELAY_MS = 1000;

@@ -20,8 +20,8 @@ import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
 import { useTranslation } from '@/hooks/useTranslation';
 import { FirstNameAndLastNameInForm } from '@/components/form/FirstNameAndLastNameInForm';
-import type { Unit } from '@/services/hr/unit';
 import i18n from '@/lib/i18n';
+import type { Unit } from '@/services/hr/employee';
 
 type SingleEmployeeFormValues = {
   firstName: string;
@@ -39,7 +39,7 @@ type SingleEmployeeFormValues = {
 
 type SingleEmployeeFormProps = {
   readonly form: UseFormReturnType<SingleEmployeeFormValues>;
-  readonly units: Unit[];
+  readonly units: readonly Unit[];
   readonly isLoading: boolean;
   readonly showAlert: boolean;
   readonly error?: string;

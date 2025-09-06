@@ -1,5 +1,5 @@
 import * as z from 'zod/v4';
-import { ClientPublicConfigSchema, dictionarySchema } from './common.schemas';
+import { ClientPublicConfigSchema, dictionarySchema, idSchema } from './common.schemas';
 import {
   NavigationItemSchema,
   DEFAULT_NAVIGATION_CONFIG,
@@ -18,7 +18,33 @@ export const ClientConfigSchema = z.object({
     .array(NavigationItemSchema)
     .optional()
     .default(DEFAULT_MOBILE_NAVIGATION_CONFIG), // Backend-driven mobile navigation
-  ...ClientPublicConfigSchema.shape,
+  publicConfig: ClientPublicConfigSchema,
+  features: z
+    .object({
+      apiCall: z
+        .object({
+          delay: z.number(),
+        })
+        .partial(),
+      deliveryRequest: z
+        .object({
+          assigneeIds: z.array(idSchema),
+        })
+        .partial(),
+      employee: z
+        .object({
+          workType: z.boolean(),
+        })
+        .partial(),
+      customer: z
+        .object({
+          noTaxCode: z.boolean().optional(),
+          noEmail: z.boolean().optional(),
+        })
+        .partial(),
+    })
+    .partial()
+    .optional(),
 });
 
 // Types derived from schemas

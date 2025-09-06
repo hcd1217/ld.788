@@ -10,6 +10,7 @@ export const EmployeeOverviewSchema = z.object({
   lastName: stringSchema.describe('Employee last name'),
   departmentId: idSchema.optional().describe('Department ID'),
   departmentName: stringSchema.optional().describe('Department name'),
+  positionName: stringSchema.optional().describe('Position name'),
   employeeCode: optionalStringSchema.describe('Employee code'),
 });
 

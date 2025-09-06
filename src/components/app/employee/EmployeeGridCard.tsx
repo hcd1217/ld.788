@@ -76,7 +76,7 @@ export function EmployeeGridCard({ employee }: EmployeeGridCardProps) {
           </Text>
           <ContactInfo email={employee.email} phoneNumber={employee.phone} />
         </Group>
-        {clientConfig.features.employee.workType ? (
+        {clientConfig.features?.employee?.workType ? (
           <>
             {/* Work Type */}
             <Group wrap="nowrap">

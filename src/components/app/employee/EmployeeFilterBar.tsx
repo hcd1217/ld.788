@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { SearchBar } from '@/components/common';
 import { EMPLOYEE_STATUS } from '@/constants/employee';
-import type { Unit } from '@/services/hr/unit';
+import type { Unit } from '@/services/hr/employee';
 
 interface EmployeeFilterBarProps {
   readonly searchQuery: string;

@@ -1,9 +1,7 @@
 import { useMemo } from 'react';
 import { useAppStore } from '@/stores/useAppStore';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { GetMeResponse } from '@/lib/api/schemas/auth.schemas';
-import { getNavigationItems, getMobileNavigationItems } from '@/services/navigationService';
-import { skipEmpty, unique } from '@/utils/array';
+import { getNavigationItems, getMobileNavigationItems } from '@/utils/navigation';
 
 /**
  * Custom hook for getting navigation items with role-based access control
@@ -18,12 +16,7 @@ function useNavigationItems(isMobile = false) {
   // Get navigation items from backend or static fallback
   const navigationItems = useMemo(() => {
     // Extract role names from user profile
-    const userRoles = skipEmpty(
-      unique([
-        ...(user?.roles?.map((role: GetMeResponse['roles'][number]) => role.name) || []),
-        user?.department?.code || '',
-      ]),
-    );
+    const userRoles = [user?.department?.code || ''];
 
     // Use mobile or desktop navigation service based on isMobile flag
     if (isMobile) {

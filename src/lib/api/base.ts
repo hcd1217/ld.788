@@ -1,6 +1,6 @@
 import type * as z from 'zod/v4';
 import { addApiError } from '@/stores/error';
-import { authService } from '@/services/auth';
+import { authService } from '@/services/auth/auth';
 import { cleanObject } from '@/utils/object';
 import { isDevelopment } from '@/utils/env';
 import { delay } from '@/utils/time';

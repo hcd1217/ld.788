@@ -9,6 +9,3 @@ export const FAB_Z_INDEX = 1001;
 export const DRAWER_BODY_PADDING_BOTTOM = 80;
 export const DRAWER_HEADER_PADDING = '16px 20px';
 export const DRAWER_HEIGHT_CALC = 'calc(90vh - 80px)';
-
-// API & Network Constants
-export const RETRY_DELAY_MS = 1000;

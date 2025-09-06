@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { employeeService, type Employee } from '@/services/hr/employee';
-import { unitService, type Unit } from '@/services/hr/unit';
 import { getErrorMessage } from '@/utils/errorUtils';
 import { useMemo } from 'react';
 import { logError } from '@/utils/logger';
@@ -9,8 +8,6 @@ import { logError } from '@/utils/logger';
 type HrState = {
   // Employee data
   employees: Employee[];
-  units: Unit[];
-  unitMap: Map<string, Unit>;
   currentEmployee: Employee | undefined;
   isLoading: boolean;
   error: string | undefined;
@@ -18,7 +15,6 @@ type HrState = {
   // Actions
   setCurrentEmployee: (employee: Employee | undefined) => void;
   loadEmployees: (force?: boolean) => Promise<void>;
-  loadUnits: () => Promise<void>;
   refreshEmployees: () => Promise<void>;
   deactivateEmployee: (id: string) => Promise<void>;
   activateEmployee: (id: string) => Promise<void>;
@@ -62,22 +58,6 @@ export const useHrStore = create<HrState>()(
         set({ currentEmployee: employee, error: undefined });
       },
 
-      async loadUnits() {
-        set({ error: undefined });
-        try {
-          const units = await unitService.getUnits();
-
-          set({
-            units,
-            unitMap: new Map(units.map((unit) => [unit.id, unit])),
-          });
-        } catch (error) {
-          set({
-            error: getErrorMessage(error, 'Failed to load units'),
-          });
-        }
-      },
-
       async loadEmployees(force = false) {
         if (get().employees.length > 0 && !force) {
           return;
@@ -86,14 +66,10 @@ export const useHrStore = create<HrState>()(
         set({ isLoading: true, error: undefined });
         try {
           // Load both employees and units in parallel
-          const [employees, units] = await Promise.all([
-            employeeService.getAllEmployee(),
-            unitService.getUnits(),
-          ]);
+          const employees = await employeeService.getAllEmployee();
           set({
             isLoading: false,
             employees,
-            units,
           });
         } catch (error) {
           set({
@@ -276,7 +252,6 @@ export const useHrStore = create<HrState>()(
 // Computed selectors for convenience
 export const useCurrentEmployee = () => useHrStore((state) => state.currentEmployee);
 export const useEmployeeList = () => useHrStore((state) => state.employees);
-export const useUnitList = () => useHrStore((state) => state.units);
 export const useHrLoading = () => useHrStore((state) => state.isLoading);
 export const useHrError = () => useHrStore((state) => state.error);
 
@@ -284,7 +259,6 @@ export const useHrError = () => useHrStore((state) => state.error);
 export const useHrActions = () => {
   const setCurrentEmployee = useHrStore((state) => state.setCurrentEmployee);
   const loadEmployees = useHrStore((state) => state.loadEmployees);
-  const loadUnits = useHrStore((state) => state.loadUnits);
   const refreshEmployees = useHrStore((state) => state.refreshEmployees);
   const deactivateEmployee = useHrStore((state) => state.deactivateEmployee);
   const activateEmployee = useHrStore((state) => state.activateEmployee);
@@ -297,7 +271,6 @@ export const useHrActions = () => {
     () => ({
       setCurrentEmployee,
       loadEmployees,
-      loadUnits,
       refreshEmployees,
       deactivateEmployee,
       activateEmployee,
@@ -309,7 +282,6 @@ export const useHrActions = () => {
     [
       setCurrentEmployee,
       loadEmployees,
-      loadUnits,
       refreshEmployees,
       deactivateEmployee,
       activateEmployee,

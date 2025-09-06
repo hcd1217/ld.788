@@ -4,7 +4,6 @@ import { EmployeeActions } from './EmployeeActions';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
 import { ActiveBadge } from '@/components/common';
-import { renderFullName } from '@/utils/string';
 import { getEmployeeDetailRoute } from '@/config/routeConfig';
 import { getEndDateHighlightStyles } from '@/utils/time';
 
@@ -41,7 +40,6 @@ export function EmployeeCard({
     ...actionIconsStyle,
   };
 
-  const fullName = renderFullName(employee);
   const highlightStyles = getEndDateHighlightStyles(employee.endDate, employee.isActive);
 
   return (
@@ -57,14 +55,14 @@ export function EmployeeCard({
       }}
       className={className}
       aria-label={t('employee.employeeCard', {
-        name: fullName,
+        name: employee.fullName,
       })}
       onClick={() => navigate(getEmployeeDetailRoute(employee.id))}
     >
       <Group justify="space-between" align="flex-start" style={{ position: 'relative' }}>
         <Box>
           <Text fw={500} size="sm">
-            {fullName}
+            {employee.fullName}
           </Text>
           {employee.unitId ? (
             <Text size="xs" c="dimmed">

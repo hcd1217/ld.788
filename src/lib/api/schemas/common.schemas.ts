@@ -63,22 +63,6 @@ export const ClientPublicConfigSchema = z.object({
   features: z.object({
     language: z.boolean(),
     darkMode: z.boolean(),
-    apiCall: z.object({
-      delay: z.number(),
-    }),
-    deliveryRequest: z.object({
-      assigneeIds: z.array(idSchema),
-    }),
-    employee: z.object({
-      workType: z.boolean(),
-    }),
-    customer: z
-      .object({
-        noTaxCode: z.boolean().optional(),
-        noEmail: z.boolean().optional(),
-      })
-      .optional()
-      .default({ noTaxCode: true, noEmail: true }),
   }),
   clientCode: optionalStringSchema,
   clientName: optionalStringSchema,

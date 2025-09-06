@@ -53,13 +53,13 @@ export function EmployeeDataTable({ employees }: EmployeeDataTableProps) {
         {
           key: 'workType',
           header: t('employee.workType'),
-          hidden: !clientConfig.features.employee.workType,
+          hidden: !clientConfig.features?.employee?.workType,
           render: (employee: Employee) => <WorkTypeBadge workType={employee.workType} />,
         },
         {
           key: 'startDate',
           header: t('employee.startDate'),
-          hidden: !clientConfig.features.employee.workType,
+          hidden: !clientConfig.features?.employee?.workType,
           render: (employee: Employee) => (
             <>
               {employee.startDate ? formatDate(employee.startDate) : '-'}

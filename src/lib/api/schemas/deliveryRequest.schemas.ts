@@ -5,7 +5,6 @@ import {
   paginationSchema,
   stringSchema,
   timestampSchema,
-  numberSchema,
   AddressSchema,
 } from './common.schemas';
 
@@ -24,43 +23,25 @@ export const DeliveryRequestSchema = z.object({
   id: idSchema,
   deliveryRequestNumber: stringSchema,
   status: DeliveryStatusSchema,
-  purchaseOrderId: idSchema,
-  poNumber: optionalStringSchema,
-  customerId: idSchema.optional(),
-  customerName: stringSchema.optional(),
   assignedTo: idSchema.optional(),
   assignedType: PICTypeSchema.optional(),
   scheduledDate: timestampSchema,
   completedDate: timestampSchema.optional(),
+  metadata: z.looseObject({
+    photoUrls: z.array(stringSchema).optional(),
+    deliveryAddress: AddressSchema.optional(),
+    po: z
+      .looseObject({
+        poId: idSchema,
+        poNumber: stringSchema,
+        customerName: stringSchema,
+        customerId: idSchema,
+      })
+      .optional(),
+  }),
   notes: stringSchema.optional(),
-  photoUrls: z.array(stringSchema).optional(),
-  deliveryAddress: AddressSchema.optional(),
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
-});
-
-// Delivery Request with PO info (for detail endpoints)
-export const DeliveryRequestDetailSchema = DeliveryRequestSchema.extend({
-  purchaseOrder: z
-    .object({
-      id: idSchema,
-      poNumber: stringSchema,
-      customer: z.object({
-        id: idSchema,
-        name: stringSchema,
-      }),
-      items: z.array(
-        z.object({
-          id: idSchema,
-          productCode: stringSchema,
-          description: stringSchema,
-          quantity: numberSchema,
-          color: optionalStringSchema,
-          category: optionalStringSchema,
-        }),
-      ),
-    })
-    .optional(),
 });
 
 // ========== Request Schemas ==========
@@ -103,12 +84,12 @@ export const GetDeliveryRequestsResponseSchema = z.object({
 
 export const CreateDeliveryRequestResponseSchema = DeliveryRequestSchema;
 export const UpdateDeliveryRequestResponseSchema = DeliveryRequestSchema;
-export const GetDeliveryRequestResponseSchema = DeliveryRequestDetailSchema;
+export const GetDeliveryRequestResponseSchema = DeliveryRequestSchema;
 
 // ========== Type Exports ==========
 
 export type DeliveryRequest = z.infer<typeof DeliveryRequestSchema>;
-export type DeliveryRequestDetail = z.infer<typeof DeliveryRequestDetailSchema>;
+export type DeliveryRequestDetail = z.infer<typeof DeliveryRequestSchema>;
 
 export type CreateDeliveryRequest = z.infer<typeof CreateDeliveryRequestSchema>;
 export type UpdateDeliveryRequest = z.infer<typeof UpdateDeliveryRequestSchema>;

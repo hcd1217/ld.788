@@ -7,8 +7,6 @@ import {
   type POStatusHistory,
   type POStatus,
 } from '@/lib/api/schemas/sales.schemas';
-import { logError, logInfo } from '@/utils/logger';
-import { RETRY_DELAY_MS } from '@/constants/po.constants';
 import type { DeliveryStatus, PICType } from './deliveryRequest';
 
 // Re-export types for compatibility
@@ -30,8 +28,6 @@ export type PurchaseOrder = Omit<ApiPurchaseOrder, 'metadata'> & {
   };
 };
 
-export type { Customer } from './customer';
-
 /**
  * Transform API PurchaseOrder to Frontend PurchaseOrder
  */
@@ -45,41 +41,6 @@ function transformApiToFrontend(apiPO: ApiPurchaseOrder): Omit<PurchaseOrder, 'c
     statusHistory: metadata?.statusHistory,
     deliveryRequest: metadata?.deliveryRequest,
   };
-}
-
-/**
- * Simple retry helper for critical operations only
- * Only retries on 5xx server errors with a single retry attempt
- */
-async function retryOnServerError<T>(
-  operation: () => Promise<T>,
-  enableRetry: boolean = false,
-): Promise<T> {
-  if (!enableRetry) {
-    return operation();
-  }
-
-  try {
-    return await operation();
-  } catch (error: any) {
-    // Only retry on 5xx server errors
-    const isServerError =
-      (error?.status >= 500 && error?.status < 600) ||
-      (error?.response?.status >= 500 && error?.response?.status < 600);
-
-    if (isServerError) {
-      logInfo('Retrying after server error', {
-        module: 'PurchaseOrderService',
-        action: 'retryOnServerError',
-        metadata: { error },
-      });
-      // Wait before retry
-      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
-      return operation(); // Single retry attempt
-    }
-
-    throw error;
-  }
 }
 
 // Filter parameters for purchase orders
@@ -154,16 +115,8 @@ export const purchaseOrderService = {
   async getPOById(id: string): Promise<PurchaseOrder | undefined> {
     try {
       const po = await salesApi.getPurchaseOrderById(id);
-      if (po) {
-        return transformApiToFrontend(po);
-      }
-      return undefined;
-    } catch (error) {
-      logError('Failed to get PO by ID', error, {
-        module: 'PurchaseOrderService',
-        action: 'getPOById',
-        metadata: { id },
-      });
+      return po ? transformApiToFrontend(po) : undefined;
+    } catch {
       return undefined;
     }
   },
@@ -175,7 +128,6 @@ export const purchaseOrderService = {
       orderDate?: Date;
       deliveryDate?: Date;
     },
-    enableRetry: boolean = false,
   ): Promise<void> {
     const createRequest: CreatePurchaseOrderRequest = {
       customerId: data.customerId,
@@ -197,15 +149,10 @@ export const purchaseOrderService = {
       },
     };
 
-    // Only critical operations get retry capability
-    await retryOnServerError(() => salesApi.createPurchaseOrder(createRequest), enableRetry);
+    await salesApi.createPurchaseOrder(createRequest);
   },
 
-  async updatePO(
-    id: string,
-    data: Partial<PurchaseOrder>,
-    enableRetry: boolean = false,
-  ): Promise<void> {
+  async updatePO(id: string, data: Partial<PurchaseOrder>): Promise<void> {
     const updateRequest: UpdatePurchaseOrderRequest = {
       status: data.status,
       items: data.items,
@@ -239,8 +186,7 @@ export const purchaseOrderService = {
           : undefined,
     };
 
-    // Only critical operations get retry capability
-    await retryOnServerError(() => salesApi.updatePurchaseOrder(id, updateRequest), enableRetry);
+    await salesApi.updatePurchaseOrder(id, updateRequest);
   },
 
   // ========== Update Purchase Order Status ==========

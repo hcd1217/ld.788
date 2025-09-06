@@ -1,7 +1,7 @@
-import { Stack, Group, Card, Text, Grid } from '@mantine/core';
+import { Stack, Group, Card, Text, Grid, Anchor } from '@mantine/core';
 import { IconMapPin } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { DeliveryRequestDetail } from '@/services/sales/deliveryRequest';
+import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { formatDate } from '@/utils/time';
 import { useMemo } from 'react';
 import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
@@ -10,9 +10,11 @@ import { useEmployeeMapByUserId } from '@/stores/useAppStore';
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
 import { ViewOnMap } from '@/components/common';
+import { getPODetailRoute } from '@/config/routeConfig';
+import { useNavigate } from 'react-router';
 
 type DeliveryDetailTabsProps = {
-  readonly deliveryRequest: DeliveryRequestDetail;
+  readonly deliveryRequest: DeliveryRequest;
   readonly isLoading?: boolean;
 };
 
@@ -20,6 +22,7 @@ export function DeliveryDetailTabs({
   deliveryRequest,
   isLoading: _isLoading,
 }: DeliveryDetailTabsProps) {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
   const employeeMapByUserId = useEmployeeMapByUserId();
@@ -45,7 +48,7 @@ export function DeliveryDetailTabs({
       {/* Header with Actions */}
       <Group justify="start" align="center" gap="md">
         <Text size="xl" fw={600}>
-          {t('delivery.deliveryId')}: DR-{deliveryRequest.id.slice(-6)}
+          {t('delivery.deliveryId')}: {deliveryRequest.deliveryRequestNumber}
         </Text>
         <DeliveryStatusBadge status={deliveryRequest.status} />
       </Group>
@@ -67,7 +70,17 @@ export function DeliveryDetailTabs({
                         {t('delivery.fields.poNumber')}
                       </Text>
                       <Text size="sm" fw={500}>
-                        {deliveryRequest.purchaseOrder?.poNumber}
+                        <Anchor
+                          size="sm"
+                          c="blue"
+                          fw="bold"
+                          onClick={() => {
+                            const purchaseOrderId = deliveryRequest.purchaseOrderId || '-';
+                            navigate(getPODetailRoute(purchaseOrderId));
+                          }}
+                        >
+                          {deliveryRequest.purchaseOrderNumber}
+                        </Anchor>
                       </Text>
                     </div>
                     <div>
@@ -75,7 +88,7 @@ export function DeliveryDetailTabs({
                         {t('delivery.fields.customer')}
                       </Text>
                       <Text size="sm" fw={500}>
-                        {deliveryRequest.purchaseOrder?.customer?.name}
+                        {deliveryRequest.customerName}
                       </Text>
                     </div>
                     <div>

@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { Stack, Grid, Text, Group, Badge, Button, Anchor } from '@mantine/core';
 import {
   IconBuilding,
@@ -51,15 +50,7 @@ export function POAccordionInfoPanel({
   const employeeMapByUserId = useEmployeeMapByUserId();
   const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
   const isEditable = isPOEditable(purchaseOrder);
-
   const shippingInfo = getShippingInfo(purchaseOrder.statusHistory);
-
-  const handleViewDeliveryRequest = useCallback(
-    (deliveryRequestId: string) => {
-      navigate(getDeliveryDetailRoute(deliveryRequestId));
-    },
-    [navigate],
-  );
 
   return (
     <Stack gap="md">
@@ -191,9 +182,12 @@ export function POAccordionInfoPanel({
               </Text>
               <Anchor
                 size="sm"
-                onClick={() =>
-                  handleViewDeliveryRequest(purchaseOrder.deliveryRequest?.deliveryRequestId || '-')
-                }
+                c="blue"
+                fw="bold"
+                onClick={() => {
+                  const deliveryRequestId = purchaseOrder.deliveryRequest?.deliveryRequestId || '-';
+                  navigate(getDeliveryDetailRoute(deliveryRequestId));
+                }}
               >
                 {purchaseOrder.deliveryRequest.deliveryRequestNumber}
               </Anchor>

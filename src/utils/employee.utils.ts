@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
 import { type TFunction } from 'i18next';
 import { firstName, lastName } from '@/utils/fake';
-import type { Unit } from '@/services/hr/unit';
+import type { Unit } from '@/services/hr/employee';
 
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 

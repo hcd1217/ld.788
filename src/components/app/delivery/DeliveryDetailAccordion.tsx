@@ -1,7 +1,7 @@
-import { Stack, Accordion, Group, Button, Text, Grid } from '@mantine/core';
+import { Stack, Accordion, Group, Button, Text, Grid, Anchor } from '@mantine/core';
 import { IconTruck, IconCheck, IconPhoto, IconPackage, IconMapPin } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { DeliveryRequestDetail } from '@/services/sales/deliveryRequest';
+import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { formatDate } from '@/utils/time';
 import { useMemo } from 'react';
 import { useEmployeeMapByEmployeeId, useEmployeeMapByUserId } from '@/stores/useAppStore';
@@ -9,9 +9,11 @@ import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/ov
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
 import { ViewOnMap } from '@/components/common';
+import { getPODetailRoute } from '@/config/routeConfig';
+import { useNavigate } from 'react-router';
 
 type DeliveryDetailAccordionProps = {
-  readonly deliveryRequest: DeliveryRequestDetail;
+  readonly deliveryRequest: DeliveryRequest;
   readonly isLoading?: boolean;
   readonly canStartTransit?: boolean;
   readonly canComplete?: boolean;
@@ -32,6 +34,7 @@ export function DeliveryDetailAccordion({
   onTakePhoto,
 }: DeliveryDetailAccordionProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
   const employeeMapByUserId = useEmployeeMapByUserId();
   const { canStartTransitBased, canCompleteBased, canTakePhotoBased } = useMemo(() => {
@@ -70,11 +73,25 @@ export function DeliveryDetailAccordion({
       },
       {
         label: t('delivery.fields.poNumber'),
-        value: deliveryRequest.purchaseOrder?.poNumber,
+        value: (
+          <Text size="sm" fw={500}>
+            <Anchor
+              size="sm"
+              c="blue"
+              fw="bold"
+              onClick={() => {
+                const purchaseOrderId = deliveryRequest.purchaseOrderId || '-';
+                navigate(getPODetailRoute(purchaseOrderId));
+              }}
+            >
+              {deliveryRequest.purchaseOrderNumber}
+            </Anchor>
+          </Text>
+        ),
       },
       {
         label: t('delivery.fields.customer'),
-        value: deliveryRequest.purchaseOrder?.customer?.name,
+        value: deliveryRequest.customerName,
       },
       {
         label: t('delivery.fields.scheduledDate'),
@@ -99,7 +116,7 @@ export function DeliveryDetailAccordion({
         value: assignedName,
       },
     ],
-    [t, deliveryRequest, assignedName],
+    [t, deliveryRequest, assignedName, navigate],
   );
 
   return (

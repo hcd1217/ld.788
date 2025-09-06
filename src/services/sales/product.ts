@@ -7,9 +7,8 @@ import {
   type BulkUpsertProductsRequest,
   type BulkUpsertProductsResponse,
 } from '@/lib/api/schemas/sales.schemas';
-import { logError } from '@/utils/logger';
 
-// Re-export Product types for compatibility
+// Re-export types for compatibility
 export type {
   Product,
   ProductStatus,
@@ -33,8 +32,6 @@ export type BulkUpsertProductItem = {
 };
 
 export const productService = {
-  products: [] as Product[],
-
   async getAllProducts(params?: {
     search?: string;
     category?: string;
@@ -50,36 +47,10 @@ export const productService = {
 
   async getProduct(id: string): Promise<Product | undefined> {
     try {
-      const product = await salesApi.getProductById(id);
-      return product;
-    } catch (error) {
-      logError('Failed to get product by ID', error, {
-        module: 'ProductService',
-        action: 'getProduct',
-        metadata: { id },
-      });
+      return await salesApi.getProductById(id);
+    } catch {
       return undefined;
     }
-  },
-
-  async getActiveProducts(): Promise<Product[]> {
-    const response = await salesApi.getProducts({ status: 'ACTIVE' });
-    return response.products;
-  },
-
-  async getLowStockProducts(): Promise<Product[]> {
-    const response = await salesApi.getProducts({ lowStock: true });
-    return response.products;
-  },
-
-  async searchProducts(searchTerm: string): Promise<Product[]> {
-    const response = await salesApi.getProducts({ search: searchTerm });
-    return response.products;
-  },
-
-  async getProductsByCategory(category: string): Promise<Product[]> {
-    const response = await salesApi.getProducts({ category });
-    return response.products;
   },
 
   async createProduct(data: CreateProductRequest): Promise<Product> {

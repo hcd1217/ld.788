@@ -136,7 +136,9 @@ export function DeliveryDetailPage() {
     },
   });
 
-  const title = deliveryRequest ? `DR-${deliveryRequest.id.slice(-6)}` : t('delivery.detail.title');
+  const title = deliveryRequest
+    ? `${deliveryRequest.deliveryRequestNumber}`
+    : t('delivery.detail.title');
 
   // Check view permission
   if (!permissions.deliveryRequest.canView) {
