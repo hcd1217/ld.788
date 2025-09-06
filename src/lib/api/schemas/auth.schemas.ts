@@ -286,6 +286,7 @@ function fakePermission(code: DepartmentCode) {
         actions: {
           ...permissions.purchaseOrder.actions,
           canConfirm: true,
+          canDeliver: true,
           canCancel: true,
         },
       };
@@ -331,12 +332,14 @@ function fakePermission(code: DepartmentCode) {
         ...permissions.purchaseOrder,
         canView: true,
         actions: {
+          canShip: true,
           canRefund: true,
         },
       };
       permissions.deliveryRequest = {
         ...permissions.deliveryRequest,
         canView: true,
+        canCreate: true,
       };
       return permissions;
     }

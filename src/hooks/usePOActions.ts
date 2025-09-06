@@ -51,7 +51,6 @@ export type POActionsOptions = {
 export type UsePOActionsProps = {
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading?: boolean;
-  readonly canEdit?: boolean;
   readonly permissions: {
     readonly canConfirm: boolean;
     readonly canCancel: boolean;
@@ -81,15 +80,19 @@ export type UsePOActionsProps = {
 export function usePOActions({
   purchaseOrder,
   isLoading = false,
-  canEdit = false,
   permissions,
   callbacks,
 }: UsePOActionsProps): POActionConfig[] {
   // Extract permissions with defaults based on variant
 
   const availableActions = useMemo(() => {
-    const { canConfirm, canCancel, canProcess, canMarkReady, canShip, canDeliver, canRefund } =
-      permissions;
+    const canCancel = permissions.canCancel;
+    const canProcess = permissions.canProcess;
+    const canMarkReady = permissions.canMarkReady;
+    const canShip = permissions.canShip;
+    const canDeliver = permissions.canDeliver;
+    const canRefund = permissions.canRefund;
+    const canConfirm = permissions.canConfirm;
 
     const actions: POActionConfig[] = [];
 
@@ -115,17 +118,6 @@ export function usePOActions({
       translationKey: 'po.refund',
       onClick: callbacks.onRefund,
       isDisabled: !canRefund || isLoading,
-    });
-
-    // Helper to create ship button config
-    const createShipAction = (): POActionConfig => ({
-      key: 'ship',
-      action: 'ship',
-      color: 'indigo',
-      icon: IconTruck,
-      translationKey: 'po.markShipped',
-      onClick: callbacks.onShip,
-      isDisabled: !purchaseOrder.deliveryRequest || !canShip || isLoading,
     });
 
     switch (purchaseOrder.status) {
@@ -176,7 +168,15 @@ export function usePOActions({
       }
 
       case 'READY_FOR_PICKUP': {
-        actions.push(createShipAction());
+        actions.push({
+          key: 'ship',
+          action: 'ship',
+          color: 'indigo',
+          icon: IconTruck,
+          translationKey: 'po.markShipped',
+          onClick: callbacks.onShip,
+          isDisabled: !purchaseOrder.deliveryRequest || !canShip || isLoading,
+        });
 
         if (callbacks.onCreateDelivery) {
           actions.push({
@@ -187,7 +187,7 @@ export function usePOActions({
             icon: IconClipboardList,
             translationKey: 'po.createDeliveryRequest',
             onClick: callbacks.onCreateDelivery,
-            isDisabled: !!purchaseOrder.deliveryRequest || !canEdit || isLoading,
+            isDisabled: !!purchaseOrder.deliveryRequest || !canShip || isLoading,
             showCondition: true,
           });
         }
@@ -224,14 +224,7 @@ export function usePOActions({
 
     // Filter out actions that shouldn't be shown
     return actions.filter((action) => action.showCondition !== false);
-  }, [
-    purchaseOrder.status,
-    purchaseOrder.deliveryRequest,
-    isLoading,
-    canEdit,
-    permissions,
-    callbacks,
-  ]);
+  }, [purchaseOrder, isLoading, permissions, callbacks]);
 
   return availableActions;
 }

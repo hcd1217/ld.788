@@ -25,7 +25,6 @@ type POAccordionActionsProps = {
 };
 
 export function POAccordionActions({
-  canEdit,
   canConfirm,
   canProcess,
   canShip,
@@ -50,7 +49,6 @@ export function POAccordionActions({
   const actions = usePOActions({
     purchaseOrder,
     isLoading,
-    canEdit,
     permissions: {
       canConfirm,
       canCancel,

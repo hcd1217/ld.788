@@ -26,7 +26,6 @@ type POActionZoneProps = {
 
 export function POActionZone({
   purchaseOrder,
-  canEdit,
   isLoading,
   canConfirm,
   canCancel,
@@ -50,7 +49,6 @@ export function POActionZone({
   const actions = usePOActions({
     purchaseOrder,
     isLoading,
-    canEdit,
     // POActionZone uses canEdit for all permissions
     permissions: {
       canConfirm,

@@ -253,7 +253,7 @@ export function PODetailPage() {
       if (!data || !purchaseOrder) {
         throw new Error(t('po.deliveryRequestCreateFailed'));
       }
-      if (!permissions.purchaseOrder.actions?.canDeliver) {
+      if (!permissions.purchaseOrder.actions?.canShip) {
         throw new Error(t('po.deliveryRequestCreateFailed'));
       }
       if (!permissions.deliveryRequest.canCreate) {
