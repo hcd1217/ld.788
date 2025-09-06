@@ -86,17 +86,11 @@ export function usePOActions({
   callbacks,
 }: UsePOActionsProps): POActionConfig[] {
   // Extract permissions with defaults based on variant
-  const {
-    canConfirm = canEdit,
-    canCancel = canEdit,
-    canProcess = canEdit,
-    canMarkReady = canEdit,
-    canShip = canEdit,
-    canDeliver = canEdit,
-    canRefund = canEdit,
-  } = permissions;
 
   const availableActions = useMemo(() => {
+    const { canConfirm, canCancel, canProcess, canMarkReady, canShip, canDeliver, canRefund } =
+      permissions;
+
     const actions: POActionConfig[] = [];
 
     // Helper to create cancel button config
@@ -235,13 +229,7 @@ export function usePOActions({
     purchaseOrder.deliveryRequest,
     isLoading,
     canEdit,
-    canConfirm,
-    canCancel,
-    canProcess,
-    canMarkReady,
-    canShip,
-    canDeliver,
-    canRefund,
+    permissions,
     callbacks,
   ]);
 

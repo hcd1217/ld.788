@@ -23,7 +23,14 @@ import { useState } from 'react';
 type PODetailTabsProps = {
   readonly canEdit: boolean;
   readonly purchaseOrder: PurchaseOrder;
-  readonly isLoading?: boolean;
+  readonly isLoading: boolean;
+  readonly canConfirm: boolean;
+  readonly canCancel: boolean;
+  readonly canProcess: boolean;
+  readonly canMarkReady: boolean;
+  readonly canShip: boolean;
+  readonly canDeliver: boolean;
+  readonly canRefund: boolean;
   readonly onConfirm: () => void;
   readonly onProcess: () => void;
   readonly onMarkReady: () => void;
@@ -38,6 +45,13 @@ export function PODetailTabs({
   canEdit,
   purchaseOrder,
   isLoading = false,
+  canConfirm,
+  canCancel,
+  canProcess,
+  canMarkReady,
+  canShip,
+  canDeliver,
+  canRefund,
   onConfirm,
   onProcess,
   onMarkReady,
@@ -106,6 +120,13 @@ export function PODetailTabs({
         <Stack gap="sm">
           <POActionZone
             canEdit={canEdit}
+            canConfirm={canConfirm}
+            canCancel={canCancel}
+            canProcess={canProcess}
+            canMarkReady={canMarkReady}
+            canShip={canShip}
+            canDeliver={canDeliver}
+            canRefund={canRefund}
             purchaseOrder={purchaseOrder}
             isLoading={isLoading}
             onConfirm={onConfirm}

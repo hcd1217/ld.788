@@ -426,6 +426,13 @@ export function PODetailPage() {
         <POErrorBoundary componentName="PODetailTabs">
           <PODetailTabs
             canEdit={permissions.purchaseOrder.canEdit}
+            canConfirm={permissions.purchaseOrder.actions?.canConfirm ?? false}
+            canProcess={permissions.purchaseOrder.actions?.canProcess ?? false}
+            canShip={permissions.purchaseOrder.actions?.canShip ?? false}
+            canDeliver={permissions.purchaseOrder.actions?.canDeliver ?? false}
+            canMarkReady={permissions.purchaseOrder.actions?.canMarkReady ?? false}
+            canRefund={permissions.purchaseOrder.actions?.canRefund ?? false}
+            canCancel={permissions.purchaseOrder.actions?.canCancel ?? false}
             purchaseOrder={purchaseOrder}
             isLoading={isLoading}
             onConfirm={handleConfirm}

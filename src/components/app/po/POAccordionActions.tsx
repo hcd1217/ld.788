@@ -5,13 +5,13 @@ import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 
 type POAccordionActionsProps = {
   readonly canEdit: boolean;
-  readonly canConfirm?: boolean;
-  readonly canProcess?: boolean;
-  readonly canShip?: boolean;
-  readonly canMarkReady?: boolean;
-  readonly canDeliver?: boolean;
-  readonly canRefund?: boolean;
-  readonly canCancel?: boolean;
+  readonly canConfirm: boolean;
+  readonly canProcess: boolean;
+  readonly canShip: boolean;
+  readonly canMarkReady: boolean;
+  readonly canDeliver: boolean;
+  readonly canRefund: boolean;
+  readonly canCancel: boolean;
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading: boolean;
   readonly onConfirm: () => void;
@@ -52,13 +52,13 @@ export function POAccordionActions({
     isLoading,
     canEdit,
     permissions: {
-      canConfirm: canConfirm ?? false,
-      canCancel: canCancel ?? false,
-      canProcess: canProcess ?? false,
-      canMarkReady: canMarkReady ?? false,
-      canShip: canShip ?? false,
-      canDeliver: canDeliver ?? false,
-      canRefund: canRefund ?? false,
+      canConfirm,
+      canCancel,
+      canProcess,
+      canMarkReady,
+      canShip,
+      canDeliver,
+      canRefund,
     },
     callbacks: {
       onConfirm,
