@@ -1,5 +1,4 @@
 import {
-  Modal,
   Drawer,
   ScrollArea,
   Text,
@@ -26,7 +25,7 @@ import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
 
 export type DeliveryModalMode = 'start_transit' | 'complete';
 
-type DeliveryStatusModalProps = {
+type DeliveryStatusDrawerProps = {
   readonly opened: boolean;
   readonly mode: DeliveryModalMode;
   readonly deliveryRequest?: DeliveryRequest;
@@ -62,20 +61,20 @@ const getModalConfig = (mode: DeliveryModalMode, t: any) => {
   return configs[mode];
 };
 
-export function DeliveryStatusModal({
+export function DeliveryStatusDrawer({
   opened,
   mode,
   deliveryRequest,
   onClose,
   onConfirm,
-}: DeliveryStatusModalProps) {
+}: DeliveryStatusDrawerProps) {
   const { t } = useTranslation();
-  const { isMobile } = useDeviceType();
+  const { isDesktop } = useDeviceType();
   const [notes, setNotes] = useState('');
   const [recipient, setRecipient] = useState('');
   const [deliveryTime, setDeliveryTime] = useState('');
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
-  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
+  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>(deliveryRequest?.photoUrls || []);
   const permissions = usePermissions();
   const { uploadPhotos } = useDeliveryRequestActions();
   const isComplete = mode === 'complete';
@@ -262,49 +261,39 @@ export function DeliveryStatusModal({
     </Stack>
   );
 
-  // Use Drawer for mobile, Modal for desktop
-  if (isMobile) {
+  if (isDesktop) {
+    return null;
+  }
+
+  if (showPhotoUpload) {
     return (
-      <>
-        <Drawer
-          opened={opened}
-          onClose={handleClose}
-          title={config.title}
-          position="bottom"
-          size="90%"
-          trapFocus
-          returnFocus
-          styles={{
-            body: { paddingBottom: DRAWER_BODY_PADDING_BOTTOM },
-            header: { padding: DRAWER_HEADER_PADDING },
-          }}
-        >
-          <ScrollArea h="calc(90% - 80px)" type="never">
-            {content}
-          </ScrollArea>
-        </Drawer>
-        <DeliveryPhotoUpload
-          opened={showPhotoUpload}
-          onClose={() => setShowPhotoUpload(false)}
-          onUpload={handlePhotoUpload}
-        />
-      </>
+      <DeliveryPhotoUpload
+        opened={showPhotoUpload}
+        onClose={() => setShowPhotoUpload(false)}
+        onUpload={handlePhotoUpload}
+      />
     );
   }
 
   return (
     <>
-      <Modal
+      <Drawer
         opened={opened}
         onClose={handleClose}
         title={config.title}
-        centered
-        size="md"
+        position="bottom"
+        size="90%"
         trapFocus
         returnFocus
+        styles={{
+          body: { paddingBottom: DRAWER_BODY_PADDING_BOTTOM },
+          header: { padding: DRAWER_HEADER_PADDING },
+        }}
       >
-        {content}
-      </Modal>
+        <ScrollArea h="calc(90% - 80px)" type="never">
+          {content}
+        </ScrollArea>
+      </Drawer>
     </>
   );
 }

@@ -18,7 +18,7 @@ import { AppPageTitle } from '@/components/common';
 import { AppMobileLayout, AppDesktopLayout } from '@/components/common';
 import { DeliveryDetailTabs } from '@/components/app/delivery/DeliveryDetailTabs';
 import { DeliveryDetailAccordion } from '@/components/app/delivery/DeliveryDetailAccordion';
-import { DeliveryStatusModal } from '@/components/app/delivery/DeliveryStatusModal';
+import { DeliveryStatusDrawer } from '@/components/app/delivery/DeliveryStatusDrawer';
 import { DeliveryPhotoUpload } from '@/components/app/delivery/DeliveryPhotoUpload';
 import { DeliveryUpdateModal } from '@/components/app/delivery/DeliveryUpdateModal';
 
@@ -235,14 +235,14 @@ export function DeliveryDetailPage() {
         </Stack>
 
         {/* Modal components */}
-        <DeliveryStatusModal
+        <DeliveryStatusDrawer
           opened={modals.startTransit}
           mode="start_transit"
           deliveryRequest={selectedDeliveryRequest}
           onClose={handleCloseModal('startTransit')}
           onConfirm={startTransitAction}
         />
-        <DeliveryStatusModal
+        <DeliveryStatusDrawer
           opened={modals.complete}
           mode="complete"
           deliveryRequest={selectedDeliveryRequest}

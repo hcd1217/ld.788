@@ -3,7 +3,7 @@ export { DeliveryGridCard } from './DeliveryGridCard';
 export { DeliveryDataTable } from './DeliveryDataTable';
 export { DeliveryFilterBarDesktop } from './DeliveryFilterBarDesktop';
 export { DeliveryStatusBadge } from './DeliveryStatusBadge';
-export { DeliveryStatusModal } from './DeliveryStatusModal';
+export { DeliveryStatusDrawer } from './DeliveryStatusDrawer';
 export { DeliveryDetailTabs } from './DeliveryDetailTabs';
 export { DeliveryDetailAccordion } from './DeliveryDetailAccordion';
 export { DeliveryPhotoUpload } from './DeliveryPhotoUpload';
