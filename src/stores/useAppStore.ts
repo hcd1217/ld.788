@@ -366,3 +366,8 @@ export const usePermissions = () =>
 
 export const useClientConfig = () =>
   useAppStore((state) => state.user?.clientConfig ?? EMPTY_CLIENT_CONFIG);
+
+// Current logged in user
+export const useMe = () => useAppStore((state) => state.user);
+
+export const useLogout = () => useAppStore((state) => state.logout);

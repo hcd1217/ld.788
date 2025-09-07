@@ -93,13 +93,14 @@ export function DeliveryStatusModal({
       data = {
         transitNotes: notes.trim(),
         startedAt: new Date().toISOString(),
-        photoUrls: uploadedPhotos, // Include uploaded photos
+        photoUrls: uploadedPhotos,
       };
     } else if (mode === 'complete') {
       data = {
         completionNotes: notes.trim(),
         recipient: recipient.trim(),
         deliveredAt: deliveryTime || new Date().toISOString(),
+        photoUrls: uploadedPhotos,
       };
     }
 
@@ -119,10 +120,7 @@ export function DeliveryStatusModal({
   // Check if confirm button should be disabled
   const isConfirmDisabled = () => {
     if (isComplete) {
-      if (uploadedPhotos.length === 0) {
-        return true;
-      }
-      return !notes.trim() || !recipient.trim();
+      return uploadedPhotos.length === 0 || !notes.trim() || !recipient.trim();
     }
     return false;
   };
@@ -218,6 +216,12 @@ export function DeliveryStatusModal({
         </>
       )}
 
+      {isComplete && uploadedPhotos.length === 0 && (
+        <Text size="xs" c="red" ta="center">
+          {t('delivery.detail.photosRequired')}
+        </Text>
+      )}
+
       <Group justify="flex-end">
         <Button variant="outline" onClick={handleClose}>
           {t('common.cancel')}
@@ -230,11 +234,6 @@ export function DeliveryStatusModal({
         >
           {config.buttonText}
         </Button>
-        {isComplete && uploadedPhotos.length === 0 && (
-          <Text size="xs" c="red.4" fw={700} style={{ fontStyle: 'italic' }}>
-            {t('delivery.detail.photosRequired')}
-          </Text>
-        )}
       </Group>
     </Stack>
   );

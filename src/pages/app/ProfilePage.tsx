@@ -21,7 +21,7 @@ import {
   IconIdBadge2,
   IconBuilding,
 } from '@tabler/icons-react';
-import { useAppStore } from '@/stores/useAppStore';
+import { useMe, useLogout } from '@/stores/useAppStore';
 import { useTranslation } from '@/hooks/useTranslation';
 import { GoBack } from '@/components/common';
 import { ROUTERS } from '@/config/routeConfig';
@@ -30,7 +30,8 @@ import { renderFullName } from '@/utils/string';
 export function ProfilePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { user, logout } = useAppStore();
+  const me = useMe();
+  const logout = useLogout();
 
   const handleLogout = () => {
     logout();
@@ -38,7 +39,7 @@ export function ProfilePage() {
   };
 
   // If no user data, show login prompt
-  if (!user) {
+  if (!me) {
     return (
       <Container size="xs" px="xs" mt="xl">
         <Card shadow="sm" padding="lg" radius="md">
@@ -57,7 +58,7 @@ export function ProfilePage() {
     );
   }
 
-  const userInitial = user.userName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase();
+  const userInitial = me.userName?.charAt(0).toUpperCase() || me.email?.charAt(0).toUpperCase();
 
   return (
     <Container fluid p="lg">
@@ -74,11 +75,11 @@ export function ProfilePage() {
               {userInitial}
             </Avatar>
             <Stack gap={4} ta="center">
-              {user.employee ? <Title order={3}>{renderFullName(user.employee)}</Title> : null}
+              {me.employee ? <Title order={3}>{renderFullName(me.employee)}</Title> : null}
               <Text size="sm" c="dimmed">
-                {user.email ?? '-'}
+                {me.email ?? '-'}
               </Text>
-              {user.isRoot && (
+              {me.isRoot && (
                 <Badge color="red" variant="filled" size="sm">
                   {t('profile.rootUser')}
                 </Badge>
@@ -88,7 +89,7 @@ export function ProfilePage() {
         </Card>
 
         {/* Employee Information */}
-        {user.employee && (
+        {me.employee && (
           <Card shadow="sm" padding="lg" radius="md">
             <Stack gap="xs">
               <Group gap="xs" mb="xs">
@@ -102,16 +103,16 @@ export function ProfilePage() {
                     {t('profile.employeeCode')}
                   </Text>
                   <Text size="sm" fw={500}>
-                    {user.employee.employeeCode}
+                    {me.employee.employeeCode}
                   </Text>
                 </Group>
-                {user.employee.email && (
+                {me.employee.email && (
                   <Group justify="space-between">
                     <Text size="sm" c="dimmed">
                       {t('profile.workEmail')}
                     </Text>
                     <Text size="sm" fw={500}>
-                      {user.employee.email}
+                      {me.employee.email}
                     </Text>
                   </Group>
                 )}
@@ -120,7 +121,7 @@ export function ProfilePage() {
                     {t('profile.phone')}
                   </Text>
                   <Text size="sm" fw={500}>
-                    {user.employee.phoneNumber}
+                    {me.employee.phoneNumber}
                   </Text>
                 </Group>
                 <Group justify="space-between">
@@ -128,7 +129,7 @@ export function ProfilePage() {
                     {t('profile.employmentType')}
                   </Text>
                   <Badge variant="light" size="md">
-                    {user.employee.employmentType === 'FULL_TIME'
+                    {me.employee.employmentType === 'FULL_TIME'
                       ? t('profile.fullTime')
                       : t('profile.partTime')}
                   </Badge>
@@ -139,7 +140,7 @@ export function ProfilePage() {
         )}
 
         {/* Department Information */}
-        {user.department && (
+        {me.department && (
           <Card shadow="sm" padding="lg" radius="md">
             <Stack gap="xs">
               <Group gap="xs" mb="xs">
@@ -153,7 +154,7 @@ export function ProfilePage() {
                     {t('profile.departmentName')}
                   </Text>
                   <Text size="sm" fw={500}>
-                    {user.department.name}
+                    {me.department.name}
                   </Text>
                 </Group>
                 <Group justify="space-between">
@@ -161,7 +162,7 @@ export function ProfilePage() {
                     {t('profile.departmentCode')}
                   </Text>
                   <Badge variant="light" size="md">
-                    {user.department.code}
+                    {me.department.code}
                   </Badge>
                 </Group>
               </SimpleGrid>
@@ -170,7 +171,7 @@ export function ProfilePage() {
         )}
 
         {/* Roles & Permissions */}
-        {/* {user.roles.length > 0 && (
+        {/* {me.roles.length > 0 && (
           <Card shadow="sm" padding="lg" radius="md">
             <Stack gap="xs">
               <Group gap="xs" mb="xs">
@@ -179,7 +180,7 @@ export function ProfilePage() {
               </Group>
               <Divider />
               <Stack gap="xs" mt="xs">
-                {user.roles.map((role) => (
+                {me.roles.map((role) => (
                   <Group key={role.name} justify="space-between">
                     <Badge variant="light" size="md">
                       {role.name}

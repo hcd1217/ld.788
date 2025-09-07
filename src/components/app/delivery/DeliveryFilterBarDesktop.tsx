@@ -6,45 +6,46 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { SearchBar } from '@/components/common';
 import { DELIVERY_STATUS, type DeliveryStatusType } from '@/constants/deliveryRequest';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
+import { useEmployees, useClientConfig } from '@/stores/useAppStore';
 import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
 
 interface DeliveryFilterBarDesktopProps {
   readonly searchQuery: string;
   readonly customerId?: string;
+  readonly assignedTo?: string;
   readonly selectedStatuses: DeliveryStatusType[];
   readonly scheduledDateStart?: Date;
   readonly scheduledDateEnd?: Date;
-  readonly completedDateStart?: Date;
-  readonly completedDateEnd?: Date;
   readonly customers: readonly Customer[];
   readonly hasActiveFilters: boolean;
   readonly onSearchChange: (query: string) => void;
   readonly onCustomerChange: (customerId: string | undefined) => void;
+  readonly onAssignedToChange: (assignedTo: string | undefined) => void;
   readonly onStatusesChange: (statuses: DeliveryStatusType[]) => void;
   readonly onScheduledDateChange: (start: Date | undefined, end: Date | undefined) => void;
-  readonly onCompletedDateChange: (start: Date | undefined, end: Date | undefined) => void;
   readonly onClearFilters: () => void;
 }
 
 export function DeliveryFilterBarDesktop({
   searchQuery,
   customerId,
+  assignedTo,
   selectedStatuses,
   scheduledDateStart,
   scheduledDateEnd,
-  completedDateStart,
-  completedDateEnd,
   customers,
   hasActiveFilters,
   onSearchChange,
   onCustomerChange,
+  onAssignedToChange,
   onStatusesChange,
   onScheduledDateChange,
-  onCompletedDateChange,
   onClearFilters,
 }: DeliveryFilterBarDesktopProps) {
   const { t, currentLanguage } = useTranslation();
+  const employees = useEmployees();
+  const clientConfig = useClientConfig();
   const valueFormat = currentLanguage === 'vi' ? 'DD/MM/YYYY' : 'MMM DD, YYYY';
 
   // Customer options for Select
@@ -55,6 +56,25 @@ export function DeliveryFilterBarDesktop({
       label: customer.name,
     })),
   ];
+
+  // Employee options for Select - filtered by assigneeIds from clientConfig
+  const employeeOptions = useMemo(() => {
+    const assigneeIds = clientConfig.features?.deliveryRequest?.assigneeIds ?? [];
+
+    // Filter employees based on assigneeIds if configured, otherwise show all
+    const filteredEmployees =
+      assigneeIds.length > 0
+        ? employees.filter((employee) => assigneeIds.includes(employee.id))
+        : employees;
+
+    return [
+      { value: '', label: t('delivery.filters.selectAssignee' as any) },
+      ...filteredEmployees.map((employee) => ({
+        value: employee.id,
+        label: employee.fullName,
+      })),
+    ];
+  }, [employees, clientConfig.features?.deliveryRequest, t]);
 
   // Status options for MultiSelect
   const statusOptions = [
@@ -79,7 +99,7 @@ export function DeliveryFilterBarDesktop({
   return (
     <Group justify="start" align="flex-end" gap="sm" wrap="nowrap" mb="xl">
       {/* Search Bar - flex 2 */}
-      <div style={{ flex: 2, minWidth: 200 }}>
+      <div style={{ flex: 2, minWidth: 150, maxWidth: 250 }}>
         <SearchBar
           placeholder={t('delivery.filters.searchPlaceholder')}
           searchQuery={searchQuery}
@@ -97,6 +117,18 @@ export function DeliveryFilterBarDesktop({
         style={{ flex: 1, minWidth: 150 }}
         onChange={(value) => onCustomerChange(value || undefined)}
         label={t('delivery.fields.customer') as string}
+      />
+
+      {/* Assignee Select - flex 1 */}
+      <Select
+        clearable
+        searchable
+        placeholder={t('delivery.filters.selectAssignee')}
+        data={employeeOptions}
+        value={assignedTo || ''}
+        style={{ flex: 1, minWidth: 150 }}
+        onChange={(value) => onAssignedToChange(value || undefined)}
+        label={t('delivery.fields.assignedTo') as string}
       />
 
       {/* Status MultiSelect - flex 1 */}
@@ -137,25 +169,6 @@ export function DeliveryFilterBarDesktop({
             const startDate = start ? new Date(start) : undefined;
             const endDate = end ? new Date(end) : undefined;
             onScheduledDateChange(startDate, endDate);
-          }
-        }}
-      />
-
-      {/* Completed Date Range */}
-      <DatePickerInput
-        label={t('delivery.fields.completedDate')}
-        placeholder={t('delivery.filters.selectStatus')}
-        value={[completedDateStart, completedDateEnd]}
-        valueFormat={valueFormat}
-        style={{ flex: 1.5, minWidth: 220 }}
-        onChange={(dates) => {
-          if (!dates) {
-            onCompletedDateChange(undefined, undefined);
-          } else {
-            const [start, end] = dates;
-            const startDate = start ? new Date(start) : undefined;
-            const endDate = end ? new Date(end) : undefined;
-            onCompletedDateChange(startDate, endDate);
           }
         }}
       />

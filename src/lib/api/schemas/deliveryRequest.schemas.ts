@@ -34,7 +34,6 @@ export const DeliveryRequestSchema = z.object({
       .looseObject({
         poId: idSchema,
         poNumber: stringSchema,
-        customerName: stringSchema,
         customerId: idSchema,
       })
       .optional(),

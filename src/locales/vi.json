@@ -669,10 +669,10 @@
       "complete": "Hoàn Thành Giao Hàng"
     },
     "status": {
-      "pending": "Chờ Xử Lý",
-      "inTransit": "Đang Vận Chuyển",
-      "in_transit": "Đang Vận Chuyển",
-      "completed": "Đã Hoàn Thành"
+      "pending": "Chờ Giao",
+      "inTransit": "Đang Giao",
+      "in_transit": "Đang Giao",
+      "completed": "Đã Giao"
     },
     "fields": {
       "id": "Mã Yêu Cầu",
@@ -702,6 +702,7 @@
     "filters": {
       "searchPlaceholder": "Tìm kiếm theo số PO",
       "selectStatus": "Chọn Trạng Thái",
+      "selectAssignee": "Chọn Người Phụ Trách",
       "selectCustomer": "Chọn Khách Hàng"
     },
     "detail": {

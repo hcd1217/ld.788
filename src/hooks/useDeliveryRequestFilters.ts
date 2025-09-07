@@ -11,10 +11,6 @@ export interface DeliveryRequestFilters {
     start: Date | undefined;
     end: Date | undefined;
   };
-  completedDateRange: {
-    start: Date | undefined;
-    end: Date | undefined;
-  };
 }
 
 export interface DeliveryRequestFilterHandlers {
@@ -24,23 +20,20 @@ export interface DeliveryRequestFilterHandlers {
   setAssignedTo: (assignedTo: string | undefined) => void;
   setCustomerId: (customerId: string | undefined) => void;
   setScheduledDateRange: (start: Date | undefined, end: Date | undefined) => void;
-  setCompletedDateRange: (start: Date | undefined, end: Date | undefined) => void;
   updateFilters: (updates: Partial<DeliveryRequestFilters>) => void;
   resetFilters: () => void;
 }
 
+const ONE_DAY = 24 * 60 * 60 * 1000;
+
 const defaultFilters: DeliveryRequestFilters = {
   searchQuery: '',
-  statuses: [], // Empty array means show all
+  statuses: [DELIVERY_STATUS.PENDING],
   assignedTo: undefined,
   customerId: undefined,
   scheduledDateRange: {
-    start: undefined,
-    end: undefined,
-  },
-  completedDateRange: {
-    start: undefined,
-    end: undefined,
+    start: new Date(new Date().setHours(0, 0, 0, 0)),
+    end: new Date(new Date(Date.now() + ONE_DAY).setHours(23, 59, 59, 999)),
   },
 };
 
@@ -61,9 +54,6 @@ export function useDeliveryRequestFilters(deliveryRequests: readonly DeliveryReq
       return true;
     }
     if (filters.scheduledDateRange.start || filters.scheduledDateRange.end) {
-      return true;
-    }
-    if (filters.completedDateRange.start || filters.completedDateRange.end) {
       return true;
     }
     return false;
@@ -102,13 +92,6 @@ export function useDeliveryRequestFilters(deliveryRequests: readonly DeliveryReq
     }));
   }, []);
 
-  const setCompletedDateRange = useCallback((start: Date | undefined, end: Date | undefined) => {
-    setFilters((prev) => ({
-      ...prev,
-      completedDateRange: { start, end },
-    }));
-  }, []);
-
   const updateFilters = useCallback((updates: Partial<DeliveryRequestFilters>) => {
     setFilters((prev) => ({ ...prev, ...updates }));
   }, []);
@@ -123,10 +106,6 @@ export function useDeliveryRequestFilters(deliveryRequests: readonly DeliveryReq
         start: undefined,
         end: undefined,
       },
-      completedDateRange: {
-        start: undefined,
-        end: undefined,
-      },
     });
   }, []);
 
@@ -138,7 +117,6 @@ export function useDeliveryRequestFilters(deliveryRequests: readonly DeliveryReq
       setAssignedTo,
       setCustomerId,
       setScheduledDateRange,
-      setCompletedDateRange,
       updateFilters,
       resetFilters,
     }),
@@ -149,7 +127,6 @@ export function useDeliveryRequestFilters(deliveryRequests: readonly DeliveryReq
       setAssignedTo,
       setCustomerId,
       setScheduledDateRange,
-      setCompletedDateRange,
       updateFilters,
       resetFilters,
     ],

@@ -28,7 +28,7 @@ export class DeliveryRequestApi extends BaseApiClient {
     scheduledDate?: string;
     scheduledDateFrom?: string;
     scheduledDateTo?: string;
-    purchaseOrderId?: string;
+    deliveryRequestNumber?: string;
     customerId?: string;
     cursor?: string;
     limit?: number;
@@ -42,7 +42,8 @@ export class DeliveryRequestApi extends BaseApiClient {
     if (params?.scheduledDateFrom)
       queryParams.append('scheduledDateFrom', params.scheduledDateFrom);
     if (params?.scheduledDateTo) queryParams.append('scheduledDateTo', params.scheduledDateTo);
-    if (params?.purchaseOrderId) queryParams.append('purchaseOrderId', params.purchaseOrderId);
+    if (params?.deliveryRequestNumber)
+      queryParams.append('deliveryRequestNumber', params.deliveryRequestNumber);
     if (params?.customerId) queryParams.append('customerId', params.customerId);
     if (params?.cursor) queryParams.append('cursor', params.cursor);
     if (params?.limit) queryParams.append('limit', String(params.limit));

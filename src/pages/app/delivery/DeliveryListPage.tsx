@@ -12,7 +12,7 @@ import {
   useDeliveryRequestActions,
   useDeliveryRequestPaginationState,
 } from '@/stores/useDeliveryRequestStore';
-import { useCustomers, usePermissions } from '@/stores/useAppStore';
+import { useCustomers, usePermissions, useMe } from '@/stores/useAppStore';
 import {
   AppPageTitle,
   SwitchView,
@@ -27,16 +27,12 @@ import {
   DeliveryGridCard,
   DeliveryListSkeleton,
   DeliveryFilterBarDesktop,
-  DeliveryFilterBarMobile,
-  DeliveryCustomerDrawer,
-  DeliveryStatusDrawer,
-  DeliveryDateDrawer,
   DeliveryErrorBoundary,
 } from '@/components/app/delivery';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { DELIVERY_STATUS } from '@/constants/deliveryRequest';
 import { useViewMode } from '@/hooks/useViewMode';
-import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
+import { useDebouncedValue } from '@mantine/hooks';
 
 export function DeliveryListPage() {
   const { isMobile, isDesktop } = useDeviceType();
@@ -46,6 +42,16 @@ export function DeliveryListPage() {
   const customers = useCustomers();
   const isLoading = useDeliveryRequestLoading();
   const error = useDeliveryRequestError();
+  const currentUser = useMe();
+  const { currentEmployeeId, canFilter, canViewAll } = useMemo(() => {
+    const employeeId = currentUser?.employee?.id ?? '-';
+    return {
+      currentEmployeeId: employeeId,
+      canViewAll: permissions.deliveryRequest.query?.canViewAll ?? false,
+      canFilter: permissions.deliveryRequest.query?.canFilter ?? false,
+    };
+  }, [currentUser, permissions.deliveryRequest]);
+
   const {
     loadDeliveryRequestsWithFilter,
     loadMoreDeliveryRequests,
@@ -68,16 +74,8 @@ export function DeliveryListPage() {
 
   // Track previous date ranges to detect incomplete changes
   const prevScheduledDateRangeRef = useRef(filters.scheduledDateRange);
-  const prevCompletedDateRangeRef = useRef(filters.completedDateRange);
 
   const { viewMode, isTableView, setViewMode } = useViewMode();
-
-  // Drawer states using Mantine's useDisclosure directly
-  const [customerDrawerOpened, { open: openCustomerDrawer, close: closeCustomerDrawer }] =
-    useDisclosure(false);
-  const [statusDrawerOpened, { open: openStatusDrawer, close: closeStatusDrawer }] =
-    useDisclosure(false);
-  const [dateDrawerOpened, { open: openDateDrawer, close: closeDateDrawer }] = useDisclosure(false);
 
   // Scroll detection state
   const [isNearBottom, setIsNearBottom] = useState(false);
@@ -92,56 +90,33 @@ export function DeliveryListPage() {
         filters.statuses.length === 1 && filters.statuses[0] !== DELIVERY_STATUS.ALL
           ? filters.statuses[0]
           : undefined,
-      assignedTo: filters.assignedTo,
-      purchaseOrderId: debouncedSearch || undefined,
+      assignedTo: canViewAll ? filters.assignedTo : currentEmployeeId,
+      deliveryRequestNumber: debouncedSearch || undefined,
       scheduledDateFrom: filters.scheduledDateRange.start?.toISOString(),
       scheduledDateTo: filters.scheduledDateRange.end?.toISOString(),
-      completedDateFrom: filters.completedDateRange.start?.toISOString(),
-      completedDateTo: filters.completedDateRange.end?.toISOString(),
       sortBy: 'scheduledDate' as const,
       sortOrder: 'asc' as const,
     }),
-    [
-      filters.customerId,
-      filters.statuses,
-      filters.assignedTo,
-      debouncedSearch,
-      filters.scheduledDateRange.start,
-      filters.scheduledDateRange.end,
-      filters.completedDateRange.start,
-      filters.completedDateRange.end,
-    ],
+    [canViewAll, filters, debouncedSearch, currentEmployeeId],
   );
 
   // Effect to load delivery requests when filter params change with forced delay for ALL filters
   useEffect(() => {
     // Check if date range change is incomplete
     const prevScheduledDate = prevScheduledDateRangeRef.current;
-    const prevCompletedDate = prevCompletedDateRangeRef.current;
     const currScheduledDate = filters.scheduledDateRange;
-    const currCompletedDate = filters.completedDateRange;
 
     // Check if this is just setting the first date of a range (incomplete)
     const isSettingScheduledDateStart =
       !prevScheduledDate.start && currScheduledDate.start && !currScheduledDate.end;
     const isSettingScheduledDateEnd =
       !prevScheduledDate.end && currScheduledDate.end && !currScheduledDate.start;
-    const isSettingCompletedDateStart =
-      !prevCompletedDate.start && currCompletedDate.start && !currCompletedDate.end;
-    const isSettingCompletedDateEnd =
-      !prevCompletedDate.end && currCompletedDate.end && !currCompletedDate.start;
 
     // Update refs for next comparison
     prevScheduledDateRangeRef.current = currScheduledDate;
-    prevCompletedDateRangeRef.current = currCompletedDate;
 
     // Skip API call if setting incomplete date range
-    if (
-      isSettingScheduledDateStart ||
-      isSettingScheduledDateEnd ||
-      isSettingCompletedDateStart ||
-      isSettingCompletedDateEnd
-    ) {
+    if (isSettingScheduledDateStart || isSettingScheduledDateEnd) {
       setIsFilterLoading(false);
       return;
     }
@@ -236,14 +211,6 @@ export function DeliveryListPage() {
   }
 
   if (isMobile) {
-    // Date filter indicators for mobile view
-    const hasScheduledDateFilter = !!(
-      filters.scheduledDateRange.start || filters.scheduledDateRange.end
-    );
-    const hasCompletedDateFilter = !!(
-      filters.completedDateRange.start || filters.completedDateRange.end
-    );
-
     return (
       <AppMobileLayout
         showLogo
@@ -253,56 +220,6 @@ export function DeliveryListPage() {
         header={<AppPageTitle title={t('delivery.list.title')} />}
       >
         <DeliveryErrorBoundary componentName="DeliveryListPage">
-          {/* Mobile Filter Bar */}
-          <DeliveryFilterBarMobile
-            searchQuery={filters.searchQuery}
-            customerId={filters.customerId}
-            selectedStatuses={filters.statuses}
-            hasScheduledDateFilter={hasScheduledDateFilter}
-            hasCompletedDateFilter={hasCompletedDateFilter}
-            customers={customers}
-            hasActiveFilters={hasActiveFilters}
-            onSearchChange={filterHandlers.setSearchQuery}
-            onCustomerClick={openCustomerDrawer}
-            onStatusClick={openStatusDrawer}
-            onDateClick={openDateDrawer}
-            onClearFilters={filterHandlers.resetFilters}
-          />
-
-          {/* Customer Selection Drawer */}
-          <DeliveryCustomerDrawer
-            opened={customerDrawerOpened}
-            customers={customers}
-            selectedCustomerId={filters.customerId}
-            onClose={closeCustomerDrawer}
-            onCustomerSelect={filterHandlers.setCustomerId}
-          />
-
-          {/* Status Selection Drawer */}
-          <DeliveryStatusDrawer
-            opened={statusDrawerOpened}
-            selectedStatuses={filters.statuses}
-            onClose={closeStatusDrawer}
-            onStatusToggle={filterHandlers.toggleStatus}
-            onApply={() => closeStatusDrawer()}
-            onClear={() => {
-              filterHandlers.setStatuses([]);
-              closeStatusDrawer();
-            }}
-          />
-
-          {/* Date Range Selection Drawer */}
-          <DeliveryDateDrawer
-            opened={dateDrawerOpened}
-            scheduledDateStart={filters.scheduledDateRange.start}
-            scheduledDateEnd={filters.scheduledDateRange.end}
-            completedDateStart={filters.completedDateRange.start}
-            completedDateEnd={filters.completedDateRange.end}
-            onClose={closeDateDrawer}
-            onScheduledDateRangeSelect={filterHandlers.setScheduledDateRange}
-            onCompletedDateRangeSelect={filterHandlers.setCompletedDateRange}
-          />
-
           <BlankState {...blankStateProps} />
           <Stack mt="md" gap={0}>
             {isLoading && deliveryRequests.length === 0 ? (
@@ -367,23 +284,26 @@ export function DeliveryListPage() {
         </Group>
 
         {/* Desktop Filter Controls */}
-        <DeliveryFilterBarDesktop
-          searchQuery={filters.searchQuery}
-          customerId={filters.customerId}
-          selectedStatuses={filters.statuses}
-          scheduledDateStart={filters.scheduledDateRange.start}
-          scheduledDateEnd={filters.scheduledDateRange.end}
-          completedDateStart={filters.completedDateRange.start}
-          completedDateEnd={filters.completedDateRange.end}
-          customers={customers}
-          hasActiveFilters={hasActiveFilters}
-          onSearchChange={filterHandlers.setSearchQuery}
-          onCustomerChange={filterHandlers.setCustomerId}
-          onStatusesChange={filterHandlers.setStatuses}
-          onScheduledDateChange={filterHandlers.setScheduledDateRange}
-          onCompletedDateChange={filterHandlers.setCompletedDateRange}
-          onClearFilters={filterHandlers.resetFilters}
-        />
+        {canFilter ? (
+          <DeliveryFilterBarDesktop
+            searchQuery={filters.searchQuery}
+            customerId={filters.customerId}
+            assignedTo={canViewAll ? filters.assignedTo : currentEmployeeId}
+            selectedStatuses={filters.statuses}
+            scheduledDateStart={filters.scheduledDateRange.start}
+            scheduledDateEnd={filters.scheduledDateRange.end}
+            customers={customers}
+            hasActiveFilters={hasActiveFilters}
+            onSearchChange={filterHandlers.setSearchQuery}
+            onCustomerChange={filterHandlers.setCustomerId}
+            onAssignedToChange={() => {
+              filterHandlers.setAssignedTo(canViewAll ? filters.assignedTo : currentEmployeeId);
+            }}
+            onStatusesChange={filterHandlers.setStatuses}
+            onScheduledDateChange={filterHandlers.setScheduledDateRange}
+            onClearFilters={filterHandlers.resetFilters}
+          />
+        ) : null}
 
         {/* Content Area */}
         <BlankState

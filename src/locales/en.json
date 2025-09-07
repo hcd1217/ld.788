@@ -702,6 +702,7 @@
     "filters": {
       "searchPlaceholder": "Search by PO number",
       "selectStatus": "Select Status",
+      "selectAssignee": "Select Assignee",
       "selectCustomer": "Select Customer"
     },
     "detail": {
