@@ -191,7 +191,7 @@ export function DeliveryDetailAccordion({
             onClick={onTakePhoto}
             disabled={isLoading}
           >
-            {t('delivery.actions.takePhoto')}
+            {t('common.photos.takePhoto')}
           </Button>
         ) : (
           <div> </div>

@@ -36,7 +36,7 @@ export const DELIVERY_STATUS_LABELS: Record<DeliveryStatus, string> = {
 export const DELIVERY_ACTION_LABELS: Record<DeliveryActionType, string> = {
   [DELIVERY_ACTIONS.START_TRANSIT]: 'delivery.actions.startTransit',
   [DELIVERY_ACTIONS.COMPLETE]: 'delivery.actions.complete',
-  [DELIVERY_ACTIONS.TAKE_PHOTO]: 'delivery.actions.takePhoto',
+  [DELIVERY_ACTIONS.TAKE_PHOTO]: 'common.photos.takePhoto',
   [DELIVERY_ACTIONS.DELETE]: 'delivery.actions.cancel',
 };
 

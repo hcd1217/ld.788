@@ -9,14 +9,17 @@ import {
   Alert,
   Textarea,
   TextInput,
+  Image,
+  Grid,
 } from '@mantine/core';
-import { IconAlertTriangle, IconCheck, IconTruck } from '@tabler/icons-react';
+import { IconAlertTriangle, IconCheck, IconTruck, IconCamera } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { formatDate } from '@/utils/time';
 import { DRAWER_BODY_PADDING_BOTTOM, DRAWER_HEADER_PADDING } from '@/constants/po.constants';
+import { DeliveryPhotoUpload } from './DeliveryPhotoUpload';
 
 export type DeliveryModalMode = 'start_transit' | 'complete';
 
@@ -44,9 +47,9 @@ const getModalConfig = (mode: DeliveryModalMode, t: any) => {
       title: t('delivery.completeDelivery'),
       description: t('delivery.completeDeliveryDescription'),
       buttonText: t('delivery.markAsCompleted'),
-      buttonColor: 'green',
+      buttonColor: 'red',
       icon: <IconCheck size={16} />,
-      alertColor: 'green',
+      alertColor: 'red',
       requiresNotes: true,
       notesLabel: t('delivery.completionNotes'),
       notesPlaceholder: t('delivery.enterCompletionNotes'),
@@ -68,11 +71,18 @@ export function DeliveryStatusModal({
   const [notes, setNotes] = useState('');
   const [recipient, setRecipient] = useState('');
   const [deliveryTime, setDeliveryTime] = useState('');
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
 
   // Get modal configuration - memoized
   const config = useMemo(() => getModalConfig(mode, t), [mode, t]);
 
   if (!deliveryRequest) return null;
+
+  const handlePhotoUpload = async (data: { photoUrls: string[] }) => {
+    setUploadedPhotos((prev) => [...prev, ...data.photoUrls]);
+    setShowPhotoUpload(false);
+  };
 
   const handleConfirm = async () => {
     let data: any = undefined;
@@ -81,6 +91,7 @@ export function DeliveryStatusModal({
       data = {
         transitNotes: notes.trim(),
         startedAt: new Date().toISOString(),
+        photoUrls: uploadedPhotos, // Include uploaded photos
       };
     } else if (mode === 'complete') {
       data = {
@@ -98,6 +109,8 @@ export function DeliveryStatusModal({
     setNotes('');
     setRecipient('');
     setDeliveryTime('');
+    setUploadedPhotos([]);
+    setShowPhotoUpload(false);
     onClose();
   };
 
@@ -124,25 +137,13 @@ export function DeliveryStatusModal({
           {t('delivery.deliveryId')}: {deliveryRequest.deliveryRequestNumber}
         </Text>
         <Text size="sm" c="dimmed">
-          {t('delivery.fields.poNumber')}: {deliveryRequest.purchaseOrderNumber}
-        </Text>
-        <Text size="sm" c="dimmed">
           {t('delivery.customerName')}: {deliveryRequest.customerName}
-        </Text>
-        <Text size="sm" c="dimmed">
-          {t('delivery.currentStatus')}:{' '}
-          {t(`delivery.status.${deliveryRequest.status.toLowerCase()}` as any)}
         </Text>
         {deliveryRequest.scheduledDate && (
           <Text size="sm" c="dimmed">
             {t('delivery.fields.scheduledDate')}: {formatDate(deliveryRequest.scheduledDate)}
           </Text>
         )}
-        {/* {deliveryRequest.assignedName && (
-          <Text size="sm" c="dimmed">
-            {t('delivery.fields.assignedTo')}: {deliveryRequest.assignedName}
-          </Text>
-        )} */}
       </div>
 
       {mode === 'start_transit' && (
@@ -158,6 +159,40 @@ export function DeliveryStatusModal({
 
       {mode === 'complete' && (
         <>
+          <Text size="sm" fw={500} mb="xs">
+            {t('delivery.detail.photos')}
+          </Text>
+
+          {/* Display uploaded photos */}
+          {uploadedPhotos.length > 0 && (
+            <>
+              <Grid mb="xs">
+                {uploadedPhotos.map((url, index) => (
+                  <Grid.Col key={index} span={4}>
+                    <Image
+                      src={url}
+                      alt={`Photo ${index + 1}`}
+                      height={80}
+                      fit="cover"
+                      radius="sm"
+                      fallbackSrc="/public/photos/no-photo.svg"
+                    />
+                  </Grid.Col>
+                ))}
+              </Grid>
+              <Text size="xs" c="dimmed" mb="xs">
+                {uploadedPhotos.length} {uploadedPhotos.length === 1 ? 'photo' : 'photos'} uploaded
+              </Text>
+            </>
+          )}
+
+          <Button
+            variant="light"
+            leftSection={<IconCamera size={16} />}
+            onClick={() => setShowPhotoUpload(true)}
+          >
+            {t('common.photos.takePhoto')}
+          </Button>
           <TextInput
             label={t('delivery.recipient')}
             placeholder={t('delivery.enterRecipientName')}
@@ -197,37 +232,51 @@ export function DeliveryStatusModal({
   // Use Drawer for mobile, Modal for desktop
   if (isMobile) {
     return (
-      <Drawer
-        opened={opened}
-        onClose={handleClose}
-        title={config.title}
-        position="bottom"
-        size="90%"
-        trapFocus
-        returnFocus
-        styles={{
-          body: { paddingBottom: DRAWER_BODY_PADDING_BOTTOM },
-          header: { padding: DRAWER_HEADER_PADDING },
-        }}
-      >
-        <ScrollArea h="calc(90% - 80px)" type="never">
-          {content}
-        </ScrollArea>
-      </Drawer>
+      <>
+        <Drawer
+          opened={opened}
+          onClose={handleClose}
+          title={config.title}
+          position="bottom"
+          size="90%"
+          trapFocus
+          returnFocus
+          styles={{
+            body: { paddingBottom: DRAWER_BODY_PADDING_BOTTOM },
+            header: { padding: DRAWER_HEADER_PADDING },
+          }}
+        >
+          <ScrollArea h="calc(90% - 80px)" type="never">
+            {content}
+          </ScrollArea>
+        </Drawer>
+        <DeliveryPhotoUpload
+          opened={showPhotoUpload}
+          onClose={() => setShowPhotoUpload(false)}
+          onUpload={handlePhotoUpload}
+        />
+      </>
     );
   }
 
   return (
-    <Modal
-      opened={opened}
-      onClose={handleClose}
-      title={config.title}
-      centered
-      size="md"
-      trapFocus
-      returnFocus
-    >
-      {content}
-    </Modal>
+    <>
+      <Modal
+        opened={opened}
+        onClose={handleClose}
+        title={config.title}
+        centered
+        size="md"
+        trapFocus
+        returnFocus
+      >
+        {content}
+      </Modal>
+      <DeliveryPhotoUpload
+        opened={showPhotoUpload}
+        onClose={() => setShowPhotoUpload(false)}
+        onUpload={handlePhotoUpload}
+      />
+    </>
   );
 }

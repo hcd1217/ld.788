@@ -52,6 +52,7 @@
       }
     },
     "photos": {
+      "takePhoto": "Take Photo",
       "capture": "Capture",
       "retake": "Retake",
       "upload": "Upload",
@@ -665,12 +666,12 @@
       "create": "Create Delivery Request",
       "startTransit": "Start Transit",
       "startTransitDescription": "Mark this delivery request as in transit",
-      "takePhoto": "Take Photo",
       "complete": "Complete Delivery"
     },
     "status": {
       "pending": "Pending",
       "inTransit": "In Transit",
+      "in_transit": "In Transit",
       "completed": "Completed"
     },
     "fields": {
@@ -710,7 +711,7 @@
       "noPhotos": "No photos uploaded yet"
     },
     "completeDelivery": "Complete Delivery",
-    "completeDeliveryDescription": "Mark this delivery as completed with proof photos",
+    "completeDeliveryDescription": "Mark this delivery as completed",
     "markAsCompleted": "Mark as Completed",
     "deliveryDetails": "Delivery Details",
     "deliveryId": "Delivery ID",

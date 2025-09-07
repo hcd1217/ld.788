@@ -52,6 +52,7 @@
       }
     },
     "photos": {
+      "takePhoto": "Chụp Ảnh",
       "capture": "Chụp Ảnh",
       "retake": "Chụp Lại",
       "upload": "Tải lên",
@@ -665,12 +666,12 @@
       "create": "Tạo Yêu Cầu Giao Hàng",
       "startTransit": "Bắt Đầu Vận Chuyển",
       "startTransitDescription": "Đánh dấu yêu cầu giao hàng này đang vận chuyển",
-      "takePhoto": "Chụp Ảnh",
       "complete": "Hoàn Thành Giao Hàng"
     },
     "status": {
       "pending": "Chờ Xử Lý",
       "inTransit": "Đang Vận Chuyển",
+      "in_transit": "Đang Vận Chuyển",
       "completed": "Đã Hoàn Thành"
     },
     "fields": {
@@ -710,7 +711,7 @@
       "noPhotos": "Chưa có ảnh nào được tải lên"
     },
     "completeDelivery": "Hoàn Thành Giao Hàng",
-    "completeDeliveryDescription": "Đánh dấu giao hàng này đã hoàn thành với ảnh chứng minh",
+    "completeDeliveryDescription": "Đánh dấu đã hoàn thành",
     "markAsCompleted": "Đánh Dấu Hoàn Thành",
     "deliveryDetails": "Chi Tiết Giao Hàng",
     "deliveryId": "Mã Giao Hàng",
