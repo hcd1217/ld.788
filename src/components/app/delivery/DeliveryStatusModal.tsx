@@ -202,7 +202,7 @@ export function DeliveryStatusModal({
                       height={80}
                       fit="cover"
                       radius="sm"
-                      fallbackSrc="/public/photos/no-photo.svg"
+                      fallbackSrc="/photos/no-photo.svg"
                     />
                   </Grid.Col>
                 ))}

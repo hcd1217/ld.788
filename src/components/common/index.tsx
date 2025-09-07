@@ -19,6 +19,7 @@ export {
   SwitchView,
   Tabs,
   Tooltip,
+  UrgentBadge,
   type BaseMobileFooterItem,
   type BaseMobileFooterProps,
   type BulkImportModalContentProps,

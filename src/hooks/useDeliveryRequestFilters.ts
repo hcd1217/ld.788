@@ -28,7 +28,8 @@ const ONE_DAY = 24 * 60 * 60 * 1000;
 
 const defaultFilters: DeliveryRequestFilters = {
   searchQuery: '',
-  statuses: [DELIVERY_STATUS.PENDING],
+  // statuses: [DELIVERY_STATUS.PENDING],
+  statuses: [], // All statuses
   assignedTo: undefined,
   customerId: undefined,
   scheduledDateRange: {

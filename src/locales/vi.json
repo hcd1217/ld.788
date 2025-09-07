@@ -71,6 +71,7 @@
       "pic": "Người Phụ Trách",
       "picPlaceholder": "Nhập Thông Tin Người Phụ Trách"
     },
+    "urgent": "Gấp",
     "tryAgain": "Thử lại",
     "navigation": "Điều Hướng",
     "viewOnMap": "Xem trên Google Maps",
@@ -676,6 +677,7 @@
     },
     "fields": {
       "id": "Mã Yêu Cầu",
+      "urgentDelivery": "Giao Gấp",
       "purchaseOrder": "Đơn Đặt Hàng",
       "poNumber": "Số PO",
       "customer": "Khách Hàng",
@@ -687,6 +689,7 @@
     },
     "assignmentTypes": {},
     "form": {
+      "urgentDeliveryDescription": "Đánh dấu đơn hàng này là giao gấp",
       "selectAssignee": "Chọn Người Phụ Trách",
       "selectDate": "Chọn Ngày Dự Kiến",
       "enterNotes": "Nhập ghi chú giao hàng"
@@ -739,7 +742,7 @@
     "noDeliveryRequestsFound": "Không có yêu cầu giao hàng",
     "tryDifferentSearch": "Thử điều chỉnh tiêu chí tìm kiếm",
     "createFirstDeliveryRequestDescription": "Tạo yêu cầu giao hàng đầu tiên từ đơn đặt hàng",
-    "noMoreDeliveryRequests": "Không còn yêu cầu giao hàng nào để tải"
+    "noMoreDeliveryRequests": "Tất cả yêu cầu giao hàng đã được tải"
   },
   "timekeeper": {
     "greeting": {

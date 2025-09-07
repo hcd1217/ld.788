@@ -40,7 +40,7 @@ export function DeliveryPhotoGallery({
             radius="sm"
             h={imageHeight}
             fit="cover"
-            fallbackSrc="/public/photos/no-photo.svg"
+            fallbackSrc="/photos/no-photo.svg"
           />
         </Grid.Col>
       ))}
@@ -95,7 +95,7 @@ export function DeliveryPhotoGallery({
               width: 'auto',
               height: 'auto',
             }}
-            fallbackSrc="/public/photos/no-photo.svg"
+            fallbackSrc="/photos/no-photo.svg"
           />
         )}
       </Modal>

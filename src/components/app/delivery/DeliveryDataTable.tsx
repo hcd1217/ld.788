@@ -2,6 +2,7 @@ import React, { memo, useCallback } from 'react';
 import { Table, Text, ScrollArea, Group } from '@mantine/core';
 import { useNavigate } from 'react-router';
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
+import { UrgentBadge } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { formatDate, getLocaleFormat } from '@/utils/time';
@@ -64,6 +65,9 @@ function DeliveryDataTableComponent({
                 key={delivery.id}
                 style={{
                   cursor: 'pointer',
+                  backgroundColor: delivery.isUrgentDelivery
+                    ? 'var(--mantine-color-red-0)'
+                    : undefined,
                 }}
                 onClick={handleRowClick(delivery.id)}
               >
@@ -85,7 +89,10 @@ function DeliveryDataTableComponent({
                   </Text>
                 </Table.Td>
                 <Table.Td>
-                  <DeliveryStatusBadge status={delivery.status} />
+                  <Group gap="xs">
+                    {delivery.isUrgentDelivery && <UrgentBadge size="xs" />}
+                    <DeliveryStatusBadge status={delivery.status} />
+                  </Group>
                 </Table.Td>
                 {!noAction && (
                   <Table.Td onClick={handleStopPropagation}>

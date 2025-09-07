@@ -102,7 +102,7 @@ export class DeliveryRequestApi extends BaseApiClient {
       {
         photoUrls: data.photoUrls.map((url) => {
           if (url.includes('mock')) {
-            return '/public/photos/no-photo.svg';
+            return '/photos/no-photo.svg';
           }
           return url;
         }),

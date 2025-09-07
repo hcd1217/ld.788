@@ -12,10 +12,9 @@ import {
 import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
-import { ViewOnMap } from '@/components/common';
+import { ViewOnMap, ContactInfo, UrgentBadge } from '@/components/common';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useNavigate } from 'react-router';
-import { ContactInfo } from '@/components/common';
 
 type DeliveryDetailAccordionProps = {
   readonly deliveryRequest: DeliveryRequest;
@@ -74,7 +73,12 @@ export function DeliveryDetailAccordion({
     () => [
       {
         label: t('delivery.fields.status'),
-        value: <DeliveryStatusBadge status={deliveryRequest.status} />,
+        value: (
+          <Group gap="xs">
+            {deliveryRequest.isUrgentDelivery && <UrgentBadge size="xs" />}
+            <DeliveryStatusBadge status={deliveryRequest.status} />
+          </Group>
+        ),
       },
       {
         label: t('delivery.fields.poNumber'),
@@ -131,7 +135,19 @@ export function DeliveryDetailAccordion({
   return (
     <Stack gap="md">
       {/* Details Accordion */}
-      <Accordion defaultValue="delivery-info">
+      <Accordion 
+        defaultValue="delivery-info"
+        styles={{
+          item: {
+            backgroundColor: deliveryRequest.isUrgentDelivery 
+              ? 'var(--mantine-color-red-0)' 
+              : undefined,
+            borderColor: deliveryRequest.isUrgentDelivery 
+              ? 'var(--mantine-color-red-3)' 
+              : undefined,
+          },
+        }}
+      >
         {/* Delivery Information */}
         <Accordion.Item value="delivery-info">
           <Accordion.Control icon={<IconPackage size={20} />}>

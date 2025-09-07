@@ -50,7 +50,7 @@ export function DeliveryFilterBarDesktop({
 
   // Customer options for Select
   const customerOptions = [
-    { value: '', label: t('delivery.filters.selectCustomer' as any) },
+    { value: '', label: t('delivery.filters.selectCustomer') },
     ...customers.map((customer) => ({
       value: customer.id,
       label: customer.name,
@@ -68,7 +68,7 @@ export function DeliveryFilterBarDesktop({
         : employees;
 
     return [
-      { value: '', label: t('delivery.filters.selectAssignee' as any) },
+      { value: '', label: t('delivery.filters.selectAssignee') },
       ...filteredEmployees.map((employee) => ({
         value: employee.id,
         label: employee.fullName,
@@ -90,7 +90,7 @@ export function DeliveryFilterBarDesktop({
   const statusPlaceholder = useMemo(() => {
     const count = filteredStatuses.length;
     if (count === 0) {
-      return t('delivery.filters.selectStatus' as any);
+      return t('delivery.filters.selectStatus');
     } else {
       return `${count} selected`;
     }

@@ -7,20 +7,20 @@ interface DeliveryStatusBadgeProps {
   readonly size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
+const statusKeyMap = {
+  ALL: 'All',
+  PENDING: 'delivery.status.pending',
+  IN_TRANSIT: 'delivery.status.inTransit',
+  COMPLETED: 'delivery.status.completed',
+} as const;
+
 export function DeliveryStatusBadge({ status, size = 'sm' }: DeliveryStatusBadgeProps) {
   const { t } = useTranslation();
   const color = DELIVERY_STATUS_COLORS[status] || 'gray';
 
-  const statusKeyMap: Record<DeliveryStatusType, string> = {
-    ALL: 'All',
-    PENDING: 'delivery.status.pending',
-    IN_TRANSIT: 'delivery.status.inTransit',
-    COMPLETED: 'delivery.status.completed',
-  };
-
   return (
     <Badge color={color} size={size}>
-      {status === 'ALL' ? statusKeyMap[status] : t(statusKeyMap[status] as any)}
+      {status === 'ALL' ? statusKeyMap[status] : t(statusKeyMap[status])}
     </Badge>
   );
 }

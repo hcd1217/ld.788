@@ -7,6 +7,7 @@ import { formatDate, getLocaleFormat } from '@/utils/time';
 import { getEmployeeNameByEmployeeId } from '@/utils/overview';
 import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
+import { UrgentBadge } from '@/components/common';
 
 type DeliveryCardProps = {
   readonly deliveryRequest: DeliveryRequest;
@@ -33,40 +34,69 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
       padding="md"
       radius="md"
       style={{
+        position: 'relative',
         cursor: 'pointer',
+        backgroundColor: deliveryRequest.isUrgentDelivery
+          ? 'var(--mantine-color-red-0)'
+          : undefined,
+        borderColor: deliveryRequest.isUrgentDelivery ? 'var(--mantine-color-red-3)' : undefined,
         ...style,
       }}
       className={className}
       onClick={handleCardClick}
     >
-      <Group justify="space-between" align="flex-start" style={{ position: 'relative' }}>
+      <Group justify="space-between" align="flex-start" gap="xs" style={{ position: 'relative' }}>
         <Box style={{ flex: 1 }}>
-          <Text fw={500} size="sm">
+          <Text fw="bold" size="sm">
             {deliveryRequest.deliveryRequestNumber}
           </Text>
           {deliveryRequest.customerName && (
-            <Text size="xs" c="dimmed">
-              {t('delivery.fields.customer')}: {deliveryRequest.customerName}
-            </Text>
+            <Group gap="sm">
+              <Text size="sm" c="dimmed">
+                {t('delivery.fields.customer')}:
+              </Text>
+              <Text size="sm" fw={500}>
+                {deliveryRequest.customerName}
+              </Text>
+            </Group>
           )}
-          <Text size="xs" c="dimmed">
-            {t('delivery.fields.scheduledDate')}:{' '}
-            {formatDate(deliveryRequest.scheduledDate, getLocaleFormat(currentLanguage))}
-          </Text>
-          {deliveryRequest.assignedTo && (
-            <Text size="xs" c="dimmed" mt="xs">
-              {t('delivery.fields.assignedTo')}:{' '}
-              {getEmployeeNameByEmployeeId(employeeMapByEmployeeId, deliveryRequest.assignedTo)}
+          <Group gap="sm">
+            <Text size="sm" c="dimmed">
+              {t('delivery.fields.scheduledDate')}:
             </Text>
+            <Text size="sm" fw={500}>
+              {formatDate(deliveryRequest.scheduledDate, getLocaleFormat(currentLanguage))}
+            </Text>
+          </Group>
+
+          {deliveryRequest.assignedTo && (
+            <Group gap="sm">
+              <Text size="sm" c="dimmed">
+                {t('delivery.fields.assignedTo')}:
+              </Text>
+              <Text size="sm" fw={500}>
+                {getEmployeeNameByEmployeeId(employeeMapByEmployeeId, deliveryRequest.assignedTo)}
+              </Text>
+            </Group>
           )}
           {deliveryRequest.notes && (
-            <Text size="xs" c="dimmed" lineClamp={2} mt="xs">
-              {t('delivery.fields.notes')}: {deliveryRequest.notes}
-            </Text>
+            <Group gap="sm">
+              <Text size="sm" c="dimmed">
+                {t('delivery.fields.notes')}:
+              </Text>
+              <Text size="sm" fw={500}>
+                {deliveryRequest.notes}
+              </Text>
+            </Group>
           )}
         </Box>
 
-        <DeliveryStatusBadge status={deliveryRequest.status} />
+        <div style={{ position: 'absolute', top: 0, right: 0 }}>
+          <Group gap="xs">
+            {deliveryRequest.isUrgentDelivery && <UrgentBadge size="xs" />}
+            <DeliveryStatusBadge status={deliveryRequest.status} />
+          </Group>
+        </div>
       </Group>
     </Card>
   );

@@ -9,7 +9,7 @@ import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
 import { useEmployeeMapByUserId } from '@/stores/useAppStore';
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
-import { ViewOnMap } from '@/components/common';
+import { ViewOnMap, UrgentBadge } from '@/components/common';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useNavigate } from 'react-router';
 
@@ -50,6 +50,7 @@ export function DeliveryDetailTabs({
         <Text size="xl" fw={600}>
           {t('delivery.deliveryId')}: {deliveryRequest.deliveryRequestNumber}
         </Text>
+        {deliveryRequest.isUrgentDelivery && <UrgentBadge />}
         <DeliveryStatusBadge status={deliveryRequest.status} />
       </Group>
 
@@ -58,7 +59,17 @@ export function DeliveryDetailTabs({
         <Grid.Col span={8}>
           <Stack gap="md">
             {/* Delivery Information */}
-            <Card withBorder>
+            <Card 
+              withBorder
+              style={{
+                backgroundColor: deliveryRequest.isUrgentDelivery 
+                  ? 'var(--mantine-color-red-0)' 
+                  : undefined,
+                borderColor: deliveryRequest.isUrgentDelivery 
+                  ? 'var(--mantine-color-red-3)' 
+                  : undefined,
+              }}
+            >
               <Text fw={500} mb="md">
                 {t('delivery.detail.deliveryInfo')}
               </Text>
@@ -144,7 +155,17 @@ export function DeliveryDetailTabs({
             </Card>
 
             {/* Delivery Address */}
-            <Card withBorder>
+            <Card 
+              withBorder
+              style={{
+                backgroundColor: deliveryRequest.isUrgentDelivery 
+                  ? 'var(--mantine-color-red-0)' 
+                  : undefined,
+                borderColor: deliveryRequest.isUrgentDelivery 
+                  ? 'var(--mantine-color-red-3)' 
+                  : undefined,
+              }}
+            >
               <Group justify="space-between" mb="md">
                 <Group gap="xs">
                   <IconMapPin size={20} />
@@ -159,7 +180,17 @@ export function DeliveryDetailTabs({
 
         <Grid.Col span={4}>
           {/* Photos Section */}
-          <Card withBorder>
+          <Card 
+            withBorder
+            style={{
+              backgroundColor: deliveryRequest.isUrgentDelivery 
+                ? 'var(--mantine-color-red-0)' 
+                : undefined,
+              borderColor: deliveryRequest.isUrgentDelivery 
+                ? 'var(--mantine-color-red-3)' 
+                : undefined,
+            }}
+          >
             <Text fw={500} mb="md">
               {t('delivery.detail.photos')}
             </Text>

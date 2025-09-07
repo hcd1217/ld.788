@@ -71,6 +71,7 @@
       "pic": "Contact Person",
       "picPlaceholder": "Enter Contact Person"
     },
+    "urgent": "Urgent",
     "tryAgain": "Try again",
     "navigation": "Navigation",
     "viewOnMap": "View on Google Maps",
@@ -676,6 +677,7 @@
     },
     "fields": {
       "id": "Request ID",
+      "urgentDelivery": "Urgent",
       "purchaseOrder": "Purchase Order",
       "poNumber": "PO Number",
       "customer": "Customer",
@@ -687,6 +689,7 @@
     },
     "assignmentTypes": {},
     "form": {
+      "urgentDeliveryDescription": "Mark this delivery as urgent",
       "selectAssignee": "Select Assignee",
       "selectDate": "Select Scheduled Date",
       "enterNotes": "Enter delivery notes"

@@ -21,3 +21,4 @@ export { SelectableCard } from './SelectableCard';
 export { SwitchView } from './SwitchView';
 export { Tabs } from './Tabs';
 export { Tooltip } from './Tooltip';
+export { UrgentBadge } from './UrgentBadge';

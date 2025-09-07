@@ -2,7 +2,7 @@ import { Stack, Group, Text } from '@mantine/core';
 import { useNavigate } from 'react-router';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
-import { SelectableCard } from '@/components/common';
+import { SelectableCard, UrgentBadge } from '@/components/common';
 import { getDeliveryDetailRoute } from '@/config/routeConfig';
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 import { formatDate, formatDateTime, getLocaleFormat } from '@/utils/time';
@@ -26,6 +26,10 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
       radius="md"
       style={{
         cursor: 'pointer',
+        backgroundColor: deliveryRequest.isUrgentDelivery
+          ? 'var(--mantine-color-red-0)'
+          : undefined,
+        borderColor: deliveryRequest.isUrgentDelivery ? 'var(--mantine-color-red-3)' : undefined,
       }}
       aria-label={t('delivery.gridCard', {
         id: deliveryRequest.id.slice(-6),
@@ -46,37 +50,37 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
             <Stack gap="xs" mt="xs">
               {deliveryRequest.customerName && (
                 <div>
-                  <Text size="sm" fw={500}>
+                  <Text size="sm" c="dimmed">
                     {t('delivery.fields.customer')}
                   </Text>
-                  <Text size="sm" c="dimmed">
+                  <Text size="sm" fw={500}>
                     {deliveryRequest.customerName}
                   </Text>
                 </div>
               )}
               <div>
-                <Text size="sm" fw={500}>
+                <Text size="sm" c="dimmed">
                   {t('delivery.fields.purchaseOrder')}
                 </Text>
-                <Text size="sm" c="dimmed">
+                <Text size="sm" fw={500}>
                   {/* LINK TO PURCHASE ORDER */}
                   {deliveryRequest.purchaseOrderNumber || '-'}
                 </Text>
               </div>
               <div>
-                <Text size="sm" fw={500}>
+                <Text size="sm" c="dimmed">
                   {t('delivery.fields.scheduledDate')}
                 </Text>
-                <Text size="sm" c="dimmed">
+                <Text size="sm" fw={500}>
                   {formatDate(deliveryRequest.scheduledDate, getLocaleFormat(currentLanguage))}
                 </Text>
               </div>
               {deliveryRequest.assignedTo && (
                 <div>
-                  <Text size="sm" fw={500}>
+                  <Text size="sm" c="dimmed">
                     {t('delivery.fields.assignedTo')}
                   </Text>
-                  <Text size="sm" c="dimmed">
+                  <Text size="sm" fw={500}>
                     {getEmployeeNameByEmployeeId(
                       employeeMapByEmployeeId,
                       deliveryRequest.assignedTo,
@@ -86,10 +90,10 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
               )}
               {deliveryRequest.completedDate && (
                 <div>
-                  <Text size="sm" fw={500}>
+                  <Text size="sm" c="dimmed">
                     {t('delivery.fields.completedDate')}
                   </Text>
-                  <Text size="sm" c="dimmed">
+                  <Text size="sm" fw={500}>
                     {formatDateTime(
                       deliveryRequest.completedDate,
                       getLocaleFormat(currentLanguage),
@@ -106,7 +110,10 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
               right: 0,
             }}
           >
-            <DeliveryStatusBadge status={deliveryRequest.status} />
+            <Group gap="xs">
+              {deliveryRequest.isUrgentDelivery && <UrgentBadge size="sm" />}
+              <DeliveryStatusBadge status={deliveryRequest.status} />
+            </Group>
           </div>
         </Group>
       </Stack>

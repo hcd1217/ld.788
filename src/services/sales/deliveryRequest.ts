@@ -19,6 +19,7 @@ export type {
 
 // Frontend types with transformed metadata
 export type DeliveryRequest = Omit<ApiDeliveryRequest, 'metadata'> & {
+  isUrgentDelivery?: boolean;
   deliveryRequestNumber: string;
   purchaseOrderNumber?: string | undefined;
   purchaseOrderId?: string | undefined;
@@ -43,6 +44,7 @@ function transformApiToFrontend(
   const customerName = customerId ? (customerMapByCustomerId.get(customerId)?.name ?? '') : '';
   return {
     ...rest,
+    isUrgentDelivery: apiDR.metadata?.isUrgentDelivery ?? false,
     purchaseOrderId: apiDR.metadata?.po?.poId,
     purchaseOrderNumber: apiDR.metadata?.po?.poNumber as string,
     customerName,
@@ -106,11 +108,20 @@ export const deliveryRequestService = {
       : undefined;
 
     const response = await deliveryRequestApi.getDeliveryRequests(apiParams);
+    const deliveryRequests = response.deliveryRequests.map((dr) =>
+      transformApiToFrontend(dr, customerMapByCustomerId),
+    );
+
+    deliveryRequests.sort((a, b) => {
+      if (a.isUrgentDelivery && !b.isUrgentDelivery) return -1;
+      if (!a.isUrgentDelivery && b.isUrgentDelivery) return 1;
+      const _a = a.scheduledDate.getTime();
+      const _b = b.scheduledDate.getTime();
+      return _a - _b;
+    });
 
     return {
-      deliveryRequests: response.deliveryRequests.map((dr) =>
-        transformApiToFrontend(dr, customerMapByCustomerId),
-      ),
+      deliveryRequests,
       pagination: response.pagination,
     };
   },

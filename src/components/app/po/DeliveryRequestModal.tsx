@@ -1,6 +1,6 @@
-import { Modal, Drawer, Stack, Text, Group, Button, Select, Textarea } from '@mantine/core';
+import { Modal, Drawer, Stack, Text, Group, Button, Select, Textarea, Switch } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
-import { IconTruck, IconCalendar } from '@tabler/icons-react';
+import { IconTruck, IconCalendar, IconUrgent } from '@tabler/icons-react';
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
@@ -10,6 +10,7 @@ import { formatDate } from '@/utils/time';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 import type { PICType } from '@/services/sales/deliveryRequest';
+import { UrgentBadge } from '@/components/common';
 
 type DeliveryRequestModalProps = {
   readonly opened: boolean;
@@ -20,6 +21,7 @@ type DeliveryRequestModalProps = {
     assignedType: PICType;
     scheduledDate: string;
     notes: string;
+    isUrgentDelivery?: boolean;
   }) => Promise<void>;
 };
 
@@ -39,6 +41,7 @@ export function DeliveryRequestModal({
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [scheduledDate, setScheduledDate] = useState<Date | null>(new Date());
   const [notes, setNotes] = useState('');
+  const [isUrgentDelivery, setIsUrgentDelivery] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Employee options for select - filtered by assigneeIds from clientConfig
@@ -64,6 +67,7 @@ export function DeliveryRequestModal({
       setSelectedEmployeeId(null);
       setScheduledDate(new Date());
       setNotes('');
+      setIsUrgentDelivery(false);
     } else if (purchaseOrder && !notes) {
       // Only set default notes if empty (preserves user input)
       setNotes(`Delivery request for PO ${purchaseOrder.poNumber}`);
@@ -83,6 +87,7 @@ export function DeliveryRequestModal({
         assignedType: 'EMPLOYEE',
         scheduledDate: scheduledDate.toISOString(),
         notes,
+        isUrgentDelivery,
       });
       // Form will be reset by useEffect when modal closes
       onClose();
@@ -149,6 +154,21 @@ export function DeliveryRequestModal({
         value={notes}
         onChange={(e) => setNotes(e.currentTarget.value)}
         rows={3}
+      />
+
+      <Switch
+        label={
+          <Group gap="xs">
+            {t('delivery.fields.urgentDelivery')}
+            {isUrgentDelivery && <UrgentBadge size="xs" withIcon={false} />}
+          </Group>
+        }
+        description={t('delivery.form.urgentDeliveryDescription')}
+        checked={isUrgentDelivery}
+        onChange={(event) => setIsUrgentDelivery(event.currentTarget.checked)}
+        size="md"
+        color="red"
+        thumbIcon={isUrgentDelivery ? <IconUrgent size={12} /> : undefined}
       />
 
       <Group justify="flex-end" gap="sm">
