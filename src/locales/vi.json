@@ -664,8 +664,8 @@
     },
     "actions": {
       "create": "Tạo Yêu Cầu Giao Hàng",
-      "startTransit": "Bắt Đầu Vận Chuyển",
-      "startTransitDescription": "Đánh dấu yêu cầu giao hàng này đang vận chuyển",
+      "startTransit": "Bắt Đầu",
+      "startTransitDescription": "Đánh dấu đang vận chuyển",
       "complete": "Hoàn Thành Giao Hàng"
     },
     "status": {

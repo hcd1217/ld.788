@@ -20,6 +20,9 @@ import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { formatDate } from '@/utils/time';
 import { DRAWER_BODY_PADDING_BOTTOM, DRAWER_HEADER_PADDING } from '@/constants/po.constants';
 import { DeliveryPhotoUpload } from './DeliveryPhotoUpload';
+import { useAction } from '@/hooks/useAction';
+import { usePermissions } from '@/stores/useAppStore';
+import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
 
 export type DeliveryModalMode = 'start_transit' | 'complete';
 
@@ -73,16 +76,35 @@ export function DeliveryStatusModal({
   const [deliveryTime, setDeliveryTime] = useState('');
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
-
+  const permissions = usePermissions();
+  const { uploadPhotos } = useDeliveryRequestActions();
   const isComplete = mode === 'complete';
 
   // Get modal configuration - memoized
   const config = useMemo(() => getModalConfig(mode, t), [mode, t]);
 
-  if (!deliveryRequest) return null;
+  // Upload photos action
+  const uploadPhotosAction = useAction({
+    options: {
+      successTitle: t('common.success'),
+      successMessage: t('delivery.messages.photosUploaded'),
+      errorTitle: t('common.error'),
+      errorMessage: t('delivery.messages.uploadFailed'),
+    },
+    async actionHandler(data?: { photoUrls: string[] }) {
+      if (!permissions.deliveryRequest.actions?.canTakePhoto) {
+        throw new Error(t('delivery.messages.uploadFailed'));
+      }
+      if (!deliveryRequest || !data?.photoUrls) {
+        throw new Error(t('delivery.messages.uploadFailed'));
+      }
+      await uploadPhotos(deliveryRequest.id, data.photoUrls);
+    },
+  });
 
   const handlePhotoUpload = async (data: { photoUrls: string[] }) => {
     setUploadedPhotos((prev) => [...prev, ...data.photoUrls]);
+    await uploadPhotosAction(data);
     setShowPhotoUpload(false);
   };
 
@@ -124,6 +146,8 @@ export function DeliveryStatusModal({
     }
     return false;
   };
+
+  if (!deliveryRequest) return null;
 
   // Content to be rendered in both Modal and Drawer
   const content = (
@@ -281,11 +305,6 @@ export function DeliveryStatusModal({
       >
         {content}
       </Modal>
-      <DeliveryPhotoUpload
-        opened={showPhotoUpload}
-        onClose={() => setShowPhotoUpload(false)}
-        onUpload={handlePhotoUpload}
-      />
     </>
   );
 }

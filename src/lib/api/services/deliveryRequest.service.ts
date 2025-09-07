@@ -99,7 +99,14 @@ export class DeliveryRequestApi extends BaseApiClient {
   async uploadDeliveryPhotos(id: string, data: UploadPhotos): Promise<void> {
     return this.post<void, UploadPhotos>(
       `/api/sales/delivery-requests/${id}/photos`,
-      data,
+      {
+        photoUrls: data.photoUrls.map((url) => {
+          if (url.includes('mock')) {
+            return '/public/photos/no-photo.svg';
+          }
+          return url;
+        }),
+      },
       undefined,
       UploadPhotosSchema,
     );
