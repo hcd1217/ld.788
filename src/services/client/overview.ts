@@ -35,6 +35,9 @@ export type CustomerOverview = {
   id: string;
   name: string;
   address: string | undefined;
+  pic: string | undefined;
+  phone: string | undefined;
+  email: string | undefined;
   googleMapsUrl: string | undefined;
 };
 
@@ -104,6 +107,9 @@ export const overviewService = {
       id: beCustomer.id,
       name: beCustomer.name,
       address: beCustomer.address ?? undefined,
+      pic: beCustomer.pic ?? undefined,
+      phone: beCustomer.phone ?? undefined,
+      email: beCustomer.email ?? undefined,
       googleMapsUrl: beCustomer.googleMapsUrl ?? undefined,
     };
   },

@@ -34,6 +34,9 @@ export const CustomerOverviewSchema = z.object({
   id: idSchema.describe('Customer ID'),
   name: stringSchema.describe('Customer name'),
   address: optionalStringSchema.describe('Customer address'),
+  pic: optionalStringSchema.describe('Customer PIC'),
+  phone: optionalStringSchema.describe('Customer phone'),
+  email: optionalStringSchema.describe('Customer email'),
   googleMapsUrl: optionalStringSchema.describe('Google Maps URL'),
 });
 

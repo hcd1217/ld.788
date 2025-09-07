@@ -4,13 +4,18 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { formatDate } from '@/utils/time';
 import { useMemo } from 'react';
-import { useEmployeeMapByEmployeeId, useEmployeeMapByUserId } from '@/stores/useAppStore';
+import {
+  useCustomers,
+  useEmployeeMapByEmployeeId,
+  useEmployeeMapByUserId,
+} from '@/stores/useAppStore';
 import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
 import { ViewOnMap } from '@/components/common';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useNavigate } from 'react-router';
+import { ContactInfo } from '@/components/common';
 
 type DeliveryDetailAccordionProps = {
   readonly deliveryRequest: DeliveryRequest;
@@ -92,6 +97,10 @@ export function DeliveryDetailAccordion({
       {
         label: t('delivery.fields.customer'),
         value: deliveryRequest.customerName,
+      },
+      {
+        label: t('common.contact'),
+        value: <DeliveryCustomerInfo customerId={deliveryRequest.customerId} />,
       },
       {
         label: t('delivery.fields.scheduledDate'),
@@ -220,5 +229,27 @@ export function DeliveryDetailAccordion({
         )}
       </Group>
     </Stack>
+  );
+}
+
+function DeliveryCustomerInfo({ customerId }: { customerId: string | undefined }) {
+  const customers = useCustomers();
+  const customer = useMemo(() => {
+    if (!customerId) {
+      return undefined;
+    }
+    return customers.find((c) => c.id === customerId);
+  }, [customers, customerId]);
+
+  return customer ? (
+    <ContactInfo
+      horizontal
+      email={customer.email}
+      phoneNumber={customer.phone}
+      pic={customer.pic}
+      blank={'-'}
+    />
+  ) : (
+    '-'
   );
 }
