@@ -164,13 +164,13 @@
     "description": "Tính năng này được tối ưu cho thiết bị di động. Vui lòng truy cập từ điện thoại thông minh hoặc máy tính bảng để có trải nghiệm tốt nhất."
   },
   "pwa": {
-    "installTitle": "Cài đặt CMngt App",
+    "installTitle": "Cài đặt Credo App",
     "installDescription": "Cài đặt ứng dụng này trên thiết bị của bạn để có trải nghiệm tốt hơn",
     "maybeLater": "Để sau",
     "install": "Cài đặt",
     "safari": {
-      "installTitle": "Cài đặt CMngt App",
-      "installDescription": "Thêm CMngt vào màn hình chính để truy cập nhanh và sử dụng ngoại tuyến",
+      "installTitle": "Cài đặt Credo App",
+      "installDescription": "Thêm Credo vào màn hình chính để truy cập nhanh và sử dụng ngoại tuyến",
       "remindLater": "Nhắc tôi sau",
       "dontShowAgain": "Không hiện lại",
       "ios": {
@@ -311,7 +311,7 @@
     "endedButActiveMessage": "Hợp đồng của nhân viên này đã kết thúc nhưng vẫn được đánh dấu là hoạt động. Vui lòng xem xét trạng thái của họ."
   },
   "auth": {
-    "title": "CMngt",
+    "title": "Credo",
     "identifier": "Tên đăng nhập",
     "password": "Mật khẩu",
     "firstNamePlaceholder": "Văn An",

@@ -245,7 +245,7 @@ export function usePWA() {
           id: 'pwa-update-sw',
           title: t('common.pwa.newVersionAvailableForBrowser'),
           message: t('common.pwa.newVersionOfApp', {
-            appName: import.meta.env.VITE_APP_NAME || 'CMngt',
+            appName: import.meta.env.VITE_APP_NAME || 'Credo',
           }),
           color: 'blue',
           autoClose: false,
@@ -272,7 +272,7 @@ export function usePWA() {
       showSuccessNotification(
         t('common.pwa.offlineReady'),
         t('common.pwa.appAvailableOffline', {
-          appName: import.meta.env.VITE_APP_NAME || 'CMngt',
+          appName: import.meta.env.VITE_APP_NAME || 'Credo',
         }),
       );
     }
