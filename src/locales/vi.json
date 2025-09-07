@@ -707,11 +707,12 @@
     "detail": {
       "title": "Chi Tiết Giao Hàng",
       "deliveryInfo": "Thông Tin Giao Hàng",
+      "photosRequired": "Vui lòng chụp hình trước khi hoàn thành giao hàng",
       "photos": "Ảnh Giao Hàng",
       "noPhotos": "Chưa có ảnh nào được tải lên"
     },
     "completeDelivery": "Hoàn Thành Giao Hàng",
-    "completeDeliveryDescription": "Đánh dấu đã hoàn thành",
+    "completeDeliveryDescription": "Chụp ảnh để hoàn thành đơn hàng!",
     "markAsCompleted": "Đánh Dấu Hoàn Thành",
     "deliveryDetails": "Chi Tiết Giao Hàng",
     "deliveryId": "Mã Giao Hàng",

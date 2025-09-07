@@ -74,6 +74,8 @@ export function DeliveryStatusModal({
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
 
+  const isComplete = mode === 'complete';
+
   // Get modal configuration - memoized
   const config = useMemo(() => getModalConfig(mode, t), [mode, t]);
 
@@ -116,7 +118,10 @@ export function DeliveryStatusModal({
 
   // Check if confirm button should be disabled
   const isConfirmDisabled = () => {
-    if (mode === 'complete') {
+    if (isComplete) {
+      if (uploadedPhotos.length === 0) {
+        return true;
+      }
       return !notes.trim() || !recipient.trim();
     }
     return false;
@@ -146,7 +151,7 @@ export function DeliveryStatusModal({
         )}
       </div>
 
-      {mode === 'start_transit' && (
+      {!isComplete && (
         <Textarea
           label={t('delivery.transitNotes')}
           placeholder={t('delivery.enterTransitNotes')}
@@ -157,7 +162,7 @@ export function DeliveryStatusModal({
         />
       )}
 
-      {mode === 'complete' && (
+      {isComplete && (
         <>
           <Text size="sm" fw={500} mb="xs">
             {t('delivery.detail.photos')}
@@ -225,6 +230,11 @@ export function DeliveryStatusModal({
         >
           {config.buttonText}
         </Button>
+        {isComplete && uploadedPhotos.length === 0 && (
+          <Text size="xs" c="red.4" fw={700} style={{ fontStyle: 'italic' }}>
+            {t('delivery.detail.photosRequired')}
+          </Text>
+        )}
       </Group>
     </Stack>
   );

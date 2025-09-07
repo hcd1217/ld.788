@@ -707,6 +707,7 @@
     "detail": {
       "title": "Delivery Details",
       "deliveryInfo": "Delivery Information",
+      "photosRequired": "Please upload at photo before completing the delivery",
       "photos": "Delivery Photos",
       "noPhotos": "No photos uploaded yet"
     },

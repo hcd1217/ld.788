@@ -1,7 +1,7 @@
 import { Modal, Drawer, Stack, Text, Group, Button, Select, Textarea } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { IconTruck, IconCalendar } from '@tabler/icons-react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useEmployees, useClientConfig } from '@/stores/useAppStore';
@@ -57,12 +57,18 @@ export function DeliveryRequestModal({
     }));
   }, [employees, clientConfig.features?.deliveryRequest]);
 
-  // Reset form when modal opens
-  const handleOpen = () => {
-    if (purchaseOrder) {
+  // Handle modal lifecycle - reset form when closed, set default notes when opened
+  useEffect(() => {
+    if (!opened) {
+      // Reset form when modal closes
+      setSelectedEmployeeId(null);
+      setScheduledDate(new Date());
+      setNotes('');
+    } else if (purchaseOrder && !notes) {
+      // Only set default notes if empty (preserves user input)
       setNotes(`Delivery request for PO ${purchaseOrder.poNumber}`);
     }
-  };
+  }, [opened, purchaseOrder?.poNumber]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle form submission
   const handleSubmit = async () => {
@@ -78,10 +84,7 @@ export function DeliveryRequestModal({
         scheduledDate: scheduledDate.toISOString(),
         notes,
       });
-      // Reset form
-      setSelectedEmployeeId(null);
-      setScheduledDate(new Date());
-      setNotes('');
+      // Form will be reset by useEffect when modal closes
       onClose();
     } finally {
       setIsSubmitting(false);
@@ -169,9 +172,6 @@ export function DeliveryRequestModal({
       <Drawer
         opened={opened}
         onClose={onClose}
-        onTransitionEnd={() => {
-          if (opened) handleOpen();
-        }}
         title={t('delivery.actions.create')}
         position="bottom"
         size="auto"
@@ -186,9 +186,6 @@ export function DeliveryRequestModal({
     <Modal
       opened={opened}
       onClose={onClose}
-      onTransitionEnd={() => {
-        if (opened) handleOpen();
-      }}
       title={t('delivery.actions.create')}
       centered
       size="md"
