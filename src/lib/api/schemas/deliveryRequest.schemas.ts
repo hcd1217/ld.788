@@ -61,6 +61,7 @@ export const UpdateDeliveryRequestSchema = z.object({
   assignedType: PICTypeSchema.optional(),
   scheduledDate: stringSchema.optional(),
   notes: optionalStringSchema,
+  isUrgentDelivery: optionalBooleanSchema,
 });
 
 export const UpdateDeliveryStatusSchema = z.object({

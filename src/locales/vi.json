@@ -61,9 +61,11 @@
     },
     "entity": {
       "product": "Sản Phẩm",
-      "customer": "Khách Hàng"
+      "customer": "Khách Hàng",
+      "deliveryRequest": "Yêu Cầu Giao Hàng"
     },
     "form": {
+      "update": "Cập Nhật",
       "memo": "Ghi Chú",
       "memoPlaceholder": "Nhập ghi chú",
       "email": "Email",

@@ -61,9 +61,11 @@
     },
     "entity": {
       "product": "Product",
-      "customer": "Customer"
+      "customer": "Customer",
+      "deliveryRequest": "Delivery Request"
     },
     "form": {
+      "update": "Update",
       "memo": "Memo",
       "memoPlaceholder": "Enter memo",
       "email": "Email",

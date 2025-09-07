@@ -5,6 +5,7 @@ type DeliveryModalState = {
   startTransit: boolean;
   complete: boolean;
   uploadPhotos: boolean;
+  update: boolean;
 };
 
 export function useDeliveryModals() {
@@ -12,6 +13,7 @@ export function useDeliveryModals() {
     startTransit: false,
     complete: false,
     uploadPhotos: false,
+    update: false,
   });
   const [selectedDeliveryRequest, setSelectedDeliveryRequest] = useState<
     DeliveryRequest | undefined
@@ -36,6 +38,11 @@ export function useDeliveryModals() {
     handleTakeDeliveryPhoto: (dr: DeliveryRequest) => {
       setSelectedDeliveryRequest(dr);
       setModals((prev) => ({ ...prev, uploadPhotos: true }));
+    },
+
+    handleUpdate: (dr: DeliveryRequest) => {
+      setSelectedDeliveryRequest(dr);
+      setModals((prev) => ({ ...prev, update: true }));
     },
   };
 
