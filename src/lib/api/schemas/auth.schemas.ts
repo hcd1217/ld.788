@@ -78,6 +78,11 @@ const PermissionSchema = z.object({
     canCreate: booleanSchema,
     canEdit: booleanSchema,
     canDelete: booleanSchema,
+    actions: z
+      .object({
+        canSetPassword: booleanSchema,
+      })
+      .optional(),
   }),
   purchaseOrder: z.object({
     canView: booleanSchema,
@@ -209,6 +214,9 @@ function fakePermission(code: DepartmentCode) {
       },
       employee: {
         ...basePermission,
+        actions: {
+          canSetPassword: false,
+        },
       },
       purchaseOrder: {
         ...basePermission,

@@ -1,5 +1,8 @@
 import { BaseApiClient } from '../base';
-import { type ClientPublicConfigResponse } from '../schemas/client.schemas';
+import {
+  SetPasswordForUserRequestSchema,
+  type ClientPublicConfigResponse,
+} from '../schemas/client.schemas';
 import { ClientPublicConfigSchema } from '../schemas';
 
 export class ClientApi extends BaseApiClient {
@@ -8,6 +11,15 @@ export class ClientApi extends BaseApiClient {
       `/clients/${clientCode}/public-config`,
       undefined,
       ClientPublicConfigSchema,
+    );
+  }
+
+  async setPasswordForUser(userId: string, password: string): Promise<void> {
+    return this.post(
+      `/clients/users/set-password`,
+      { userId, password },
+      undefined,
+      SetPasswordForUserRequestSchema,
     );
   }
 }

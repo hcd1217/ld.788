@@ -184,8 +184,8 @@ export const generateCustomerExcelTemplate = (language?: string) => {
     : [
         [
           'John Doe',
-          'Acme Inc',
-          'john@acme.com',
+          'NKTU Inc',
+          'john@NKTU.com',
           '555-1234',
           '123 Main St',
           'https://maps.app.goo.gl/example1',

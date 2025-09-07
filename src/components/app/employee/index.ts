@@ -3,6 +3,7 @@ export { EmployeeCard } from './EmployeeCard';
 export { EmployeeDataTable } from './EmployeeDataTable';
 export { EmployeeGridCard } from './EmployeeGridCard';
 export { EmployeeStatusModal } from './EmployeeStatusModal';
+export { EmployeePasswordModal } from './EmployeePasswordModal';
 export { EmployeeBasicInfoCard } from './EmployeeBasicInfoCard';
 export { EmployeeMagicLinkModal } from './EmployeeMagicLinkModal';
 export { EmployeeDangerZone } from './EmployeeDangerZone';

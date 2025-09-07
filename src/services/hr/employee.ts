@@ -11,6 +11,7 @@ export type Unit = {
 
 export type Employee = {
   id: string;
+  loginIdentifier?: string;
   userId?: string;
   firstName: string;
   lastName: string;

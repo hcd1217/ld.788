@@ -14,17 +14,21 @@ import type { Employee } from '@/services/hr/employee';
 type EmployeeDetailAccordionProps = {
   readonly employee: Employee;
   readonly canEdit: boolean;
+  readonly canSetPassword?: boolean;
   readonly onActivate: () => void;
   readonly onDeactivate: () => void;
   readonly onEdit: () => void;
+  readonly onSetPassword: () => void;
 };
 
 export function EmployeeDetailAccordion({
   employee,
   canEdit,
+  canSetPassword,
   onActivate,
   onDeactivate,
   onEdit,
+  onSetPassword,
 }: EmployeeDetailAccordionProps) {
   const { t } = useTranslation();
 
@@ -91,9 +95,11 @@ export function EmployeeDetailAccordion({
           <Stack gap="xl" pt="md">
             <EmployeeDangerZone
               canEdit={canEdit}
+              canSetPassword={canSetPassword}
               employee={employee}
               onActivate={onActivate}
               onDeactivate={onDeactivate}
+              onSetPassword={onSetPassword}
             />
           </Stack>
         </Accordion.Panel>

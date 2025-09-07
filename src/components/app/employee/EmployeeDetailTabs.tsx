@@ -14,17 +14,21 @@ import type { Employee } from '@/services/hr/employee';
 type EmployeeDetailTabsProps = {
   readonly employee: Employee;
   readonly canEdit: boolean;
+  readonly canSetPassword?: boolean;
   readonly onEdit: () => void;
   readonly onActivate: () => void;
   readonly onDeactivate: () => void;
+  readonly onSetPassword: () => void;
 };
 
 export function EmployeeDetailTabs({
   employee,
   canEdit,
+  canSetPassword,
   onEdit,
   onActivate,
   onDeactivate,
+  onSetPassword,
 }: EmployeeDetailTabsProps) {
   const { t } = useTranslation();
 
@@ -61,8 +65,10 @@ export function EmployeeDetailTabs({
               <EmployeeDangerZone
                 employee={employee}
                 canEdit={canEdit}
+                canSetPassword={canSetPassword}
                 onActivate={onActivate}
                 onDeactivate={onDeactivate}
+                onSetPassword={onSetPassword}
               />
             </Stack>
           </Box>

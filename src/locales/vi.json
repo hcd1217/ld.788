@@ -164,13 +164,13 @@
     "description": "Tính năng này được tối ưu cho thiết bị di động. Vui lòng truy cập từ điện thoại thông minh hoặc máy tính bảng để có trải nghiệm tốt nhất."
   },
   "pwa": {
-    "installTitle": "Cài đặt Credo App",
+    "installTitle": "Cài đặt CMngt App",
     "installDescription": "Cài đặt ứng dụng này trên thiết bị của bạn để có trải nghiệm tốt hơn",
     "maybeLater": "Để sau",
     "install": "Cài đặt",
     "safari": {
-      "installTitle": "Cài đặt Credo App",
-      "installDescription": "Thêm Credo vào màn hình chính để truy cập nhanh và sử dụng ngoại tuyến",
+      "installTitle": "Cài đặt CMngt App",
+      "installDescription": "Thêm CMngt vào màn hình chính để truy cập nhanh và sử dụng ngoại tuyến",
       "remindLater": "Nhắc tôi sau",
       "dontShowAgain": "Không hiện lại",
       "ios": {
@@ -230,6 +230,20 @@
     "employeeActivated": "Đã kích hoạt nhân viên thành công",
     "activateEmployeeFailed": "Không thể kích hoạt nhân viên",
     "activate": "Kích Hoạt",
+    "setPasswordTitle": "Đặt Mật Khẩu",
+    "setPasswordDescription": "Đặt mật khẩu mới cho tài khoản nhân viên này",
+    "setPasswordMessage": "Đặt mật khẩu mới cho \"{{name}}\"",
+    "setPasswordWarning": "Nhân viên sẽ nhận được mật khẩu này và nên thay đổi khi đăng nhập lần đầu",
+    "setPassword": "Đặt Mật Khẩu",
+    "newPassword": "Mật Khẩu Mới",
+    "confirmPassword": "Xác Nhận Mật Khẩu",
+    "enterNewPassword": "Nhập mật khẩu mới",
+    "enterConfirmPassword": "Xác nhận mật khẩu mới",
+    "passwordRequired": "Mật khẩu là bắt buộc",
+    "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
+    "passwordMismatch": "Mật khẩu không khớp",
+    "passwordSetSuccessfully": "Đặt mật khẩu thành công",
+    "setPasswordFailed": "Không thể đặt mật khẩu",
     "employeeDetails": "Chi Tiết Nhân Viên",
     "editEmployee": "Cập Nhật Thông Tin Nhân Viên",
     "updateEmployee": "Cập Nhật Thông Tin Nhân Viên",
@@ -297,7 +311,7 @@
     "endedButActiveMessage": "Hợp đồng của nhân viên này đã kết thúc nhưng vẫn được đánh dấu là hoạt động. Vui lòng xem xét trạng thái của họ."
   },
   "auth": {
-    "title": "Credo",
+    "title": "CMngt",
     "identifier": "Tên đăng nhập",
     "password": "Mật khẩu",
     "firstNamePlaceholder": "Văn An",

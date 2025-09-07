@@ -1,4 +1,4 @@
-import { userApi } from '@/lib/api';
+import { userApi, clientApi } from '@/lib/api';
 
 export const userService = {
   magicLinks: {} as Record<string, string>,
@@ -9,5 +9,8 @@ export const userService = {
         `${location.origin}/magic-link?clientCode=${clientCode}&token=${response.magicToken}`;
     }
     return this.magicLinks[userId];
+  },
+  async setPasswordForUser(userId: string, password: string): Promise<void> {
+    await clientApi.setPasswordForUser(userId, password);
   },
 };

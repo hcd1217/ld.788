@@ -10,6 +10,7 @@ import { AppPageTitle, PermissionDeniedPage } from '@/components/common';
 import { AppMobileLayout } from '@/components/common';
 import {
   EmployeeStatusModal,
+  EmployeePasswordModal,
   EmployeeDetailTabs,
   EmployeeDetailAccordion,
   EmployeeDetailAlert,
@@ -19,6 +20,8 @@ import { useOnce } from '@/hooks/useOnce';
 import { useAction } from '@/hooks/useAction';
 import { useEmployeeModal } from '@/hooks/useEmployeeModal';
 import { usePermissions } from '@/stores/useAppStore';
+import { userService } from '@/services/user/user';
+import { showSuccessNotification, showErrorNotification } from '@/utils/notifications';
 
 export function EmployeeDetailPage() {
   const { employeeId } = useParams<{ employeeId: string }>();
@@ -29,7 +32,7 @@ export function EmployeeDetailPage() {
   const employees = useEmployeeList();
   const isLoading = useHrLoading();
   const { loadEmployees, deactivateEmployee, activateEmployee } = useHrActions();
-  const { targetEmployee, deactivateModal, activateModal } = useEmployeeModal();
+  const { targetEmployee, deactivateModal, activateModal, passwordModal } = useEmployeeModal();
 
   // Memoize employee lookup for better performance
   const employee = useMemo(
@@ -52,6 +55,30 @@ export function EmployeeDetailPage() {
   const handleActivate = () => {
     if (employee && permissions.employee.canEdit) {
       activateModal.open(employee);
+    }
+  };
+
+  const handleSetPassword = () => {
+    if (employee && permissions.employee.actions?.canSetPassword) {
+      passwordModal.open(employee);
+    }
+  };
+
+  const confirmSetPassword = async (password: string) => {
+    if (!targetEmployee) {
+      return;
+    }
+
+    try {
+      await userService.setPasswordForUser(targetEmployee.id, password);
+      showSuccessNotification(t('common.success'), t('employee.passwordSetSuccessfully'));
+      passwordModal.close();
+    } catch (error) {
+      showErrorNotification(
+        t('common.error'),
+        error instanceof Error ? error.message : t('employee.setPasswordFailed'),
+      );
+      console.error('Failed to set password:', error);
     }
   };
 
@@ -110,6 +137,12 @@ export function EmployeeDetailPage() {
         onClose={activateModal.close}
         onConfirm={confirmActivateEmployee}
       />
+      <EmployeePasswordModal
+        opened={passwordModal.opened}
+        employee={targetEmployee}
+        onClose={passwordModal.close}
+        onConfirm={confirmSetPassword}
+      />
     </>
   );
 
@@ -143,10 +176,12 @@ export function EmployeeDetailPage() {
           <EmployeeDetailAlert endDate={employee.endDate} isActive={employee.isActive} />
           <EmployeeDetailAccordion
             canEdit={permissions.employee.canEdit}
+            canSetPassword={permissions.employee.actions?.canSetPassword}
             employee={employee}
             onActivate={handleActivate}
             onDeactivate={handleDeactivate}
             onEdit={handleEdit}
+            onSetPassword={handleSetPassword}
           />
         </Stack>
         {modals}
@@ -161,10 +196,12 @@ export function EmployeeDetailPage() {
           <EmployeeDetailAlert endDate={employee.endDate} isActive={employee.isActive} />
           <EmployeeDetailTabs
             canEdit={permissions.employee.canEdit}
+            canSetPassword={permissions.employee.actions?.canSetPassword}
             employee={employee}
             onEdit={handleEdit}
             onActivate={handleActivate}
             onDeactivate={handleDeactivate}
+            onSetPassword={handleSetPassword}
           />
         </Stack>
       ) : (

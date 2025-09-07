@@ -1,11 +1,11 @@
 {
-  "name": "Credo App",
-  "short_name": "Credo",
-  "description": "Credo - Multi-tenant SaaS Platform",
+  "name": "CMngt App",
+  "short_name": "CMngt",
+  "description": "CMngt Progressive Web Application",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#324e71",
+  "theme_color": "#1969c8",
   "background_color": "#ffffff",
   "icons": [
     {

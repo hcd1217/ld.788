@@ -1,5 +1,11 @@
 import { Card, Stack, Group, Title, Divider, Paper, Box, Text, Button } from '@mantine/core';
-import { IconAlertTriangle, IconUserOff, IconUserCheck, IconTrash } from '@tabler/icons-react';
+import {
+  IconAlertTriangle,
+  IconUserOff,
+  IconUserCheck,
+  IconTrash,
+  IconLock,
+} from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import type { Employee } from '@/services/hr/employee';
@@ -7,15 +13,19 @@ import type { Employee } from '@/services/hr/employee';
 type EmployeeDangerZoneProps = {
   readonly employee: Employee;
   readonly canEdit: boolean;
+  readonly canSetPassword: boolean;
   readonly onActivate: () => void;
   readonly onDeactivate: () => void;
+  readonly onSetPassword: () => void;
 };
 
 export function EmployeeDangerZone({
   canEdit,
   employee,
+  canSetPassword,
   onActivate,
   onDeactivate,
+  onSetPassword,
 }: EmployeeDangerZoneProps) {
   const { t } = useTranslation();
   const { isDesktop } = useDeviceType();
@@ -39,6 +49,47 @@ export function EmployeeDangerZone({
         <Divider color="red.6" />
 
         <Stack gap="md">
+          {employee.loginIdentifier ? (
+            <Paper withBorder p="md">
+              {isDesktop ? (
+                <Group justify="space-between" wrap="nowrap">
+                  <Box>
+                    <Text fw={500}>{t('employee.setPasswordTitle')}</Text>
+                    <Text size="sm" c="dimmed">
+                      {t('employee.setPasswordDescription')}
+                    </Text>
+                  </Box>
+                  <Button
+                    color="blue"
+                    leftSection={<IconLock size={16} />}
+                    disabled={!canSetPassword}
+                    onClick={onSetPassword}
+                  >
+                    {t('employee.setPassword')}
+                  </Button>
+                </Group>
+              ) : (
+                <Stack gap="sm">
+                  <Box>
+                    <Text fw={500}>{t('employee.setPasswordTitle')}</Text>
+                    <Text size="sm" c="dimmed">
+                      {t('employee.setPasswordDescription')}
+                    </Text>
+                  </Box>
+                  <Button
+                    fullWidth
+                    color="blue"
+                    leftSection={<IconLock size={16} />}
+                    disabled={!canSetPassword}
+                    onClick={onSetPassword}
+                  >
+                    {t('employee.setPassword')}
+                  </Button>
+                </Stack>
+              )}
+            </Paper>
+          ) : null}
+
           {employee.isActive ? (
             <Paper withBorder p="md">
               {isDesktop ? (

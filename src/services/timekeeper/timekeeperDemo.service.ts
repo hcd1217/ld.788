@@ -53,7 +53,7 @@ class TimekeeperDemoService {
       location: location || {
         latitude: 10.8231,
         longitude: 106.6297,
-        address: 'Credo HQ, District 1, Ho Chi Minh City',
+        address: 'CMngt HQ, District 1, Ho Chi Minh City',
       },
       createdAt: now,
       updatedAt: now,
@@ -92,7 +92,7 @@ class TimekeeperDemoService {
       location: location || {
         latitude: 10.8231,
         longitude: 106.6297,
-        address: 'Credo HQ, District 1, Ho Chi Minh City',
+        address: 'CMngt HQ, District 1, Ho Chi Minh City',
       },
       createdAt: clockInTime,
       updatedAt: now,

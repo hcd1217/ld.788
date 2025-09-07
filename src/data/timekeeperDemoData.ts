@@ -28,7 +28,7 @@ export const demoClockEntries: ClockEntry[] = [
     location: {
       latitude: 10.8231,
       longitude: 106.6297,
-      address: 'Credo HQ, District 1, Ho Chi Minh City',
+      address: 'CMngt HQ, District 1, Ho Chi Minh City',
     },
     createdAt: getRelativeDate(0, 9, 0),
     updatedAt: getRelativeDate(0, 9, 0),
@@ -44,7 +44,7 @@ export const demoClockEntries: ClockEntry[] = [
     location: {
       latitude: 10.8231,
       longitude: 106.6297,
-      address: 'Credo HQ, District 1, Ho Chi Minh City',
+      address: 'CMngt HQ, District 1, Ho Chi Minh City',
     },
     createdAt: getRelativeDate(-1, 8, 30),
     updatedAt: getRelativeDate(-1, 17, 45),
@@ -277,7 +277,7 @@ const generateTimesheetEntries = (): TimesheetEntry[] => {
       location: {
         latitude: 10.8231 + (Math.random() * 0.01 - 0.005),
         longitude: 106.6297 + (Math.random() * 0.01 - 0.005),
-        address: 'Credo HQ, District 1, Ho Chi Minh City',
+        address: 'CMngt HQ, District 1, Ho Chi Minh City',
       },
       createdAt: clockIn,
       updatedAt: clockOut || new Date(),
@@ -316,17 +316,17 @@ export const demoLocations = [
   {
     latitude: 10.8231,
     longitude: 106.6297,
-    address: 'Credo HQ, District 1, Ho Chi Minh City',
+    address: 'CMngt HQ, District 1, Ho Chi Minh City',
   },
   {
     latitude: 10.7769,
     longitude: 106.7009,
-    address: 'Credo Branch - District 2, Ho Chi Minh City',
+    address: 'CMngt Branch - District 2, Ho Chi Minh City',
   },
   {
     latitude: 10.8142,
     longitude: 106.6438,
-    address: 'Credo Warehouse - Tan Binh, Ho Chi Minh City',
+    address: 'CMngt Warehouse - Tan Binh, Ho Chi Minh City',
   },
 ];
 
