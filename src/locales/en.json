@@ -385,22 +385,6 @@
     "departmentName": "Department",
     "departmentCode": "Department Code"
   },
-  "staff": {
-    "steps": {
-      "basicInfo": {},
-      "workingPattern": {},
-      "leaveManagement": {},
-      "accessPermissions": {}
-    },
-    "basicInfo": {
-      "clockInPreview": {}
-    },
-    "workingPattern": {},
-    "accessPermissions": {
-      "permissions": {}
-    },
-    "leaveManagement": {}
-  },
   "customer": {
     "company": "Company",
     "address": "Address",
@@ -705,10 +689,18 @@
       "completeFailed": "Failed to complete delivery"
     },
     "filters": {
-      "searchPlaceholder": "Search by PO number",
+      "allStatus": "All",
+      "searchPlaceholder": "Search by delivery number",
       "selectStatus": "Select Status",
       "selectAssignee": "Select Assignee",
       "selectCustomer": "Select Customer"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "today": "Today",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "allDates": "All Dates"
     },
     "detail": {
       "title": "Delivery Details",

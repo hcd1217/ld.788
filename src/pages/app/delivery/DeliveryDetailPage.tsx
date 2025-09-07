@@ -21,6 +21,7 @@ import { DeliveryDetailAccordion } from '@/components/app/delivery/DeliveryDetai
 import { DeliveryStatusDrawer } from '@/components/app/delivery/DeliveryStatusDrawer';
 import { DeliveryPhotoUpload } from '@/components/app/delivery/DeliveryPhotoUpload';
 import { DeliveryUpdateModal } from '@/components/app/delivery/DeliveryUpdateModal';
+import { ROUTERS } from '@/config/routeConfig';
 
 export function DeliveryDetailPage() {
   const { deliveryId } = useParams<{ deliveryId: string }>();
@@ -210,6 +211,16 @@ export function DeliveryDetailPage() {
       );
     }
 
+    if (modals.uploadPhotos) {
+      return (
+        <DeliveryPhotoUpload
+          opened={modals.uploadPhotos}
+          onClose={handleCloseModal('uploadPhotos')}
+          onUpload={uploadPhotosAction}
+        />
+      );
+    }
+
     return (
       <AppMobileLayout
         withGoBack
@@ -234,7 +245,7 @@ export function DeliveryDetailPage() {
           />
         </Stack>
 
-        {/* Modal components */}
+        {/* Drawer components */}
         <DeliveryStatusDrawer
           opened={modals.startTransit}
           mode="start_transit"
@@ -249,11 +260,6 @@ export function DeliveryDetailPage() {
           onClose={handleCloseModal('complete')}
           onConfirm={completeDeliveryAction}
         />
-        <DeliveryPhotoUpload
-          opened={modals.uploadPhotos}
-          onClose={handleCloseModal('uploadPhotos')}
-          onUpload={uploadPhotosAction}
-        />
         <DeliveryUpdateModal
           opened={modals.update}
           deliveryRequest={selectedDeliveryRequest}
@@ -267,7 +273,7 @@ export function DeliveryDetailPage() {
   // Desktop layout
   return (
     <AppDesktopLayout isLoading={isLoading} error={error} clearError={clearError}>
-      <AppPageTitle title={title} />
+      <AppPageTitle withGoBack route={ROUTERS.DELIVERY_MANAGEMENT} title={title} />
 
       {isLoading ? (
         <LoadingOverlay visible />

@@ -27,6 +27,9 @@ import {
   DeliveryGridCard,
   DeliveryListSkeleton,
   DeliveryFilterBarDesktop,
+  DeliveryFilterBarMobile,
+  DeliveryStatusFilterDrawer,
+  DeliveryQuickActionsDrawer,
   DeliveryErrorBoundary,
 } from '@/components/app/delivery';
 import { useDeviceType } from '@/hooks/useDeviceType';
@@ -64,6 +67,11 @@ export function DeliveryListPage() {
 
   // Use the delivery request filters hook for filter state management
   const { filters, filterHandlers, hasActiveFilters } = useDeliveryRequestFilters([]);
+
+  // Mobile drawer states
+  const [quickActionsDrawerOpened, setQuickActionsDrawerOpened] = useState(false);
+  const [statusDrawerOpened, setStatusDrawerOpened] = useState(false);
+  const [selectedQuickAction, setSelectedQuickAction] = useState<string | undefined>();
 
   // Debounce the search query for API calls (1 second delay)
   const [debouncedSearch] = useDebouncedValue(filters.searchQuery, 1000);
@@ -205,6 +213,23 @@ export function DeliveryListPage() {
 
   // Initial load is handled by filter effect
 
+  // Mobile drawer handlers
+  const handleQuickActionSelect = (
+    action: string | undefined,
+    dateRange?: { start: Date; end: Date },
+  ) => {
+    setSelectedQuickAction(action);
+    if (dateRange) {
+      filterHandlers.setScheduledDateRange(dateRange.start, dateRange.end);
+    } else {
+      filterHandlers.setScheduledDateRange(undefined, undefined);
+    }
+  };
+
+  const handleStatusApply = () => {
+    // The apply is handled within the drawer component
+  };
+
   // Check view permission
   if (!permissions.deliveryRequest.canView) {
     return <PermissionDeniedPage />;
@@ -220,6 +245,22 @@ export function DeliveryListPage() {
         header={<AppPageTitle title={t('delivery.list.title')} />}
       >
         <DeliveryErrorBoundary componentName="DeliveryListPage">
+          {/* Mobile Filter Bar */}
+          <DeliveryFilterBarMobile
+            searchQuery={filters.searchQuery}
+            selectedStatuses={filters.statuses}
+            hasDateFilter={!!filters.scheduledDateRange.start || !!filters.scheduledDateRange.end}
+            quickAction={selectedQuickAction}
+            hasActiveFilters={hasActiveFilters}
+            onSearchChange={filterHandlers.setSearchQuery}
+            onQuickActionsClick={() => setQuickActionsDrawerOpened(true)}
+            onStatusClick={() => setStatusDrawerOpened(true)}
+            onClearFilters={() => {
+              filterHandlers.resetFilters();
+              setSelectedQuickAction(undefined);
+            }}
+          />
+
           <BlankState {...blankStateProps} />
           <Stack mt="md" gap={0}>
             {isLoading && deliveryRequests.length === 0 ? (
@@ -263,6 +304,23 @@ export function DeliveryListPage() {
           )}
 
           {/* Note: Delivery requests are created from PO pages, not directly */}
+
+          {/* Mobile Filter Drawers */}
+          <DeliveryQuickActionsDrawer
+            opened={quickActionsDrawerOpened}
+            selectedAction={selectedQuickAction}
+            onClose={() => setQuickActionsDrawerOpened(false)}
+            onActionSelect={handleQuickActionSelect}
+          />
+
+          <DeliveryStatusFilterDrawer
+            opened={statusDrawerOpened}
+            selectedStatuses={filters.statuses}
+            onClose={() => setStatusDrawerOpened(false)}
+            onStatusToggle={filterHandlers.toggleStatus}
+            onApply={handleStatusApply}
+            onClear={() => filterHandlers.setStatuses([])}
+          />
         </DeliveryErrorBoundary>
       </AppMobileLayout>
     );

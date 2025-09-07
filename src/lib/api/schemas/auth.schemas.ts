@@ -316,6 +316,7 @@ function fakePermission(code: DepartmentCode) {
       permissions.purchaseOrder = {
         ...permissions.purchaseOrder,
         canView: true,
+        canEdit: true,
         actions: {
           canShip: true,
           canRefund: true,

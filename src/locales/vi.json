@@ -385,22 +385,6 @@
     "departmentName": "Phòng Ban",
     "departmentCode": "Mã Phòng Ban"
   },
-  "staff": {
-    "steps": {
-      "basicInfo": {},
-      "workingPattern": {},
-      "leaveManagement": {},
-      "accessPermissions": {}
-    },
-    "basicInfo": {
-      "clockInPreview": {}
-    },
-    "workingPattern": {},
-    "accessPermissions": {
-      "permissions": {}
-    },
-    "leaveManagement": {}
-  },
   "customer": {
     "company": "Công Ty",
     "address": "Địa Chỉ",
@@ -705,10 +689,18 @@
       "completeFailed": "Không thể hoàn thành giao hàng"
     },
     "filters": {
+      "allStatus": "Tất Cả",
       "searchPlaceholder": "Tìm kiếm theo số PO",
       "selectStatus": "Chọn Trạng Thái",
       "selectAssignee": "Chọn Người Phụ Trách",
       "selectCustomer": "Chọn Khách Hàng"
+    },
+    "quickActions": {
+      "title": "Chọn Nhanh",
+      "today": "Hôm Nay",
+      "thisWeek": "Tuần Này",
+      "thisMonth": "Tháng Này",
+      "allDates": "Tất Cả"
     },
     "detail": {
       "title": "Chi Tiết Giao Hàng",

@@ -148,119 +148,6 @@ export function DeliveryStatusDrawer({
 
   if (!deliveryRequest) return null;
 
-  // Content to be rendered in both Modal and Drawer
-  const content = (
-    <Stack gap="md">
-      <Alert icon={<IconAlertTriangle size={16} />} color={config.alertColor} variant="light">
-        {config.description}
-      </Alert>
-
-      <div>
-        <Text fw={500} mb="xs">
-          {t('delivery.deliveryDetails')}
-        </Text>
-        <Text size="sm" c="dimmed">
-          {t('delivery.deliveryId')}: {deliveryRequest.deliveryRequestNumber}
-        </Text>
-        <Text size="sm" c="dimmed">
-          {t('delivery.customerName')}: {deliveryRequest.customerName}
-        </Text>
-        {deliveryRequest.scheduledDate && (
-          <Text size="sm" c="dimmed">
-            {t('delivery.fields.scheduledDate')}: {formatDate(deliveryRequest.scheduledDate)}
-          </Text>
-        )}
-      </div>
-
-      {!isComplete && (
-        <Textarea
-          label={t('delivery.transitNotes')}
-          placeholder={t('delivery.enterTransitNotes')}
-          value={notes}
-          onChange={(event) => setNotes(event.currentTarget.value)}
-          rows={3}
-          description={t('delivery.transitNotesDescription')}
-        />
-      )}
-
-      {isComplete && (
-        <>
-          <Text size="sm" fw={500} mb="xs">
-            {t('delivery.detail.photos')}
-          </Text>
-
-          {/* Display uploaded photos */}
-          {uploadedPhotos.length > 0 && (
-            <>
-              <Grid mb="xs">
-                {uploadedPhotos.map((url, index) => (
-                  <Grid.Col key={index} span={4}>
-                    <Image
-                      src={url}
-                      alt={`Photo ${index + 1}`}
-                      height={80}
-                      fit="cover"
-                      radius="sm"
-                      fallbackSrc="/photos/no-photo.svg"
-                    />
-                  </Grid.Col>
-                ))}
-              </Grid>
-              <Text size="xs" c="dimmed" mb="xs">
-                {uploadedPhotos.length} {uploadedPhotos.length === 1 ? 'photo' : 'photos'} uploaded
-              </Text>
-            </>
-          )}
-
-          <Button
-            variant="light"
-            leftSection={<IconCamera size={16} />}
-            onClick={() => setShowPhotoUpload(true)}
-          >
-            {t('common.photos.takePhoto')}
-          </Button>
-          <TextInput
-            label={t('delivery.recipient')}
-            placeholder={t('delivery.enterRecipientName')}
-            value={recipient}
-            onChange={(event) => setRecipient(event.currentTarget.value)}
-            required
-            description={t('delivery.recipientDescription')}
-          />
-          <Textarea
-            label={t('delivery.completionNotes')}
-            placeholder={t('delivery.enterCompletionNotes')}
-            value={notes}
-            onChange={(event) => setNotes(event.currentTarget.value)}
-            rows={3}
-            required
-            description={t('delivery.completionNotesDescription')}
-          />
-        </>
-      )}
-
-      {isComplete && uploadedPhotos.length === 0 && (
-        <Text size="xs" c="red" ta="center">
-          {t('delivery.detail.photosRequired')}
-        </Text>
-      )}
-
-      <Group justify="flex-end">
-        <Button variant="outline" onClick={handleClose}>
-          {t('common.cancel')}
-        </Button>
-        <Button
-          color={config.buttonColor}
-          leftSection={config.icon}
-          onClick={handleConfirm}
-          disabled={isConfirmDisabled()}
-        >
-          {config.buttonText}
-        </Button>
-      </Group>
-    </Stack>
-  );
-
   if (isDesktop) {
     return null;
   }
@@ -291,7 +178,116 @@ export function DeliveryStatusDrawer({
         }}
       >
         <ScrollArea h="calc(90% - 80px)" type="never">
-          {content}
+          <Stack gap="md">
+            <Alert icon={<IconAlertTriangle size={16} />} color={config.alertColor} variant="light">
+              {config.description}
+            </Alert>
+
+            <div>
+              <Text fw={500} mb="xs">
+                {t('delivery.deliveryDetails')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('delivery.deliveryId')}: {deliveryRequest.deliveryRequestNumber}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('delivery.customerName')}: {deliveryRequest.customerName}
+              </Text>
+              {deliveryRequest.scheduledDate && (
+                <Text size="sm" c="dimmed">
+                  {t('delivery.fields.scheduledDate')}: {formatDate(deliveryRequest.scheduledDate)}
+                </Text>
+              )}
+            </div>
+
+            {!isComplete && (
+              <Textarea
+                label={t('delivery.transitNotes')}
+                placeholder={t('delivery.enterTransitNotes')}
+                value={notes}
+                onChange={(event) => setNotes(event.currentTarget.value)}
+                rows={3}
+                description={t('delivery.transitNotesDescription')}
+              />
+            )}
+
+            {isComplete && (
+              <>
+                <Text size="sm" fw={500} mb="xs">
+                  {t('delivery.detail.photos')}
+                </Text>
+
+                {/* Display uploaded photos */}
+                {uploadedPhotos.length > 0 && (
+                  <>
+                    <Grid mb="xs">
+                      {uploadedPhotos.map((url, index) => (
+                        <Grid.Col key={index} span={4}>
+                          <Image
+                            src={url}
+                            alt={`Photo ${index + 1}`}
+                            height={80}
+                            fit="cover"
+                            radius="sm"
+                            fallbackSrc="/photos/no-photo.svg"
+                          />
+                        </Grid.Col>
+                      ))}
+                    </Grid>
+                    <Text size="xs" c="dimmed" mb="xs">
+                      {uploadedPhotos.length} {uploadedPhotos.length === 1 ? 'photo' : 'photos'}{' '}
+                      uploaded
+                    </Text>
+                  </>
+                )}
+
+                <Button
+                  variant="light"
+                  leftSection={<IconCamera size={16} />}
+                  onClick={() => setShowPhotoUpload(true)}
+                >
+                  {t('common.photos.takePhoto')}
+                </Button>
+                <TextInput
+                  label={t('delivery.recipient')}
+                  placeholder={t('delivery.enterRecipientName')}
+                  value={recipient}
+                  onChange={(event) => setRecipient(event.currentTarget.value)}
+                  required
+                  description={t('delivery.recipientDescription')}
+                />
+                <Textarea
+                  label={t('delivery.completionNotes')}
+                  placeholder={t('delivery.enterCompletionNotes')}
+                  value={notes}
+                  onChange={(event) => setNotes(event.currentTarget.value)}
+                  rows={3}
+                  required
+                  description={t('delivery.completionNotesDescription')}
+                />
+              </>
+            )}
+
+            {isComplete && uploadedPhotos.length === 0 && (
+              <Text size="xs" c="red" ta="center">
+                {t('delivery.detail.photosRequired')}
+              </Text>
+            )}
+
+            <Group justify="flex-end">
+              <Button variant="outline" onClick={handleClose}>
+                {t('common.cancel')}
+              </Button>
+              <Button
+                color={config.buttonColor}
+                leftSection={config.icon}
+                onClick={handleConfirm}
+                disabled={isConfirmDisabled()}
+              >
+                {config.buttonText}
+              </Button>
+            </Group>
+          </Stack>
         </ScrollArea>
       </Drawer>
     </>

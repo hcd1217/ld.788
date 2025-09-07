@@ -149,3 +149,57 @@ export function getEndDateHighlightStyles(
     }
   }
 }
+
+/**
+ * Get the start of a day
+ * @param date - The date to get the start of
+ * @returns The start of the day
+ */
+export function startOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+/**
+ * Get the end of a day
+ * @param date - The date to get the end of
+ * @returns The end of the day
+ */
+export function endOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+}
+
+/**
+ * Get the start of a week
+ * @param date - The date to get the start of
+ * @returns The start of the week
+ */
+export function startOfWeek(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay());
+}
+
+/**
+ * Get the end of a week
+ * @param date - The date to get the end of
+ * @returns The end of the week
+ */
+export function endOfWeek(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + (6 - date.getDay()));
+}
+
+/**
+ * Get the start of a month
+ * @param date - The date to get the start of
+ * @returns The start of the month
+ */
+export function startOfMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+/**
+ * Get the end of a month
+ * @param date - The date to get the end of
+ * @returns The end of the month
+ */
+export function endOfMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+}
