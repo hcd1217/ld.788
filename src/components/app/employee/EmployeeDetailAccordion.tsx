@@ -24,7 +24,7 @@ type EmployeeDetailAccordionProps = {
 export function EmployeeDetailAccordion({
   employee,
   canEdit,
-  canSetPassword,
+  canSetPassword = false,
   onActivate,
   onDeactivate,
   onEdit,

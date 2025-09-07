@@ -24,7 +24,7 @@ type EmployeeDetailTabsProps = {
 export function EmployeeDetailTabs({
   employee,
   canEdit,
-  canSetPassword,
+  canSetPassword = false,
   onEdit,
   onActivate,
   onDeactivate,
