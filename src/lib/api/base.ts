@@ -1,4 +1,5 @@
 import type * as z from 'zod/v4';
+import { Md5 } from 'ts-md5';
 import { addApiError } from '@/stores/error';
 import { authService } from '@/services/auth/auth';
 import { cleanObject } from '@/utils/object';
@@ -234,6 +235,9 @@ export class BaseApiClient {
       method: 'DELETE',
       body: data ? JSON.stringify(data) : undefined,
       schema,
+      headers: {
+        'X-CACHE-CONTROL': 'no-cache',
+      },
     });
 
     // Invalidate related cache entries
@@ -300,29 +304,28 @@ export class BaseApiClient {
     },
   ): Promise<T> {
     const { params, schema, ...init } = config;
+    const isGetRequest = init.method === 'GET';
+
     // Add configurable delay in development mode
     if (isDevelopment) {
-      const delayMs = Number(import.meta.env.VITE_DEV_API_DELAY) || 0;
-      if (delayMs > 0) {
-        console.ignore?.(
-          `[API] Delaying request for ${delayMs}ms: ${init.method ?? 'GET'} ${endpoint}`,
-        );
-        await new Promise((resolve) => {
-          setTimeout(resolve, delayMs);
-        });
-      }
+      const DELAY_MS = 500;
+      await delay(DELAY_MS);
     }
 
     const url = new URL(`${this.baseURL}${endpoint}`);
-    if (params) {
+    if (isGetRequest && params) {
       for (const [key, value] of Object.entries(params)) {
         url.searchParams.append(key, value);
       }
     }
 
-    const token = this.getAuthToken();
     const headers = new Headers(init.headers);
 
+    if (!isGetRequest) {
+      headers.set('X-CACHE-CONTROL', 'no-cache');
+    }
+
+    const token = this.getAuthToken();
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
@@ -340,6 +343,8 @@ export class BaseApiClient {
       headers.set('Content-Type', 'application/json');
     }
 
+    this.buildNonceHeaders(headers);
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       controller.abort();
@@ -354,75 +359,20 @@ export class BaseApiClient {
 
       clearTimeout(timeoutId);
 
-      // Check if response has content before parsing JSON
-      const contentType = response.headers.get('content-type');
-      const contentLength = response.headers.get('content-length');
-
-      // Check if response likely has JSON content
-      const hasJsonContent =
-        contentType?.includes('application/json') &&
-        contentLength !== '0' &&
-        response.status !== 204;
-
-      let data = hasJsonContent ? await response.json() : undefined;
-
-      // @todo: refactor this later
-      if (data && 'success' in data) {
-        data = data.data;
-      }
+      const data = await this.parseResponse(response);
 
       if (!response.ok) {
         const apiError = new ApiError(response.status, response.statusText, data);
-
-        // Handle 401 / 403 errors globally
-        if (response.status === 401 || response.status === 403) {
-          // Import app store dynamically to avoid circular dependencies
-          import('@/stores/useAppStore').then(({ useAppStore }) => {
-            const state = useAppStore.getState();
-            // If user is authenticated but got 401, it's a permission error
-            if (state.isAuthenticated) {
-              state.setPermissionError(true);
-            }
-          });
+        if (isDevelopment && !options?.noError) {
+          this.logError(apiError, response, init, url, endpoint, headers, data);
         }
-
-        // Log to error store in development
-        if (!options?.noError && isDevelopment) {
-          addApiError(apiError.message, response.status, endpoint, {
-            method: init.method ?? 'GET',
-            url: url.toString(),
-            requestBody: init.body,
-            responseData: data,
-            headers: Object.fromEntries(headers.entries()),
-          });
-        }
-
         throw apiError;
       }
 
-      // Validate response if schema provided
       if (schema) {
-        try {
-          return schema.parse(data) as T;
-        } catch (error) {
-          const validationError = new ApiError(422, 'Invalid response format', {
-            received: data,
-            error: error instanceof Error ? error.message : 'Validation failed',
-          });
-          // Log validation errors to error store
-          if (isDevelopment) {
-            addApiError(validationError.message, 422, endpoint, {
-              method: init.method ?? 'GET',
-              url: url.toString(),
-              validationError: error instanceof Error ? error.message : 'Validation failed',
-              receivedData: data,
-            });
-          }
-
-          throw validationError;
-        }
+        // Validate response if schema provided
+        return this.validateResponse(schema, data, init, url, endpoint);
       }
-
       return data as T;
     } catch (error) {
       clearTimeout(timeoutId);
@@ -470,6 +420,88 @@ export class BaseApiClient {
     }
   }
 
+  private logError<T>(
+    apiError: ApiError,
+    response: Response,
+    init: RequestConfig<T>,
+    url: URL,
+    endpoint: string,
+    headers: Headers,
+    responseData: unknown,
+  ) {
+    // Handle 401 / 403 errors globally
+    if (response.status === 401 || response.status === 403) {
+      // Import app store dynamically to avoid circular dependencies
+      import('@/stores/useAppStore').then(({ useAppStore }) => {
+        const state = useAppStore.getState();
+        // If user is authenticated but got 401, it's a permission error
+        if (state.isAuthenticated) {
+          state.setPermissionError(true);
+        }
+      });
+    }
+    addApiError(apiError.message, response.status, endpoint, {
+      method: init.method ?? 'GET',
+      url: url.toString(),
+      requestBody: init.body,
+      responseData,
+      headers: Object.fromEntries(headers.entries()),
+    });
+  }
+
+  private validateResponse<T>(
+    schema: z.ZodSchema<T>,
+    data: unknown,
+    init: RequestConfig<T>,
+    url: URL,
+    endpoint: string,
+  ) {
+    try {
+      return schema.parse(data) as T;
+    } catch (error) {
+      const validationError = new ApiError(422, 'Invalid response format', {
+        received: data,
+        error: error instanceof Error ? error.message : 'Validation failed',
+      });
+      // Log validation errors to error store
+      if (isDevelopment) {
+        addApiError(validationError.message, 422, endpoint, {
+          method: init.method ?? 'GET',
+          url: url.toString(),
+          validationError: error instanceof Error ? error.message : 'Validation failed',
+          receivedData: data,
+        });
+      }
+
+      throw validationError;
+    }
+  }
+
+  private async parseResponse(response: Response): Promise<unknown> {
+    const contentLength = response.headers.get('content-length');
+    if (contentLength === '0' || response.status === 204) {
+      return undefined;
+    }
+    const contentType = response.headers.get('content-type');
+    const hasJsonContent = contentType?.includes('application/json');
+    const data = hasJsonContent ? await response.json() : undefined;
+    if (data && 'success' in data) {
+      return data.data;
+    }
+    return undefined;
+  }
+
+  private buildNonceHeaders(headers: Headers): void {
+    const timestamp = Date.now().toString();
+    const requestKey = Math.random().toString(36).slice(2, 15);
+    const nonce = this.generateNonce(timestamp, requestKey);
+    if (nonce) {
+      headers.set('X-REQUEST-KEY', requestKey);
+      headers.set('X-TIMESTAMP', timestamp);
+      headers.set('X-NONCE', nonce);
+    }
+  }
+
   private setCachedData<T>(cacheKey: string, data: T, ttl?: number): void {
     if (!this.cacheEnabled) return;
 
@@ -478,5 +510,26 @@ export class BaseApiClient {
       timestamp: Date.now(),
       ttl: ttl ?? this.cacheTTL,
     });
+  }
+
+  private getMark(requestKey: string): string {
+    return requestKey.slice(9, 10);
+  }
+
+  private generateNonce(timestamp: string, requestKey: string): string {
+    const mark = this.getMark(requestKey);
+    let count = 0;
+    do {
+      const md5 = new Md5();
+      const random = Math.random().toString(36).slice(2, 15);
+      md5.appendStr(`${random}.${timestamp}.${requestKey}`);
+      const nonce = md5.end().toString();
+      if (nonce.endsWith(mark)) {
+        return random;
+      }
+      count++;
+    } while (count < 1000);
+
+    return '';
   }
 }
