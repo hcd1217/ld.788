@@ -26,6 +26,7 @@ import {
   parseExcelFile,
 } from '@/utils/employee.utils';
 import { useAppStore, usePermissions } from '@/stores/useAppStore';
+import { delay } from '@/utils/time';
 
 type EmployeeFormPageProps = {
   readonly mode: 'create' | 'edit';
@@ -204,9 +205,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
     async actionHandler() {
       setIsDownloading(true);
       showInfoNotification(t('common.downloading'), t('employee.creatingSampleFile'));
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1000);
-      });
+      await delay(1000);
       const unitOptions = units.map((unit) => ({
         value: unit.id,
         label: unit.name,

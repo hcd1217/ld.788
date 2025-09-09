@@ -1,16 +1,15 @@
 import { Modal, Drawer, Stack, Text, Group, Button, Select, Textarea, Switch } from '@mantine/core';
-import { DateInput } from '@mantine/dates';
 import { IconTruck, IconCalendar, IconUrgent } from '@tabler/icons-react';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { useEmployees, useClientConfig } from '@/stores/useAppStore';
+import { useDeliveryAssigneeOptions } from '@/stores/useDeliveryRequestStore';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { formatDate } from '@/utils/time';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 import type { PICType } from '@/services/sales/deliveryRequest';
-import { UrgentBadge } from '@/components/common';
+import { DateInput, UrgentBadge } from '@/components/common';
 
 type DeliveryRequestModalProps = {
   readonly opened: boolean;
@@ -33,39 +32,22 @@ export function DeliveryRequestModal({
 }: DeliveryRequestModalProps) {
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
-  const employees = useEmployees();
-  const clientConfig = useClientConfig();
   const customerMapByCustomerId = useCustomerMapByCustomerId();
+  const assigneeOptions = useDeliveryAssigneeOptions();
 
   // Form state
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
-  const [scheduledDate, setScheduledDate] = useState<Date | null>(new Date());
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined);
   const [notes, setNotes] = useState('');
   const [isUrgentDelivery, setIsUrgentDelivery] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Employee options for select - filtered by assigneeIds from clientConfig
-  const employeeOptions = useMemo(() => {
-    const assigneeIds = clientConfig.features?.deliveryRequest?.assigneeIds ?? [];
-
-    // Filter employees based on assigneeIds if configured, otherwise show all
-    const filteredEmployees =
-      assigneeIds.length > 0
-        ? employees.filter((employee) => assigneeIds.includes(employee.id))
-        : employees;
-
-    return filteredEmployees.map((employee) => ({
-      value: employee.id,
-      label: employee.fullName,
-    }));
-  }, [employees, clientConfig.features?.deliveryRequest]);
 
   // Handle modal lifecycle - reset form when closed, set default notes when opened
   useEffect(() => {
     if (!opened) {
       // Reset form when modal closes
       setSelectedEmployeeId(null);
-      setScheduledDate(new Date());
+      setScheduledDate(undefined);
       setNotes('');
       setIsUrgentDelivery(false);
     } else if (purchaseOrder && !notes) {
@@ -128,9 +110,9 @@ export function DeliveryRequestModal({
       )}
 
       <Select
-        label={t('delivery.fields.assignedTo')}
+        label={t('delivery.assignedTo')}
         placeholder={t('delivery.form.selectAssignee')}
-        data={employeeOptions}
+        data={assigneeOptions}
         value={selectedEmployeeId}
         onChange={setSelectedEmployeeId}
         searchable
@@ -139,17 +121,17 @@ export function DeliveryRequestModal({
       />
 
       <DateInput
-        label={t('delivery.fields.scheduledDate')}
+        label={t('delivery.scheduledDate')}
         placeholder={t('delivery.form.selectDate')}
         value={scheduledDate}
-        onChange={(date) => setScheduledDate(date ? new Date(date) : null)}
+        onChange={(date) => setScheduledDate(date ? new Date(date) : undefined)}
         required
         minDate={new Date()}
         leftSection={<IconCalendar size={16} />}
       />
 
       <Textarea
-        label={t('delivery.fields.notes')}
+        label={t('delivery.notes')}
         placeholder={t('delivery.form.enterNotes')}
         value={notes}
         onChange={(e) => setNotes(e.currentTarget.value)}
@@ -159,7 +141,7 @@ export function DeliveryRequestModal({
       <Switch
         label={
           <Group gap="xs">
-            {t('delivery.fields.urgentDelivery')}
+            {t('delivery.urgentDelivery')}
             {isUrgentDelivery && <UrgentBadge size="xs" withIcon={false} />}
           </Group>
         }

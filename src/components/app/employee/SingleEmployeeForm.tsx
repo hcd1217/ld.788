@@ -20,7 +20,6 @@ import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
 import { useTranslation } from '@/hooks/useTranslation';
 import { FirstNameAndLastNameInForm } from '@/components/form/FirstNameAndLastNameInForm';
-import i18n from '@/lib/i18n';
 import type { Unit } from '@/services/hr/employee';
 
 type SingleEmployeeFormValues = {
@@ -70,9 +69,6 @@ export function SingleEmployeeForm({
       })),
     [units],
   );
-
-  const locale = i18n.language;
-  const valueFormat = locale === 'vi' ? 'DD/MM/YYYY' : 'MMM DD, YYYY';
   return (
     <Card withBorder radius="md" p="xl">
       <form onSubmit={form.onSubmit(onSubmit)}>
@@ -157,7 +153,6 @@ export function SingleEmployeeForm({
             label={t('employee.startDate')}
             placeholder={t('employee.startDatePlaceholder')}
             clearable
-            valueFormat={valueFormat}
             {...form.getInputProps('startDate')}
           />
           {isEditMode && (
@@ -172,7 +167,6 @@ export function SingleEmployeeForm({
               label={t('employee.endDate')}
               placeholder={t('employee.endDatePlaceholder')}
               clearable
-              valueFormat={valueFormat}
               {...form.getInputProps('endDate')}
             />
           )}

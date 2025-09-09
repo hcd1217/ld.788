@@ -8,6 +8,7 @@ import {
   UpdateDeliveryStatusSchema,
   UploadPhotosSchema,
   CompleteDeliverySchema,
+  UpdateDeliveryOrderInDaySchema,
   type GetDeliveryRequestsResponse,
   type CreateDeliveryRequest,
   type CreateDeliveryRequestResponse,
@@ -16,6 +17,7 @@ import {
   type UpdateDeliveryStatus,
   type UploadPhotos,
   type CompleteDelivery,
+  type UpdateDeliveryOrderInDay,
   type DeliveryStatus,
 } from '../schemas/deliveryRequest.schemas';
 
@@ -118,6 +120,15 @@ export class DeliveryRequestApi extends BaseApiClient {
       data,
       undefined,
       CompleteDeliverySchema,
+    );
+  }
+
+  async updateDeliveryOrderInDay(data: UpdateDeliveryOrderInDay): Promise<void> {
+    await this.post<void, UpdateDeliveryOrderInDay>(
+      '/api/sales/delivery-requests/update-delivery-order-in-day',
+      data,
+      undefined,
+      UpdateDeliveryOrderInDaySchema,
     );
   }
 }

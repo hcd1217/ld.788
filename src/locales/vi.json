@@ -378,7 +378,6 @@
     "loginFailed": "Đăng nhập thất bại",
     "invalidCredentials": "Email hoặc mật khẩu không đúng. Vui lòng thử lại."
   },
-  "permission": {},
   "profile": {
     "notLoggedIn": "Chưa Đăng Nhập",
     "pleaseLogin": "Vui lòng đăng nhập để xem hồ sơ của bạn.",
@@ -660,33 +659,30 @@
     "deliveryRequestCreateFailed": "Không thể tạo yêu cầu giao hàng"
   },
   "delivery": {
-    "list": {
-      "title": "Quản Lý Giao Hàng"
-    },
+    "title": "Quản Lý Giao Hàng",
     "actions": {
       "create": "Tạo Yêu Cầu Giao Hàng",
       "startTransit": "Bắt Đầu",
       "startTransitDescription": "Đánh dấu đang vận chuyển",
       "complete": "Hoàn Thành Giao Hàng"
     },
-    "status": {
+    "statuses": {
       "pending": "Chờ Giao",
       "inTransit": "Đang Giao",
       "in_transit": "Đang Giao",
       "completed": "Đã Giao"
     },
-    "fields": {
-      "id": "Mã Yêu Cầu",
-      "urgentDelivery": "Giao Gấp",
-      "purchaseOrder": "Đơn Đặt Hàng",
-      "poNumber": "Số PO",
-      "customer": "Khách Hàng",
-      "assignedTo": "Người Phụ Trách",
-      "scheduledDate": "Ngày Dự Kiến",
-      "completedDate": "Ngày Hoàn Thành",
-      "status": "Trạng Thái",
-      "notes": "Ghi Chú"
-    },
+    "id": "Mã Yêu Cầu",
+    "urgentDelivery": "Giao Gấp",
+    "purchaseOrder": "Đơn Đặt Hàng",
+    "poNumber": "Số PO",
+    "customer": "Khách Hàng",
+    "assignedTo": "Người Phụ Trách",
+    "arrangeDeliveryOrder": "Sắp Xếp Thứ Tự Giao Hàng",
+    "scheduledDate": "Ngày Dự Kiến",
+    "completedDate": "Ngày Hoàn Thành",
+    "status": "Trạng Thái",
+    "notes": "Ghi Chú",
     "assignmentTypes": {},
     "form": {
       "urgentDeliveryDescription": "Đánh dấu đơn hàng này là giao gấp",
@@ -704,7 +700,7 @@
     },
     "filters": {
       "allStatus": "Tất Cả",
-      "searchPlaceholder": "Tìm kiếm theo số PO",
+      "searchPlaceholder": "Tìm kiếm theo mã giao hàng",
       "selectStatus": "Chọn Trạng Thái",
       "selectAssignee": "Chọn Người Phụ Trách",
       "selectCustomer": "Chọn Khách Hàng"
@@ -746,6 +742,7 @@
       "complete": {},
       "cancel": {}
     },
+    "pleaseSelectAssigneeAndScheduledDate": "Vui lòng chọn người phụ trách và ngày dự kiến",
     "noDeliveryRequestsFoundSearch": "Không tìm thấy yêu cầu giao hàng phù hợp với tìm kiếm",
     "noDeliveryRequestsFound": "Không có yêu cầu giao hàng",
     "tryDifferentSearch": "Thử điều chỉnh tiêu chí tìm kiếm",

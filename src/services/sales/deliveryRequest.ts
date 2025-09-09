@@ -7,6 +7,8 @@ import {
   type DeliveryStatus,
 } from '@/lib/api/schemas/deliveryRequest.schemas';
 import { overviewService } from '../client/overview';
+import { startOfDay } from '@/utils/time';
+import { endOfDay } from '@/utils/time';
 
 // Re-export types for compatibility
 export type {
@@ -58,7 +60,6 @@ function transformApiToFrontend(
 export type DeliveryRequestFilterParams = {
   status?: DeliveryStatus;
   assignedTo?: string;
-  scheduledDate?: string | Date;
   scheduledDateFrom?: string | Date;
   scheduledDateTo?: string | Date;
   deliveryRequestNumber?: string;
@@ -86,10 +87,6 @@ export const deliveryRequestService = {
       ? {
           status: filters.status,
           assignedTo: filters.assignedTo,
-          scheduledDate:
-            filters.scheduledDate instanceof Date
-              ? filters.scheduledDate.toISOString()
-              : filters.scheduledDate,
           scheduledDateFrom:
             filters.scheduledDateFrom instanceof Date
               ? filters.scheduledDateFrom.toISOString()
@@ -108,17 +105,20 @@ export const deliveryRequestService = {
       : undefined;
 
     const response = await deliveryRequestApi.getDeliveryRequests(apiParams);
-    const deliveryRequests = response.deliveryRequests.map((dr) =>
-      transformApiToFrontend(dr, customerMapByCustomerId),
-    );
-
-    deliveryRequests.sort((a, b) => {
-      if (a.isUrgentDelivery && !b.isUrgentDelivery) return -1;
-      if (!a.isUrgentDelivery && b.isUrgentDelivery) return 1;
-      const _a = a.scheduledDate.getTime();
-      const _b = b.scheduledDate.getTime();
-      return _a - _b;
-    });
+    const deliveryRequests = response.deliveryRequests
+      .sort((a, b) => {
+        if (a.metadata?.isUrgentDelivery && !b.metadata?.isUrgentDelivery) return -1;
+        if (!a.metadata?.isUrgentDelivery && b.metadata?.isUrgentDelivery) return 1;
+        const _a = a.scheduledDate.setHours(0, 0, 0, 0);
+        const _b = b.scheduledDate.setHours(0, 0, 0, 0);
+        if (_a === _b) {
+          const _a = a.metadata?.deliveryOrderInDay ?? 0;
+          const _b = b.metadata?.deliveryOrderInDay ?? 0;
+          return _a - _b;
+        }
+        return _a - _b;
+      })
+      .map((dr) => transformApiToFrontend(dr, customerMapByCustomerId));
 
     return {
       deliveryRequests,
@@ -159,5 +159,23 @@ export const deliveryRequestService = {
     data?: { photoUrls?: string[]; notes?: string },
   ): Promise<void> {
     await deliveryRequestApi.completeDelivery(id, data || {});
+  },
+
+  async updateDeliveryOrderInDay(
+    assignedTo: string,
+    scheduledDate: string | Date,
+    orderedDeliveryRequestIds: string[],
+  ): Promise<void> {
+    const sortOrder = orderedDeliveryRequestIds.map((id, index) => ({
+      id,
+      deliveryOrderInDay: index + 1,
+    }));
+    const date = scheduledDate instanceof Date ? scheduledDate : new Date(scheduledDate);
+    await deliveryRequestApi.updateDeliveryOrderInDay({
+      assignedTo: assignedTo,
+      startOfDay: startOfDay(date).toISOString(),
+      endOfDay: endOfDay(date).toISOString(),
+      sortOrder,
+    });
   },
 };

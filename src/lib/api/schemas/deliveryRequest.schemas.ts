@@ -7,6 +7,8 @@ import {
   timestampSchema,
   AddressSchema,
   optionalBooleanSchema,
+  optionalNumberSchema,
+  numberSchema,
 } from './common.schemas';
 
 // ========== Delivery Request Schemas ==========
@@ -30,6 +32,7 @@ export const DeliveryRequestSchema = z.object({
   completedDate: timestampSchema.optional(),
   metadata: z.looseObject({
     isUrgentDelivery: optionalBooleanSchema,
+    deliveryOrderInDay: optionalNumberSchema,
     photoUrls: z.array(stringSchema).optional(),
     deliveryAddress: AddressSchema.optional(),
     po: z
@@ -78,6 +81,18 @@ export const CompleteDeliverySchema = z.object({
   notes: optionalStringSchema,
 });
 
+export const UpdateDeliveryOrderInDaySchema = z.object({
+  assignedTo: idSchema,
+  startOfDay: stringSchema,
+  endOfDay: stringSchema,
+  sortOrder: z.array(
+    z.object({
+      id: idSchema,
+      deliveryOrderInDay: numberSchema,
+    }),
+  ),
+});
+
 // ========== Response Schemas ==========
 
 export const GetDeliveryRequestsResponseSchema = z.object({
@@ -99,6 +114,7 @@ export type UpdateDeliveryRequest = z.infer<typeof UpdateDeliveryRequestSchema>;
 export type UpdateDeliveryStatus = z.infer<typeof UpdateDeliveryStatusSchema>;
 export type UploadPhotos = z.infer<typeof UploadPhotosSchema>;
 export type CompleteDelivery = z.infer<typeof CompleteDeliverySchema>;
+export type UpdateDeliveryOrderInDay = z.infer<typeof UpdateDeliveryOrderInDaySchema>;
 
 export type GetDeliveryRequestsResponse = z.infer<typeof GetDeliveryRequestsResponseSchema>;
 export type CreateDeliveryRequestResponse = z.infer<typeof CreateDeliveryRequestResponseSchema>;

@@ -35,7 +35,7 @@ export function PODeliverySection({ purchaseOrder }: PODeliverySectionProps) {
       <Stack gap="xs">
         <Group gap="xs">
           <Text size="xs" c="dimmed">
-            {t('delivery.fields.id')}:
+            {t('delivery.id')}:
           </Text>
           <Anchor
             size="sm"
@@ -50,14 +50,14 @@ export function PODeliverySection({ purchaseOrder }: PODeliverySectionProps) {
         </Group>
         <Group gap="xs">
           <Text size="xs" c="dimmed">
-            {t('delivery.fields.status')}:
+            {t('delivery.status')}:
           </Text>
           <DeliveryStatusBadge status={purchaseOrder.deliveryRequest.status} />
         </Group>
         {purchaseOrder.deliveryRequest.assignedTo && (
           <Group gap="xs">
             <Text size="xs" c="dimmed">
-              {t('delivery.fields.assignedTo')}:
+              {t('delivery.assignedTo')}:
             </Text>
             <Group gap={4}>
               <IconUser size={14} color="var(--mantine-color-gray-6)" />
@@ -77,7 +77,7 @@ export function PODeliverySection({ purchaseOrder }: PODeliverySectionProps) {
         )}
         <Group gap="xs">
           <Text size="xs" c="dimmed">
-            {t('delivery.fields.scheduledDate')}:
+            {t('delivery.scheduledDate')}:
           </Text>
           <Group gap={4}>
             <IconCalendar size={14} color="var(--mantine-color-gray-6)" />

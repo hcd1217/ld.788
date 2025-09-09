@@ -18,7 +18,6 @@ import {
 import type { POItem } from '@/services/sales/purchaseOrder';
 import { useMemo, useEffect, useCallback } from 'react';
 import { ErrorAlert } from '@/components/common';
-import { useTranslation } from '@/hooks/useTranslation';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
 
 export type POFormValues = {
@@ -58,8 +57,6 @@ export function POForm({
   isEditMode = false,
 }: POFormProps) {
   const { isMobile } = useDeviceType();
-  const { currentLanguage } = useTranslation();
-  const valueFormat = currentLanguage === 'vi' ? 'DD/MM/YYYY' : 'MMM DD, YYYY';
 
   // Computed values
   const selectedCustomer = useMemo(
@@ -107,7 +104,7 @@ export function POForm({
       />
 
       {/* Date Fields */}
-      <POFormDateSection form={form} isLoading={isLoading} valueFormat={valueFormat} />
+      <POFormDateSection form={form} isLoading={isLoading} />
 
       {/* Order Items */}
       <POFormItemsSection form={form} isLoading={isLoading} />

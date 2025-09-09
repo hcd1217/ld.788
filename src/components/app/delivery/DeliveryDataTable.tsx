@@ -46,15 +46,15 @@ function DeliveryDataTableComponent({
 
   return (
     <ScrollArea>
-      <Table striped highlightOnHover aria-label={t('delivery.list.title') as string}>
+      <Table striped highlightOnHover aria-label={t('delivery.title') as string}>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>{t('delivery.fields.id')}</Table.Th>
-            <Table.Th>{t('delivery.fields.customer')}</Table.Th>
-            <Table.Th>{t('delivery.fields.scheduledDate')}</Table.Th>
-            <Table.Th>{t('delivery.fields.completedDate')}</Table.Th>
-            <Table.Th>{t('delivery.fields.assignedTo')}</Table.Th>
-            <Table.Th>{t('delivery.fields.status')}</Table.Th>
+            <Table.Th>{t('delivery.id')}</Table.Th>
+            <Table.Th>{t('delivery.customer')}</Table.Th>
+            <Table.Th>{t('delivery.scheduledDate')}</Table.Th>
+            <Table.Th>{t('delivery.completedDate')}</Table.Th>
+            <Table.Th>{t('delivery.assignedTo')}</Table.Th>
+            <Table.Th>{t('delivery.status')}</Table.Th>
             {!noAction && <Table.Th style={{ width: 120 }}>{t('common.actions')}</Table.Th>}
           </Table.Tr>
         </Table.Thead>

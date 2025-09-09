@@ -92,7 +92,7 @@ export function DeliveryDetailTabs({
                   <Stack gap="xs">
                     <div>
                       <Text size="sm" c="dimmed">
-                        {t('delivery.fields.poNumber')}
+                        {t('delivery.poNumber')}
                       </Text>
                       <Text size="sm" fw={500}>
                         <Anchor
@@ -110,7 +110,7 @@ export function DeliveryDetailTabs({
                     </div>
                     <div>
                       <Text size="sm" c="dimmed">
-                        {t('delivery.fields.customer')}
+                        {t('delivery.customer')}
                       </Text>
                       <Text size="sm" fw={500}>
                         {deliveryRequest.customerName}
@@ -118,7 +118,7 @@ export function DeliveryDetailTabs({
                     </div>
                     <div>
                       <Text size="sm" c="dimmed">
-                        {t('delivery.fields.assignedTo')}
+                        {t('delivery.assignedTo')}
                       </Text>
                       <Text size="sm" fw={500}>
                         {assignedName}
@@ -130,7 +130,7 @@ export function DeliveryDetailTabs({
                   <Stack gap="xs">
                     <div>
                       <Text size="sm" c="dimmed">
-                        {t('delivery.fields.scheduledDate')}
+                        {t('delivery.scheduledDate')}
                       </Text>
                       <Text size="sm" fw={500}>
                         {deliveryRequest.scheduledDate
@@ -141,7 +141,7 @@ export function DeliveryDetailTabs({
                     {deliveryRequest.completedDate && (
                       <div>
                         <Text size="sm" c="dimmed">
-                          {t('delivery.fields.completedDate')}
+                          {t('delivery.completedDate')}
                         </Text>
                         <Text size="sm" fw={500}>
                           {formatDate(deliveryRequest.completedDate)}
@@ -150,7 +150,7 @@ export function DeliveryDetailTabs({
                     )}
                     <div>
                       <Text size="sm" c="dimmed">
-                        {t('delivery.fields.status')}
+                        {t('delivery.status')}
                       </Text>
                       <DeliveryStatusBadge status={deliveryRequest.status} />
                     </div>
@@ -161,7 +161,7 @@ export function DeliveryDetailTabs({
               {deliveryRequest.notes && (
                 <div>
                   <Text size="sm" c="dimmed" mt="md" mb="xs">
-                    {t('delivery.fields.notes')}
+                    {t('delivery.notes')}
                   </Text>
                   <Text size="sm">{deliveryRequest.notes}</Text>
                 </div>

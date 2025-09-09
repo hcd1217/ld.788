@@ -7,10 +7,9 @@ import { useDeviceType } from '@/hooks/useDeviceType';
 type POFormDateSectionProps = {
   readonly form: UseFormReturnType<any>;
   readonly isLoading: boolean;
-  readonly valueFormat: string;
 };
 
-export function POFormDateSection({ form, isLoading, valueFormat }: POFormDateSectionProps) {
+export function POFormDateSection({ form, isLoading }: POFormDateSectionProps) {
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
 
@@ -26,7 +25,6 @@ export function POFormDateSection({ form, isLoading, valueFormat }: POFormDateSe
             placeholder={t('po.selectOrderDate')}
             clearable
             disabled={isLoading}
-            valueFormat={valueFormat}
             value={form.values.orderDate}
             onChange={(date) => form.setFieldValue('orderDate', date ? new Date(date) : undefined)}
             maxDate={form.values.deliveryDate || undefined}
@@ -36,7 +34,6 @@ export function POFormDateSection({ form, isLoading, valueFormat }: POFormDateSe
             placeholder={t('po.selectDeliveryDate')}
             clearable
             disabled={isLoading}
-            valueFormat={valueFormat}
             value={form.values.deliveryDate}
             onChange={(date) =>
               form.setFieldValue('deliveryDate', date ? new Date(date) : undefined)

@@ -1,8 +1,10 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { Stack, Group, SimpleGrid, Button, Loader, Text, Center, Flex } from '@mantine/core';
+import { useNavigate } from 'react-router';
 import type { Timeout } from '@/types';
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { IconChevronLeft, IconChevronRight, IconSortAscending } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { ROUTERS } from '@/config/routeConfig';
 import { useDeliveryRequestFilters } from '@/hooks/useDeliveryRequestFilters';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 import {
@@ -40,6 +42,7 @@ import { useDebouncedValue } from '@mantine/hooks';
 export function DeliveryListPage() {
   const { isMobile, isDesktop } = useDeviceType();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const permissions = usePermissions();
   const deliveryRequests = useDeliveryRequests();
   const customers = useCustomers();
@@ -122,6 +125,12 @@ export function DeliveryListPage() {
 
     // Update refs for next comparison
     prevScheduledDateRangeRef.current = currScheduledDate;
+
+    // Skip API call if setting incomplete date range
+    if (isSettingScheduledDateStart || isSettingScheduledDateEnd) {
+      setIsFilterLoading(false);
+      return;
+    }
 
     // Skip API call if setting incomplete date range
     if (isSettingScheduledDateStart || isSettingScheduledDateEnd) {
@@ -242,7 +251,7 @@ export function DeliveryListPage() {
         isLoading={isLoading || isFilterLoading}
         error={error}
         clearError={clearError}
-        header={<AppPageTitle title={t('delivery.list.title')} />}
+        header={<AppPageTitle title={t('delivery.title')} />}
       >
         <DeliveryErrorBoundary componentName="DeliveryListPage">
           {/* Mobile Filter Bar */}
@@ -334,8 +343,16 @@ export function DeliveryListPage() {
     >
       <DeliveryErrorBoundary componentName="DeliveryListPage">
         <Group justify="space-between" mb="lg">
-          <AppPageTitle title={t('delivery.list.title')} />
+          <AppPageTitle title={t('delivery.title')} />
           <Group gap="sm">
+            <Button
+              leftSection={<IconSortAscending size={16} />}
+              variant="light"
+              onClick={() => navigate(ROUTERS.DELIVERY_UPDATE_ORDER)}
+              disabled={!permissions.deliveryRequest.actions?.canUpdateDeliveryOrderInDay}
+            >
+              {t('delivery.arrangeDeliveryOrder')}
+            </Button>
             <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
             {/* Note: Delivery requests are created from PO pages, not directly */}
           </Group>

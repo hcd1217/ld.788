@@ -46,6 +46,7 @@ const ROUTE_DEFINITIONS = {
   // Delivery management
   DELIVERY_MANAGEMENT: { id: 'delivery-management', path: '/delivery-management' },
   DELIVERY_DETAIL: { id: 'delivery-detail', path: '/delivery/:deliveryId' },
+  DELIVERY_UPDATE_ORDER: { id: 'delivery-update-order', path: '/delivery/update-order' },
 } as const;
 
 // Type helper to extract keys

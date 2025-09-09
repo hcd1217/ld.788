@@ -1,5 +1,4 @@
 import { Modal, Drawer, Stack, Text, Group, Button, Select, Textarea, Switch } from '@mantine/core';
-import { DateInput } from '@mantine/dates';
 import { IconEdit, IconCalendar, IconUrgent } from '@tabler/icons-react';
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -8,7 +7,7 @@ import { useEmployees, useClientConfig } from '@/stores/useAppStore';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
-import { UrgentBadge } from '@/components/common';
+import { DateInput, UrgentBadge } from '@/components/common';
 
 type DeliveryUpdateModalProps = {
   readonly opened: boolean;
@@ -37,7 +36,7 @@ export function DeliveryUpdateModal({
 
   // Form state - initialize with existing values
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
-  const [scheduledDate, setScheduledDate] = useState<Date | null>(null);
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined);
   const [notes, setNotes] = useState('');
   const [isUrgentDelivery, setIsUrgentDelivery] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,14 +62,14 @@ export function DeliveryUpdateModal({
     if (opened && deliveryRequest) {
       setSelectedEmployeeId(deliveryRequest.assignedTo || null);
       setScheduledDate(
-        deliveryRequest.scheduledDate ? new Date(deliveryRequest.scheduledDate) : null,
+        deliveryRequest.scheduledDate ? new Date(deliveryRequest.scheduledDate) : undefined,
       );
       setNotes(deliveryRequest.notes || '');
       setIsUrgentDelivery(deliveryRequest.isUrgentDelivery || false);
     } else if (!opened) {
       // Reset form when modal closes
       setSelectedEmployeeId(null);
-      setScheduledDate(null);
+      setScheduledDate(undefined);
       setNotes('');
       setIsUrgentDelivery(false);
     }
@@ -103,7 +102,7 @@ export function DeliveryUpdateModal({
         <Stack gap="xs">
           <Group justify="space-between">
             <Text size="sm" c="dimmed">
-              {t('delivery.fields.id')}:
+              {t('delivery.id')}:
             </Text>
             <Text size="sm" fw={500}>
               {deliveryRequest.deliveryRequestNumber}
@@ -129,7 +128,7 @@ export function DeliveryUpdateModal({
       )}
 
       <Select
-        label={t('delivery.fields.assignedTo')}
+        label={t('delivery.assignedTo')}
         placeholder={t('delivery.form.selectAssignee')}
         data={employeeOptions}
         value={selectedEmployeeId}
@@ -140,17 +139,17 @@ export function DeliveryUpdateModal({
       />
 
       <DateInput
-        label={t('delivery.fields.scheduledDate')}
+        label={t('delivery.scheduledDate')}
         placeholder={t('delivery.form.selectDate')}
         value={scheduledDate}
-        onChange={(date) => setScheduledDate(date ? new Date(date) : null)}
+        onChange={(date) => setScheduledDate(date ? new Date(date) : undefined)}
         required
         minDate={new Date()}
         leftSection={<IconCalendar size={16} />}
       />
 
       <Textarea
-        label={t('delivery.fields.notes')}
+        label={t('delivery.notes')}
         placeholder={t('delivery.form.enterNotes')}
         value={notes}
         onChange={(e) => setNotes(e.currentTarget.value)}
@@ -160,7 +159,7 @@ export function DeliveryUpdateModal({
       <Switch
         label={
           <Group gap="xs">
-            {t('delivery.fields.urgentDelivery')}
+            {t('delivery.urgentDelivery')}
             {isUrgentDelivery && <UrgentBadge size="xs" withIcon={false} />}
           </Group>
         }

@@ -43,8 +43,7 @@ export function POFilterBarDesktop({
   onDeliveryDateChange,
   onClearFilters,
 }: POFilterBarDesktopProps) {
-  const { t, currentLanguage } = useTranslation();
-  const valueFormat = currentLanguage === 'vi' ? 'DD/MM/YYYY' : 'MMM DD, YYYY';
+  const { t } = useTranslation();
 
   // Customer options for Select
   const customerOptions = [
@@ -134,7 +133,6 @@ export function POFilterBarDesktop({
         label={t('po.orderDate')}
         placeholder={t('po.selectDateRange')}
         value={[orderDateStart, orderDateEnd]}
-        valueFormat={valueFormat}
         style={{ flex: 1.5, minWidth: 220 }}
         onChange={(dates) => {
           if (!dates) {
@@ -153,7 +151,6 @@ export function POFilterBarDesktop({
         label={t('po.deliveryDate')}
         placeholder={t('po.selectDateRange')}
         value={[deliveryDateStart, deliveryDateEnd]}
-        valueFormat={valueFormat}
         style={{ flex: 1.5, minWidth: 220 }}
         onChange={(dates) => {
           if (!dates) {

@@ -195,7 +195,7 @@ export function DeliveryStatusDrawer({
               </Text>
               {deliveryRequest.scheduledDate && (
                 <Text size="sm" c="dimmed">
-                  {t('delivery.fields.scheduledDate')}: {formatDate(deliveryRequest.scheduledDate)}
+                  {t('delivery.scheduledDate')}: {formatDate(deliveryRequest.scheduledDate)}
                 </Text>
               )}
             </div>

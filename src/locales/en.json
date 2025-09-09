@@ -378,7 +378,6 @@
     "loginFailed": "Login failed",
     "invalidCredentials": "Invalid email or password. Please try again."
   },
-  "permission": {},
   "profile": {
     "notLoggedIn": "Not Logged In",
     "pleaseLogin": "Please log in to view your profile.",
@@ -660,6 +659,7 @@
     "autoFilledFromCustomerAddress": "Auto-filled from customer address"
   },
   "delivery": {
+    "title": "Delivery Management",
     "list": {
       "title": "Delivery Management"
     },
@@ -669,24 +669,23 @@
       "startTransitDescription": "Mark this delivery request as in transit",
       "complete": "Complete Delivery"
     },
-    "status": {
+    "statuses": {
       "pending": "Pending",
       "inTransit": "In Transit",
       "in_transit": "In Transit",
       "completed": "Completed"
     },
-    "fields": {
-      "id": "Request ID",
-      "urgentDelivery": "Urgent",
-      "purchaseOrder": "Purchase Order",
-      "poNumber": "PO Number",
-      "customer": "Customer",
-      "assignedTo": "Assigned To",
-      "scheduledDate": "Scheduled Date",
-      "completedDate": "Completed Date",
-      "status": "Status",
-      "notes": "Notes"
-    },
+    "id": "Request ID",
+    "urgentDelivery": "Urgent",
+    "purchaseOrder": "Purchase Order",
+    "poNumber": "PO Number",
+    "customer": "Customer",
+    "assignedTo": "Assigned To",
+    "arrangeDeliveryOrder": "Arrange Delivery Order",
+    "scheduledDate": "Scheduled Date",
+    "completedDate": "Completed Date",
+    "status": "Status",
+    "notes": "Notes",
     "assignmentTypes": {},
     "form": {
       "urgentDeliveryDescription": "Mark this delivery as urgent",
@@ -729,6 +728,7 @@
     "deliveryDetails": "Delivery Details",
     "deliveryId": "Delivery ID",
     "customerName": "Customer Name",
+    "pleaseSelectAssigneeAndScheduledDate": "Please select assignee and scheduled date",
     "noDeliveryRequestsFoundSearch": "No delivery requests found matching your search",
     "tryDifferentSearch": "Try adjusting your search criteria",
     "noDeliveryRequestsFound": "No delivery requests found",

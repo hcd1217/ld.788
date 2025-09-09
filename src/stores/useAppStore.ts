@@ -123,9 +123,6 @@ export const useAppStore = create<AppState>()(
               clearClientTranslations();
               updateClientTranslations(user.clientConfig.translations);
             }
-
-            console.log('USER PERMISSIONS', JSON.stringify(user.permissions, null, 2));
-
             // Fetch overview data after getting user profile
             await get().fetchOverviewData();
           } catch (error: unknown) {
@@ -161,8 +158,6 @@ export const useAppStore = create<AppState>()(
               employeeMapByEmployeeId,
               customerMapByCustomerId,
             });
-            console.log('employeeMapByEmployeeId', employeeMapByEmployeeId);
-            console.log('employeeMapByUserId', employeeMapByUserId);
           } catch (error: unknown) {
             logError('Failed to fetch overview data:', error, {
               module: 'AppStore',

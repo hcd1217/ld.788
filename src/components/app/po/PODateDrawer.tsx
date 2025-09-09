@@ -28,8 +28,7 @@ export function PODateDrawer({
   onOrderDateRangeSelect,
   onDeliveryDateRangeSelect,
 }: PODateDrawerProps) {
-  const { t, currentLanguage } = useTranslation();
-  const valueFormat = currentLanguage === 'vi' ? 'DD/MM/YYYY' : 'MMM DD, YYYY';
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<'delivery' | 'order'>('delivery');
   const [tempOrderStartDate, setTempOrderStartDate] = useState<Date | undefined>(orderDateStart);
@@ -92,7 +91,6 @@ export function PODateDrawer({
                 label={t('po.startDate')}
                 placeholder={t('po.selectStartDate')}
                 clearable
-                valueFormat={valueFormat}
                 value={tempOrderStartDate}
                 onChange={(date) => setTempOrderStartDate(date ? new Date(date) : undefined)}
                 maxDate={tempOrderEndDate}
@@ -101,7 +99,6 @@ export function PODateDrawer({
                 label={t('po.endDate')}
                 placeholder={t('po.selectEndDate')}
                 clearable
-                valueFormat={valueFormat}
                 value={tempOrderEndDate}
                 onChange={(date) => setTempOrderEndDate(date ? new Date(date) : undefined)}
                 minDate={tempOrderStartDate}
@@ -115,7 +112,6 @@ export function PODateDrawer({
                 label={t('po.startDate')}
                 placeholder={t('po.selectStartDate')}
                 clearable
-                valueFormat={valueFormat}
                 value={tempDeliveryStartDate}
                 onChange={(date) => setTempDeliveryStartDate(date ? new Date(date) : undefined)}
                 maxDate={tempDeliveryEndDate}
@@ -124,7 +120,6 @@ export function PODateDrawer({
                 label={t('po.endDate')}
                 placeholder={t('po.selectEndDate')}
                 clearable
-                valueFormat={valueFormat}
                 value={tempDeliveryEndDate}
                 onChange={(date) => setTempDeliveryEndDate(date ? new Date(date) : undefined)}
                 minDate={tempDeliveryStartDate}

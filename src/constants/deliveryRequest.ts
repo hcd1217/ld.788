@@ -27,9 +27,9 @@ export const DELIVERY_STATUS_COLORS: Record<DeliveryStatusType, string> = {
 
 // Status labels for display
 export const DELIVERY_STATUS_LABELS: Record<DeliveryStatus, string> = {
-  [DELIVERY_STATUS.PENDING]: 'delivery.status.pending',
-  [DELIVERY_STATUS.IN_TRANSIT]: 'delivery.status.inTransit',
-  [DELIVERY_STATUS.COMPLETED]: 'delivery.status.completed',
+  [DELIVERY_STATUS.PENDING]: 'delivery.statuses.pending',
+  [DELIVERY_STATUS.IN_TRANSIT]: 'delivery.statuses.inTransit',
+  [DELIVERY_STATUS.COMPLETED]: 'delivery.statuses.completed',
 };
 
 // Action labels for buttons

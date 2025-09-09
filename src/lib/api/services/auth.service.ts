@@ -16,6 +16,9 @@ import {
   VerifyMagicLinkResponseSchema,
   VerifyMagicLinkRequestSchema,
 } from '../schemas/auth.schemas';
+import { fakePermission, type FakeDepartmentCode } from '@/utils/fake';
+import { isDebug } from '@/utils/env';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 export class AuthApi extends BaseApiClient {
   async login(data: LoginRequest): Promise<LoginResponse> {
@@ -61,6 +64,15 @@ export class AuthApi extends BaseApiClient {
     // const isCached = this.hasCachedData(cacheKey);
     // const ttlRemaining = this.getCacheTTL(cacheKey);
     // this.clearCacheEntry(cacheKey); // To clear specific cache
-    return this.get<GetMeResponse>('/auth/me', undefined, GetMeResponseSchema);
+    const res = await this.get<GetMeResponse>('/auth/me', undefined, GetMeResponseSchema);
+
+    if (isDebug) {
+      const role: FakeDepartmentCode = localStorage.getItem(
+        STORAGE_KEYS.DEBUG.CURRENT_ROLE,
+      ) as FakeDepartmentCode;
+      res.permissions = fakePermission(role);
+    }
+
+    return res;
   }
 }

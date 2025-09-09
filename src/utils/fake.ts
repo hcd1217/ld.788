@@ -1,3 +1,4 @@
+import type { GetMeResponse } from '@/lib/api/schemas/auth.schemas';
 import { normalizeVietnameseChars } from './string';
 
 // Cspell:disable
@@ -297,4 +298,157 @@ export function fakeEmail(name: string) {
     '@' +
     randomElement(domains)
   );
+}
+
+export type FakeDepartmentCode = 'sales' | 'delivery' | 'warehouse' | 'accounting' | 'manager';
+export function fakePermission(code: FakeDepartmentCode): GetMeResponse['permissions'] {
+  const basePermission = {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+  };
+
+  function generateDefaultPermission(): GetMeResponse['permissions'] {
+    return {
+      customer: {
+        ...basePermission,
+      },
+      product: {
+        ...basePermission,
+      },
+      employee: {
+        ...basePermission,
+        actions: {
+          canSetPassword: false,
+        },
+      },
+      purchaseOrder: {
+        ...basePermission,
+        actions: {
+          canConfirm: false,
+          canProcess: false,
+          canShip: false,
+          canMarkReady: false,
+          canDeliver: false,
+          canCancel: false,
+        },
+      },
+      deliveryRequest: {
+        ...basePermission,
+        query: {
+          canFilter: false,
+          canViewAll: false,
+        },
+        actions: {
+          canUpdateDeliveryOrderInDay: false,
+          canStartTransit: false,
+          canComplete: false,
+          canTakePhoto: false,
+        },
+      },
+    };
+  }
+
+  interface Permission {
+    [key: string]: boolean | Permission;
+  }
+
+  function toTrue(permission: Permission): Permission {
+    Object.keys(permission).forEach((key) => {
+      if (typeof permission[key] === 'object') {
+        permission[key] = toTrue(permission[key]);
+      } else {
+        permission[key] = true;
+      }
+    });
+    return permission;
+  }
+
+  const permissions = generateDefaultPermission();
+  const fullPermissions = toTrue(generateDefaultPermission()) as typeof permissions;
+
+  switch (code) {
+    case 'manager': {
+      return fullPermissions;
+    }
+    case 'sales': {
+      permissions.purchaseOrder = {
+        ...permissions.purchaseOrder,
+        canView: true,
+        canCreate: true,
+        canEdit: true,
+        actions: {
+          ...permissions.purchaseOrder.actions,
+          canConfirm: true,
+          canDeliver: true,
+          canCancel: true,
+        },
+      };
+      permissions.deliveryRequest = {
+        ...permissions.deliveryRequest,
+        query: {
+          canFilter: true,
+          canViewAll: true,
+        },
+        canView: true,
+      };
+      return permissions;
+    }
+    case 'delivery': {
+      permissions.deliveryRequest = {
+        ...permissions.deliveryRequest,
+        canView: true,
+        actions: {
+          canStartTransit: true,
+          canComplete: true,
+          canTakePhoto: true,
+        },
+      };
+      return permissions;
+    }
+    case 'warehouse': {
+      permissions.purchaseOrder = {
+        ...permissions.purchaseOrder,
+        canView: true,
+        actions: {
+          canProcess: true,
+          canMarkReady: true,
+          canDeliver: true,
+          canShip: true,
+        },
+      };
+      permissions.deliveryRequest = {
+        ...permissions.deliveryRequest,
+        canView: true,
+        canCreate: true,
+      };
+      return permissions;
+    }
+    case 'accounting': {
+      permissions.employee.canView = true;
+      permissions.purchaseOrder = {
+        ...permissions.purchaseOrder,
+        canView: true,
+        canEdit: true,
+        actions: {
+          canShip: true,
+          canRefund: true,
+        },
+      };
+      permissions.deliveryRequest = {
+        ...permissions.deliveryRequest,
+        query: {
+          canFilter: true,
+          canViewAll: true,
+        },
+        canView: true,
+        canCreate: true,
+      };
+      return permissions;
+    }
+    default: {
+      return permissions;
+    }
+  }
 }

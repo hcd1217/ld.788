@@ -37,7 +37,7 @@ export function DeliveryFilterBarMobile({
       const statusKey = `delivery.status.${selectedStatuses[0].toLowerCase()}` as any;
       return t(statusKey);
     }
-    return `${t('delivery.fields.status')} (${selectedStatuses.length})`;
+    return `${t('delivery.status')} (${selectedStatuses.length})`;
   };
 
   const getQuickActionLabel = () => {

@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   DatePickerInput as MantineDatePickerInput,
   type DatePickerInputProps as MantineDatePickerInputProps,
@@ -5,16 +6,19 @@ import {
 
 type DatePickerInputProps = Omit<
   MantineDatePickerInputProps<'range'>,
-  'value' | 'type' | 'onChange' | 'clearable'
+  'value' | 'type' | 'onChange' | 'clearable' | 'valueFormat'
 > & {
   readonly value: [string | Date | undefined, string | Date | undefined];
   readonly onChange: (dates: [string | undefined, string | undefined]) => void;
 };
 
 export function DatePickerInput({ onChange, value, ...props }: DatePickerInputProps) {
+  const { currentLanguage } = useTranslation();
+  const valueFormat = currentLanguage === 'vi' ? 'DD/MM/YYYY' : 'MMM DD, YYYY';
   return (
     <MantineDatePickerInput
       {...props}
+      valueFormat={valueFormat}
       clearable
       type="range"
       value={[value[0] ?? null, value[1] ?? null]}

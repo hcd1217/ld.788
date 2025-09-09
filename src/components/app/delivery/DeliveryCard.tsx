@@ -53,7 +53,7 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
           {deliveryRequest.customerName && (
             <Group gap="sm">
               <Text size="sm" c="dimmed">
-                {t('delivery.fields.customer')}:
+                {t('delivery.customer')}:
               </Text>
               <Text size="sm" fw={500}>
                 {deliveryRequest.customerName}
@@ -62,7 +62,7 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
           )}
           <Group gap="sm">
             <Text size="sm" c="dimmed">
-              {t('delivery.fields.scheduledDate')}:
+              {t('delivery.scheduledDate')}:
             </Text>
             <Text size="sm" fw={500}>
               {formatDate(deliveryRequest.scheduledDate, getLocaleFormat(currentLanguage))}
@@ -72,7 +72,7 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
           {deliveryRequest.assignedTo && (
             <Group gap="sm">
               <Text size="sm" c="dimmed">
-                {t('delivery.fields.assignedTo')}:
+                {t('delivery.assignedTo')}:
               </Text>
               <Text size="sm" fw={500}>
                 {getEmployeeNameByEmployeeId(employeeMapByEmployeeId, deliveryRequest.assignedTo)}
@@ -82,7 +82,7 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
           {deliveryRequest.notes && (
             <Group gap="sm">
               <Text size="sm" c="dimmed">
-                {t('delivery.fields.notes')}:
+                {t('delivery.notes')}:
               </Text>
               <Text size="sm" fw={500}>
                 {deliveryRequest.notes}

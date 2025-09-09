@@ -51,7 +51,7 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
               {deliveryRequest.customerName && (
                 <div>
                   <Text size="sm" c="dimmed">
-                    {t('delivery.fields.customer')}
+                    {t('delivery.customer')}
                   </Text>
                   <Text size="sm" fw={500}>
                     {deliveryRequest.customerName}
@@ -60,7 +60,7 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
               )}
               <div>
                 <Text size="sm" c="dimmed">
-                  {t('delivery.fields.purchaseOrder')}
+                  {t('delivery.purchaseOrder')}
                 </Text>
                 <Text size="sm" fw={500}>
                   {/* LINK TO PURCHASE ORDER */}
@@ -69,7 +69,7 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
               </div>
               <div>
                 <Text size="sm" c="dimmed">
-                  {t('delivery.fields.scheduledDate')}
+                  {t('delivery.scheduledDate')}
                 </Text>
                 <Text size="sm" fw={500}>
                   {formatDate(deliveryRequest.scheduledDate, getLocaleFormat(currentLanguage))}
@@ -78,7 +78,7 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
               {deliveryRequest.assignedTo && (
                 <div>
                   <Text size="sm" c="dimmed">
-                    {t('delivery.fields.assignedTo')}
+                    {t('delivery.assignedTo')}
                   </Text>
                   <Text size="sm" fw={500}>
                     {getEmployeeNameByEmployeeId(
@@ -91,7 +91,7 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
               {deliveryRequest.completedDate && (
                 <div>
                   <Text size="sm" c="dimmed">
-                    {t('delivery.fields.completedDate')}
+                    {t('delivery.completedDate')}
                   </Text>
                   <Text size="sm" fw={500}>
                     {formatDateTime(

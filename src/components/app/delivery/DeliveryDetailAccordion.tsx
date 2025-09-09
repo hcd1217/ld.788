@@ -83,7 +83,7 @@ export function DeliveryDetailAccordion({
   const deliveryInfoFields = useMemo(
     () => [
       {
-        label: t('delivery.fields.status'),
+        label: t('delivery.status'),
         value: (
           <Group gap="xs">
             {deliveryRequest.isUrgentDelivery && <UrgentBadge size="xs" />}
@@ -92,7 +92,7 @@ export function DeliveryDetailAccordion({
         ),
       },
       {
-        label: t('delivery.fields.poNumber'),
+        label: t('delivery.poNumber'),
         value: (
           <Text size="sm" fw={500}>
             <Anchor
@@ -110,7 +110,7 @@ export function DeliveryDetailAccordion({
         ),
       },
       {
-        label: t('delivery.fields.customer'),
+        label: t('delivery.customer'),
         value: deliveryRequest.customerName,
       },
       {
@@ -118,7 +118,7 @@ export function DeliveryDetailAccordion({
         value: <DeliveryCustomerInfo customerId={deliveryRequest.customerId} />,
       },
       {
-        label: t('delivery.fields.scheduledDate'),
+        label: t('delivery.scheduledDate'),
         value: deliveryRequest.scheduledDate
           ? formatDate(deliveryRequest.scheduledDate)
           : t('common.notScheduled'),
@@ -126,17 +126,17 @@ export function DeliveryDetailAccordion({
       ...(deliveryRequest.completedDate
         ? [
             {
-              label: t('delivery.fields.completedDate'),
+              label: t('delivery.completedDate'),
               value: formatDate(deliveryRequest.completedDate),
             },
           ]
         : []),
       {
-        label: t('delivery.fields.notes'),
+        label: t('delivery.notes'),
         value: deliveryRequest.notes || '-',
       },
       {
-        label: t('delivery.fields.assignedTo'),
+        label: t('delivery.assignedTo'),
         value: assignedName,
       },
     ],

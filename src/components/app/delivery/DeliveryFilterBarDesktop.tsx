@@ -43,10 +43,9 @@ export function DeliveryFilterBarDesktop({
   onScheduledDateChange,
   onClearFilters,
 }: DeliveryFilterBarDesktopProps) {
-  const { t, currentLanguage } = useTranslation();
+  const { t } = useTranslation();
   const employees = useEmployees();
   const clientConfig = useClientConfig();
-  const valueFormat = currentLanguage === 'vi' ? 'DD/MM/YYYY' : 'MMM DD, YYYY';
 
   // Customer options for Select
   const customerOptions = [
@@ -78,9 +77,9 @@ export function DeliveryFilterBarDesktop({
 
   // Status options for MultiSelect
   const statusOptions = [
-    { value: DELIVERY_STATUS.PENDING, label: t('delivery.status.pending') },
-    { value: DELIVERY_STATUS.IN_TRANSIT, label: t('delivery.status.inTransit') },
-    { value: DELIVERY_STATUS.COMPLETED, label: t('delivery.status.completed') },
+    { value: DELIVERY_STATUS.PENDING, label: t('delivery.statuses.pending') },
+    { value: DELIVERY_STATUS.IN_TRANSIT, label: t('delivery.statuses.inTransit') },
+    { value: DELIVERY_STATUS.COMPLETED, label: t('delivery.statuses.completed') },
   ];
 
   // Filter out 'all' status if present
@@ -116,7 +115,7 @@ export function DeliveryFilterBarDesktop({
         value={customerId || ''}
         style={{ flex: 1, minWidth: 150 }}
         onChange={(value) => onCustomerChange(value || undefined)}
-        label={t('delivery.fields.customer') as string}
+        label={t('delivery.customer') as string}
       />
 
       {/* Assignee Select - flex 1 */}
@@ -128,7 +127,7 @@ export function DeliveryFilterBarDesktop({
         value={assignedTo || ''}
         style={{ flex: 1, minWidth: 150 }}
         onChange={(value) => onAssignedToChange(value || undefined)}
-        label={t('delivery.fields.assignedTo') as string}
+        label={t('delivery.assignedTo') as string}
       />
 
       {/* Status MultiSelect - flex 1 */}
@@ -140,7 +139,7 @@ export function DeliveryFilterBarDesktop({
         value={filteredStatuses}
         style={{ flex: 1, minWidth: 180 }}
         onChange={(values) => onStatusesChange(values as DeliveryStatusType[])}
-        label={t('delivery.fields.status') as string}
+        label={t('delivery.status') as string}
         maxDropdownHeight={280}
         styles={{
           input: {
@@ -156,10 +155,9 @@ export function DeliveryFilterBarDesktop({
 
       {/* Scheduled Date Range */}
       <DatePickerInput
-        label={t('delivery.fields.scheduledDate')}
+        label={t('delivery.scheduledDate')}
         placeholder={t('delivery.filters.selectStatus')}
         value={[scheduledDateStart, scheduledDateEnd]}
-        valueFormat={valueFormat}
         style={{ flex: 1.5, minWidth: 220 }}
         onChange={(dates) => {
           if (!dates) {

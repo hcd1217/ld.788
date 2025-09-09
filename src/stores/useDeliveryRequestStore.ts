@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { useMemo } from 'react';
 import {
   deliveryRequestService,
   type DeliveryRequest,
@@ -9,6 +10,9 @@ import {
   type DeliveryStatus,
 } from '@/services/sales/deliveryRequest';
 import { getErrorMessage } from '@/utils/errorUtils';
+import { useAppStore } from './useAppStore';
+import type { ClientConfig } from '@/lib/api/schemas/clientConfig.schemas';
+import { startOfDay, endOfDay } from '@/utils/time';
 
 type DeliveryRequestState = {
   // Delivery Request data
@@ -61,11 +65,16 @@ type DeliveryRequestState = {
   updateDeliveryStatus: (id: string, status: DeliveryStatus, notes?: string) => Promise<void>;
   uploadPhotos: (id: string, photoUrls: string[]) => Promise<void>;
   completeDelivery: (id: string, data?: { photoUrls?: string[]; notes?: string }) => Promise<void>;
+  updateDeliveryOrderInDay: (assignedTo: string, date: Date, orderedIds: string[]) => Promise<void>;
+  loadDeliveryRequestsForDate: (assignedTo: string, date: Date) => Promise<DeliveryRequest[]>;
   clearError: () => void;
 
   // Selectors
   getDeliveryRequestById: (id: string) => DeliveryRequest | undefined;
+  getDeliveryAssigneeOptions: () => Array<{ value: string; label: string }>;
 };
+
+const DEFAULT_DELIVERY_ASSIGNEE_OPTIONS: Array<{ value: string; label: string }> = [];
 
 export const useDeliveryRequestStore = create<DeliveryRequestState>()(
   devtools(
@@ -404,11 +413,65 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
         }
       },
 
+      async updateDeliveryOrderInDay(assignedTo: string, date: Date, orderedIds: string[]) {
+        set({ isLoading: true, error: undefined });
+        try {
+          await deliveryRequestService.updateDeliveryOrderInDay(assignedTo, date, orderedIds);
+          // No need to reload, the page will refresh the data
+        } catch (error) {
+          set({ error: getErrorMessage(error, 'Failed to update delivery order') });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      async loadDeliveryRequestsForDate(assignedTo: string, date: Date) {
+        set({ isLoading: true, error: undefined });
+        try {
+          const response = await deliveryRequestService.getDeliveryRequestsWithFilter({
+            assignedTo,
+            scheduledDateFrom: startOfDay(date),
+            scheduledDateTo: endOfDay(date),
+            limit: 100, // Get all for the day
+          });
+          return response.deliveryRequests;
+        } catch (error) {
+          set({ error: getErrorMessage(error, 'Failed to load delivery requests') });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
       clearError: () => set({ error: undefined }),
 
       // Selectors
       getDeliveryRequestById: (id: string) => {
         return get().deliveryRequests.find((dr) => dr.id === id);
+      },
+
+      getDeliveryAssigneeOptions: () => {
+        // Get employees and clientConfig from app store
+        const appState = useAppStore.getState();
+        const employees = appState.overviewData?.employees;
+        const clientConfig: ClientConfig | undefined = appState.user?.clientConfig;
+        const assigneeIds = clientConfig?.features?.deliveryRequest?.assigneeIds;
+
+        if (!assigneeIds || !employees) {
+          return DEFAULT_DELIVERY_ASSIGNEE_OPTIONS;
+        }
+
+        // Filter employees based on assigneeIds if configured, otherwise show all
+        const filteredEmployees =
+          assigneeIds.length > 0
+            ? employees.filter((employee) => assigneeIds.includes(employee.id))
+            : employees;
+
+        return filteredEmployees.map((employee) => ({
+          value: employee.id,
+          label: employee.fullName,
+        }));
       },
 
       // Internal helper methods
@@ -522,6 +585,12 @@ export const useDeliveryRequestActions = () => {
   const updateDeliveryStatus = useDeliveryRequestStore((state) => state.updateDeliveryStatus);
   const uploadPhotos = useDeliveryRequestStore((state) => state.uploadPhotos);
   const completeDelivery = useDeliveryRequestStore((state) => state.completeDelivery);
+  const updateDeliveryOrderInDay = useDeliveryRequestStore(
+    (state) => state.updateDeliveryOrderInDay,
+  );
+  const loadDeliveryRequestsForDate = useDeliveryRequestStore(
+    (state) => state.loadDeliveryRequestsForDate,
+  );
   const clearError = useDeliveryRequestStore((state) => state.clearError);
 
   return {
@@ -537,6 +606,8 @@ export const useDeliveryRequestActions = () => {
     updateDeliveryStatus,
     uploadPhotos,
     completeDelivery,
+    updateDeliveryOrderInDay,
+    loadDeliveryRequestsForDate,
     clearError,
   };
 };
@@ -562,4 +633,26 @@ export const useDeliveryRequestPaginationState = () => {
     activeFilters,
     currentPage,
   };
+};
+
+// Delivery assignee options hook with memoization to prevent infinite re-renders
+export const useDeliveryAssigneeOptions = () => {
+  // Get the selector function (stable reference)
+  const getDeliveryAssigneeOptions = useDeliveryRequestStore(
+    (state) => state.getDeliveryAssigneeOptions,
+  );
+
+  // Get dependencies that might affect the options
+  const employees = useAppStore((state) => state.overviewData?.employees);
+  const assigneeIds = useAppStore(
+    (state) => state.user?.clientConfig?.features?.deliveryRequest?.assigneeIds,
+  );
+
+  // Memoize the result based on the actual data dependencies
+  return useMemo(() => {
+    if (!employees || !assigneeIds) {
+      return DEFAULT_DELIVERY_ASSIGNEE_OPTIONS;
+    }
+    return getDeliveryAssigneeOptions();
+  }, [getDeliveryAssigneeOptions, employees, assigneeIds]);
 };

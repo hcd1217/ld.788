@@ -12,7 +12,6 @@ export function useViewMode(key = 'DEFAULT') {
 
   useEffect(() => {
     setViewMode((prev) => {
-      console.log('loadViewModeFromLocalStorage', key);
       const viewMode = loadViewModeFromLocalStorage(key);
       if (prev === viewMode) return prev;
       return viewMode;

@@ -9,9 +9,9 @@ interface DeliveryStatusBadgeProps {
 
 const statusKeyMap = {
   ALL: 'All',
-  PENDING: 'delivery.status.pending',
-  IN_TRANSIT: 'delivery.status.inTransit',
-  COMPLETED: 'delivery.status.completed',
+  PENDING: 'delivery.statuses.pending',
+  IN_TRANSIT: 'delivery.statuses.inTransit',
+  COMPLETED: 'delivery.statuses.completed',
 } as const;
 
 export function DeliveryStatusBadge({ status, size = 'sm' }: DeliveryStatusBadgeProps) {

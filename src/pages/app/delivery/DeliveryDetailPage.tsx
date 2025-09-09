@@ -91,7 +91,7 @@ export function DeliveryDetailPage() {
     options: {
       successTitle: t('common.success'),
       successMessage: t('delivery.messages.statusUpdated', {
-        status: t('delivery.status.inTransit'),
+        status: t('delivery.statuses.inTransit'),
       }),
       errorTitle: t('common.error'),
       errorMessage: t('delivery.messages.statusUpdateFailed'),
