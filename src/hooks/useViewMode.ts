@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+
 import { getViewModeKey } from '@/utils/storageKeys';
 
 export const VIEW_MODE = {

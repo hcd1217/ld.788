@@ -1,6 +1,7 @@
-import { Title, Text, Container, Card, Box, Stack } from '@mantine/core';
-import { useTranslation } from '@/hooks/useTranslation';
+import { Box, Card, Container, Stack, Text, Title } from '@mantine/core';
+
 import { GoBack } from '@/components/common';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function BlankPage() {
   const { t } = useTranslation();

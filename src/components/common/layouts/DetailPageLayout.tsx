@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
-import { Container, Stack, Group, Title, LoadingOverlay, type MantineSize } from '@mantine/core';
-import { useDeviceType } from '@/hooks/useDeviceType';
+
+import { Container, Group, LoadingOverlay, type MantineSize, Stack, Title } from '@mantine/core';
+
 import { GoBack } from '@/components/common';
+import { useDeviceType } from '@/hooks/useDeviceType';
 
 interface DetailPageLayoutProps {
   readonly title: string;

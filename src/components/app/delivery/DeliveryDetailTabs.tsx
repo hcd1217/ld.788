@@ -1,17 +1,21 @@
-import { Stack, Group, Card, Text, Grid, Anchor, Button } from '@mantine/core';
-import { IconMapPin, IconEdit } from '@tabler/icons-react';
+import { useMemo } from 'react';
+
+import { useNavigate } from 'react-router';
+
+import { Anchor, Button, Card, Grid, Group, Stack, Text } from '@mantine/core';
+import { IconEdit, IconMapPin } from '@tabler/icons-react';
+
+import { UrgentBadge, ViewOnMap } from '@/components/common';
+import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
-import { formatDate } from '@/utils/time';
-import { useMemo } from 'react';
-import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
 import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
 import { useEmployeeMapByUserId } from '@/stores/useAppStore';
-import { DeliveryStatusBadge } from './DeliveryStatusBadge';
+import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
+import { formatDate } from '@/utils/time';
+
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
-import { ViewOnMap, UrgentBadge } from '@/components/common';
-import { getPODetailRoute } from '@/config/routeConfig';
-import { useNavigate } from 'react-router';
+import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 
 type DeliveryDetailTabsProps = {
   readonly deliveryRequest: DeliveryRequest;
@@ -161,7 +165,7 @@ export function DeliveryDetailTabs({
               {deliveryRequest.notes && (
                 <div>
                   <Text size="sm" c="dimmed" mt="md" mb="xs">
-                    {t('delivery.notes')}
+                    {t('common.notes')}
                   </Text>
                   <Text size="sm">{deliveryRequest.notes}</Text>
                 </div>

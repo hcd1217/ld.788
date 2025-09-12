@@ -1,21 +1,24 @@
 import { useEffect, useState } from 'react';
+
 import { useNavigate, useSearchParams } from 'react-router';
-import { Stack, Space, Button, TextInput, PasswordInput, Divider, Text } from '@mantine/core';
-import { IconQrcode } from '@tabler/icons-react';
+
+import { Button, Divider, PasswordInput, Space, Stack, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useAppStore } from '@/stores/useAppStore';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useAuthForm } from '@/hooks/useAuthForm';
-import { GuestLayout } from '@/components/layouts/GuestLayout';
-import { getFormValidators } from '@/utils/validation';
+import { IconQrcode } from '@tabler/icons-react';
+
+import { AuthAlert, AuthHeader } from '@/components/auth';
 import { FormContainer } from '@/components/form/FormContainer';
-import { AuthHeader, AuthAlert } from '@/components/auth';
-import { useClientCode } from '@/hooks/useClientCode';
-import { isDevelopment } from '@/utils/env';
+import { GuestLayout } from '@/components/layouts/GuestLayout';
 import { ROUTERS } from '@/config/routeConfig';
+import { useAuthForm } from '@/hooks/useAuthForm';
+import { useClientCode } from '@/hooks/useClientCode';
 import { useOnce } from '@/hooks/useOnce';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/stores/useAppStore';
+import { isDevelopment } from '@/utils/env';
 import { logInfo } from '@/utils/logger';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
+import { getFormValidators } from '@/utils/validation';
 
 type LoginFormValues = {
   identifier: string;

@@ -1,11 +1,13 @@
-import { Stack, Text, Image, Code, Button, Title, Modal, CopyButton } from '@mantine/core';
-import { IconCopy, IconCheck, IconPhoto } from '@tabler/icons-react';
 import { useCallback, useState } from 'react';
+
+import { Button, Code, CopyButton, Image, Modal, Stack, Text, Title } from '@mantine/core';
+import { IconCheck, IconCopy, IconPhoto } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { showSuccessNotification, showErrorNotification } from '@/utils/notifications';
 import type { Employee } from '@/services/hr/employee';
-import { renderFullName } from '@/utils/string';
 import { logError } from '@/utils/logger';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
+import { renderFullName } from '@/utils/string';
 
 type EmployeeMagicLinkModalProps = {
   readonly opened: boolean;

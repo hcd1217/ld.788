@@ -1,10 +1,11 @@
-import {
-  Drawer as MantineDrawer,
-  Box,
-  rem,
-  type DrawerProps as MantineDrawerProps,
-} from '@mantine/core';
 import { type ReactNode, useRef } from 'react';
+
+import {
+  Box,
+  Drawer as MantineDrawer,
+  type DrawerProps as MantineDrawerProps,
+  rem,
+} from '@mantine/core';
 
 type DrawerProps = MantineDrawerProps & {
   readonly position?: 'bottom' | 'left' | 'right' | 'top';

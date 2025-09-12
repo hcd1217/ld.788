@@ -1,13 +1,15 @@
-import { Box, Stack, ScrollArea, Skeleton } from '@mantine/core';
-import { Tabs } from '@/components/common';
+import { Box, ScrollArea, Skeleton, Stack } from '@mantine/core';
 import {
-  IconInfoCircle,
   IconClipboardList,
-  IconTruck,
   IconFileInvoice,
+  IconInfoCircle,
   IconMessage,
+  IconTruck,
 } from '@tabler/icons-react';
+
+import { Tabs } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
+
 import { POBasicInfoCardSkeleton } from './POBasicInfoCardSkeleton';
 
 export function PODetailTabsSkeleton() {

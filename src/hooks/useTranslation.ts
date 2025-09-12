@@ -1,4 +1,5 @@
 import { useTranslation as useI18nTranslation } from 'react-i18next';
+
 import type { TFunction } from 'i18next';
 
 export type TranslationFunction = TFunction<'translation', undefined>;

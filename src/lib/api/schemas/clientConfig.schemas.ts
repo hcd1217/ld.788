@@ -1,9 +1,10 @@
 import * as z from 'zod/v4';
+
 import { ClientPublicConfigSchema, dictionarySchema, idSchema } from './common.schemas';
 import {
-  NavigationItemSchema,
-  DEFAULT_NAVIGATION_CONFIG,
   DEFAULT_MOBILE_NAVIGATION_CONFIG,
+  DEFAULT_NAVIGATION_CONFIG,
+  NavigationItemSchema,
 } from './navigation.schemas';
 // Import is handled by re-export below
 

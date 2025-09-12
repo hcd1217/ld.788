@@ -1,10 +1,12 @@
-import { Center, Container, Stack, Paper, Title, Text, Button } from '@mantine/core';
-import { IconDeviceDesktop } from '@tabler/icons-react';
 import { Outlet } from 'react-router';
+import { useNavigate } from 'react-router';
+
+import { Button, Center, Container, Paper, Stack, Text, Title } from '@mantine/core';
+import { IconDeviceDesktop } from '@tabler/icons-react';
+
 import { ROUTERS } from '@/config/routeConfig';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useIsDarkMode } from '@/hooks/useIsDarkMode';
-import { useNavigate } from 'react-router';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export function PCOnlyLayout() {

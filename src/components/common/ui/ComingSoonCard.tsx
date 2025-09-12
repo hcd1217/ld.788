@@ -1,5 +1,7 @@
 import React from 'react';
-import { Card, Stack, Title, Text } from '@mantine/core';
+
+import { Card, Stack, Text, Title } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
 
 type ComingSoonCardProps = {

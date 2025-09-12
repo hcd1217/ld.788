@@ -1,9 +1,12 @@
+import { useCallback } from 'react';
+
+import { useLocation, useNavigate } from 'react-router';
+
 import { ActionIcon, Anchor, Box, Center, rem } from '@mantine/core';
 import { IconArrowLeft, IconChevronLeft } from '@tabler/icons-react';
-import { useLocation, useNavigate } from 'react-router';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useCallback } from 'react';
+
 import { ROUTERS } from '@/config/routeConfig';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type GoBackProps = {
   readonly variant?: 'anchor' | 'mobile-header' | 'icon';

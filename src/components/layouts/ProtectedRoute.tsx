@@ -1,7 +1,9 @@
 import React from 'react';
+
 import { Navigate } from 'react-router';
-import { useAppStore } from '@/stores/useAppStore';
+
 import { NoPermission } from '@/components/common';
+import { useAppStore } from '@/stores/useAppStore';
 
 type ProtectedRouteProps = {
   readonly children: React.ReactNode;

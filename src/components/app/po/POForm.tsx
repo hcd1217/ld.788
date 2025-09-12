@@ -1,37 +1,36 @@
-import { Stack, Box } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
+import { useCallback, useEffect, useMemo } from 'react';
+
+import { Box, Stack } from '@mantine/core';
 import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
-import { useDeviceType } from '@/hooks/useDeviceType';
-import { POCustomerSelection } from './POCustomerSelection';
-import { POAdditionalInfo } from './POAdditionalInfo';
-import { POFormActions } from './POFormActions';
-import { POFormDateSection } from './POFormDateSection';
-import { POFormItemsSection } from './POFormItemsSection';
-import { POFormAddressSection } from './POFormAddressSection';
-import { createAddressFromCustomer } from './POFormHelpers';
+
+import { ErrorAlert } from '@/components/common';
 import {
+  DESKTOP_FORM_ACTIONS_Z_INDEX,
   FIXED_BUTTON_AREA_HEIGHT,
   MOBILE_FORM_ACTIONS_Z_INDEX,
-  DESKTOP_FORM_ACTIONS_Z_INDEX,
 } from '@/constants/po.constants';
-import type { POItem } from '@/services/sales/purchaseOrder';
-import { useMemo, useEffect, useCallback } from 'react';
-import { ErrorAlert } from '@/components/common';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
+import type { POItem } from '@/services/sales/purchaseOrder';
+
+import { POAdditionalInfo } from './POAdditionalInfo';
+import { POCustomerSelection } from './POCustomerSelection';
+import { POFormActions } from './POFormActions';
+import { POFormAddressSection } from './POFormAddressSection';
+import { POFormDateSection } from './POFormDateSection';
+import { createAddressFromCustomer } from './POFormHelpers';
+import { POFormItemsSection } from './POFormItemsSection';
+
+import type { UseFormReturnType } from '@mantine/form';
 
 export type POFormValues = {
   customerId: string;
   items: POItem[];
   orderDate?: Date;
   deliveryDate?: Date;
-  shippingAddress: {
+  shippingAddress?: {
     oneLineAddress?: string;
-    street?: string;
-    city?: string;
-    state?: string;
-    postalCode?: string;
-    country?: string;
     googleMapsUrl?: string;
   };
   notes?: string;

@@ -1,20 +1,22 @@
+import { useNavigate } from 'react-router';
+
 import {
+  Avatar,
   Group,
   Menu,
-  Avatar,
-  Text,
   rem,
-  UnstyledButton,
   Switch,
-  useMantineColorScheme,
+  Text,
+  UnstyledButton,
   useComputedColorScheme,
+  useMantineColorScheme,
 } from '@mantine/core';
-import { useNavigate } from 'react-router';
-import { IconUser, IconLogout, IconSun, IconMoon } from '@tabler/icons-react';
+import { IconLogout, IconMoon, IconSun, IconUser } from '@tabler/icons-react';
+
 import { VersionInformation } from '@/components/common';
+import { ROUTERS } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/stores/useAppStore';
-import { ROUTERS } from '@/config/routeConfig';
 
 export function MobileUserMenu() {
   const navigate = useNavigate();

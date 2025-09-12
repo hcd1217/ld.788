@@ -1,18 +1,21 @@
 import { StrictMode, Suspense } from 'react';
-import { createRoot } from 'react-dom/client';
-import { Notifications } from '@mantine/notifications';
+
 import { ModalsProvider } from '@mantine/modals';
+import { Notifications } from '@mantine/notifications';
+import { createRoot } from 'react-dom/client';
+
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 import './index.css';
-import i18n from './lib/i18n';
-import App from './App.tsx';
+import { AppLoader, ErrorModal } from '@/components/common';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import registerGlobalErrorCatcher from '@/utils/errorCatcher';
-import { ErrorModal, AppLoader } from '@/components/common';
 import { registerLogger } from '@/utils/logger';
 import { initializeOrientationLock } from '@/utils/screenOrientation';
+
+import App from './App.tsx';
+import i18n from './lib/i18n';
 
 // Initialize i18n
 void i18n;

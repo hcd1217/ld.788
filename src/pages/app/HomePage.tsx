@@ -1,6 +1,7 @@
-import { Title, Text, Card, Box, Stack } from '@mantine/core';
-import { useDeviceType } from '@/hooks/useDeviceType';
+import { Box, Card, Stack, Text, Title } from '@mantine/core';
+
 import { AppDesktopLayout, AppMobileLayout } from '@/components/common';
+import { useDeviceType } from '@/hooks/useDeviceType';
 
 export function HomePage() {
   const { isMobile } = useDeviceType();

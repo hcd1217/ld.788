@@ -1,10 +1,11 @@
 import { Grid, Text } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { formatDateTime } from '@/utils/time';
-import { getEmployeeNameByUserId } from '@/utils/overview';
+import type { POStatus, PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { useEmployeeMapByUserId } from '@/stores/useAppStore';
+import { getEmployeeNameByUserId } from '@/utils/overview';
 import { getStatusHistoryByStatus } from '@/utils/purchaseOrder';
-import type { PurchaseOrder, POStatus } from '@/services/sales/purchaseOrder';
+import { formatDateTime } from '@/utils/time';
 
 type POStatusHistorySectionProps = {
   readonly purchaseOrder: PurchaseOrder;

@@ -1,7 +1,8 @@
 import { Modal, Stack, Text, ThemeIcon } from '@mantine/core';
 import { IconRotate2 } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
+
 import { useOrientation } from '@/hooks/useOrientation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function OrientationNotice() {
   const { t } = useTranslation();

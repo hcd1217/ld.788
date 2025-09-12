@@ -1,5 +1,6 @@
-import { isDevelopment } from './env';
 import { logInfo } from '@/utils/logger';
+
+import { isDevelopment } from './env';
 
 export interface RouteTransition {
   readonly from: string | null;

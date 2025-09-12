@@ -1,6 +1,8 @@
-import { Center, Container, Stack, Paper, Title, Text, Button, Group } from '@mantine/core';
-import { IconLock } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
+
+import { Button, Center, Container, Group, Paper, Stack, Text, Title } from '@mantine/core';
+import { IconLock } from '@tabler/icons-react';
+
 import { ROUTERS } from '@/config/routeConfig';
 import { useIsDarkMode } from '@/hooks/useIsDarkMode';
 import { useTranslation } from '@/hooks/useTranslation';

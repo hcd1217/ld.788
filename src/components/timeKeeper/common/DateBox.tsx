@@ -1,4 +1,5 @@
-import { Box, Text, Stack } from '@mantine/core';
+import { Box, Stack, Text } from '@mantine/core';
+
 import classes from './DateBox.module.css';
 
 interface DateBoxProps {

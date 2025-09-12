@@ -1,6 +1,8 @@
 import * as React from 'react';
-import { useDeviceType } from './useDeviceType';
+
 import { useAppStore } from '@/stores/useAppStore';
+
+import { useDeviceType } from './useDeviceType';
 // Ref: https://stackoverflow.com/a/78696557
 
 export interface PaginationOptions<T, TFilters = { searchQuery?: string }> {

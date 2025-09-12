@@ -1,8 +1,11 @@
-import { Box, Text, Grid } from '@mantine/core';
 import { useMemo } from 'react';
+
+import { Box, Grid, Text } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import classes from './MyTimesheetWeekSummary.module.css';
 import { formatDuration } from '@/utils/timekeeper.utils';
+
+import classes from './MyTimesheetWeekSummary.module.css';
 
 interface MyTimesheetWeekSummaryProps {
   readonly regularHours: number;

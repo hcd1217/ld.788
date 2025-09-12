@@ -1,8 +1,9 @@
-import { useTranslation } from '@/hooks/useTranslation';
 import {
   DatePickerInput as MantineDatePickerInput,
   type DatePickerInputProps as MantineDatePickerInputProps,
 } from '@mantine/dates';
+
+import { useTranslation } from '@/hooks/useTranslation';
 
 type DatePickerInputProps = Omit<
   MantineDatePickerInputProps<'range'>,

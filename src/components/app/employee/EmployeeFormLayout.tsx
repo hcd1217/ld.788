@@ -1,6 +1,8 @@
 import { type ReactNode } from 'react';
+
 import { Container, Group } from '@mantine/core';
-import { AppPageTitle, AppMobileLayout, AppDesktopLayout, GoBack } from '@/components/common';
+
+import { AppDesktopLayout, AppMobileLayout, AppPageTitle, GoBack } from '@/components/common';
 import { ROUTERS } from '@/config/routeConfig';
 
 type EmployeeFormLayoutProps = {

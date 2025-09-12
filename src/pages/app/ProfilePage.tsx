@@ -1,30 +1,25 @@
+import { useNavigate } from 'react-router';
+
 import {
-  Title,
-  Text,
-  Container,
+  Avatar,
+  Badge,
   Button,
   Card,
-  Group,
-  Stack,
-  Badge,
-  Divider,
-  Avatar,
-  SimpleGrid,
   Center,
+  Container,
+  Divider,
+  Group,
+  SimpleGrid,
+  Stack,
+  Text,
+  Title,
 } from '@mantine/core';
-import { useNavigate } from 'react-router';
-import {
-  IconUser,
-  IconLogout,
-  // IconShieldCheck,
-  // IconBriefcase,
-  IconIdBadge2,
-  IconBuilding,
-} from '@tabler/icons-react';
-import { useMe, useLogout } from '@/stores/useAppStore';
-import { useTranslation } from '@/hooks/useTranslation';
+import { IconBuilding, IconIdBadge2, IconLogout, IconUser } from '@tabler/icons-react';
+
 import { GoBack } from '@/components/common';
 import { ROUTERS } from '@/config/routeConfig';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useLogout, useMe } from '@/stores/useAppStore';
 import { renderFullName } from '@/utils/string';
 
 export function ProfilePage() {

@@ -1,8 +1,10 @@
-import { Stack, Button, Checkbox, Group, ScrollArea } from '@mantine/core';
+import { useEffect, useState } from 'react';
+
+import { Button, Checkbox, Group, ScrollArea, Stack } from '@mantine/core';
+
 import { Drawer } from '@/components/common';
-import { useTranslation } from '@/hooks/useTranslation';
 import { PO_STATUS, type POStatusType } from '@/constants/purchaseOrder';
-import { useState, useEffect } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface POStatusDrawerProps {
   readonly opened: boolean;

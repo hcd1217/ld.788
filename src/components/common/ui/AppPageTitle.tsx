@@ -1,6 +1,8 @@
-import { Title, Group, Button } from '@mantine/core';
-import { IconPlus } from '@tabler/icons-react';
 import React from 'react';
+
+import { Button, Group, Title } from '@mantine/core';
+import { IconPlus } from '@tabler/icons-react';
+
 import { GoBack } from '../navigation/GoBack';
 
 type AppPageTitleProps = {

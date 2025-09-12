@@ -1,6 +1,6 @@
 import { mediaApi } from '@/lib/api';
-import { logError, logInfo } from '@/utils/logger';
 import type { UploadUrlRequest } from '@/lib/api/schemas/media.schemas';
+import { logError, logInfo } from '@/utils/logger';
 
 export type MediaUploadOptions = {
   fileName: string;

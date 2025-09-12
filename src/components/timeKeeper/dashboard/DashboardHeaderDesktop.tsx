@@ -1,8 +1,10 @@
-import { Paper, Text, Group, Stack, Grid, Badge, useMantineTheme } from '@mantine/core';
-import { IconHandStop, IconClock, IconCalendarWeek } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
+import { Badge, Grid, Group, Paper, Stack, Text, useMantineTheme } from '@mantine/core';
+import { IconCalendarWeek, IconClock, IconHandStop } from '@tabler/icons-react';
+
 import { useGreeting } from '@/hooks/useGreeting';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { DashboardHeaderData } from '@/types/timekeeper';
+
 import classes from './DashboardHeaderDesktop.module.css';
 
 type DashboardHeaderDesktopProps = DashboardHeaderData;

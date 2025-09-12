@@ -1,7 +1,9 @@
-import { Card, Stack, Title, Timeline } from '@mantine/core';
+import { Card, Stack, Timeline, Title } from '@mantine/core';
+
+import { usePOTimelineItems } from '@/hooks/usePOTimelineItems';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { usePOTimelineItems } from '@/hooks/usePOTimelineItems';
+
 import { POTimelineItem } from './POTimelineItem';
 
 type POTimelineProps = {

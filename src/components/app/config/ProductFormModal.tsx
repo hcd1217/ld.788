@@ -1,17 +1,19 @@
 import {
-  Stack,
-  TextInput,
-  Select,
-  Textarea,
-  Group,
-  Button,
-  LoadingOverlay,
   Box,
+  Button,
+  Group,
+  LoadingOverlay,
+  Select,
+  Stack,
+  Textarea,
+  TextInput,
 } from '@mantine/core';
-import { useTranslation } from '@/hooks/useTranslation';
+
 import { ModalOrDrawer } from '@/components/common';
-import type { UseFormReturnType } from '@mantine/form';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { ProductStatus } from '@/services/sales/product';
+
+import type { UseFormReturnType } from '@mantine/form';
 
 export type ProductFormValues = {
   productCode: string;

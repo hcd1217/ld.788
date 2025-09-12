@@ -1,10 +1,12 @@
 import { RouterProvider } from 'react-router';
-import { router } from '@/routers';
-import { usePWA } from '@/hooks/usePWA';
-import { useClientBranding } from '@/hooks/useClientBranding';
+
 import { DatesProvider } from '@mantine/dates';
+
 import { ErrorBoundary, OrientationNotice } from '@/components/common';
+import { useClientBranding } from '@/hooks/useClientBranding';
+import { usePWA } from '@/hooks/usePWA';
 import { useTranslation } from '@/hooks/useTranslation';
+import { router } from '@/routers';
 
 function App() {
   usePWA();

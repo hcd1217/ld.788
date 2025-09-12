@@ -1,9 +1,9 @@
 import { BaseApiClient } from '../base';
 import {
-  UploadUrlRequestSchema,
-  UploadUrlResponseSchema,
   type UploadUrlRequest,
+  UploadUrlRequestSchema,
   type UploadUrlResponse,
+  UploadUrlResponseSchema,
 } from '../schemas/media.schemas';
 
 export class MediaApi extends BaseApiClient {

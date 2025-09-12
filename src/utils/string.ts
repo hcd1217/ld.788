@@ -175,7 +175,7 @@ export function normalizeVietnameseChars(text: string): string {
     Đ: 'D',
   };
   return text.replaceAll(
-    // Cspell:disable-next-line
+    // cspell:disable-next-line
     /[ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠạẢảẤấẦầẨẩẪẫẬậẮắẰằẲẳẴẵẶặẸẹẺẻẼẽẾếỀềỂểỄễỆệỈỉỊịỌọỎỏỐốỒồỔổỖỗỘộỚớỜờỞởỠỡỢợỤụỦủỨứỪừỬửỮữỰựỲỳỴỵỶỷỸỹ]/g,
     (char) => vietnameseMap[char] || char,
   );

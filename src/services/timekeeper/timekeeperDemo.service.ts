@@ -1,21 +1,21 @@
 // Demo Timekeeper Service for UI Testing
-import type {
-  DashboardData,
-  ClockEntry,
-  Shift,
-  LeaveRequest,
-  TimesheetEntry,
-  ClockResponse,
-} from '@/types/timekeeper';
 import {
   demoDashboardData,
   // demoClockEntries,
-  demoShifts,
   demoLeaveRequests,
+  demoShifts,
   demoTimesheetEntries,
   getCurrentClockStatus,
   getRandomShift,
 } from '@/data/timekeeperDemoData';
+import type {
+  ClockEntry,
+  ClockResponse,
+  DashboardData,
+  LeaveRequest,
+  Shift,
+  TimesheetEntry,
+} from '@/types/timekeeper';
 
 // Simulate API delay
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

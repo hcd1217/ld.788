@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import type { UseFormReturnType } from '@mantine/form';
+
 import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
+
+import type { UseFormReturnType } from '@mantine/form';
 
 type UseAuthFormOptions = {
   readonly onSuccess?: () => void;

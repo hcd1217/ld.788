@@ -1,5 +1,7 @@
 import React from 'react';
-import { Timeline, Text, Group, Badge } from '@mantine/core';
+
+import { Badge, Group, Text, Timeline } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import { formatDateTime } from '@/utils/time';
 

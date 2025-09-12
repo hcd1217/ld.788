@@ -1,4 +1,5 @@
-import { Text, Group } from '@mantine/core';
+import { Group, Text } from '@mantine/core';
+
 import { formatTime } from '@/utils/timekeeper.utils';
 
 interface TimeDisplayProps {

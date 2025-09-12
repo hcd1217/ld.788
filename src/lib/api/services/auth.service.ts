@@ -1,24 +1,25 @@
-import { BaseApiClient } from '../base';
+import { isDebug } from '@/utils/env';
+import { type FakeDepartmentCode, fakePermission } from '@/utils/fake';
 import { logError } from '@/utils/logger';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
+
+import { BaseApiClient } from '../base';
 import {
-  LoginRequestSchema,
-  LoginResponseSchema,
-  RenewTokenRequestSchema,
-  RenewTokenResponseSchema,
+  type GetMeResponse,
   GetMeResponseSchema,
   type LoginRequest,
+  LoginRequestSchema,
   type LoginResponse,
+  LoginResponseSchema,
   type RenewTokenRequest,
+  RenewTokenRequestSchema,
   type RenewTokenResponse,
-  type GetMeResponse,
+  RenewTokenResponseSchema,
   type VerifyMagicLinkRequest,
+  VerifyMagicLinkRequestSchema,
   type VerifyMagicLinkResponse,
   VerifyMagicLinkResponseSchema,
-  VerifyMagicLinkRequestSchema,
 } from '../schemas/auth.schemas';
-import { fakePermission, type FakeDepartmentCode } from '@/utils/fake';
-import { isDebug } from '@/utils/env';
-import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 export class AuthApi extends BaseApiClient {
   async login(data: LoginRequest): Promise<LoginResponse> {

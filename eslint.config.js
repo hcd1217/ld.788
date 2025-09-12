@@ -54,11 +54,11 @@ export default tseslint.config(
 
       // Base XO rules (using XO's recommended settings)
       ...js.configs.recommended.rules,
-      
+
       // TypeScript rules from XO
       ...tseslint.configs.recommended.rules,
       ...tseslint.configs.strict.rules,
-      
+
       // XO Unicorn plugin rules - more balanced selection
       'unicorn/better-regex': 'warn',
       'unicorn/catch-error-name': 'error',
@@ -161,14 +161,14 @@ export default tseslint.config(
       // React refresh
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
 
-      'no-unused-vars': 'off',
-
       // TypeScript specific
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
           ignoreRestSiblings: true,
         },
       ],
@@ -210,11 +210,61 @@ export default tseslint.config(
       'n/file-extension-in-import': 'off',
       'n/prefer-global/buffer': 'off',
 
+      // Import ordering rules
+      'import/order': [
+        'error',
+        {
+          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'type'],
+          pathGroups: [
+            {
+              pattern: 'react',
+              group: 'builtin',
+              position: 'before',
+            },
+            {
+              pattern: 'react-router',
+              group: 'builtin',
+              position: 'before',
+            },
+            {
+              pattern: '@/**',
+              group: 'internal',
+              position: 'after',
+            },
+          ],
+          pathGroupsExcludedImportTypes: ['react'],
+          'newlines-between': 'always',
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true,
+          },
+        },
+      ],
+
+      // Sort imports
+      'sort-imports': [
+        'error',
+        {
+          ignoreCase: true,
+          ignoreDeclarationSort: true,
+          ignoreMemberSort: false,
+          memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
+          allowSeparatedGroups: true,
+          // newlinesBetween: 'always',
+          // alphabetize: {
+          //   order: 'asc',
+          //   caseInsensitive: true,
+          // },
+        },
+      ],
+
       // Prettier integration
       'prettier/prettier': 'error',
 
       // Disable conflicting rules
       ...prettierConfig.rules,
+
+      'no-unused-vars': 'off',
     },
   },
   {

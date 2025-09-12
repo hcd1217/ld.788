@@ -1,11 +1,12 @@
 import { type ReactNode, useCallback } from 'react';
+
 import { useRouteChange } from '@/hooks/useRouteChange';
-import { routeTracker } from '@/utils/routeTracking';
-import { refreshNavigationCacheTTL } from '@/utils/navigationCache';
 import { useTheme } from '@/hooks/useTheme';
-import { getThemeForRoute } from '@/utils/routeTheme';
 import { routeObjects } from '@/routers';
 import { useAppStore } from '@/stores/useAppStore';
+import { refreshNavigationCacheTTL } from '@/utils/navigationCache';
+import { getThemeForRoute } from '@/utils/routeTheme';
+import { routeTracker } from '@/utils/routeTracking';
 
 interface RouteChangeProviderProps {
   readonly children: ReactNode;

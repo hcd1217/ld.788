@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
-import { Paper, Text, Group, Button, Stack, Alert, Badge } from '@mantine/core';
-import { IconAlertCircle, IconFileSpreadsheet, IconDownload } from '@tabler/icons-react';
+
+import { Alert, Badge, Button, Group, Paper, Stack, Text } from '@mantine/core';
+import { IconAlertCircle, IconDownload, IconFileSpreadsheet } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
 
@@ -32,7 +34,7 @@ export function BulkImportModalContent({
       setSelectedFile(file);
       onFileSelect(file);
     } else {
-      showErrorNotification(t('auth.invalidFileType'), t(`${entityType}.pleaseSelectExcelFile`));
+      showErrorNotification(t('auth.invalidFileType'), t(`common.file.pleaseSelectExcelFile`));
     }
   };
 

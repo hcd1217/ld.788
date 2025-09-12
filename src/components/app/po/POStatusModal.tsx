@@ -1,10 +1,13 @@
-import { Modal, Drawer, ScrollArea } from '@mantine/core';
-import { useState, useMemo } from 'react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useDeviceType } from '@/hooks/useDeviceType';
+import { useMemo, useState } from 'react';
+
+import { Drawer, Modal, ScrollArea } from '@mantine/core';
+
 import { DRAWER_BODY_PADDING_BOTTOM, DRAWER_HEADER_PADDING } from '@/constants/po.constants';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { type POModalMode, getModalConfig } from './POStatusModalConfig';
+
+import { getModalConfig, type POModalMode } from './POStatusModalConfig';
 import { POStatusModalContent } from './POStatusModalContent';
 
 export type { POModalMode } from './POStatusModalConfig';

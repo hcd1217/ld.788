@@ -1,11 +1,13 @@
 import { useMemo } from 'react';
+
 import { useForm } from '@mantine/form';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { getFormValidators } from '@/utils/validation';
+import type { Unit } from '@/services/hr/employee';
+import type { SingleEmployeeFormValues } from '@/utils/employee.utils';
 import { isDevelopment } from '@/utils/env';
 import { firstName, lastName, randomElement } from '@/utils/fake';
-import type { SingleEmployeeFormValues } from '@/utils/employee.utils';
-import type { Unit } from '@/services/hr/employee';
+import { getFormValidators } from '@/utils/validation';
 
 type UseEmployeeFormProps = {
   readonly isEditMode: boolean;

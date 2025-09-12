@@ -1,11 +1,13 @@
-import type * as z from 'zod/v4';
 import { Md5 } from 'ts-md5';
-import { addApiError } from '@/stores/error';
+
 import { authService } from '@/services/auth/auth';
-import { cleanObject } from '@/utils/object';
+import { addApiError } from '@/stores/error';
 import { isDevelopment } from '@/utils/env';
-import { delay } from '@/utils/time';
 import { logError } from '@/utils/logger';
+import { cleanObject } from '@/utils/object';
+import { delay } from '@/utils/time';
+
+import type * as z from 'zod/v4';
 
 type ApiConfig = {
   baseURL: string;
@@ -493,12 +495,14 @@ export class BaseApiClient {
 
   private buildNonceHeaders(headers: Headers): void {
     const timestamp = Date.now().toString();
-    const requestKey = Math.random().toString(36).slice(2, 15);
+    const requestKey = Math.random().toString(16).slice(2);
     const nonce = this.generateNonce(timestamp, requestKey);
     if (nonce) {
       headers.set('X-REQUEST-KEY', requestKey);
       headers.set('X-TIMESTAMP', timestamp);
       headers.set('X-NONCE', nonce);
+    } else {
+      // alert('nonce is empty');
     }
   }
 

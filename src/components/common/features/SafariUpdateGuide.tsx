@@ -1,5 +1,6 @@
-import { Alert, Text, List } from '@mantine/core';
+import { Alert, List, Text } from '@mantine/core';
 import { IconInfoCircle } from '@tabler/icons-react';
+
 import { usePWA } from '@/hooks/usePWA';
 import { useTranslation } from '@/hooks/useTranslation';
 

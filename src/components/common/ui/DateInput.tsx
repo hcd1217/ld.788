@@ -1,8 +1,9 @@
 import {
-  DateInput as MantineDateInput,
   type DateValue,
+  DateInput as MantineDateInput,
   type DateInputProps as MantineDateInputProps,
 } from '@mantine/dates';
+
 import { useTranslation } from '@/hooks/useTranslation';
 
 type DateInputProps = Omit<MantineDateInputProps, 'valueFormat' | 'onChange'> & {

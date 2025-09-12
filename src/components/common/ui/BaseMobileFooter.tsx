@@ -1,5 +1,7 @@
-import { Grid, Text, UnstyledButton, Stack } from '@mantine/core';
 import type React from 'react';
+
+import { Grid, Stack, Text, UnstyledButton } from '@mantine/core';
+
 import classes from './BaseMobileFooter.module.css';
 
 export interface BaseMobileFooterItem {

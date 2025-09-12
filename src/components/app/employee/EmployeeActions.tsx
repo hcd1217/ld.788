@@ -1,9 +1,11 @@
-import { type MantineStyleProp, ActionIcon, Group } from '@mantine/core';
-import { IconEdit, IconUserOff, IconUserCheck } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
-import { useTranslation } from '@/hooks/useTranslation';
+
+import { ActionIcon, Group, type MantineStyleProp } from '@mantine/core';
+import { IconEdit, IconUserCheck, IconUserOff } from '@tabler/icons-react';
+
 import { Tooltip } from '@/components/common';
 import { getEmployeeEditRoute } from '@/config/routeConfig';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type EmployeeActionsProps = {
   readonly employeeId: string;

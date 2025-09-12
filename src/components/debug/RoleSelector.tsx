@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
+
 import { Select } from '@mantine/core';
-import { useState, useEffect } from 'react';
+
 import { isDebug } from '@/utils/env';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 type DepartmentCode = 'sales' | 'delivery' | 'warehouse' | 'accounting' | 'manager';

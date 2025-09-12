@@ -1,23 +1,26 @@
 import { useMemo } from 'react';
+
 import { Box, Container } from '@mantine/core';
-import { useOnce } from '@/hooks/useOnce';
+
 import { AppMobileLayout } from '@/components/common';
-import { formatHours } from '@/utils/timekeeper.utils';
 import {
-  TimekeeperMobileFooter,
   DashboardHeader,
-  DashboardTimesheet,
   DashboardQuickActions,
   DashboardResources,
   DashboardSkeleton,
+  DashboardTimesheet,
   TimekeeperErrorBoundary,
+  TimekeeperMobileFooter,
 } from '@/components/timeKeeper';
+import { useOnce } from '@/hooks/useOnce';
 import {
+  useTimekeeperActions,
   useTimekeeperDashboard,
   useTimekeeperError,
-  useTimekeeperActions,
   useTimekeeperStore,
 } from '@/stores/useTimekeeperStore';
+import { formatHours } from '@/utils/timekeeper.utils';
+
 import classes from './TimekeeperDashboardPage.module.css';
 
 function TimekeeperDashboardPageContent() {

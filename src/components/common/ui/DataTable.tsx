@@ -1,7 +1,9 @@
 import React from 'react';
-import { Table, LoadingOverlay, Box, Center, Text, ScrollArea } from '@mantine/core';
-import { useTranslation } from '@/hooks/useTranslation';
+
+import { Box, Center, LoadingOverlay, ScrollArea, Table, Text } from '@mantine/core';
+
 import { useDeviceType } from '@/hooks/useDeviceType';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type DataTableColumn<T> = {
   key: string;

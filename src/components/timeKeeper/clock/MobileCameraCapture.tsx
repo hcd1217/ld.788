@@ -1,12 +1,15 @@
-import { useRef, useState, useCallback, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { Box, Button } from '@mantine/core';
 import { IconX } from '@tabler/icons-react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+
+import { logError } from '@/utils/logger';
+
+import { CameraError } from './CameraError';
 import { CameraView } from './CameraView';
 import { PhotoPreview } from './PhotoPreview';
-import { CameraError } from './CameraError';
-import { logError } from '@/utils/logger';
 
 interface MobileCameraCaptureProps {
   readonly opened: boolean;

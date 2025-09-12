@@ -1,9 +1,10 @@
-import { Stack, Text, Alert, Flex, Button } from '@mantine/core';
+import { Alert, Button, Flex, Stack, Text } from '@mantine/core';
+
+import { ModalOrDrawer } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
-import { renderFullName } from '@/utils/string';
-import { ModalOrDrawer } from '@/components/common';
 import { getIcon, IconIdentifiers } from '@/utils/iconRegistry';
+import { renderFullName } from '@/utils/string';
 
 const IconAlertTriangle = getIcon(IconIdentifiers.ALERT_TRIANGLE);
 

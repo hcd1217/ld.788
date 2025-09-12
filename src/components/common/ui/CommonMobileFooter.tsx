@@ -1,7 +1,10 @@
-import { useNavigate, useLocation } from 'react-router';
 import { useMemo } from 'react';
-import { BaseMobileFooter, type BaseMobileFooterItem } from './BaseMobileFooter';
+
+import { useLocation, useNavigate } from 'react-router';
+
 import { useMobileNavigation } from '@/hooks/useNavigationItems';
+
+import { BaseMobileFooter, type BaseMobileFooterItem } from './BaseMobileFooter';
 
 export function CommonMobileFooter() {
   const navigate = useNavigate();

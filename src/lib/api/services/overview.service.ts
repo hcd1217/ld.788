@@ -1,7 +1,7 @@
 import { BaseApiClient } from '../base';
 import {
-  CombinedOverviewSchema,
   type CombinedOverview,
+  CombinedOverviewSchema,
   type OverviewParams,
 } from '../schemas/overview.schemas';
 

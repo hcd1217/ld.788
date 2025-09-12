@@ -1,4 +1,5 @@
-import { Box, Container, Skeleton, Stack, SimpleGrid } from '@mantine/core';
+import { Box, Container, SimpleGrid, Skeleton, Stack } from '@mantine/core';
+
 import classes from './DashboardSkeleton.module.css';
 
 export function DashboardSkeleton() {

@@ -1,13 +1,16 @@
-import { Stack, Text, Group, Anchor } from '@mantine/core';
-import { IconTruckDelivery, IconUser, IconCalendar } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
-import { useTranslation } from '@/hooks/useTranslation';
-import { formatDate } from '@/utils/time';
-import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
-import { useEmployeeMapByEmployeeId, useEmployeeMapByUserId } from '@/stores/useAppStore';
+
+import { Anchor, Group, Stack, Text } from '@mantine/core';
+import { IconCalendar, IconTruckDelivery, IconUser } from '@tabler/icons-react';
+
 import { getDeliveryDetailRoute } from '@/config/routeConfig';
-import { DeliveryStatusBadge } from '../delivery/DeliveryStatusBadge';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { useEmployeeMapByEmployeeId, useEmployeeMapByUserId } from '@/stores/useAppStore';
+import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
+import { formatDate } from '@/utils/time';
+
+import { DeliveryStatusBadge } from '../delivery/DeliveryStatusBadge';
 
 type PODeliverySectionProps = {
   readonly purchaseOrder: PurchaseOrder;

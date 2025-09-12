@@ -1,7 +1,8 @@
-import { Stack, Group, Button } from '@mantine/core';
+import { Button, Group, Stack } from '@mantine/core';
 import { IconChevronDown, IconClearAll } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
+
 import { SearchBar } from '@/components/common';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
 
 interface POFilterBarMobileProps {

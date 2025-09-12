@@ -1,20 +1,24 @@
 import { BaseApiClient } from '../base';
 import {
   // Customer schemas
-  GetCustomersResponseSchema,
-  CreateCustomerRequestSchema,
-  CreateCustomerResponseSchema,
-  UpdateCustomerRequestSchema,
-  UpdateCustomerResponseSchema,
   BulkUpsertCustomersRequestSchema,
   BulkUpsertCustomersResponseSchema,
-  type GetCustomersResponse,
-  type CreateCustomerRequest,
-  type CreateCustomerResponse,
-  type UpdateCustomerRequest,
-  type UpdateCustomerResponse,
+  CreateCustomerRequestSchema,
+  CreateCustomerResponseSchema,
+  GetCustomersResponseSchema,
+  UpdateCustomerRequestSchema,
+  UpdateCustomerResponseSchema,
+
+  // Purchase Order schemas
+  // eslint-disable-next-line sort-imports
   type BulkUpsertCustomersRequest,
   type BulkUpsertCustomersResponse,
+  type CreateCustomerRequest,
+  type CreateCustomerResponse,
+  type GetCustomersResponse,
+  type UpdateCustomerRequest,
+  type UpdateCustomerResponse,
+
   // Purchase Order schemas
   GetPurchaseOrdersResponseSchema,
   CreatePurchaseOrderRequestSchema,

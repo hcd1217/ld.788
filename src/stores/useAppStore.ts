@@ -1,17 +1,18 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { authService } from '@/services/auth/auth';
+
 import { authApi, clientApi, type ClientConfig, type ClientPublicConfigResponse } from '@/lib/api';
-import { updateClientTranslations, clearClientTranslations } from '@/lib/i18n';
 import type { GetMeResponse } from '@/lib/api/schemas/auth.schemas';
+import { clearClientTranslations, updateClientTranslations } from '@/lib/i18n';
+import { authService } from '@/services/auth/auth';
 import {
-  overviewService,
-  type OverviewData,
-  type EmployeeOverview,
   type CustomerOverview,
+  type EmployeeOverview,
+  type OverviewData,
+  overviewService,
 } from '@/services/client/overview';
-import { cacheNavigationConfig, clearNavigationCache } from '@/utils/navigationCache';
 import { logError } from '@/utils/logger';
+import { cacheNavigationConfig, clearNavigationCache } from '@/utils/navigationCache';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 type ClientPublicConfig = ClientPublicConfigResponse;
@@ -87,10 +88,10 @@ export const useAppStore = create<AppState>()(
           pagination: {
             mobile: {
               defaultPageSize: 1000,
-              PagingOptions: [{ value: '1000', label: '1000' }],
+              pagingOptions: [{ value: '1000', label: '1000' }],
             },
             desktop: {
-              defaultPageSize: 12,
+              defaultPageSize: 20,
               pagingOptions: [
                 { value: '10', label: '10' },
                 { value: '20', label: '20' },
@@ -320,7 +321,12 @@ const EMPTY_PERMISSIONS: Permission = Object.freeze({
     canCreate: false,
     canEdit: false,
     canDelete: false,
+    query: {
+      canFilter: false,
+      canViewAll: false,
+    },
     actions: {
+      canUpdateDeliveryOrderInDay: false,
       canStartTransit: false,
       canComplete: false,
       canTakePhoto: false,

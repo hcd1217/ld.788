@@ -1,10 +1,14 @@
-import { useMemo, memo } from 'react';
-import { SimpleGrid, Box } from '@mantine/core';
+import { memo, useMemo } from 'react';
+
 import { useNavigate } from 'react-router';
-import { useTranslation } from '@/hooks/useTranslation';
+
+import { Box, SimpleGrid } from '@mantine/core';
+
 import { QUICK_ACTIONS_CONFIG, type QuickActionConfig } from '@/config/timekeeper.config';
-import { ActionCard } from '../common';
 import { useDeviceType } from '@/hooks/useDeviceType';
+import { useTranslation } from '@/hooks/useTranslation';
+
+import { ActionCard } from '../common';
 
 interface QuickActionBadge {
   readonly value: number;

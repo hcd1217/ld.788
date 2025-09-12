@@ -1,8 +1,8 @@
 import { authApi, type LoginRequest } from '@/lib/api';
-import { logError } from '@/utils/logger';
 import { isTokenExpired } from '@/utils/jwt';
-import { delay } from '@/utils/time';
+import { logError } from '@/utils/logger';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
+import { delay } from '@/utils/time';
 
 export const authService = {
   async loginWithMagicToken(clientCode: string, token: string) {

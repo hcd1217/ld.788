@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
-import { Group, Button, ActionIcon } from '@mantine/core';
-import { IconChevronLeft, IconChevronRight, IconCalendar } from '@tabler/icons-react';
+
+import { ActionIcon, Button, Group } from '@mantine/core';
+import { IconCalendar, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { getWeekRange, getDaysOfWeek, formatDateRange } from '@/utils/timekeeper.utils';
+import { formatDateRange, getDaysOfWeek, getWeekRange } from '@/utils/timekeeper.utils';
 
 interface MyTimesheetWeekNavigatorProps {
   readonly currentWeek: Date;

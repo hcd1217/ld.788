@@ -1,27 +1,31 @@
 import { useCallback, useEffect } from 'react';
+
 import { useParams } from 'react-router';
+
 import { LoadingOverlay, Stack } from '@mantine/core';
-import { useTranslation } from '@/hooks/useTranslation';
+
+import { DeliveryDetailAccordion } from '@/components/app/delivery/DeliveryDetailAccordion';
+import { DeliveryDetailTabs } from '@/components/app/delivery/DeliveryDetailTabs';
+import { DeliveryPhotoUpload } from '@/components/app/delivery/DeliveryPhotoUpload';
+import { DeliveryStatusDrawer } from '@/components/app/delivery/DeliveryStatusDrawer';
+import { DeliveryUpdateModal } from '@/components/app/delivery/DeliveryUpdateModal';
+import { AppDesktopLayout, AppMobileLayout } from '@/components/common';
+import { AppPageTitle } from '@/components/common';
+import { PermissionDeniedPage } from '@/components/common/layouts/PermissionDeniedPage';
+import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
+import { ROUTERS } from '@/config/routeConfig';
+import { useDeliveryModals } from '@/hooks/useDeliveryModals';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { useAction } from '@/hooks/useAction';
+import { useSWRAction } from '@/hooks/useSWRAction';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { PICType } from '@/services/sales/deliveryRequest';
 import { usePermissions } from '@/stores/useAppStore';
 import {
   useCurrentDeliveryRequest,
-  useDeliveryRequestLoading,
-  useDeliveryRequestError,
   useDeliveryRequestActions,
+  useDeliveryRequestError,
+  useDeliveryRequestLoading,
 } from '@/stores/useDeliveryRequestStore';
-import { useDeliveryModals } from '@/hooks/useDeliveryModals';
-import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
-import { PermissionDeniedPage } from '@/components/common/layouts/PermissionDeniedPage';
-import { AppPageTitle } from '@/components/common';
-import { AppMobileLayout, AppDesktopLayout } from '@/components/common';
-import { DeliveryDetailTabs } from '@/components/app/delivery/DeliveryDetailTabs';
-import { DeliveryDetailAccordion } from '@/components/app/delivery/DeliveryDetailAccordion';
-import { DeliveryStatusDrawer } from '@/components/app/delivery/DeliveryStatusDrawer';
-import { DeliveryPhotoUpload } from '@/components/app/delivery/DeliveryPhotoUpload';
-import { DeliveryUpdateModal } from '@/components/app/delivery/DeliveryUpdateModal';
-import { ROUTERS } from '@/config/routeConfig';
 
 export function DeliveryDetailPage() {
   const { deliveryId } = useParams<{ deliveryId: string }>();
@@ -87,89 +91,93 @@ export function DeliveryDetailPage() {
   };
 
   // Start transit action
-  const startTransitAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('delivery.messages.statusUpdated', {
-        status: t('delivery.statuses.inTransit'),
-      }),
-      errorTitle: t('common.error'),
-      errorMessage: t('delivery.messages.statusUpdateFailed'),
-    },
-    async actionHandler(data?: any) {
+  const startTransitAction = useSWRAction(
+    'start-transit',
+    async (data?: { transitNotes?: string }) => {
       if (!permissions.deliveryRequest.actions?.canStartTransit) {
-        throw new Error(t('delivery.messages.statusUpdateFailed'));
+        throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedDeliveryRequest) {
-        throw new Error(t('delivery.messages.statusUpdateFailed'));
+        throw new Error(t('common.invalidFormData'));
       }
       await updateDeliveryStatus(selectedDeliveryRequest.id, 'IN_TRANSIT', data?.transitNotes);
       closeModal('startTransit');
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('delivery.messages.statusUpdated', {
+          status: t('delivery.statuses.inTransit'),
+        }),
+        errorTitle: t('common.error'),
+        errorMessage: t('delivery.messages.statusUpdateFailed'),
+      },
+    },
+  );
 
   // Complete delivery action
-  const completeDeliveryAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('delivery.messages.completed'),
-      errorTitle: t('common.error'),
-      errorMessage: t('delivery.messages.completeFailed'),
-    },
-    async actionHandler(data?: { completionNotes?: string; recipient?: string }) {
+  const completeDeliveryAction = useSWRAction(
+    'complete-delivery',
+    async (data?: { completionNotes?: string; recipient?: string }) => {
       if (!permissions.deliveryRequest.actions?.canComplete) {
-        throw new Error(t('delivery.messages.completeFailed'));
+        throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedDeliveryRequest) {
-        throw new Error(t('delivery.messages.completeFailed'));
+        throw new Error(t('common.invalidFormData'));
       }
       await completeDelivery(selectedDeliveryRequest.id, {
         notes: data?.completionNotes,
-        // recipient data would be handled by the backend
       });
       closeModal('complete');
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('delivery.messages.completed'),
+        errorTitle: t('common.error'),
+        errorMessage: t('delivery.messages.completeFailed'),
+      },
+    },
+  );
 
   // Upload photos action
-  const uploadPhotosAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('delivery.messages.photosUploaded'),
-      errorTitle: t('common.error'),
-      errorMessage: t('delivery.messages.uploadFailed'),
-    },
-    async actionHandler(data?: { photoUrls: string[] }) {
+  const uploadPhotosAction = useSWRAction(
+    'upload-photos',
+    async (data?: { photoUrls: string[] }) => {
       if (!permissions.deliveryRequest.actions?.canTakePhoto) {
-        throw new Error(t('delivery.messages.uploadFailed'));
+        throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedDeliveryRequest || !data?.photoUrls) {
-        throw new Error(t('delivery.messages.uploadFailed'));
+        throw new Error(t('common.invalidFormData'));
       }
       await uploadPhotos(selectedDeliveryRequest.id, data.photoUrls);
       closeModal('uploadPhotos');
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('delivery.messages.photosUploaded'),
+        errorTitle: t('common.error'),
+        errorMessage: t('delivery.messages.uploadFailed'),
+      },
+    },
+  );
 
   // Update delivery request action
-  const updateDeliveryRequestAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('common.updateFailed', {
-        entity: t('common.entity.deliveryRequest'),
-      }),
-      errorTitle: t('common.error'),
-      errorMessage: t('common.updateFailed', {
-        entity: t('common.entity.deliveryRequest'),
-      }),
-    },
-    async actionHandler(data?: any) {
+  const updateDeliveryRequestAction = useSWRAction(
+    'update-delivery-request',
+    async (data?: {
+      assignedTo?: string;
+      assignedType?: PICType;
+      scheduledDate?: string;
+      notes?: string;
+      isUrgentDelivery?: boolean;
+    }) => {
+      if (!permissions.deliveryRequest.canEdit) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
       if (!selectedDeliveryRequest) {
-        throw new Error(
-          t('common.updateFailed', {
-            entity: t('common.entity.deliveryRequest'),
-          }),
-        );
+        throw new Error(t('common.invalidFormData'));
       }
       await updateDeliveryRequest(selectedDeliveryRequest.id, {
         assignedTo: data?.assignedTo,
@@ -180,7 +188,7 @@ export function DeliveryDetailPage() {
       });
       closeModal('update');
     },
-  });
+  );
 
   const title = deliveryRequest
     ? `${deliveryRequest.deliveryRequestNumber}`
@@ -216,7 +224,7 @@ export function DeliveryDetailPage() {
         <DeliveryPhotoUpload
           opened={modals.uploadPhotos}
           onClose={handleCloseModal('uploadPhotos')}
-          onUpload={uploadPhotosAction}
+          onUpload={uploadPhotosAction.trigger}
         />
       );
     }
@@ -251,20 +259,20 @@ export function DeliveryDetailPage() {
           mode="start_transit"
           deliveryRequest={selectedDeliveryRequest}
           onClose={handleCloseModal('startTransit')}
-          onConfirm={startTransitAction}
+          onConfirm={startTransitAction.trigger}
         />
         <DeliveryStatusDrawer
           opened={modals.complete}
           mode="complete"
           deliveryRequest={selectedDeliveryRequest}
           onClose={handleCloseModal('complete')}
-          onConfirm={completeDeliveryAction}
+          onConfirm={completeDeliveryAction.trigger}
         />
         <DeliveryUpdateModal
           opened={modals.update}
           deliveryRequest={selectedDeliveryRequest}
           onClose={handleCloseModal('update')}
-          onConfirm={updateDeliveryRequestAction}
+          onConfirm={updateDeliveryRequestAction.trigger}
         />
       </AppMobileLayout>
     );
@@ -289,7 +297,7 @@ export function DeliveryDetailPage() {
             opened={modals.update}
             deliveryRequest={selectedDeliveryRequest}
             onClose={handleCloseModal('update')}
-            onConfirm={updateDeliveryRequestAction}
+            onConfirm={updateDeliveryRequestAction.trigger}
           />
         </>
       ) : (

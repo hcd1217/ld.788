@@ -1,7 +1,8 @@
-import * as XLSX from 'xlsx';
 import { type TFunction } from 'i18next';
-import { firstName, lastName } from '@/utils/fake';
+import * as XLSX from 'xlsx';
+
 import type { Unit } from '@/services/hr/employee';
+import { firstName, lastName } from '@/utils/fake';
 
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -47,7 +48,7 @@ export function generateSampleExcel({
       return [lastName(), firstName(), option.label];
     });
     sampleData.unshift([lastName(), firstName(), '']);
-    // Cspell:disable
+    // cspell:disable
     sampleData.unshift(['Họ', 'Tên', 'Bộ phận']);
   } else {
     sampleData = [
@@ -58,12 +59,12 @@ export function generateSampleExcel({
       ['Sarah', 'Wilson', ''],
     ];
   }
-  // Cspell:enable
+  // cspell:enable
 
   const workbook = XLSX.utils.book_new();
   const worksheet = XLSX.utils.aoa_to_sheet(sampleData);
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Employees');
-  // Cspell:disable-next-line
+  // cspell:disable-next-line
   XLSX.writeFile(workbook, 'Danh_sách_mẫu.xlsx');
 }
 

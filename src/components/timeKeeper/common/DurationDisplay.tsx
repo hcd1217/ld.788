@@ -1,4 +1,5 @@
-import { Text, Group, Badge } from '@mantine/core';
+import { Badge, Group, Text } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import { formatDuration } from '@/utils/timekeeper.utils';
 

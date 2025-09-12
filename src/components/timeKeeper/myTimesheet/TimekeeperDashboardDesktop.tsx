@@ -1,18 +1,22 @@
-import { Grid, Box, Paper, Stack, Title, Group, Badge, Text, Card } from '@mantine/core';
+import { useNavigate } from 'react-router';
+
+import { Badge, Box, Card, Grid, Group, Paper, Stack, Text, Title } from '@mantine/core';
 import {
+  IconBook,
   IconCalendarEvent,
   IconClipboardList,
-  IconBook,
-  IconFileText,
-  IconUsers,
-  IconHeadset,
   IconClipboardText,
+  IconFileText,
+  IconHeadset,
+  IconUsers,
 } from '@tabler/icons-react';
-import { useNavigate } from 'react-router';
+
+import { QUICK_ACTIONS_CONFIG } from '@/config/timekeeper.config';
+import { useTranslation } from '@/hooks/useTranslation';
+
 import { DashboardHeaderDesktop } from '../dashboard/DashboardHeaderDesktop';
 import { DashboardTimesheet } from '../dashboard/DashboardTimesheet';
-import { useTranslation } from '@/hooks/useTranslation';
-import { QUICK_ACTIONS_CONFIG } from '@/config/timekeeper.config';
+
 import classes from './TimekeeperDashboardDesktop.module.css';
 
 interface TimekeeperDashboardDesktopProps {

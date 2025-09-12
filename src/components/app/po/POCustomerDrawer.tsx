@@ -1,9 +1,11 @@
-import { Stack, Button, TextInput } from '@mantine/core';
+import { useMemo, useState } from 'react';
+
+import { Button, Stack, TextInput } from '@mantine/core';
+import { IconSearch } from '@tabler/icons-react';
+
 import { Drawer } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
-import { useState, useMemo } from 'react';
-import { IconSearch } from '@tabler/icons-react';
 
 interface POCustomerDrawerProps {
   readonly opened: boolean;

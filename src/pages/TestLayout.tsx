@@ -1,5 +1,6 @@
-import { AppMobileLayout } from '@/components/common';
 import { Box } from '@mantine/core';
+
+import { AppMobileLayout } from '@/components/common';
 
 export function TestLayout() {
   return (

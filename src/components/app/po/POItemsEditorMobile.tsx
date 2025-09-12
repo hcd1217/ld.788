@@ -1,13 +1,16 @@
-import { memo, useState, useEffect, useImperativeHandle, forwardRef, useCallback } from 'react';
-import { Stack, Text, Affix, ActionIcon, Card, Button } from '@mantine/core';
+import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+
+import { ActionIcon, Affix, Button, Card, Stack, Text } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { v4 as uuidv4 } from 'uuid';
-import { useTranslation } from '@/hooks/useTranslation';
-import { POItemCard } from './POItemCard';
-import { POAddItemModal } from './POAddItemModal';
-import { createPOItem } from '@/utils/poItemUtils';
+
 import { FAB_BOTTOM_OFFSET, FAB_RIGHT_OFFSET, FAB_Z_INDEX } from '@/constants/po.constants';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { POItem } from '@/services/sales/purchaseOrder';
+import { createPOItem } from '@/utils/poItemUtils';
+
+import { POAddItemModal } from './POAddItemModal';
+import { POItemCard } from './POItemCard';
 
 // Define POItemsEditorRef locally since it's not exported from POItemsEditor
 export type POItemsEditorRef = {
@@ -105,6 +108,9 @@ const POItemsEditorMobileComponent = forwardRef<POItemsEditorRef, POItemsEditorM
                 description: item.description,
                 quantity: item.quantity,
                 category: item.category,
+                notes: item.notes,
+                unit: item.unit,
+                productId: item.productId,
               });
               return item;
             }

@@ -1,7 +1,8 @@
 import type { GetMeResponse } from '@/lib/api/schemas/auth.schemas';
+
 import { normalizeVietnameseChars } from './string';
 
-// Cspell:disable
+// cspell:disable
 const lastNames = [
   'Bùi',
   'Châu',
@@ -301,15 +302,96 @@ export function fakeEmail(name: string) {
 }
 
 export type FakeDepartmentCode = 'sales' | 'delivery' | 'warehouse' | 'accounting' | 'manager';
+
 export function fakePermission(code: FakeDepartmentCode): GetMeResponse['permissions'] {
-  const basePermission = {
-    canView: false,
-    canCreate: false,
-    canEdit: false,
-    canDelete: false,
+  const permissions = generateDepartmentPermissions();
+  return (permissions[code] || permissions.default) as GetMeResponse['permissions'];
+}
+
+export const departmentPermissions = generateDepartmentPermissions();
+
+function generateDepartmentPermissions() {
+  type Permissions = GetMeResponse['permissions'];
+  return {
+    manager: toTrue(generateDefaultPermissions()),
+    sales: (() => {
+      const permissions: Permissions = generateDefaultPermissions();
+      permissions.purchaseOrder = toTrue(permissions.purchaseOrder) as Permissions['purchaseOrder'];
+      {
+        const actions = permissions.purchaseOrder.actions || {};
+        actions.canProcess = false;
+        actions.canMarkReady = false;
+      }
+      {
+        permissions.deliveryRequest.canView = true;
+        permissions.deliveryRequest.canEdit = true;
+        const actions = permissions.deliveryRequest.actions || {};
+        actions.canTakePhoto = true;
+      }
+      return permissions;
+    })(),
+    warehouse: (() => {
+      const permissions: Permissions = generateDefaultPermissions();
+      permissions.purchaseOrder = {
+        ...permissions.purchaseOrder,
+        canView: true,
+        actions: toTrue(
+          permissions.purchaseOrder.actions || {},
+        ) as Permissions['purchaseOrder']['actions'],
+      };
+      permissions.deliveryRequest.canView = true;
+      permissions.deliveryRequest.actions = {
+        ...permissions.deliveryRequest.actions,
+        canTakePhoto: true,
+      };
+      return permissions;
+    })(),
+    accounting: (() => {
+      const permissions: Permissions = generateDefaultPermissions();
+      {
+        const actions =
+          (toTrue(
+            permissions.purchaseOrder.actions || {},
+          ) as Permissions['purchaseOrder']['actions']) || {};
+        actions.canProcess = false;
+        actions.canMarkReady = false;
+        permissions.purchaseOrder = {
+          ...permissions.purchaseOrder,
+          canView: true,
+          actions,
+        };
+      }
+      {
+        permissions.deliveryRequest = toTrue(
+          permissions.deliveryRequest,
+        ) as Permissions['deliveryRequest'];
+        const actions = permissions.deliveryRequest.actions || {};
+        actions.canTakePhoto = false;
+        actions.canComplete = false;
+      }
+      return permissions;
+    })(),
+    delivery: (() => {
+      const permissions: Permissions = generateDefaultPermissions();
+      permissions.deliveryRequest.canView = true;
+      permissions.deliveryRequest.actions = {
+        canUpdateDeliveryOrderInDay: true,
+        canStartTransit: true,
+        canTakePhoto: true,
+        canComplete: true,
+      };
+      return permissions;
+    })(),
+    default: generateDefaultPermissions(),
   };
 
-  function generateDefaultPermission(): GetMeResponse['permissions'] {
+  function generateDefaultPermissions(): GetMeResponse['permissions'] {
+    const basePermission = {
+      canView: false,
+      canCreate: false,
+      canEdit: false,
+      canDelete: false,
+    };
     return {
       customer: {
         ...basePermission,
@@ -332,6 +414,7 @@ export function fakePermission(code: FakeDepartmentCode): GetMeResponse['permiss
           canMarkReady: false,
           canDeliver: false,
           canCancel: false,
+          canRefund: false,
         },
       },
       deliveryRequest: {
@@ -363,92 +446,5 @@ export function fakePermission(code: FakeDepartmentCode): GetMeResponse['permiss
       }
     });
     return permission;
-  }
-
-  const permissions = generateDefaultPermission();
-  const fullPermissions = toTrue(generateDefaultPermission()) as typeof permissions;
-
-  switch (code) {
-    case 'manager': {
-      return fullPermissions;
-    }
-    case 'sales': {
-      permissions.purchaseOrder = {
-        ...permissions.purchaseOrder,
-        canView: true,
-        canCreate: true,
-        canEdit: true,
-        actions: {
-          ...permissions.purchaseOrder.actions,
-          canConfirm: true,
-          canDeliver: true,
-          canCancel: true,
-        },
-      };
-      permissions.deliveryRequest = {
-        ...permissions.deliveryRequest,
-        query: {
-          canFilter: true,
-          canViewAll: true,
-        },
-        canView: true,
-      };
-      return permissions;
-    }
-    case 'delivery': {
-      permissions.deliveryRequest = {
-        ...permissions.deliveryRequest,
-        canView: true,
-        actions: {
-          canStartTransit: true,
-          canComplete: true,
-          canTakePhoto: true,
-        },
-      };
-      return permissions;
-    }
-    case 'warehouse': {
-      permissions.purchaseOrder = {
-        ...permissions.purchaseOrder,
-        canView: true,
-        actions: {
-          canProcess: true,
-          canMarkReady: true,
-          canDeliver: true,
-          canShip: true,
-        },
-      };
-      permissions.deliveryRequest = {
-        ...permissions.deliveryRequest,
-        canView: true,
-        canCreate: true,
-      };
-      return permissions;
-    }
-    case 'accounting': {
-      permissions.employee.canView = true;
-      permissions.purchaseOrder = {
-        ...permissions.purchaseOrder,
-        canView: true,
-        canEdit: true,
-        actions: {
-          canShip: true,
-          canRefund: true,
-        },
-      };
-      permissions.deliveryRequest = {
-        ...permissions.deliveryRequest,
-        query: {
-          canFilter: true,
-          canViewAll: true,
-        },
-        canView: true,
-        canCreate: true,
-      };
-      return permissions;
-    }
-    default: {
-      return permissions;
-    }
   }
 }

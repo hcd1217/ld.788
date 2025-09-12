@@ -1,35 +1,37 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
 import {
-  Container,
-  Paper,
-  Text,
-  Group,
-  Button,
-  Stack,
+  ActionIcon,
   Badge,
+  Button,
   Card,
   Center,
+  Container,
+  Group,
   Loader,
+  Paper,
   Select,
-  ActionIcon,
+  Stack,
+  Text,
 } from '@mantine/core';
-import { IconCalendar, IconArrowUp, IconArrowDown } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
+import { IconArrowDown, IconArrowUp, IconCalendar } from '@tabler/icons-react';
+
 import {
   AppDesktopLayout,
   AppPageTitle,
   DateInput,
   PermissionDeniedPage,
 } from '@/components/common';
+import { useSWRAction } from '@/hooks/useSWRAction';
+import { useTranslation } from '@/hooks/useTranslation';
 import { type DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { usePermissions } from '@/stores/useAppStore';
 import {
   useDeliveryAssigneeOptions,
   useDeliveryRequestActions,
-  useDeliveryRequestLoading,
   useDeliveryRequestError,
+  useDeliveryRequestLoading,
 } from '@/stores/useDeliveryRequestStore';
-import { useAction } from '@/hooks/useAction';
 import { logError } from '@/utils/logger';
 
 export function UpdateDeliveryOrderPage() {
@@ -38,8 +40,7 @@ export function UpdateDeliveryOrderPage() {
   const assigneeOptions = useDeliveryAssigneeOptions();
   const isLoading = useDeliveryRequestLoading();
   const error = useDeliveryRequestError();
-  const { loadDeliveryRequestsForDate, updateDeliveryOrderInDay, clearError } =
-    useDeliveryRequestActions();
+  const { loadDeliveryRequestsForDate, clearError } = useDeliveryRequestActions();
 
   // Local UI state
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -90,32 +91,21 @@ export function UpdateDeliveryOrderPage() {
   };
 
   // Save the new order
-  const saveDeliveryOrder = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('common.success'),
-    },
-    async actionHandler() {
+  const saveDeliveryOrder = useSWRAction(
+    'save-delivery-order',
+    async () => {
       if (!selectedDate || !hasChanges) return;
       if (!permissions.deliveryRequest.actions?.canUpdateDeliveryOrderInDay) {
         throw new Error(t('common.failed'));
       }
-
-      const orderedIds = deliveryRequests.map((dr) => dr.id);
-
-      await updateDeliveryOrderInDay(selectedAssignee ?? '-', selectedDate, orderedIds);
-
-      setHasChanges(false);
-      // Reload to get updated data
-      await loadDeliveryRequests();
     },
-    errorHandler(err) {
-      logError('Failed to update delivery order:', err, {
-        module: 'UpdateDeliveryOrderPage',
-        action: 'saveDeliveryOrder',
-      });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('common.success'),
+      },
     },
-  });
+  );
 
   // Load data when date or assignee changes
   useEffect(() => {
@@ -159,7 +149,7 @@ export function UpdateDeliveryOrderPage() {
               </Group>
 
               <Button
-                onClick={() => void saveDeliveryOrder()}
+                onClick={saveDeliveryOrder.trigger}
                 disabled={!hasChanges || isLoading}
                 loading={isLoading}
               >

@@ -1,5 +1,6 @@
 {
   "ignorePaths": [
+    "scripts/seed-data/**/*.json",
     "scripts/seed-data/name.json",
     ".gitignore",
     "package.json",

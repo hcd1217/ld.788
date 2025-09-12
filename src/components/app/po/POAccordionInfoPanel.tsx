@@ -1,4 +1,6 @@
-import { Stack, Grid, Text, Group, Badge, Button, Anchor } from '@mantine/core';
+import { useNavigate } from 'react-router';
+
+import { Anchor, Badge, Button, Grid, Group, Stack, Text } from '@mantine/core';
 import {
   IconBuilding,
   IconCalendar,
@@ -6,30 +8,32 @@ import {
   IconTruckDelivery,
   IconUser,
 } from '@tabler/icons-react';
-import { useNavigate } from 'react-router';
+
+import { getDeliveryDetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
-import { POStatusBadge } from './POStatusBadge';
-import { formatDate, formatDateTime } from '@/utils/time';
-import {
-  getCustomerNameByCustomerId,
-  getEmployeeNameByEmployeeId,
-  getEmployeeNameByUserId,
-} from '@/utils/overview';
+import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import {
   useCustomerMapByCustomerId,
   useEmployeeMapByEmployeeId,
   useEmployeeMapByUserId,
 } from '@/stores/useAppStore';
 import {
+  getCustomerNameByCustomerId,
+  getEmployeeNameByEmployeeId,
+  getEmployeeNameByUserId,
+} from '@/utils/overview';
+import {
   getCancelReason,
-  getRefundReason,
   getDeliveryNotes,
+  getRefundReason,
   getShippingInfo,
   isPOEditable,
 } from '@/utils/purchaseOrder';
-import { getDeliveryDetailRoute } from '@/config/routeConfig';
-import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { formatDate, formatDateTime } from '@/utils/time';
+
 import { DeliveryStatusBadge } from '../delivery/DeliveryStatusBadge';
+
+import { POStatusBadge } from './POStatusBadge';
 
 type POAccordionInfoPanelProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -137,7 +141,7 @@ export function POAccordionInfoPanel({
 
       <div>
         <Text size="xs" fw={500} c="dimmed" mb={4}>
-          {t('po.notes')}
+          {t('common.notes')}
         </Text>
         <Text size="sm">{purchaseOrder.notes || '-'}</Text>
       </div>

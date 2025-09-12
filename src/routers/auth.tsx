@@ -1,5 +1,6 @@
-import { ROUTERS } from '@/config/routeConfig';
 import { lazy } from 'react';
+
+import { ROUTERS } from '@/config/routeConfig';
 
 const LoginPage = lazy(async () => {
   const module = await import('@/pages/auth/LoginPage');

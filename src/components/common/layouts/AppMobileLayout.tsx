@@ -1,15 +1,20 @@
 import React from 'react';
-import { AppShell, Container, Group, LoadingOverlay, ActionIcon, Tooltip } from '@mantine/core';
-import { IconHome } from '@tabler/icons-react';
+
 import { useNavigate } from 'react-router';
-import { CommonMobileHeader } from '../ui/CommonMobileHeader';
+
+import { ActionIcon, AppShell, Container, Group, LoadingOverlay, Tooltip } from '@mantine/core';
+import { IconHome } from '@tabler/icons-react';
+
+import { ROUTERS } from '@/config/routeConfig';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/stores/useAppStore';
+
+import { ErrorAlert } from '../feedback';
+import { AppLogo, GoBack } from '../navigation';
 import { CommonMobileFooter } from '../ui';
 import { CommonMobileFooterSkeleton } from '../ui/CommonMobileFooterSkeleton';
-import { useAppStore } from '@/stores/useAppStore';
-import { AppLogo, GoBack } from '../navigation';
-import { ErrorAlert } from '../feedback';
-import { useTranslation } from '@/hooks/useTranslation';
-import { ROUTERS } from '@/config/routeConfig';
+import { CommonMobileHeader } from '../ui/CommonMobileHeader';
+
 import classes from './AppLayoutMobile.module.css';
 
 type AppMobileLayoutProps = {

@@ -1,39 +1,40 @@
-import { useState, useMemo } from 'react';
-import { Paper, Text, Group, Button } from '@mantine/core';
+import { useMemo, useState } from 'react';
+
+import { Button, Group, Paper, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { IconPlus, IconUpload } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useAction } from '@/hooks/useAction';
-import { useOnce } from '@/hooks/useOnce';
-import {
-  DataTable,
-  AppDesktopLayout,
-  AppPageTitle,
-  SearchBar,
-  Pagination,
-  BulkImportModalContent,
-  PermissionDeniedPage,
-} from '@/components/common';
+
 import {
   ProductFormModal,
   type ProductFormValues,
   ProductStatusBadge,
 } from '@/components/app/config';
 import {
-  productService,
-  type Product,
-  type CreateProductRequest,
-  type UpdateProductRequest,
+  AppDesktopLayout,
+  AppPageTitle,
+  BulkImportModalContent,
+  DataTable,
+  Pagination,
+  PermissionDeniedPage,
+  SearchBar,
+} from '@/components/common';
+import { useClientSidePagination } from '@/hooks/useClientSidePagination';
+import { useOnce } from '@/hooks/useOnce';
+import { useSimpleSWRAction, useSWRAction } from '@/hooks/useSWRAction';
+import { useTranslation } from '@/hooks/useTranslation';
+import {
   type BulkUpsertProductsRequest,
+  type BulkUpsertProductsResponse,
+  type CreateProductRequest,
+  type Product,
+  productService,
   type ProductStatus,
 } from '@/services/sales/product';
-import { showSuccessNotification, showErrorNotification } from '@/utils/notifications';
-import { useClientSidePagination } from '@/hooks/useClientSidePagination';
-import { logError } from '@/utils/logger';
-import { parseProductExcelFile, generateProductExcelTemplate } from '@/utils/excelParser';
 import { usePermissions } from '@/stores/useAppStore';
+import { generateProductExcelTemplate, parseProductExcelFile } from '@/utils/excelParser';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
 
 export function ProductConfigPage() {
   const { t, i18n } = useTranslation();
@@ -78,45 +79,43 @@ export function ProductConfigPage() {
 
   const [paginatedProducts, paginationState, paginationHandlers] = useClientSidePagination({
     data: filteredProducts,
-    defaultPageSize: 15,
+    defaultPageSize: 20,
   });
 
-  const loadProducts = useAction<Record<string, never>>({
-    options: {
-      errorTitle: t('common.error'),
-      errorMessage: t('common.loadingFailed'),
-    },
-    async actionHandler() {
-      if (!permissions.product.canView) {
-        return;
-      }
+  const loadProductsAction = useSimpleSWRAction(
+    'load-products',
+    async () => {
       setIsLoading(true);
       setError(undefined);
+      if (!permissions.product.canView) {
+        return [];
+      }
       const data = await productService.getAllProducts();
       setProducts(data);
     },
-    errorHandler(err) {
-      logError('Failed to load products:', err, {
-        module: 'ProductConfigPagePage',
-        action: 'actionHandler',
-      });
-      setError(t('common.loadingFailed'));
+    {
+      notifications: {
+        errorTitle: t('common.error'),
+        errorMessage: t('common.loadingFailed'),
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
     },
-    cleanupHandler() {
-      setIsLoading(false);
-    },
+  );
+
+  useOnce(() => {
+    loadProductsAction.trigger();
   });
 
-  useOnce(loadProducts);
-
-  const handleCreateProduct = useAction<ProductFormValues>({
-    options: {
-      errorTitle: t('common.error'),
-      errorMessage: t('common.addFailed', { entity: t('common.entity.product') }),
-    },
-    async actionHandler(values) {
-      if (!permissions.product.canCreate || !values) {
-        throw new Error(t('common.addFailed', { entity: t('common.entity.product') }));
+  const handleCreateProductAction = useSWRAction(
+    'create-product',
+    async (values: ProductFormValues): Promise<Product> => {
+      if (!permissions.product.canCreate) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      if (!values) {
+        throw new Error(t('common.invalidFormData'));
       }
       setIsLoading(true);
       const data: CreateProductRequest = {
@@ -128,104 +127,92 @@ export function ProductConfigPage() {
         status: values.status,
         unit: values.unit || undefined,
       };
-      await productService.createProduct(data);
-      showSuccessNotification(
-        t('product.created'),
-        t('product.createdMessage', { name: values.name }),
-      );
-      closeCreate();
-      form.reset();
-      await loadProducts();
+      const product = await productService.createProduct(data);
+      return product;
     },
-    errorHandler(error) {
-      logError('Failed to create product:', error, {
-        module: 'ProductConfigPagePage',
-        action: 'errorHandler',
-      });
+    {
+      notifications: {
+        errorTitle: t('common.error'),
+        errorMessage: t('common.addFailed', { entity: t('common.entity.product') }),
+      },
+      onSuccess: (product: Product) => {
+        showSuccessNotification(
+          t('product.created'),
+          t('product.createdMessage', { name: product.name }),
+        );
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
     },
-    cleanupHandler() {
-      setIsLoading(false);
-    },
-  });
+  );
 
-  const handleUpdateProduct = useAction<ProductFormValues>({
-    options: {
-      errorTitle: t('common.error'),
-      errorMessage: t('common.updateFailed', { entity: t('common.entity.product') }),
-    },
-    async actionHandler(values) {
-      if (!permissions.product.canEdit || !values || !selectedProduct) {
-        throw new Error(t('common.updateFailed'));
+  const handleUpdateProductAction = useSWRAction(
+    'update-product',
+    async (values: ProductFormValues) => {
+      if (!permissions.product.canEdit) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      if (!selectedProduct) {
+        throw new Error(t('common.invalidFormData'));
       }
       setIsLoading(true);
-      const data: UpdateProductRequest = {
-        name: values.name,
-        description: values.description || undefined,
-        category: values.category || undefined,
-        color: values.color || undefined,
-        status: values.status,
-        unit: values.unit || undefined,
-        sku: values.sku || undefined,
-        barcode: values.barcode || undefined,
-      };
-      await productService.updateProduct(selectedProduct.id, data);
-      showSuccessNotification(
-        t('product.updated'),
-        t('product.updatedMessage', { name: values.name }),
-      );
-      closeEdit();
-      await loadProducts();
+      return await productService.updateProduct(selectedProduct?.id, values);
     },
-    errorHandler(error) {
-      logError('Failed to update product:', error, {
-        module: 'ProductConfigPagePage',
-        action: 'errorHandler',
-      });
+    {
+      notifications: {
+        errorTitle: t('common.error'),
+        errorMessage: t('common.updateFailed', { entity: t('common.entity.product') }),
+      },
+      onSuccess: (product: Product) => {
+        showSuccessNotification(
+          t('product.updated'),
+          t('product.updatedMessage', { name: product.name }),
+        );
+        closeEdit();
+        form.reset();
+        loadProductsAction.trigger();
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
     },
-    cleanupHandler() {
-      setIsLoading(false);
-    },
-  });
+  );
 
-  const confirmDeleteProduct = useAction<{ product: Product }>({
-    options: {
-      successTitle: t('product.deleted'),
-      errorTitle: t('common.error'),
-      errorMessage: t('common.deleteFailed', { entity: t('common.entity.product') }),
+  const deleteProductAction = useSWRAction(
+    'delete-product',
+    async (product: Product) => {
+      await productService.deleteProduct(product.id);
+      return product;
     },
-    async actionHandler(values) {
-      if (!permissions.product.canDelete || !values?.product) {
-        throw new Error(t('common.deleteFailed', { entity: t('common.entity.product') }));
-      }
-      setIsLoading(true);
-      await productService.deleteProduct(values.product.id);
-      showSuccessNotification(
-        t('product.deleted'),
-        t('product.deletedMessage', { name: values.product.name }),
-      );
-      await loadProducts();
+    {
+      notifications: {
+        errorTitle: t('common.error'),
+        errorMessage: t('common.deleteFailed', { entity: t('common.entity.product') }),
+      },
+      onSuccess: (product: Product) => {
+        showSuccessNotification(
+          t('product.deleted'),
+          t('product.deletedMessage', { name: product.name }),
+        );
+        loadProductsAction.trigger();
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
     },
-    errorHandler(error) {
-      logError('Failed to delete product:', error, {
-        module: 'ProductConfigPagePage',
-        action: 'actionHandler',
-      });
-    },
-    cleanupHandler() {
-      setIsLoading(false);
-    },
-  });
+  );
 
   const handleDeleteProduct = (product: Product) => {
     if (!permissions.product.canDelete) {
-      throw new Error(t('common.deleteFailed', { entity: t('common.entity.product') }));
+      throw new Error(t('common.doNotHavePermissionForAction'));
     }
     modals.openConfirmModal({
       title: t('common.confirmDelete'),
       children: <Text size="sm">{t('common.confirmDeleteMessage', { name: product.name })}</Text>,
       labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
       confirmProps: { color: 'red' },
-      onConfirm: () => confirmDeleteProduct({ product }),
+      onConfirm: () => deleteProductAction.trigger(product),
     });
   };
 
@@ -256,6 +243,62 @@ export function ProductConfigPage() {
     openCreate();
   };
 
+  // Handle Excel file import
+  const handleExcelImportAction = useSWRAction(
+    'handle-excel-import',
+    async (data: { file: File }): Promise<BulkUpsertProductsResponse> => {
+      const { file } = data;
+
+      setIsLoading(true);
+
+      // Parse Excel file
+      const products = await parseProductExcelFile(file);
+
+      if (products.length === 0) {
+        throw new Error(t('product.noValidDataFound'));
+      }
+
+      // Prepare request - convert parsed products to API format
+      const request: BulkUpsertProductsRequest = {
+        products: products.map((p) => ({
+          productCode: p.productCode,
+          name: p.name,
+          description: p.description || undefined,
+          category: p.category || undefined,
+          color: p.color || undefined,
+          status: (p.status as ProductStatus) || 'ACTIVE',
+          unit: p.unit || undefined,
+          sku: p.sku || undefined,
+          barcode: p.barcode || undefined,
+        })),
+        skipInvalid: false,
+      };
+
+      const result = await productService.bulkUpsertProducts(request);
+      return result;
+    },
+    {
+      notifications: {
+        errorTitle: t('common.error'),
+        errorMessage: t('auth.importFailed'),
+      },
+      onSuccess: async (result: BulkUpsertProductsResponse) => {
+        const message = t('product.bulkImportSuccess', {
+          created: result.created,
+          updated: result.updated,
+          failed: result.failed,
+        });
+
+        showSuccessNotification(t('auth.importSuccess'), message);
+        modals.closeAll();
+        await loadProductsAction.trigger();
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
+    },
+  );
+
   // Open bulk import modal
   const openBulkImportModal = () => {
     if (!permissions.product.canCreate) {
@@ -285,76 +328,17 @@ export function ProductConfigPage() {
         leftSection: <IconUpload size={16} />,
       },
       onConfirm: () => {
+        if (!permissions.product.canCreate) {
+          throw new Error(t('common.doNotHavePermissionForAction'));
+        }
         if (selectedFile) {
-          handleExcelImport({ file: selectedFile });
+          handleExcelImportAction.trigger({ file: selectedFile });
         } else {
-          showErrorNotification(t('common.error'), t('common.selectFile'));
+          showErrorNotification(t('common.error'), t('common.file.pleaseSelectFileFirst'));
         }
       },
     });
   };
-
-  // Handle Excel file import
-  const handleExcelImport = useAction<{ file: File }>({
-    options: {
-      errorTitle: t('common.error'),
-      errorMessage: t('auth.importFailed'),
-    },
-    async actionHandler(data) {
-      if (!permissions.product.canCreate) {
-        return;
-      }
-      if (!data?.file) return;
-      const { file } = data;
-
-      setIsLoading(true);
-
-      // Parse Excel file
-      const products = await parseProductExcelFile(file);
-
-      if (products.length === 0) {
-        throw new Error(t('product.noValidDataFound'));
-      }
-
-      // Prepare request - convert parsed products to API format
-      const request: BulkUpsertProductsRequest = {
-        products: products.map((p) => ({
-          productCode: p.productCode,
-          name: p.name,
-          description: p.description || undefined,
-          category: p.category || undefined,
-          color: p.color || undefined,
-          status: (p.status as ProductStatus) || 'ACTIVE',
-          unit: p.unit || undefined,
-          sku: p.sku || undefined,
-          barcode: p.barcode || undefined,
-        })),
-        skipInvalid: false,
-      };
-
-      const result = await productService.bulkUpsertProducts(request);
-
-      // Show results
-      const message = t('product.bulkImportSuccess', {
-        created: result.created,
-        updated: result.updated,
-        failed: result.failed,
-      });
-
-      showSuccessNotification(t('auth.importSuccess'), message);
-      modals.closeAll();
-      await loadProducts();
-    },
-    errorHandler(error) {
-      logError('Failed to import products from Excel:', error, {
-        module: 'ProductConfigPage',
-        action: 'handleExcelImport',
-      });
-    },
-    cleanupHandler() {
-      setIsLoading(false);
-    },
-  });
 
   if (!permissions.product.canView) {
     return <PermissionDeniedPage />;
@@ -417,6 +401,11 @@ export function ProductConfigPage() {
               render: (product: Product) => product.name,
             },
             {
+              key: 'unit',
+              header: t('product.unit'),
+              render: (product: Product) => product.unit || '-',
+            },
+            {
               key: 'category',
               header: t('product.category'),
               render: (product: Product) => product.category || '-',
@@ -437,7 +426,6 @@ export function ProductConfigPage() {
       </Paper>
 
       <Pagination
-        hidden={paginationState.totalPages < 2}
         totalPages={paginationState.totalPages}
         pageSize={paginationState.pageSize}
         currentPage={paginationState.currentPage}
@@ -454,7 +442,7 @@ export function ProductConfigPage() {
         isLoading={isLoading}
         opened={createOpened}
         onClose={closeCreate}
-        onSubmit={handleCreateProduct}
+        onSubmit={handleCreateProductAction.trigger}
       />
 
       <ProductFormModal
@@ -466,7 +454,7 @@ export function ProductConfigPage() {
         form={form}
         isLoading={isLoading}
         onClose={closeEdit}
-        onSubmit={handleUpdateProduct}
+        onSubmit={handleUpdateProductAction.trigger}
         onDelete={() => {
           if (selectedProduct) {
             handleDeleteProduct(selectedProduct);

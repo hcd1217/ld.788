@@ -1,5 +1,6 @@
-import { Title, Stack, Card, Button, Text } from '@mantine/core';
 import React from 'react';
+
+import { Button, Card, Stack, Text, Title } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 
 type BlankStateProps = {

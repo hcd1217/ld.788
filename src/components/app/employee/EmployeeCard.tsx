@@ -1,11 +1,14 @@
-import { Card, Group, Box, Text, type MantineStyleProp } from '@mantine/core';
 import { useNavigate } from 'react-router';
-import { EmployeeActions } from './EmployeeActions';
-import { useTranslation } from '@/hooks/useTranslation';
-import type { Employee } from '@/services/hr/employee';
+
+import { Box, Card, Group, type MantineStyleProp, Text } from '@mantine/core';
+
 import { ActiveBadge } from '@/components/common';
 import { getEmployeeDetailRoute } from '@/config/routeConfig';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { Employee } from '@/services/hr/employee';
 import { getEndDateHighlightStyles } from '@/utils/time';
+
+import { EmployeeActions } from './EmployeeActions';
 
 type EmployeeCardProps = {
   readonly employee: Employee;

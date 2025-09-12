@@ -1,14 +1,17 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
 import { useNavigate, useSearchParams } from 'react-router';
-import { Stack, Space, Button, Text, Alert, TextInput, Group } from '@mantine/core';
-import { IconX, IconCheck, IconQrcode, IconForms } from '@tabler/icons-react';
-import { useAppStore } from '@/stores/useAppStore';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useAction } from '@/hooks/useAction';
-import { GuestLayout } from '@/components/layouts/GuestLayout';
-import { FormContainer } from '@/components/form/FormContainer';
+
+import { Alert, Button, Group, Space, Stack, Text, TextInput } from '@mantine/core';
+import { IconCheck, IconForms, IconQrcode, IconX } from '@tabler/icons-react';
+
 import { AuthHeader, QrScannerModal } from '@/components/auth';
+import { FormContainer } from '@/components/form/FormContainer';
+import { GuestLayout } from '@/components/layouts/GuestLayout';
 import { ROUTERS } from '@/config/routeConfig';
+import { useSWRAction } from '@/hooks/useSWRAction';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useAppStore } from '@/stores/useAppStore';
 import { logError } from '@/utils/logger';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 
@@ -56,12 +59,9 @@ export function MagicLinkLoginPage() {
     }
   }, [mounted, searchParams, navigate]);
 
-  const verifyMagicLink = useAction({
-    options: {
-      navigateTo: ROUTERS.HOME,
-      delay: 1000,
-    },
-    async actionHandler() {
+  const verifyMagicLink = useSWRAction(
+    'verify-magic-link',
+    async () => {
       // Prevent double execution (React StrictMode in dev)
       if (verificationInProgress.current) {
         return;
@@ -85,26 +85,23 @@ export function MagicLinkLoginPage() {
         setError(t('auth.magicLink.invalidLink'));
         throw new Error(t('auth.magicLink.invalidLink'));
       }
-
       setIsLoading(true);
       // Use the new store function that properly sets isAuthenticated
       await loginWithMagicLink({ clientCode, token });
       setError(undefined);
     },
-    errorHandler(error) {
-      logError('Magic link verification failed:', error, {
-        module: 'MagicLinkLoginPagePage',
-        action: 'if',
-      });
-      setError(t('auth.magicLink.verificationFailed'));
-      verificationInProgress.current = false;
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('auth.magicLink.success'),
+      },
+      onSettled: () => {
+        // Clear stored params on error or after successful verification
+        sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
+        setIsLoading(false);
+      },
     },
-    cleanupHandler() {
-      // Clear stored params on error or after successful verification
-      sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
-      setIsLoading(false);
-    },
-  });
+  );
 
   // Trigger verification after redirect to clean URL
   useEffect(() => {
@@ -122,7 +119,7 @@ export function MagicLinkLoginPage() {
     // Check if we have stored params (means we've redirected to clean URL)
     const storedParams = sessionStorage.getItem(MAGIC_LINK_STORAGE_KEY);
     if (storedParams && !verificationInProgress.current) {
-      void verifyMagicLink();
+      void verifyMagicLink.trigger();
     } else if (!storedParams) {
       // No params found - show QR/manual entry options instead of error
       setShowOptions(true);
@@ -151,7 +148,7 @@ export function MagicLinkLoginPage() {
         if (token && clientCode) {
           // Store params and trigger verification
           sessionStorage.setItem(MAGIC_LINK_STORAGE_KEY, JSON.stringify({ token, clientCode }));
-          void verifyMagicLink();
+          void verifyMagicLink.trigger();
         } else {
           setError(t('auth.magicLink.invalidQrCode'));
         }
@@ -163,7 +160,7 @@ export function MagicLinkLoginPage() {
           MAGIC_LINK_STORAGE_KEY,
           JSON.stringify({ token: trimmedData, clientCode }),
         );
-        void verifyMagicLink();
+        void verifyMagicLink.trigger();
       }
     } catch (error_) {
       logError('Invalid QR code:', error_, {
@@ -191,7 +188,7 @@ export function MagicLinkLoginPage() {
           MAGIC_LINK_STORAGE_KEY,
           JSON.stringify({ token: trimmedCode, clientCode }),
         );
-        void verifyMagicLink();
+        void verifyMagicLink.trigger();
       }
     } catch (error_) {
       logError('Invalid manual code:', error_, {

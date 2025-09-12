@@ -1,6 +1,7 @@
+import type { ReactNode } from 'react';
+
 import { notifications } from '@mantine/notifications';
 import { IconAlertCircle, IconCheck, IconInfoCircle } from '@tabler/icons-react';
-import type { ReactNode } from 'react';
 
 // Type-safe notification options that allow flexibility for special cases
 interface NotificationOptions {

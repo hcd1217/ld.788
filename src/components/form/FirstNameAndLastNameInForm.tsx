@@ -1,9 +1,12 @@
-import { Grid, TextInput } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
 import { useEffect } from 'react';
+
+import { Grid, TextInput } from '@mantine/core';
+
+import { getLocaleConfig } from '@/config/localeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import i18n from '@/lib/i18n';
-import { getLocaleConfig } from '@/config/localeConfig';
+
+import type { UseFormReturnType } from '@mantine/form';
 
 export function FirstNameAndLastNameInForm<T extends { firstName: string; lastName: string }>({
   form,

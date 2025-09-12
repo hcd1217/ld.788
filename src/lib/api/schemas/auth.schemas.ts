@@ -1,18 +1,20 @@
 import * as z from 'zod/v4';
+
+import { renderFullName } from '@/utils/string';
+
+import { ClientConfigSchema } from './clientConfig.schemas';
 import {
   booleanSchema,
   emailSchema,
   idSchema,
   jwtTokenSchema,
   numberSchema,
-  optionalBooleanSchema,
   optionalStringSchema,
   passwordSchema,
   stringSchema,
 } from './common.schemas';
-import { ClientConfigSchema } from './clientConfig.schemas';
 import { DepartmentSchema, EmployeeSchema } from './hr.schemas';
-import { renderFullName } from '@/utils/string';
+
 // Schemas
 export const LoginRequestSchema = z.object({
   identifier: stringSchema,
@@ -86,37 +88,31 @@ const PermissionSchema = z.object({
     canCreate: booleanSchema,
     canEdit: booleanSchema,
     canDelete: booleanSchema,
-    actions: z
-      .object({
-        canConfirm: optionalBooleanSchema,
-        canProcess: optionalBooleanSchema,
-        canShip: optionalBooleanSchema,
-        canDeliver: optionalBooleanSchema,
-        canMarkReady: optionalBooleanSchema,
-        canRefund: optionalBooleanSchema,
-        canCancel: optionalBooleanSchema,
-      })
-      .optional(),
+    actions: z.object({
+      canConfirm: booleanSchema,
+      canProcess: booleanSchema,
+      canShip: booleanSchema,
+      canDeliver: booleanSchema,
+      canMarkReady: booleanSchema,
+      canRefund: booleanSchema,
+      canCancel: booleanSchema,
+    }),
   }),
   deliveryRequest: z.object({
     canView: booleanSchema,
     canCreate: booleanSchema,
     canEdit: booleanSchema,
     canDelete: booleanSchema,
-    query: z
-      .object({
-        canFilter: optionalBooleanSchema,
-        canViewAll: optionalBooleanSchema,
-      })
-      .optional(),
-    actions: z
-      .object({
-        canUpdateDeliveryOrderInDay: optionalBooleanSchema,
-        canStartTransit: optionalBooleanSchema,
-        canComplete: optionalBooleanSchema,
-        canTakePhoto: optionalBooleanSchema,
-      })
-      .optional(),
+    query: z.object({
+      canFilter: booleanSchema,
+      canViewAll: booleanSchema,
+    }),
+    actions: z.object({
+      canUpdateDeliveryOrderInDay: booleanSchema,
+      canStartTransit: booleanSchema,
+      canComplete: booleanSchema,
+      canTakePhoto: booleanSchema,
+    }),
   }),
 });
 
@@ -133,6 +129,12 @@ export const GetMeResponseSchema = z
     employee: EmployeeSchema.optional(),
     department: DepartmentSchema.optional(),
     permissions: PermissionSchema,
+    navigationOverrides: z
+      .object({
+        granted: z.array(stringSchema),
+        denied: z.array(stringSchema),
+      })
+      .optional(),
   })
   .transform((val) => {
     if (val.userName) {

@@ -1,14 +1,17 @@
-import { AppShell, Group, Burger } from '@mantine/core';
 import { Outlet } from 'react-router';
+
+import { AppShell, Burger, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { NavBar } from './NavBar';
-import { NavBarSkeleton } from './NavBarSkeleton';
-import { UserMenu } from './UserMenu';
-import { ColorSchemeToggle, LanguageSwitcher, AppLogo } from '@/components/common';
+
+import { AppLogo, ColorSchemeToggle, LanguageSwitcher } from '@/components/common';
+import { RoleSelector } from '@/components/debug/RoleSelector';
 import { LAYOUT_CONFIG } from '@/config/layoutConfig';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useAppStore } from '@/stores/useAppStore';
-import { RoleSelector } from '@/components/debug/RoleSelector';
+
+import { NavBar } from './NavBar';
+import { NavBarSkeleton } from './NavBarSkeleton';
+import { UserMenu } from './UserMenu';
 
 export function AuthLayout() {
   const [isMenuOpen, { toggle: toggleMenu }] = useDisclosure(true);

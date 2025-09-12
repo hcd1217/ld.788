@@ -1,4 +1,5 @@
 import { useMediaQuery } from '@mantine/hooks';
+
 import { AuthLayout } from './AuthLayout';
 import { AuthLayoutMobile } from './AuthLayoutMobile';
 

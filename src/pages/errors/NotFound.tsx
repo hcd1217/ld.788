@@ -1,8 +1,10 @@
-import { Button, Container, Group, Text, Title, Stack, Paper } from '@mantine/core';
 import { useNavigate } from 'react-router';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useIsDarkMode } from '@/hooks/useIsDarkMode';
+
+import { Button, Container, Group, Paper, Stack, Text, Title } from '@mantine/core';
+
 import { ROUTERS } from '@/config/routeConfig';
+import { useIsDarkMode } from '@/hooks/useIsDarkMode';
+import { useTranslation } from '@/hooks/useTranslation';
 import { IconIdentifiers } from '@/utils/iconRegistry';
 import { getIcon } from '@/utils/iconRegistry';
 

@@ -1,25 +1,27 @@
+import { useMemo } from 'react';
+
 import {
+  Alert,
   Button,
+  Card,
+  Group,
+  NumberInput,
+  SegmentedControl,
   Select,
   Stack,
-  Alert,
-  Transition,
-  Group,
-  Card,
-  TextInput,
-  SegmentedControl,
-  NumberInput,
-  Text,
   Switch,
+  Text,
+  TextInput,
+  Transition,
 } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
-import { IconAlertCircle, IconUser, IconMail, IconPhone } from '@tabler/icons-react';
+import { type UseFormReturnType } from '@mantine/form';
+import { IconAlertCircle, IconMail, IconPhone, IconUser } from '@tabler/icons-react';
+
 import { DateInput } from '@/components/common';
-import { useMemo } from 'react';
 import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
-import { useTranslation } from '@/hooks/useTranslation';
 import { FirstNameAndLastNameInForm } from '@/components/form/FirstNameAndLastNameInForm';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { Unit } from '@/services/hr/employee';
 
 type SingleEmployeeFormValues = {

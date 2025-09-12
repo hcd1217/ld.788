@@ -1,5 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
+
 import { useDisclosure } from '@mantine/hooks';
+
 import type { Employee } from '@/services/hr/employee';
 
 export type ModalType = 'activate' | 'deactivate' | 'password';

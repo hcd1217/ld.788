@@ -1,5 +1,6 @@
-import { Container, Stack, Box, Alert, Group } from '@mantine/core';
+import { Alert, Box, Container, Group, Stack } from '@mantine/core';
 import { IconAlertCircle } from '@tabler/icons-react';
+
 import { GoBack } from '@/components/common';
 
 type ResourceNotFoundProps = {

@@ -1,31 +1,34 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
+
 import { useNavigate, useParams } from 'react-router';
-import { rem, Loader, Center } from '@mantine/core';
+
+import { Center, Loader, rem } from '@mantine/core';
 import { IconFileSpreadsheet, IconUser } from '@tabler/icons-react';
-import {
-  showErrorNotification,
-  showSuccessNotification,
-  showInfoNotification,
-} from '@/utils/notifications';
-import { useTranslation } from '@/hooks/useTranslation';
+
+import { BulkImportForm, EmployeeFormLayout, SingleEmployeeForm } from '@/components/app/employee';
+import { PermissionDeniedPage, Tabs } from '@/components/common';
+import { ROUTERS } from '@/config/routeConfig';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useEmployeeForm } from '@/hooks/useEmployeeForm';
-import { Tabs, PermissionDeniedPage } from '@/components/common';
-import { SingleEmployeeForm, BulkImportForm, EmployeeFormLayout } from '@/components/app/employee';
-import { useHrActions, useHrLoading, useHrError } from '@/stores/useHrStore';
-import { employeeService } from '@/services/hr/employee';
-import { ROUTERS } from '@/config/routeConfig';
-import { useAction } from '@/hooks/useAction';
 import { useOnce } from '@/hooks/useOnce';
+import { useSWRAction } from '@/hooks/useSWRAction';
+import { useTranslation } from '@/hooks/useTranslation';
+import { employeeService } from '@/services/hr/employee';
+import { useAppStore, usePermissions } from '@/stores/useAppStore';
+import { useHrActions, useHrError, useHrLoading } from '@/stores/useHrStore';
+import {
+  generateSampleExcel,
+  type ImportResult,
+  parseExcelFile,
+  type SingleEmployeeFormValues,
+  validateFileType,
+} from '@/utils/employee.utils';
 import { logError } from '@/utils/logger';
 import {
-  type SingleEmployeeFormValues,
-  type ImportResult,
-  generateSampleExcel,
-  validateFileType,
-  parseExcelFile,
-} from '@/utils/employee.utils';
-import { useAppStore, usePermissions } from '@/stores/useAppStore';
+  showErrorNotification,
+  showInfoNotification,
+  showSuccessNotification,
+} from '@/utils/notifications';
 import { delay } from '@/utils/time';
 
 type EmployeeFormPageProps = {
@@ -127,21 +130,20 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
   });
 
   // Handle form submission (create or edit)
-  const handleSingleSubmit = useAction<SingleEmployeeFormValues>({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: isEditMode ? t('employee.employeeUpdated') : t('employee.employeeAdded'),
-      errorTitle: t('common.error'),
-      errorMessage: isEditMode
-        ? t('employee.updateEmployeeFailed')
-        : t('employee.addEmployeeFailed'),
-      navigateTo: ROUTERS.EMPLOYEE_MANAGEMENT,
-    },
-    async actionHandler(values) {
+  const handleSingleSubmit = useSWRAction<SingleEmployeeFormValues>(
+    isEditMode ? `update-employee-${id}` : 'create-employee',
+    async (values) => {
       if (!values) {
-        throw new Error(
-          isEditMode ? t('employee.updateEmployeeFailed') : t('employee.addEmployeeFailed'),
-        );
+        throw new Error(t('common.invalidFormData'));
+      }
+      if (isEditMode && !permissions.employee.canEdit) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      if (isEditMode && !id) {
+        throw new Error(t('common.invalidFormData'));
+      }
+      if (!isEditMode && !permissions.employee.canCreate) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
       }
 
       setIsSingleLoading(true);
@@ -150,7 +152,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
 
       if (isEditMode && id) {
         // Update existing employee
-        await employeeService.updateEmployee(id, {
+        const result = await employeeService.updateEmployee(id, {
           firstName: values.firstName,
           lastName: values.lastName,
           unitId: values.unitId,
@@ -163,6 +165,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
           displayOrder: values.displayOrder,
           ...(values.isEndDateEnabled && { endDate: values.endDate }),
         });
+        return result;
       } else {
         // Create new employee
         await addEmployee({
@@ -178,31 +181,28 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
         });
       }
     },
-    errorHandler(error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : isEditMode
-            ? t('employee.updateEmployeeFailed')
-            : t('employee.addEmployeeFailed');
-
-      setSingleError(errorMessage);
-      setShowSingleAlert(true);
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: isEditMode ? t('employee.employeeUpdated') : t('employee.employeeAdded'),
+        errorTitle: t('common.error'),
+        errorMessage: isEditMode
+          ? t('employee.updateEmployeeFailed')
+          : t('employee.addEmployeeFailed'),
+      },
+      onSuccess: () => {
+        navigate(ROUTERS.EMPLOYEE_MANAGEMENT);
+      },
+      onSettled: () => {
+        setIsSingleLoading(false);
+      },
     },
-    cleanupHandler() {
-      setIsSingleLoading(false);
-    },
-  });
+  );
 
   // Bulk import handlers (create mode only)
-  const handleDownloadSample = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('employee.sampleFileDownloaded'),
-      errorTitle: t('common.error'),
-      errorMessage: t('employee.failedToDownloadSample'),
-    },
-    async actionHandler() {
+  const handleDownloadSample = useSWRAction(
+    'download-employee-sample',
+    async () => {
       setIsDownloading(true);
       showInfoNotification(t('common.downloading'), t('employee.creatingSampleFile'));
       await delay(1000);
@@ -217,10 +217,18 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
         isVietnamese: i18n.language === 'vi',
       });
     },
-    cleanupHandler() {
-      setIsDownloading(false);
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('employee.sampleFileDownloaded'),
+        errorTitle: t('common.error'),
+        errorMessage: t('employee.failedToDownloadSample'),
+      },
+      onSettled: () => {
+        setIsDownloading(false);
+      },
     },
-  });
+  );
 
   const handleFileSelect = (selectedFile: File) => {
     try {
@@ -231,7 +239,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
     } catch (error) {
       showErrorNotification(
         t('common.error'),
-        error instanceof Error ? error.message : t('employee.pleaseSelectExcelFile'),
+        error instanceof Error ? error.message : t('common.file.pleaseSelectExcelFile'),
       );
     }
   };
@@ -241,16 +249,11 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
     setImportResult(undefined);
   };
 
-  const handleBulkUpload = useAction({
-    options: {
-      errorTitle: t('auth.importFailed'),
-      errorMessage: t('auth.importFailed'),
-      navigateTo: ROUTERS.EMPLOYEE_MANAGEMENT,
-      delay: 2000,
-    },
-    async actionHandler() {
+  const handleBulkUpload = useSWRAction(
+    'bulk-upload-employees',
+    async () => {
       if (!file) {
-        throw new Error(t('employee.pleaseSelectFileFirst'));
+        throw new Error(t('common.file.pleaseSelectFileFirst'));
       }
 
       setIsBulkLoading(true);
@@ -280,25 +283,38 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
           total: result.summary.total,
         }),
       );
-    },
-    errorHandler(error) {
-      const errorMessage = error instanceof Error ? error.message : t('auth.importFailed');
 
-      const result: ImportResult = {
-        summary: {
-          total: 0,
-          success: 0,
-          failed: 0,
-        },
-        errors: [String(errorMessage)],
-      };
+      return result;
+    },
+    {
+      notifications: {
+        errorTitle: t('auth.importFailed'),
+        errorMessage: t('auth.importFailed'),
+      },
+      onSuccess: () => {
+        setTimeout(() => {
+          navigate(ROUTERS.EMPLOYEE_MANAGEMENT);
+        }, 2000);
+      },
+      onError: (error) => {
+        const errorMessage = error instanceof Error ? error.message : t('auth.importFailed');
 
-      setImportResult(result);
+        const result: ImportResult = {
+          summary: {
+            total: 0,
+            success: 0,
+            failed: 0,
+          },
+          errors: [String(errorMessage)],
+        };
+
+        setImportResult(result);
+      },
+      onSettled: () => {
+        setIsBulkLoading(false);
+      },
     },
-    cleanupHandler() {
-      setIsBulkLoading(false);
-    },
-  });
+  );
 
   const iconStyle = useMemo(() => ({ width: rem(12), height: rem(12) }), []);
   const pageTitle = isEditMode ? t('employee.editEmployee') : t('employee.addEmployee');
@@ -321,7 +337,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
     showAlert: showSingleAlert,
     error: singleError,
     setShowAlert: setShowSingleAlert,
-    onSubmit: handleSingleSubmit,
+    onSubmit: handleSingleSubmit.trigger,
     onCancel: navigateToList,
     isEditMode,
   };
@@ -376,10 +392,10 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
               file={file}
               importResult={importResult}
               validateFileType={(file) => validateFileType(file, t)}
-              onDownloadSample={handleDownloadSample}
+              onDownloadSample={handleDownloadSample.trigger}
               onFileSelect={handleFileSelect}
               onFileRemove={handleFileRemove}
-              onImport={handleBulkUpload}
+              onImport={handleBulkUpload.trigger}
               onCancel={navigateToList}
             />
           </Tabs.Panel>

@@ -1,8 +1,10 @@
-import { useState, useMemo, useEffect, type ReactNode } from 'react';
-import { MantineProvider, LoadingOverlay } from '@mantine/core';
+import { type ReactNode, useEffect, useMemo, useState } from 'react';
+
+import { LoadingOverlay, MantineProvider } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
-import { getMantineTheme, getResolver } from '@/theme';
+
 import { ThemeContext } from '@/contexts/ThemeContext';
+import { getMantineTheme, getResolver } from '@/theme';
 
 interface ThemeProviderProps {
   readonly children: ReactNode;

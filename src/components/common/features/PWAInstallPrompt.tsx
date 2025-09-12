@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Button, Paper, Text, Group, CloseButton } from '@mantine/core';
+
+import { Button, CloseButton, Group, Paper, Text } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
 
 type BeforeInstallPromptEvent = {

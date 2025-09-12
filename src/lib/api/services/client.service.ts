@@ -1,9 +1,9 @@
 import { BaseApiClient } from '../base';
-import {
-  SetPasswordForUserRequestSchema,
-  type ClientPublicConfigResponse,
-} from '../schemas/client.schemas';
 import { ClientPublicConfigSchema } from '../schemas';
+import {
+  type ClientPublicConfigResponse,
+  SetPasswordForUserRequestSchema,
+} from '../schemas/client.schemas';
 
 export class ClientApi extends BaseApiClient {
   async getPubicClientConfig(clientCode: string): Promise<ClientPublicConfigResponse> {

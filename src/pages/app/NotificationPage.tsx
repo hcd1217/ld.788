@@ -1,4 +1,4 @@
-import { Title, Text, Container, Card, Box, Stack } from '@mantine/core';
+import { Box, Card, Container, Stack, Text, Title } from '@mantine/core';
 
 export function NotificationsPage() {
   return (

@@ -1,7 +1,9 @@
-import { Card, Group, Text, Box } from '@mantine/core';
 import type { ElementType, MouseEvent, ReactNode } from 'react';
-import { StatusBadge } from './StatusBadge';
+
+import { Box, Card, Group, Text } from '@mantine/core';
+
 import classes from './ActionCard.module.css';
+import { StatusBadge } from './StatusBadge';
 
 interface ActionCardProps {
   readonly icon: ElementType;

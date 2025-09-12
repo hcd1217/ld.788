@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Stack, Text, Alert, Flex, Button, PasswordInput } from '@mantine/core';
-import { IconLock, IconAlertTriangle } from '@tabler/icons-react';
+
+import { Alert, Button, Flex, PasswordInput, Stack, Text } from '@mantine/core';
+import { IconAlertTriangle, IconLock } from '@tabler/icons-react';
+
+import { ModalOrDrawer } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
 import { renderFullName } from '@/utils/string';
-import { ModalOrDrawer } from '@/components/common';
 
 type EmployeePasswordModalProps = {
   readonly opened: boolean;

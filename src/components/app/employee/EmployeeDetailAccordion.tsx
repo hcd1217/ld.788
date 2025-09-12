@@ -1,15 +1,17 @@
-import { Accordion, Stack, Box, Text } from '@mantine/core';
+import { Accordion, Box, Stack, Text } from '@mantine/core';
 import {
-  IconInfoCircle,
   IconClock,
   IconCurrencyDollar,
+  IconInfoCircle,
   IconShoppingCart,
 } from '@tabler/icons-react';
-import { EmployeeBasicInfoCard } from './EmployeeBasicInfoCard';
-import { EmployeeDangerZone } from './EmployeeDangerZone';
+
 import { ComingSoonCard } from '@/components/common/ui/ComingSoonCard';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
+
+import { EmployeeBasicInfoCard } from './EmployeeBasicInfoCard';
+import { EmployeeDangerZone } from './EmployeeDangerZone';
 
 type EmployeeDetailAccordionProps = {
   readonly employee: Employee;

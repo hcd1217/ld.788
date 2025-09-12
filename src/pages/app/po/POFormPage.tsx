@@ -1,28 +1,31 @@
 import { useCallback, useState } from 'react';
-import { useParams, useNavigate } from 'react-router';
-import { Container, Loader, Center, Alert } from '@mantine/core';
+
+import { useNavigate, useParams } from 'react-router';
+
+import { Alert, Center, Container, Loader } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconAlertCircle } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useDeviceType } from '@/hooks/useDeviceType';
+
+import { POErrorBoundary, POForm } from '@/components/app/po';
 import {
-  AppPageTitle,
-  AppMobileLayout,
   AppDesktopLayout,
+  AppMobileLayout,
+  AppPageTitle,
   PermissionDeniedPage,
 } from '@/components/common';
-import { POForm, POErrorBoundary } from '@/components/app/po';
-import { usePOActions, usePOLoading, usePOError } from '@/stores/usePOStore';
-import { useCustomers, usePermissions } from '@/stores/useAppStore';
-import { purchaseOrderService } from '@/services/sales/purchaseOrder';
 import { ROUTERS } from '@/config/routeConfig';
 import { getPODetailRoute } from '@/config/routeConfig';
-import { useAction } from '@/hooks/useAction';
-import { isPOLocked } from '@/utils/purchaseOrder';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useOnce } from '@/hooks/useOnce';
 import { type POFormValues, usePOForm } from '@/hooks/usePOForm';
+import { useSWRAction } from '@/hooks/useSWRAction';
+import { useTranslation } from '@/hooks/useTranslation';
+import { purchaseOrderService } from '@/services/sales/purchaseOrder';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { useCustomers, usePermissions } from '@/stores/useAppStore';
+import { usePOActions, usePOError, usePOLoading } from '@/stores/usePOStore';
 import { logError } from '@/utils/logger';
+import { isPOLocked } from '@/utils/purchaseOrder';
 
 type PageMode = 'create' | 'edit';
 
@@ -112,13 +115,9 @@ export function POFormPage({ mode }: POFormPageProps) {
   });
 
   // Unified submit handler
-  const handleSubmit = useAction<POFormValues>({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t(isEditMode ? 'po.updated' : 'po.created'),
-      navigateTo: isEditMode && id ? getPODetailRoute(id) : ROUTERS.PO_MANAGEMENT,
-    },
-    async actionHandler(values) {
+  const handleSubmit = useSWRAction(
+    'submit-po',
+    async (values: POFormValues) => {
       if (!values) return;
       if (isEditMode && (!id || !currentPO)) return;
 
@@ -151,7 +150,17 @@ export function POFormPage({ mode }: POFormPageProps) {
         await createPurchaseOrder(newPO);
       }
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t(isEditMode ? 'po.updated' : 'po.created'),
+      },
+      onSuccess: () => {
+        form.reset();
+        navigate(isEditMode && id ? getPODetailRoute(id) : ROUTERS.PO_MANAGEMENT);
+      },
+    },
+  );
 
   // Page title
   const pageTitle = t(isEditMode ? 'po.editPO' : 'po.createPO');
@@ -164,6 +173,14 @@ export function POFormPage({ mode }: POFormPageProps) {
       navigate(ROUTERS.PO_MANAGEMENT);
     }
   };
+
+  if (isEditMode && !permissions.purchaseOrder.canEdit) {
+    return <PermissionDeniedPage />;
+  }
+
+  if (!isEditMode && !permissions.purchaseOrder.canCreate) {
+    return <PermissionDeniedPage />;
+  }
 
   const content = (
     <POErrorBoundary componentName="POFormPage">
@@ -181,21 +198,13 @@ export function POFormPage({ mode }: POFormPageProps) {
           customers={customers}
           isLoading={isLoading}
           error={error}
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit.trigger}
           onCancel={handleCancel}
           isEditMode={isEditMode}
         />
       )}
     </POErrorBoundary>
   );
-
-  if (isEditMode && !permissions.purchaseOrder.canEdit) {
-    return <PermissionDeniedPage />;
-  }
-
-  if (!isEditMode && !permissions.purchaseOrder.canCreate) {
-    return <PermissionDeniedPage />;
-  }
 
   if (isMobile) {
     return (

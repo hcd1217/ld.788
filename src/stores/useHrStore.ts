@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
+
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { employeeService, type Employee } from '@/services/hr/employee';
+
+import { type Employee, employeeService } from '@/services/hr/employee';
 import { getErrorMessage } from '@/utils/errorUtils';
-import { useMemo } from 'react';
 import { logError } from '@/utils/logger';
 
 type HrState = {

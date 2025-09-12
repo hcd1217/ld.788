@@ -1,4 +1,5 @@
 import { Badge } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import type { WorkType } from '@/services/hr/employee';
 

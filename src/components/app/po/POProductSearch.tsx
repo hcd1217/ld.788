@@ -1,5 +1,7 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+
 import { Autocomplete } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/stores/useAppStore';
 
@@ -8,7 +10,7 @@ type POProductSearchProps = {
   readonly placeholder?: string;
   readonly size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   readonly limit?: number;
-  readonly onChange: (product: { code: string; name: string } | null) => void;
+  readonly onChange: (product?: { code: string; name: string; unit: string }) => void;
 };
 
 export function POProductSearch({
@@ -37,9 +39,9 @@ export function POProductSearch({
       const product = overviewData?.products.find((p) => p.code === productCode);
 
       if (product) {
-        onChange({ code: product.code, name: product.name });
+        onChange({ code: product.code, name: product.name, unit: product.unit });
       } else {
-        onChange(null);
+        onChange(undefined);
       }
     },
     [overviewData, onChange],

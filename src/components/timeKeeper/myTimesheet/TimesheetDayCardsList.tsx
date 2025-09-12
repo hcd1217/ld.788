@@ -1,5 +1,7 @@
-import { Stack, Grid } from '@mantine/core';
+import { Grid, Stack } from '@mantine/core';
+
 import type { TimesheetEntry } from '@/types/timekeeper';
+
 import { MyTimesheetDayCard } from './MyTimesheetDayCard';
 
 interface TimesheetDayCardsListProps {

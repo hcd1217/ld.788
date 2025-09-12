@@ -1,4 +1,5 @@
-import { Card, Stack, Group, Title, Divider, Grid, Skeleton } from '@mantine/core';
+import { Card, Divider, Grid, Group, Skeleton, Stack, Title } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
 
 export function POBasicInfoCardSkeleton() {

@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
-import { Paper, Text, Group, CloseButton, Stack, List, ThemeIcon, Button } from '@mantine/core';
+import { useEffect, useState } from 'react';
+
+import { Button, CloseButton, Group, List, Paper, Stack, Text, ThemeIcon } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import {
+  IconCheckbox,
+  IconDeviceDesktop,
+  IconDeviceMobile,
   IconShare,
   IconSquareRoundedPlus,
-  IconDeviceMobile,
-  IconDeviceDesktop,
-  IconCheckbox,
 } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { useLocalStorage } from '@mantine/hooks';
 
 // Detect if browser is Safari
 const isSafari = () => {

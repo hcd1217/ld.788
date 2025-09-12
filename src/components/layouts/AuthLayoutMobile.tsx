@@ -1,9 +1,12 @@
-import { AppShell } from '@mantine/core';
 import { Outlet } from 'react-router';
-import classes from './AuthLayoutMobile.module.css';
+
+import { AppShell } from '@mantine/core';
+
 import { CommonMobileFooter, CommonMobileHeader } from '@/components/common';
 import { CommonMobileFooterSkeleton } from '@/components/common/ui/CommonMobileFooterSkeleton';
 import { useAppStore } from '@/stores/useAppStore';
+
+import classes from './AuthLayoutMobile.module.css';
 
 // @deprecated: This method should not be used any more
 export function AuthLayoutMobile() {

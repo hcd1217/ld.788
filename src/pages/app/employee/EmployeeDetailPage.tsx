@@ -1,27 +1,30 @@
 import { useMemo } from 'react';
+
 import { useNavigate, useParams } from 'react-router';
+
 import { LoadingOverlay, Stack } from '@mantine/core';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useDeviceType } from '@/hooks/useDeviceType';
-import { useEmployeeList, useHrActions, useHrLoading } from '@/stores/useHrStore';
-import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
-import { DetailPageLayout } from '@/components/common/layouts/DetailPageLayout';
-import { AppPageTitle, PermissionDeniedPage } from '@/components/common';
-import { AppMobileLayout } from '@/components/common';
+
 import {
-  EmployeeStatusModal,
-  EmployeePasswordModal,
-  EmployeeDetailTabs,
   EmployeeDetailAccordion,
   EmployeeDetailAlert,
+  EmployeeDetailTabs,
+  EmployeePasswordModal,
+  EmployeeStatusModal,
 } from '@/components/app/employee';
+import { AppPageTitle, PermissionDeniedPage } from '@/components/common';
+import { AppMobileLayout } from '@/components/common';
+import { DetailPageLayout } from '@/components/common/layouts/DetailPageLayout';
+import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
 import { getEmployeeEditRoute } from '@/config/routeConfig';
-import { useOnce } from '@/hooks/useOnce';
-import { useAction } from '@/hooks/useAction';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useEmployeeModal } from '@/hooks/useEmployeeModal';
-import { usePermissions } from '@/stores/useAppStore';
+import { useOnce } from '@/hooks/useOnce';
+import { useSWRAction } from '@/hooks/useSWRAction';
+import { useTranslation } from '@/hooks/useTranslation';
 import { userService } from '@/services/user/user';
-import { showSuccessNotification, showErrorNotification } from '@/utils/notifications';
+import { usePermissions } from '@/stores/useAppStore';
+import { useEmployeeList, useHrActions, useHrLoading } from '@/stores/useHrStore';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
 
 export function EmployeeDetailPage() {
   const { employeeId } = useParams<{ employeeId: string }>();
@@ -82,39 +85,55 @@ export function EmployeeDetailPage() {
     }
   };
 
-  const confirmDeactivateEmployee = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('employee.employeeDeactivated'),
-      errorTitle: t('common.error'),
-      errorMessage: t('employee.deactivateEmployeeFailed'),
-    },
-    async actionHandler() {
+  const confirmDeactivateEmployee = useSWRAction(
+    'deactivate-employee',
+    async () => {
       if (!targetEmployee) {
-        throw new Error(t('employee.deactivateEmployeeFailed'));
+        throw new Error(t('common.invalidFormData'));
+      }
+      if (!permissions.employee.canEdit) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
       }
 
       await deactivateEmployee(targetEmployee.id);
-      deactivateModal.close();
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('employee.employeeDeactivated'),
+        errorTitle: t('common.error'),
+        errorMessage: t('employee.deactivateEmployeeFailed'),
+      },
+      onSuccess: () => {
+        deactivateModal.close();
+      },
+    },
+  );
 
-  const confirmActivateEmployee = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('employee.employeeActivated'),
-      errorTitle: t('common.error'),
-      errorMessage: t('employee.activateEmployeeFailed'),
-    },
-    async actionHandler() {
+  const confirmActivateEmployee = useSWRAction(
+    'activate-employee',
+    async () => {
       if (!targetEmployee) {
-        throw new Error(t('employee.activateEmployeeFailed'));
+        throw new Error(t('common.invalidFormData'));
+      }
+      if (!permissions.employee.canEdit) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
       }
 
       await activateEmployee(targetEmployee.id);
-      activateModal.close();
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('employee.employeeActivated'),
+        errorTitle: t('common.error'),
+        errorMessage: t('employee.activateEmployeeFailed'),
+      },
+      onSuccess: () => {
+        activateModal.close();
+      },
+    },
+  );
 
   useOnce(() => {
     void loadEmployees();
@@ -128,14 +147,14 @@ export function EmployeeDetailPage() {
         opened={deactivateModal.opened}
         employee={targetEmployee}
         onClose={deactivateModal.close}
-        onConfirm={confirmDeactivateEmployee}
+        onConfirm={confirmDeactivateEmployee.trigger}
       />
       <EmployeeStatusModal
         mode="activate"
         opened={activateModal.opened}
         employee={targetEmployee}
         onClose={activateModal.close}
-        onConfirm={confirmActivateEmployee}
+        onConfirm={confirmActivateEmployee.trigger}
       />
       <EmployeePasswordModal
         opened={passwordModal.opened}

@@ -1,10 +1,14 @@
 import { memo } from 'react';
-import { Card, Group, Text, Box, ActionIcon } from '@mantine/core';
+
+import { ActionIcon, Box, Card, Group, Text } from '@mantine/core';
 import { IconChevronRight } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import type { TimesheetEntry } from '@/types/timekeeper';
 import { formatTime } from '@/utils/timekeeper.utils';
+
 import { DateBox, DurationDisplay } from '../common';
+
 import classes from './MyTimesheetDayCard.module.css';
 
 interface MyTimesheetDayCardProps {

@@ -1,24 +1,27 @@
-import { Stack, ScrollArea, Group, Button } from '@mantine/core';
+import { useState } from 'react';
+
+import { Button, Group, ScrollArea, Stack } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import {
-  IconInfoCircle,
   IconClipboardList,
-  IconTruck,
+  IconFileExport,
   IconFileInvoice,
+  IconFileTypePdf,
+  IconInfoCircle,
   IconMessage,
   IconPrinter,
-  IconFileExport,
-  IconFileTypePdf,
+  IconTruck,
 } from '@tabler/icons-react';
-import { POBasicInfoCard } from './POBasicInfoCard';
-import { POActionZone } from './POActionZone';
-import { POTimeline } from './POTimeline';
-import { POItemsList } from './POItemsList';
-import { POErrorBoundary } from './POErrorBoundary';
-import { Tabs, ComingSoonCard } from '@/components/common';
+
+import { ComingSoonCard, Tabs } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
-import { notifications } from '@mantine/notifications';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { useState } from 'react';
+
+import { POActionZone } from './POActionZone';
+import { POBasicInfoCard } from './POBasicInfoCard';
+import { POErrorBoundary } from './POErrorBoundary';
+import { POItemsList } from './POItemsList';
+import { POTimeline } from './POTimeline';
 
 type PODetailTabsProps = {
   readonly canEdit: boolean;

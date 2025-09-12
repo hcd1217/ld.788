@@ -1,5 +1,7 @@
 import type { ElementType } from 'react';
-import { IconCalendarCheck, IconCalendarWeek, IconBeach, IconUserMinus } from '@tabler/icons-react';
+
+import { IconBeach, IconCalendarCheck, IconCalendarWeek, IconUserMinus } from '@tabler/icons-react';
+
 import { ROUTERS } from './routeConfig';
 
 export interface QuickActionConfig {

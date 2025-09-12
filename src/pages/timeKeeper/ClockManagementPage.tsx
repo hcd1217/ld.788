@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import { useNavigate } from 'react-router';
-import { MobileCameraCapture } from '@/components/timeKeeper/clock/MobileCameraCapture';
+
+import { useTranslation } from 'react-i18next';
+
 import { TimekeeperErrorBoundary } from '@/components/timeKeeper';
-import { useTimekeeperStore } from '@/stores/useTimekeeperStore';
-import { useDeviceType } from '@/hooks/useDeviceType';
+import { MobileCameraCapture } from '@/components/timeKeeper/clock/MobileCameraCapture';
 import { ROUTERS } from '@/config/routeConfig';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { useTimekeeperStore } from '@/stores/useTimekeeperStore';
 import { logError } from '@/utils/logger';
 
 function ClockManagementPageContent() {

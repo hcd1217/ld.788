@@ -1,16 +1,23 @@
 import * as z from 'zod/v4';
+
 import {
+  AddressSchema,
   idSchema,
   numberSchema,
   optionalStringSchema,
   paginationSchema,
   stringSchema,
   timestampSchema,
-  AddressSchema,
 } from './common.schemas';
 import { DeliveryStatusSchema, PICTypeSchema } from './deliveryRequest.schemas';
 
 // ========== Purchase Order Schemas ==========
+
+const POItemMetadataSchema = z.looseObject({
+  productId: idSchema,
+  unit: stringSchema,
+  notes: optionalStringSchema,
+});
 
 // PO Item schemas
 export const POItemSchema = z.object({
@@ -21,6 +28,7 @@ export const POItemSchema = z.object({
   color: optionalStringSchema,
   quantity: numberSchema,
   category: optionalStringSchema,
+  metadata: POItemMetadataSchema,
 });
 
 export const CreatePOItemSchema = z.object({
@@ -29,6 +37,7 @@ export const CreatePOItemSchema = z.object({
   color: optionalStringSchema,
   quantity: numberSchema.min(0),
   category: optionalStringSchema,
+  metadata: POItemMetadataSchema,
 });
 
 // PO Status enum
@@ -63,7 +72,7 @@ export const PurchaseOrderSchema = z.object({
   poNumber: stringSchema,
   customerId: idSchema,
   status: POStatusSchema,
-  orderDate: timestampSchema,
+  orderDate: timestampSchema.optional(),
   deliveryDate: timestampSchema.optional(),
   completedDate: timestampSchema.optional(),
   notes: optionalStringSchema,

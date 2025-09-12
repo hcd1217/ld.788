@@ -1,11 +1,12 @@
 import React from 'react';
+
 import {
   IconCheck,
-  IconX,
-  IconTruck,
+  IconCurrencyDollar,
   IconPackage,
   IconPackageExport,
-  IconCurrencyDollar,
+  IconTruck,
+  IconX,
 } from '@tabler/icons-react';
 
 export type POModalMode =

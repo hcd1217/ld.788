@@ -1,17 +1,17 @@
 import { BaseApiClient } from '../base';
 import {
-  GetEmployeesResponseSchema,
-  CreateEmployeesRequestSchema,
-  CreateEmployeesResponseSchema,
-  UpdateEmployeeRequestSchema,
-  UpdateEmployeeResponseSchema,
-  type GetEmployeesResponse,
-  type CreateEmployeesRequest,
-  type CreateEmployeesResponse,
-  type UpdateEmployeeRequest,
-  type UpdateEmployeeResponse,
   type CreateBulkEmployeesRequest,
   CreateBulkEmployeesRequestSchema,
+  type CreateEmployeesRequest,
+  CreateEmployeesRequestSchema,
+  type CreateEmployeesResponse,
+  CreateEmployeesResponseSchema,
+  type GetEmployeesResponse,
+  GetEmployeesResponseSchema,
+  type UpdateEmployeeRequest,
+  UpdateEmployeeRequestSchema,
+  type UpdateEmployeeResponse,
+  UpdateEmployeeResponseSchema,
 } from '../schemas/hr.schemas';
 
 export class HrApi extends BaseApiClient {

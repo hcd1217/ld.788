@@ -1,4 +1,5 @@
 import z from 'zod/v4';
+
 import type { Dictionary } from '@/types/dictionary';
 
 const passwordRegex =

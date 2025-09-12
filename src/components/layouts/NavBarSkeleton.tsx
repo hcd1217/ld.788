@@ -1,4 +1,5 @@
 import { AppShell, Box, Loader } from '@mantine/core';
+
 import { LAYOUT_CONFIG } from '@/config/layoutConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 

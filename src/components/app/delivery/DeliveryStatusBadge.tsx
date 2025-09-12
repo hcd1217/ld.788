@@ -1,6 +1,7 @@
 import { Badge } from '@mantine/core';
-import { useTranslation } from '@/hooks/useTranslation';
+
 import { DELIVERY_STATUS_COLORS, type DeliveryStatusType } from '@/constants/deliveryRequest';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface DeliveryStatusBadgeProps {
   readonly status: DeliveryStatusType;

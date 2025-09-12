@@ -1,13 +1,15 @@
-import { Modal, Drawer, Stack, Text, Group, Button, Select, Textarea, Switch } from '@mantine/core';
-import { IconEdit, IconCalendar, IconUrgent } from '@tabler/icons-react';
-import { useState, useMemo, useEffect } from 'react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useDeviceType } from '@/hooks/useDeviceType';
-import { useEmployees, useClientConfig } from '@/stores/useAppStore';
-import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
-import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
+import { useEffect, useMemo, useState } from 'react';
+
+import { Button, Drawer, Group, Modal, Select, Stack, Switch, Text, Textarea } from '@mantine/core';
+import { IconCalendar, IconEdit, IconUrgent } from '@tabler/icons-react';
+
 import { DateInput, UrgentBadge } from '@/components/common';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
+import { useClientConfig, useEmployees } from '@/stores/useAppStore';
+import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
+import { getCustomerNameByCustomerId } from '@/utils/overview';
 
 type DeliveryUpdateModalProps = {
   readonly opened: boolean;
@@ -149,7 +151,7 @@ export function DeliveryUpdateModal({
       />
 
       <Textarea
-        label={t('delivery.notes')}
+        label={t('common.notes')}
         placeholder={t('delivery.form.enterNotes')}
         value={notes}
         onChange={(e) => setNotes(e.currentTarget.value)}

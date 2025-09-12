@@ -1,12 +1,15 @@
-import { Stack, Alert, Text, Group, Button } from '@mantine/core';
+import { Alert, Button, Group, Stack, Text } from '@mantine/core';
 import { IconAlertTriangle } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { formatDate } from '@/utils/time';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
-import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import type { POModalMode, ModalConfig } from './POStatusModalConfig';
+import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
+import { getCustomerNameByCustomerId } from '@/utils/overview';
+import { formatDate } from '@/utils/time';
+
 import { POStatusModalFields } from './POStatusModalFields';
+
+import type { ModalConfig, POModalMode } from './POStatusModalConfig';
 
 type POStatusModalContentProps = {
   readonly mode: POModalMode;

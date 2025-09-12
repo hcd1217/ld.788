@@ -1,4 +1,5 @@
-import { Stack, Skeleton, Table, Group, SimpleGrid } from '@mantine/core';
+import { Group, SimpleGrid, Skeleton, Stack, Table } from '@mantine/core';
+
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useTranslation } from '@/hooks/useTranslation';
 

@@ -1,6 +1,8 @@
-import { Component, type ReactNode, type ErrorInfo } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
+
 import { Alert, Button, Stack, Text, Title } from '@mantine/core';
 import { IconAlertTriangle } from '@tabler/icons-react';
+
 import { addComponentError } from '@/stores/error';
 import { isDevelopment } from '@/utils/env';
 import { logError } from '@/utils/logger';

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+
 import { useAppStore } from '@/stores/useAppStore';
 
 export function useLogoAndTitle(options?: { color?: boolean }) {

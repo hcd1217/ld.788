@@ -1,5 +1,6 @@
-import { Card, Group, Box, Text, Title } from '@mantine/core';
+import { Box, Card, Group, Text, Title } from '@mantine/core';
 import { IconClipboardText } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
 
 export function DashboardResources() {

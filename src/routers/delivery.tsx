@@ -1,5 +1,7 @@
 import { lazy } from 'react';
+
 import { ROUTERS } from '@/config/routeConfig';
+
 import { PCOnlyLayout } from './components';
 
 // Lazy load delivery components

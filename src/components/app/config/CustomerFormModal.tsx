@@ -1,18 +1,21 @@
-import {
-  Stack,
-  TextInput,
-  Switch,
-  Group,
-  Button,
-  LoadingOverlay,
-  Box,
-  Textarea,
-} from '@mantine/core';
-import { useTranslation } from '@/hooks/useTranslation';
-import { ModalOrDrawer } from '@/components/common';
-import type { UseFormReturnType } from '@mantine/form';
-import { useClientConfig } from '@/stores/useAppStore';
 import { useMemo } from 'react';
+
+import {
+  Box,
+  Button,
+  Group,
+  LoadingOverlay,
+  Stack,
+  Switch,
+  Textarea,
+  TextInput,
+} from '@mantine/core';
+
+import { ModalOrDrawer } from '@/components/common';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useClientConfig } from '@/stores/useAppStore';
+
+import type { UseFormReturnType } from '@mantine/form';
 
 export type CustomerFormValues = {
   name: string;

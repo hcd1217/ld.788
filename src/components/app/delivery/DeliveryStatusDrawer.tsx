@@ -1,27 +1,30 @@
+import { useMemo, useState } from 'react';
+
 import {
-  Drawer,
-  ScrollArea,
-  Text,
-  Group,
-  Button,
-  Stack,
   Alert,
+  Button,
+  Drawer,
+  Grid,
+  Group,
+  Image,
+  ScrollArea,
+  Stack,
+  Text,
   Textarea,
   TextInput,
-  Image,
-  Grid,
 } from '@mantine/core';
-import { IconAlertTriangle, IconCheck, IconTruck, IconCamera } from '@tabler/icons-react';
-import { useState, useMemo } from 'react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useDeviceType } from '@/hooks/useDeviceType';
-import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
-import { formatDate } from '@/utils/time';
+import { IconAlertTriangle, IconCamera, IconCheck, IconTruck } from '@tabler/icons-react';
+
 import { DRAWER_BODY_PADDING_BOTTOM, DRAWER_HEADER_PADDING } from '@/constants/po.constants';
-import { DeliveryPhotoUpload } from './DeliveryPhotoUpload';
-import { useAction } from '@/hooks/useAction';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { useSWRAction } from '@/hooks/useSWRAction';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { usePermissions } from '@/stores/useAppStore';
 import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
+import { formatDate } from '@/utils/time';
+
+import { DeliveryPhotoUpload } from './DeliveryPhotoUpload';
 
 export type DeliveryModalMode = 'start_transit' | 'complete';
 
@@ -82,29 +85,43 @@ export function DeliveryStatusDrawer({
   // Get modal configuration - memoized
   const config = useMemo(() => getModalConfig(mode, t), [mode, t]);
 
-  // Upload photos action
-  const uploadPhotosAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('delivery.messages.photosUploaded'),
-      errorTitle: t('common.error'),
-      errorMessage: t('delivery.messages.uploadFailed'),
-    },
-    async actionHandler(data?: { photoUrls: string[] }) {
+  // Upload photos action using SWR
+  const uploadPhotosAction = useSWRAction(
+    // Unique key that includes the delivery request ID for proper caching
+    deliveryRequest ? `upload-photos-${deliveryRequest.id}` : 'upload-photos',
+    async (data: { photoUrls: string[] }) => {
+      // Validation
       if (!permissions.deliveryRequest.actions?.canTakePhoto) {
         throw new Error(t('delivery.messages.uploadFailed'));
       }
-      if (!deliveryRequest || !data?.photoUrls) {
+      if (!deliveryRequest || !data?.photoUrls || data.photoUrls.length === 0) {
         throw new Error(t('delivery.messages.uploadFailed'));
       }
-      await uploadPhotos(deliveryRequest.id, data.photoUrls);
+
+      // Perform the upload
+      return await uploadPhotos(deliveryRequest.id, data.photoUrls);
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('delivery.messages.photosUploaded'),
+        errorTitle: t('common.error'),
+        errorMessage: t('delivery.messages.uploadFailed'),
+      },
+      onSuccess: () => {
+        // Update the local state only after successful upload
+        // Note: We're not using the returned data here since uploadPhotos might return void
+        setShowPhotoUpload(false);
+      },
+    },
+  );
 
   const handlePhotoUpload = async (data: { photoUrls: string[] }) => {
+    // Simply trigger the upload action
+    // Update state after successful upload
+    await uploadPhotosAction.trigger(data);
+    // Only update photos if the upload was successful (no error thrown)
     setUploadedPhotos((prev) => [...prev, ...data.photoUrls]);
-    await uploadPhotosAction(data);
-    setShowPhotoUpload(false);
   };
 
   const handleConfirm = async () => {
@@ -245,6 +262,8 @@ export function DeliveryStatusDrawer({
                   variant="light"
                   leftSection={<IconCamera size={16} />}
                   onClick={() => setShowPhotoUpload(true)}
+                  loading={uploadPhotosAction.isMutating}
+                  disabled={uploadPhotosAction.isMutating}
                 >
                   {t('common.photos.takePhoto')}
                 </Button>

@@ -1,9 +1,11 @@
 import * as z from 'zod/v4';
-import { numberSchema, optionalBooleanSchema, stringSchema } from './common.schemas';
+
 import { hasRoute, RouteIdentifiers } from '@/config/routeConfig';
 import type { RouteIdentifier } from '@/config/routeConfig';
 import { hasIcon, IconIdentifiers } from '@/utils/iconRegistry';
 import type { IconIdentifier } from '@/utils/iconRegistry';
+
+import { numberSchema, optionalBooleanSchema, stringSchema } from './common.schemas';
 
 // Default mobile navigation configuration for backend reference
 export const DEFAULT_MOBILE_NAVIGATION_CONFIG: NavigationItem[] = [

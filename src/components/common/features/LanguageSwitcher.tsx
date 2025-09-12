@@ -1,5 +1,6 @@
 import { Select } from '@mantine/core';
 import { IconLanguage } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/stores/useAppStore';
 import { STORAGE_KEYS } from '@/utils/storageKeys';

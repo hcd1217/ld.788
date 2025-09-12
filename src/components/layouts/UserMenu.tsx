@@ -1,13 +1,16 @@
-import { Avatar, Group, Menu, Text, UnstyledButton, rem } from '@mantine/core';
-import { IconCaretDownFilled, IconLogout, IconUser } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
-import classes from './AuthLayout.module.css';
+
+import { Avatar, Group, Menu, rem, Text, UnstyledButton } from '@mantine/core';
+import { IconCaretDownFilled, IconLogout, IconUser } from '@tabler/icons-react';
+
 import { VersionInformation } from '@/components/common';
 import { LAYOUT_CONFIG } from '@/config/layoutConfig';
 import { ROUTERS } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/stores/useAppStore';
 import { renderFullName } from '@/utils/string';
+
+import classes from './AuthLayout.module.css';
 
 interface UserMenuProps {
   readonly c?: string;

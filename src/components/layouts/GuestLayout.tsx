@@ -1,9 +1,13 @@
 import { type ReactNode } from 'react';
-import { Affix, Box, Center, Container, Group } from '@mantine/core';
+
 import { Navigate } from 'react-router';
-import { VersionInformation } from '../common';
-import { LanguageSwitcher, ColorSchemeToggle } from '@/components/common';
+
+import { Affix, Box, Center, Container, Group } from '@mantine/core';
+
+import { ColorSchemeToggle, LanguageSwitcher } from '@/components/common';
 import { useAppStore } from '@/stores/useAppStore';
+
+import { VersionInformation } from '../common';
 
 type GuestLayoutProps = {
   readonly children: ReactNode;

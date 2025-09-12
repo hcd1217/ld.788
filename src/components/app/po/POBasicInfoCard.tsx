@@ -1,17 +1,19 @@
-import { Card, Stack, Group, Divider, Grid, Text, SimpleGrid } from '@mantine/core';
+import { Card, Divider, Grid, Group, SimpleGrid, Stack, Text } from '@mantine/core';
+
+import { ViewOnMap } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
-import { POInfoSection } from './POInfoSection';
-import { PODatesSection } from './PODatesSection';
-import { POStatusHistorySection } from './POStatusHistorySection';
-import { PODeliverySection } from './PODeliverySection';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import {
   getCancelReason,
-  getRefundReason,
   getDeliveryNotes,
+  getRefundReason,
   getShippingInfo,
 } from '@/utils/purchaseOrder';
-import { ViewOnMap } from '@/components/common';
+
+import { PODatesSection } from './PODatesSection';
+import { PODeliverySection } from './PODeliverySection';
+import { POInfoSection } from './POInfoSection';
+import { POStatusHistorySection } from './POStatusHistorySection';
 
 type POBasicInfoCardProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -46,7 +48,7 @@ export function POBasicInfoCard({ purchaseOrder, onNavigateToItemsList }: POBasi
           <Grid.Col span={{ base: 12, md: 6 }}>
             <div>
               <Text size="sm" fw={500} c="dimmed" mb="xs">
-                {t('po.notes')}
+                {t('common.notes')}
               </Text>
               <Text size="sm">{purchaseOrder.notes}</Text>
             </div>

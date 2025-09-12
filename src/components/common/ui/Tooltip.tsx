@@ -1,9 +1,11 @@
+import { type ReactNode } from 'react';
+
 import {
   Tooltip as MantineTooltip,
-  rem,
   type TooltipProps as MantineTooltipProps,
+  rem,
 } from '@mantine/core';
-import { type ReactNode } from 'react';
+
 import { useIsDarkMode } from '@/hooks/useIsDarkMode';
 
 type TooltipProps = MantineTooltipProps & {

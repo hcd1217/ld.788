@@ -1,15 +1,19 @@
 import React from 'react';
-import { Text, Group } from '@mantine/core';
+import { useMemo } from 'react';
+
 import { useNavigate } from 'react-router';
+
+import { Group, Text } from '@mantine/core';
+
+import { ActiveBadge, ContactInfo, DataTable } from '@/components/common/ui';
+import { getEmployeeDetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
-import { getEmployeeDetailRoute } from '@/config/routeConfig';
-import { formatDate } from '@/utils/string';
-import { ActiveBadge, ContactInfo, DataTable } from '@/components/common/ui';
-import { WorkTypeBadge } from './WorkTypeBadge';
-import { getEndDateHighlightStyles } from '@/utils/time';
-import { useMemo } from 'react';
 import { useClientConfig } from '@/stores/useAppStore';
+import { formatDate } from '@/utils/string';
+import { getEndDateHighlightStyles } from '@/utils/time';
+
+import { WorkTypeBadge } from './WorkTypeBadge';
 
 // Event handler to prevent propagation on action cells
 const handleActionCellClick = (e: React.MouseEvent) => {

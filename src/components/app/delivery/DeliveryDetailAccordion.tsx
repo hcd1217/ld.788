@@ -1,27 +1,31 @@
-import { Stack, Accordion, Group, Button, Text, Grid, Anchor } from '@mantine/core';
+import { useMemo } from 'react';
+
+import { useNavigate } from 'react-router';
+
+import { Accordion, Anchor, Button, Grid, Group, Stack, Text } from '@mantine/core';
 import {
-  IconTruck,
   IconCheck,
-  IconPhoto,
-  IconPackage,
-  IconMapPin,
   IconEdit,
+  IconMapPin,
+  IconPackage,
+  IconPhoto,
+  IconTruck,
 } from '@tabler/icons-react';
+
+import { ContactInfo, UrgentBadge, ViewOnMap } from '@/components/common';
+import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
-import { formatDate } from '@/utils/time';
-import { useMemo } from 'react';
 import {
   useCustomers,
   useEmployeeMapByEmployeeId,
   useEmployeeMapByUserId,
 } from '@/stores/useAppStore';
 import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
-import { DeliveryStatusBadge } from './DeliveryStatusBadge';
+import { formatDate } from '@/utils/time';
+
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
-import { ViewOnMap, ContactInfo, UrgentBadge } from '@/components/common';
-import { getPODetailRoute } from '@/config/routeConfig';
-import { useNavigate } from 'react-router';
+import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 
 type DeliveryDetailAccordionProps = {
   readonly deliveryRequest: DeliveryRequest;
@@ -132,7 +136,7 @@ export function DeliveryDetailAccordion({
           ]
         : []),
       {
-        label: t('delivery.notes'),
+        label: t('common.notes'),
         value: deliveryRequest.notes || '-',
       },
       {

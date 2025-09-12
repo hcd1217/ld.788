@@ -1,27 +1,30 @@
 import { useCallback, useEffect, useState } from 'react';
+
 import { useNavigate, useParams } from 'react-router';
+
 import { LoadingOverlay, Stack } from '@mantine/core';
 import { IconEdit } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useDeviceType } from '@/hooks/useDeviceType';
-import { useCurrentPO, usePOActions, usePOLoading, usePOError } from '@/stores/usePOStore';
-import { usePOModals } from '@/hooks/usePOModals';
-import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
-import { AppPageTitle, PermissionDeniedPage } from '@/components/common';
-import { AppMobileLayout, AppDesktopLayout } from '@/components/common';
+
 import {
-  PODetailTabs,
-  PODetailAccordion,
-  POStatusModal,
-  POErrorBoundary,
-  PODetailTabsSkeleton,
   DeliveryRequestModal,
+  PODetailAccordion,
+  PODetailTabs,
+  PODetailTabsSkeleton,
+  POErrorBoundary,
+  POStatusModal,
 } from '@/components/app/po';
+import { AppPageTitle, PermissionDeniedPage } from '@/components/common';
+import { AppDesktopLayout, AppMobileLayout } from '@/components/common';
+import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
 import { getPOEditRoute, ROUTERS } from '@/config/routeConfig';
-import { useAction } from '@/hooks/useAction';
-import { isPOEditable } from '@/utils/purchaseOrder';
-import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { usePOModals } from '@/hooks/usePOModals';
+import { useSWRAction } from '@/hooks/useSWRAction';
+import { useTranslation } from '@/hooks/useTranslation';
 import { usePermissions } from '@/stores/useAppStore';
+import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
+import { useCurrentPO, usePOActions, usePOError, usePOLoading } from '@/stores/usePOStore';
+import { isPOEditable } from '@/utils/purchaseOrder';
 
 export function PODetailPage() {
   const { poId } = useParams<{ poId: string }>();
@@ -112,152 +115,194 @@ export function PODetailPage() {
     }
   };
 
-  const confirmPOAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('po.confirmed'),
-      errorTitle: t('common.error'),
-      errorMessage: t('po.confirmFailed'),
-    },
-    async actionHandler() {
+  const confirmPOAction = useSWRAction(
+    'confirm-po',
+    async () => {
       if (!selectedPO) {
-        throw new Error(t('po.confirmFailed'));
+        throw new Error(t('common.invalidFormData'));
       }
       if (!permissions.purchaseOrder.actions?.canConfirm) {
-        throw new Error(t('po.confirmFailed'));
+        throw new Error(t('common.doNotHavePermissionForAction'));
       }
       await confirmPurchaseOrder(selectedPO.id);
-      closeModal('confirm');
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('po.confirmed'),
+        errorTitle: t('common.error'),
+        errorMessage: t('po.confirmFailed'),
+      },
+      onSuccess: () => {
+        closeModal('confirm');
+      },
+    },
+  );
 
-  const processPOAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('po.processing'),
-      errorTitle: t('common.error'),
-      errorMessage: t('po.processFailed'),
-    },
-    async actionHandler() {
-      if (!selectedPO) {
-        throw new Error(t('po.processFailed'));
-      }
+  const processPOAction = useSWRAction(
+    'process-po',
+    async () => {
       if (!permissions.purchaseOrder.actions?.canProcess) {
-        throw new Error(t('po.processFailed'));
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      if (!selectedPO) {
+        throw new Error(t('common.invalidFormData'));
       }
       await processPurchaseOrder(selectedPO.id);
-      closeModal('process');
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('po.processing'),
+        errorTitle: t('common.error'),
+        errorMessage: t('po.processFailed'),
+      },
+      onSuccess: () => {
+        closeModal('process');
+      },
+    },
+  );
 
-  const markReadyPOAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('po.markReady'),
-      errorTitle: t('common.error'),
-      errorMessage: t('po.markReadyFailed'),
-    },
-    async actionHandler(data?: { pickupLocation?: string; notificationMessage?: string }) {
-      if (!selectedPO) {
-        throw new Error(t('po.markReadyFailed'));
-      }
+  const markReadyPOAction = useSWRAction<
+    { pickupLocation?: string; notificationMessage?: string } | undefined
+  >(
+    'mark-ready-po',
+    async (data) => {
       if (!permissions.purchaseOrder.actions?.canMarkReady) {
-        throw new Error(t('po.markReadyFailed'));
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      if (!selectedPO) {
+        throw new Error(t('common.invalidFormData'));
       }
       await markPurchaseOrderReady(selectedPO.id, data);
-      closeModal('markReady');
+      return selectedPO;
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('po.markReady'),
+        errorTitle: t('common.error'),
+        errorMessage: t('po.markReadyFailed'),
+      },
+      onSuccess: () => {
+        closeModal('markReady');
+      },
+    },
+  );
 
-  const shipPOAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('po.shipped'),
-      errorTitle: t('common.error'),
-      errorMessage: t('po.shipFailed'),
-    },
-    async actionHandler(data?: any) {
-      if (!selectedPO || !permissions.purchaseOrder.actions?.canShip) {
-        throw new Error(t('po.shipFailed'));
+  const shipPOAction = useSWRAction<any>(
+    'ship-po',
+    async (data) => {
+      if (!permissions.purchaseOrder.actions?.canShip) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      if (!selectedPO) {
+        throw new Error(t('common.invalidFormData'));
       }
       await shipPurchaseOrder(selectedPO.id, data);
-      closeModal('ship');
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('po.shipped'),
+        errorTitle: t('common.error'),
+        errorMessage: t('po.shipFailed'),
+      },
+      onSuccess: () => {
+        closeModal('ship');
+      },
+    },
+  );
 
-  const deliverPOAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('po.delivered'),
-      errorTitle: t('common.error'),
-      errorMessage: t('po.deliverFailed'),
-    },
-    async actionHandler(data?: { deliveryNotes?: string }) {
-      if (!selectedPO || !permissions.purchaseOrder.actions?.canDeliver) {
-        throw new Error(t('po.deliverFailed'));
+  const deliverPOAction = useSWRAction<{ deliveryNotes?: string } | undefined>(
+    'deliver-po',
+    async (data) => {
+      if (!permissions.purchaseOrder.actions?.canDeliver) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      if (!selectedPO) {
+        throw new Error(t('common.invalidFormData'));
       }
       await deliverPurchaseOrder(selectedPO.id, data);
-      closeModal('deliver');
+      return selectedPO;
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('po.delivered'),
+        errorTitle: t('common.error'),
+        errorMessage: t('po.deliverFailed'),
+      },
+      onSuccess: () => {
+        closeModal('deliver');
+      },
+    },
+  );
 
-  const cancelPOAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('po.cancelled'),
-      errorTitle: t('common.error'),
-      errorMessage: t('po.cancelFailed'),
-    },
-    async actionHandler(data) {
-      if (!selectedPO) {
-        throw new Error(t('po.cancelFailed'));
-      }
+  const cancelPOAction = useSWRAction<any>(
+    'cancel-po',
+    async (data) => {
       if (!permissions.purchaseOrder.actions?.canCancel) {
-        throw new Error(t('po.cancelFailed'));
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      if (!selectedPO) {
+        throw new Error(t('common.invalidFormData'));
       }
       await cancelPurchaseOrder(selectedPO.id, data);
-      closeModal('cancel');
+      return selectedPO;
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('po.cancelled'),
+        errorTitle: t('common.error'),
+        errorMessage: t('po.cancelFailed'),
+      },
+      onSuccess: () => {
+        closeModal('cancel');
+      },
+    },
+  );
 
-  const refundPOAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('po.refunded'),
-      errorTitle: t('common.error'),
-      errorMessage: t('po.refundFailed'),
-    },
-    async actionHandler(data?: { refundReason?: string }) {
-      if (!selectedPO) {
-        throw new Error(t('po.refundFailed'));
-      }
+  const refundPOAction = useSWRAction<{ refundReason?: string } | undefined>(
+    'refund-po',
+    async (data) => {
       if (!permissions.purchaseOrder.actions?.canRefund) {
-        throw new Error(t('po.refundFailed'));
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      if (!selectedPO) {
+        throw new Error(t('common.invalidFormData'));
       }
       await refundPurchaseOrder(selectedPO.id, data);
-      closeModal('refund');
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('po.refunded'),
+        errorTitle: t('common.error'),
+        errorMessage: t('po.refundFailed'),
+      },
+      onSuccess: () => {
+        closeModal('refund');
+      },
+    },
+  );
 
   const { createDeliveryRequest } = useDeliveryRequestActions();
 
-  const createDeliveryAction = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('po.deliveryRequestCreated'),
-      errorTitle: t('common.error'),
-      errorMessage: t('po.deliveryRequestCreateFailed'),
-      navigateTo: ROUTERS.DELIVERY_MANAGEMENT,
-    },
-    async actionHandler(data?: { assignedTo: string; scheduledDate: string; notes?: string }) {
-      if (!data || !purchaseOrder) {
-        throw new Error(t('po.deliveryRequestCreateFailed'));
-      }
+  const createDeliveryAction = useSWRAction<
+    { assignedTo: string; scheduledDate: string; notes?: string } | undefined
+  >(
+    'create-delivery-request',
+    async (data) => {
       if (!permissions.purchaseOrder.actions?.canShip) {
-        throw new Error(t('po.deliveryRequestCreateFailed'));
+        throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!permissions.deliveryRequest.canCreate) {
-        throw new Error(t('po.deliveryRequestCreateFailed'));
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      if (!data || !purchaseOrder) {
+        throw new Error(t('common.invalidFormData'));
       }
       await createDeliveryRequest({
         purchaseOrderId: purchaseOrder.id,
@@ -266,9 +311,20 @@ export function PODetailPage() {
         scheduledDate: data.scheduledDate,
         notes: data.notes,
       });
-      setDeliveryModalOpened(false);
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('po.deliveryRequestCreated'),
+        errorTitle: t('common.error'),
+        errorMessage: t('po.deliveryRequestCreateFailed'),
+      },
+      onSuccess: () => {
+        setDeliveryModalOpened(false);
+        navigate(ROUTERS.DELIVERY_MANAGEMENT);
+      },
+    },
+  );
 
   useEffect(() => {
     if (poId) {
@@ -284,55 +340,59 @@ export function PODetailPage() {
         purchaseOrder={selectedPO}
         mode="confirm"
         onClose={handleCloseModal('confirm')}
-        onConfirm={confirmPOAction}
+        onConfirm={async () => {
+          await confirmPOAction.trigger();
+        }}
       />
       <POStatusModal
         opened={modals.processModalOpened}
         purchaseOrder={selectedPO}
         mode="process"
         onClose={handleCloseModal('process')}
-        onConfirm={processPOAction}
+        onConfirm={async () => {
+          await processPOAction.trigger();
+        }}
       />
       <POStatusModal
         opened={modals.markReadyModalOpened}
         purchaseOrder={selectedPO}
         mode="markReady"
         onClose={handleCloseModal('markReady')}
-        onConfirm={markReadyPOAction}
+        onConfirm={markReadyPOAction.trigger}
       />
       <POStatusModal
         opened={modals.shipModalOpened}
         purchaseOrder={selectedPO}
         mode="ship"
         onClose={handleCloseModal('ship')}
-        onConfirm={shipPOAction}
+        onConfirm={shipPOAction.trigger}
       />
       <POStatusModal
         opened={modals.deliverModalOpened}
         purchaseOrder={selectedPO}
         mode="deliver"
         onClose={handleCloseModal('deliver')}
-        onConfirm={deliverPOAction}
+        onConfirm={deliverPOAction.trigger}
       />
       <POStatusModal
         opened={modals.cancelModalOpened}
         purchaseOrder={selectedPO}
         mode="cancel"
         onClose={handleCloseModal('cancel')}
-        onConfirm={cancelPOAction}
+        onConfirm={cancelPOAction.trigger}
       />
       <POStatusModal
         opened={modals.refundModalOpened}
         purchaseOrder={selectedPO}
         mode="refund"
         onClose={handleCloseModal('refund')}
-        onConfirm={refundPOAction}
+        onConfirm={refundPOAction.trigger}
       />
       <DeliveryRequestModal
         opened={deliveryModalOpened}
         purchaseOrder={purchaseOrder}
         onClose={() => setDeliveryModalOpened(false)}
-        onConfirm={createDeliveryAction}
+        onConfirm={createDeliveryAction.trigger}
       />
     </>
   );

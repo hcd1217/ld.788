@@ -1,5 +1,6 @@
+import { Anchor, Group, Stack, Text } from '@mantine/core';
+
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { Text, Stack, Group, Anchor } from '@mantine/core';
 
 type ContactInfoProps = {
   email?: string;

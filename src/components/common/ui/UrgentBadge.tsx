@@ -1,5 +1,6 @@
 import { Badge, type BadgeVariant, Group } from '@mantine/core';
 import { IconUrgent } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
 
 type UrgentBadgeProps = {

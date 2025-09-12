@@ -1,14 +1,15 @@
 // TODO: Uncomment when API endpoints are available
 // import { userApi } from '@/lib/api';
+import { shouldUseDemoData } from '@/config/demo.config';
 import type {
-  DashboardData,
   ClockEntry,
   ClockResponse,
-  Shift,
+  DashboardData,
   LeaveRequest,
+  Shift,
   TimesheetEntry,
 } from '@/types/timekeeper';
-import { shouldUseDemoData } from '@/config/demo.config';
+
 import { timekeeperDemoService } from './timekeeperDemo.service';
 
 class TimekeeperService {

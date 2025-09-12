@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
-import { useAppStore } from '@/stores/useAppStore';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { getNavigationItems, getMobileNavigationItems } from '@/utils/navigation';
+import { useAppStore } from '@/stores/useAppStore';
+import { getMobileNavigationItems, getNavigationItems } from '@/utils/navigation';
 
 /**
  * Custom hook for getting navigation items with role-based access control
@@ -18,12 +19,25 @@ function useNavigationItems(isMobile = false) {
     // Extract role names from user profile
     const userRoles = [user?.department?.code || ''];
 
+    // Extract navigation overrides from user profile
+    const navigationOverrides = user?.navigationOverrides;
+
     // Use mobile or desktop navigation service based on isMobile flag
     if (isMobile) {
-      return getMobileNavigationItems(user?.clientConfig?.mobileNavigation, t, userRoles);
+      return getMobileNavigationItems(
+        user?.clientConfig?.mobileNavigation,
+        t,
+        userRoles,
+        navigationOverrides,
+      );
     }
 
-    return getNavigationItems(user?.clientConfig?.navigation, t, userRoles);
+    return getNavigationItems(
+      user?.clientConfig?.navigation,
+      t,
+      userRoles,
+      navigationOverrides,
+    );
   }, [user, t, isMobile]);
 
   return {

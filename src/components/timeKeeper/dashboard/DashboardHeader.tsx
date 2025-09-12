@@ -1,10 +1,13 @@
 import { memo } from 'react';
-import { Box, Container, Text, Flex, Center, Stack, useMantineTheme } from '@mantine/core';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useGreeting } from '@/hooks/useGreeting';
-import type { DashboardHeaderData } from '@/types/timekeeper';
-import classes from './DashboardHeader.module.css';
+
+import { Box, Center, Container, Flex, Stack, Text, useMantineTheme } from '@mantine/core';
 import { IconHandStop } from '@tabler/icons-react';
+
+import { useGreeting } from '@/hooks/useGreeting';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { DashboardHeaderData } from '@/types/timekeeper';
+
+import classes from './DashboardHeader.module.css';
 
 type DashboardHeaderProps = DashboardHeaderData;
 

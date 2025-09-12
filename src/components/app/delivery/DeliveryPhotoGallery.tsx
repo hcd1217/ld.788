@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Grid, Image, Modal, Text, ScrollArea } from '@mantine/core';
+
+import { Grid, Image, Modal, ScrollArea, Text } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
 
 type DeliveryPhotoGalleryProps = {

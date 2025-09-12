@@ -1,5 +1,6 @@
 import { forwardRef } from 'react';
-import { Box, ActionIcon } from '@mantine/core';
+
+import { ActionIcon, Box } from '@mantine/core';
 import { IconCamera } from '@tabler/icons-react';
 
 interface CameraViewProps {

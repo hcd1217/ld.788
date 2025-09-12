@@ -1,7 +1,7 @@
-import type { NavigationItemType as BackendNavigationItem } from '@/lib/api/schemas/clientConfig.schemas';
 import type { NavigationItem as FrontendNavigationItem } from '@/components/layouts/types';
-import { getIcon } from '@/utils/iconRegistry';
 import { getRoute } from '@/config/routeConfig';
+import type { NavigationItemType as BackendNavigationItem } from '@/lib/api/schemas/clientConfig.schemas';
+import { getIcon } from '@/utils/iconRegistry';
 // Translation function type is 'any' to match existing NavBar.tsx pattern
 
 /**
@@ -58,6 +58,7 @@ function transformBackendNavigation(
  * @param backendNav Optional backend navigation configuration
  * @param t Translation function
  * @param userRoles Optional user roles for role-based filtering
+ * @param navigationOverrides Optional navigation overrides (granted/denied)
  * @returns Array of frontend navigation items ready for rendering
  */
 export function getNavigationItems(
@@ -76,11 +77,16 @@ export function getNavigationItems(
    */
   t: any,
   userRoles?: string[],
+  navigationOverrides?: { granted: string[]; denied: string[] },
 ): FrontendNavigationItem[] {
   // Use backend navigation if available
   if (backendNav?.length) {
     // Apply role-based access control if user roles are provided
-    const processedNav = userRoles ? applyRoleBasedAccess(backendNav, userRoles) : backendNav;
+    let processedNav = userRoles ? applyRoleBasedAccess(backendNav, userRoles) : backendNav;
+    
+    // Apply navigation overrides after role-based access
+    processedNav = applyNavigationOverrides(processedNav, navigationOverrides);
+    
     return transformBackendNavigation(processedNav, t);
   }
 
@@ -130,6 +136,54 @@ function applyRoleBasedAccess(
 
     return newItem;
   });
+}
+
+/**
+ * Applies navigation overrides (granted/denied) to navigation items
+ * @param items Navigation items to process
+ * @param overrides Navigation overrides with granted and denied arrays
+ * @returns Navigation items with overrides applied
+ */
+function applyNavigationOverrides(
+  items: BackendNavigationItem[],
+  overrides?: { granted: string[]; denied: string[] },
+): BackendNavigationItem[] {
+  if (!overrides) {
+    return items;
+  }
+
+  const { granted = [], denied = [] } = overrides;
+
+  return items
+    .map((item) => {
+      // If item is denied, hide it
+      if (denied.includes(item.id)) {
+        return null;
+      }
+
+      // Create a new item to avoid mutation
+      const newItem = { ...item };
+
+      // If item is explicitly granted, enable it regardless of role
+      if (granted.includes(item.id)) {
+        newItem.disabled = false;
+      }
+
+      // Process sub-items recursively
+      if (item.subs?.length) {
+        const processedSubs = applyNavigationOverrides(item.subs, overrides);
+        // Only include sub-items that weren't filtered out
+        newItem.subs = processedSubs.filter((sub) => sub !== null) as BackendNavigationItem[];
+
+        // If parent has no path and all children are removed, remove parent too
+        if (!newItem.path && newItem.subs.length === 0) {
+          return null;
+        }
+      }
+
+      return newItem;
+    })
+    .filter((item): item is BackendNavigationItem => item !== null);
 }
 
 /**
@@ -185,19 +239,25 @@ export function filterNavigationByFeatureFlags(
  * @param backendMobileNav Optional backend mobile navigation configuration
  * @param t Translation function
  * @param userRoles Optional user roles for role-based filtering
+ * @param navigationOverrides Optional navigation overrides (granted/denied)
  * @returns Array of frontend navigation items ready for mobile navigation
  */
 export function getMobileNavigationItems(
   backendMobileNav: BackendNavigationItem[] | undefined,
   t: any,
   userRoles?: string[],
+  navigationOverrides?: { granted: string[]; denied: string[] },
 ): FrontendNavigationItem[] {
   // Use backend mobile navigation if available
   if (backendMobileNav?.length) {
     // Apply role-based access control if user roles are provided
-    const processedNav = userRoles
+    let processedNav = userRoles
       ? applyRoleBasedAccess(backendMobileNav, userRoles)
       : backendMobileNav;
+    
+    // Apply navigation overrides after role-based access
+    processedNav = applyNavigationOverrides(processedNav, navigationOverrides);
+    
     return transformBackendNavigation(processedNav, t);
   }
 

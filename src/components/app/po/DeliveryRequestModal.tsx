@@ -1,15 +1,17 @@
-import { Modal, Drawer, Stack, Text, Group, Button, Select, Textarea, Switch } from '@mantine/core';
-import { IconTruck, IconCalendar, IconUrgent } from '@tabler/icons-react';
-import { useState, useEffect } from 'react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useDeviceType } from '@/hooks/useDeviceType';
-import { useDeliveryAssigneeOptions } from '@/stores/useDeliveryRequestStore';
-import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { formatDate } from '@/utils/time';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
-import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
-import type { PICType } from '@/services/sales/deliveryRequest';
+import { useEffect, useState } from 'react';
+
+import { Button, Drawer, Group, Modal, Select, Stack, Switch, Text, Textarea } from '@mantine/core';
+import { IconCalendar, IconTruck, IconUrgent } from '@tabler/icons-react';
+
 import { DateInput, UrgentBadge } from '@/components/common';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { PICType } from '@/services/sales/deliveryRequest';
+import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
+import { useDeliveryAssigneeOptions } from '@/stores/useDeliveryRequestStore';
+import { getCustomerNameByCustomerId } from '@/utils/overview';
+import { formatDate } from '@/utils/time';
 
 type DeliveryRequestModalProps = {
   readonly opened: boolean;
@@ -131,7 +133,7 @@ export function DeliveryRequestModal({
       />
 
       <Textarea
-        label={t('delivery.notes')}
+        label={t('common.notes')}
         placeholder={t('delivery.form.enterNotes')}
         value={notes}
         onChange={(e) => setNotes(e.currentTarget.value)}

@@ -1,8 +1,9 @@
-import { Grid, Text, Group } from '@mantine/core';
+import { Grid, Group, Text } from '@mantine/core';
 import { IconCalendar } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { formatDate, formatDateTime } from '@/utils/time';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { formatDate, formatDateTime } from '@/utils/time';
 
 type PODatesSectionProps = {
   readonly purchaseOrder: PurchaseOrder;

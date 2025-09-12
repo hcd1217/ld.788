@@ -1,4 +1,5 @@
-import { Stack, Group, Text } from '@mantine/core';
+import { Group, Stack, Text } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 

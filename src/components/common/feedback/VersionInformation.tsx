@@ -1,5 +1,7 @@
-import { Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
+
+import { Text } from '@mantine/core';
+
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 export function VersionInformation() {

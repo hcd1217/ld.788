@@ -1,4 +1,5 @@
 import * as z from 'zod/v4';
+
 import { booleanSchema, idSchema, optionalStringSchema } from './common.schemas';
 
 export const GetUsersRequestSchema = z.object({

@@ -1,10 +1,10 @@
 import { overviewApi } from '@/lib/api';
 import type {
-  EmployeeOverview as BEEmployeeOverview,
-  DepartmentOverview as BEDepartmentOverview,
-  ProductOverview as BEProductOverview,
-  CustomerOverview as BECustomerOverview,
   CombinedOverview as BECombinedOverview,
+  CustomerOverview as BECustomerOverview,
+  DepartmentOverview as BEDepartmentOverview,
+  EmployeeOverview as BEEmployeeOverview,
+  ProductOverview as BEProductOverview,
   OverviewParams,
 } from '@/lib/api/schemas/overview.schemas';
 import { renderFullName } from '@/utils/string';
@@ -29,6 +29,7 @@ export type ProductOverview = {
   id: string;
   name: string;
   code: string;
+  unit: string;
 };
 
 export type CustomerOverview = {
@@ -136,6 +137,7 @@ export const overviewService = {
       id: beProduct.id,
       name: beProduct.name,
       code: beProduct.code,
+      unit: beProduct.unit,
     };
   },
 };

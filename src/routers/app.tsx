@@ -1,5 +1,6 @@
-import { ROUTERS } from '@/config/routeConfig';
 import { lazy } from 'react';
+
+import { ROUTERS } from '@/config/routeConfig';
 
 const MorePage = lazy(async () => {
   const module = await import('@/pages/app/MorePage');

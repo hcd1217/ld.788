@@ -1,37 +1,40 @@
 import { useMemo } from 'react';
+
 import { useNavigate } from 'react-router';
-import { Stack, Group, Box, SimpleGrid, Select, SegmentedControl, Button } from '@mantine/core';
+
+import { Box, Button, Group, SegmentedControl, Select, SimpleGrid, Stack } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { IconClearAll } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useClientSidePagination } from '@/hooks/useClientSidePagination';
-import { useOnce } from '@/hooks/useOnce';
-import { useEmployeeFilters } from '@/hooks/useEmployeeFilters';
-import { useEmployeeList, useHrLoading, useHrError, useHrActions } from '@/stores/useHrStore';
-import {
-  Pagination,
-  AppPageTitle,
-  SearchBar,
-  SwitchView,
-  BlankState,
-  AppMobileLayout,
-  AppDesktopLayout,
-  PermissionDeniedPage,
-} from '@/components/common';
+
 import {
   EmployeeCard,
   EmployeeDataTable,
+  EmployeeFilterBar,
   EmployeeGridCard,
   EmployeeListSkeleton,
-  EmployeeFilterBar,
-  EmployeeUnitDrawer,
   EmployeeStatusDrawer,
+  EmployeeUnitDrawer,
 } from '@/components/app/employee';
-import { useDeviceType } from '@/hooks/useDeviceType';
+import {
+  AppDesktopLayout,
+  AppMobileLayout,
+  AppPageTitle,
+  BlankState,
+  Pagination,
+  PermissionDeniedPage,
+  SearchBar,
+  SwitchView,
+} from '@/components/common';
 import { ROUTERS } from '@/config/routeConfig';
 import { EMPLOYEE_STATUS } from '@/constants/employee';
-import { useDisclosure } from '@mantine/hooks';
+import { useClientSidePagination } from '@/hooks/useClientSidePagination';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { useEmployeeFilters } from '@/hooks/useEmployeeFilters';
+import { useOnce } from '@/hooks/useOnce';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useViewMode } from '@/hooks/useViewMode';
 import { useAppStore, usePermissions } from '@/stores/useAppStore';
+import { useEmployeeList, useHrActions, useHrError, useHrLoading } from '@/stores/useHrStore';
 
 export function EmployeeListPage() {
   const navigate = useNavigate();
@@ -246,7 +249,6 @@ export function EmployeeListPage() {
       </div>
 
       <Pagination
-        hidden={paginationState.totalItems === 0}
         totalPages={paginationState.totalPages}
         pageSize={paginationState.pageSize}
         currentPage={paginationState.currentPage}

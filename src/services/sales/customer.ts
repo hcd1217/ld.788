@@ -1,4 +1,4 @@
-import { salesApi, type Customer as APICustomer } from '@/lib/api';
+import { type Customer as APICustomer, salesApi } from '@/lib/api';
 import {
   type BulkUpsertCustomersRequest,
   type BulkUpsertCustomersResponse,

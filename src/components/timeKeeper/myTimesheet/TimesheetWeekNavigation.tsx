@@ -1,8 +1,9 @@
-import { Group, ActionIcon, Button, Card, Text, Box, type MantineStyleProp } from '@mantine/core';
-import { IconChevronLeft, IconChevronRight, IconCalendar } from '@tabler/icons-react';
+import { ActionIcon, Box, Button, Card, Group, type MantineStyleProp, Text } from '@mantine/core';
+import { IconCalendar, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useTranslation } from '@/hooks/useTranslation';
 import { formatDateRange } from '@/utils/timekeeper.utils';
-import { useDeviceType } from '@/hooks/useDeviceType';
 
 interface TimesheetWeekNavigationProps {
   readonly weekRange: {

@@ -1,36 +1,38 @@
-import { useState, useMemo } from 'react';
-import { Paper, Text, Group, Button, Stack } from '@mantine/core';
+import { useMemo, useState } from 'react';
+
+import { Button, Group, Paper, Stack, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { IconPlus, IconUpload } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useAction } from '@/hooks/useAction';
-import {
-  DataTable,
-  AppDesktopLayout,
-  AppPageTitle,
-  SearchBar,
-  Pagination,
-  ActiveBadge,
-  ContactInfo,
-  BulkImportModalContent,
-  ViewOnMap,
-  PermissionDeniedPage,
-} from '@/components/common';
+
 import { CustomerFormModal, type CustomerFormValues } from '@/components/app/config';
 import {
-  customerService,
-  type Customer,
-  type BulkUpsertCustomersRequest,
-} from '@/services/sales/customer';
-import { showSuccessNotification, showErrorNotification } from '@/utils/notifications';
-import { validateEmail } from '@/utils/validation';
+  ActiveBadge,
+  AppDesktopLayout,
+  AppPageTitle,
+  BulkImportModalContent,
+  ContactInfo,
+  DataTable,
+  Pagination,
+  PermissionDeniedPage,
+  SearchBar,
+  ViewOnMap,
+} from '@/components/common';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
 import { useOnce } from '@/hooks/useOnce';
-import { logError } from '@/utils/logger';
-import { parseCustomerExcelFile, generateCustomerExcelTemplate } from '@/utils/excelParser';
+import { useSimpleSWRAction, useSWRAction } from '@/hooks/useSWRAction';
+import { useTranslation } from '@/hooks/useTranslation';
+import {
+  type BulkUpsertCustomersRequest,
+  type BulkUpsertCustomersResponse,
+  type Customer,
+  customerService,
+} from '@/services/sales/customer';
 import { usePermissions } from '@/stores/useAppStore';
+import { generateCustomerExcelTemplate, parseCustomerExcelFile } from '@/utils/excelParser';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
+import { validateEmail } from '@/utils/validation';
 
 // Form values type will be imported from CustomerFormModal
 
@@ -82,45 +84,40 @@ export function CustomerConfigPage() {
     defaultPageSize: 20,
   });
 
-  const loadCustomers = useAction({
-    options: {
-      errorTitle: t('common.error'),
-      errorMessage: t('common.loadingFailed'),
-    },
-    async actionHandler() {
+  const loadCustomersAction = useSimpleSWRAction(
+    'load-customers',
+    async () => {
       if (!permissions.customer.canView) {
-        return;
+        return [];
       }
       setIsLoading(true);
       const data = await customerService.getAllCustomers();
-      setCustomers(data);
+      return data;
     },
-    errorHandler(err) {
-      logError('Failed to load customers:', err, {
-        module: 'CustomerConfigPage',
-        action: 'loadCustomers',
-      });
+    {
+      notifications: {
+        errorTitle: t('common.error'),
+        errorMessage: t('common.loadingFailed'),
+      },
+      onSuccess: (data: Customer[]) => {
+        setCustomers(data);
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
     },
-    cleanupHandler() {
-      setIsLoading(false);
-    },
-  });
+  );
 
   useOnce(() => {
-    loadCustomers();
+    loadCustomersAction.trigger();
   });
 
-  const handleCreateCustomer = useAction<CustomerFormValues>({
-    options: {
-      errorTitle: t('common.error'),
-      errorMessage: t('common.addFailed', { entity: t('common.entity.customer') }),
-    },
-    async actionHandler(values) {
+  const createCustomerAction = useSWRAction(
+    'create-customer',
+    async (values: CustomerFormValues) => {
       if (!permissions.customer.canCreate || !values) {
         throw new Error(t('common.addFailed', { entity: t('common.entity.customer') }));
       }
-
-      setIsLoading(true);
       const data = {
         name: values.name,
         companyName: values.companyName || undefined,
@@ -132,39 +129,38 @@ export function CustomerConfigPage() {
         isActive: true,
         memo: values.memo || undefined,
       };
+      setIsLoading(true);
+      const customer = await customerService.createCustomer(data);
+      return customer;
+    },
+    {
+      notifications: {
+        errorTitle: t('common.error'),
+        errorMessage: t('common.addFailed', { entity: t('common.entity.customer') }),
+      },
+      onSuccess: (customer) => {
+        showSuccessNotification(
+          t('customer.created'),
+          t('customer.createdMessage', { name: customer.name }),
+        );
+        closeCreate();
+        form.reset();
+        loadCustomersAction.trigger();
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
+    },
+  );
 
-      await customerService.createCustomer(data);
-      showSuccessNotification(
-        t('customer.created'),
-        t('customer.createdMessage', { name: values.name }),
-      );
-      closeCreate();
-      form.reset();
-      await loadCustomers();
-    },
-    errorHandler(error) {
-      logError('Failed to create customer:', error, {
-        module: 'CustomerConfigPage',
-        action: 'handleCreateCustomer',
-      });
-    },
-    cleanupHandler() {
-      setIsLoading(false);
-    },
-  });
-
-  const handleUpdateCustomer = useAction<CustomerFormValues>({
-    options: {
-      errorTitle: t('common.error'),
-      errorMessage: t('common.updateFailed', { entity: t('common.entity.customer') }),
-    },
-    async actionHandler(values) {
+  const updateCustomerAction = useSWRAction(
+    'update-customer',
+    async (values: CustomerFormValues) => {
       if (!permissions.customer.canEdit || !values || !selectedCustomer) {
         throw new Error(t('common.updateFailed', { entity: t('common.entity.customer') }));
       }
-
       setIsLoading(true);
-      const data = {
+      return await customerService.updateCustomer(selectedCustomer.id, {
         name: values.name,
         companyName: values.companyName || undefined,
         contactEmail: values.contactEmail || undefined,
@@ -175,55 +171,50 @@ export function CustomerConfigPage() {
         pic: values.pic || undefined,
         taxCode: values.taxCode || undefined,
         isActive: values.isActive,
-      };
-
-      await customerService.updateCustomer(selectedCustomer.id, data);
-      showSuccessNotification(
-        t('customer.updated'),
-        t('customer.updatedMessage', { name: values.name }),
-      );
-      closeEdit();
-      await loadCustomers();
-    },
-    errorHandler(error) {
-      logError('Failed to update customer:', error, {
-        module: 'CustomerConfigPage',
-        action: 'handleUpdateCustomer',
       });
     },
-    cleanupHandler() {
-      setIsLoading(false);
+    {
+      notifications: {
+        errorTitle: t('common.error'),
+        errorMessage: t('common.updateFailed', { entity: t('common.entity.customer') }),
+      },
+      onSuccess: (customer) => {
+        showSuccessNotification(
+          t('customer.updated'),
+          t('customer.updatedMessage', { name: customer.name }),
+        );
+        closeEdit();
+        form.reset();
+        loadCustomersAction.trigger();
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
     },
-  });
+  );
 
-  const handleDelete = useAction<Customer>({
-    options: {
-      errorTitle: t('common.error'),
-      errorMessage: t('common.deleteFailed', { entity: t('common.entity.customer') }),
+  const deleteCustomerAction = useSWRAction(
+    'delete-customer',
+    async (customer: Customer) => {
+      return await customerService.deleteCustomer(customer.id);
     },
-    async actionHandler(customer) {
-      if (!permissions.customer.canDelete || !customer) {
-        throw new Error(t('common.deleteFailed', { entity: t('common.entity.customer') }));
-      }
-
-      setIsLoading(true);
-      await customerService.deleteCustomer(customer.id);
-      showSuccessNotification(
-        t('customer.deleted'),
-        t('customer.deletedMessage', { name: customer.name }),
-      );
-      await loadCustomers();
+    {
+      notifications: {
+        errorTitle: t('common.error'),
+        errorMessage: t('common.deleteFailed', { entity: t('common.entity.customer') }),
+      },
+      onSuccess: () => {
+        showSuccessNotification(
+          t('customer.deleted'),
+          t('customer.deletedMessage', { name: selectedCustomer?.name || '' }),
+        );
+        loadCustomersAction.trigger();
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
     },
-    errorHandler(error) {
-      logError('Failed to delete customer:', error, {
-        module: 'CustomerConfigPage',
-        action: 'handleDelete',
-      });
-    },
-    cleanupHandler() {
-      setIsLoading(false);
-    },
-  });
+  );
 
   const openEditModal = (customer: Customer) => {
     setSelectedCustomer(customer);
@@ -259,7 +250,7 @@ export function CustomerConfigPage() {
       children: <Text size="sm">{t('common.confirmDeleteMessage', { name: customer.name })}</Text>,
       labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
       confirmProps: { color: 'red' },
-      onConfirm: () => handleDelete(customer),
+      onConfirm: () => deleteCustomerAction.trigger(customer),
     });
   };
 
@@ -293,7 +284,7 @@ export function CustomerConfigPage() {
       },
       onConfirm: () => {
         if (selectedFile) {
-          handleExcelImport({ file: selectedFile });
+          handleExcelImportAction.trigger({ file: selectedFile });
         } else {
           showErrorNotification(t('common.error'), t('common.selectFile'));
         }
@@ -302,16 +293,15 @@ export function CustomerConfigPage() {
   };
 
   // Handle Excel file import
-  const handleExcelImport = useAction<{ file: File }>({
-    options: {
-      errorTitle: t('common.error'),
-      errorMessage: t('auth.importFailed'),
-    },
-    async actionHandler(data) {
+  const handleExcelImportAction = useSWRAction(
+    'handle-excel-import',
+    async (data: { file: File }): Promise<BulkUpsertCustomersResponse> => {
       if (!permissions.customer.canCreate) {
-        return;
+        throw new Error(t('common.doNotHavePermissionForAction'));
       }
-      if (!data?.file) return;
+      if (!data?.file) {
+        throw new Error(t('common.file.pleaseSelectFileFirst'));
+      }
       const { file } = data;
 
       setIsLoading(true);
@@ -340,28 +330,28 @@ export function CustomerConfigPage() {
       };
 
       const result = await customerService.bulkUpsertCustomers(request);
-
-      // Show results
-      const message = t('customer.bulkImportSuccess', {
-        created: result.created,
-        updated: result.updated,
-        failed: result.failed,
-      });
-
-      showSuccessNotification(t('auth.importSuccess'), message);
-      modals.closeAll();
-      await loadCustomers();
+      return result;
     },
-    errorHandler(error) {
-      logError('Failed to import customers from Excel:', error, {
-        module: 'CustomerConfigPage',
-        action: 'handleExcelImport',
-      });
+    {
+      notifications: {
+        errorTitle: t('common.error'),
+        errorMessage: t('auth.importFailed'),
+      },
+      onSuccess: async (result: BulkUpsertCustomersResponse) => {
+        const message = t('customer.bulkImportSuccess', {
+          created: result.created,
+          updated: result.updated,
+          failed: result.failed,
+        });
+        showSuccessNotification(t('auth.importSuccess'), message);
+        modals.closeAll();
+        loadCustomersAction.trigger();
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
     },
-    cleanupHandler() {
-      setIsLoading(false);
-    },
-  });
+  );
 
   if (!permissions.customer.canView) {
     return <PermissionDeniedPage />;
@@ -458,7 +448,6 @@ export function CustomerConfigPage() {
 
       {/* Pagination */}
       <Pagination
-        hidden={paginationState.totalPages < 2}
         totalPages={paginationState.totalPages}
         pageSize={paginationState.pageSize}
         currentPage={paginationState.currentPage}
@@ -474,7 +463,7 @@ export function CustomerConfigPage() {
         canEdit={permissions.customer.canEdit}
         canDelete={permissions.customer.canDelete}
         form={form}
-        onSubmit={handleCreateCustomer}
+        onSubmit={createCustomerAction.trigger}
         isLoading={isLoading}
       />
 
@@ -486,7 +475,7 @@ export function CustomerConfigPage() {
         canEdit={permissions.customer.canEdit}
         canDelete={permissions.customer.canDelete}
         form={form}
-        onSubmit={handleUpdateCustomer}
+        onSubmit={updateCustomerAction.trigger}
         onDelete={() => {
           if (selectedCustomer) {
             confirmDelete(selectedCustomer);

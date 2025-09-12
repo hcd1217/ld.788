@@ -1,7 +1,9 @@
-import { Modal, rem, type MantineSize } from '@mantine/core';
 import type { ReactNode } from 'react';
-import { useDeviceType } from '@/hooks/useDeviceType';
+
+import { type MantineSize, Modal, rem } from '@mantine/core';
+
 import { Drawer } from '@/components/common/ui';
+import { useDeviceType } from '@/hooks/useDeviceType';
 
 type ModalOrDrawerProps = {
   readonly opened: boolean;

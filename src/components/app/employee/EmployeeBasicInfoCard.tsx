@@ -1,19 +1,22 @@
-import { Card, Stack, Group, Title, Button, Divider, Grid, Text, Tooltip } from '@mantine/core';
-import { IconEdit, IconQrcode } from '@tabler/icons-react';
+import { useEffect, useState } from 'react';
+
+import { Button, Card, Divider, Grid, Group, Stack, Text, Title, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useState, useEffect } from 'react';
-import { EmployeeMagicLinkModal } from './EmployeeMagicLinkModal';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useAction } from '@/hooks/useAction';
-import type { Employee } from '@/services/hr/employee';
-import { renderFullName, formatDate, formatCurrency } from '@/utils/string';
-import { userService } from '@/services/user/user';
-import { generateQRCodeWithLogo } from '@/utils/qr';
-import { useClientCode } from '@/hooks/useClientCode';
+import { IconEdit, IconQrcode } from '@tabler/icons-react';
+
 import { ActiveBadge } from '@/components/common/ui';
-import { WorkTypeBadge } from './WorkTypeBadge';
-import { logError } from '@/utils/logger';
+import { useClientCode } from '@/hooks/useClientCode';
+import { useSimpleSWRAction } from '@/hooks/useSWRAction';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { Employee } from '@/services/hr/employee';
+import { userService } from '@/services/user/user';
 import { useClientConfig } from '@/stores/useAppStore';
+import { logError } from '@/utils/logger';
+import { generateQRCodeWithLogo } from '@/utils/qr';
+import { formatCurrency, formatDate, renderFullName } from '@/utils/string';
+
+import { EmployeeMagicLinkModal } from './EmployeeMagicLinkModal';
+import { WorkTypeBadge } from './WorkTypeBadge';
 
 type EmployeeBasicInfoCardProps = {
   readonly employee: Employee;
@@ -45,23 +48,29 @@ export function EmployeeBasicInfoCard({ employee, canEdit, onEdit }: EmployeeBas
     }
   }, [magicLink]);
 
-  const handleGetMagicLink = useAction({
-    options: {
-      successTitle: t('common.success'),
-      successMessage: t('employee.magicLinkGenerated'),
-      errorTitle: t('common.error'),
-      errorMessage: t('employee.magicLinkFailed'),
-    },
-    async actionHandler() {
+  const getMagicLinkAction = useSimpleSWRAction(
+    `get-magic-link-${employee.id}`,
+    async () => {
       if (!employee.userId) {
         throw new Error('No user ID available');
       }
 
       const link = await userService.getLoginMagicLink(employee.userId, clientCode);
-      setMagicLink(link);
-      open();
+      return link;
     },
-  });
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('employee.magicLinkGenerated'),
+        errorTitle: t('common.error'),
+        errorMessage: t('employee.magicLinkFailed'),
+      },
+      onSuccess: (link) => {
+        setMagicLink(link);
+        open();
+      },
+    },
+  );
 
   return (
     <>
@@ -77,7 +86,9 @@ export function EmployeeBasicInfoCard({ employee, canEdit, onEdit }: EmployeeBas
                   <Button
                     leftSection={<IconQrcode size={16} />}
                     variant="subtle"
-                    onClick={() => handleGetMagicLink()}
+                    onClick={() => {
+                      getMagicLinkAction.trigger();
+                    }}
                     disabled={!employee.isActive || !canEdit}
                   >
                     {t('employee.magicLink')}

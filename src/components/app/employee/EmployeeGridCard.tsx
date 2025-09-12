@@ -1,14 +1,17 @@
-import { Stack, Group, Text } from '@mantine/core';
 import { useNavigate } from 'react-router';
+
+import { Group, Stack, Text } from '@mantine/core';
+
+import { SelectableCard } from '@/components/common';
+import { ActiveBadge, ContactInfo } from '@/components/common/ui';
+import { getEmployeeDetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
-import { SelectableCard } from '@/components/common';
-import { getEmployeeDetailRoute } from '@/config/routeConfig';
-import { ActiveBadge, ContactInfo } from '@/components/common/ui';
-import { WorkTypeBadge } from './WorkTypeBadge';
+import { useClientConfig } from '@/stores/useAppStore';
 import { formatDate } from '@/utils/string';
 import { getEndDateHighlightStyles } from '@/utils/time';
-import { useClientConfig } from '@/stores/useAppStore';
+
+import { WorkTypeBadge } from './WorkTypeBadge';
 
 type EmployeeGridCardProps = {
   readonly employee: Employee;

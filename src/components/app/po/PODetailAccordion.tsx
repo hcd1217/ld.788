@@ -1,12 +1,14 @@
-import { Accordion, Stack, Group, Text } from '@mantine/core';
-import { IconInfoCircle, IconClipboardList, IconMapPin, IconHistory } from '@tabler/icons-react';
+import { Accordion, Group, Stack, Text } from '@mantine/core';
+import { IconClipboardList, IconHistory, IconInfoCircle, IconMapPin } from '@tabler/icons-react';
+
+import { ViewOnMap } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
+import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+
 import { POAccordionActions } from './POAccordionActions';
+import { POAccordionHistoryPanel } from './POAccordionHistoryPanel';
 import { POAccordionInfoPanel } from './POAccordionInfoPanel';
 import { POAccordionItemsPanel } from './POAccordionItemsPanel';
-import { POAccordionHistoryPanel } from './POAccordionHistoryPanel';
-import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { ViewOnMap } from '@/components/common';
 
 type PODetailAccordionProps = {
   readonly purchaseOrder: PurchaseOrder;

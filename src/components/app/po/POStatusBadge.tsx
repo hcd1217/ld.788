@@ -1,7 +1,8 @@
 import { Badge, type BadgeProps } from '@mantine/core';
+
+import { PO_STATUS_COLORS } from '@/constants/purchaseOrder';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { POStatus } from '@/services/sales/purchaseOrder';
-import { PO_STATUS_COLORS } from '@/constants/purchaseOrder';
 
 type POStatusBadgeProps = {
   readonly status: POStatus;

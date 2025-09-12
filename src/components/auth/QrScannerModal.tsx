@@ -1,18 +1,20 @@
+import { useState } from 'react';
+
 import {
-  Modal,
-  Text,
-  Stack,
   Alert,
   Button,
-  TextInput,
-  Group,
   FileInput,
-  Tabs,
+  Group,
+  Modal,
   rem,
+  Stack,
+  Tabs,
+  Text,
+  TextInput,
 } from '@mantine/core';
-import { IconAlertCircle, IconUpload, IconClipboard, IconCamera } from '@tabler/icons-react';
-import { useState } from 'react';
-import { Scanner, type IDetectedBarcode } from '@yudiel/react-qr-scanner';
+import { IconAlertCircle, IconCamera, IconClipboard, IconUpload } from '@tabler/icons-react';
+import { type IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
+
 // Dynamic import for jsQR to reduce bundle size
 import { useTranslation } from '@/hooks/useTranslation';
 import { logError } from '@/utils/logger';

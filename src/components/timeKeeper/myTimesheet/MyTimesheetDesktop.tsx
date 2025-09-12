@@ -1,12 +1,14 @@
-import { Container, Stack, Title, Box, Paper, Grid, Group, Badge, Text } from '@mantine/core';
-import { IconClock, IconCalendarStats } from '@tabler/icons-react';
+import { Badge, Box, Container, Grid, Group, Paper, Stack, Text, Title } from '@mantine/core';
+import { IconCalendarStats, IconClock } from '@tabler/icons-react';
+
+import { useTimesheetWeekLogic } from '@/hooks/useTimesheetWeekLogic';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { TimesheetEntry } from '@/types/timekeeper';
-import { MyTimesheetWeekSummary } from './MyTimesheetWeekSummary';
 import { formatHoursMinutes } from '@/utils/timekeeper.utils';
-import { useTimesheetWeekLogic } from '@/hooks/useTimesheetWeekLogic';
-import { TimesheetWeekNavigation } from './TimesheetWeekNavigation';
+
+import { MyTimesheetWeekSummary } from './MyTimesheetWeekSummary';
 import { TimesheetDayCardsList } from './TimesheetDayCardsList';
+import { TimesheetWeekNavigation } from './TimesheetWeekNavigation';
 
 interface MyTimesheetDesktopProps {
   readonly currentWeek: Date;

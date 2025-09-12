@@ -1,43 +1,46 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
-import { Stack, Group, SimpleGrid, Button, Loader, Text, Center, Flex } from '@mantine/core';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
 import { useNavigate } from 'react-router';
-import type { Timeout } from '@/types';
+
+import { Button, Center, Flex, Group, Loader, SimpleGrid, Stack, Text } from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
 import { IconChevronLeft, IconChevronRight, IconSortAscending } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { ROUTERS } from '@/config/routeConfig';
-import { useDeliveryRequestFilters } from '@/hooks/useDeliveryRequestFilters';
-import { STORAGE_KEYS } from '@/utils/storageKeys';
-import {
-  useDeliveryRequests,
-  useDeliveryRequestLoading,
-  useDeliveryRequestError,
-  useDeliveryRequestActions,
-  useDeliveryRequestPaginationState,
-} from '@/stores/useDeliveryRequestStore';
-import { useCustomers, usePermissions, useMe } from '@/stores/useAppStore';
-import {
-  AppPageTitle,
-  SwitchView,
-  BlankState,
-  AppMobileLayout,
-  AppDesktopLayout,
-  PermissionDeniedPage,
-} from '@/components/common';
+
 import {
   DeliveryCard,
   DeliveryDataTable,
-  DeliveryGridCard,
-  DeliveryListSkeleton,
+  DeliveryErrorBoundary,
   DeliveryFilterBarDesktop,
   DeliveryFilterBarMobile,
-  DeliveryStatusFilterDrawer,
+  DeliveryGridCard,
+  DeliveryListSkeleton,
   DeliveryQuickActionsDrawer,
-  DeliveryErrorBoundary,
+  DeliveryStatusFilterDrawer,
 } from '@/components/app/delivery';
-import { useDeviceType } from '@/hooks/useDeviceType';
+import {
+  AppDesktopLayout,
+  AppMobileLayout,
+  AppPageTitle,
+  BlankState,
+  PermissionDeniedPage,
+  SwitchView,
+} from '@/components/common';
+import { ROUTERS } from '@/config/routeConfig';
 import { DELIVERY_STATUS } from '@/constants/deliveryRequest';
+import { useDeliveryRequestFilters } from '@/hooks/useDeliveryRequestFilters';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useViewMode } from '@/hooks/useViewMode';
-import { useDebouncedValue } from '@mantine/hooks';
+import { useCustomers, useMe, usePermissions } from '@/stores/useAppStore';
+import {
+  useDeliveryRequestActions,
+  useDeliveryRequestError,
+  useDeliveryRequestLoading,
+  useDeliveryRequestPaginationState,
+  useDeliveryRequests,
+} from '@/stores/useDeliveryRequestStore';
+import type { Timeout } from '@/types';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 export function DeliveryListPage() {
   const { isMobile, isDesktop } = useDeviceType();

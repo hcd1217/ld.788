@@ -1,10 +1,12 @@
-import { Grid, Stack, Text, Group, Badge } from '@mantine/core';
+import { Badge, Grid, Group, Stack, Text } from '@mantine/core';
 import { IconBuilding } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { POStatusBadge } from './POStatusBadge';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
-import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
+import { getCustomerNameByCustomerId } from '@/utils/overview';
+
+import { POStatusBadge } from './POStatusBadge';
 
 type POInfoSectionProps = {
   readonly purchaseOrder: PurchaseOrder;

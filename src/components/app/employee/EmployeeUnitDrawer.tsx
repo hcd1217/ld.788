@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { SelectionDrawer, type SelectionItem } from './SelectionDrawer';
 import type { Unit } from '@/services/hr/employee';
+
+import { SelectionDrawer, type SelectionItem } from './SelectionDrawer';
 
 interface EmployeeUnitDrawerProps {
   readonly opened: boolean;

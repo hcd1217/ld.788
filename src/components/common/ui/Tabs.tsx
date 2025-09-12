@@ -1,10 +1,12 @@
+import { type ReactNode } from 'react';
+
 import {
   Tabs as MantineTabs,
-  type TabsProps as MantineTabsProps,
   type TabsListProps as MantineTabsListProps,
+  type TabsProps as MantineTabsProps,
   type TabsTabProps as MantineTabsTabProps,
 } from '@mantine/core';
-import { type ReactNode } from 'react';
+
 import classes from './Tabs.module.css';
 
 // Main Tabs component

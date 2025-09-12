@@ -1,13 +1,16 @@
-import { Stack, Group, Text } from '@mantine/core';
 import { useNavigate } from 'react-router';
-import { useTranslation } from '@/hooks/useTranslation';
-import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
+
+import { Group, Stack, Text } from '@mantine/core';
+
 import { SelectableCard, UrgentBadge } from '@/components/common';
 import { getDeliveryDetailRoute } from '@/config/routeConfig';
-import { DeliveryStatusBadge } from './DeliveryStatusBadge';
-import { formatDate, formatDateTime, getLocaleFormat } from '@/utils/time';
-import { getEmployeeNameByEmployeeId } from '@/utils/overview';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
+import { getEmployeeNameByEmployeeId } from '@/utils/overview';
+import { formatDate, formatDateTime, getLocaleFormat } from '@/utils/time';
+
+import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 
 type DeliveryGridCardProps = {
   readonly deliveryRequest: DeliveryRequest;

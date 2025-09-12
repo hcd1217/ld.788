@@ -1,5 +1,7 @@
-import { Stack, Text, Card, Textarea } from '@mantine/core';
+import { Card, Stack, Text, Textarea } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
+
 import type { UseFormReturnType } from '@mantine/form';
 
 type POAdditionalInfoProps = {
@@ -17,7 +19,7 @@ export function POAdditionalInfo({ form }: POAdditionalInfoProps) {
         </Text>
 
         <Textarea
-          label={t('po.notes')}
+          label={t('common.notes')}
           placeholder={t('po.notesPlaceholder')}
           rows={4}
           {...form.getInputProps('notes')}

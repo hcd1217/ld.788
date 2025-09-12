@@ -1,14 +1,19 @@
+import { memo, useCallback, useEffect, useState } from 'react';
+
+import { useLocation, useNavigate } from 'react-router';
+
 import { AppShell, Collapse, Group, Stack, Text, UnstyledButton } from '@mantine/core';
 import { IconCaretDownFilled } from '@tabler/icons-react';
-import type { TFunction } from 'i18next';
-import { useEffect, useState, useCallback, memo } from 'react';
-import { useLocation, useNavigate } from 'react-router';
-import classes from './AuthLayout.module.css';
-import type { NavigationItem } from './types';
+
 import { LAYOUT_CONFIG } from '@/config/layoutConfig';
-import { useTranslation } from '@/hooks/useTranslation';
 import { useDesktopNavigation } from '@/hooks/useNavigationItems';
+import { useTranslation } from '@/hooks/useTranslation';
 import { isNavigationItemActive } from '@/utils/navigationUtils';
+
+import classes from './AuthLayout.module.css';
+
+import type { NavigationItem } from './types';
+import type { TFunction } from 'i18next';
 
 // Persist expanded menu state
 const EXPANDED_MENU_KEY = 'auth-layout-expanded-menu';

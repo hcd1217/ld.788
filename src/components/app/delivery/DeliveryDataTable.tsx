@@ -1,13 +1,17 @@
 import React, { memo, useCallback } from 'react';
-import { Table, Text, ScrollArea, Group } from '@mantine/core';
+
 import { useNavigate } from 'react-router';
-import { DeliveryStatusBadge } from './DeliveryStatusBadge';
+
+import { Group, ScrollArea, Table, Text } from '@mantine/core';
+
 import { UrgentBadge } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
-import { formatDate, getLocaleFormat } from '@/utils/time';
-import { getEmployeeNameByEmployeeId } from '@/utils/overview';
 import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
+import { getEmployeeNameByEmployeeId } from '@/utils/overview';
+import { formatDate, getLocaleFormat } from '@/utils/time';
+
+import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 
 type DeliveryDataTableProps = {
   readonly deliveryRequests: readonly DeliveryRequest[];

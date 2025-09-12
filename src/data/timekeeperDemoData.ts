@@ -1,13 +1,13 @@
 // Demo data for Timekeeper UI
 import type {
-  DashboardData,
   ClockEntry,
-  Shift,
-  LeaveRequest,
-  TimesheetEntry,
   ClockStatus,
-  ShiftStatus,
+  DashboardData,
+  LeaveRequest,
   LeaveRequestStatus,
+  Shift,
+  ShiftStatus,
+  TimesheetEntry,
 } from '@/types/timekeeper';
 
 // Helper to create dates relative to today

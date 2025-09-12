@@ -1,4 +1,4 @@
-import { userApi, clientApi } from '@/lib/api';
+import { clientApi, userApi } from '@/lib/api';
 
 export const userService = {
   magicLinks: {} as Record<string, string>,

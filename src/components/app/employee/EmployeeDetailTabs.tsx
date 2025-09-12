@@ -1,15 +1,17 @@
-import { Box, Stack, ScrollArea } from '@mantine/core';
+import { Box, ScrollArea, Stack } from '@mantine/core';
 import {
-  IconInfoCircle,
   IconClock,
   IconCurrencyDollar,
+  IconInfoCircle,
   IconShoppingCart,
 } from '@tabler/icons-react';
-import { EmployeeBasicInfoCard } from './EmployeeBasicInfoCard';
-import { EmployeeDangerZone } from './EmployeeDangerZone';
-import { Tabs, ComingSoonCard } from '@/components/common';
+
+import { ComingSoonCard, Tabs } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
+
+import { EmployeeBasicInfoCard } from './EmployeeBasicInfoCard';
+import { EmployeeDangerZone } from './EmployeeDangerZone';
 
 type EmployeeDetailTabsProps = {
   readonly employee: Employee;

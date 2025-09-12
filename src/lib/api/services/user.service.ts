@@ -1,13 +1,13 @@
 import { BaseApiClient } from '../base';
 import {
-  GetUsersRequestSchema,
-  GetUsersResponseSchema,
-  GetMagicLinkResponseSchema,
-  RevokeSessionsResponseSchema,
-  type GetUsersRequest,
-  type GetUsersResponse,
   type GetMagicLinkResponse,
+  GetMagicLinkResponseSchema,
+  type GetUsersRequest,
+  GetUsersRequestSchema,
+  type GetUsersResponse,
+  GetUsersResponseSchema,
   type RevokeSessionsResponse,
+  RevokeSessionsResponseSchema,
 } from '../schemas/user.schemas';
 
 export class UserApi extends BaseApiClient {

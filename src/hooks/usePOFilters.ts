@@ -1,8 +1,9 @@
-import { useState, useMemo, useCallback } from 'react';
-import type { PurchaseOrder } from '@/services/sales';
+import { useCallback, useMemo, useState } from 'react';
+
 import { PO_STATUS, type POStatusType } from '@/constants/purchaseOrder';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
+import type { PurchaseOrder } from '@/services/sales';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
+import { getCustomerNameByCustomerId } from '@/utils/overview';
 
 export type DateFilterType = 'orderDate' | 'deliveryDate';
 
@@ -219,10 +220,10 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[]) {
       }
 
       // Order date range filter
-      if (orderDateRange.start && po.orderDate < orderDateRange.start) {
+      if (orderDateRange.start && po.orderDate && po.orderDate < orderDateRange.start) {
         return false;
       }
-      if (orderDateRange.end && po.orderDate > orderDateRange.end) {
+      if (orderDateRange.end && po.orderDate && po.orderDate > orderDateRange.end) {
         return false;
       }
 

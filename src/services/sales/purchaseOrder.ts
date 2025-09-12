@@ -1,18 +1,27 @@
 import { salesApi } from '@/lib/api';
 import {
+  type POItem as ApiPOItem,
   type PurchaseOrder as ApiPurchaseOrder,
   type CreatePurchaseOrderRequest,
-  type UpdatePurchaseOrderRequest,
-  type UpdatePOStatusRequest,
-  type POStatusHistory,
   type POStatus,
+  type POStatusHistory,
+  type UpdatePOStatusRequest,
+  type UpdatePurchaseOrderRequest,
 } from '@/lib/api/schemas/sales.schemas';
+
 import type { DeliveryStatus, PICType } from './deliveryRequest';
 
 // Re-export types for compatibility
-export type { POStatus, POItem, UpdatePOStatusRequest } from '@/lib/api/schemas/sales.schemas';
+export type { POStatus, UpdatePOStatusRequest } from '@/lib/api/schemas/sales.schemas';
 
-export type PurchaseOrder = Omit<ApiPurchaseOrder, 'metadata'> & {
+export type POItem = Omit<ApiPOItem, 'metadata'> & {
+  notes: string;
+  unit: string;
+  productId: string;
+};
+
+export type PurchaseOrder = Omit<ApiPurchaseOrder, 'metadata' | 'items'> & {
+  items: POItem[];
   address?: string;
   googleMapsUrl?: string;
   statusHistory?: POStatusHistory[];
@@ -40,6 +49,12 @@ function transformApiToFrontend(apiPO: ApiPurchaseOrder): Omit<PurchaseOrder, 'c
     googleMapsUrl: metadata?.shippingAddress?.googleMapsUrl,
     statusHistory: metadata?.statusHistory,
     deliveryRequest: metadata?.deliveryRequest,
+    items: apiPO.items.map(({ metadata, ...item }) => ({
+      ...item,
+      notes: metadata.notes ?? '',
+      unit: metadata.unit ?? '',
+      productId: metadata.productId ?? '',
+    })),
   };
 }
 
@@ -107,27 +122,21 @@ export const purchaseOrderService = {
     const response = await salesApi.getPurchaseOrders(apiParams);
 
     return {
-      purchaseOrders: response.purchaseOrders.map(transformApiToFrontend),
+      purchaseOrders: response.purchaseOrders.map((po) => transformApiToFrontend(po)),
       pagination: response.pagination,
     };
   },
 
   async getPOById(id: string): Promise<PurchaseOrder | undefined> {
-    try {
-      const po = await salesApi.getPurchaseOrderById(id);
-      return po ? transformApiToFrontend(po) : undefined;
-    } catch {
-      return undefined;
-    }
+    const po = await salesApi.getPurchaseOrderById(id);
+    return po ? transformApiToFrontend(po) : undefined;
   },
 
   async createPO(
-    data: Omit<CreatePurchaseOrderRequest, 'orderDate' | 'deliveryDate' | 'completedDate'> & {
-      address?: string;
-      googleMapsUrl?: string;
-      orderDate?: Date;
-      deliveryDate?: Date;
-    },
+    data: Omit<
+      PurchaseOrder,
+      'id' | 'status' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber'
+    >,
   ): Promise<void> {
     const createRequest: CreatePurchaseOrderRequest = {
       customerId: data.customerId,
@@ -139,6 +148,11 @@ export const purchaseOrderService = {
         color: item.color,
         quantity: item.quantity,
         category: item.category,
+        metadata: {
+          productId: item.productId,
+          notes: item.notes,
+          unit: item.unit,
+        },
       })),
       notes: data.notes,
       metadata: {
@@ -153,9 +167,20 @@ export const purchaseOrderService = {
   },
 
   async updatePO(id: string, data: Partial<PurchaseOrder>): Promise<void> {
+    if (!data.items) {
+      throw new Error('Items are required');
+    }
+
     const updateRequest: UpdatePurchaseOrderRequest = {
       status: data.status,
-      items: data.items,
+      items: data.items.map(({ productId, notes, unit, ...item }) => ({
+        ...item,
+        metadata: {
+          productId,
+          notes,
+          unit,
+        },
+      })),
       orderDate:
         data.orderDate instanceof Date
           ? data.orderDate.toISOString()

@@ -1,5 +1,6 @@
+import { type ErrorType, useErrorStore } from '@/stores/error';
+
 import { isDevelopment, isProduction } from './env';
-import { useErrorStore, type ErrorType } from '@/stores/error';
 
 type ErrorEventDetails = {
   message: string;

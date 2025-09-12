@@ -1,8 +1,10 @@
-import { Card, Stack, Text, Textarea, TextInput, Group } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
+import { Card, Group, Stack, Text, Textarea, TextInput } from '@mantine/core';
+
+import { ViewOnMap } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
-import { ViewOnMap } from '@/components/common';
+
+import type { UseFormReturnType } from '@mantine/form';
 
 type POFormAddressSectionProps = {
   readonly form: UseFormReturnType<any>;

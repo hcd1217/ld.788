@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Container, LoadingOverlay } from '@mantine/core';
+
 import { ErrorAlert } from '../feedback';
 
 type AppDesktopLayoutProps = {

@@ -1,10 +1,13 @@
 import { useState } from 'react';
+
 import { Outlet } from 'react-router';
+
 import { Center, Loader } from '@mantine/core';
-import { useAppStore } from '@/stores/useAppStore';
+
 import { PWAInstallPrompt, SafariPWAGuide } from '@/components/common';
 import { RouteChangeProvider } from '@/components/providers/RouteChangeProvider';
 import { useOnce } from '@/hooks/useOnce';
+import { useAppStore } from '@/stores/useAppStore';
 
 const debug = true;
 

@@ -1,5 +1,6 @@
 import { ROUTERS } from '@/config/routeConfig';
-import { POListPage, POCreatePage, PODetailPage, EditPOPage } from './components';
+
+import { EditPOPage, POCreatePage, PODetailPage, POListPage } from './components';
 
 export const salesRouteObjects = [
   { path: ROUTERS.PO_MANAGEMENT, Component: POListPage },

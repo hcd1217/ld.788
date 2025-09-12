@@ -1,4 +1,5 @@
-import { Card, Stack, Title, Table, Text, Group, Badge } from '@mantine/core';
+import { Badge, Card, Group, Stack, Table, Text, Title } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 
@@ -22,20 +23,29 @@ export function POItemsList({ purchaseOrder }: POItemsListProps) {
         <Table withTableBorder withColumnBorders aria-label={t('po.itemsTableAriaLabel')}>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>{t('po.productCode')}</Table.Th>
+              <Table.Th>{t('common.tableDisplayOrder')}</Table.Th>
+              <Table.Th>{t('product.productCode')}</Table.Th>
               <Table.Th>{t('po.description')}</Table.Th>
-              <Table.Th>{t('po.category')}</Table.Th>
+              <Table.Th>{t('product.unit')}</Table.Th>
+              <Table.Th>{t('product.category')}</Table.Th>
               <Table.Th style={{ textAlign: 'center' }}>{t('po.quantity')}</Table.Th>
+              <Table.Th>{t('common.notes')}</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {purchaseOrder.items.map((item) => (
+            {purchaseOrder.items.map((item, index) => (
               <Table.Tr key={item.id}>
+                <Table.Td>
+                  <Text>{index + 1}</Text>
+                </Table.Td>
                 <Table.Td>
                   <Text fw={500}>{item.productCode}</Text>
                 </Table.Td>
                 <Table.Td>
                   <Text>{item.description}</Text>
+                </Table.Td>
+                <Table.Td>
+                  <Text>{item.unit}</Text>
                 </Table.Td>
                 <Table.Td>
                   {item.category ? (
@@ -50,6 +60,9 @@ export function POItemsList({ purchaseOrder }: POItemsListProps) {
                 </Table.Td>
                 <Table.Td style={{ textAlign: 'center' }}>
                   <Text>{item.quantity}</Text>
+                </Table.Td>
+                <Table.Td>
+                  <Text>{item.notes || '-'}</Text>
                 </Table.Td>
               </Table.Tr>
             ))}

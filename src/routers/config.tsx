@@ -1,4 +1,5 @@
 import { ROUTERS } from '@/config/routeConfig';
+
 import { CustomerConfigPage, PCOnlyLayout, ProductConfigPage } from './components';
 
 export const configRouteObjects = [

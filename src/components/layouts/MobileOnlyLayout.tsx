@@ -1,20 +1,22 @@
+import { Outlet, useNavigate } from 'react-router';
+
 import {
   Anchor,
   Box,
   Center,
   Container,
   Group,
+  Paper,
   rem,
   Stack,
-  Paper,
-  Title,
   Text,
+  Title,
 } from '@mantine/core';
 import { IconArrowLeft, IconDeviceMobile } from '@tabler/icons-react';
-import { Outlet, useNavigate } from 'react-router';
-import { useTranslation } from '@/hooks/useTranslation';
+
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useIsDarkMode } from '@/hooks/useIsDarkMode';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function MobileOnlyLayout() {
   const navigate = useNavigate();

@@ -1,5 +1,7 @@
-import { Button, Stack, Text, Title } from '@mantine/core';
 import { type ReactElement } from 'react';
+
+import { Button, Stack, Text, Title } from '@mantine/core';
+
 import { AuthHeader } from './AuthHeader';
 
 type AuthSuccessStateProps = {

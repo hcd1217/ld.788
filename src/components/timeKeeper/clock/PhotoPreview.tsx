@@ -1,5 +1,5 @@
-import { Box, Image, Stack, Text, Progress, Group, Button } from '@mantine/core';
-import { IconRefresh, IconCheck } from '@tabler/icons-react';
+import { Box, Button, Group, Image, Progress, Stack, Text } from '@mantine/core';
+import { IconCheck, IconRefresh } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
 interface PhotoPreviewProps {

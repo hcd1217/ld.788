@@ -1,19 +1,20 @@
-import { Stack, Group, Text } from '@mantine/core';
+import { Group, Stack, Text } from '@mantine/core';
 import {
-  IconFileInvoice,
   IconCheck,
+  IconFileInvoice,
   IconPackage,
-  IconTruck,
   IconPackageExport,
-  IconX,
   IconReceipt,
+  IconTruck,
+  IconX,
 } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { formatDateTime } from '@/utils/time';
-import { getEmployeeNameByUserId } from '@/utils/overview';
+import type { POStatus, PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { useEmployeeMapByUserId } from '@/stores/useAppStore';
+import { getEmployeeNameByUserId } from '@/utils/overview';
 import { getStatusHistoryByStatus } from '@/utils/purchaseOrder';
-import type { PurchaseOrder, POStatus } from '@/services/sales/purchaseOrder';
+import { formatDateTime } from '@/utils/time';
 
 // Status history display configuration
 const STATUS_HISTORY_CONFIG = [

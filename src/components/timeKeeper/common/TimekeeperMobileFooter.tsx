@@ -1,9 +1,12 @@
-import { useNavigate, useLocation } from 'react-router';
-import { IconHome, IconClock, IconBriefcase, IconMenu2 } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
 import { useMemo } from 'react';
+
+import { useLocation, useNavigate } from 'react-router';
+
+import { IconBriefcase, IconClock, IconHome, IconMenu2 } from '@tabler/icons-react';
+
 import { BaseMobileFooter, type BaseMobileFooterItem } from '@/components/common';
 import { ROUTERS } from '@/config/routeConfig';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function TimekeeperMobileFooter() {
   const navigate = useNavigate();

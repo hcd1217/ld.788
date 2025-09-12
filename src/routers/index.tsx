@@ -1,23 +1,25 @@
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
-import { ResponsiveAuthLayout } from '@/components/layouts/ResponsiveAuthLayout';
+
 import { AppLayout } from '@/components/layouts/AppLayout';
 import { ProtectedRoute } from '@/components/layouts/ProtectedRoute';
+import { ResponsiveAuthLayout } from '@/components/layouts/ResponsiveAuthLayout';
 import { ROUTERS } from '@/config/routeConfig';
+
+import { appRouteObjects } from './app';
+import { authRouteObjects } from './auth';
 import {
-  TimekeeperDashboardPage,
-  ServiceLayout,
-  NotFound,
+  ClockManagementPage,
   HomePage,
   MobileOnlyLayout,
-  ClockManagementPage,
   MyTimesheetPage,
+  NotFound,
+  ServiceLayout,
+  TimekeeperDashboardPage,
 } from './components';
-import { authRouteObjects } from './auth';
 import { configRouteObjects } from './config';
-import { salesRouteObjects } from './sales';
 import { deliveryRouteObjects } from './delivery';
-import { appRouteObjects } from './app';
 import { managementRouteObjects } from './management';
+import { salesRouteObjects } from './sales';
 
 // Type for route with theme metadata
 export type ThemeRouteObject = RouteObject & {

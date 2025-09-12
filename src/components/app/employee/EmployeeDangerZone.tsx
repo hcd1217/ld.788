@@ -1,13 +1,14 @@
-import { Card, Stack, Group, Title, Divider, Paper, Box, Text, Button } from '@mantine/core';
+import { Box, Button, Card, Divider, Group, Paper, Stack, Text, Title } from '@mantine/core';
 import {
   IconAlertTriangle,
-  IconUserOff,
-  IconUserCheck,
-  IconTrash,
   IconLock,
+  IconTrash,
+  IconUserCheck,
+  IconUserOff,
 } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
+
 import { useDeviceType } from '@/hooks/useDeviceType';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
 
 type EmployeeDangerZoneProps = {

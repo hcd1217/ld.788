@@ -1,4 +1,5 @@
-import { Switch, Group, Text } from '@mantine/core';
+import { Group, Switch, Text } from '@mantine/core';
+
 import { usePWA } from '@/hooks/usePWA';
 import { useTranslation } from '@/hooks/useTranslation';
 

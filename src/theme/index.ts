@@ -1,12 +1,13 @@
 import {
   Button,
   createTheme,
+  type CSSVariablesResolver,
   PasswordInput,
   rem,
   TextInput,
-  type CSSVariablesResolver,
 } from '@mantine/core';
-import { themeConfig, type CustomColors } from './customTheme';
+
+import { type CustomColors, themeConfig } from './customTheme';
 
 /**
  * Get Mantine theme configuration for a specific theme
@@ -20,7 +21,7 @@ export function getMantineTheme(themeName: string) {
     colors: {
       brand: config.brandColors,
     },
-    // Cspell:words Noto Consolas
+    // cspell:words Noto Consolas
     fontFamily:
       '"Noto Sans", Consolas, Monaco, "Courier New", monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
     headings: {

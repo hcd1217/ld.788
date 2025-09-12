@@ -1,5 +1,7 @@
 import { type ReactNode } from 'react';
-import { Paper, LoadingOverlay, Transition, Stack } from '@mantine/core';
+
+import { LoadingOverlay, Paper, Stack, Transition } from '@mantine/core';
+
 import { useDeviceType } from '@/hooks/useDeviceType';
 
 type FormContainerProps = {

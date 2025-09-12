@@ -1,5 +1,6 @@
 import * as z from 'zod/v4';
-import { idSchema, type ClientPublicConfigSchema } from './common.schemas';
+
+import { type ClientPublicConfigSchema, idSchema } from './common.schemas';
 
 export const SetPasswordForUserRequestSchema = z.object({
   userId: idSchema,

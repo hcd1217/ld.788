@@ -1,6 +1,7 @@
 import { Tooltip } from '@mantine/core';
 import { ActionIcon } from '@mantine/core';
 import { IconExternalLink } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
 
 type ViewOnMapProps = {

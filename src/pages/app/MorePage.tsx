@@ -1,22 +1,25 @@
-import { Text, Card, Stack, Group, Button, Divider, rem, Box } from '@mantine/core';
+import { useCallback, useMemo } from 'react';
+
+import { Navigate, useNavigate } from 'react-router';
+
+import { Box, Button, Card, Divider, Group, rem, Stack, Text } from '@mantine/core';
 import {
   IconBell,
-  IconUser,
+  IconClock,
   IconExternalLink,
   IconLogout,
-  IconUsersGroup,
-  IconClock,
   IconPackage,
   IconSettings,
+  IconUser,
+  IconUsersGroup,
 } from '@tabler/icons-react';
-import { Navigate, useNavigate } from 'react-router';
+
+import { AppMobileLayout } from '@/components/common';
+import { ROUTERS } from '@/config/routeConfig';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/stores/useAppStore';
-import { ROUTERS } from '@/config/routeConfig';
-import { useCallback, useMemo } from 'react';
 import { isDevelopment } from '@/utils/env';
-import { useDeviceType } from '@/hooks/useDeviceType';
-import { AppMobileLayout } from '@/components/common';
 
 export function MorePage() {
   const navigate = useNavigate();

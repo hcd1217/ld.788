@@ -1,4 +1,5 @@
 import { Group, Title } from '@mantine/core';
+
 import { useLogoAndTitle } from '@/hooks/useLogoAndTitle';
 
 type AuthHeaderProps = {

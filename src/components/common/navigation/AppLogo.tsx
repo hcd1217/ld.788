@@ -1,5 +1,7 @@
-import { type MantineStyleProps, Group, Title, Box } from '@mantine/core';
 import { useNavigate } from 'react-router';
+
+import { Box, Group, type MantineStyleProps, Title } from '@mantine/core';
+
 import { useLogoAndTitle } from '@/hooks/useLogoAndTitle';
 
 type AppLogoProps = {

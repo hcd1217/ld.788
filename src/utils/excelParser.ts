@@ -9,7 +9,7 @@ export type BulkCustomer = {
   googleMapsUrl?: string;
   taxCode?: string;
 };
-// Cspell:disable
+// cspell:disable
 export const parseCustomerExcelFile = async (file: File): Promise<BulkCustomer[]> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

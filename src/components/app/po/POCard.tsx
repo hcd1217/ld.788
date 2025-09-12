@@ -1,13 +1,16 @@
 import { useCallback } from 'react';
-import { Card, Group, Box, Text, Badge, type MantineStyleProp } from '@mantine/core';
+
 import { useNavigate } from 'react-router';
-import { useTranslation } from '@/hooks/useTranslation';
-import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+
+import { Badge, Box, Card, Group, type MantineStyleProp, Text } from '@mantine/core';
+
 import { getPODetailRoute } from '@/config/routeConfig';
 import { PO_STATUS_COLORS } from '@/constants/purchaseOrder';
-import { formatDate } from '@/utils/time';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
+import { getCustomerNameByCustomerId } from '@/utils/overview';
+import { formatDate } from '@/utils/time';
 
 type POCardProps = {
   readonly purchaseOrder: PurchaseOrder;

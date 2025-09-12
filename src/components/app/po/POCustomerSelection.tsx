@@ -1,6 +1,8 @@
-import { Select, Stack, Text, Card } from '@mantine/core';
+import { Card, Select, Stack, Text } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
+
 import type { UseFormReturnType } from '@mantine/form';
 
 type POCustomerSelectionProps = {

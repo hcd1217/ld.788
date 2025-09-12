@@ -1,27 +1,42 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
+
 import {
-  Table,
-  TextInput,
-  NumberInput,
   ActionIcon,
-  Button,
   Box,
-  Stack,
+  Button,
   Card,
-  Title,
+  NumberInput,
+  Stack,
+  Table,
   Text,
+  TextInput,
+  Title,
 } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
+import type { POItem } from '@/services/sales/purchaseOrder';
 import { showErrorNotification } from '@/utils/notifications';
-import { POProductSearch } from './POProductSearch';
 import { createPOItem } from '@/utils/poItemUtils';
-import type { POItem } from '@/lib/api/schemas/sales.schemas';
+
+import { POProductSearch } from './POProductSearch';
 
 type POItemsEditorDesktopProps = {
   readonly items: POItem[];
   readonly onChange: (items: POItem[]) => void;
   readonly isReadOnly?: boolean;
+};
+
+type NewItem = Omit<POItem, 'id' | 'purchaseOrderId'>;
+
+const DEFAULT_NEW_ITEM: Omit<POItem, 'id' | 'purchaseOrderId'> = {
+  productCode: '',
+  description: '',
+  quantity: 1,
+  category: '',
+  notes: '',
+  unit: '',
+  productId: '',
 };
 
 export function POItemsEditorDesktop({
@@ -31,11 +46,8 @@ export function POItemsEditorDesktop({
 }: POItemsEditorDesktopProps) {
   const { t } = useTranslation();
 
-  const [newItem, setNewItem] = useState<Partial<POItem>>({
-    productCode: '',
-    description: '',
-    quantity: 1,
-    category: '',
+  const [newItem, setNewItem] = useState<NewItem>({
+    ...DEFAULT_NEW_ITEM,
   });
 
   const handleAddItem = useCallback(() => {
@@ -50,12 +62,7 @@ export function POItemsEditorDesktop({
       onChange([...items, result.item]);
 
       // Reset form
-      setNewItem({
-        productCode: '',
-        description: '',
-        quantity: 1,
-        category: '',
-      });
+      setNewItem({ ...DEFAULT_NEW_ITEM });
       return result.item;
     }
 
@@ -84,7 +91,7 @@ export function POItemsEditorDesktop({
   );
 
   const handleProductSelection = useCallback(
-    (itemId: string | 'new', product: { code: string; name: string } | null) => {
+    (itemId: string | 'new', product?: { code: string; unit: string; name: string }) => {
       if (!product) return;
 
       if (itemId === 'new') {
@@ -92,6 +99,7 @@ export function POItemsEditorDesktop({
           ...newItem,
           productCode: product.code,
           description: product.name,
+          unit: product.unit || '',
           category: newItem.category || '',
         });
       } else {
@@ -135,6 +143,11 @@ export function POItemsEditorDesktop({
                   setNewItem({ ...newItem, quantity: typeof value === 'number' ? value : 1 })
                 }
               />
+              <TextInput
+                placeholder={t('common.notes')}
+                value={newItem.notes || ''}
+                onChange={(e) => setNewItem({ ...newItem, notes: e.target.value })}
+              />
               <Button
                 leftSection={<IconPlus size={16} />}
                 onClick={handleAddItem}
@@ -166,6 +179,7 @@ export function POItemsEditorDesktop({
                 <Table.Th style={{ width: 200 }}>{t('po.productCode')}</Table.Th>
                 <Table.Th style={{ minWidth: 200 }}>{t('po.description')}</Table.Th>
                 <Table.Th style={{ width: 80 }}>{t('po.quantity')}</Table.Th>
+                <Table.Th style={{ width: 300 }}>{t('common.notes')}</Table.Th>
                 {!isReadOnly && <Table.Th style={{ width: 60 }}>{t('common.actions')}</Table.Th>}
               </Table.Tr>
             </Table.Thead>
@@ -209,6 +223,19 @@ export function POItemsEditorDesktop({
                       />
                     )}
                   </Table.Td>
+                  <Table.Td>
+                    {isReadOnly ? (
+                      <Text size="sm" ta="center">
+                        {item.notes}
+                      </Text>
+                    ) : (
+                      <TextInput
+                        value={item.notes}
+                        onChange={(e) => handleUpdateItem(item.id, 'notes', e.target.value)}
+                        size="xs"
+                      />
+                    )}
+                  </Table.Td>
                   {!isReadOnly && (
                     <Table.Td>
                       <ActionIcon
@@ -248,6 +275,14 @@ export function POItemsEditorDesktop({
                       onChange={(value) =>
                         setNewItem({ ...newItem, quantity: typeof value === 'number' ? value : 1 })
                       }
+                      size="xs"
+                    />
+                  </Table.Td>
+                  <Table.Td>
+                    <TextInput
+                      placeholder={t('common.notes')}
+                      value={newItem.notes || ''}
+                      onChange={(e) => setNewItem({ ...newItem, notes: e.target.value })}
                       size="xs"
                     />
                   </Table.Td>

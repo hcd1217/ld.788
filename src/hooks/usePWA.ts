@@ -1,10 +1,12 @@
-import { useRegisterSW } from 'virtual:pwa-register/react';
-import { useEffect, useRef, useCallback } from 'react';
-import { notifications } from '@mantine/notifications';
+import { useCallback, useEffect, useRef } from 'react';
+
 import { useLocalStorage } from '@mantine/hooks';
-import { showSuccessNotification } from '@/utils/notifications';
+import { notifications } from '@mantine/notifications';
+import { useRegisterSW } from 'virtual:pwa-register/react';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import { logError } from '@/utils/logger';
+import { showSuccessNotification } from '@/utils/notifications';
 
 // Browser detection utilities
 const isChromium = () => {

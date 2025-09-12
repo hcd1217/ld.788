@@ -1,9 +1,11 @@
 import { Box } from '@mantine/core';
-import type { TimesheetEntry } from '@/types/timekeeper';
-import { MyTimesheetWeekSummary } from './MyTimesheetWeekSummary';
+
 import { useTimesheetWeekLogic } from '@/hooks/useTimesheetWeekLogic';
-import { TimesheetWeekNavigation } from './TimesheetWeekNavigation';
+import type { TimesheetEntry } from '@/types/timekeeper';
+
+import { MyTimesheetWeekSummary } from './MyTimesheetWeekSummary';
 import { TimesheetDayCardsList } from './TimesheetDayCardsList';
+import { TimesheetWeekNavigation } from './TimesheetWeekNavigation';
 
 interface MyTimesheetMobileProps {
   readonly currentWeek: Date;

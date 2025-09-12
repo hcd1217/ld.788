@@ -1,5 +1,7 @@
 import { type ReactNode } from 'react';
+
 import { Card, type CardProps } from '@mantine/core';
+
 import classes from './SelectableCard.module.css';
 
 export interface SelectableCardProps extends Omit<CardProps, 'onClick'> {

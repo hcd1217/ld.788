@@ -1,29 +1,31 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
 import {
-  Modal,
-  Drawer,
-  TextInput,
-  NumberInput,
-  Select,
   Autocomplete,
   Button,
+  Drawer,
   Group,
-  Stack,
+  Modal,
+  NumberInput,
   ScrollArea,
+  Select,
+  Stack,
+  TextInput,
 } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useDeviceType } from '@/hooks/useDeviceType';
-import { showErrorNotification } from '@/utils/notifications';
-import { PRODUCT_CATEGORIES } from '@/constants/purchaseOrder';
+
 import {
-  FOCUS_DELAY_MS,
   DRAWER_BODY_PADDING_BOTTOM,
   DRAWER_HEADER_PADDING,
   DRAWER_HEIGHT_CALC,
+  FOCUS_DELAY_MS,
 } from '@/constants/po.constants';
+import { PRODUCT_CATEGORIES } from '@/constants/purchaseOrder';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { POItem } from '@/services/sales/purchaseOrder';
 import { useAppStore } from '@/stores/useAppStore';
+import { showErrorNotification } from '@/utils/notifications';
 
 type POAddItemModalProps = {
   readonly opened: boolean;
@@ -106,6 +108,9 @@ export function POAddItemModal({ opened, onClose, onAdd, existingItems }: POAddI
       description,
       quantity,
       category: category || undefined,
+      notes: '',
+      unit: '',
+      productId: '',
     };
 
     onAdd(newItem);

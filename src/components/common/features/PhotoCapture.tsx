@@ -1,9 +1,11 @@
-import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
-import { Text, Button, Stack, Image, Group, Badge, Loader } from '@mantine/core';
-import { IconCamera, IconX, IconCheck, IconRotate } from '@tabler/icons-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import { Badge, Button, Group, Image, Loader, Stack, Text } from '@mantine/core';
+import { IconCamera, IconCheck, IconRotate, IconX } from '@tabler/icons-react';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { showErrorNotification } from '@/utils/notifications';
 import { logError } from '@/utils/logger';
+import { showErrorNotification } from '@/utils/notifications';
 
 export type PhotoConfig = {
   readonly quality?: number;

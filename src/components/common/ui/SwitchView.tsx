@@ -1,8 +1,10 @@
-import { Center, Box, SegmentedControl, type MantineBreakpoint } from '@mantine/core';
+import { Box, Center, type MantineBreakpoint, SegmentedControl } from '@mantine/core';
 import { IconLayoutGrid, IconTable } from '@tabler/icons-react';
-import { Tooltip } from './Tooltip';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import { VIEW_MODE, type ViewModeType } from '@/hooks/useViewMode';
+
+import { Tooltip } from './Tooltip';
 
 type SwitchViewProps = {
   readonly viewMode: ViewModeType;

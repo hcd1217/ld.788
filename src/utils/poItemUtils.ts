@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+
 import type { POItem } from '@/services/sales/purchaseOrder';
 
 /**
@@ -35,6 +36,9 @@ export const createPOItem = (
     quantity: itemData.quantity || 1,
     color: itemData.color,
     category: itemData.category,
+    notes: itemData.notes ?? '',
+    unit: itemData.unit ?? '',
+    productId: itemData.productId ?? '',
   };
 
   return { item };

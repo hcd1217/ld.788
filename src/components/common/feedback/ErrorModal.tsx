@@ -1,54 +1,56 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
 import {
-  Modal,
-  ScrollArea,
-  Stack,
-  Group,
-  Text,
+  ActionIcon,
+  Alert,
   Badge,
   Button,
-  ActionIcon,
-  Tooltip,
-  Paper,
+  Card,
   Code,
+  type DefaultMantineColor,
   Divider,
-  Title,
-  Alert,
-  TextInput,
+  Group,
+  Modal,
+  Paper,
+  RingProgress,
+  ScrollArea,
   Select,
+  SimpleGrid,
+  Stack,
   Switch,
   Tabs,
-  SimpleGrid,
-  Card,
-  RingProgress,
-  type DefaultMantineColor,
+  Text,
+  TextInput,
+  Title,
+  Tooltip,
 } from '@mantine/core';
 import {
-  IconX,
-  IconCopy,
-  IconTrash,
-  IconBug,
   IconAlertTriangle,
-  IconCheck,
-  IconSearch,
-  IconFilter,
-  IconDownload,
+  IconBug,
   IconChartBar,
-  IconSettings,
+  IconCheck,
+  IconCopy,
+  IconDownload,
+  IconFilter,
   IconList,
+  IconSearch,
+  IconSettings,
+  IconTrash,
+  IconX,
 } from '@tabler/icons-react';
+
+import {
+  type ErrorRecord,
+  type ErrorSeverity,
+  type ErrorType,
+  useErrorStore,
+} from '@/stores/error';
+import { isDevelopment, isProduction } from '@/utils/env';
 import {
   showErrorNotification,
   showInfoNotification,
   showSuccessNotification,
 } from '@/utils/notifications';
-import {
-  useErrorStore,
-  type ErrorRecord,
-  type ErrorSeverity,
-  type ErrorType,
-} from '@/stores/error';
-import { isDevelopment, isProduction } from '@/utils/env';
 
 type ErrorModalProps = {
   readonly isAutoOpen?: boolean;

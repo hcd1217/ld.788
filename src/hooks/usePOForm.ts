@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
+
 import { useTranslation } from '@/hooks/useTranslation';
-import { getBasicValidators } from '@/utils/validation';
 import type { POItem } from '@/services/sales/purchaseOrder';
-import { isDevelopment } from '@/utils/env';
+import { getBasicValidators } from '@/utils/validation';
 
 export type POFormValues = {
   customerId: string;
   items: POItem[];
   orderDate?: Date;
   deliveryDate?: Date;
-  shippingAddress: {
+  shippingAddress?: {
     oneLineAddress?: string;
     googleMapsUrl?: string;
   };
@@ -30,15 +30,6 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
       customerId: '',
       items: [],
       orderDate: new Date(new Date().setHours(0, 0, 0, 1)),
-      deliveryDate: undefined,
-      shippingAddress: {
-        // cspell:disable-next-line
-        oneLineAddress: isDevelopment ? '123 Main St, Anytown, USA' : undefined,
-        googleMapsUrl: isDevelopment
-          ? 'https://www.google.com/maps/place/123+Main+St,+Anytown,+USA'
-          : undefined,
-      },
-      notes: isDevelopment ? 'notes' : undefined,
     }),
     [],
   );

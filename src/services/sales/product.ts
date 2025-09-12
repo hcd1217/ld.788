@@ -1,11 +1,11 @@
 import { salesApi } from '@/lib/api';
 import {
-  type Product,
-  type ProductStatus,
-  type CreateProductRequest,
-  type UpdateProductRequest,
   type BulkUpsertProductsRequest,
   type BulkUpsertProductsResponse,
+  type CreateProductRequest,
+  type Product,
+  type ProductStatus,
+  type UpdateProductRequest,
 } from '@/lib/api/schemas/sales.schemas';
 
 // Re-export types for compatibility

@@ -1,4 +1,5 @@
 import { Badge, type BadgeVariant } from '@mantine/core';
+
 import { useTranslation } from '@/hooks/useTranslation';
 
 type ActiveBadgeProps = {

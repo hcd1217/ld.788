@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+
 import { useLocation } from 'react-router';
 
 export interface RouteChangeHandler {
