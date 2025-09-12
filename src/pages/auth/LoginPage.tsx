@@ -97,7 +97,7 @@ export function LoginPage() {
   return (
     <GuestLayout>
       <FormContainer isLoading={isLoading} mounted={mounted}>
-        <AuthHeader title={t('auth.title')} />
+        <AuthHeader />
         <Space h="lg" />
         <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap="lg">
@@ -133,7 +133,6 @@ export function LoginPage() {
             </Button>
           </Stack>
         </form>
-
         <Stack gap="md" mt="xl">
           <Divider
             label={

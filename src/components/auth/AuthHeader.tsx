@@ -6,10 +6,11 @@ type AuthHeaderProps = {
   readonly title?: string;
 };
 
+// Use environment variable as default fallback
+const defaultAppName = import.meta.env.VITE_APP_NAME || 'CMngt';
+
 export function AuthHeader({ title: pageTitle }: AuthHeaderProps) {
   const { logoUrl, title } = useLogoAndTitle({ color: true });
-  // Use environment variable as default fallback
-  const defaultAppName = import.meta.env.VITE_APP_NAME || 'Credo';
   return (
     <Group justify="center" gap="md" mb="lg">
       <img
