@@ -32,12 +32,7 @@ function useNavigationItems(isMobile = false) {
       );
     }
 
-    return getNavigationItems(
-      user?.clientConfig?.navigation,
-      t,
-      userRoles,
-      navigationOverrides,
-    );
+    return getNavigationItems(user?.clientConfig?.navigation, t, userRoles, navigationOverrides);
   }, [user, t, isMobile]);
 
   return {

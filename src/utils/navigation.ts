@@ -83,10 +83,10 @@ export function getNavigationItems(
   if (backendNav?.length) {
     // Apply role-based access control if user roles are provided
     let processedNav = userRoles ? applyRoleBasedAccess(backendNav, userRoles) : backendNav;
-    
+
     // Apply navigation overrides after role-based access
     processedNav = applyNavigationOverrides(processedNav, navigationOverrides);
-    
+
     return transformBackendNavigation(processedNav, t);
   }
 
@@ -254,10 +254,10 @@ export function getMobileNavigationItems(
     let processedNav = userRoles
       ? applyRoleBasedAccess(backendMobileNav, userRoles)
       : backendMobileNav;
-    
+
     // Apply navigation overrides after role-based access
     processedNav = applyNavigationOverrides(processedNav, navigationOverrides);
-    
+
     return transformBackendNavigation(processedNav, t);
   }
 

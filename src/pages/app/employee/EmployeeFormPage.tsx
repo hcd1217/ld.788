@@ -14,7 +14,7 @@ import { useOnce } from '@/hooks/useOnce';
 import { useSWRAction } from '@/hooks/useSWRAction';
 import { useTranslation } from '@/hooks/useTranslation';
 import { employeeService } from '@/services/hr/employee';
-import { useAppStore, usePermissions } from '@/stores/useAppStore';
+import { useAppStore, useClientConfig, usePermissions } from '@/stores/useAppStore';
 import { useHrActions, useHrError, useHrLoading } from '@/stores/useHrStore';
 import {
   generateSampleExcel,
@@ -45,6 +45,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
   const error = useHrError();
   const { clearError, addEmployee, addBulkEmployees } = useHrActions();
   const { overviewData } = useAppStore();
+  const clientConfig = useClientConfig();
 
   // Mode-specific state
   const isEditMode = mode === 'edit';
@@ -362,7 +363,10 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
       isMobile={isMobile}
     >
       {isMobile || isEditMode ? (
-        <SingleEmployeeForm {...formProps} />
+        <SingleEmployeeForm
+          {...formProps}
+          hasWorkType={clientConfig.features?.employee?.workType ?? false}
+        />
       ) : (
         <Tabs
           value={activeTab}
@@ -382,7 +386,10 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
           </Tabs.List>
 
           <Tabs.Panel value="single" pt="xl">
-            <SingleEmployeeForm {...formProps} />
+            <SingleEmployeeForm
+              {...formProps}
+              hasWorkType={clientConfig.features?.employee?.workType ?? false}
+            />
           </Tabs.Panel>
 
           <Tabs.Panel value="bulk" pt="xl">

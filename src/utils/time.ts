@@ -28,27 +28,18 @@ export function getLocaleFormat(language: string): string {
  * @param options - Intl.DateTimeFormat options
  * @returns Formatted date string
  */
-export function formatDate(
-  date: Date | string | undefined,
-  locale?: string,
-  options?: Intl.DateTimeFormatOptions,
-): string {
+export function formatDate(date: Date | string | undefined): string {
   if (!date) {
     return '-';
   }
 
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
-  const defaultOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-  };
+  const year = dateObj.getFullYear();
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+  const day = dateObj.getDate().toString().padStart(2, '0');
 
-  return new Intl.DateTimeFormat(locale || 'vi-VN', {
-    ...defaultOptions,
-    ...options,
-  }).format(dateObj);
+  return `${year}-${month}-${day}`;
 }
 
 /**
@@ -58,29 +49,20 @@ export function formatDate(
  * @param options - Intl.DateTimeFormat options
  * @returns Formatted date string with time
  */
-export function formatDateTime(
-  date: Date | string | undefined,
-  locale?: string,
-  options?: Intl.DateTimeFormatOptions,
-): string {
+export function formatDateTime(date: Date | string | undefined): string {
   if (!date) {
     return '-';
   }
 
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
-  const defaultOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  };
+  const year = dateObj.getFullYear();
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+  const day = dateObj.getDate().toString().padStart(2, '0');
+  const hour = dateObj.getHours().toString().padStart(2, '0');
+  const minute = dateObj.getMinutes().toString().padStart(2, '0');
 
-  return new Intl.DateTimeFormat(locale || 'vi-VN', {
-    ...defaultOptions,
-    ...options,
-  }).format(dateObj);
+  return `${year}-${month}-${day} ${hour}:${minute}`;
 }
 
 export type EndDateStatus = 'none' | 'ending_soon' | 'ended_but_active';

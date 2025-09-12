@@ -104,7 +104,7 @@ export function POAccordionInfoPanel({
           </Text>
           <Group gap="xs">
             <IconCalendar size={14} color="var(--mantine-color-gray-6)" />
-            <Text size="sm">{formatDateTime(purchaseOrder.orderDate)}</Text>
+            <Text size="sm">{formatDate(purchaseOrder.orderDate)}</Text>
           </Group>
         </Grid.Col>
         <Grid.Col span={6}>

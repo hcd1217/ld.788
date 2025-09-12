@@ -9,7 +9,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
 import { getEmployeeNameByEmployeeId } from '@/utils/overview';
-import { formatDate, getLocaleFormat } from '@/utils/time';
+import { formatDate } from '@/utils/time';
 
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 
@@ -22,7 +22,7 @@ type DeliveryCardProps = {
 };
 
 export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCardProps) {
-  const { t, currentLanguage } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
 
@@ -69,7 +69,7 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
               {t('delivery.scheduledDate')}:
             </Text>
             <Text size="sm" fw={500}>
-              {formatDate(deliveryRequest.scheduledDate, getLocaleFormat(currentLanguage))}
+              {formatDate(deliveryRequest.scheduledDate)}
             </Text>
           </Group>
 

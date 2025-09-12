@@ -8,7 +8,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
-import { formatDateTime } from '@/utils/time';
+import { formatDate } from '@/utils/time';
 
 import { POStatusBadge } from './POStatusBadge';
 
@@ -69,7 +69,7 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
                   {t('po.orderDate')}
                 </Text>
                 <Text size="sm" fw={500}>
-                  {formatDateTime(purchaseOrder.orderDate)}
+                  {formatDate(purchaseOrder.orderDate)}
                 </Text>
               </div>
               <div>
@@ -77,7 +77,7 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
                   {t('po.deliveryDate')}
                 </Text>
                 <Text size="sm" fw={500}>
-                  {formatDateTime(purchaseOrder.deliveryRequest?.scheduledDate)}
+                  {formatDate(purchaseOrder.deliveryRequest?.scheduledDate)}
                 </Text>
               </div>
             </Group>

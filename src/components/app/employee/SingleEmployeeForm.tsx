@@ -44,6 +44,7 @@ type SingleEmployeeFormProps = {
   readonly isLoading: boolean;
   readonly showAlert: boolean;
   readonly error?: string;
+  readonly hasWorkType: boolean;
   readonly onSubmit: (values: SingleEmployeeFormValues) => void;
   readonly onCancel: () => void;
   readonly setShowAlert: (show: boolean) => void;
@@ -56,6 +57,7 @@ export function SingleEmployeeForm({
   isLoading,
   showAlert,
   error,
+  hasWorkType,
   onSubmit,
   onCancel,
   setShowAlert,
@@ -116,62 +118,67 @@ export function SingleEmployeeForm({
             leftSection={<IconPhone size={16} />}
             {...form.getInputProps('phone')}
           />
-          <Stack gap="xs">
-            <Text size="sm" fw={500}>
-              {t('employee.workType')}
-            </Text>
-            <SegmentedControl
-              data={[
-                { label: t('employee.fullTime'), value: 'FULL_TIME' },
-                { label: t('employee.partTime'), value: 'PART_TIME' },
-              ]}
-              {...form.getInputProps('workType')}
-            />
-          </Stack>
 
-          {form.values.workType === 'FULL_TIME' && (
-            <NumberInput
-              label={t('employee.monthlySalary')}
-              placeholder="12,000,000"
-              min={0}
-              step={1000000}
-              thousandSeparator=","
-              leftSection="₫"
-              {...form.getInputProps('monthlySalary')}
-            />
+          {hasWorkType && (
+            <>
+              <Stack gap="xs">
+                <Text size="sm" fw={500}>
+                  {t('employee.workType')}
+                </Text>
+                <SegmentedControl
+                  data={[
+                    { label: t('employee.fullTime'), value: 'FULL_TIME' },
+                    { label: t('employee.partTime'), value: 'PART_TIME' },
+                  ]}
+                  {...form.getInputProps('workType')}
+                />
+              </Stack>
+              {form.values.workType === 'FULL_TIME' && (
+                <NumberInput
+                  label={t('employee.monthlySalary')}
+                  placeholder="12,000,000"
+                  min={0}
+                  step={1000000}
+                  thousandSeparator=","
+                  leftSection="₫"
+                  {...form.getInputProps('monthlySalary')}
+                />
+              )}
+              {form.values.workType === 'PART_TIME' && (
+                <NumberInput
+                  label={t('employee.hourlyRate')}
+                  placeholder="25,000"
+                  min={0}
+                  step={1000}
+                  thousandSeparator=","
+                  leftSection="₫"
+                  {...form.getInputProps('hourlyRate')}
+                />
+              )}
+              <DateInput
+                label={t('employee.startDate')}
+                placeholder={t('employee.startDatePlaceholder')}
+                clearable
+                {...form.getInputProps('startDate')}
+              />
+              {isEditMode && (
+                <Switch
+                  label={t('employee.updateEndDate')}
+                  description={t('employee.updateEndDateDescription')}
+                  {...form.getInputProps('isEndDateEnabled', { type: 'checkbox' })}
+                />
+              )}
+              {isEditMode && form.values.isEndDateEnabled && (
+                <DateInput
+                  label={t('employee.endDate')}
+                  placeholder={t('employee.endDatePlaceholder')}
+                  clearable
+                  {...form.getInputProps('endDate')}
+                />
+              )}
+            </>
           )}
-          {form.values.workType === 'PART_TIME' && (
-            <NumberInput
-              label={t('employee.hourlyRate')}
-              placeholder="25,000"
-              min={0}
-              step={1000}
-              thousandSeparator=","
-              leftSection="₫"
-              {...form.getInputProps('hourlyRate')}
-            />
-          )}
-          <DateInput
-            label={t('employee.startDate')}
-            placeholder={t('employee.startDatePlaceholder')}
-            clearable
-            {...form.getInputProps('startDate')}
-          />
-          {isEditMode && (
-            <Switch
-              label={t('employee.updateEndDate')}
-              description={t('employee.updateEndDateDescription')}
-              {...form.getInputProps('isEndDateEnabled', { type: 'checkbox' })}
-            />
-          )}
-          {isEditMode && form.values.isEndDateEnabled && (
-            <DateInput
-              label={t('employee.endDate')}
-              placeholder={t('employee.endDatePlaceholder')}
-              clearable
-              {...form.getInputProps('endDate')}
-            />
-          )}
+
           <Group justify="flex-end">
             <Button variant="light" disabled={isLoading} onClick={onCancel}>
               {t('common.cancel')}

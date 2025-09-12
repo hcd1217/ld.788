@@ -8,7 +8,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
 import { getEmployeeNameByEmployeeId } from '@/utils/overview';
-import { formatDate, formatDateTime, getLocaleFormat } from '@/utils/time';
+import { formatDate, formatDateTime } from '@/utils/time';
 
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 
@@ -17,7 +17,7 @@ type DeliveryGridCardProps = {
 };
 
 export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
-  const { t, currentLanguage } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
 
@@ -75,7 +75,7 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
                   {t('delivery.scheduledDate')}
                 </Text>
                 <Text size="sm" fw={500}>
-                  {formatDate(deliveryRequest.scheduledDate, getLocaleFormat(currentLanguage))}
+                  {formatDate(deliveryRequest.scheduledDate)}
                 </Text>
               </div>
               {deliveryRequest.assignedTo && (
@@ -97,10 +97,7 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
                     {t('delivery.completedDate')}
                   </Text>
                   <Text size="sm" fw={500}>
-                    {formatDateTime(
-                      deliveryRequest.completedDate,
-                      getLocaleFormat(currentLanguage),
-                    )}
+                    {formatDateTime(deliveryRequest.completedDate)}
                   </Text>
                 </div>
               )}

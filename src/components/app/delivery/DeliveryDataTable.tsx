@@ -9,7 +9,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
 import { getEmployeeNameByEmployeeId } from '@/utils/overview';
-import { formatDate, getLocaleFormat } from '@/utils/time';
+import { formatDate } from '@/utils/time';
 
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 
@@ -23,7 +23,7 @@ function DeliveryDataTableComponent({
   deliveryRequests,
   noAction = false,
 }: DeliveryDataTableProps) {
-  const { t, currentLanguage } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
@@ -40,13 +40,6 @@ function DeliveryDataTableComponent({
   const handleStopPropagation = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
   }, []);
-
-  const fmtDate = useCallback(
-    (date: Date | string | undefined) => {
-      return formatDate(date, getLocaleFormat(currentLanguage));
-    },
-    [currentLanguage],
-  );
 
   return (
     <ScrollArea>
@@ -83,9 +76,9 @@ function DeliveryDataTableComponent({
                     <Text fw={400}>{delivery.customerName}</Text>
                   </Group>
                 </Table.Td>
-                <Table.Td>{fmtDate(delivery.scheduledDate)}</Table.Td>
+                <Table.Td>{formatDate(delivery.scheduledDate)}</Table.Td>
                 <Table.Td>
-                  {delivery.completedDate ? fmtDate(delivery.completedDate) : '-'}
+                  {delivery.completedDate ? formatDate(delivery.completedDate) : '-'}
                 </Table.Td>
                 <Table.Td>
                   <Text size="sm">
