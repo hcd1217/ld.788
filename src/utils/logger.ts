@@ -1,4 +1,4 @@
-import { isDevelopment } from './env';
+import { isDevelopment, isProduction } from './env';
 
 declare global {
   interface Console {
@@ -8,6 +8,31 @@ declare global {
 console.ignore = () => {
   // Do nothing
 };
+
+const colorMap = {
+  debug: 'green',
+  info: 'blue',
+  warn: '#f27a02',
+  error: 'red',
+};
+
+const fontSizeMap = {
+  debug: '15px',
+  info: '15px',
+  warn: '20px',
+  error: '36px',
+};
+
+const levelValueMap = {
+  none: 1000,
+  debug: 10,
+  info: 20,
+  warn: 30,
+  error: 40,
+  fatal: 50,
+} as const;
+
+const logLevel = isProduction ? levelValueMap['none'] : levelValueMap['debug'];
 
 export function registerLogger() {
   const debug = false;
@@ -22,25 +47,9 @@ export function registerLogger() {
   console.info = isDevelopment ? log.bind(null, 'info') : productionLog;
   console.debug = isDevelopment ? log.bind(null, 'debug') : productionLog;
 
-  const colorMap = {
-    debug: 'green',
-    info: 'blue',
-    warn: '#f27a02',
-    error: 'red',
-  };
-  const fontSizeMap = {
-    debug: '15px',
-    info: '15px',
-    warn: '20px',
-    error: '36px',
-  };
-
   function log(level: 'info' | 'warn' | 'error' | 'debug', message: unknown, ...args: unknown[]) {
-    if (level === 'debug') {
+    if (levelValueMap[level] < logLevel) {
       return;
-    }
-    if (level === 'info') {
-      // return;
     }
     const message_: string = [message, ...args]
       .map((arg) => {

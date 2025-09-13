@@ -1,6 +1,12 @@
 import * as z from 'zod/v4';
 
-import { ClientPublicConfigSchema, dictionarySchema, idSchema } from './common.schemas';
+import {
+  booleanSchema,
+  ClientPublicConfigSchema,
+  dictionarySchema,
+  idSchema,
+  optionalBooleanSchema,
+} from './common.schemas';
 import {
   DEFAULT_MOBILE_NAVIGATION_CONFIG,
   DEFAULT_NAVIGATION_CONFIG,
@@ -34,13 +40,14 @@ export const ClientConfigSchema = z.object({
         .partial(),
       employee: z
         .object({
-          workType: z.boolean(),
+          workType: booleanSchema,
+          forceSetPasswordOnFirstLogin: optionalBooleanSchema,
         })
         .partial(),
       customer: z
         .object({
-          noTaxCode: z.boolean().optional(),
-          noEmail: z.boolean().optional(),
+          noTaxCode: optionalBooleanSchema,
+          noEmail: optionalBooleanSchema,
         })
         .partial(),
     })

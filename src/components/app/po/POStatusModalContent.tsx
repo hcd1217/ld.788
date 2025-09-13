@@ -1,4 +1,4 @@
-import { Alert, Button, Group, Stack, Text } from '@mantine/core';
+import { Alert, Button, Group, LoadingOverlay, Stack, Text } from '@mantine/core';
 import { IconAlertTriangle } from '@tabler/icons-react';
 
 import { useTranslation } from '@/hooks/useTranslation';
@@ -15,6 +15,7 @@ type POStatusModalContentProps = {
   readonly mode: POModalMode;
   readonly config: ModalConfig;
   readonly purchaseOrder: PurchaseOrder;
+  readonly loading?: boolean;
   readonly reason: string;
   readonly setReason: (value: string) => void;
   readonly deliveryNotes: string;
@@ -32,6 +33,7 @@ export function POStatusModalContent({
   mode,
   config,
   purchaseOrder,
+  loading = false,
   reason,
   setReason,
   deliveryNotes,
@@ -48,7 +50,9 @@ export function POStatusModalContent({
   const customerMapByCustomerId = useCustomerMapByCustomerId();
 
   return (
-    <Stack gap="md">
+    <Stack gap="md" pos="relative">
+      <LoadingOverlay visible={loading} />
+
       <Alert icon={<IconAlertTriangle size={16} />} color={config.alertColor} variant="light">
         {config.description}
       </Alert>
@@ -90,14 +94,15 @@ export function POStatusModalContent({
       />
 
       <Group justify="flex-end">
-        <Button variant="outline" onClick={onClose}>
+        <Button variant="outline" onClick={onClose} disabled={loading}>
           {t('common.cancel')}
         </Button>
         <Button
           color={config.buttonColor}
           leftSection={config.icon}
           onClick={onConfirm}
-          disabled={isConfirmDisabled}
+          disabled={isConfirmDisabled || loading}
+          loading={loading}
         >
           {config.buttonText}
         </Button>

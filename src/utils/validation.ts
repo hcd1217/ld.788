@@ -28,7 +28,7 @@ export function validatePhone(value: string, t: TranslationFunction): string | u
   return undefined;
 }
 
-// Password validation
+// Password validation - complex requirements
 export function validatePassword(value: string, t: TranslationFunction): string | undefined {
   if (!value) return t('validation.passwordRequired');
   if (!VALIDATION_PATTERNS.password.test(value)) {
@@ -44,9 +44,9 @@ export function validateConfirmPassword(
   password: string,
   t: TranslationFunction,
 ): string | undefined {
-  if (!value) return t('validation.confirmPasswordRequired');
+  if (!value) return t('employee.confirmPassword');
   if (value !== password) {
-    return t('validation.passwordsDoNotMatch');
+    return t('validation.passwordMismatch');
   }
 
   return undefined;

@@ -3,6 +3,7 @@ import * as z from 'zod/v4';
 import {
   idSchema,
   numberSchema,
+  optionalBooleanSchema,
   optionalStringSchema,
   paginationSchema,
   stringSchema,
@@ -122,7 +123,7 @@ export const BulkUpsertProductItemSchema = z.object({
 
 export const BulkUpsertProductsRequestSchema = z.object({
   products: z.array(BulkUpsertProductItemSchema).min(1),
-  skipInvalid: z.boolean().optional().default(false),
+  skipInvalid: optionalBooleanSchema.default(false),
 });
 
 export const BulkUpsertProductsResponseSchema = z.object({

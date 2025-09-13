@@ -1,4 +1,4 @@
-import { logInfo } from '@/utils/logger';
+import { logDebug } from '@/utils/logger';
 
 import { isDevelopment } from './env';
 
@@ -111,7 +111,7 @@ class RouteTracker {
       ? ` (spent ${Math.round(transition.duration / 1000)}s on previous page)`
       : '';
 
-    logInfo(`${message}${details}`, {
+    logDebug(`${message}${details}`, {
       module: 'routeTracking',
       action: 'message',
     });

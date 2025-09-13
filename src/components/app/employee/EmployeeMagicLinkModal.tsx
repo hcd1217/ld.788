@@ -35,7 +35,10 @@ export function EmployeeMagicLinkModal({
 
       // Check if browser supports clipboard API for images
       if (!navigator.clipboard || !ClipboardItem) {
-        showErrorNotification(t('common.error'), t('employee.copyQrCodeNotSupported'));
+        showErrorNotification(
+          t('common.errors.notificationTitle'),
+          t('employee.copyQrCodeNotSupported'),
+        );
         return;
       }
 
@@ -59,7 +62,7 @@ export function EmployeeMagicLinkModal({
         module: 'EmployeeMagicLinkModal',
         action: 'clipboardItem',
       });
-      showErrorNotification(t('common.error'), t('employee.copyQrCodeFailed'));
+      showErrorNotification(t('common.errors.notificationTitle'), t('employee.copyQrCodeFailed'));
     }
   }, [qrCodeData, t]);
 

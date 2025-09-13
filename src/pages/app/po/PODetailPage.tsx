@@ -130,7 +130,7 @@ export function PODetailPage() {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('po.confirmed'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('po.confirmFailed'),
       },
       onSuccess: () => {
@@ -154,7 +154,7 @@ export function PODetailPage() {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('po.processing'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('po.processFailed'),
       },
       onSuccess: () => {
@@ -181,7 +181,7 @@ export function PODetailPage() {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('po.markReady'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('po.markReadyFailed'),
       },
       onSuccess: () => {
@@ -205,7 +205,7 @@ export function PODetailPage() {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('po.shipped'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('po.shipFailed'),
       },
       onSuccess: () => {
@@ -230,7 +230,7 @@ export function PODetailPage() {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('po.delivered'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('po.deliverFailed'),
       },
       onSuccess: () => {
@@ -255,7 +255,7 @@ export function PODetailPage() {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('po.cancelled'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('po.cancelFailed'),
       },
       onSuccess: () => {
@@ -279,7 +279,7 @@ export function PODetailPage() {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('po.refunded'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('po.refundFailed'),
       },
       onSuccess: () => {
@@ -316,7 +316,7 @@ export function PODetailPage() {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('po.deliveryRequestCreated'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('po.deliveryRequestCreateFailed'),
       },
       onSuccess: () => {
@@ -339,6 +339,7 @@ export function PODetailPage() {
         opened={modals.confirmModalOpened}
         purchaseOrder={selectedPO}
         mode="confirm"
+        loading={confirmPOAction.isMutating}
         onClose={handleCloseModal('confirm')}
         onConfirm={async () => {
           await confirmPOAction.trigger();
@@ -348,6 +349,7 @@ export function PODetailPage() {
         opened={modals.processModalOpened}
         purchaseOrder={selectedPO}
         mode="process"
+        loading={processPOAction.isMutating}
         onClose={handleCloseModal('process')}
         onConfirm={async () => {
           await processPOAction.trigger();
@@ -357,6 +359,7 @@ export function PODetailPage() {
         opened={modals.markReadyModalOpened}
         purchaseOrder={selectedPO}
         mode="markReady"
+        loading={markReadyPOAction.isMutating}
         onClose={handleCloseModal('markReady')}
         onConfirm={markReadyPOAction.trigger}
       />
@@ -364,6 +367,7 @@ export function PODetailPage() {
         opened={modals.shipModalOpened}
         purchaseOrder={selectedPO}
         mode="ship"
+        loading={shipPOAction.isMutating}
         onClose={handleCloseModal('ship')}
         onConfirm={shipPOAction.trigger}
       />
@@ -371,6 +375,7 @@ export function PODetailPage() {
         opened={modals.deliverModalOpened}
         purchaseOrder={selectedPO}
         mode="deliver"
+        loading={deliverPOAction.isMutating}
         onClose={handleCloseModal('deliver')}
         onConfirm={deliverPOAction.trigger}
       />
@@ -378,6 +383,7 @@ export function PODetailPage() {
         opened={modals.cancelModalOpened}
         purchaseOrder={selectedPO}
         mode="cancel"
+        loading={cancelPOAction.isMutating}
         onClose={handleCloseModal('cancel')}
         onConfirm={cancelPOAction.trigger}
       />
@@ -385,12 +391,14 @@ export function PODetailPage() {
         opened={modals.refundModalOpened}
         purchaseOrder={selectedPO}
         mode="refund"
+        loading={refundPOAction.isMutating}
         onClose={handleCloseModal('refund')}
         onConfirm={refundPOAction.trigger}
       />
       <DeliveryRequestModal
         opened={deliveryModalOpened}
         purchaseOrder={purchaseOrder}
+        loading={createDeliveryAction.isMutating}
         onClose={() => setDeliveryModalOpened(false)}
         onConfirm={createDeliveryAction.trigger}
       />

@@ -33,7 +33,7 @@ export function PODeliverySection({ purchaseOrder }: PODeliverySectionProps) {
     <div>
       <Text size="sm" fw={500} c="blue" mb="xs">
         <IconTruckDelivery size={14} style={{ verticalAlign: 'middle' }} />{' '}
-        {t('po.deliveryRequest')}
+        {t('common.entity.deliveryRequest')}
       </Text>
       <Stack gap="xs">
         <Group gap="xs">

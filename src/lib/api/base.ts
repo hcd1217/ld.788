@@ -47,6 +47,8 @@ export class BaseApiClient {
   private readonly cacheTTL: number;
   private readonly cache = new Map<string, CacheEntry<unknown>>();
   private readonly locks = new Map<string, true>();
+  private readonly delayOnCacheHit = 200;
+  private readonly delayOnRequest = 300;
 
   constructor(config: ApiConfig) {
     this.baseURL = config.baseURL;
@@ -135,7 +137,7 @@ export class BaseApiClient {
 
     if (this.locks.has(cacheKey)) {
       console.ignore?.('race condition!!!');
-      await delay(200);
+      await delay(this.delayOnCacheHit);
       return this.get(endpoint, params, schema, paramsSchema);
     }
 
@@ -353,6 +355,7 @@ export class BaseApiClient {
     }, this.timeout);
 
     try {
+      const startTime = Date.now();
       const response = await fetch(url.toString(), {
         ...init,
         headers,
@@ -371,10 +374,20 @@ export class BaseApiClient {
         throw apiError;
       }
 
+      {
+        const elapsedTime = Date.now() - startTime;
+        const waitPeriod = this.delayOnRequest - elapsedTime;
+        if (waitPeriod > 0) {
+          console.debug(`Request delayed for ${waitPeriod}ms`);
+          await delay(waitPeriod);
+        }
+      }
+
       if (schema) {
         // Validate response if schema provided
         return this.validateResponse(schema, data, init, url, endpoint);
       }
+
       return data as T;
     } catch (error) {
       clearTimeout(timeoutId);

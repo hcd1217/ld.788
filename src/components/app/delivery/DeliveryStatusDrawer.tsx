@@ -105,7 +105,7 @@ export function DeliveryStatusDrawer({
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('delivery.messages.photosUploaded'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('delivery.messages.uploadFailed'),
       },
       onSuccess: () => {

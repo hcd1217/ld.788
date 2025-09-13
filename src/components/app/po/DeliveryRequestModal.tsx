@@ -16,6 +16,7 @@ import { formatDate } from '@/utils/time';
 type DeliveryRequestModalProps = {
   readonly opened: boolean;
   readonly purchaseOrder?: PurchaseOrder;
+  readonly loading?: boolean;
   readonly onClose: () => void;
   readonly onConfirm: (data: {
     assignedTo: string;
@@ -29,6 +30,7 @@ type DeliveryRequestModalProps = {
 export function DeliveryRequestModal({
   opened,
   purchaseOrder,
+  loading = false,
   onClose,
   onConfirm,
 }: DeliveryRequestModalProps) {
@@ -156,13 +158,13 @@ export function DeliveryRequestModal({
       />
 
       <Group justify="flex-end" gap="sm">
-        <Button variant="light" onClick={onClose} disabled={isSubmitting}>
+        <Button variant="light" onClick={onClose} disabled={isSubmitting || loading}>
           {t('common.cancel')}
         </Button>
         <Button
           onClick={handleSubmit}
-          loading={isSubmitting}
-          disabled={!selectedEmployeeId || !scheduledDate}
+          loading={isSubmitting || loading}
+          disabled={!selectedEmployeeId || !scheduledDate || loading}
           leftSection={<IconTruck size={16} />}
         >
           {t('delivery.actions.create')}

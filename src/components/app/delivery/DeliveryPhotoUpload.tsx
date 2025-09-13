@@ -36,7 +36,10 @@ export function DeliveryPhotoUpload({ opened, onClose, onUpload }: DeliveryPhoto
           module: 'DeliveryPhotoUpload',
           action: 'handlePhotoCapture',
         });
-        showErrorNotification(t('common.error'), t('delivery.messages.uploadFailed'));
+        showErrorNotification(
+          t('common.errors.notificationTitle'),
+          t('delivery.messages.uploadFailed'),
+        );
         throw error; // Re-throw to prevent closing the modal
       }
     },

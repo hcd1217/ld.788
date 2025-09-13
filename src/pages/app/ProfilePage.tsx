@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { useNavigate } from 'react-router';
 
 import {
@@ -5,7 +7,6 @@ import {
   Badge,
   Button,
   Card,
-  Center,
   Container,
   Divider,
   Group,
@@ -14,10 +15,12 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { IconBuilding, IconIdBadge2, IconLogout, IconUser } from '@tabler/icons-react';
+import { IconBuilding, IconIdBadge2, IconLock, IconLogout, IconUser } from '@tabler/icons-react';
 
+import { ChangePasswordModal } from '@/components/app/profile';
 import { GoBack } from '@/components/common';
 import { ROUTERS } from '@/config/routeConfig';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useLogout, useMe } from '@/stores/useAppStore';
 import { renderFullName } from '@/utils/string';
@@ -25,8 +28,10 @@ import { renderFullName } from '@/utils/string';
 export function ProfilePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { isDesktop } = useDeviceType();
   const me = useMe();
   const logout = useLogout();
+  const [changePasswordModalOpened, setChangePasswordModalOpened] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -165,47 +170,39 @@ export function ProfilePage() {
           </Card>
         )}
 
-        {/* Roles & Permissions */}
-        {/* {me.roles.length > 0 && (
-          <Card shadow="sm" padding="lg" radius="md">
-            <Stack gap="xs">
-              <Group gap="xs" mb="xs">
-                <IconShieldCheck size={20} stroke={1.5} />
-                <Text fw={600}>{t('profile.roles')}</Text>
-              </Group>
-              <Divider />
-              <Stack gap="xs" mt="xs">
-                {me.roles.map((role) => (
-                  <Group key={role.name} justify="space-between">
-                    <Badge variant="light" size="md">
-                      {role.name}
-                    </Badge>
-                    <Text size="xs" c="dimmed">
-                      {t('profile.level')} {role.level}
-                    </Text>
-                  </Group>
-                ))}
-              </Stack>
-            </Stack>
-          </Card>
-        )} */}
-
         {/* Actions */}
         <Stack gap="xs">
-          <Center>
+          <Group gap="xs" justify={isDesktop ? 'space-between' : 'flex-end'} wrap="nowrap">
+            {/* Change Password Button - Desktop Only */}
+            {isDesktop && (
+              <Button
+                variant="light"
+                mt="md"
+                leftSection={<IconLock size={20} />}
+                onClick={() => setChangePasswordModalOpened(true)}
+              >
+                {t('profile.changePassword')}
+              </Button>
+            )}
+            {/* Logout Button */}
             <Button
-              w="20rem"
               variant="light"
-              mt="md"
+              mt={isDesktop ? 'xs' : 'md'}
               leftSection={<IconLogout size={20} />}
               color="red"
               onClick={handleLogout}
             >
               {t('common.logout')}
             </Button>
-          </Center>
+          </Group>
         </Stack>
       </Stack>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        opened={changePasswordModalOpened}
+        onClose={() => setChangePasswordModalOpened(false)}
+      />
     </Container>
   );
 }

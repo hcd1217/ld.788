@@ -186,7 +186,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
       notifications: {
         successTitle: t('common.success'),
         successMessage: isEditMode ? t('employee.employeeUpdated') : t('employee.employeeAdded'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: isEditMode
           ? t('employee.updateEmployeeFailed')
           : t('employee.addEmployeeFailed'),
@@ -222,7 +222,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('employee.sampleFileDownloaded'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('employee.failedToDownloadSample'),
       },
       onSettled: () => {
@@ -239,7 +239,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
       }
     } catch (error) {
       showErrorNotification(
-        t('common.error'),
+        t('common.errors.notificationTitle'),
         error instanceof Error ? error.message : t('common.file.pleaseSelectExcelFile'),
       );
     }

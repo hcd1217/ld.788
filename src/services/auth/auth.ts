@@ -43,6 +43,14 @@ export const authService = {
     }
   },
 
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    await authApi.changePassword(userId, currentPassword, newPassword);
+  },
+
   logout() {
     clearTokens();
   },

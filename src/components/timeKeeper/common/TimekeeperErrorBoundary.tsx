@@ -85,7 +85,7 @@ function ErrorFallback({ error, componentName, onReset }: ErrorFallbackProps) {
   return (
     <Alert
       icon={<IconAlertTriangle size={24} />}
-      title={t('common.error')}
+      title={t('common.errors.notificationTitle')}
       color="red"
       variant="light"
       p="lg"

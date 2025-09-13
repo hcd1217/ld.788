@@ -4,6 +4,7 @@ import {
   emailSchema,
   idSchema,
   numberSchema,
+  optionalBooleanSchema,
   optionalStringSchema,
   paginationSchema,
   phoneNumberSchema,
@@ -53,7 +54,7 @@ export const UpdateCustomerRequestSchema = z.object({
   address: optionalStringSchema,
   metadata: CustomerMetadataSchema,
   taxCode: optionalStringSchema,
-  isActive: z.boolean().optional(),
+  isActive: optionalBooleanSchema,
 });
 
 // Bulk upsert schema for customers
@@ -69,7 +70,7 @@ export const BulkUpsertCustomerItemSchema = z.object({
 
 export const BulkUpsertCustomersRequestSchema = z.object({
   customers: z.array(BulkUpsertCustomerItemSchema),
-  skipInvalid: z.boolean().optional().default(false),
+  skipInvalid: optionalBooleanSchema.default(false),
 });
 
 export const BulkUpsertCustomersResponseSchema = z.object({

@@ -81,7 +81,7 @@ export function MyTimesheetPage() {
   const errorAlert = error && (
     <Alert
       icon={<IconAlertCircle size={16} />}
-      title={t('common.error')}
+      title={t('common.errors.notificationTitle')}
       color="red"
       withCloseButton
       onClose={clearError}

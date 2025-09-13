@@ -61,8 +61,8 @@
     },
     "entity": {
       "product": "Sản Phẩm",
-      "customer": "Khách Hàng",
-      "deliveryRequest": "Yêu Cầu Giao Hàng"
+      "deliveryRequest": "Yêu Cầu Giao Hàng",
+      "customer": "Khách Hàng"
     },
     "file": {
       "pleaseSelectExcelFile": "Vui lòng chọn một file Excel (.xlsx, .xls, hoặc .csv)",
@@ -76,6 +76,10 @@
       "emailPlaceholder": "Nhập email",
       "pic": "Người Phụ Trách",
       "picPlaceholder": "Nhập Thông Tin Người Phụ Trách"
+    },
+    "errors": {
+      "notificationTitle": "Lỗi",
+      "setPasswordFailed": "Không thể đặt mật khẩu"
     },
     "actions": "",
     "active": "Hoạt động",
@@ -104,7 +108,6 @@
     "downloading": "Đang tải xuống",
     "dragAndDropFile": "Kéo và thả file vào đây",
     "edit": "Sửa",
-    "error": "Lỗi",
     "failed": "Thất bại",
     "failedToParseExcel": "Không thể phân tích file Excel",
     "failedToReadFile": "Không thể đọc file",
@@ -247,11 +250,7 @@
     "confirmPassword": "Xác Nhận Mật Khẩu",
     "enterNewPassword": "Nhập mật khẩu mới",
     "enterConfirmPassword": "Xác nhận mật khẩu mới",
-    "passwordRequired": "Mật khẩu là bắt buộc",
-    "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
-    "passwordMismatch": "Mật khẩu không khớp",
-    "passwordSetSuccessfully": "Đặt mật khẩu thành công",
-    "setPasswordFailed": "Không thể đặt mật khẩu",
+    "passwordSetSuccessfully": "Đặt mật khẩu thành công, hệ thống sẽ tự động đăng xuất sau 3 giây",
     "employeeDetails": "Chi Tiết Nhân Viên",
     "editEmployee": "Cập Nhật Thông Tin Nhân Viên",
     "updateEmployee": "Cập Nhật Thông Tin Nhân Viên",
@@ -317,7 +316,6 @@
     "endedButActiveMessage": "Hợp đồng của nhân viên này đã kết thúc nhưng vẫn được đánh dấu là hoạt động. Vui lòng xem xét trạng thái của họ."
   },
   "auth": {
-    "title": "Credo",
     "identifier": "Tên đăng nhập",
     "password": "Mật khẩu",
     "firstNamePlaceholder": "Văn An",
@@ -331,7 +329,6 @@
       "success": "Đăng nhập thành công!",
       "redirecting": "Đang chuyển hướng đến trang chủ...",
       "invalidLink": "Liên kết không hợp lệ hoặc đã hết hạn.",
-      "verificationFailed": "Không thể xác thực liên kết. Vui lòng thử lại.",
       "tryAgain": "Quay Lại Đăng Nhập",
       "scanQrCode": "Quét Mã QR",
       "enterCodeManually": "Nhập Mã Thủ Công",
@@ -364,7 +361,7 @@
     "passwordRequired": "Cần nhập mật khẩu",
     "passwordWeak": "Mật khẩu phải có ít nhất 8 ký tự bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt",
     "confirmPasswordRequired": "Vui lòng xác nhận mật khẩu",
-    "passwordsDoNotMatch": "Mật khẩu không khớp",
+    "passwordMismatch": "Mật khẩu không khớp",
     "firstNameRequired": "Cần nhập tên và chữ lót",
     "firstNameTooShort": "Tên phải có ít nhất 2 ký tự",
     "lastNameRequired": "Cần nhập họ",
@@ -385,14 +382,11 @@
     "invalidCredentials": "Email hoặc mật khẩu không đúng. Vui lòng thử lại."
   },
   "profile": {
+    "changePassword": "Thay Đổi Mật Khẩu",
+    "changePasswordDescription": "Đặt mật khẩu mới cho tài khoản",
     "notLoggedIn": "Chưa Đăng Nhập",
     "pleaseLogin": "Vui lòng đăng nhập để xem hồ sơ của bạn.",
-    "clientCode": "Mã Khách Hàng",
     "rootUser": "Người Dùng Gốc",
-    "roles": "Vai Trò",
-    "level": "Cấp Độ",
-    "accountInfo": "Thông Tin Tài Khoản",
-    "accountId": "Mã Tài Khoản",
     "employeeInfo": "Thông Tin Nhân Viên",
     "employeeCode": "Mã Nhân Viên",
     "workEmail": "Email Công Việc",
@@ -656,13 +650,11 @@
     "invalidQuantity": "Số lượng không hợp lệ",
     "productAlreadyAdded": "Sản phẩm {{productCode}} đã được thêm",
     "autoFilledFromCustomerAddress": "Tự động điền từ địa chỉ khách hàng",
-    "deliveryRequest": "Yêu Cầu Giao Hàng",
     "createDeliveryRequest": "Tạo Yêu Cầu Giao Hàng",
     "deliveryRequestCreated": "Tạo yêu cầu giao hàng thành công",
     "deliveryRequestCreateFailed": "Không thể tạo yêu cầu giao hàng"
   },
   "delivery": {
-    "title": "Quản Lý Giao Hàng",
     "actions": {
       "create": "Tạo Yêu Cầu Giao Hàng",
       "startTransit": "Bắt Đầu",
@@ -672,7 +664,6 @@
     "statuses": {
       "pending": "Chờ Giao",
       "inTransit": "Đang Giao",
-      "in_transit": "Đang Giao",
       "completed": "Đã Giao"
     },
     "id": "Mã Yêu Cầu",
@@ -728,7 +719,6 @@
     "deliveryId": "Mã Giao Hàng",
     "gridCard": "Thẻ giao hàng {{id}}",
     "customerName": "Tên Khách Hàng",
-    "currentStatus": "Trạng Thái Hiện Tại",
     "transitNotes": "Ghi Chú Vận Chuyển",
     "enterTransitNotes": "Nhập ghi chú vận chuyển (tùy chọn)",
     "transitNotesDescription": "Ghi chú tùy chọn về việc bắt đầu vận chuyển",

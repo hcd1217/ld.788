@@ -61,8 +61,8 @@
     },
     "entity": {
       "product": "Product",
-      "customer": "Customer",
-      "deliveryRequest": "Delivery Request"
+      "deliveryRequest": "Delivery Request",
+      "customer": "Customer"
     },
     "file": {
       "pleaseSelectExcelFile": "Please select a CSV or Excel file",
@@ -76,6 +76,10 @@
       "emailPlaceholder": "Enter email",
       "pic": "Contact Person",
       "picPlaceholder": "Enter Contact Person"
+    },
+    "errors": {
+      "notificationTitle": "Error",
+      "setPasswordFailed": "Failed to set password"
     },
     "actions": "Actions",
     "active": "Active",
@@ -104,7 +108,6 @@
     "downloading": "Downloading",
     "dragAndDropFile": "Drag and drop your file here",
     "edit": "Edit",
-    "error": "Error",
     "failed": "Failed",
     "failedToParseExcel": "Failed to parse Excel file",
     "failedToReadFile": "Failed to read file",
@@ -247,11 +250,7 @@
     "confirmPassword": "Confirm Password",
     "enterNewPassword": "Enter new password",
     "enterConfirmPassword": "Confirm new password",
-    "passwordRequired": "Password is required",
-    "passwordMinLength": "Password must be at least 8 characters",
-    "passwordMismatch": "Passwords do not match",
-    "passwordSetSuccessfully": "Password set successfully",
-    "setPasswordFailed": "Failed to set password",
+    "passwordSetSuccessfully": "Password set successfully, the system will automatically logout after 3 seconds",
     "employeeDetails": "Employee Details",
     "editEmployee": "Edit Employee",
     "updateEmployee": "Update Employee",
@@ -317,7 +316,6 @@
     "endedButActiveMessage": "This employee's contract has ended but they are still marked as active. Please review their status."
   },
   "auth": {
-    "title": "Credo",
     "identifier": "Username",
     "password": "Password",
     "firstNamePlaceholder": "John",
@@ -331,7 +329,6 @@
       "success": "Login successful!",
       "redirecting": "Redirecting to your dashboard...",
       "invalidLink": "Invalid or expired magic link.",
-      "verificationFailed": "Failed to verify magic link. Please try again.",
       "tryAgain": "Go to Login",
       "scanQrCode": "Scan QR Code",
       "enterCodeManually": "Enter Code Manually",
@@ -364,7 +361,7 @@
     "passwordRequired": "Password is required",
     "passwordWeak": "Password must be at least 8 characters with uppercase, lowercase, number and special character",
     "confirmPasswordRequired": "Please confirm your password",
-    "passwordsDoNotMatch": "Passwords do not match",
+    "passwordMismatch": "Passwords do not match",
     "firstNameRequired": "First name is required",
     "firstNameTooShort": "First name must be at least 2 characters",
     "lastNameRequired": "Last name is required",
@@ -385,14 +382,11 @@
     "invalidCredentials": "Invalid email or password. Please try again."
   },
   "profile": {
+    "changePassword": "Change Password",
+    "changePasswordDescription": "Set a new password for this account",
     "notLoggedIn": "Not Logged In",
     "pleaseLogin": "Please log in to view your profile.",
-    "clientCode": "Client Code",
     "rootUser": "Root User",
-    "roles": "Roles",
-    "level": "Level",
-    "accountInfo": "Account Information",
-    "accountId": "Account ID",
     "employeeInfo": "Employee Information",
     "employeeCode": "Employee Code",
     "workEmail": "Work Email",
@@ -528,7 +522,6 @@
     "delivered": "Order marked as delivered",
     "deliveryDate": "Delivery Date",
     "deliveryNotes": "Delivery Notes",
-    "deliveryRequest": "Delivery Request",
     "createDeliveryRequest": "Create Delivery Request",
     "deliveryRequestCreated": "Delivery request created successfully",
     "deliveryRequestCreateFailed": "Failed to create delivery request",
@@ -662,7 +655,6 @@
     "autoFilledFromCustomerAddress": "Auto-filled from customer address"
   },
   "delivery": {
-    "title": "Delivery Management",
     "list": {
       "title": "Delivery Management"
     },
@@ -675,7 +667,6 @@
     "statuses": {
       "pending": "Pending",
       "inTransit": "In Transit",
-      "in_transit": "In Transit",
       "completed": "Completed"
     },
     "id": "Request ID",
@@ -736,7 +727,6 @@
     "noDeliveryRequestsFound": "No delivery requests found",
     "createFirstDeliveryRequestDescription": "Create your first delivery request from a purchase order",
     "noMoreDeliveryRequests": "No more delivery requests to load",
-    "currentStatus": "Current Status",
     "gridCard": "Delivery card {{id}}",
     "transitNotes": "Transit Notes",
     "enterTransitNotes": "Enter transit notes (optional)",

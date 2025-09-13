@@ -78,8 +78,8 @@ export function EmployeeDetailPage() {
       passwordModal.close();
     } catch (error) {
       showErrorNotification(
-        t('common.error'),
-        error instanceof Error ? error.message : t('employee.setPasswordFailed'),
+        t('common.errors.notificationTitle'),
+        error instanceof Error ? error.message : t('common.errors.setPasswordFailed'),
       );
       console.error('Failed to set password:', error);
     }
@@ -101,7 +101,7 @@ export function EmployeeDetailPage() {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('employee.employeeDeactivated'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('employee.deactivateEmployeeFailed'),
       },
       onSuccess: () => {
@@ -126,7 +126,7 @@ export function EmployeeDetailPage() {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('employee.employeeActivated'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('employee.activateEmployeeFailed'),
       },
       onSuccess: () => {

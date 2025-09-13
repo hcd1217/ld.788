@@ -52,6 +52,7 @@ import {
   usePurchaseOrderList,
 } from '@/stores/usePOStore';
 import type { Timeout } from '@/types';
+import { xOr } from '@/utils/boolean';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 export function POListPage() {
@@ -77,10 +78,6 @@ export function POListPage() {
   // Filter loading state for UI lock
   const [isFilterLoading, setIsFilterLoading] = useState(false);
   const filterTimeoutRef = useRef<Timeout | undefined>(undefined);
-
-  // Track previous date ranges to detect incomplete changes
-  const prevOrderDateRangeRef = useRef(filters.orderDateRange);
-  const prevDeliveryDateRangeRef = useRef(filters.deliveryDateRange);
 
   const { viewMode, isTableView, setViewMode } = useViewMode();
 
@@ -125,32 +122,12 @@ export function POListPage() {
 
   // Effect to load POs when filter params change with forced delay for ALL filters
   useEffect(() => {
-    // Check if date range change is incomplete
-    const prevOrderDate = prevOrderDateRangeRef.current;
-    const prevDeliveryDate = prevDeliveryDateRangeRef.current;
-    const currOrderDate = filters.orderDateRange;
-    const currDeliveryDate = filters.deliveryDateRange;
-
-    // Check if this is just setting the first date of a range (incomplete)
-    const isSettingOrderDateStart =
-      !prevOrderDate.start && currOrderDate.start && !currOrderDate.end;
-    const isSettingOrderDateEnd = !prevOrderDate.end && currOrderDate.end && !currOrderDate.start;
-    const isSettingDeliveryDateStart =
-      !prevDeliveryDate.start && currDeliveryDate.start && !currDeliveryDate.end;
-    const isSettingDeliveryDateEnd =
-      !prevDeliveryDate.end && currDeliveryDate.end && !currDeliveryDate.start;
-
-    // Update refs for next comparison
-    prevOrderDateRangeRef.current = currOrderDate;
-    prevDeliveryDateRangeRef.current = currDeliveryDate;
-
     // Skip API call if setting incomplete date range
-    if (
-      isSettingOrderDateStart ||
-      isSettingOrderDateEnd ||
-      isSettingDeliveryDateStart ||
-      isSettingDeliveryDateEnd
-    ) {
+    if (xOr(filterParams.deliveryDateFrom, filterParams.deliveryDateTo)) {
+      setIsFilterLoading(false);
+      return;
+    }
+    if (xOr(filterParams.orderDateFrom, filterParams.orderDateTo)) {
       setIsFilterLoading(false);
       return;
     }
@@ -166,6 +143,7 @@ export function POListPage() {
     if (Number.isNaN(delay)) {
       delay = 1500;
     }
+
     filterTimeoutRef.current = setTimeout(() => {
       void loadPOsWithFilter(filterParams, true);
       setIsFilterLoading(false);

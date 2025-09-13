@@ -86,19 +86,22 @@ export function POAddItemModal({ opened, onClose, onAdd, existingItems }: POAddI
   const handleAdd = () => {
     // Validation
     if (!productCode || !description) {
-      showErrorNotification(t('common.error'), t('po.itemsRequired'));
+      showErrorNotification(t('common.errors.notificationTitle'), t('po.itemsRequired'));
       return;
     }
 
     if (quantity <= 0) {
-      showErrorNotification(t('common.error'), t('po.invalidQuantity'));
+      showErrorNotification(t('common.errors.notificationTitle'), t('po.invalidQuantity'));
       return;
     }
 
     // Check for duplicates
     const isDuplicate = existingItems.some((item) => item.productCode === productCode);
     if (isDuplicate) {
-      showErrorNotification(t('common.error'), t('po.productAlreadyAdded', { productCode }));
+      showErrorNotification(
+        t('common.errors.notificationTitle'),
+        t('po.productAlreadyAdded', { productCode }),
+      );
       return;
     }
 

@@ -109,7 +109,7 @@ export function DeliveryDetailPage() {
         successMessage: t('delivery.messages.statusUpdated', {
           status: t('delivery.statuses.inTransit'),
         }),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('delivery.messages.statusUpdateFailed'),
       },
     },
@@ -134,7 +134,7 @@ export function DeliveryDetailPage() {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('delivery.messages.completed'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('delivery.messages.completeFailed'),
       },
     },
@@ -157,7 +157,7 @@ export function DeliveryDetailPage() {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('delivery.messages.photosUploaded'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('delivery.messages.uploadFailed'),
       },
     },

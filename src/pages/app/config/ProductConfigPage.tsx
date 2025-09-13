@@ -58,8 +58,8 @@ export function ProductConfigPage() {
       unit: '',
     },
     validate: {
-      productCode: (value) => (!value ? t('common.error') : null),
-      name: (value) => (!value ? t('common.error') : null),
+      productCode: (value) => (!value ? t('common.errors.notificationTitle') : null),
+      name: (value) => (!value ? t('common.errors.notificationTitle') : null),
     },
   });
 
@@ -95,7 +95,7 @@ export function ProductConfigPage() {
     },
     {
       notifications: {
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('common.loadingFailed'),
       },
       onSettled: () => {
@@ -132,7 +132,7 @@ export function ProductConfigPage() {
     },
     {
       notifications: {
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('common.addFailed', { entity: t('common.entity.product') }),
       },
       onSuccess: (product: Product) => {
@@ -161,7 +161,7 @@ export function ProductConfigPage() {
     },
     {
       notifications: {
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('common.updateFailed', { entity: t('common.entity.product') }),
       },
       onSuccess: (product: Product) => {
@@ -187,7 +187,7 @@ export function ProductConfigPage() {
     },
     {
       notifications: {
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('common.deleteFailed', { entity: t('common.entity.product') }),
       },
       onSuccess: (product: Product) => {
@@ -279,7 +279,7 @@ export function ProductConfigPage() {
     },
     {
       notifications: {
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('auth.importFailed'),
       },
       onSuccess: async (result: BulkUpsertProductsResponse) => {
@@ -334,7 +334,10 @@ export function ProductConfigPage() {
         if (selectedFile) {
           handleExcelImportAction.trigger({ file: selectedFile });
         } else {
-          showErrorNotification(t('common.error'), t('common.file.pleaseSelectFileFirst'));
+          showErrorNotification(
+            t('common.errors.notificationTitle'),
+            t('common.file.pleaseSelectFileFirst'),
+          );
         }
       },
     });

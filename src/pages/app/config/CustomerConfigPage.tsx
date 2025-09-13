@@ -96,7 +96,7 @@ export function CustomerConfigPage() {
     },
     {
       notifications: {
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('common.loadingFailed'),
       },
       onSuccess: (data: Customer[]) => {
@@ -135,7 +135,7 @@ export function CustomerConfigPage() {
     },
     {
       notifications: {
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('common.addFailed', { entity: t('common.entity.customer') }),
       },
       onSuccess: (customer) => {
@@ -175,7 +175,7 @@ export function CustomerConfigPage() {
     },
     {
       notifications: {
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('common.updateFailed', { entity: t('common.entity.customer') }),
       },
       onSuccess: (customer) => {
@@ -200,7 +200,7 @@ export function CustomerConfigPage() {
     },
     {
       notifications: {
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('common.deleteFailed', { entity: t('common.entity.customer') }),
       },
       onSuccess: () => {
@@ -286,7 +286,7 @@ export function CustomerConfigPage() {
         if (selectedFile) {
           handleExcelImportAction.trigger({ file: selectedFile });
         } else {
-          showErrorNotification(t('common.error'), t('common.selectFile'));
+          showErrorNotification(t('common.errors.notificationTitle'), t('common.selectFile'));
         }
       },
     });
@@ -334,7 +334,7 @@ export function CustomerConfigPage() {
     },
     {
       notifications: {
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('auth.importFailed'),
       },
       onSuccess: async (result: BulkUpsertCustomersResponse) => {

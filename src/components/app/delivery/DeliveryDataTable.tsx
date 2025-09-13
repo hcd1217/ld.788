@@ -43,7 +43,7 @@ function DeliveryDataTableComponent({
 
   return (
     <ScrollArea>
-      <Table striped highlightOnHover aria-label={t('delivery.title') as string}>
+      <Table striped highlightOnHover aria-label={t('delivery.list.title') as string}>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>{t('delivery.id')}</Table.Th>

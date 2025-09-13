@@ -88,7 +88,7 @@ export function usePWA() {
       // Initialize stored version if empty
       if (!storedVersion) {
         setStoredVersion(currentBuild);
-        console.log('Initialized PWA version:', currentBuild);
+        console.debug('Initialized PWA version:', currentBuild);
         return;
       }
 

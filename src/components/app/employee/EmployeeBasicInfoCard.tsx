@@ -62,7 +62,7 @@ export function EmployeeBasicInfoCard({ employee, canEdit, onEdit }: EmployeeBas
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('employee.magicLinkGenerated'),
-        errorTitle: t('common.error'),
+        errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('employee.magicLinkFailed'),
       },
       onSuccess: (link) => {

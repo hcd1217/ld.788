@@ -40,6 +40,7 @@ import {
   useDeliveryRequests,
 } from '@/stores/useDeliveryRequestStore';
 import type { Timeout } from '@/types';
+import { xOr } from '@/utils/boolean';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 export function DeliveryListPage() {
@@ -86,9 +87,6 @@ export function DeliveryListPage() {
   const [isFilterLoading, setIsFilterLoading] = useState(false);
   const filterTimeoutRef = useRef<Timeout | undefined>(undefined);
 
-  // Track previous date ranges to detect incomplete changes
-  const prevScheduledDateRangeRef = useRef(filters.scheduledDateRange);
-
   const { viewMode, isTableView, setViewMode } = useViewMode();
 
   // Scroll detection state
@@ -116,27 +114,8 @@ export function DeliveryListPage() {
 
   // Effect to load delivery requests when filter params change with forced delay for ALL filters
   useEffect(() => {
-    // Check if date range change is incomplete
-    const prevScheduledDate = prevScheduledDateRangeRef.current;
-    const currScheduledDate = filters.scheduledDateRange;
-
-    // Check if this is just setting the first date of a range (incomplete)
-    const isSettingScheduledDateStart =
-      !prevScheduledDate.start && currScheduledDate.start && !currScheduledDate.end;
-    const isSettingScheduledDateEnd =
-      !prevScheduledDate.end && currScheduledDate.end && !currScheduledDate.start;
-
-    // Update refs for next comparison
-    prevScheduledDateRangeRef.current = currScheduledDate;
-
     // Skip API call if setting incomplete date range
-    if (isSettingScheduledDateStart || isSettingScheduledDateEnd) {
-      setIsFilterLoading(false);
-      return;
-    }
-
-    // Skip API call if setting incomplete date range
-    if (isSettingScheduledDateStart || isSettingScheduledDateEnd) {
+    if (xOr(filterParams.scheduledDateFrom, filterParams.scheduledDateTo)) {
       setIsFilterLoading(false);
       return;
     }
@@ -254,7 +233,7 @@ export function DeliveryListPage() {
         isLoading={isLoading || isFilterLoading}
         error={error}
         clearError={clearError}
-        header={<AppPageTitle title={t('delivery.title')} />}
+        header={<AppPageTitle title={t('delivery.list.title')} />}
       >
         <DeliveryErrorBoundary componentName="DeliveryListPage">
           {/* Mobile Filter Bar */}
@@ -346,7 +325,7 @@ export function DeliveryListPage() {
     >
       <DeliveryErrorBoundary componentName="DeliveryListPage">
         <Group justify="space-between" mb="lg">
-          <AppPageTitle title={t('delivery.title')} />
+          <AppPageTitle title={t('delivery.list.title')} />
           <Group gap="sm">
             <Button
               leftSection={<IconSortAscending size={16} />}

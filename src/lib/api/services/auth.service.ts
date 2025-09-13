@@ -58,6 +58,22 @@ export class AuthApi extends BaseApiClient {
     });
   }
 
+  /**
+   * Change password for a user
+   *
+   * @param userId - The ID of the user
+   * @param currentPassword - The old password
+   * @param newPassword - The new password
+   * @returns void
+   */
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    return this.put<void>(`/api/users/${userId}/password`, { currentPassword, newPassword });
+  }
+
   async getMe(): Promise<GetMeResponse> {
     // Cache key is automatically generated and used by the get() method
     // To manually manage cache for this endpoint:

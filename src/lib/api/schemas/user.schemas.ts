@@ -1,6 +1,11 @@
 import * as z from 'zod/v4';
 
-import { booleanSchema, idSchema, optionalStringSchema } from './common.schemas';
+import {
+  booleanSchema,
+  idSchema,
+  optionalBooleanSchema,
+  optionalStringSchema,
+} from './common.schemas';
 
 export const GetUsersRequestSchema = z.object({
   cursor: optionalStringSchema,
@@ -19,7 +24,7 @@ export const GetUsersResponseSchema = z.object({
         id: idSchema,
         userName: optionalStringSchema,
         email: optionalStringSchema,
-        isRoot: z.boolean().optional(),
+        isRoot: optionalBooleanSchema,
         firstName: optionalStringSchema,
         lastName: optionalStringSchema,
       }),

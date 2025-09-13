@@ -54,7 +54,7 @@ export function POItemsEditorDesktop({
     const result = createPOItem(newItem, items);
 
     if (result.error) {
-      showErrorNotification(t('common.error'), result.error);
+      showErrorNotification(t('common.errors.notificationTitle'), result.error);
       return null;
     }
 

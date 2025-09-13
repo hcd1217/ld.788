@@ -177,7 +177,7 @@ export function POAccordionInfoPanel({
         <div>
           <Text size="xs" fw={500} c="blue" mb={4}>
             <IconTruckDelivery size={14} style={{ verticalAlign: 'middle' }} />{' '}
-            {t('po.deliveryRequest')}
+            {t('common.entity.deliveryRequest')}
           </Text>
           <Stack gap="xs">
             <Group gap="xs">

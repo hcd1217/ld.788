@@ -6,7 +6,9 @@ import { IconAlertTriangle, IconLock } from '@tabler/icons-react';
 import { ModalOrDrawer } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
+import { useClientConfig } from '@/stores/useAppStore';
 import { renderFullName } from '@/utils/string';
+import { validateConfirmPassword, validatePassword } from '@/utils/validation';
 
 type EmployeePasswordModalProps = {
   readonly opened: boolean;
@@ -25,7 +27,9 @@ export function EmployeePasswordModal({
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | undefined>(undefined);
-
+  const clientConfig = useClientConfig();
+  const forceSetPasswordOnFirstLogin =
+    clientConfig?.features?.employee?.forceSetPasswordOnFirstLogin ?? false;
   const handleClose = () => {
     setPassword('');
     setConfirmPassword('');
@@ -35,18 +39,15 @@ export function EmployeePasswordModal({
 
   const handleConfirm = () => {
     // Validation
-    if (!password) {
-      setError(t('employee.passwordRequired'));
+    const passwordError = validatePassword(password, t);
+    if (passwordError) {
+      setError(passwordError);
       return;
     }
 
-    if (password.length < 8) {
-      setError(t('employee.passwordMinLength'));
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError(t('employee.passwordMismatch'));
+    const confirmPasswordError = validateConfirmPassword(confirmPassword, password, t);
+    if (confirmPasswordError) {
+      setError(confirmPasswordError);
       return;
     }
 
@@ -79,6 +80,7 @@ export function EmployeePasswordModal({
           }}
           leftSection={<IconLock size={16} />}
           required
+          description={t('validation.passwordWeak')}
         />
 
         <PasswordInput
@@ -99,9 +101,11 @@ export function EmployeePasswordModal({
           </Alert>
         )}
 
-        <Alert icon={<IconAlertTriangle size={16} />} color="yellow" variant="light">
-          {t('employee.setPasswordWarning')}
-        </Alert>
+        {forceSetPasswordOnFirstLogin && (
+          <Alert icon={<IconAlertTriangle size={16} />} color="yellow" variant="light">
+            {t('employee.setPasswordWarning')}
+          </Alert>
+        )}
 
         <Flex gap="sm" justify="flex-end">
           <Button variant="light" onClick={handleClose}>
