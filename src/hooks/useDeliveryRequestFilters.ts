@@ -46,8 +46,6 @@ export interface DeliveryRequestFilterHandlers {
   resetFilters: () => void;
 }
 
-const ONE_DAY = 24 * 60 * 60 * 1000;
-
 const defaultFilters: DeliveryRequestFilters = {
   searchQuery: '',
   // statuses: [DELIVERY_STATUS.PENDING],
@@ -55,8 +53,8 @@ const defaultFilters: DeliveryRequestFilters = {
   assignedTo: undefined,
   customerId: undefined,
   scheduledDateRange: {
-    start: new Date(new Date().setHours(0, 0, 0, 0)),
-    end: new Date(new Date(Date.now() + ONE_DAY).setHours(23, 59, 59, 999)),
+    start: undefined,
+    end: undefined,
   },
 };
 

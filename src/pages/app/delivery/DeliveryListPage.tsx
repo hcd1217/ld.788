@@ -353,8 +353,8 @@ export function DeliveryListPage() {
             hasActiveFilters={hasActiveFilters}
             onSearchChange={filterHandlers.setSearchQuery}
             onCustomerChange={filterHandlers.setCustomerId}
-            onAssignedToChange={() => {
-              filterHandlers.setAssignedTo(canViewAll ? filters.assignedTo : currentEmployeeId);
+            onAssignedToChange={(assignedTo) => {
+              filterHandlers.setAssignedTo(canViewAll ? assignedTo : currentEmployeeId);
             }}
             onStatusesChange={filterHandlers.setStatuses}
             onScheduledDateChange={filterHandlers.setScheduledDateRange}
