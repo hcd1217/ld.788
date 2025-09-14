@@ -35,8 +35,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Project specific files
 .env.production
-en-flattened.json
 i18n-analysis-results.json
 used-translation-keys.json
 *.backup.json

@@ -158,7 +158,7 @@ export function DeliveryFilterBarDesktop({
       {/* Scheduled Date Range */}
       <DatePickerInput
         label={t('delivery.scheduledDate')}
-        placeholder={t('delivery.filters.selectStatus')}
+        placeholder={t('delivery.filters.selectScheduledDate')}
         value={[scheduledDateStart, scheduledDateEnd]}
         style={{ flex: 1.5, minWidth: 220 }}
         onChange={(dates) => {

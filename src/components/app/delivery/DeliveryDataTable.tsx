@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react';
+import { memo, useCallback } from 'react';
 
 import { useNavigate } from 'react-router';
 
@@ -15,14 +15,10 @@ import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 
 type DeliveryDataTableProps = {
   readonly deliveryRequests: readonly DeliveryRequest[];
-  readonly noAction?: boolean;
   readonly isLoading?: boolean;
 };
 
-function DeliveryDataTableComponent({
-  deliveryRequests,
-  noAction = false,
-}: DeliveryDataTableProps) {
+function DeliveryDataTableComponent({ deliveryRequests }: DeliveryDataTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -36,11 +32,6 @@ function DeliveryDataTableComponent({
     [navigate],
   );
 
-  // Memoized stop propagation handler
-  const handleStopPropagation = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-  }, []);
-
   return (
     <ScrollArea>
       <Table striped highlightOnHover aria-label={t('delivery.list.title') as string}>
@@ -52,7 +43,6 @@ function DeliveryDataTableComponent({
             <Table.Th>{t('delivery.completedDate')}</Table.Th>
             <Table.Th>{t('delivery.assignedTo')}</Table.Th>
             <Table.Th>{t('delivery.status')}</Table.Th>
-            {!noAction && <Table.Th style={{ width: 120 }}>{t('common.actions')}</Table.Th>}
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -91,14 +81,6 @@ function DeliveryDataTableComponent({
                     <DeliveryStatusBadge status={delivery.status} />
                   </Group>
                 </Table.Td>
-                {!noAction && (
-                  <Table.Td onClick={handleStopPropagation}>
-                    {/* TODO: Add delivery actions component */}
-                    <Text size="sm" c="dimmed">
-                      Actions
-                    </Text>
-                  </Table.Td>
-                )}
               </Table.Tr>
             );
           })}

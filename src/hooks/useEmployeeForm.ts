@@ -62,7 +62,10 @@ export function useEmployeeForm({ isEditMode, units }: UseEmployeeFormProps) {
       ...getFormValidators(t, ['firstName', 'lastName']),
       email: (value) =>
         value && !/^\S+@\S+\.\S+$/.test(value) ? t('validation.invalidEmail') : undefined,
-      phone: (value) => (value && value.length < 10 ? t('validation.phoneTooShort') : undefined),
+      phone: (value) =>
+        value && value.length < 10
+          ? t('validation.tooShort', { field: t('common.phone'), length: 10 })
+          : undefined,
       monthlySalary: (value, values) => {
         if (!isEditMode && values.workType === 'FULL_TIME' && !value) {
           return t('validation.fieldRequired');

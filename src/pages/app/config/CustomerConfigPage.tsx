@@ -335,7 +335,7 @@ export function CustomerConfigPage() {
     {
       notifications: {
         errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('auth.importFailed'),
+        errorMessage: t('common.bulkImport.importFailed', { entity: t('common.entity.customer') }),
       },
       onSuccess: async (result: BulkUpsertCustomersResponse) => {
         const message = t('customer.bulkImportSuccess', {
@@ -343,7 +343,10 @@ export function CustomerConfigPage() {
           updated: result.updated,
           failed: result.failed,
         });
-        showSuccessNotification(t('auth.importSuccess'), message);
+        showSuccessNotification(
+          t('common.bulkImport.importSuccess', { entity: t('common.entity.customer') }),
+          message,
+        );
         modals.closeAll();
         loadCustomersAction.trigger();
       },

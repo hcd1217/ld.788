@@ -278,7 +278,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
       setImportResult(result);
 
       showSuccessNotification(
-        t('auth.importSuccess'),
+        t('common.bulkImport.importSuccess', { entity: t('common.entity.employee') }),
         t('employee.importedEmployees', {
           success: result.summary.success,
           total: result.summary.total,
@@ -289,8 +289,8 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
     },
     {
       notifications: {
-        errorTitle: t('auth.importFailed'),
-        errorMessage: t('auth.importFailed'),
+        errorTitle: t('common.errors.notificationTitle'),
+        errorMessage: t('common.bulkImport.importFailed', { entity: t('common.entity.employee') }),
       },
       onSuccess: () => {
         setTimeout(() => {
@@ -298,7 +298,10 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
         }, 2000);
       },
       onError: (error) => {
-        const errorMessage = error instanceof Error ? error.message : t('auth.importFailed');
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : t('common.bulkImport.importFailed', { entity: t('common.entity.employee') });
 
         const result: ImportResult = {
           summary: {

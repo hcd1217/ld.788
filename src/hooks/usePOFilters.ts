@@ -1,11 +1,40 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { z } from 'zod';
 
 import { PO_STATUS, type POStatusType } from '@/constants/purchaseOrder';
 import type { PurchaseOrder } from '@/services/sales';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
+
+import { useOnce } from './useOnce';
 
 export type DateFilterType = 'orderDate' | 'deliveryDate';
+
+const POFiltersSchema = z.object({
+  searchQuery: z.string(),
+  customerId: z.string().optional(),
+  statuses: z.array(z.enum(Object.values(PO_STATUS) as [string, ...string[]])),
+  orderDateRange: z
+    .object({
+      start: z.string().optional(),
+      end: z.string().optional(),
+    })
+    .transform((val) => ({
+      start: val.start ? new Date(val.start) : undefined,
+      end: val.end ? new Date(val.end) : undefined,
+    })),
+  deliveryDateRange: z
+    .object({
+      start: z.string().optional(),
+      end: z.string().optional(),
+    })
+    .transform((val) => ({
+      start: val.start ? new Date(val.start) : undefined,
+      end: val.end ? new Date(val.end) : undefined,
+    })),
+});
 
 export interface POFilters {
   searchQuery: string;
@@ -252,6 +281,22 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[]) {
     // Extract just the PO objects from the filtered results
     return filtered.map(({ po }) => po);
   }, [filters, hasActiveFilters, normalizedSearchQuery, posWithSearchText, purchaseOrders]);
+
+  useOnce(() => {
+    const storedFilters = localStorage.getItem(STORAGE_KEYS.FILTERS.PURCHASE_ORDERS);
+    if (storedFilters) {
+      const parsedFilters = POFiltersSchema.safeParse(JSON.parse(storedFilters));
+      if (parsedFilters.success) {
+        setFilters(parsedFilters.data as POFilters);
+      } else {
+        setFilters(defaultFilters);
+      }
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.FILTERS.PURCHASE_ORDERS, JSON.stringify(filters));
+  }, [filters]);
 
   return { filteredPOs, filters, filterHandlers, hasActiveFilters };
 }

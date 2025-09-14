@@ -291,7 +291,8 @@ export function PODetailPage() {
   const { createDeliveryRequest } = useDeliveryRequestActions();
 
   const createDeliveryAction = useSWRAction<
-    { assignedTo: string; scheduledDate: string; notes?: string } | undefined
+    | { assignedTo: string; scheduledDate: string; notes?: string; isUrgentDelivery?: boolean }
+    | undefined
   >(
     'create-delivery-request',
     async (data) => {
@@ -310,6 +311,7 @@ export function PODetailPage() {
         assignedType: 'EMPLOYEE' as const,
         scheduledDate: data.scheduledDate,
         notes: data.notes,
+        isUrgentDelivery: data.isUrgentDelivery,
       });
     },
     {

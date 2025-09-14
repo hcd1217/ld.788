@@ -280,7 +280,7 @@ export function ProductConfigPage() {
     {
       notifications: {
         errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('auth.importFailed'),
+        errorMessage: t('common.bulkImport.importFailed', { entity: t('common.entity.product') }),
       },
       onSuccess: async (result: BulkUpsertProductsResponse) => {
         const message = t('product.bulkImportSuccess', {
@@ -289,7 +289,10 @@ export function ProductConfigPage() {
           failed: result.failed,
         });
 
-        showSuccessNotification(t('auth.importSuccess'), message);
+        showSuccessNotification(
+          t('common.bulkImport.importSuccess', { entity: t('common.entity.product') }),
+          message,
+        );
         modals.closeAll();
         await loadProductsAction.trigger();
       },

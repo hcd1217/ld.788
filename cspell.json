@@ -1,5 +1,6 @@
 {
   "ignorePaths": [
+    "scripts/i18n/flattened/",
     "scripts/seed-data/**/*.json",
     "scripts/seed-data/name.json",
     ".gitignore",

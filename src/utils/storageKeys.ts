@@ -43,6 +43,12 @@ export const STORAGE_KEYS = {
     API_DELAY: '__CLIENT_CONFIG_API_DELAY__',
   },
 
+  // FILTERS
+  FILTERS: {
+    DELIVERY_REQUESTS: '__FILTERS_DELIVERY_REQUESTS__',
+    PURCHASE_ORDERS: '__FILTERS_PURCHASE_ORDERS__',
+  },
+
   // Debug & Development
   DEBUG: {
     MODE: '__DEBUG_MODE__',

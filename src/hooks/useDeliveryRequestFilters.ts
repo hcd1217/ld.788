@@ -1,7 +1,28 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { z } from 'zod';
 
 import { DELIVERY_STATUS, type DeliveryStatusType } from '@/constants/deliveryRequest';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
+
+import { useOnce } from './useOnce';
+
+const DeliveryRequestFiltersSchema = z.object({
+  searchQuery: z.string(),
+  statuses: z.array(z.enum(Object.values(DELIVERY_STATUS) as [string, ...string[]])),
+  assignedTo: z.string().optional(),
+  customerId: z.string().optional(),
+  scheduledDateRange: z
+    .object({
+      start: z.string().optional(),
+      end: z.string().optional(),
+    })
+    .transform((val) => ({
+      start: val.start ? new Date(val.start) : undefined,
+      end: val.end ? new Date(val.end) : undefined,
+    })),
+});
 
 export interface DeliveryRequestFilters {
   searchQuery: string;
@@ -137,6 +158,22 @@ export function useDeliveryRequestFilters(deliveryRequests: readonly DeliveryReq
   // Server-side filtering - this is not used for client-side filtering
   // We keep this structure for consistency with PO filters
   const filteredDeliveryRequests = deliveryRequests;
+
+  useOnce(() => {
+    const storedFilters = localStorage.getItem(STORAGE_KEYS.FILTERS.DELIVERY_REQUESTS);
+    if (storedFilters) {
+      const parsedFilters = DeliveryRequestFiltersSchema.safeParse(JSON.parse(storedFilters));
+      if (parsedFilters.success) {
+        setFilters(parsedFilters.data as DeliveryRequestFilters);
+      } else {
+        setFilters(defaultFilters);
+      }
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.FILTERS.DELIVERY_REQUESTS, JSON.stringify(filters));
+  }, [filters]);
 
   return {
     filters,

@@ -40,13 +40,16 @@ export function BulkImportModalContent({
 
   const handleDownloadTemplate = () => {
     onDownloadTemplate();
-    showSuccessNotification(t('common.success'), t(`${entityType}.templateDownloaded`));
+    showSuccessNotification(t('common.success'), t('common.bulkImport.templateDownloaded'));
   };
 
   return (
     <Stack gap="md">
       <Alert icon={<IconAlertCircle size={16} />} color="blue">
-        {t(`${entityType}.bulkImportDescription`)}
+        {t('common.bulkImport.description', {
+          entity: t(`common.entity.${entityType}`),
+          field: t(`common.bulkImport.fields.${entityType}`),
+        })}
       </Alert>
 
       {/* Download Template Section */}
@@ -55,10 +58,10 @@ export function BulkImportModalContent({
           <div>
             <Group gap="xs">
               <IconFileSpreadsheet size={20} color="var(--mantine-color-blue-6)" />
-              <Text fw={500}>{t(`${entityType}.downloadTemplate`)}</Text>
+              <Text fw={500}>{t('common.bulkImport.downloadTemplate')}</Text>
             </Group>
             <Text size="sm" c="dimmed">
-              {t(`${entityType}.templateDescription`)}
+              {t('common.bulkImport.downloadTemplateDescription')}
             </Text>
           </div>
           <Button
@@ -141,7 +144,10 @@ export function BulkImportModalContent({
       )}
 
       <Text size="sm" c="dimmed">
-        {t(`${entityType}.upsertDescription`)}
+        {t('common.bulkImport.upsertDescription', {
+          entity: t(`common.entity.${entityType}`),
+          field: t(`common.bulkImport.fields.${entityType}`),
+        })}
       </Text>
     </Stack>
   );

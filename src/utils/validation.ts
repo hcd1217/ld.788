@@ -23,7 +23,7 @@ export function validateEmail(value: string, t: TranslationFunction): string | u
 // Phone validation
 export function validatePhone(value: string, t: TranslationFunction): string | undefined {
   if (!value) return t('validation.phoneRequired');
-  if (value.length < 10) return t('validation.phoneTooShort');
+  if (value.length < 10) return t('validation.tooShort', { field: t('common.phone'), length: 10 });
   // TODO: validate phone number format
   return undefined;
 }
@@ -64,9 +64,12 @@ export function validateName(
   t: TranslationFunction,
   fieldKey: 'firstName' | 'lastName',
 ): string | undefined {
-  if (!value) return t(`validation.${fieldKey}Required`);
+  if (!value) return t(`validation.required`, { field: t(`validation.fields.${fieldKey}`) });
   if (value.length < VALIDATION_CONSTRAINTS.minNameLength) {
-    return t(`validation.${fieldKey}TooShort`);
+    return t('validation.tooShort', {
+      field: t(`validation.fields.${fieldKey}`),
+      length: VALIDATION_CONSTRAINTS.minNameLength,
+    });
   }
 
   return undefined;
@@ -76,7 +79,10 @@ export function validateName(
 export function validateIdentifier(value: string, t: TranslationFunction): string | undefined {
   if (!value) return t('validation.identifierRequired');
   if (value.length < VALIDATION_CONSTRAINTS.minIdentifierLength) {
-    return t('validation.identifierTooShort');
+    return t('validation.tooShort', {
+      field: t('auth.identifier'),
+      length: VALIDATION_CONSTRAINTS.minIdentifierLength,
+    });
   }
 
   return undefined;
