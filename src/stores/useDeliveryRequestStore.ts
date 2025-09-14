@@ -68,7 +68,7 @@ type DeliveryRequestState = {
   updateDeliveryStatus: (id: string, status: DeliveryStatus, notes?: string) => Promise<void>;
   uploadPhotos: (id: string, photoUrls: string[]) => Promise<void>;
   completeDelivery: (id: string, data?: { photoUrls?: string[]; notes?: string }) => Promise<void>;
-  updateDeliveryOrderInDay: (assignedTo: string, date: Date, orderedIds: string[]) => Promise<void>;
+  updateDeliveryOrderInDay: (assignedTo: string, date: Date, requestIds: string[]) => Promise<void>;
   loadDeliveryRequestsForDate: (assignedTo: string, date: Date) => Promise<DeliveryRequest[]>;
   clearError: () => void;
 
@@ -416,10 +416,10 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
         }
       },
 
-      async updateDeliveryOrderInDay(assignedTo: string, date: Date, orderedIds: string[]) {
+      async updateDeliveryOrderInDay(assignedTo: string, date: Date, requestIds: string[]) {
         set({ isLoading: true, error: undefined });
         try {
-          await deliveryRequestService.updateDeliveryOrderInDay(assignedTo, date, orderedIds);
+          await deliveryRequestService.updateDeliveryOrderInDay(assignedTo, date, requestIds);
           // No need to reload, the page will refresh the data
         } catch (error) {
           set({ error: getErrorMessage(error, 'Failed to update delivery order') });

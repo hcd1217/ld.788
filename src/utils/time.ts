@@ -147,7 +147,8 @@ export function startOfDay(date: Date): Date {
  * @returns The end of the day
  */
 export function endOfDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+  return new Date(startOfDay(date).getTime() + ONE_DAY - 1);
 }
 
 /**
