@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Button, Checkbox, Group, ScrollArea, Stack } from '@mantine/core';
 
@@ -35,31 +35,36 @@ export function POStatusDrawer({
     }
   }, [opened, selectedStatuses]);
 
-  const statusOptions = [
-    { value: PO_STATUS.NEW, label: t('po.status.NEW') },
-    { value: PO_STATUS.CONFIRMED, label: t('po.status.CONFIRMED') },
-    { value: PO_STATUS.PROCESSING, label: t('po.status.PROCESSING') },
-    { value: PO_STATUS.SHIPPED, label: t('po.status.SHIPPED') },
-    { value: PO_STATUS.DELIVERED, label: t('po.status.DELIVERED') },
-    { value: PO_STATUS.CANCELLED, label: t('po.status.CANCELLED') },
-    { value: PO_STATUS.REFUNDED, label: t('po.status.REFUNDED') },
-  ];
+  const statusOptions = useMemo(
+    () => [
+      { value: PO_STATUS.NEW, label: t('po.status.NEW') },
+      { value: PO_STATUS.CONFIRMED, label: t('po.status.CONFIRMED') },
+      { value: PO_STATUS.PROCESSING, label: t('po.status.PROCESSING') },
+      { value: PO_STATUS.SHIPPED, label: t('po.status.SHIPPED') },
+      { value: PO_STATUS.DELIVERED, label: t('po.status.DELIVERED') },
+      { value: PO_STATUS.CANCELLED, label: t('po.status.CANCELLED') },
+      { value: PO_STATUS.REFUNDED, label: t('po.status.REFUNDED') },
+    ],
+    [t],
+  );
 
-  const isAllSelected = localStatuses.length === 0;
-  const selectedCount = isAllSelected ? 0 : localStatuses.length;
+  const selectedCount = localStatuses.length;
+  const isAllSelected = selectedCount === statusOptions.length;
 
-  const handleAllToggle = () => {
+  const handleAllToggle = useCallback(() => {
+    const isAllSelected = localStatuses.length === statusOptions.length;
     if (isAllSelected) {
-      // If ALL is selected (empty array), select all individual statuses
-      const allStatuses = statusOptions.map((option) => option.value);
-      setLocalStatuses(allStatuses);
-    } else {
-      // If some statuses are selected, clear all (select ALL)
+      // If ALL is selected, clear all
       setLocalStatuses([]);
+      return;
     }
-  };
 
-  const handleStatusToggle = (status: POStatusType) => {
+    // If ALL is not selected, select all individual statuses
+    const allStatuses = statusOptions.map((option) => option.value);
+    setLocalStatuses(allStatuses);
+  }, [localStatuses, statusOptions]);
+
+  const handleStatusToggle = useCallback((status: POStatusType) => {
     setLocalStatuses((prev) => {
       const isSelected = prev.includes(status);
       if (isSelected) {
@@ -70,9 +75,9 @@ export function POStatusDrawer({
         return [...prev, status];
       }
     });
-  };
+  }, []);
 
-  const handleApply = () => {
+  const handleApply = useCallback(() => {
     // Apply local changes to actual filters
     if (localStatuses.length === 0) {
       // Empty array means ALL selected
@@ -84,13 +89,13 @@ export function POStatusDrawer({
     }
     onApply();
     onClose();
-  };
+  }, [localStatuses, onStatusToggle, onClear, onApply, onClose]);
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setLocalStatuses([]);
     onClear();
     onClose();
-  };
+  }, [onClear, onClose]);
 
   return (
     <Drawer
@@ -107,7 +112,7 @@ export function POStatusDrawer({
           <Stack gap="md">
             {/* All option */}
             <Checkbox
-              label={t('po.allStatus')}
+              label={t('common.filters.allStatus')}
               checked={isAllSelected}
               onChange={() => handleAllToggle()}
             />
@@ -118,7 +123,7 @@ export function POStatusDrawer({
                 <Checkbox
                   key={option.value}
                   label={option.label}
-                  checked={!isAllSelected && localStatuses.includes(option.value)}
+                  checked={localStatuses.includes(option.value)}
                   disabled={isAllSelected}
                   onChange={() => handleStatusToggle(option.value)}
                 />

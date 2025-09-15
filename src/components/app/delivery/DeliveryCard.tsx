@@ -7,8 +7,6 @@ import { Box, Card, Group, type MantineStyleProp, Text } from '@mantine/core';
 import { UrgentBadge } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
-import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
-import { getEmployeeNameByEmployeeId } from '@/utils/overview';
 import { formatDate } from '@/utils/time';
 
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
@@ -24,7 +22,6 @@ type DeliveryCardProps = {
 export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
 
   // Memoized navigation handler
   const handleCardClick = useCallback(() => {
@@ -57,7 +54,7 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
           {deliveryRequest.customerName && (
             <Group gap="sm">
               <Text size="sm" c="dimmed">
-                {t('delivery.customer')}:
+                {t('common.customer')}:
               </Text>
               <Text size="sm" fw={500}>
                 {deliveryRequest.customerName}
@@ -79,7 +76,7 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
                 {t('delivery.assignedTo')}:
               </Text>
               <Text size="sm" fw={500}>
-                {getEmployeeNameByEmployeeId(employeeMapByEmployeeId, deliveryRequest.assignedTo)}
+                {deliveryRequest.deliveryPerson}
               </Text>
             </Group>
           )}

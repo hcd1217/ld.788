@@ -20,7 +20,6 @@ type DataTableProps<T> = {
   readonly emptyMessage?: string;
   readonly renderActions?: (item: T) => React.ReactNode;
   readonly onRowClick?: (item: T) => void;
-  readonly ariaLabel?: string;
   readonly getRowStyles?: (item: T) => React.CSSProperties;
   readonly onActionCellClick?: (event: React.MouseEvent) => void;
 };
@@ -32,7 +31,6 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
   emptyMessage,
   renderActions,
   onRowClick,
-  ariaLabel,
   getRowStyles,
   onActionCellClick,
 }: DataTableProps<T>) {
@@ -55,7 +53,7 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
 
       <Box visibleFrom="md">
         <ScrollArea>
-          <Table striped highlightOnHover aria-label={ariaLabel}>
+          <Table striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
                 {columns.map((column) => (

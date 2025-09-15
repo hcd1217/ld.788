@@ -163,13 +163,7 @@ const POItemsEditorMobileComponent = forwardRef<POItemsEditorRef, POItemsEditorM
             position={{ bottom: FAB_BOTTOM_OFFSET, right: FAB_RIGHT_OFFSET }}
             zIndex={FAB_Z_INDEX}
           >
-            <ActionIcon
-              size="xl"
-              radius="xl"
-              color="blue"
-              onClick={() => setModalOpened(true)}
-              aria-label={t('po.addPO')}
-            >
+            <ActionIcon size="xl" radius="xl" color="blue" onClick={() => setModalOpened(true)}>
               <IconPlus size={24} />
             </ActionIcon>
           </Affix>

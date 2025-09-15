@@ -12,16 +12,8 @@ import {
 import { getDeliveryDetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import {
-  useCustomerMapByCustomerId,
-  useEmployeeMapByEmployeeId,
-  useEmployeeMapByUserId,
-} from '@/stores/useAppStore';
-import {
-  getCustomerNameByCustomerId,
-  getEmployeeNameByEmployeeId,
-  getEmployeeNameByUserId,
-} from '@/utils/overview';
+import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
+import { getCustomerNameByCustomerId } from '@/utils/overview';
 import {
   getCancelReason,
   getDeliveryNotes,
@@ -51,8 +43,6 @@ export function POAccordionInfoPanel({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const customerMapByCustomerId = useCustomerMapByCustomerId();
-  const employeeMapByUserId = useEmployeeMapByUserId();
-  const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
   const isEditable = isPOEditable(purchaseOrder);
   const shippingInfo = getShippingInfo(purchaseOrder.statusHistory);
 
@@ -209,17 +199,7 @@ export function POAccordionInfoPanel({
                 </Text>
                 <Group gap={4}>
                   <IconUser size={14} color="var(--mantine-color-gray-6)" />
-                  <Text size="sm">
-                    {purchaseOrder.deliveryRequest.assignedType === 'EMPLOYEE'
-                      ? getEmployeeNameByEmployeeId(
-                          employeeMapByEmployeeId,
-                          purchaseOrder.deliveryRequest.assignedTo,
-                        )
-                      : getEmployeeNameByUserId(
-                          employeeMapByUserId,
-                          purchaseOrder.deliveryRequest.assignedTo,
-                        )}
-                  </Text>
+                  <Text size="sm">{purchaseOrder.deliveryRequest.deliveryPerson}</Text>
                 </Group>
               </Group>
             )}

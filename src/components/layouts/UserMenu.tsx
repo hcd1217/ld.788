@@ -36,11 +36,7 @@ export function UserMenu({ c }: UserMenuProps) {
       transitionProps={{ transition: 'pop-top-right' }}
     >
       <Menu.Target>
-        <UnstyledButton
-          className={classes.userMenuButton}
-          aria-label={t('common.userMenu')}
-          aria-haspopup="true"
-        >
+        <UnstyledButton className={classes.userMenuButton} aria-haspopup="true">
           <Group gap={7}>
             <Avatar radius="xl" size="md" color="brand" c={c}>
               {userInitials}

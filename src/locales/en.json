@@ -61,6 +61,8 @@
     "contact": "Contact",
     "copied": "Copied!",
     "createdAt": "Created At",
+    "customer": "Customer",
+    "customerName": "Customer Name",
     "dangerZone": "Danger Zone",
     "darkMode": "Dark Mode",
     "delete": "Delete",
@@ -88,6 +90,11 @@
       "pleaseSelectExcelFile": "Please select a CSV or Excel file",
       "pleaseSelectFileFirst": "Please select a file first"
     },
+    "filters": {
+      "allStatus": "All Status",
+      "selectCustomer": "Select Customer",
+      "selectStatus": "Select Status"
+    },
     "firstName": "First name",
     "form": {
       "email": "Email",
@@ -108,13 +115,10 @@
     "lastName": "Last name",
     "loadingFailed": "Failed to load data",
     "loadingMore": "Loading more...",
-    "loadingNavigation": "Loading navigation",
     "logout": "Logout",
-    "mainNavigation": "Main Navigation",
     "name": "Name",
     "navigation": "Navigation",
     "next": "Next",
-    "nextWeek": "Next week",
     "noDataFound": "No data found",
     "notAssigned": "Not assigned",
     "notScheduled": "Not scheduled",
@@ -160,7 +164,6 @@
       "uploading": "Uploading photos..."
     },
     "previous": "Previous",
-    "previousWeek": "Previous week",
     "pwa": {
       "appAvailableOffline": "{{appName}} App is now available offline!",
       "clickToUpdate": "Click here to update now.",
@@ -187,18 +190,16 @@
     "save": "Save",
     "selectFile": "Select File",
     "status": "Status",
+    "statusesSelected": "{{count}} statuses selected",
     "success": "Success",
     "tableDisplayOrder": "#",
     "tableView": "Table",
-    "thisWeek": "This week",
-    "toggleColorScheme": "Toggle color scheme",
     "total": "Total",
     "tryAgain": "Try again",
     "unknownError": "Unknown error",
     "updateFailed": "Failed to update {{entity}}",
     "updatedAt": "Updated At",
     "urgent": "Urgent",
-    "userMenu": "User Menu",
     "viewOnMap": "View on Google Maps"
   },
   "customer": {
@@ -216,7 +217,6 @@
     "noValidDataFound": "No valid customer data found in the file",
     "phonePlaceholder": "+84901234567",
     "searchPlaceholder": "Search customers by name, company, email, or phone...",
-    "tableAriaLabel": "Customer list table",
     "taxCode": "Tax Code",
     "taxCodePlaceholder": "Tax Code (Optional)",
     "updated": "Customer Updated",
@@ -224,40 +224,31 @@
   },
   "delivery": {
     "actions": {
+      "arrangeDeliveryOrder": "Arrange Delivery Order",
       "complete": "Complete Delivery",
       "create": "Create Delivery Request",
+      "enterCompletionNotes": "Enter completion notes",
+      "enterRecipientName": "Enter recipient name",
+      "enterTransitNotes": "Enter transit notes (optional)",
+      "markAsCompleted": "Mark as Completed",
       "startTransit": "Start Transit",
       "startTransitDescription": "Mark this delivery request as in transit"
     },
-    "arrangeDeliveryOrder": "Arrange Delivery Order",
     "assignedTo": "Assigned To",
-    "completeDelivery": "Complete Delivery",
-    "completeDeliveryDescription": "Mark this delivery as completed",
     "completedDate": "Completed Date",
     "completionNotes": "Completion Notes",
-    "completionNotesDescription": "Notes about the completed delivery",
-    "createFirstDeliveryRequestDescription": "Create your first delivery request from a purchase order",
-    "customer": "Customer",
-    "customerName": "Customer Name",
-    "deliveryDetails": "Delivery Details",
     "deliveryId": "Delivery ID",
-    "detail": {
-      "deliveryInfo": "Delivery Information",
-      "noPhotos": "No photos uploaded yet",
-      "photos": "Delivery Photos",
-      "photosRequired": "Please upload at photo before completing the delivery",
-      "title": "Delivery Details"
+    "deliveryInfo": "Delivery Information",
+    "descriptions": {
+      "completeDelivery": "Mark this delivery as completed",
+      "completionNotes": "Notes about the completed delivery",
+      "createFirstDeliveryRequest": "Create your first delivery request from a purchase order"
     },
-    "enterCompletionNotes": "Enter completion notes",
-    "enterRecipientName": "Enter recipient name",
-    "enterTransitNotes": "Enter transit notes (optional)",
+    "detail": "Delivery Details",
     "filters": {
-      "allStatus": "All",
       "searchPlaceholder": "Search by delivery number",
       "selectAssignee": "Select Assignee",
-      "selectCustomer": "Select Customer",
-      "selectScheduledDate": "Select scheduled data",
-      "selectStatus": "Select Status"
+      "selectScheduledDate": "Select scheduled data"
     },
     "form": {
       "enterNotes": "Enter delivery notes",
@@ -265,12 +256,7 @@
       "selectDate": "Select Scheduled Date",
       "urgentDeliveryDescription": "Mark this delivery as urgent"
     },
-    "gridCard": "Delivery card {{id}}",
     "id": "Request ID",
-    "list": {
-      "title": "Delivery Management"
-    },
-    "markAsCompleted": "Mark as Completed",
     "messages": {
       "completeFailed": "Failed to complete delivery",
       "completed": "Delivery completed successfully",
@@ -282,7 +268,10 @@
     "noDeliveryRequestsFound": "No delivery requests found",
     "noDeliveryRequestsFoundSearch": "No delivery requests found matching your search",
     "noMoreDeliveryRequests": "No more delivery requests to load",
+    "noPhotos": "No photos uploaded yet",
     "notFound": "Delivery request not found",
+    "photos": "Delivery Photos",
+    "photosRequired": "Please upload at photo before completing the delivery",
     "pleaseSelectAssigneeAndScheduledDate": "Please select assignee and scheduled date",
     "poNumber": "PO Number",
     "purchaseOrder": "Purchase Order",
@@ -302,6 +291,7 @@
       "inTransit": "In Transit",
       "pending": "Pending"
     },
+    "title": "Delivery Management",
     "transitNotes": "Transit Notes",
     "transitNotesDescription": "Optional notes about starting transit",
     "tryDifferentSearch": "Try adjusting your search criteria",
@@ -458,7 +448,6 @@
     "address": "Address",
     "addressPlaceholder": "Enter complete address",
     "allCustomers": "All Customers",
-    "allStatus": "All Status",
     "autoFilledFromCustomerAddress": "Auto-filled from customer address",
     "availableActions": "Available Actions",
     "cancel": "Cancel",
@@ -535,7 +524,7 @@
     "itemsTableAriaLabel": "Purchase order items table",
     "markAsDelivered": "Mark as Delivered",
     "markDelivered": "Mark as Delivered",
-    "markReady": "Ready for Pickup",
+    "markReady": "Ready",
     "markReadyFailed": "Failed to mark as ready for pickup",
     "markReadyOrder": "Mark Ready for Pickup",
     "markReadyOrderDescription": "Mark this order as ready for pickup. You can specify the pickup location and send a notification.",
@@ -590,6 +579,7 @@
     "refundReason": "Refund Reason",
     "refunded": "Order refunded successfully",
     "refundedBy": "Refunded by",
+    "salesPerson": "Person in Charge",
     "searchCustomer": "Search customers",
     "searchPlaceholder": "Search by PO number",
     "searchProduct": "Search product",
@@ -599,6 +589,7 @@
     "selectDeliveryDate": "Select delivery date",
     "selectEndDate": "Select End Date",
     "selectOrderDate": "Select order date",
+    "selectSalesPerson": "Select Person in charge",
     "selectStartDate": "Select Start Date",
     "selectStatus": "Select Status",
     "ship": "Ship",
@@ -619,12 +610,11 @@
       "DELIVERED": "Delivered",
       "NEW": "New",
       "PROCESSING": "Processing",
-      "READY_FOR_PICKUP": "Ready for Pickup",
+      "READY_FOR_PICKUP": "Ready",
       "REFUNDED": "Refunded",
       "SHIPPED": "Shipped"
     },
     "statusLabel": "Order status: {{status}}",
-    "statusesSelected": "statuses selected",
     "street": "Street Address",
     "streetPlaceholder": "Enter street address",
     "tableAriaLabel": "Purchase orders table",
@@ -664,7 +654,6 @@
       "outOfStock": "Out of Stock"
     },
     "statusPlaceholder": "Select status",
-    "tableAriaLabel": "Product list table",
     "unit": "Unit",
     "unitPlaceholder": "pcs, kg, etc.",
     "updated": "Product Updated",

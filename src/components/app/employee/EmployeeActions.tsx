@@ -33,13 +33,7 @@ export function EmployeeActions({
 
   return (
     <Group gap={gap} style={style}>
-      <ActionIcon
-        variant="subtle"
-        color="gray"
-        size="sm"
-        aria-label={t('common.edit')}
-        onClick={handleEdit}
-      >
+      <ActionIcon variant="subtle" color="gray" size="sm" onClick={handleEdit}>
         <Tooltip label={t('common.edit')} position="bottom">
           <IconEdit size={16} />
         </Tooltip>
@@ -48,7 +42,6 @@ export function EmployeeActions({
         <ActionIcon
           variant="subtle"
           size="sm"
-          aria-label={t('employee.deactivate')}
           color="var(--app-danger-color)"
           onClick={onDeactivate}
         >
@@ -57,13 +50,7 @@ export function EmployeeActions({
           </Tooltip>
         </ActionIcon>
       ) : (
-        <ActionIcon
-          variant="subtle"
-          color="var(--app-active-color)"
-          size="sm"
-          aria-label={t('employee.activate')}
-          onClick={onActivate}
-        >
+        <ActionIcon variant="subtle" color="var(--app-active-color)" size="sm" onClick={onActivate}>
           <Tooltip label={t('employee.activate')}>
             <IconUserCheck size={16} />
           </Tooltip>

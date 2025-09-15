@@ -29,9 +29,6 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
       style={{
         cursor: 'pointer',
       }}
-      aria-label={t('po.poCard', {
-        number: purchaseOrder.poNumber,
-      })}
       onClick={() => navigate(getPODetailRoute(purchaseOrder.id))}
     >
       <Stack
@@ -63,6 +60,18 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
                 </Text>
               </div>
             </Group>
+            {purchaseOrder.salesId && (
+              <Group justify="space-between" w="100%">
+                <div>
+                  <Text size="sm" c="dimmed">
+                    {t('po.salesPerson')}
+                  </Text>
+                  <Text size="sm" fw={500}>
+                    {purchaseOrder.salesPerson}
+                  </Text>
+                </div>
+              </Group>
+            )}
             <Group justify="space-between" w="100%">
               <div>
                 <Text size="sm" c="dimmed">

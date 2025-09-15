@@ -2,22 +2,24 @@ import { Card, Select, Stack, Text } from '@mantine/core';
 
 import { useTranslation } from '@/hooks/useTranslation';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
+import { usePurchaseOrderAssigneeOptions } from '@/stores/usePOStore';
 
 import type { UseFormReturnType } from '@mantine/form';
 
-type POCustomerSelectionProps = {
+type POCustomerAndSalesSelectionProps = {
   readonly form: UseFormReturnType<any>;
   readonly customers: readonly Customer[];
   readonly selectedCustomer: Customer | undefined;
   readonly isEditMode?: boolean;
 };
 
-export function POCustomerSelection({
+export function POCustomerAndSalesSelection({
   form,
   customers,
   isEditMode = false,
-}: POCustomerSelectionProps) {
+}: POCustomerAndSalesSelectionProps) {
   const { t } = useTranslation();
+  const salesOptions = usePurchaseOrderAssigneeOptions();
 
   const customerOptions = customers.map((customer) => ({
     value: customer.id,
@@ -39,6 +41,15 @@ export function POCustomerSelection({
           data={customerOptions}
           disabled={isEditMode}
           {...form.getInputProps('customerId')}
+        />
+
+        <Select
+          searchable
+          clearable
+          label={t('po.salesPerson')}
+          placeholder={t('po.selectSalesPerson')}
+          data={salesOptions}
+          {...form.getInputProps('salesId')}
         />
       </Stack>
     </Card>

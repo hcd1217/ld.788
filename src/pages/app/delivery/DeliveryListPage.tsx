@@ -44,21 +44,20 @@ import { xOr } from '@/utils/boolean';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 export function DeliveryListPage() {
-  const { isMobile, isDesktop } = useDeviceType();
-  const { t } = useTranslation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { isMobile, isDesktop } = useDeviceType();
+  const currentUser = useMe();
   const permissions = usePermissions();
   const deliveryRequests = useDeliveryRequests();
   const customers = useCustomers();
   const isLoading = useDeliveryRequestLoading();
   const error = useDeliveryRequestError();
-  const currentUser = useMe();
-  const { currentEmployeeId, canFilter, canViewAll } = useMemo(() => {
+  const { currentEmployeeId, canViewAll } = useMemo(() => {
     const employeeId = currentUser?.employee?.id ?? '-';
     return {
       currentEmployeeId: employeeId,
       canViewAll: permissions.deliveryRequest.query?.canViewAll ?? false,
-      canFilter: permissions.deliveryRequest.query?.canFilter ?? false,
     };
   }, [currentUser, permissions.deliveryRequest]);
 
@@ -73,7 +72,7 @@ export function DeliveryListPage() {
     useDeliveryRequestPaginationState();
 
   // Use the delivery request filters hook for filter state management
-  const { filters, filterHandlers, hasActiveFilters } = useDeliveryRequestFilters([]);
+  const { filters, filterHandlers, hasActiveFilters } = useDeliveryRequestFilters();
 
   // Mobile drawer states
   const [quickActionsDrawerOpened, setQuickActionsDrawerOpened] = useState(false);
@@ -197,7 +196,7 @@ export function DeliveryListPage() {
         : t('delivery.noDeliveryRequestsFound'),
       description: hasActiveFilters
         ? t('delivery.tryDifferentSearch')
-        : t('delivery.createFirstDeliveryRequestDescription'),
+        : t('delivery.descriptions.createFirstDeliveryRequest'),
     }),
     [deliveryRequests.length, isLoading, hasActiveFilters, t],
   );
@@ -233,7 +232,7 @@ export function DeliveryListPage() {
         isLoading={isLoading || isFilterLoading}
         error={error}
         clearError={clearError}
-        header={<AppPageTitle title={t('delivery.list.title')} />}
+        header={<AppPageTitle title={t('delivery.title')} />}
       >
         <DeliveryErrorBoundary componentName="DeliveryListPage">
           {/* Mobile Filter Bar */}
@@ -325,7 +324,7 @@ export function DeliveryListPage() {
     >
       <DeliveryErrorBoundary componentName="DeliveryListPage">
         <Group justify="space-between" mb="lg">
-          <AppPageTitle title={t('delivery.list.title')} />
+          <AppPageTitle title={t('delivery.title')} />
           <Group gap="sm">
             <Button
               leftSection={<IconSortAscending size={16} />}
@@ -333,7 +332,7 @@ export function DeliveryListPage() {
               onClick={() => navigate(ROUTERS.DELIVERY_UPDATE_ORDER)}
               disabled={!permissions.deliveryRequest.actions?.canUpdateDeliveryOrderInDay}
             >
-              {t('delivery.arrangeDeliveryOrder')}
+              {t('delivery.actions.arrangeDeliveryOrder')}
             </Button>
             <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
             {/* Note: Delivery requests are created from PO pages, not directly */}
@@ -341,26 +340,24 @@ export function DeliveryListPage() {
         </Group>
 
         {/* Desktop Filter Controls */}
-        {canFilter ? (
-          <DeliveryFilterBarDesktop
-            searchQuery={filters.searchQuery}
-            customerId={filters.customerId}
-            assignedTo={canViewAll ? filters.assignedTo : currentEmployeeId}
-            selectedStatuses={filters.statuses}
-            scheduledDateStart={filters.scheduledDateRange.start}
-            scheduledDateEnd={filters.scheduledDateRange.end}
-            customers={customers}
-            hasActiveFilters={hasActiveFilters}
-            onSearchChange={filterHandlers.setSearchQuery}
-            onCustomerChange={filterHandlers.setCustomerId}
-            onAssignedToChange={(assignedTo) => {
-              filterHandlers.setAssignedTo(canViewAll ? assignedTo : currentEmployeeId);
-            }}
-            onStatusesChange={filterHandlers.setStatuses}
-            onScheduledDateChange={filterHandlers.setScheduledDateRange}
-            onClearFilters={filterHandlers.resetFilters}
-          />
-        ) : null}
+        <DeliveryFilterBarDesktop
+          searchQuery={filters.searchQuery}
+          customerId={filters.customerId}
+          assignedTo={canViewAll ? filters.assignedTo : currentEmployeeId}
+          selectedStatuses={filters.statuses}
+          scheduledDateStart={filters.scheduledDateRange.start}
+          scheduledDateEnd={filters.scheduledDateRange.end}
+          customers={customers}
+          hasActiveFilters={hasActiveFilters}
+          onSearchChange={filterHandlers.setSearchQuery}
+          onCustomerChange={filterHandlers.setCustomerId}
+          onAssignedToChange={(assignedTo) => {
+            filterHandlers.setAssignedTo(canViewAll ? assignedTo : currentEmployeeId);
+          }}
+          onStatusesChange={filterHandlers.setStatuses}
+          onScheduledDateChange={filterHandlers.setScheduledDateRange}
+          onClearFilters={filterHandlers.resetFilters}
+        />
 
         {/* Content Area */}
         <BlankState

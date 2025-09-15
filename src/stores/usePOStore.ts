@@ -1,6 +1,9 @@
+import { useMemo } from 'react';
+
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
+import type { ClientConfig } from '@/lib/api/schemas/clientConfig.schemas';
 import {
   type POFilterParams,
   type POStatus,
@@ -9,6 +12,8 @@ import {
   type UpdatePOStatusRequest,
 } from '@/services/sales';
 import { getErrorMessage } from '@/utils/errorUtils';
+
+import { useAppStore } from './useAppStore';
 
 type POState = {
   // PO data
@@ -72,7 +77,10 @@ type POState = {
 
   // Selectors
   getPOById: (id: string) => PurchaseOrder | undefined;
+  getPurchaseOrderAssigneeOptions: () => Array<{ value: string; label: string }>;
 };
+
+const DEFAULT_PURCHASE_ORDER_ASSIGNEE_OPTIONS: Array<{ value: string; label: string }> = [];
 
 export const usePOStore = create<POState>()(
   devtools(
@@ -433,6 +441,29 @@ export const usePOStore = create<POState>()(
         return get().purchaseOrders.find((po) => po.id === id);
       },
 
+      getPurchaseOrderAssigneeOptions: () => {
+        // Get employees and clientConfig from app store
+        const appState = useAppStore.getState();
+        const employees = appState.overviewData?.employees;
+        const clientConfig: ClientConfig | undefined = appState.user?.clientConfig;
+        const assigneeIds = clientConfig?.features?.purchaseOrder?.assigneeIds;
+
+        if (!assigneeIds || !employees) {
+          return DEFAULT_PURCHASE_ORDER_ASSIGNEE_OPTIONS;
+        }
+
+        // Filter employees based on assigneeIds if configured, otherwise show all
+        const filteredEmployees =
+          assigneeIds.length > 0
+            ? employees.filter((employee) => assigneeIds.includes(employee.id))
+            : employees;
+
+        return filteredEmployees.map((employee) => ({
+          value: employee.id,
+          label: employee.fullName,
+        }));
+      },
+
       // Generic status update helper - simplified and DRY
       async _updatePOStatus(
         id: string,
@@ -624,4 +655,26 @@ export const usePOPaginationState = () => {
     activeFilters,
     currentPage,
   };
+};
+
+// Purchase order assignee options hook with memoization to prevent infinite re-renders
+export const usePurchaseOrderAssigneeOptions = () => {
+  // Get the selector function (stable reference)
+  const getPurchaseOrderAssigneeOptions = usePOStore(
+    (state) => state.getPurchaseOrderAssigneeOptions,
+  );
+
+  // Get dependencies that might affect the options
+  const employees = useAppStore((state) => state.overviewData?.employees);
+  const assigneeIds = useAppStore(
+    (state) => state.user?.clientConfig?.features?.purchaseOrder?.assigneeIds,
+  );
+
+  // Memoize the result based on the actual data dependencies
+  return useMemo(() => {
+    if (!employees || !assigneeIds) {
+      return DEFAULT_PURCHASE_ORDER_ASSIGNEE_OPTIONS;
+    }
+    return getPurchaseOrderAssigneeOptions();
+  }, [getPurchaseOrderAssigneeOptions, employees, assigneeIds]);
 };

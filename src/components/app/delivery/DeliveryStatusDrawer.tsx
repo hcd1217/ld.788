@@ -49,9 +49,9 @@ const getModalConfig = (mode: DeliveryModalMode, t: any) => {
       requiresNotes: false,
     },
     complete: {
-      title: t('delivery.completeDelivery'),
-      description: t('delivery.completeDeliveryDescription'),
-      buttonText: t('delivery.markAsCompleted'),
+      title: t('actions.complete'),
+      description: t('delivery.descriptions.completeDelivery'),
+      buttonText: t('delivery.actions.markAsCompleted'),
       buttonColor: 'red',
       icon: <IconCheck size={16} />,
       alertColor: 'red',
@@ -202,13 +202,13 @@ export function DeliveryStatusDrawer({
 
             <div>
               <Text fw={500} mb="xs">
-                {t('delivery.deliveryDetails')}
+                {t('delivery.detail')}
               </Text>
               <Text size="sm" c="dimmed">
                 {t('delivery.deliveryId')}: {deliveryRequest.deliveryRequestNumber}
               </Text>
               <Text size="sm" c="dimmed">
-                {t('delivery.customerName')}: {deliveryRequest.customerName}
+                {t('common.customerName')}: {deliveryRequest.customerName}
               </Text>
               {deliveryRequest.scheduledDate && (
                 <Text size="sm" c="dimmed">
@@ -220,7 +220,7 @@ export function DeliveryStatusDrawer({
             {!isComplete && (
               <Textarea
                 label={t('delivery.transitNotes')}
-                placeholder={t('delivery.enterTransitNotes')}
+                placeholder={t('delivery.actions.enterTransitNotes')}
                 value={notes}
                 onChange={(event) => setNotes(event.currentTarget.value)}
                 rows={3}
@@ -231,7 +231,7 @@ export function DeliveryStatusDrawer({
             {isComplete && (
               <>
                 <Text size="sm" fw={500} mb="xs">
-                  {t('delivery.detail.photos')}
+                  {t('delivery.photos')}
                 </Text>
 
                 {/* Display uploaded photos */}
@@ -269,7 +269,7 @@ export function DeliveryStatusDrawer({
                 </Button>
                 <TextInput
                   label={t('delivery.recipient')}
-                  placeholder={t('delivery.enterRecipientName')}
+                  placeholder={t('delivery.actions.enterRecipientName')}
                   value={recipient}
                   onChange={(event) => setRecipient(event.currentTarget.value)}
                   required
@@ -277,19 +277,19 @@ export function DeliveryStatusDrawer({
                 />
                 <Textarea
                   label={t('delivery.completionNotes')}
-                  placeholder={t('delivery.enterCompletionNotes')}
+                  placeholder={t('delivery.actions.enterCompletionNotes')}
                   value={notes}
                   onChange={(event) => setNotes(event.currentTarget.value)}
                   rows={3}
                   required
-                  description={t('delivery.completionNotesDescription')}
+                  description={t('delivery.descriptions.completionNotes')}
                 />
               </>
             )}
 
             {isComplete && uploadedPhotos.length === 0 && (
               <Text size="xs" c="red" ta="center">
-                {t('delivery.detail.photosRequired')}
+                {t('delivery.photosRequired')}
               </Text>
             )}
 

@@ -9,6 +9,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
 import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
+import { usePermissions } from '@/stores/useAppStore';
 
 interface POFilterBarDesktopProps {
   readonly searchQuery: string;
@@ -46,15 +47,18 @@ export function POFilterBarDesktop({
   onClearFilters,
 }: POFilterBarDesktopProps) {
   const { t } = useTranslation();
+  const permissions = usePermissions();
 
   // Customer options for Select
-  const customerOptions = [
-    { value: '', label: t('po.allCustomers') },
-    ...customers.map((customer) => ({
-      value: customer.id,
-      label: customer.name,
-    })),
-  ];
+  const customerOptions = useMemo(() => {
+    return [
+      { value: '', label: t('po.allCustomers') },
+      ...customers.map((customer) => ({
+        value: customer.id,
+        label: customer.name,
+      })),
+    ];
+  }, [customers, t]);
 
   // Status options for MultiSelect
   const statusOptions = useMemo(() => {
@@ -70,20 +74,32 @@ export function POFilterBarDesktop({
     ];
   }, [t]);
 
-  // Filter out 'all' status if present
-  const filteredStatuses = selectedStatuses.filter((s) => s !== PO_STATUS.ALL);
-
   // Custom placeholder for MultiSelect to show count
-  const statusPlaceholder = useMemo(() => {
+  const { filteredStatuses, statusPlaceholder } = useMemo(() => {
+    // Filter out 'all' status if present
+    const filteredStatuses = selectedStatuses.filter((s) => s !== PO_STATUS.ALL);
     const count = filteredStatuses.length;
     if (count === 0) {
-      return t('po.selectStatus');
+      return {
+        filteredStatuses,
+        statusPlaceholder: t('po.selectStatus'),
+      };
     }
     if (count === 1) {
-      return statusOptions.find((s) => s.value === filteredStatuses[0])?.label;
+      return {
+        filteredStatuses,
+        statusPlaceholder: statusOptions.find((s) => s.value === filteredStatuses[0])?.label,
+      };
     }
-    return `${count} ${t('po.statusesSelected')}`;
-  }, [filteredStatuses, statusOptions, t]);
+    return {
+      filteredStatuses,
+      statusPlaceholder: t('common.statusesSelected', { count }),
+    };
+  }, [selectedStatuses, statusOptions, t]);
+
+  if (!permissions.purchaseOrder.query.canFilter) {
+    return null;
+  }
 
   return (
     <Group justify="start" align="flex-end" gap="sm" wrap="nowrap" mb="xl">

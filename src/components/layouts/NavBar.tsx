@@ -115,12 +115,7 @@ const NavigationItemComponent = memo(
         <Stack className={classes.navItemsContainer}>
           {buttonContent}
           <Collapse in={isExpanded}>
-            <Stack
-              className={classes.navItemsContainer}
-              id={`submenu-${item.id}`}
-              role="group"
-              aria-label={item.label}
-            >
+            <Stack className={classes.navItemsContainer} id={`submenu-${item.id}`} role="group">
               {item.subs.map((subItem) => (
                 <NavigationSubItem
                   key={subItem.id}
@@ -238,7 +233,6 @@ export function NavBar() {
       withBorder={false}
       w={LAYOUT_CONFIG.NAVBAR_ACTUAL_WIDTH}
       role="navigation"
-      aria-label={t('common.mainNavigation')}
     >
       <Stack className={classes.navbarStack}>
         {navigationItems.map((item) => {

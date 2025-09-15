@@ -1,12 +1,10 @@
 import { ActionIcon, useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import { IconMoon, IconSun } from '@tabler/icons-react';
-import { useTranslation } from 'react-i18next';
 
 import { useAppStore } from '@/stores/useAppStore';
 import { isDevelopment } from '@/utils/env';
 
 export function ColorSchemeToggle() {
-  const { t } = useTranslation();
   const { publicClientConfig } = useAppStore();
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light', {
@@ -21,7 +19,6 @@ export function ColorSchemeToggle() {
     <ActionIcon
       variant="default"
       size="lg"
-      aria-label={t('common.toggleColorScheme')}
       onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
     >
       {computedColorScheme === 'light' ? <IconMoon stroke={1.5} /> : <IconSun stroke={1.5} />}

@@ -399,7 +399,6 @@ export function CustomerConfigPage() {
           isLoading={false}
           emptyMessage={t('common.noDataFound')}
           onRowClick={openEditModal}
-          ariaLabel={t('customer.tableAriaLabel')}
           columns={[
             {
               key: 'name',

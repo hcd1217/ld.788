@@ -61,6 +61,8 @@
     "contact": "Liên Hệ",
     "copied": "Đã sao chép!",
     "createdAt": "Ngày Tạo",
+    "customer": "Khách Hàng",
+    "customerName": "Tên Khách Hàng",
     "dangerZone": "Khu Vực Nguy Hiểm",
     "darkMode": "Chế độ tối",
     "delete": "Xóa",
@@ -88,6 +90,11 @@
       "pleaseSelectExcelFile": "Vui lòng chọn một file Excel (.xlsx, .xls, hoặc .csv)",
       "pleaseSelectFileFirst": "Vui lòng chọn file trước"
     },
+    "filters": {
+      "allStatus": "Tất Cả",
+      "selectCustomer": "Chọn Khách Hàng",
+      "selectStatus": "Chọn Trạng Thái"
+    },
     "firstName": "Tên",
     "form": {
       "email": "Email",
@@ -108,13 +115,10 @@
     "lastName": "Họ",
     "loadingFailed": "Không thể tải dữ liệu",
     "loadingMore": "Đang tải thêm...",
-    "loadingNavigation": "Đang tải điều hướng",
     "logout": "Đăng xuất",
-    "mainNavigation": "Điều Hướng Chính",
     "name": "Tên",
     "navigation": "Điều Hướng",
     "next": "Tiếp theo",
-    "nextWeek": "Tuần sau",
     "noDataFound": "Không tìm thấy dữ liệu",
     "notAssigned": "Not assigned",
     "notScheduled": "Not scheduled",
@@ -160,7 +164,6 @@
       "uploading": "Đang tải ảnh lên"
     },
     "previous": "Trước",
-    "previousWeek": "Tuần trước",
     "pwa": {
       "appAvailableOffline": "Ứng dụng {{appName}} đã sẵn sàng hoạt động ngoại tuyến!",
       "clickToUpdate": "Nhấn vào đây để cập nhật ngay.",
@@ -187,18 +190,16 @@
     "save": "Lưu",
     "selectFile": "Chọn file",
     "status": "Trạng thái",
+    "statusesSelected": "{{count}} trạng thái đã chọn",
     "success": "Thành công",
     "tableDisplayOrder": "#",
     "tableView": "Xem Dạng Bảng",
-    "thisWeek": "Tuần này",
-    "toggleColorScheme": "Chuyển đổi chế độ màu",
     "total": "Tổng",
     "tryAgain": "Thử lại",
     "unknownError": "Lỗi không xác định",
     "updateFailed": "Không thể cập nhật {{entity}}",
     "updatedAt": "Ngày Cập Nhật",
     "urgent": "Gấp",
-    "userMenu": "Menu Người Dùng",
     "viewOnMap": "Xem trên Google Maps"
   },
   "customer": {
@@ -216,7 +217,6 @@
     "noValidDataFound": "Không có dữ liệu khách hàng hợp lệ trong tệp",
     "phonePlaceholder": "+84901234567",
     "searchPlaceholder": "Tìm khách hàng theo tên, công ty, email hoặc điện thoại...",
-    "tableAriaLabel": "Bảng danh sách khách hàng",
     "taxCode": "Mã Số Thuế",
     "taxCodePlaceholder": "Mã Số Thuế (Tùy Chọn)",
     "updated": "Đã Cập Nhật Khách Hàng",
@@ -224,40 +224,31 @@
   },
   "delivery": {
     "actions": {
+      "arrangeDeliveryOrder": "Sắp Xếp Thứ Tự Giao Hàng",
       "complete": "Hoàn Thành Giao Hàng",
       "create": "Tạo Yêu Cầu Giao Hàng",
+      "enterCompletionNotes": "Nhập ghi chú hoàn thành",
+      "enterRecipientName": "Nhập tên người nhận",
+      "enterTransitNotes": "Nhập ghi chú vận chuyển (tùy chọn)",
+      "markAsCompleted": "Đánh Dấu Hoàn Thành",
       "startTransit": "Bắt Đầu",
       "startTransitDescription": "Đánh dấu đang vận chuyển"
     },
-    "arrangeDeliveryOrder": "Sắp Xếp Thứ Tự Giao Hàng",
     "assignedTo": "Người Phụ Trách",
-    "completeDelivery": "Hoàn Thành Giao Hàng",
-    "completeDeliveryDescription": "Chụp ảnh để hoàn thành đơn hàng!",
     "completedDate": "Ngày Hoàn Thành",
     "completionNotes": "Ghi Chú Hoàn Thành",
-    "completionNotesDescription": "Ghi chú về việc hoàn thành giao hàng",
-    "createFirstDeliveryRequestDescription": "Tạo yêu cầu giao hàng đầu tiên từ đơn đặt hàng",
-    "customer": "Khách Hàng",
-    "customerName": "Tên Khách Hàng",
-    "deliveryDetails": "Chi Tiết Giao Hàng",
     "deliveryId": "Mã Giao Hàng",
-    "detail": {
-      "deliveryInfo": "Thông Tin Giao Hàng",
-      "noPhotos": "Chưa có ảnh nào được tải lên",
-      "photos": "Ảnh Giao Hàng",
-      "photosRequired": "Vui lòng chụp hình trước khi hoàn thành giao hàng",
-      "title": "Chi Tiết Giao Hàng"
+    "deliveryInfo": "Thông Tin Giao Hàng",
+    "descriptions": {
+      "completeDelivery": "Chụp ảnh để hoàn thành đơn hàng!",
+      "completionNotes": "Ghi chú về việc hoàn thành giao hàng",
+      "createFirstDeliveryRequest": "Tạo yêu cầu giao hàng đầu tiên từ đơn đặt hàng"
     },
-    "enterCompletionNotes": "Nhập ghi chú hoàn thành",
-    "enterRecipientName": "Nhập tên người nhận",
-    "enterTransitNotes": "Nhập ghi chú vận chuyển (tùy chọn)",
+    "detail": "Chi Tiết Giao Hàng",
     "filters": {
-      "allStatus": "Tất Cả",
       "searchPlaceholder": "Tìm kiếm theo mã giao hàng",
       "selectAssignee": "Chọn Người Phụ Trách",
-      "selectCustomer": "Chọn Khách Hàng",
-      "selectScheduledDate": "Chọn ngày dự kiến",
-      "selectStatus": "Chọn Trạng Thái"
+      "selectScheduledDate": "Chọn ngày dự kiến"
     },
     "form": {
       "enterNotes": "Nhập ghi chú giao hàng",
@@ -265,12 +256,7 @@
       "selectDate": "Chọn Ngày Dự Kiến",
       "urgentDeliveryDescription": "Đánh dấu đơn hàng này là giao gấp"
     },
-    "gridCard": "Thẻ giao hàng {{id}}",
     "id": "Mã Yêu Cầu",
-    "list": {
-      "title": "Danh Sách Yêu Cầu Giao Hàng"
-    },
-    "markAsCompleted": "Đánh Dấu Hoàn Thành",
     "messages": {
       "completeFailed": "Không thể hoàn thành giao hàng",
       "completed": "Hoàn thành giao hàng thành công",
@@ -282,7 +268,10 @@
     "noDeliveryRequestsFound": "Không có yêu cầu giao hàng",
     "noDeliveryRequestsFoundSearch": "Không tìm thấy yêu cầu giao hàng phù hợp với tìm kiếm",
     "noMoreDeliveryRequests": "Tất cả yêu cầu giao hàng đã được tải",
+    "noPhotos": "Chưa có ảnh nào được tải lên",
     "notFound": "Không tìm thấy yêu cầu giao hàng",
+    "photos": "Ảnh Giao Hàng",
+    "photosRequired": "Vui lòng chụp hình trước khi hoàn thành giao hàng",
     "pleaseSelectAssigneeAndScheduledDate": "Vui lòng chọn người phụ trách và ngày dự kiến",
     "poNumber": "Số PO",
     "purchaseOrder": "Đơn Đặt Hàng",
@@ -302,6 +291,7 @@
       "inTransit": "Đang Giao",
       "pending": "Chờ Giao"
     },
+    "title": "Danh Sách Yêu Cầu Giao Hàng",
     "transitNotes": "Ghi Chú Vận Chuyển",
     "transitNotesDescription": "Ghi chú tùy chọn về việc bắt đầu vận chuyển",
     "tryDifferentSearch": "Thử điều chỉnh tiêu chí tìm kiếm",
@@ -458,7 +448,6 @@
     "address": "Địa chỉ",
     "addressPlaceholder": "Nhập địa chỉ đầy đủ",
     "allCustomers": "Tất Cả Khách Hàng",
-    "allStatus": "Tất Cả Trạng Thái",
     "autoFilledFromCustomerAddress": "Tự động điền từ địa chỉ khách hàng",
     "availableActions": "Hành Động Khả Dụng",
     "cancel": "Hủy đơn hàng",
@@ -535,7 +524,7 @@
     "itemsTableAriaLabel": "Bảng mặt hàng đơn hàng",
     "markAsDelivered": "Đánh Dấu Đã Giao",
     "markDelivered": "Đánh Dấu Đã Giao",
-    "markReady": "Sẵn Sàng Lấy Hàng",
+    "markReady": "Có hàng",
     "markReadyFailed": "Không thể đánh dấu sẵn sàng lấy hàng",
     "markReadyOrder": "Đánh Dấu Sẵn Sàng Lấy Hàng",
     "markReadyOrderDescription": "Đánh dấu đơn hàng này sẵn sàng để lấy. Bạn có thể chỉ định địa điểm lấy hàng và gửi thông báo.",
@@ -590,6 +579,7 @@
     "refundReason": "Lý Do Hoàn Trả",
     "refunded": "Đã hoàn trả đơn hàng thành công",
     "refundedBy": "Hoàn tiền bởi",
+    "salesPerson": "Nhân viên phụ trách",
     "searchCustomer": "Tìm kiếm khách hàng",
     "searchPlaceholder": "Tìm kiếm theo số PO",
     "searchProduct": "Tìm kiếm sản phẩm",
@@ -599,6 +589,7 @@
     "selectDeliveryDate": "Chọn ngày giao hàng",
     "selectEndDate": "Chọn ngày kết thúc",
     "selectOrderDate": "Chọn ngày đặt hàng",
+    "selectSalesPerson": "Chọn Nhân viên phụ trách",
     "selectStartDate": "Chọn ngày bắt đầu",
     "selectStatus": "Chọn trạng thái",
     "ship": "Gửi Hàng",
@@ -619,12 +610,11 @@
       "DELIVERED": "Đã Giao",
       "NEW": "Mới",
       "PROCESSING": "Đang Xử Lý",
-      "READY_FOR_PICKUP": "Sẵn Sàng Lấy Hàng",
+      "READY_FOR_PICKUP": "Có hàng",
       "REFUNDED": "Đã Hoàn Trả",
       "SHIPPED": "Đã Gửi"
     },
     "statusLabel": "Trạng thái đơn hàng: {{status}}",
-    "statusesSelected": "trạng thái đã chọn",
     "street": "Địa Chỉ",
     "streetPlaceholder": "Nhập địa chỉ",
     "tableAriaLabel": "Bảng đơn hàng",
@@ -664,7 +654,6 @@
       "outOfStock": "Hết Hàng"
     },
     "statusPlaceholder": "Chọn trạng thái",
-    "tableAriaLabel": "Bảng danh sách sản phẩm",
     "unit": "Đơn Vị",
     "unitPlaceholder": "cái, kg, v.v.",
     "updated": "Đã Cập Nhật Sản Phẩm",

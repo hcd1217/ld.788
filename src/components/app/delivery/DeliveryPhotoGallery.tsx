@@ -25,7 +25,7 @@ export function DeliveryPhotoGallery({
   if (!photoUrls || photoUrls.length === 0) {
     return (
       <Text size="sm" c="dimmed" ta="center" py="xl">
-        {t('delivery.detail.noPhotos')}
+        {t('delivery.noPhotos')}
       </Text>
     );
   }

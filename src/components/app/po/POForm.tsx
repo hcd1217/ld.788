@@ -11,11 +11,11 @@ import {
   MOBILE_FORM_ACTIONS_Z_INDEX,
 } from '@/constants/po.constants';
 import { useDeviceType } from '@/hooks/useDeviceType';
+import type { POFormValues } from '@/hooks/usePOForm';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
-import type { POItem } from '@/services/sales/purchaseOrder';
 
 import { POAdditionalInfo } from './POAdditionalInfo';
-import { POCustomerSelection } from './POCustomerSelection';
+import { POCustomerAndSalesSelection } from './POCustomerAndSalesSelection';
 import { POFormActions } from './POFormActions';
 import { POFormAddressSection } from './POFormAddressSection';
 import { POFormDateSection } from './POFormDateSection';
@@ -23,18 +23,6 @@ import { createAddressFromCustomer } from './POFormHelpers';
 import { POFormItemsSection } from './POFormItemsSection';
 
 import type { UseFormReturnType } from '@mantine/form';
-
-export type POFormValues = {
-  customerId: string;
-  items: POItem[];
-  orderDate?: Date;
-  deliveryDate?: Date;
-  shippingAddress?: {
-    oneLineAddress?: string;
-    googleMapsUrl?: string;
-  };
-  notes?: string;
-};
 
 type POFormProps = {
   readonly form: UseFormReturnType<POFormValues>;
@@ -94,8 +82,8 @@ export function POForm({
       {/* Error Alert */}
       <ErrorAlert error={error} />
 
-      {/* Customer Selection */}
-      <POCustomerSelection
+      {/* Customer and Sales Selection */}
+      <POCustomerAndSalesSelection
         form={form}
         customers={customers}
         selectedCustomer={selectedCustomer}

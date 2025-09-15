@@ -30,9 +30,6 @@ export function EmployeeGridCard({ employee }: EmployeeGridCardProps) {
       shadow="sm"
       padding="lg"
       radius="md"
-      aria-label={t('employee.employeeCard', {
-        name: `${employee.firstName} ${employee.lastName}`,
-      })}
       onClick={() => navigate(getEmployeeDetailRoute(employee.id))}
       style={{
         cursor: 'pointer',

@@ -20,8 +20,6 @@ type POCardProps = {
   readonly style?: MantineStyleProp;
   /** Custom className for the card container */
   readonly className?: string;
-  /** Custom styles for the action icons group */
-  readonly actionIconsStyle?: MantineStyleProp;
   /** Whether to hide the actions */
   readonly noActions?: boolean;
 };
@@ -48,9 +46,6 @@ export function POCard({ purchaseOrder, style, className }: POCardProps) {
         ...style,
       }}
       className={className}
-      aria-label={t('po.poCard', {
-        number: purchaseOrder.poNumber,
-      })}
       onClick={handleCardClick}
     >
       <Group justify="space-between" align="flex-start" style={{ position: 'relative' }}>
@@ -66,6 +61,17 @@ export function POCard({ purchaseOrder, style, className }: POCardProps) {
               {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
             </Text>
           </Group>
+
+          {purchaseOrder.salesId && (
+            <Group gap="lg">
+              <Text size="xs" c="dimmed">
+                {t('po.salesPerson')}:
+              </Text>
+              <Text size="xs" fw={500}>
+                {purchaseOrder.salesPerson}
+              </Text>
+            </Group>
+          )}
 
           <Group gap="lg">
             <Text size="xs" c="dimmed">

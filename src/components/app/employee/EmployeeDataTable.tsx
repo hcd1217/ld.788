@@ -95,7 +95,6 @@ export function EmployeeDataTable({ employees }: EmployeeDataTableProps) {
       onRowClick={handleRowClick}
       getRowStyles={getRowStyles}
       onActionCellClick={handleActionCellClick}
-      ariaLabel={t('employee.tableAriaLabel')}
     />
   );
 }

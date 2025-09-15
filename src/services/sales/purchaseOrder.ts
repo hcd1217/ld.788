@@ -8,6 +8,9 @@ import {
   type UpdatePOStatusRequest,
   type UpdatePurchaseOrderRequest,
 } from '@/lib/api/schemas/sales.schemas';
+import type { EmployeeOverview } from '@/services/client/overview';
+
+import { overviewService } from '../client/overview';
 
 import type { DeliveryStatus, PICType } from './deliveryRequest';
 
@@ -25,11 +28,13 @@ export type PurchaseOrder = Omit<ApiPurchaseOrder, 'metadata' | 'items'> & {
   address?: string;
   googleMapsUrl?: string;
   statusHistory?: POStatusHistory[];
+  salesPerson?: string;
   deliveryRequest?: {
     deliveryRequestId: string;
     deliveryRequestNumber?: string;
     status: DeliveryStatus;
     assignedType: PICType;
+    deliveryPerson?: string;
     scheduledDate: Date | string;
     assignedTo?: string;
     createdAt?: string;
@@ -40,10 +45,21 @@ export type PurchaseOrder = Omit<ApiPurchaseOrder, 'metadata' | 'items'> & {
 /**
  * Transform API PurchaseOrder to Frontend PurchaseOrder
  */
-function transformApiToFrontend(apiPO: ApiPurchaseOrder): Omit<PurchaseOrder, 'customer'> {
+function transformApiToFrontend(
+  apiPO: ApiPurchaseOrder,
+  employeeMapByEmployeeId: Map<string, EmployeeOverview>,
+): Omit<PurchaseOrder, 'customer'> {
   const { metadata, ...rest } = apiPO;
+  const salesPerson = apiPO.salesId
+    ? employeeMapByEmployeeId.get(apiPO.salesId)?.fullName
+    : undefined;
+  const deliveryRequest = metadata?.deliveryRequest;
+  const deliveryPerson = deliveryRequest?.assignedTo
+    ? employeeMapByEmployeeId.get(deliveryRequest.assignedTo)?.fullName
+    : undefined;
   return {
     ...rest,
+    salesPerson,
     customerId: apiPO.customerId,
     address: metadata?.shippingAddress?.oneLineAddress,
     googleMapsUrl: metadata?.shippingAddress?.googleMapsUrl,
@@ -51,6 +67,7 @@ function transformApiToFrontend(apiPO: ApiPurchaseOrder): Omit<PurchaseOrder, 'c
     deliveryRequest: metadata?.deliveryRequest,
     items: apiPO.items.map(({ metadata, ...item }) => ({
       ...item,
+      deliveryPerson,
       notes: metadata.notes ?? '',
       unit: metadata.unit ?? '',
       productId: metadata.productId ?? '',
@@ -60,6 +77,7 @@ function transformApiToFrontend(apiPO: ApiPurchaseOrder): Omit<PurchaseOrder, 'c
 
 // Filter parameters for purchase orders
 export type POFilterParams = {
+  salesId?: string;
   poNumber?: string;
   customerId?: string;
   status?: POStatus; // Single status for backward compatibility
@@ -92,6 +110,7 @@ export const purchaseOrderService = {
       ? {
           poNumber: filters.poNumber,
           customerId: filters.customerId,
+          salesId: filters.salesId,
           // Support both single status and multiple statuses
           status: filters.statuses?.length === 1 ? filters.statuses[0] : filters.status,
           statuses:
@@ -120,16 +139,20 @@ export const purchaseOrderService = {
       : undefined;
 
     const response = await salesApi.getPurchaseOrders(apiParams);
+    const employeeMapByEmployeeId = await overviewService.getEmployeeOverview();
 
     return {
-      purchaseOrders: response.purchaseOrders.map((po) => transformApiToFrontend(po)),
+      purchaseOrders: response.purchaseOrders.map((po) =>
+        transformApiToFrontend(po, employeeMapByEmployeeId),
+      ),
       pagination: response.pagination,
     };
   },
 
   async getPOById(id: string): Promise<PurchaseOrder | undefined> {
     const po = await salesApi.getPurchaseOrderById(id);
-    return po ? transformApiToFrontend(po) : undefined;
+    const employeeMapByEmployeeId = await overviewService.getEmployeeOverview();
+    return po ? transformApiToFrontend(po, employeeMapByEmployeeId) : undefined;
   },
 
   async createPO(
@@ -140,6 +163,7 @@ export const purchaseOrderService = {
   ): Promise<void> {
     const createRequest: CreatePurchaseOrderRequest = {
       customerId: data.customerId,
+      salesId: data.salesId,
       orderDate: data.orderDate ? data.orderDate.toISOString() : new Date().toISOString(),
       deliveryDate: data.deliveryDate ? data.deliveryDate.toISOString() : undefined,
       items: data.items.map((item) => ({
@@ -172,6 +196,7 @@ export const purchaseOrderService = {
     }
 
     const updateRequest: UpdatePurchaseOrderRequest = {
+      salesId: data.salesId,
       status: data.status,
       items: data.items.map(({ productId, notes, unit, ...item }) => ({
         ...item,

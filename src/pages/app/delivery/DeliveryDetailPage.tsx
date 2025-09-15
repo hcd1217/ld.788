@@ -190,9 +190,7 @@ export function DeliveryDetailPage() {
     },
   );
 
-  const title = deliveryRequest
-    ? `${deliveryRequest.deliveryRequestNumber}`
-    : t('delivery.detail.title');
+  const title = deliveryRequest ? `${deliveryRequest.deliveryRequestNumber}` : t('delivery.detail');
 
   // Check view permission
   if (!permissions.deliveryRequest.canView) {

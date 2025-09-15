@@ -24,13 +24,7 @@ export function POStatusBadge({
   const color = PO_STATUS_COLORS[status] || 'gray';
 
   return (
-    <Badge
-      color={color}
-      size={size}
-      variant={variant}
-      radius={radius}
-      aria-label={t('po.statusLabel', { status: t(`po.status.${status}`) })}
-    >
+    <Badge color={color} size={size} variant={variant} radius={radius}>
       {t(`po.status.${status}`)}
     </Badge>
   );

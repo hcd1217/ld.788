@@ -71,6 +71,7 @@ export const PurchaseOrderSchema = z.object({
   clientId: idSchema,
   poNumber: stringSchema,
   customerId: idSchema,
+  salesId: idSchema.optional(),
   status: POStatusSchema,
   orderDate: timestampSchema.optional(),
   deliveryDate: timestampSchema.optional(),
@@ -100,6 +101,7 @@ export const PurchaseOrderSchema = z.object({
 // Purchase Order request schemas
 export const CreatePurchaseOrderRequestSchema = z.object({
   customerId: idSchema,
+  salesId: idSchema.optional(),
   orderDate: optionalStringSchema,
   deliveryDate: optionalStringSchema,
   items: z.array(CreatePOItemSchema).min(1),
@@ -110,7 +112,7 @@ export const CreatePurchaseOrderRequestSchema = z.object({
 });
 
 export const UpdatePurchaseOrderRequestSchema = z.object({
-  customerId: idSchema.optional(),
+  salesId: idSchema.optional(),
   status: POStatusSchema.optional(),
   orderDate: stringSchema.optional(),
   deliveryDate: optionalStringSchema,

@@ -48,7 +48,6 @@ export function AuthLayout() {
               visibleFrom="sm"
               size="xs"
               color="var(--app-shell-color)"
-              aria-label={isMenuOpen ? 'Close navigation' : 'Open navigation'}
               aria-expanded={isMenuOpen}
               onClick={toggleMenu}
             />

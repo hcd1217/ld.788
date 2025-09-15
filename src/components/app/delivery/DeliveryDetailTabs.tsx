@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { useNavigate } from 'react-router';
 
 import { Anchor, Button, Card, Grid, Group, Stack, Text } from '@mantine/core';
@@ -9,9 +7,6 @@ import { UrgentBadge, ViewOnMap } from '@/components/common';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
-import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
-import { useEmployeeMapByUserId } from '@/stores/useAppStore';
-import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
 import { formatDate } from '@/utils/time';
 
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
@@ -32,24 +27,6 @@ export function DeliveryDetailTabs({
 }: DeliveryDetailTabsProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
-  const employeeMapByUserId = useEmployeeMapByUserId();
-
-  const assignedName = useMemo(() => {
-    if (!deliveryRequest.assignedTo) {
-      return t('common.notAssigned');
-    }
-    if (deliveryRequest.assignedType === 'EMPLOYEE') {
-      return getEmployeeNameByEmployeeId(employeeMapByEmployeeId, deliveryRequest.assignedTo);
-    }
-    return getEmployeeNameByUserId(employeeMapByUserId, deliveryRequest.assignedTo);
-  }, [
-    t,
-    deliveryRequest.assignedTo,
-    deliveryRequest.assignedType,
-    employeeMapByEmployeeId,
-    employeeMapByUserId,
-  ]);
 
   return (
     <Stack gap="lg">
@@ -89,7 +66,7 @@ export function DeliveryDetailTabs({
               }}
             >
               <Text fw={500} mb="md">
-                {t('delivery.detail.deliveryInfo')}
+                {t('delivery.deliveryInfo')}
               </Text>
               <Grid>
                 <Grid.Col span={6}>
@@ -114,7 +91,7 @@ export function DeliveryDetailTabs({
                     </div>
                     <div>
                       <Text size="sm" c="dimmed">
-                        {t('delivery.customer')}
+                        {t('common.customer')}
                       </Text>
                       <Text size="sm" fw={500}>
                         {deliveryRequest.customerName}
@@ -125,7 +102,7 @@ export function DeliveryDetailTabs({
                         {t('delivery.assignedTo')}
                       </Text>
                       <Text size="sm" fw={500}>
-                        {assignedName}
+                        {deliveryRequest.deliveryPerson}
                       </Text>
                     </div>
                   </Stack>
@@ -210,7 +187,7 @@ export function DeliveryDetailTabs({
             }}
           >
             <Text fw={500} mb="md">
-              {t('delivery.detail.photos')}
+              {t('delivery.photos')}
             </Text>
             <DeliveryPhotoGallery
               photoUrls={deliveryRequest.photoUrls}

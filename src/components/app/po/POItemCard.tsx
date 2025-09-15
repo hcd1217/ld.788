@@ -38,7 +38,6 @@ export function POItemCard({ item, onUpdate, onRemove, disabled = false }: POIte
             size="md"
             onClick={() => onRemove(item.id)}
             disabled={disabled}
-            aria-label={t('common.delete')}
           >
             <IconTrash size={18} />
           </ActionIcon>

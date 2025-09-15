@@ -19,7 +19,6 @@ import { IconChevronLeft, IconChevronRight, IconPlus } from '@tabler/icons-react
 
 import {
   POCard,
-  POCustomerDrawer,
   PODataTable,
   PODateDrawer,
   POErrorBoundary,
@@ -43,7 +42,7 @@ import { useDeviceType } from '@/hooks/useDeviceType';
 import { usePOFilters } from '@/hooks/usePOFilters';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useViewMode } from '@/hooks/useViewMode';
-import { useCustomers, usePermissions } from '@/stores/useAppStore';
+import { useCustomers, useMe, usePermissions } from '@/stores/useAppStore';
 import {
   usePOActions,
   usePOError,
@@ -59,6 +58,7 @@ export function POListPage() {
   const navigate = useNavigate();
   const { isMobile, isDesktop } = useDeviceType();
   const { t } = useTranslation();
+  const currentUser = useMe();
   const permissions = usePermissions();
   const purchaseOrders = usePurchaseOrderList();
   const customers = useCustomers();
@@ -67,10 +67,8 @@ export function POListPage() {
   const { loadPOsWithFilter, loadMorePOs, loadNextPage, loadPreviousPage, clearError } =
     usePOActions();
   const { hasMorePOs, hasPreviousPage, isLoadingMore, currentPage } = usePOPaginationState();
-
   // Use the PO filters hook for filter state management
-  // Note: We don't use filteredPOs anymore since filtering happens server-side
-  const { filters, filterHandlers, hasActiveFilters } = usePOFilters([]);
+  const { filters, filterHandlers, hasActiveFilters } = usePOFilters();
 
   // Debounce the search query for API calls (1 second delay)
   const [debouncedSearch] = useDebouncedValue(filters.searchQuery, 1000);
@@ -82,8 +80,6 @@ export function POListPage() {
   const { viewMode, isTableView, setViewMode } = useViewMode();
 
   // Drawer states using Mantine's useDisclosure directly
-  const [customerDrawerOpened, { open: openCustomerDrawer, close: closeCustomerDrawer }] =
-    useDisclosure(false);
   const [statusDrawerOpened, { open: openStatusDrawer, close: closeStatusDrawer }] =
     useDisclosure(false);
   const [dateDrawerOpened, { open: openDateDrawer, close: closeDateDrawer }] = useDisclosure(false);
@@ -95,6 +91,7 @@ export function POListPage() {
   // Create stable filter params with useMemo to prevent unnecessary re-renders
   const filterParams = useMemo(
     () => ({
+      salesId: permissions.purchaseOrder.query.canViewAll ? undefined : currentUser?.employee?.id,
       customerId: filters.customerId,
       // Filter out 'all' status before passing to API
       statuses:
@@ -117,6 +114,8 @@ export function POListPage() {
       filters.orderDateRange.end,
       filters.deliveryDateRange.start,
       filters.deliveryDateRange.end,
+      permissions.purchaseOrder.query.canViewAll,
+      currentUser,
     ],
   );
 
@@ -244,26 +243,14 @@ export function POListPage() {
           {/* Mobile Filter Bar */}
           <POFilterBarMobile
             searchQuery={filters.searchQuery}
-            customerId={filters.customerId}
             selectedStatuses={filters.statuses}
             hasOrderDateFilter={hasOrderDateFilter}
             hasDeliveryDateFilter={hasDeliveryDateFilter}
-            customers={customers}
             hasActiveFilters={hasActiveFilters}
             onSearchChange={filterHandlers.setSearchQuery}
-            onCustomerClick={openCustomerDrawer}
             onStatusClick={openStatusDrawer}
             onDateClick={openDateDrawer}
             onClearFilters={filterHandlers.resetFilters}
-          />
-
-          {/* Customer Selection Drawer */}
-          <POCustomerDrawer
-            opened={customerDrawerOpened}
-            customers={customers}
-            selectedCustomerId={filters.customerId}
-            onClose={closeCustomerDrawer}
-            onCustomerSelect={filterHandlers.setCustomerId}
           />
 
           {/* Status Selection Drawer */}
@@ -336,13 +323,7 @@ export function POListPage() {
           {/* Floating Action Button for Add PO */}
           {!isLoading && permissions.purchaseOrder.canCreate && (
             <Affix position={{ bottom: 80, right: 10 }}>
-              <ActionIcon
-                size="xl"
-                radius="xl"
-                color="blue"
-                onClick={handleNavigateToAdd}
-                aria-label={t('po.addPO')}
-              >
+              <ActionIcon size="xl" radius="xl" color="blue" onClick={handleNavigateToAdd}>
                 <IconPlus size={24} />
               </ActionIcon>
             </Affix>
@@ -450,8 +431,6 @@ export function POListPage() {
             )}
           </>
         )}
-
-        {/* Note: Desktop now uses inline controls in POFilterBarDesktop, no drawers needed */}
       </POErrorBoundary>
     </AppDesktopLayout>
   );

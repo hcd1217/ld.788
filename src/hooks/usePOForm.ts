@@ -6,6 +6,7 @@ import { getBasicValidators } from '@/utils/validation';
 
 export type POFormValues = {
   customerId: string;
+  salesId?: string;
   items: POItem[];
   orderDate?: Date;
   deliveryDate?: Date;

@@ -1,7 +1,6 @@
 import { Group, SimpleGrid, Skeleton, Stack, Table } from '@mantine/core';
 
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { useTranslation } from '@/hooks/useTranslation';
 
 interface DeliveryListSkeletonProps {
   readonly viewMode?: 'table' | 'grid';
@@ -10,7 +9,6 @@ interface DeliveryListSkeletonProps {
 
 export function DeliveryListSkeleton({ viewMode = 'table', count = 5 }: DeliveryListSkeletonProps) {
   const { isMobile } = useDeviceType();
-  const { t } = useTranslation();
 
   // Mobile skeleton (card view)
   if (isMobile) {
@@ -69,7 +67,7 @@ export function DeliveryListSkeleton({ viewMode = 'table', count = 5 }: Delivery
 
   // Desktop table skeleton
   return (
-    <Table striped highlightOnHover aria-label={t('po.tableAriaLabel')}>
+    <Table striped highlightOnHover>
       <Table.Thead>
         <Table.Tr>
           <Table.Th>

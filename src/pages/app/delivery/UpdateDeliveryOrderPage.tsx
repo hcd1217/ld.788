@@ -151,7 +151,7 @@ export function UpdateDeliveryOrderPage() {
         <AppPageTitle
           withGoBack
           route={ROUTERS.DELIVERY_MANAGEMENT}
-          title={t('delivery.arrangeDeliveryOrder')}
+          title={t('delivery.actions.arrangeDeliveryOrder')}
         />
 
         <Paper p="md" shadow="xs">
@@ -243,7 +243,7 @@ export function UpdateDeliveryOrderPage() {
 
                       {deliveryRequest.customerName && (
                         <Text size="sm" c="dimmed">
-                          {t('delivery.customerName')}: {deliveryRequest.customerName}
+                          {t('common.customerName')}: {deliveryRequest.customerName}
                         </Text>
                       )}
 

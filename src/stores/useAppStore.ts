@@ -24,7 +24,6 @@ type AppState = {
   user: User | undefined; // Full user profile from /auth/me
   overviewData: OverviewData | undefined; // Combined overview data
   employeeMapByUserId: Map<string, EmployeeOverview>; // Stable Map for employee lookup
-  employeeMapByEmployeeId: Map<string, EmployeeOverview>; // Stable Map for employee lookup
   customerMapByCustomerId: Map<string, CustomerOverview>; // Stable Map for customer lookup
   isAuthenticated: boolean;
   authInitialized: boolean;
@@ -77,7 +76,6 @@ export const useAppStore = create<AppState>()(
         user: undefined, // User will be fetched from /auth/me
         overviewData: undefined, // Overview data will be fetched after login
         employeeMapByUserId: new Map(), // Initialize empty Map
-        employeeMapByEmployeeId: new Map(), // Initialize empty Map
         customerMapByCustomerId: new Map(), // Initialize empty Map
         isAuthenticated: authService.hasValidToken(),
         authInitialized: false,
@@ -147,16 +145,12 @@ export const useAppStore = create<AppState>()(
             const employeeMapByUserId = new Map(
               overviewData.employees.map((employee) => [employee.userId || employee.id, employee]),
             );
-            const employeeMapByEmployeeId = new Map(
-              overviewData.employees.map((employee) => [employee.id, employee]),
-            );
             const customerMapByCustomerId = new Map(
               overviewData.customers.map((customer) => [customer.id, customer]),
             );
             set({
               overviewData,
               employeeMapByUserId,
-              employeeMapByEmployeeId,
               customerMapByCustomerId,
             });
           } catch (error: unknown) {
@@ -235,7 +229,6 @@ export const useAppStore = create<AppState>()(
             user: undefined,
             overviewData: undefined, // Clear overview data on logout
             employeeMapByUserId: new Map(), // Clear employee map on logout
-            employeeMapByEmployeeId: new Map(), // Clear employee map on logout
             customerMapByCustomerId: new Map(), // Clear customer map on logout
             // Don't clear client-specific public config on logout
             // publicClientConfig: undefined,
@@ -262,7 +255,6 @@ export const useAppStore = create<AppState>()(
               user: undefined,
               overviewData: undefined,
               employeeMapByUserId: new Map(),
-              employeeMapByEmployeeId: new Map(),
               customerMapByCustomerId: new Map(),
               isAuthenticated: false,
               permissionError: false,
@@ -306,6 +298,10 @@ const EMPTY_PERMISSIONS: Permission = Object.freeze({
     canCreate: false,
     canEdit: false,
     canDelete: false,
+    query: {
+      canFilter: false,
+      canViewAll: false,
+    },
     actions: {
       canConfirm: false,
       canProcess: false,
@@ -351,8 +347,6 @@ const EMPTY_CLIENT_CONFIG: ClientConfig = {
 
 // Return stable Map reference to avoid infinite re-renders
 export const useEmployeeMapByUserId = () => useAppStore((state) => state.employeeMapByUserId);
-export const useEmployeeMapByEmployeeId = () =>
-  useAppStore((state) => state.employeeMapByEmployeeId);
 export const useCustomerMapByCustomerId = () =>
   useAppStore((state) => state.customerMapByCustomerId);
 // Customer selectors - use stable empty array reference

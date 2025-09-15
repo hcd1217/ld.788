@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 
 import { DELIVERY_STATUS, type DeliveryStatusType } from '@/constants/deliveryRequest';
-import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 import { useOnce } from './useOnce';
@@ -58,7 +57,7 @@ const defaultFilters: DeliveryRequestFilters = {
   },
 };
 
-export function useDeliveryRequestFilters(deliveryRequests: readonly DeliveryRequest[]) {
+export function useDeliveryRequestFilters() {
   const [filters, setFilters] = useState<DeliveryRequestFilters>(defaultFilters);
 
   const hasActiveFilters = useMemo(() => {
@@ -153,10 +152,6 @@ export function useDeliveryRequestFilters(deliveryRequests: readonly DeliveryReq
     ],
   );
 
-  // Server-side filtering - this is not used for client-side filtering
-  // We keep this structure for consistency with PO filters
-  const filteredDeliveryRequests = deliveryRequests;
-
   useOnce(() => {
     const storedFilters = localStorage.getItem(STORAGE_KEYS.FILTERS.DELIVERY_REQUESTS);
     if (storedFilters) {
@@ -176,7 +171,6 @@ export function useDeliveryRequestFilters(deliveryRequests: readonly DeliveryReq
   return {
     filters,
     filterHandlers,
-    filteredDeliveryRequests,
     hasActiveFilters,
   };
 }

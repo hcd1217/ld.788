@@ -6,8 +6,6 @@ import { IconCalendar, IconTruckDelivery, IconUser } from '@tabler/icons-react';
 import { getDeliveryDetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { useEmployeeMapByEmployeeId, useEmployeeMapByUserId } from '@/stores/useAppStore';
-import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
 import { formatDate } from '@/utils/time';
 
 import { DeliveryStatusBadge } from '../delivery/DeliveryStatusBadge';
@@ -19,8 +17,6 @@ type PODeliverySectionProps = {
 export function PODeliverySection({ purchaseOrder }: PODeliverySectionProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const employeeMapByUserId = useEmployeeMapByUserId();
-  const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
 
   const handleViewDeliveryRequest = (deliveryRequestId: string) => {
     navigate(getDeliveryDetailRoute(deliveryRequestId));
@@ -64,17 +60,7 @@ export function PODeliverySection({ purchaseOrder }: PODeliverySectionProps) {
             </Text>
             <Group gap={4}>
               <IconUser size={14} color="var(--mantine-color-gray-6)" />
-              <Text size="sm">
-                {purchaseOrder.deliveryRequest.assignedType === 'EMPLOYEE'
-                  ? getEmployeeNameByEmployeeId(
-                      employeeMapByEmployeeId,
-                      purchaseOrder.deliveryRequest.assignedTo,
-                    )
-                  : getEmployeeNameByUserId(
-                      employeeMapByUserId,
-                      purchaseOrder.deliveryRequest.assignedTo,
-                    )}
-              </Text>
+              <Text size="sm">{purchaseOrder.deliveryRequest.deliveryPerson}</Text>
             </Group>
           </Group>
         )}

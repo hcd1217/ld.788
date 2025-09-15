@@ -4,11 +4,10 @@ export { POGridCard } from './POGridCard';
 export { POStatusBadge } from './POStatusBadge';
 export { POListSkeleton } from './POListSkeleton';
 export { POForm } from './POForm';
-export type { POFormValues } from './POForm';
 export { POFormActions } from './POFormActions';
 export { createAddressFromCustomer } from './POFormHelpers';
 export { POItemsEditor } from './POItemsEditor';
-export { POCustomerSelection } from './POCustomerSelection';
+export { POCustomerAndSalesSelection } from './POCustomerAndSalesSelection';
 export { POAdditionalInfo } from './POAdditionalInfo';
 export { POErrorBoundary } from './POErrorBoundary';
 
@@ -29,6 +28,5 @@ export { DeliveryRequestModal } from './DeliveryRequestModal';
 // Filter components
 export { POFilterBarDesktop } from './POFilterBarDesktop';
 export { POFilterBarMobile } from './POFilterBarMobile';
-export { POCustomerDrawer } from './POCustomerDrawer';
 export { POStatusDrawer } from './POStatusDrawer';
 export { PODateDrawer } from './PODateDrawer';

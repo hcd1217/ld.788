@@ -73,6 +73,14 @@ export const overviewService = {
   },
 
   /**
+   * Fetch overview data and return separated employee data
+   */
+  async getEmployeeOverview(params?: OverviewParams): Promise<Map<string, EmployeeOverview>> {
+    const data = await this.getOverviewData(params);
+    return new Map(data.employees.map((employee) => [employee.id, employee]));
+  },
+
+  /**
    * Transform backend data to frontend format
    */
   transformOverviewData(beData: BECombinedOverview): OverviewData {

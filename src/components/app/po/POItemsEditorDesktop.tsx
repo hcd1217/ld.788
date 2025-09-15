@@ -173,7 +173,7 @@ export function POItemsEditorDesktop({
       <Stack gap="lg">
         <Title order={3}>{t('po.orderItems')}</Title>
         <Box style={{ overflowX: 'auto' }}>
-          <Table withTableBorder withColumnBorders aria-label={t('po.itemsTableAriaLabel')}>
+          <Table withTableBorder withColumnBorders>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th style={{ width: 200 }}>{t('po.productCode')}</Table.Th>
@@ -242,7 +242,6 @@ export function POItemsEditorDesktop({
                         color="red"
                         variant="subtle"
                         onClick={() => handleRemoveItem(item.id)}
-                        aria-label={t('common.delete')}
                       >
                         <IconTrash size={16} />
                       </ActionIcon>

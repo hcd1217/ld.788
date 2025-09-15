@@ -35,12 +35,7 @@ export function MyTimesheetWeekNavigator({
   return (
     <Group justify="space-between" align="center">
       <Group gap="md">
-        <ActionIcon
-          variant="subtle"
-          size="lg"
-          onClick={onPreviousWeek}
-          aria-label={t('common.previousWeek')}
-        >
+        <ActionIcon variant="subtle" size="lg" onClick={onPreviousWeek}>
           <IconChevronLeft size={20} />
         </ActionIcon>
 
@@ -53,12 +48,7 @@ export function MyTimesheetWeekNavigator({
           {formatDateRange(weekRange.start, weekRange.end)}
         </Button>
 
-        <ActionIcon
-          variant="subtle"
-          size="lg"
-          onClick={onNextWeek}
-          aria-label={t('common.nextWeek')}
-        >
+        <ActionIcon variant="subtle" size="lg" onClick={onNextWeek}>
           <IconChevronRight size={20} />
         </ActionIcon>
       </Group>

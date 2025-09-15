@@ -18,8 +18,6 @@ type EmployeeCardProps = {
   readonly style?: MantineStyleProp;
   /** Custom className for the card container */
   readonly className?: string;
-  /** Custom styles for the action icons group */
-  readonly actionIconsStyle?: MantineStyleProp;
   /** Whether to hide the actions */
   readonly noActions?: boolean;
 };
@@ -30,18 +28,10 @@ export function EmployeeCard({
   onActivate,
   style,
   className,
-  actionIconsStyle,
   noActions,
 }: EmployeeCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
-  const defaultActionIconsStyle: MantineStyleProp = {
-    position: 'absolute',
-    top: 'var(--mantine-spacing-xs)',
-    right: 'var(--mantine-spacing-xs)',
-    ...actionIconsStyle,
-  };
 
   const highlightStyles = getEndDateHighlightStyles(employee.endDate, employee.isActive);
 
@@ -57,9 +47,6 @@ export function EmployeeCard({
         ...style,
       }}
       className={className}
-      aria-label={t('employee.employeeCard', {
-        name: employee.fullName,
-      })}
       onClick={() => navigate(getEmployeeDetailRoute(employee.id))}
     >
       <Group justify="space-between" align="flex-start" style={{ position: 'relative' }}>
@@ -85,7 +72,6 @@ export function EmployeeCard({
         </Box>
         {noActions ? null : (
           <EmployeeActions
-            style={defaultActionIconsStyle}
             employeeId={employee.id}
             isActive={employee.isActive}
             onDeactivate={onDeactivate}

@@ -1,7 +1,6 @@
 import { Group, SimpleGrid, Skeleton, Stack, Table } from '@mantine/core';
 
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { useTranslation } from '@/hooks/useTranslation';
 
 interface EmployeeListSkeletonProps {
   readonly viewMode?: 'table' | 'grid';
@@ -10,7 +9,6 @@ interface EmployeeListSkeletonProps {
 
 export function EmployeeListSkeleton({ viewMode = 'table', count = 5 }: EmployeeListSkeletonProps) {
   const { isMobile } = useDeviceType();
-  const { t } = useTranslation();
 
   // Mobile skeleton (card view)
   if (isMobile) {
@@ -69,7 +67,7 @@ export function EmployeeListSkeleton({ viewMode = 'table', count = 5 }: Employee
 
   // Desktop table skeleton
   return (
-    <Table striped highlightOnHover aria-label={t('employee.tableAriaLabel')}>
+    <Table striped highlightOnHover>
       <Table.Thead>
         <Table.Tr>
           <Table.Th>

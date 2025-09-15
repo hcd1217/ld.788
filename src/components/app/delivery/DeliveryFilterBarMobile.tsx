@@ -1,9 +1,12 @@
+import { useCallback } from 'react';
+
 import { Button, Group, Stack } from '@mantine/core';
 import { IconCalendar, IconChevronDown, IconClearAll } from '@tabler/icons-react';
 
 import { SearchBar } from '@/components/common';
 import type { DeliveryStatusType } from '@/constants/deliveryRequest';
 import { useTranslation } from '@/hooks/useTranslation';
+import { usePermissions } from '@/stores/useAppStore';
 
 interface DeliveryFilterBarMobileProps {
   readonly searchQuery: string;
@@ -29,26 +32,31 @@ export function DeliveryFilterBarMobile({
   onClearFilters,
 }: DeliveryFilterBarMobileProps) {
   const { t } = useTranslation();
+  const permissions = usePermissions();
 
-  const getStatusLabel = () => {
+  const getStatusLabel = useCallback(() => {
     if (selectedStatuses.length === 0) {
-      return t('delivery.filters.allStatus');
+      return t('common.filters.allStatus');
     }
     if (selectedStatuses.length === 1) {
       const statusKey = `delivery.status.${selectedStatuses[0].toLowerCase()}` as any;
       return t(statusKey);
     }
     return `${t('delivery.status')} (${selectedStatuses.length})`;
-  };
+  }, [selectedStatuses, t]);
 
-  const getQuickActionLabel = () => {
+  const getQuickActionLabel = useCallback(() => {
     if (quickAction) {
       return quickAction;
     }
     return hasDateFilter
       ? `${t('delivery.quickActions.title')} (1)`
       : t('delivery.quickActions.title');
-  };
+  }, [quickAction, hasDateFilter, t]);
+
+  if (!permissions.deliveryRequest.query.canFilter) {
+    return null;
+  }
 
   return (
     <Stack p="sm" gap="sm" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>

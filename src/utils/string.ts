@@ -36,7 +36,10 @@ export function convertCamelCaseToText(text: string) {
 /**
  * Normalizes Vietnamese characters to their English equivalents
  */
-export function normalizeVietnameseChars(text: string): string {
+export function normalizeVietnameseChars(text?: string): string {
+  if (!text) {
+    return '';
+  }
   const vietnameseMap: Record<string, string> = {
     à: 'a',
     á: 'a',
@@ -185,8 +188,8 @@ export function renderFullName({
   firstName,
   lastName,
 }: {
-  readonly firstName: string;
-  readonly lastName: string;
+  readonly firstName?: string;
+  readonly lastName?: string;
 }) {
   const localeConfig = getLocaleConfig(i18n.language);
   const isVietnameseLocale = i18n.language === 'vi';

@@ -16,12 +16,7 @@ import { ContactInfo, UrgentBadge, ViewOnMap } from '@/components/common';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
-import {
-  useCustomers,
-  useEmployeeMapByEmployeeId,
-  useEmployeeMapByUserId,
-} from '@/stores/useAppStore';
-import { getEmployeeNameByEmployeeId, getEmployeeNameByUserId } from '@/utils/overview';
+import { useCustomers } from '@/stores/useAppStore';
 import { formatDate } from '@/utils/time';
 
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
@@ -54,8 +49,6 @@ export function DeliveryDetailAccordion({
 }: DeliveryDetailAccordionProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
-  const employeeMapByUserId = useEmployeeMapByUserId();
   const { canStartTransitBased, canCompleteBased, canTakePhotoBased } = useMemo(() => {
     const canStartTransitBased = deliveryRequest.status === 'PENDING';
     const canCompleteBased = deliveryRequest.status === 'IN_TRANSIT';
@@ -66,22 +59,6 @@ export function DeliveryDetailAccordion({
       canTakePhotoBased,
     };
   }, [deliveryRequest.status]);
-
-  const assignedName = useMemo(() => {
-    if (!deliveryRequest.assignedTo) {
-      return t('common.notAssigned');
-    }
-    if (deliveryRequest.assignedType === 'EMPLOYEE') {
-      return getEmployeeNameByEmployeeId(employeeMapByEmployeeId, deliveryRequest.assignedTo);
-    }
-    return getEmployeeNameByUserId(employeeMapByUserId, deliveryRequest.assignedTo);
-  }, [
-    t,
-    deliveryRequest.assignedTo,
-    deliveryRequest.assignedType,
-    employeeMapByEmployeeId,
-    employeeMapByUserId,
-  ]);
 
   // Delivery info fields for cleaner rendering
   const deliveryInfoFields = useMemo(
@@ -114,7 +91,7 @@ export function DeliveryDetailAccordion({
         ),
       },
       {
-        label: t('delivery.customer'),
+        label: t('common.customer'),
         value: deliveryRequest.customerName,
       },
       {
@@ -141,10 +118,10 @@ export function DeliveryDetailAccordion({
       },
       {
         label: t('delivery.assignedTo'),
-        value: assignedName,
+        value: deliveryRequest.deliveryPerson,
       },
     ],
-    [t, deliveryRequest, assignedName, navigate],
+    [t, deliveryRequest, navigate],
   );
 
   return (
@@ -166,7 +143,7 @@ export function DeliveryDetailAccordion({
         {/* Delivery Information */}
         <Accordion.Item value="delivery-info">
           <Accordion.Control icon={<IconPackage size={20} />}>
-            {t('delivery.detail.deliveryInfo')}
+            {t('delivery.deliveryInfo')}
           </Accordion.Control>
           <Accordion.Panel>
             <Stack gap="sm">
@@ -210,7 +187,7 @@ export function DeliveryDetailAccordion({
         {/* Photos */}
         <Accordion.Item value="photos">
           <Accordion.Control icon={<IconPhoto size={20} />}>
-            {t('delivery.detail.photos')}
+            {t('delivery.photos')}
           </Accordion.Control>
           <Accordion.Panel>
             <DeliveryPhotoGallery

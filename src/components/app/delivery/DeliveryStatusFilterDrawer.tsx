@@ -88,8 +88,8 @@ export function DeliveryStatusFilterDrawer({
       position="bottom"
       title={
         selectedCount > 0
-          ? `${t('delivery.filters.selectStatus')} (${selectedCount})`
-          : t('delivery.filters.selectStatus')
+          ? `${t('common.filters.selectStatus')} (${selectedCount})`
+          : t('common.filters.selectStatus')
       }
       onClose={onClose}
     >
@@ -102,7 +102,7 @@ export function DeliveryStatusFilterDrawer({
           fullWidth
           styles={{ label: { textAlign: 'left' } }}
         >
-          {t('delivery.filters.allStatus')}
+          {t('common.filters.allStatus')}
         </Button>
 
         {/* Status options */}

@@ -8,7 +8,7 @@ import { SearchBar } from '@/components/common';
 import { DELIVERY_STATUS, type DeliveryStatusType } from '@/constants/deliveryRequest';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
-import { useClientConfig, useEmployees } from '@/stores/useAppStore';
+import { useClientConfig, useEmployees, usePermissions } from '@/stores/useAppStore';
 import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
 
@@ -46,17 +46,21 @@ export function DeliveryFilterBarDesktop({
   onClearFilters,
 }: DeliveryFilterBarDesktopProps) {
   const { t } = useTranslation();
+  const permissions = usePermissions();
   const employees = useEmployees();
   const clientConfig = useClientConfig();
 
   // Customer options for Select
-  const customerOptions = [
-    { value: '', label: t('delivery.filters.selectCustomer') },
-    ...customers.map((customer) => ({
-      value: customer.id,
-      label: customer.name,
-    })),
-  ];
+  const customerOptions = useMemo(
+    () => [
+      { value: '', label: t('common.filters.selectCustomer') },
+      ...customers.map((customer) => ({
+        value: customer.id,
+        label: customer.name,
+      })),
+    ],
+    [customers, t],
+  );
 
   // Employee options for Select - filtered by assigneeIds from clientConfig
   const employeeOptions = useMemo(() => {
@@ -78,24 +82,32 @@ export function DeliveryFilterBarDesktop({
   }, [employees, clientConfig.features?.deliveryRequest, t]);
 
   // Status options for MultiSelect
-  const statusOptions = [
-    { value: DELIVERY_STATUS.PENDING, label: t('delivery.statuses.pending') },
-    { value: DELIVERY_STATUS.IN_TRANSIT, label: t('delivery.statuses.inTransit') },
-    { value: DELIVERY_STATUS.COMPLETED, label: t('delivery.statuses.completed') },
-  ];
-
-  // Filter out 'all' status if present
-  const filteredStatuses = selectedStatuses.filter((s) => s !== DELIVERY_STATUS.ALL);
+  const statusOptions = useMemo(
+    () => [
+      { value: DELIVERY_STATUS.PENDING, label: t('delivery.statuses.pending') },
+      { value: DELIVERY_STATUS.IN_TRANSIT, label: t('delivery.statuses.inTransit') },
+      { value: DELIVERY_STATUS.COMPLETED, label: t('delivery.statuses.completed') },
+    ],
+    [t],
+  );
 
   // Custom placeholder for MultiSelect to show count
-  const statusPlaceholder = useMemo(() => {
+  const { filteredStatuses, statusPlaceholder } = useMemo(() => {
+    // Filter out 'all' status if present
+    const filteredStatuses = selectedStatuses.filter((s) => s !== DELIVERY_STATUS.ALL);
     const count = filteredStatuses.length;
     if (count === 0) {
-      return t('delivery.filters.selectStatus');
-    } else {
-      return `${count} selected`;
+      return { filteredStatuses, statusPlaceholder: t('common.filters.selectStatus') };
     }
-  }, [filteredStatuses.length, t]);
+    return {
+      filteredStatuses,
+      statusPlaceholder: t('common.statusesSelected', { count }),
+    };
+  }, [selectedStatuses, t]);
+
+  if (!permissions.deliveryRequest.query.canFilter) {
+    return null;
+  }
 
   return (
     <Group justify="start" align="flex-end" gap="sm" wrap="nowrap" mb="xl">
@@ -112,12 +124,12 @@ export function DeliveryFilterBarDesktop({
       <Select
         clearable
         searchable
-        placeholder={t('delivery.filters.selectCustomer')}
+        placeholder={t('common.filters.selectCustomer')}
         data={customerOptions}
         value={customerId || ''}
         style={{ flex: 1, minWidth: 150 }}
         onChange={(value) => onCustomerChange(value || undefined)}
-        label={t('delivery.customer') as string}
+        label={t('common.customer') as string}
       />
 
       {/* Assignee Select - flex 1 */}

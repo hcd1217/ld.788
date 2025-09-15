@@ -84,6 +84,7 @@ export function POFormPage({ mode }: POFormPageProps) {
       // Populate form with PO data
       form.setValues({
         customerId: po.customerId,
+        salesId: po.salesId,
         items: po.items,
         orderDate: po.orderDate ? new Date(po.orderDate) : undefined,
         deliveryDate: po.deliveryDate ? new Date(po.deliveryDate) : undefined,
@@ -130,6 +131,7 @@ export function POFormPage({ mode }: POFormPageProps) {
       // Prepare PO data
       const poData = {
         customerId: values.customerId,
+        salesId: values.salesId,
         customer,
         items: values.items,
         orderDate: values.orderDate,

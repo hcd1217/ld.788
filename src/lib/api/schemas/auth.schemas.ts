@@ -88,6 +88,10 @@ const PermissionSchema = z.object({
     canCreate: booleanSchema,
     canEdit: booleanSchema,
     canDelete: booleanSchema,
+    query: z.object({
+      canFilter: booleanSchema,
+      canViewAll: booleanSchema,
+    }),
     actions: z.object({
       canConfirm: booleanSchema,
       canProcess: booleanSchema,

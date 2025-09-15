@@ -3,9 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 
 import { PO_STATUS, type POStatusType } from '@/constants/purchaseOrder';
-import type { PurchaseOrder } from '@/services/sales';
-import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 import { useOnce } from './useOnce';
@@ -81,15 +78,8 @@ const defaultFilters: POFilters = {
   },
 };
 
-// Pre-computed searchable text for each PO to avoid repeated toLowerCase() calls
-interface POWithSearchText {
-  po: PurchaseOrder;
-  searchText: string;
-}
-
-export function usePOFilters(purchaseOrders: readonly PurchaseOrder[]) {
+export function usePOFilters() {
   const [filters, setFilters] = useState<POFilters>(defaultFilters);
-  const customerMapByCustomerId = useCustomerMapByCustomerId();
   const hasActiveFilters = useMemo(() => {
     if (filters.customerId) {
       return true;
@@ -197,91 +187,6 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[]) {
     resetFilters,
   ]);
 
-  // Pre-compute searchable text for all POs once when data changes
-  // This avoids repeated toLowerCase() calls during filtering
-  const posWithSearchText = useMemo<readonly POWithSearchText[]>(() => {
-    return purchaseOrders.map((po) => {
-      // Combine all searchable fields into a single lowercase string
-      const searchParts: string[] = [
-        po.poNumber,
-        getCustomerNameByCustomerId(customerMapByCustomerId, po.customerId),
-        po.notes ?? '',
-      ];
-
-      const searchText = searchParts
-        .filter(Boolean) // Remove empty strings
-        .join(' ')
-        .toLowerCase();
-
-      return { po, searchText };
-    });
-  }, [customerMapByCustomerId, purchaseOrders]);
-
-  // Memoize the normalized search query to avoid repeated toLowerCase() calls
-  const normalizedSearchQuery = useMemo(() => {
-    return filters.searchQuery.trim().toLowerCase();
-  }, [filters.searchQuery]);
-
-  const filteredPOs = useMemo(() => {
-    const { customerId, statuses, orderDateRange, deliveryDateRange } = filters;
-
-    // Early exit if no filters are applied
-    if (!hasActiveFilters && !normalizedSearchQuery) {
-      return purchaseOrders;
-    }
-
-    // Filter the pre-computed POs with optimized checks
-    const filtered = posWithSearchText.filter(({ po, searchText }) => {
-      // Perform cheapest checks first for early exits
-
-      // Status filter (multi-select - check if PO status is in selected statuses)
-      if (
-        statuses.length > 0 &&
-        !statuses.includes(PO_STATUS.ALL) &&
-        !statuses.includes(po.status)
-      ) {
-        return false;
-      }
-
-      // Customer filter (simple ID comparison - very fast)
-      if (customerId && po.customerId !== customerId) {
-        return false;
-      }
-
-      // Order date range filter
-      if (orderDateRange.start && po.orderDate && po.orderDate < orderDateRange.start) {
-        return false;
-      }
-      if (orderDateRange.end && po.orderDate && po.orderDate > orderDateRange.end) {
-        return false;
-      }
-
-      // Delivery date range filter
-      if (po.deliveryDate) {
-        const deliveryDate = new Date(po.deliveryDate);
-        if (deliveryDateRange.start && deliveryDate < deliveryDateRange.start) {
-          return false;
-        }
-        if (deliveryDateRange.end && deliveryDate > deliveryDateRange.end) {
-          return false;
-        }
-      } else if (deliveryDateRange.start || deliveryDateRange.end) {
-        // If filter is set but PO has no delivery date, exclude it
-        return false;
-      }
-
-      // Search query filter (string search - most expensive, do last)
-      if (normalizedSearchQuery && !searchText.includes(normalizedSearchQuery)) {
-        return false;
-      }
-
-      return true;
-    });
-
-    // Extract just the PO objects from the filtered results
-    return filtered.map(({ po }) => po);
-  }, [filters, hasActiveFilters, normalizedSearchQuery, posWithSearchText, purchaseOrders]);
-
   useOnce(() => {
     const storedFilters = localStorage.getItem(STORAGE_KEYS.FILTERS.PURCHASE_ORDERS);
     if (storedFilters) {
@@ -298,5 +203,5 @@ export function usePOFilters(purchaseOrders: readonly PurchaseOrder[]) {
     localStorage.setItem(STORAGE_KEYS.FILTERS.PURCHASE_ORDERS, JSON.stringify(filters));
   }, [filters]);
 
-  return { filteredPOs, filters, filterHandlers, hasActiveFilters };
+  return { filters, filterHandlers, hasActiveFilters };
 }

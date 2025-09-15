@@ -393,7 +393,6 @@ export function ProductConfigPage() {
           isLoading={false}
           emptyMessage={t('common.noDataFound')}
           onRowClick={openEditModal}
-          ariaLabel={t('product.tableAriaLabel')}
           columns={[
             {
               key: 'productCode',

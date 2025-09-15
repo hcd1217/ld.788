@@ -1,6 +1,5 @@
 export type { BaseMobileFooterItem, BaseMobileFooterProps } from './BaseMobileFooter';
 export type { BulkImportModalContentProps } from './BulkImportModal';
-export { ActionIcons } from './ActionIcons';
 export { ActiveBadge } from './ActiveBadge';
 export { AppPageTitle } from './AppPageTitle';
 export { BaseMobileFooter } from './BaseMobileFooter';

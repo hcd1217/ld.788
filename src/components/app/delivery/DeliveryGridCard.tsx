@@ -6,8 +6,6 @@ import { SelectableCard, UrgentBadge } from '@/components/common';
 import { getDeliveryDetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
-import { useEmployeeMapByEmployeeId } from '@/stores/useAppStore';
-import { getEmployeeNameByEmployeeId } from '@/utils/overview';
 import { formatDate, formatDateTime } from '@/utils/time';
 
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
@@ -19,7 +17,6 @@ type DeliveryGridCardProps = {
 export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const employeeMapByEmployeeId = useEmployeeMapByEmployeeId();
 
   return (
     <SelectableCard
@@ -34,9 +31,6 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
           : undefined,
         borderColor: deliveryRequest.isUrgentDelivery ? 'var(--mantine-color-red-3)' : undefined,
       }}
-      aria-label={t('delivery.gridCard', {
-        id: deliveryRequest.id.slice(-6),
-      })}
       onClick={() => navigate(getDeliveryDetailRoute(deliveryRequest.id))}
     >
       <Stack
@@ -54,7 +48,7 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
               {deliveryRequest.customerName && (
                 <div>
                   <Text size="sm" c="dimmed">
-                    {t('delivery.customer')}
+                    {t('common.customer')}
                   </Text>
                   <Text size="sm" fw={500}>
                     {deliveryRequest.customerName}
@@ -84,10 +78,7 @@ export function DeliveryGridCard({ deliveryRequest }: DeliveryGridCardProps) {
                     {t('delivery.assignedTo')}
                   </Text>
                   <Text size="sm" fw={500}>
-                    {getEmployeeNameByEmployeeId(
-                      employeeMapByEmployeeId,
-                      deliveryRequest.assignedTo,
-                    )}
+                    {deliveryRequest.deliveryPerson}
                   </Text>
                 </div>
               )}

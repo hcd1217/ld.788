@@ -63,9 +63,11 @@ export class SalesApi extends BaseApiClient {
     limit?: number;
     offset?: number;
     sortBy?: string;
+    salesId?: string;
     sortOrder?: 'asc' | 'desc';
   }): Promise<GetCustomersResponse> {
     const queryParams = new URLSearchParams();
+    if (params?.salesId) queryParams.append('salesId', params.salesId);
     if (params?.search) queryParams.append('search', params.search);
     if (params?.isActive !== undefined) queryParams.append('isActive', String(params.isActive));
     if (params?.limit) queryParams.append('limit', String(params.limit));
@@ -115,6 +117,7 @@ export class SalesApi extends BaseApiClient {
 
   // ========== Purchase Order APIs ==========
   async getPurchaseOrders(params?: {
+    salesId?: string;
     poNumber?: string;
     customerId?: string;
     status?: POStatus;
@@ -129,6 +132,7 @@ export class SalesApi extends BaseApiClient {
     sortOrder?: 'asc' | 'desc';
   }): Promise<GetPurchaseOrdersResponse> {
     const queryParams = new URLSearchParams();
+    if (params?.salesId) queryParams.append('salesId', params.salesId);
     if (params?.poNumber) queryParams.append('poNumber', params.poNumber);
     if (params?.customerId) queryParams.append('customerId', params.customerId);
     if (params?.status) queryParams.append('status', params.status);

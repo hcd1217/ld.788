@@ -407,6 +407,10 @@ function generateDepartmentPermissions() {
       },
       purchaseOrder: {
         ...basePermission,
+        query: {
+          canFilter: false,
+          canViewAll: false,
+        },
         actions: {
           canConfirm: false,
           canProcess: false,

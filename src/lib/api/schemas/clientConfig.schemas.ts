@@ -38,6 +38,11 @@ export const ClientConfigSchema = z.object({
           assigneeIds: z.array(idSchema),
         })
         .partial(),
+      purchaseOrder: z
+        .object({
+          assigneeIds: z.array(idSchema),
+        })
+        .partial(),
       employee: z
         .object({
           workType: booleanSchema,

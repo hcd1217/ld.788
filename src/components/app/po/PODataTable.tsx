@@ -48,11 +48,12 @@ function PODataTableComponent({ purchaseOrders }: PODataTableProps) {
 
   return (
     <ScrollArea>
-      <Table striped highlightOnHover aria-label={t('po.tableAriaLabel')}>
+      <Table striped highlightOnHover>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>{t('po.poNumber')}</Table.Th>
             <Table.Th>{t('po.customer')}</Table.Th>
+            <Table.Th>{t('po.salesPerson')}</Table.Th>
             <Table.Th>{t('po.orderDate')}</Table.Th>
             <Table.Th>{t('po.deliveryDate')}</Table.Th>
             <Table.Th>{t('po.items')}</Table.Th>
@@ -78,6 +79,9 @@ function PODataTableComponent({ purchaseOrders }: PODataTableProps) {
                       {getCustomerNameByCustomerId(customerMapByCustomerId, po.customerId)}
                     </Text>
                   </Group>
+                </Table.Td>
+                <Table.Td>
+                  <Text size="sm">{po.salesPerson}</Text>
                 </Table.Td>
                 <Table.Td>{formatDate(po.orderDate)}</Table.Td>
                 <Table.Td>{po.deliveryDate ? formatDate(po.deliveryDate) : '-'}</Table.Td>
