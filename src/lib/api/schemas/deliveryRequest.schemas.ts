@@ -74,7 +74,8 @@ export const UploadPhotosSchema = z.object({
 
 export const CompleteDeliverySchema = z.object({
   photos: z.array(UploadPhotoSchema),
-  notes: optionalStringSchema,
+  deliveryNotes: optionalStringSchema,
+  receivedBy: stringSchema,
 });
 
 export const UpdateDeliveryOrderInDaySchema = z.object({

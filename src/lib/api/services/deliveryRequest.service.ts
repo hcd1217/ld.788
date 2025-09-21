@@ -115,7 +115,7 @@ export class DeliveryRequestApi extends BaseApiClient {
   }
 
   async completeDelivery(id: string, data: CompleteDelivery): Promise<void> {
-    return this.post<void, CompleteDelivery>(
+    return this.patch<void, CompleteDelivery>(
       `/api/sales/delivery-requests/${id}/complete`,
       data,
       undefined,

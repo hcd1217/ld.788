@@ -237,7 +237,7 @@
       "complete": "Complete Delivery",
       "create": "Create Delivery Request",
       "enterCompletionNotes": "Enter completion notes",
-      "enterRecipientName": "Enter recipient name",
+      "enterReceivedByName": "Enter receivedBy name",
       "enterTransitNotes": "Enter transit notes (optional)",
       "markAsCompleted": "Mark as Completed",
       "startTransit": "Start Transit",
@@ -290,8 +290,8 @@
       "title": "Quick Actions",
       "today": "Today"
     },
-    "recipient": "Recipient",
-    "recipientDescription": "Name of person who received the delivery",
+    "receivedBy": "ReceivedBy",
+    "receivedByDescription": "Name of person who received the delivery",
     "scheduledDate": "Scheduled Date",
     "status": "Status",
     "statuses": {

@@ -1,7 +1,7 @@
 import z from 'zod/v4';
 
 import type { Dictionary } from '@/types/dictionary';
-import { isDevelopment } from '@/utils/env';
+// import { isDevelopment } from '@/utils/env';
 
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#$%&()*?@^])[\d!#$%&()*?@A-Z^a-z]{8,}$/;
@@ -83,12 +83,13 @@ export const AddressSchema = z.object({
   googleMapsUrl: optionalStringSchema,
 });
 
-const dummyUrl =
-  'https://t3.ftcdn.net/jpg/02/17/65/88/360_F_217658823_vVaB79Y6lBL2JRk9eFPBKR6PdwcL8Ett.jpg';
+// const dummyUrl =
+//   'https://t3.ftcdn.net/jpg/02/17/65/88/360_F_217658823_vVaB79Y6lBL2JRk9eFPBKR6PdwcL8Ett.jpg';
 
 export const PhotoDataSchema = z.looseObject({
   id: idSchema,
-  publicUrl: isDevelopment ? stringSchema.transform(() => dummyUrl) : stringSchema,
+  // publicUrl: isDevelopment ? stringSchema.transform(() => dummyUrl) : stringSchema,
+  publicUrl: stringSchema,
   key: stringSchema,
   caption: optionalStringSchema,
   timestamp: stringSchema,

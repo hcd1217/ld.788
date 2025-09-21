@@ -237,7 +237,7 @@
       "complete": "Hoàn Thành Giao Hàng",
       "create": "Tạo Yêu Cầu Giao Hàng",
       "enterCompletionNotes": "Nhập ghi chú hoàn thành",
-      "enterRecipientName": "Nhập tên người nhận",
+      "enterReceivedByName": "Nhập tên người nhận",
       "enterTransitNotes": "Nhập ghi chú vận chuyển (tùy chọn)",
       "markAsCompleted": "Đánh Dấu Hoàn Thành",
       "startTransit": "Bắt Đầu",
@@ -290,8 +290,8 @@
       "title": "Chọn Nhanh",
       "today": "Hôm Nay"
     },
-    "recipient": "Người Nhận",
-    "recipientDescription": "Tên người đã nhận hàng",
+    "receivedBy": "Người Nhận",
+    "receivedByDescription": "Tên người đã nhận hàng",
     "scheduledDate": "Ngày Dự Kiến",
     "status": "Trạng Thái",
     "statuses": {

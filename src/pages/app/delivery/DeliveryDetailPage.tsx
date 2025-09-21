@@ -135,7 +135,11 @@ export function DeliveryDetailPage() {
   // Complete delivery action
   const completeDeliveryAction = useSWRAction(
     'complete-delivery',
-    async (data?: { completionNotes?: string; recipient?: string }) => {
+    async (data: {
+      photos: { publicUrl: string; key: string }[];
+      completionNotes: string;
+      receivedBy: string;
+    }) => {
       if (!canComplete) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
@@ -143,7 +147,9 @@ export function DeliveryDetailPage() {
         throw new Error(t('common.invalidFormData'));
       }
       await completeDelivery(selectedDeliveryRequest.id, {
-        notes: data?.completionNotes,
+        photos: data.photos,
+        receivedBy: data.receivedBy,
+        notes: data.completionNotes,
       });
       closeModal('complete');
     },
@@ -275,7 +281,7 @@ export function DeliveryDetailPage() {
           mode="complete"
           deliveryRequest={selectedDeliveryRequest}
           onClose={handleCloseModal('complete')}
-          onConfirm={completeDeliveryAction.trigger}
+          onComplete={completeDeliveryAction.trigger}
         />
         <DeliveryUpdateModal
           opened={modals.update}

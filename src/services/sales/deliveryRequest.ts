@@ -180,16 +180,16 @@ export const deliveryRequestService = {
 
   async completeDelivery(
     id: string,
-    data?: { photos?: { publicUrl: string; key: string; caption?: string }[]; notes?: string },
+    data: { photos: { publicUrl: string; key: string; caption?: string }[]; notes?: string },
   ): Promise<void> {
     await deliveryRequestApi.completeDelivery(id, {
-      photos:
-        data?.photos?.map((photo) => ({
-          publicUrl: photo.publicUrl,
-          key: photo.key,
-          caption: photo.caption,
-        })) ?? [],
-      notes: data?.notes,
+      photos: data.photos.map((photo) => ({
+        publicUrl: photo.publicUrl,
+        key: photo.key,
+        caption: photo.caption,
+      })),
+      deliveryNotes: data?.notes,
+      receivedBy: '',
     });
   },
 

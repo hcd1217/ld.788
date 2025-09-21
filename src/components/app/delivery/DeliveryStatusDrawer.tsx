@@ -34,7 +34,12 @@ type DeliveryStatusDrawerProps = {
   readonly mode: DeliveryModalMode;
   readonly deliveryRequest?: DeliveryRequest;
   readonly onClose: () => void;
-  readonly onConfirm: (data?: any) => Promise<void>;
+  readonly onConfirm?: (data?: { transitNotes?: string }) => Promise<void>;
+  readonly onComplete?: (data: {
+    photos: { publicUrl: string; key: string }[];
+    completionNotes: string;
+    receivedBy: string;
+  }) => Promise<void>;
 };
 
 // Modal configuration based on mode
@@ -71,11 +76,12 @@ export function DeliveryStatusDrawer({
   deliveryRequest,
   onClose,
   onConfirm,
+  onComplete,
 }: DeliveryStatusDrawerProps) {
   const { t } = useTranslation();
   const { isDesktop } = useDeviceType();
   const [notes, setNotes] = useState('');
-  const [recipient, setRecipient] = useState('');
+  const [receivedBy, setReceivedBy] = useState('');
   const [deliveryTime, setDeliveryTime] = useState('');
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [uploadedPhotos, setUploadedPhotos] = useState<{ publicUrl: string; key: string }[]>(
@@ -138,22 +144,27 @@ export function DeliveryStatusDrawer({
         startedAt: new Date().toISOString(),
         photos: uploadedPhotos,
       };
+      if (onConfirm) {
+        await onConfirm(data);
+      }
     } else if (mode === 'complete') {
       data = {
         completionNotes: notes.trim(),
-        recipient: recipient.trim(),
+        receivedBy: receivedBy.trim(),
         deliveredAt: deliveryTime || new Date().toISOString(),
         photos: uploadedPhotos,
       };
+      if (onComplete) {
+        onComplete(data);
+      }
     }
 
-    await onConfirm(data);
     handleClose();
   };
 
   const handleClose = () => {
     setNotes('');
-    setRecipient('');
+    setReceivedBy('');
     setDeliveryTime('');
     setUploadedPhotos([]);
     setShowPhotoUpload(false);
@@ -163,7 +174,7 @@ export function DeliveryStatusDrawer({
   // Check if confirm button should be disabled
   const isConfirmDisabled = () => {
     if (isComplete) {
-      return uploadedPhotos.length === 0 || !notes.trim() || !recipient.trim();
+      return uploadedPhotos.length === 0 || !notes.trim() || !receivedBy.trim();
     }
     return false;
   };
@@ -273,12 +284,12 @@ export function DeliveryStatusDrawer({
                   {t('common.photos.takePhoto')}
                 </Button>
                 <TextInput
-                  label={t('delivery.recipient')}
-                  placeholder={t('delivery.actions.enterRecipientName')}
-                  value={recipient}
-                  onChange={(event) => setRecipient(event.currentTarget.value)}
+                  label={t('delivery.receivedBy')}
+                  placeholder={t('delivery.actions.enterReceivedByName')}
+                  value={receivedBy}
+                  onChange={(event) => setReceivedBy(event.currentTarget.value)}
                   required
-                  description={t('delivery.recipientDescription')}
+                  description={t('delivery.receivedByDescription')}
                 />
                 <Textarea
                   label={t('delivery.completionNotes')}

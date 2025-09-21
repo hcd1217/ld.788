@@ -67,7 +67,14 @@ type DeliveryRequestState = {
   updateDeliveryRequest: (id: string, data: UpdateDeliveryRequest) => Promise<void>;
   updateDeliveryStatus: (id: string, status: DeliveryStatus, notes?: string) => Promise<void>;
   uploadPhotos: (id: string, photos: { publicUrl: string; key: string }[]) => Promise<void>;
-  completeDelivery: (id: string, data?: { photoUrls?: string[]; notes?: string }) => Promise<void>;
+  completeDelivery: (
+    id: string,
+    data?: {
+      receivedBy: string;
+      photos: { publicUrl: string; key: string }[];
+      notes: string;
+    },
+  ) => Promise<void>;
   updateDeliveryOrderInDay: (assignedTo: string, date: Date, requestIds: string[]) => Promise<void>;
   loadDeliveryRequestsForDate: (assignedTo: string, date: Date) => Promise<DeliveryRequest[]>;
   clearError: () => void;
@@ -378,7 +385,10 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
         }
       },
 
-      async completeDelivery(id: string, data?: { photoUrls?: string[]; notes?: string }) {
+      async completeDelivery(
+        id: string,
+        data: { photos: { publicUrl: string; key: string }[]; notes?: string },
+      ) {
         const state = get();
 
         // Check if action is already pending
