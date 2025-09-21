@@ -85,7 +85,8 @@ export function POAddItemModal({ opened, onClose, onAdd, existingItems }: POAddI
 
   const handleAdd = () => {
     // Validation
-    if (!productCode || !description) {
+    const product = overviewData?.products.find((p) => p.code === productCode);
+    if (!product) {
       showErrorNotification(t('common.errors.notificationTitle'), t('po.itemsRequired'));
       return;
     }
@@ -104,7 +105,6 @@ export function POAddItemModal({ opened, onClose, onAdd, existingItems }: POAddI
       );
       return;
     }
-
     // Create item
     const newItem = {
       productCode,
@@ -112,8 +112,8 @@ export function POAddItemModal({ opened, onClose, onAdd, existingItems }: POAddI
       quantity,
       category: category || undefined,
       notes: '',
-      unit: '',
-      productId: '',
+      unit: product.unit,
+      productId: product?.id,
     };
 
     onAdd(newItem);

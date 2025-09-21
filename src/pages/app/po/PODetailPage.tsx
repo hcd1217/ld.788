@@ -525,6 +525,7 @@ export function PODetailPage() {
     return (
       <AppMobileLayout
         withGoBack
+        goBackRoute={ROUTERS.PO_MANAGEMENT}
         noFooter
         isLoading={isLoading}
         error={error}
