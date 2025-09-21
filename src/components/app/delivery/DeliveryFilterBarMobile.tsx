@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { Button, Group, Stack } from '@mantine/core';
 import { IconCalendar, IconChevronDown, IconClearAll } from '@tabler/icons-react';
@@ -7,6 +7,7 @@ import { SearchBar } from '@/components/common';
 import type { DeliveryStatusType } from '@/constants/deliveryRequest';
 import { useTranslation } from '@/hooks/useTranslation';
 import { usePermissions } from '@/stores/useAppStore';
+import { canFilterDeliveryRequest } from '@/utils/permission.utils';
 
 interface DeliveryFilterBarMobileProps {
   readonly searchQuery: string;
@@ -34,6 +35,8 @@ export function DeliveryFilterBarMobile({
   const { t } = useTranslation();
   const permissions = usePermissions();
 
+  const canFilter = useMemo(() => canFilterDeliveryRequest(permissions), [permissions]);
+
   const getStatusLabel = useCallback(() => {
     if (selectedStatuses.length === 0) {
       return t('common.filters.allStatus');
@@ -54,7 +57,7 @@ export function DeliveryFilterBarMobile({
       : t('delivery.quickActions.title');
   }, [quickAction, hasDateFilter, t]);
 
-  if (!permissions.deliveryRequest.query.canFilter) {
+  if (!canFilter) {
     return null;
   }
 

@@ -233,7 +233,7 @@ export function usePOTimelineItems(purchaseOrder: PurchaseOrder) {
           createTimelineItem(
             'CANCELLED',
             cancelledEntry?.userId,
-            cancelledEntry?.timestamp || purchaseOrder.updatedAt,
+            cancelledEntry?.timestamp,
             additionalInfo,
             true,
             true,
@@ -250,7 +250,7 @@ export function usePOTimelineItems(purchaseOrder: PurchaseOrder) {
           createTimelineItem(
             'REFUNDED',
             refundedEntry?.userId,
-            refundedEntry?.timestamp || purchaseOrder.updatedAt,
+            refundedEntry?.timestamp,
             additionalInfo,
             true,
             true,

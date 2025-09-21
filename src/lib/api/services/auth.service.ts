@@ -66,12 +66,8 @@ export class AuthApi extends BaseApiClient {
    * @param newPassword - The new password
    * @returns void
    */
-  async changePassword(
-    userId: string,
-    currentPassword: string,
-    newPassword: string,
-  ): Promise<void> {
-    return this.put<void>(`/api/users/${userId}/password`, { currentPassword, newPassword });
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    return this.post<void>(`/auth/change-password`, { currentPassword, newPassword });
   }
 
   async getMe(): Promise<GetMeResponse> {

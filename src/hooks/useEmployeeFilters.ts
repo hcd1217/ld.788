@@ -5,13 +5,13 @@ import type { Employee } from '@/services/hr/employee';
 
 export interface EmployeeFilters {
   searchQuery: string;
-  unitId: string | undefined;
+  departmentId: string | undefined;
   status: EmployeeStatusType;
 }
 
 export interface EmployeeFilterHandlers {
   setSearchQuery: (query: string) => void;
-  setUnitId: (unitId: string | undefined) => void;
+  setDepartmentId: (departmentId: string | undefined) => void;
   setStatus: (status: EmployeeStatusType) => void;
   updateFilters: (updates: Partial<EmployeeFilters>) => void;
   resetFilters: () => void;
@@ -19,7 +19,7 @@ export interface EmployeeFilterHandlers {
 
 const defaultFilters: EmployeeFilters = {
   searchQuery: '',
-  unitId: undefined,
+  departmentId: undefined,
   status: EMPLOYEE_STATUS.ALL,
 };
 
@@ -27,7 +27,7 @@ export function useEmployeeFilters(employees: readonly Employee[]) {
   const [filters, setFilters] = useState<EmployeeFilters>(defaultFilters);
 
   const hasActiveFilters = useMemo(() => {
-    if (filters.unitId) {
+    if (filters.departmentId) {
       return true;
     }
     if (defaultFilters.status !== filters.status) {
@@ -45,8 +45,8 @@ export function useEmployeeFilters(employees: readonly Employee[]) {
         setFilters((prev) => ({ ...prev, searchQuery: query }));
       },
 
-      setUnitId: (unitId: string | undefined) => {
-        setFilters((prev) => ({ ...prev, unitId }));
+      setDepartmentId: (departmentId: string | undefined) => {
+        setFilters((prev) => ({ ...prev, departmentId }));
       },
 
       setStatus: (status: EmployeeStatusType) => {
@@ -65,7 +65,7 @@ export function useEmployeeFilters(employees: readonly Employee[]) {
 
   const filteredEmployees = useMemo(() => {
     return employees.filter((employee) => {
-      const { searchQuery, unitId, status } = filters;
+      const { searchQuery, departmentId, status } = filters;
 
       // Status filter
       if (status !== EMPLOYEE_STATUS.ALL) {
@@ -76,7 +76,7 @@ export function useEmployeeFilters(employees: readonly Employee[]) {
       }
 
       // Department filter
-      if (unitId && employee.unitId !== unitId) {
+      if (departmentId && employee.departmentId !== departmentId) {
         return false;
       }
 
@@ -99,7 +99,7 @@ export function useEmployeeFilters(employees: readonly Employee[]) {
 
   const clearAllFilters = useCallback(() => {
     filterHandlers.setSearchQuery('');
-    filterHandlers.setUnitId(undefined);
+    filterHandlers.setDepartmentId(undefined);
     filterHandlers.setStatus(EMPLOYEE_STATUS.ALL);
   }, [filterHandlers]);
 

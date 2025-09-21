@@ -1,68 +1,67 @@
+import { useMemo } from 'react';
+
 import {
+  Alert,
   Box,
   Button,
   Group,
   LoadingOverlay,
-  Select,
   Stack,
   Textarea,
   TextInput,
 } from '@mantine/core';
+import { IconCheck, IconInfoCircle, IconTrash } from '@tabler/icons-react';
 
 import { ModalOrDrawer } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { ProductStatus } from '@/services/sales/product';
+import type { Product } from '@/services/sales/product';
+import { usePermissions } from '@/stores/useAppStore';
+import { canCreateProduct, canEditProduct } from '@/utils/permission.utils';
 
 import type { UseFormReturnType } from '@mantine/form';
 
 export type ProductFormValues = {
   productCode: string;
   name: string;
-  color?: string;
   description?: string;
   category?: string;
-  status: ProductStatus;
   unit?: string;
-  sku?: string;
-  barcode?: string;
-  metaData?: Record<string, string>;
+  color?: string;
 };
 
 type ProductFormModalProps = {
-  readonly canCreate: boolean;
-  readonly canEdit: boolean;
-  readonly canDelete: boolean;
   readonly opened: boolean;
   readonly onClose: () => void;
   readonly mode: 'create' | 'edit';
   readonly form: UseFormReturnType<ProductFormValues>;
   readonly onSubmit: (values: ProductFormValues) => void;
-  readonly onDelete?: () => void;
+  readonly onActivate?: () => void;
+  readonly onDeactivate?: () => void;
   readonly isLoading: boolean;
+  readonly product?: Product;
 };
 
 export function ProductFormModal({
-  canCreate,
-  canEdit,
-  canDelete,
   opened,
   onClose,
   mode,
   form,
   onSubmit,
-  onDelete,
+  onActivate,
+  onDeactivate,
   isLoading,
+  product,
 }: ProductFormModalProps) {
   const { t } = useTranslation();
   const title = mode === 'create' ? t('product.addProduct') : t('product.editProduct');
+  const permissions = usePermissions();
 
-  const statusOptions = [
-    { value: 'ACTIVE', label: t('product.status.active') },
-    { value: 'INACTIVE', label: t('product.status.inactive') },
-    { value: 'DISCONTINUED', label: t('product.status.discontinued') },
-    { value: 'OUT_OF_STOCK', label: t('product.status.outOfStock') },
-    { value: 'LOW_STOCK', label: t('product.status.lowStock') },
-  ];
+  const { canCreate, canEdit } = useMemo(() => {
+    return {
+      canCreate: canCreateProduct(permissions),
+      canEdit: canEditProduct(permissions),
+    };
+  }, [permissions]);
 
   return (
     <ModalOrDrawer title={title} opened={opened} onClose={onClose} drawerSize="md">
@@ -74,6 +73,18 @@ export function ProductFormModal({
         />
         <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap="md">
+            {/* Product Status Alert */}
+            {mode === 'edit' && product && (
+              <Alert
+                icon={<IconInfoCircle size={16} />}
+                variant="light"
+                color={product.isDeleted ? 'var(--app-inactive-color)' : 'var(--app-active-color)'}
+              >
+                {t('common.status')}:{' '}
+                {product.isDeleted ? t('product.inactive') : t('product.active')}
+              </Alert>
+            )}
+
             {/* Basic Information */}
             <TextInput
               required
@@ -98,15 +109,6 @@ export function ProductFormModal({
               disabled={isLoading}
               minRows={2}
               {...form.getInputProps('description')}
-            />
-            <Select
-              required
-              label={t('common.status')}
-              placeholder={t('product.statusPlaceholder')}
-              data={statusOptions}
-              error={form.errors.status}
-              disabled={isLoading}
-              {...form.getInputProps('status')}
             />
             <Group grow>
               <TextInput
@@ -136,18 +138,31 @@ export function ProductFormModal({
 
             {/* Action Buttons */}
             <Group justify="space-between" mt="md">
-              {mode === 'edit' && onDelete ? (
-                <Button
-                  variant="light"
-                  color="red"
-                  onClick={onDelete}
-                  disabled={isLoading || !canDelete}
-                >
-                  {t('common.delete')}
-                </Button>
-              ) : (
-                <div />
-              )}
+              <Group>
+                {mode === 'edit' && product && (
+                  <>
+                    {product.isDeleted ? (
+                      <Button
+                        color="var(--app-active-color)"
+                        leftSection={<IconCheck size={16} />}
+                        onClick={onActivate}
+                        disabled={isLoading || !canEdit}
+                      >
+                        {t('common.activate')}
+                      </Button>
+                    ) : (
+                      <Button
+                        color="var(--app-inactive-color)"
+                        leftSection={<IconTrash size={16} />}
+                        onClick={onDeactivate}
+                        disabled={isLoading || !canEdit}
+                      >
+                        {t('common.deactivate')}
+                      </Button>
+                    )}
+                  </>
+                )}
+              </Group>
               <Group>
                 <Button variant="default" onClick={onClose} disabled={isLoading}>
                   {t('common.cancel')}

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 
 import { Accordion, Anchor, Button, Grid, Group, Stack, Text } from '@mantine/core';
 import {
+  IconCamera,
   IconCheck,
   IconEdit,
   IconMapPin,
@@ -15,8 +16,14 @@ import {
 import { ContactInfo, UrgentBadge, ViewOnMap } from '@/components/common';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
-import { useCustomers } from '@/stores/useAppStore';
+import type { DeliveryRequest } from '@/services/sales';
+import { useCustomers, usePermissions } from '@/stores/useAppStore';
+import {
+  canCompleteDeliveryRequest,
+  canEditDeliveryRequest,
+  canStartTransitDeliveryRequest,
+  canTakePhotoDeliveryRequest,
+} from '@/utils/permission.utils';
 import { formatDate } from '@/utils/time';
 
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
@@ -25,10 +32,6 @@ import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 type DeliveryDetailAccordionProps = {
   readonly deliveryRequest: DeliveryRequest;
   readonly isLoading?: boolean;
-  readonly canEdit?: boolean;
-  readonly canStartTransit?: boolean;
-  readonly canComplete?: boolean;
-  readonly canTakePhoto?: boolean;
   readonly onStartTransit: () => void;
   readonly onComplete: () => void;
   readonly onTakePhoto: () => void;
@@ -38,10 +41,6 @@ type DeliveryDetailAccordionProps = {
 export function DeliveryDetailAccordion({
   deliveryRequest,
   isLoading,
-  canEdit = false,
-  canStartTransit = false,
-  canComplete = false,
-  canTakePhoto = false,
   onStartTransit,
   onComplete,
   onTakePhoto,
@@ -49,6 +48,7 @@ export function DeliveryDetailAccordion({
 }: DeliveryDetailAccordionProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const permissions = usePermissions();
   const { canStartTransitBased, canCompleteBased, canTakePhotoBased } = useMemo(() => {
     const canStartTransitBased = deliveryRequest.status === 'PENDING';
     const canCompleteBased = deliveryRequest.status === 'IN_TRANSIT';
@@ -59,6 +59,15 @@ export function DeliveryDetailAccordion({
       canTakePhotoBased,
     };
   }, [deliveryRequest.status]);
+
+  const { canEdit, canStartTransit, canComplete, canTakePhoto } = useMemo(() => {
+    return {
+      canEdit: canEditDeliveryRequest(permissions),
+      canStartTransit: canStartTransitDeliveryRequest(permissions),
+      canComplete: canCompleteDeliveryRequest(permissions),
+      canTakePhoto: canTakePhotoDeliveryRequest(permissions),
+    };
+  }, [permissions]);
 
   // Delivery info fields for cleaner rendering
   const deliveryInfoFields = useMemo(
@@ -204,7 +213,7 @@ export function DeliveryDetailAccordion({
         <Group gap="sm">
           {canTakePhotoBased && canTakePhoto && (
             <Button
-              leftSection={<IconPhoto size={16} />}
+              leftSection={<IconCamera size={16} />}
               variant="outline"
               onClick={onTakePhoto}
               disabled={isLoading}

@@ -59,8 +59,4 @@ export class HrApi extends BaseApiClient {
   async activateEmployee(employeeId: string): Promise<void> {
     await this.patch(`/api/hr/employees/${employeeId}/activate`);
   }
-
-  async removeEmployee(employeeId: string): Promise<void> {
-    await this.delete(`/api/hr/employees/${employeeId}`);
-  }
 }

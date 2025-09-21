@@ -22,6 +22,7 @@ export function SearchBar({
 
   return (
     <TextInput
+      mb="md"
       placeholder={placeholder}
       leftSection={<IconSearch size={16} />}
       value={searchQuery}

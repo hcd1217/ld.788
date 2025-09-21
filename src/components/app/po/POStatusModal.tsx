@@ -16,7 +16,7 @@ type POStatusModalProps = {
   readonly opened: boolean;
   readonly mode: POModalMode;
   readonly purchaseOrder?: PurchaseOrder;
-  readonly loading?: boolean;
+  readonly isLoading?: boolean;
   readonly onClose: () => void;
   readonly onConfirm: (data?: any) => Promise<void>;
 };
@@ -25,7 +25,7 @@ export function POStatusModal({
   opened,
   mode,
   purchaseOrder,
-  loading = false,
+  isLoading = false,
   onClose,
   onConfirm,
 }: POStatusModalProps) {
@@ -81,7 +81,7 @@ export function POStatusModal({
       mode={mode}
       config={config}
       purchaseOrder={purchaseOrder}
-      loading={loading}
+      isLoading={isLoading}
       reason={reason}
       setReason={setReason}
       deliveryNotes={deliveryNotes}

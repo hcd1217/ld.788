@@ -6,6 +6,7 @@ import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 
+import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
 
 type POInfoSectionProps = {
@@ -27,18 +28,27 @@ export function POInfoSection({ purchaseOrder, onNavigateToItemsList }: POInfoSe
             <Text size="sm" fw={500} c="dimmed">
               {t('po.poNumber')}
             </Text>
-            <Text size="lg" fw={600}>
-              {purchaseOrder.poNumber}
-            </Text>
+            <Group justify="start" gap="sm" align="center">
+              <Text size="lg" fw={600}>
+                {purchaseOrder.poNumber}
+              </Text>
+              <POStatusBadge status={purchaseOrder.status} size="md" />
+              <PODeliveryBadge isInternalDelivery={purchaseOrder.isInternalDelivery} size="md" />
+            </Group>
           </div>
 
           <div>
             <Text size="sm" fw={500} c="dimmed">
-              {t('po.poStatus')}
+              {t('po.items')}
             </Text>
-            <Group justify="start" gap="sm" align="center">
-              <POStatusBadge status={purchaseOrder.status} size="md" />
-            </Group>
+            <Badge
+              variant="transparent"
+              size="lg"
+              style={{ cursor: 'pointer' }}
+              onClick={onNavigateToItemsList}
+            >
+              {purchaseOrder.items.length} {t('po.itemsCount')}
+            </Badge>
           </div>
         </Stack>
       </Grid.Col>
@@ -61,16 +71,9 @@ export function POInfoSection({ purchaseOrder, onNavigateToItemsList }: POInfoSe
 
           <div>
             <Text size="sm" fw={500} c="dimmed">
-              {t('po.items')}
+              {t('po.salesPerson')}
             </Text>
-            <Badge
-              variant="transparent"
-              size="lg"
-              style={{ cursor: 'pointer' }}
-              onClick={onNavigateToItemsList}
-            >
-              {purchaseOrder.items.length} {t('po.itemsCount')}
-            </Badge>
+            <Text fw={500}>{purchaseOrder.salesPerson}</Text>
           </div>
         </Stack>
       </Grid.Col>

@@ -1,16 +1,18 @@
 import { useMemo, useState } from 'react';
 
-import { Button, Group, Paper, Stack, Text } from '@mantine/core';
+import { Box, Button, Group, Paper, Stack, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { IconPlus, IconUpload } from '@tabler/icons-react';
 
-import { CustomerFormModal, type CustomerFormValues } from '@/components/app/config';
+import { CustomerCard, CustomerFormModal, type CustomerFormValues } from '@/components/app/config';
 import {
   ActiveBadge,
   AppDesktopLayout,
+  AppMobileLayout,
   AppPageTitle,
+  BlankState,
   BulkImportModalContent,
   ContactInfo,
   DataTable,
@@ -20,6 +22,7 @@ import {
   ViewOnMap,
 } from '@/components/common';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useOnce } from '@/hooks/useOnce';
 import { useSimpleSWRAction, useSWRAction } from '@/hooks/useSWRAction';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -29,15 +32,22 @@ import {
   type Customer,
   customerService,
 } from '@/services/sales/customer';
-import { usePermissions } from '@/stores/useAppStore';
+import { useClientConfig, usePermissions } from '@/stores/useAppStore';
 import { generateCustomerExcelTemplate, parseCustomerExcelFile } from '@/utils/excelParser';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
+import {
+  canCreateCustomer,
+  canDeleteCustomer,
+  canEditCustomer,
+  canViewCustomer,
+} from '@/utils/permission.utils';
 import { validateEmail } from '@/utils/validation';
 
 // Form values type will be imported from CustomerFormModal
 
 export function CustomerConfigPage() {
-  const { t, i18n } = useTranslation();
+  const { t, currentLanguage } = useTranslation();
+  const { isMobile } = useDeviceType();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | undefined>();
@@ -45,6 +55,20 @@ export function CustomerConfigPage() {
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
   const [editOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false);
   const permissions = usePermissions();
+  const clientConfig = useClientConfig();
+
+  const { canView, canCreate, canEdit } = useMemo(() => {
+    return {
+      canView: canViewCustomer(permissions),
+      canCreate: canCreateCustomer(permissions),
+      canEdit: canEditCustomer(permissions),
+      canDelete: canDeleteCustomer(permissions),
+    };
+  }, [permissions]);
+
+  const { noEmail, noTaxCode } = useMemo(() => {
+    return clientConfig.features?.customer ?? { noEmail: false, noTaxCode: false };
+  }, [clientConfig]);
 
   const form = useForm<CustomerFormValues>({
     initialValues: {
@@ -53,6 +77,7 @@ export function CustomerConfigPage() {
       contactEmail: '',
       contactPhone: '',
       address: '',
+      deliveryAddress: '',
       googleMapsUrl: '',
       pic: '',
       taxCode: '',
@@ -81,13 +106,13 @@ export function CustomerConfigPage() {
   // Use client-side pagination hook
   const [paginatedCustomers, paginationState, paginationHandlers] = useClientSidePagination({
     data: filteredCustomers,
-    defaultPageSize: 20,
+    defaultPageSize: isMobile ? 1000 : 20,
   });
 
   const loadCustomersAction = useSimpleSWRAction(
     'load-customers',
     async () => {
-      if (!permissions.customer.canView) {
+      if (!canView) {
         return [];
       }
       setIsLoading(true);
@@ -115,7 +140,7 @@ export function CustomerConfigPage() {
   const createCustomerAction = useSWRAction(
     'create-customer',
     async (values: CustomerFormValues) => {
-      if (!permissions.customer.canCreate || !values) {
+      if (!canCreate || !values) {
         throw new Error(t('common.addFailed', { entity: t('common.entity.customer') }));
       }
       const data = {
@@ -124,6 +149,7 @@ export function CustomerConfigPage() {
         contactEmail: values.contactEmail || undefined,
         contactPhone: values.contactPhone || undefined,
         address: values.address || undefined,
+        deliveryAddress: values.deliveryAddress || undefined,
         googleMapsUrl: values.googleMapsUrl || undefined,
         taxCode: values.taxCode || undefined,
         isActive: true,
@@ -156,22 +182,24 @@ export function CustomerConfigPage() {
   const updateCustomerAction = useSWRAction(
     'update-customer',
     async (values: CustomerFormValues) => {
-      if (!permissions.customer.canEdit || !values || !selectedCustomer) {
+      if (!canEdit || !values || !selectedCustomer) {
         throw new Error(t('common.updateFailed', { entity: t('common.entity.customer') }));
       }
       setIsLoading(true);
-      return await customerService.updateCustomer(selectedCustomer.id, {
+      await customerService.updateCustomer(selectedCustomer.id, {
         name: values.name,
         companyName: values.companyName || undefined,
         contactEmail: values.contactEmail || undefined,
         contactPhone: values.contactPhone || undefined,
         address: values.address || undefined,
+        deliveryAddress: values.deliveryAddress || undefined,
         googleMapsUrl: values.googleMapsUrl || undefined,
         memo: values.memo || undefined,
         pic: values.pic || undefined,
         taxCode: values.taxCode || undefined,
         isActive: values.isActive,
       });
+      return selectedCustomer;
     },
     {
       notifications: {
@@ -193,21 +221,50 @@ export function CustomerConfigPage() {
     },
   );
 
-  const deleteCustomerAction = useSWRAction(
-    'delete-customer',
+  const activateCustomerAction = useSWRAction(
+    'activate-customer',
     async (customer: Customer) => {
-      return await customerService.deleteCustomer(customer.id);
+      return await customerService.activateCustomer(customer);
     },
     {
       notifications: {
         errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('common.deleteFailed', { entity: t('common.entity.customer') }),
+        errorMessage: t('common.updateFailed', { entity: t('common.entity.customer') }),
       },
       onSuccess: () => {
         showSuccessNotification(
-          t('customer.deleted'),
-          t('customer.deletedMessage', { name: selectedCustomer?.name || '' }),
+          t('common.activated', {
+            entity: t('common.entity.customer'),
+          }),
+          t('customer.updatedMessage', { name: selectedCustomer?.name || '' }),
         );
+        closeEdit();
+        loadCustomersAction.trigger();
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
+    },
+  );
+
+  const deactivateCustomerAction = useSWRAction(
+    'deactivate-customer',
+    async (customer: Customer) => {
+      return await customerService.deactivateCustomer(customer);
+    },
+    {
+      notifications: {
+        errorTitle: t('common.errors.notificationTitle'),
+        errorMessage: t('common.updateFailed', { entity: t('common.entity.customer') }),
+      },
+      onSuccess: () => {
+        showSuccessNotification(
+          t('common.deactivated', {
+            entity: t('common.entity.customer'),
+          }),
+          t('customer.updatedMessage', { name: selectedCustomer?.name || '' }),
+        );
+        closeEdit();
         loadCustomersAction.trigger();
       },
       onSettled: () => {
@@ -224,6 +281,7 @@ export function CustomerConfigPage() {
       contactEmail: customer.contactEmail || '',
       contactPhone: customer.contactPhone || '',
       address: customer.address || '',
+      deliveryAddress: customer.deliveryAddress || '',
       googleMapsUrl: customer?.googleMapsUrl || '',
       taxCode: customer.taxCode || '',
       isActive: customer.isActive,
@@ -234,29 +292,16 @@ export function CustomerConfigPage() {
   };
 
   const openCreateModal = () => {
-    if (!permissions.customer.canCreate) {
+    if (!canCreate) {
       return;
     }
     form.reset();
     openCreate();
   };
 
-  const confirmDelete = (customer: Customer) => {
-    if (!permissions.customer.canDelete) {
-      throw new Error(t('common.deleteFailed', { entity: t('common.entity.customer') }));
-    }
-    modals.openConfirmModal({
-      title: t('common.confirmDelete'),
-      children: <Text size="sm">{t('common.confirmDeleteMessage', { name: customer.name })}</Text>,
-      labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
-      confirmProps: { color: 'red' },
-      onConfirm: () => deleteCustomerAction.trigger(customer),
-    });
-  };
-
   // Open bulk import modal
   const openBulkImportModal = () => {
-    if (!permissions.customer.canCreate) {
+    if (!canCreate) {
       return;
     }
     let selectedFile: File | undefined;
@@ -269,9 +314,11 @@ export function CustomerConfigPage() {
           onFileSelect={(file) => {
             selectedFile = file;
           }}
-          onDownloadTemplate={() => generateCustomerExcelTemplate(i18n.language)}
+          onDownloadTemplate={() =>
+            generateCustomerExcelTemplate(currentLanguage, { noEmail, noTaxCode })
+          }
           entityType="customer"
-          language={i18n.language}
+          language={currentLanguage}
         />
       ),
       labels: {
@@ -296,7 +343,7 @@ export function CustomerConfigPage() {
   const handleExcelImportAction = useSWRAction(
     'handle-excel-import',
     async (data: { file: File }): Promise<BulkUpsertCustomersResponse> => {
-      if (!permissions.customer.canCreate) {
+      if (!canCreate) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!data?.file) {
@@ -317,14 +364,15 @@ export function CustomerConfigPage() {
       const request: BulkUpsertCustomersRequest = {
         customers: customers.map((c) => ({
           name: c.name,
-          companyName: c.companyName,
-          contactEmail: c.contactEmail,
-          contactPhone: c.contactPhone,
-          address: c.address,
           metadata: {
+            companyName: c.companyName,
+            contactEmail: c.contactEmail,
+            contactPhone: c.contactPhone,
+            address: c.address,
             googleMapsUrl: c.googleMapsUrl,
+            taxCode: c.taxCode,
+            isActive: true,
           },
-          taxCode: c.taxCode,
         })),
         skipInvalid: false,
       };
@@ -338,7 +386,7 @@ export function CustomerConfigPage() {
         errorMessage: t('common.bulkImport.importFailed', { entity: t('common.entity.customer') }),
       },
       onSuccess: async (result: BulkUpsertCustomersResponse) => {
-        const message = t('customer.bulkImportSuccess', {
+        const message = t('common.bulkImportSuccess', {
           created: result.created,
           updated: result.updated,
           failed: result.failed,
@@ -356,8 +404,66 @@ export function CustomerConfigPage() {
     },
   );
 
-  if (!permissions.customer.canView) {
+  if (!canView) {
     return <PermissionDeniedPage />;
+  }
+
+  if (isMobile) {
+    return (
+      <AppMobileLayout
+        showLogo
+        withGoBack
+        isLoading={isLoading}
+        error={undefined}
+        clearError={() => {}}
+        header={<AppPageTitle title={t('common.pages.customerManagement')} />}
+      >
+        {/* Sticky Search Bar */}
+        <Box
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
+            backgroundColor: 'var(--mantine-color-body)',
+            paddingTop: '0.5rem',
+            paddingBottom: '0.5rem',
+          }}
+        >
+          <SearchBar
+            placeholder={t('customer.searchPlaceholder')}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
+        </Box>
+
+        {/* Blank State for no results */}
+        <BlankState
+          hidden={paginatedCustomers.length > 0 || isLoading}
+          title={searchQuery ? t('common.noDataFound') : t('common.noDataFound')}
+          description={searchQuery ? t('common.tryDifferentSearch') : t('common.noDataFound')}
+        />
+
+        {/* Customer List */}
+        <Box mt="md">
+          {paginatedCustomers.length > 0 && (
+            <Stack gap="sm" px="sm">
+              {paginatedCustomers.map((customer) => (
+                <CustomerCard key={customer.id} customer={customer} />
+              ))}
+            </Stack>
+          )}
+        </Box>
+
+        {/* Pagination */}
+        <Pagination
+          totalPages={paginationState.totalPages}
+          pageSize={paginationState.pageSize}
+          currentPage={paginationState.currentPage}
+          onPageSizeChange={paginationHandlers.setPageSize}
+          onPageChange={paginationHandlers.setCurrentPage}
+        />
+      </AppMobileLayout>
+    );
   }
 
   return (
@@ -369,13 +475,13 @@ export function CustomerConfigPage() {
           <Button
             variant="light"
             leftSection={<IconUpload size={16} />}
-            disabled={!permissions.customer.canCreate}
+            disabled={!canCreate}
             onClick={openBulkImportModal}
           >
             {t('customer.bulkImport')}
           </Button>
           <Button
-            disabled={!permissions.customer.canCreate}
+            disabled={!canCreate}
             leftSection={<IconPlus size={16} />}
             onClick={openCreateModal}
           >
@@ -461,9 +567,6 @@ export function CustomerConfigPage() {
         opened={createOpened}
         onClose={closeCreate}
         mode="create"
-        canCreate={permissions.customer.canCreate}
-        canEdit={permissions.customer.canEdit}
-        canDelete={permissions.customer.canDelete}
         form={form}
         onSubmit={createCustomerAction.trigger}
         isLoading={isLoading}
@@ -473,17 +576,11 @@ export function CustomerConfigPage() {
         opened={editOpened}
         onClose={closeEdit}
         mode="edit"
-        canCreate={permissions.customer.canCreate}
-        canEdit={permissions.customer.canEdit}
-        canDelete={permissions.customer.canDelete}
         form={form}
+        customer={selectedCustomer}
         onSubmit={updateCustomerAction.trigger}
-        onDelete={() => {
-          if (selectedCustomer) {
-            confirmDelete(selectedCustomer);
-            closeEdit();
-          }
-        }}
+        onActivate={() => selectedCustomer && activateCustomerAction.trigger(selectedCustomer)}
+        onDeactivate={() => selectedCustomer && deactivateCustomerAction.trigger(selectedCustomer)}
         isLoading={isLoading}
       />
     </AppDesktopLayout>

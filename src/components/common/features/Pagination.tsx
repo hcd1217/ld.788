@@ -4,6 +4,7 @@ import { useDeviceType } from '@/hooks/useDeviceType';
 import { useAppStore } from '@/stores/useAppStore';
 
 type PaginationProps = {
+  readonly hidden?: boolean;
   readonly totalPages: number;
   readonly pageSize: number;
   readonly currentPage: number;
@@ -12,6 +13,7 @@ type PaginationProps = {
 };
 
 export function Pagination({
+  hidden,
   totalPages,
   pageSize,
   currentPage,
@@ -24,6 +26,10 @@ export function Pagination({
   const pagingOptions = isDesktop
     ? config.pagination.desktop.pagingOptions
     : config.pagination.mobile.pagingOptions;
+
+  if (hidden) {
+    return null;
+  }
 
   return (
     <Stack gap="md" mt="md">

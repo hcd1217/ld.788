@@ -13,6 +13,7 @@ export {
   DateInput,
   DatePickerInput,
   Drawer,
+  InfoField,
   SearchBar,
   SelectableCard,
   SwitchView,

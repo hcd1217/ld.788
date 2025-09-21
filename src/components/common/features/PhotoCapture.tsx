@@ -6,6 +6,7 @@ import { IconCamera, IconCheck, IconRotate, IconX } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { logError } from '@/utils/logger';
 import { showErrorNotification } from '@/utils/notifications';
+import { formatDateTime } from '@/utils/time';
 
 export type PhotoConfig = {
   readonly quality?: number;
@@ -13,6 +14,8 @@ export type PhotoConfig = {
   readonly maxHeight?: number;
   readonly targetSize?: number;
   readonly minQuality?: number;
+  readonly includeTimestamp?: boolean;
+  readonly includeLocation?: boolean;
 };
 
 export type PhotoCaptureProps = {
@@ -36,6 +39,14 @@ const DEFAULT_CONFIG: Required<PhotoConfig> = {
   maxHeight: 768,
   targetSize: 200 * 1024, // 200KB
   minQuality: 0.3,
+  includeTimestamp: true,
+  includeLocation: true,
+};
+
+type LocationInfo = {
+  readonly latitude: number;
+  readonly longitude: number;
+  readonly address?: string;
 };
 
 type ViewMode = 'camera' | 'review';
@@ -66,6 +77,33 @@ export function PhotoCapture({ opened, onClose, onCapture, config, labels }: Pho
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [photoSize, setPhotoSize] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [location, setLocation] = useState<LocationInfo | null>(null);
+
+  // Get user location
+  const getLocation = useCallback(async () => {
+    if (!mergedConfig.includeLocation) return;
+
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        });
+      });
+
+      setLocation({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
+    } catch (error) {
+      logError('Failed to get location:', error, {
+        module: 'PhotoCapture',
+        action: 'getLocation',
+      });
+      // Don't show error notification as location is optional
+    }
+  }, [mergedConfig.includeLocation]);
 
   // Start camera
   const startCamera = useCallback(async () => {
@@ -83,6 +121,9 @@ export function PhotoCapture({ opened, onClose, onCapture, config, labels }: Pho
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
+
+      // Get location when camera starts
+      getLocation();
     } catch (error) {
       logError('Failed to start camera:', error, {
         module: 'PhotoCapture',
@@ -91,7 +132,7 @@ export function PhotoCapture({ opened, onClose, onCapture, config, labels }: Pho
       setCameraError(true);
       showErrorNotification(t('common.photos.permissionDenied'), mergedLabels.permissionDenied);
     }
-  }, [t, mergedConfig, mergedLabels.permissionDenied]);
+  }, [t, mergedConfig, mergedLabels.permissionDenied, getLocation]);
 
   // Stop camera
   const stopCamera = useCallback(() => {
@@ -117,6 +158,68 @@ export function PhotoCapture({ opened, onClose, onCapture, config, labels }: Pho
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, viewMode]);
 
+  // Draw overlay text on canvas
+  const drawOverlay = useCallback(
+    (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+      if (!mergedConfig.includeTimestamp && !mergedConfig.includeLocation) return;
+
+      // Prepare overlay text
+      const overlayLines: string[] = [];
+
+      // Add timestamp
+      if (mergedConfig.includeTimestamp) {
+        const now = new Date();
+        overlayLines.push(formatDateTime(now));
+      }
+
+      // Add location
+      if (mergedConfig.includeLocation && location) {
+        const locationText = `${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`;
+        overlayLines.push(locationText);
+      }
+
+      if (overlayLines.length === 0) return;
+
+      // Configure text style
+      const fontSize = Math.max(16, canvas.width * 0.025); // Scale with canvas size
+      ctx.font = `${fontSize}px system-ui, -apple-system, sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+
+      // Calculate text dimensions for background
+      const padding = fontSize * 0.5;
+      const lineHeight = fontSize * 1.3;
+      const maxWidth = Math.max(...overlayLines.map((line) => ctx.measureText(line).width));
+      const totalHeight = overlayLines.length * lineHeight + padding * 2;
+
+      // Position in bottom-left corner
+      const x = padding;
+      const y = canvas.height - totalHeight - padding;
+
+      // Draw semi-transparent background
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+      ctx.fillRect(x, y, maxWidth + padding * 2, totalHeight);
+
+      // Draw text
+      ctx.fillStyle = 'white';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+      ctx.shadowBlur = 2;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
+
+      overlayLines.forEach((line, index) => {
+        ctx.fillText(line, x + padding, y + padding + index * lineHeight);
+      });
+
+      // Reset shadow
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    },
+    [mergedConfig.includeTimestamp, mergedConfig.includeLocation, location],
+  );
+
   // Capture photo
   const capturePhoto = useCallback(async () => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -133,6 +236,9 @@ export function PhotoCapture({ opened, onClose, onCapture, config, labels }: Pho
     // Draw video frame to canvas
     ctx.drawImage(video, 0, 0);
 
+    // Add overlay
+    drawOverlay(ctx, canvas);
+
     // Get initial capture
     const base64 = canvas.toDataURL('image/jpeg', mergedConfig.quality);
 
@@ -146,7 +252,7 @@ export function PhotoCapture({ opened, onClose, onCapture, config, labels }: Pho
     setCapturedPhoto(compressed);
     setViewMode('review');
     stopCamera();
-  }, [stopCamera, mergedConfig]);
+  }, [stopCamera, mergedConfig, drawOverlay]);
 
   // Handle close
   const handleClose = useCallback(() => {
@@ -156,6 +262,7 @@ export function PhotoCapture({ opened, onClose, onCapture, config, labels }: Pho
     setCameraError(false);
     setViewMode('camera');
     setIsProcessing(false);
+    setLocation(null);
     onClose();
   }, [stopCamera, onClose]);
 

@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Autocomplete } from '@mantine/core';
 
 import { useTranslation } from '@/hooks/useTranslation';
+import type { ProductOverview } from '@/services/client/overview';
 import { useAppStore } from '@/stores/useAppStore';
 
 type POProductSearchProps = {
@@ -10,7 +11,7 @@ type POProductSearchProps = {
   readonly placeholder?: string;
   readonly size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   readonly limit?: number;
-  readonly onChange: (product?: { code: string; name: string; unit: string }) => void;
+  readonly onChange: (product?: ProductOverview) => void;
 };
 
 export function POProductSearch({
@@ -39,7 +40,7 @@ export function POProductSearch({
       const product = overviewData?.products.find((p) => p.code === productCode);
 
       if (product) {
-        onChange({ code: product.code, name: product.name, unit: product.unit });
+        onChange({ code: product.code, name: product.name, unit: product.unit, id: product.id });
       } else {
         onChange(undefined);
       }

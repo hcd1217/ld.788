@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { Card, Divider, Grid, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 
 import { ViewOnMap } from '@/components/common';
@@ -22,6 +24,14 @@ type POBasicInfoCardProps = {
 
 export function POBasicInfoCard({ purchaseOrder, onNavigateToItemsList }: POBasicInfoCardProps) {
   const { t } = useTranslation();
+  const notes = useMemo(() => {
+    return {
+      cancelReason: getCancelReason(purchaseOrder.statusHistory),
+      deliveryNotes: getDeliveryNotes(purchaseOrder.statusHistory),
+      refundReason: getRefundReason(purchaseOrder.statusHistory),
+      shippingInfo: getShippingInfo(purchaseOrder.statusHistory),
+    };
+  }, [purchaseOrder.statusHistory]);
 
   return (
     <Card shadow="sm" padding="xl" radius="md">
@@ -56,56 +66,52 @@ export function POBasicInfoCard({ purchaseOrder, onNavigateToItemsList }: POBasi
         </Grid>
         <Divider />
         <SimpleGrid cols={{ base: 1, md: 2 }}>
-          {getCancelReason(purchaseOrder.statusHistory) && (
+          <PODeliverySection purchaseOrder={purchaseOrder} />
+
+          {notes.shippingInfo && (
             <div>
-              <Text size="sm" fw={500} c="red" mb="xs">
-                {t('po.cancelReason')}
+              <Text size="sm" fw={500} c="cyan" mb="xs">
+                {t('po.shippingInfo')}
               </Text>
-              <Text size="sm">{getCancelReason(purchaseOrder.statusHistory)}</Text>
+              {notes.shippingInfo.trackingNumber && (
+                <Text size="sm">
+                  {t('po.trackingNumber')}: {notes.shippingInfo.trackingNumber}
+                </Text>
+              )}
+              {notes.shippingInfo.carrier && (
+                <Text size="sm">
+                  {t('po.carrier')}: {notes.shippingInfo.carrier}
+                </Text>
+              )}
             </div>
           )}
 
-          {getRefundReason(purchaseOrder.statusHistory) && (
-            <div>
-              <Text size="sm" fw={500} c="orange" mb="xs">
-                {t('po.refundReason')}
-              </Text>
-              <Text size="sm">{getRefundReason(purchaseOrder.statusHistory)}</Text>
-            </div>
-          )}
-
-          {getDeliveryNotes(purchaseOrder.statusHistory) && (
+          {notes.deliveryNotes && (
             <div>
               <Text size="sm" fw={500} c="blue" mb="xs">
                 {t('po.deliveryNotes')}
               </Text>
-              <Text size="sm">{getDeliveryNotes(purchaseOrder.statusHistory)}</Text>
+              <Text size="sm">{notes.deliveryNotes}</Text>
             </div>
           )}
 
-          <PODeliverySection purchaseOrder={purchaseOrder} />
+          {notes.cancelReason && (
+            <div>
+              <Text size="sm" fw={500} c="red" mb="xs">
+                {t('po.cancelReason')}
+              </Text>
+              <Text size="sm">{notes.cancelReason}</Text>
+            </div>
+          )}
 
-          {(() => {
-            const shippingInfo = getShippingInfo(purchaseOrder.statusHistory);
-            if (!shippingInfo) return null;
-            return (
-              <div>
-                <Text size="sm" fw={500} c="cyan" mb="xs">
-                  {t('po.shippingInfo')}
-                </Text>
-                {shippingInfo.trackingNumber && (
-                  <Text size="sm">
-                    {t('po.trackingNumber')}: {shippingInfo.trackingNumber}
-                  </Text>
-                )}
-                {shippingInfo.carrier && (
-                  <Text size="sm">
-                    {t('po.carrier')}: {shippingInfo.carrier}
-                  </Text>
-                )}
-              </div>
-            );
-          })()}
+          {notes.refundReason && (
+            <div>
+              <Text size="sm" fw={500} c="orange" mb="xs">
+                {t('po.refundReason')}
+              </Text>
+              <Text size="sm">{notes.refundReason}</Text>
+            </div>
+          )}
         </SimpleGrid>
         <POStatusHistorySection purchaseOrder={purchaseOrder} />
       </Stack>

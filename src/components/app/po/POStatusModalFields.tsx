@@ -14,6 +14,7 @@ type POStatusModalFieldsProps = {
   readonly setTrackingNumber: (value: string) => void;
   readonly carrier: string;
   readonly setCarrier: (value: string) => void;
+  readonly isInternalDelivery?: boolean;
 };
 
 export function POStatusModalFields({
@@ -26,6 +27,7 @@ export function POStatusModalFields({
   setTrackingNumber,
   carrier,
   setCarrier,
+  isInternalDelivery,
 }: POStatusModalFieldsProps) {
   const { t } = useTranslation();
 
@@ -67,19 +69,21 @@ export function POStatusModalFields({
     );
   }
 
-  if (mode === 'ship') {
+  if (mode === 'ship' && !isInternalDelivery) {
     return (
       <>
         <TextInput
           label={t('po.trackingNumber')}
           placeholder={t('po.enterTrackingNumber')}
           value={trackingNumber}
+          required={!isInternalDelivery}
           onChange={(event) => setTrackingNumber(event.currentTarget.value)}
         />
         <TextInput
           label={t('po.carrier')}
           placeholder={t('po.enterCarrier')}
           value={carrier}
+          required={!isInternalDelivery}
           onChange={(event) => setCarrier(event.currentTarget.value)}
         />
       </>

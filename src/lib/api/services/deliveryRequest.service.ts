@@ -102,11 +102,11 @@ export class DeliveryRequestApi extends BaseApiClient {
     return this.post<void, UploadPhotos>(
       `/api/sales/delivery-requests/${id}/photos`,
       {
-        photoUrls: data.photoUrls.map((url) => {
-          if (url.includes('mock')) {
-            return '/photos/no-photo.svg';
+        photos: data.photos.map((photo) => {
+          if (photo.publicUrl.includes('mock')) {
+            photo.publicUrl = `${window.location.origin}/photos/no-photo.svg`;
           }
-          return url;
+          return photo;
         }),
       },
       undefined,

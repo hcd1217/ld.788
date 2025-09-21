@@ -82,7 +82,6 @@ export type UsePOActionsProps = {
  */
 export function usePOActions({
   purchaseOrder,
-  isLoading = false,
   permissions,
   callbacks,
 }: UsePOActionsProps): POActionConfig[] {
@@ -108,7 +107,7 @@ export function usePOActions({
       icon: IconX,
       translationKey: 'po.cancel',
       onClick: callbacks.onCancel,
-      isDisabled: !canCancel || isLoading,
+      isDisabled: !canCancel,
     });
 
     // Helper to create refund button config
@@ -120,7 +119,7 @@ export function usePOActions({
       icon: IconReceipt,
       translationKey: 'po.refund',
       onClick: callbacks.onRefund,
-      isDisabled: !canRefund || isLoading,
+      isDisabled: !canRefund,
     });
 
     switch (purchaseOrder.status) {
@@ -133,7 +132,7 @@ export function usePOActions({
             icon: IconCheck,
             translationKey: 'po.confirm',
             onClick: callbacks.onConfirm,
-            isDisabled: !canConfirm || isLoading,
+            isDisabled: !canConfirm,
           },
           createCancelAction(),
         );
@@ -149,7 +148,7 @@ export function usePOActions({
             icon: IconPackage,
             translationKey: 'po.startProcessing',
             onClick: callbacks.onProcess,
-            isDisabled: !canProcess || isLoading,
+            isDisabled: !canProcess,
           },
           createCancelAction(),
         );
@@ -164,24 +163,14 @@ export function usePOActions({
           icon: IconPackageExport,
           translationKey: 'po.markReady',
           onClick: callbacks.onMarkReady,
-          isDisabled: !canMarkReady || isLoading,
+          isDisabled: !canMarkReady,
         });
 
         break;
       }
 
       case 'READY_FOR_PICKUP': {
-        actions.push({
-          key: 'ship',
-          action: 'ship',
-          color: 'indigo',
-          icon: IconTruck,
-          translationKey: 'po.markShipped',
-          onClick: callbacks.onShip,
-          isDisabled: !purchaseOrder.deliveryRequest || !canShip || isLoading,
-        });
-
-        if (callbacks.onCreateDelivery) {
+        if (purchaseOrder.isInternalDelivery && !purchaseOrder.deliveryRequest) {
           actions.push({
             key: 'create-delivery',
             action: 'createDelivery',
@@ -189,11 +178,22 @@ export function usePOActions({
             variant: 'filled',
             icon: IconClipboardList,
             translationKey: 'po.createDeliveryRequest',
-            onClick: callbacks.onCreateDelivery,
-            isDisabled: !!purchaseOrder.deliveryRequest || !canShip || isLoading,
+            onClick: callbacks.onCreateDelivery ?? (() => {}),
+            isDisabled: !canShip,
             showCondition: true,
           });
+        } else {
+          actions.push({
+            key: 'ship',
+            action: 'ship',
+            color: 'indigo',
+            icon: IconTruck,
+            translationKey: 'po.markShipped',
+            onClick: callbacks.onShip,
+            isDisabled: !canShip,
+          });
         }
+        actions.push(createCancelAction());
         break;
       }
 
@@ -206,9 +206,9 @@ export function usePOActions({
             icon: IconPackageExport,
             translationKey: 'po.markDelivered',
             onClick: callbacks.onDeliver,
-            isDisabled: !canDeliver || isLoading,
+            isDisabled: !canDeliver,
           },
-          createRefundAction(),
+          createCancelAction(),
         );
         break;
       }
@@ -227,7 +227,7 @@ export function usePOActions({
 
     // Filter out actions that shouldn't be shown
     return actions.filter((action) => action.showCondition !== false);
-  }, [purchaseOrder, isLoading, permissions, callbacks]);
+  }, [purchaseOrder, permissions, callbacks]);
 
   return availableActions;
 }

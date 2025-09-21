@@ -62,10 +62,10 @@ export function EmployeeGridCard({ employee }: EmployeeGridCardProps) {
           ) : null}
         </Group>
 
-        {/* Unit */}
-        {employee.unit ? (
+        {/* Department */}
+        {employee.department ? (
           <Text size="sm" c="dimmed">
-            {t('employee.unit')}: {employee.unit}
+            {t('employee.department')}: {employee.department}
           </Text>
         ) : null}
 

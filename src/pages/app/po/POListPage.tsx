@@ -42,7 +42,7 @@ import { useDeviceType } from '@/hooks/useDeviceType';
 import { usePOFilters } from '@/hooks/usePOFilters';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useViewMode } from '@/hooks/useViewMode';
-import { useCustomers, useMe, usePermissions } from '@/stores/useAppStore';
+import { useMe, usePermissions } from '@/stores/useAppStore';
 import {
   usePOActions,
   usePOError,
@@ -52,6 +52,11 @@ import {
 } from '@/stores/usePOStore';
 import type { Timeout } from '@/types';
 import { xOr } from '@/utils/boolean';
+import {
+  canCreatePurchaseOrder,
+  canViewAllPurchaseOrder,
+  canViewPurchaseOrder,
+} from '@/utils/permission.utils';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 export function POListPage() {
@@ -60,8 +65,15 @@ export function POListPage() {
   const { t } = useTranslation();
   const currentUser = useMe();
   const permissions = usePermissions();
+  const { canView, canViewAll, canCreate } = useMemo(
+    () => ({
+      canView: canViewPurchaseOrder(permissions),
+      canViewAll: canViewAllPurchaseOrder(permissions),
+      canCreate: canCreatePurchaseOrder(permissions),
+    }),
+    [permissions],
+  );
   const purchaseOrders = usePurchaseOrderList();
-  const customers = useCustomers();
   const isLoading = usePOLoading();
   const error = usePOError();
   const { loadPOsWithFilter, loadMorePOs, loadNextPage, loadPreviousPage, clearError } =
@@ -91,7 +103,7 @@ export function POListPage() {
   // Create stable filter params with useMemo to prevent unnecessary re-renders
   const filterParams = useMemo(
     () => ({
-      salesId: permissions.purchaseOrder.query.canViewAll ? undefined : currentUser?.employee?.id,
+      salesId: canViewAll ? undefined : currentUser?.employee?.id,
       customerId: filters.customerId,
       // Filter out 'all' status before passing to API
       statuses:
@@ -114,7 +126,7 @@ export function POListPage() {
       filters.orderDateRange.end,
       filters.deliveryDateRange.start,
       filters.deliveryDateRange.end,
-      permissions.purchaseOrder.query.canViewAll,
+      canViewAll,
       currentUser,
     ],
   );
@@ -202,23 +214,25 @@ export function POListPage() {
 
   // Memoized navigation handlers
   const handleNavigateToAdd = useCallback(() => {
-    if (!permissions.purchaseOrder.canCreate) {
+    if (!canCreate) {
       return;
     }
     navigate(ROUTERS.PO_ADD);
-  }, [navigate, permissions.purchaseOrder.canCreate]);
+  }, [navigate, canCreate]);
 
   // Common BlankState configuration to reduce duplication
   const blankStateProps = useMemo(
     () => ({
       hidden: purchaseOrders.length > 0 || isLoading,
       title: hasActiveFilters ? t('po.noPOsFoundSearch') : t('po.noPOsFound'),
-      description: hasActiveFilters ? t('po.tryDifferentSearch') : t('po.createFirstPODescription'),
+      description: hasActiveFilters
+        ? t('common.tryDifferentSearch')
+        : t('po.createFirstPODescription'),
     }),
     [purchaseOrders.length, isLoading, hasActiveFilters, t],
   );
 
-  if (!permissions.purchaseOrder.canView) {
+  if (!canView) {
     return <PermissionDeniedPage />;
   }
 
@@ -298,7 +312,7 @@ export function POListPage() {
                 variant="light"
                 leftSection={<IconChevronLeft size={16} />}
                 onClick={() => void loadPreviousPage()}
-                disabled={!hasPreviousPage || isLoading || !permissions.purchaseOrder.canView}
+                disabled={!hasPreviousPage || isLoading || !canView}
                 size="sm"
               >
                 {t('common.previous')}
@@ -321,7 +335,7 @@ export function POListPage() {
           )}
 
           {/* Floating Action Button for Add PO */}
-          {!isLoading && permissions.purchaseOrder.canCreate && (
+          {!isLoading && canCreate && (
             <Affix position={{ bottom: 80, right: 10 }}>
               <ActionIcon size="xl" radius="xl" color="blue" onClick={handleNavigateToAdd}>
                 <IconPlus size={24} />
@@ -347,7 +361,7 @@ export function POListPage() {
             <Button
               leftSection={<IconPlus size={16} />}
               onClick={handleNavigateToAdd}
-              disabled={!permissions.purchaseOrder.canCreate}
+              disabled={!canCreate}
             >
               {t('po.addPO')}
             </Button>
@@ -363,7 +377,6 @@ export function POListPage() {
           orderDateEnd={filters.orderDateRange.end}
           deliveryDateStart={filters.deliveryDateRange.start}
           deliveryDateEnd={filters.deliveryDateRange.end}
-          customers={customers}
           hasActiveFilters={hasActiveFilters}
           onSearchChange={filterHandlers.setSearchQuery}
           onCustomerChange={filterHandlers.setCustomerId}
@@ -382,7 +395,7 @@ export function POListPage() {
               : {
                   label: t('po.createFirstPO'),
                   onClick: handleNavigateToAdd,
-                  disabled: !permissions.purchaseOrder.canCreate,
+                  disabled: !canCreate,
                 }
           }
         />
@@ -394,7 +407,6 @@ export function POListPage() {
               <POListSkeleton viewMode={viewMode} count={10} />
             ) : isTableView ? (
               <PODataTable
-                canEdit={permissions.purchaseOrder.canEdit}
                 noAction={isLoading || isFilterLoading}
                 isLoading={isLoading || isFilterLoading}
                 purchaseOrders={purchaseOrders}

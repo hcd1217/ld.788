@@ -25,16 +25,6 @@ export const BlankPage = lazy(async () => {
   return { default: module.BlankPage };
 });
 
-export const CustomerConfigPage = lazy(async () => {
-  const module = await import('@/pages/app/config/CustomerConfigPage');
-  return { default: module.CustomerConfigPage };
-});
-
-export const ProductConfigPage = lazy(async () => {
-  const module = await import('@/pages/app/config/ProductConfigPage');
-  return { default: module.ProductConfigPage };
-});
-
 export const HomePage = lazy(async () => {
   const module = await import('@/pages/app/HomePage');
   return { default: module.HomePage };

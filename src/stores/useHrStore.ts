@@ -23,7 +23,7 @@ type HrState = {
   addEmployee: (employee: {
     firstName: string;
     lastName: string;
-    unitId?: string | undefined;
+    departmentId?: string | undefined;
     email?: string;
     phone?: string;
     workType?: 'FULL_TIME' | 'PART_TIME';
@@ -35,7 +35,9 @@ type HrState = {
     employees: Array<{
       firstName: string;
       lastName: string;
-      unitId?: string | undefined;
+      departmentId?: string | undefined;
+      email?: string;
+      phone?: string;
     }>,
   ) => Promise<void>;
   clearError: () => void;
@@ -49,8 +51,6 @@ export const useHrStore = create<HrState>()(
     (set, get) => ({
       // Initial state
       employees: [],
-      units: [],
-      unitMap: new Map(),
       currentEmployee: undefined,
       isLoading: false,
       error: undefined,
@@ -67,7 +67,6 @@ export const useHrStore = create<HrState>()(
 
         set({ isLoading: true, error: undefined });
         try {
-          // Load both employees and units in parallel
           const employees = await employeeService.getAllEmployee();
           set({
             isLoading: false,
@@ -185,7 +184,7 @@ export const useHrStore = create<HrState>()(
       async addEmployee(employee: {
         firstName: string;
         lastName: string;
-        unitId?: string | undefined;
+        departmentId?: string | undefined;
         email?: string;
         phone?: string;
         workType?: 'FULL_TIME' | 'PART_TIME';
@@ -215,7 +214,9 @@ export const useHrStore = create<HrState>()(
         employees: Array<{
           firstName: string;
           lastName: string;
-          unitId?: string | undefined;
+          departmentId?: string | undefined;
+          email?: string;
+          phone?: string;
         }>,
       ) {
         set({ isLoading: true, error: undefined });

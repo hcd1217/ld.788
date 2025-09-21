@@ -9,7 +9,7 @@ import { showErrorNotification, showSuccessNotification } from '@/utils/notifica
 export interface BulkImportModalContentProps {
   onFileSelect: (file: File) => void;
   onDownloadTemplate: () => void;
-  entityType: 'customer' | 'product';
+  entityType: 'customer' | 'employee' | 'product';
   language: string;
 }
 

@@ -3,25 +3,23 @@ import { useMemo } from 'react';
 import { useForm } from '@mantine/form';
 
 import { useTranslation } from '@/hooks/useTranslation';
-import type { Unit } from '@/services/hr/employee';
 import type { SingleEmployeeFormValues } from '@/utils/employee.utils';
 import { isDevelopment } from '@/utils/env';
-import { firstName, lastName, randomElement } from '@/utils/fake';
+import { firstName, lastName } from '@/utils/fake';
 import { getFormValidators } from '@/utils/validation';
 
 type UseEmployeeFormProps = {
   readonly isEditMode: boolean;
-  readonly units: Unit[];
 };
 
-export function useEmployeeForm({ isEditMode, units }: UseEmployeeFormProps) {
+export function useEmployeeForm({ isEditMode }: UseEmployeeFormProps) {
   const { t } = useTranslation();
 
   const getInitialValues = useMemo((): SingleEmployeeFormValues => {
     const emptyValues: SingleEmployeeFormValues = {
       firstName: '',
       lastName: '',
-      unitId: undefined,
+      departmentId: undefined,
       email: undefined,
       phone: undefined,
       workType: undefined,
@@ -43,8 +41,8 @@ export function useEmployeeForm({ isEditMode, units }: UseEmployeeFormProps) {
       return {
         firstName: fName,
         lastName: lName,
-        unitId: randomElement(units)?.id,
-        email: `${fName.toLowerCase()}.${lName.toLowerCase()}@example.com`,
+        departmentId: undefined,
+        email: undefined,
         phone: `0901-${Math.floor(Math.random() * 1e3)}-${Math.floor(Math.random() * 1e3)}`,
         workType: Math.random() > 0.5 ? 'FULL_TIME' : 'PART_TIME',
         monthlySalary: 12000000,
@@ -54,7 +52,7 @@ export function useEmployeeForm({ isEditMode, units }: UseEmployeeFormProps) {
     }
 
     return emptyValues;
-  }, [isEditMode, units]);
+  }, [isEditMode]);
 
   const form = useForm<SingleEmployeeFormValues>({
     initialValues: getInitialValues,

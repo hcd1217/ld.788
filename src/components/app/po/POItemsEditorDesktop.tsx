@@ -15,6 +15,7 @@ import {
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 
 import { useTranslation } from '@/hooks/useTranslation';
+import type { ProductOverview } from '@/lib/api';
 import type { POItem } from '@/services/sales/purchaseOrder';
 import { showErrorNotification } from '@/utils/notifications';
 import { createPOItem } from '@/utils/poItemUtils';
@@ -91,12 +92,13 @@ export function POItemsEditorDesktop({
   );
 
   const handleProductSelection = useCallback(
-    (itemId: string | 'new', product?: { code: string; unit: string; name: string }) => {
+    (itemId: string | 'new', product?: ProductOverview) => {
       if (!product) return;
 
       if (itemId === 'new') {
         setNewItem({
           ...newItem,
+          productId: product.id,
           productCode: product.code,
           description: product.name,
           unit: product.unit || '',

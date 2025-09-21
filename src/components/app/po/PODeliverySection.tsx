@@ -53,17 +53,15 @@ export function PODeliverySection({ purchaseOrder }: PODeliverySectionProps) {
           </Text>
           <DeliveryStatusBadge status={purchaseOrder.deliveryRequest.status} />
         </Group>
-        {purchaseOrder.deliveryRequest.assignedTo && (
-          <Group gap="xs">
-            <Text size="xs" c="dimmed">
-              {t('delivery.assignedTo')}:
-            </Text>
-            <Group gap={4}>
-              <IconUser size={14} color="var(--mantine-color-gray-6)" />
-              <Text size="sm">{purchaseOrder.deliveryRequest.deliveryPerson}</Text>
-            </Group>
+        <Group gap="xs">
+          <Text size="xs" c="dimmed">
+            {t('delivery.assignedTo')}:
+          </Text>
+          <Group gap={4}>
+            <IconUser size={14} color="var(--mantine-color-gray-6)" />
+            <Text size="sm">{purchaseOrder.deliveryRequest.deliveryPerson || '-'}</Text>
           </Group>
-        )}
+        </Group>
         <Group gap="xs">
           <Text size="xs" c="dimmed">
             {t('delivery.scheduledDate')}:

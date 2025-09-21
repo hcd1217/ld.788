@@ -1,8 +1,11 @@
-import { authApi, type LoginRequest } from '@/lib/api';
+import { authApi, type GetMeResponse, type LoginRequest } from '@/lib/api';
 import { isTokenExpired } from '@/utils/jwt';
 import { logError } from '@/utils/logger';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 import { delay } from '@/utils/time';
+
+export type User = GetMeResponse;
+export type Permission = User['permissions'];
 
 export const authService = {
   async loginWithMagicToken(clientCode: string, token: string) {
@@ -43,12 +46,8 @@ export const authService = {
     }
   },
 
-  async changePassword(
-    userId: string,
-    currentPassword: string,
-    newPassword: string,
-  ): Promise<void> {
-    await authApi.changePassword(userId, currentPassword, newPassword);
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    await authApi.changePassword(currentPassword, newPassword);
   },
 
   logout() {
@@ -97,6 +96,11 @@ export const authService = {
     }
 
     return true;
+  },
+
+  async getMe(): Promise<User> {
+    const response = await authApi.getMe();
+    return response;
   },
 };
 

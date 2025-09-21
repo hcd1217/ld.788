@@ -201,8 +201,7 @@ class TimekeeperService {
         firstName: 'Huỳnh',
         lastName: 'Đặng',
         fullName: 'Đặng Huỳnh',
-        position: 'Product manager',
-        unit: 'Product',
+        department: 'Product',
       },
       currentClock: {
         clockInTime,

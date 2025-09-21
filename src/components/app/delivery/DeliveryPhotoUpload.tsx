@@ -9,7 +9,7 @@ import { showErrorNotification } from '@/utils/notifications';
 type DeliveryPhotoUploadProps = {
   readonly opened: boolean;
   readonly onClose: () => void;
-  readonly onUpload: (data: { photoUrls: string[] }) => Promise<void>;
+  readonly onUpload: (data: { photos: { publicUrl: string; key: string }[] }) => Promise<void>;
 };
 
 export function DeliveryPhotoUpload({ opened, onClose, onUpload }: DeliveryPhotoUploadProps) {
@@ -20,16 +20,16 @@ export function DeliveryPhotoUpload({ opened, onClose, onUpload }: DeliveryPhoto
     async (capturedPhoto: string) => {
       try {
         // Step 1: Upload to S3
-        const uploadedUrl = await uploadBase64ToS3(capturedPhoto, {
+        const { publicUrl, key } = await uploadBase64ToS3(capturedPhoto, {
           fileName: `delivery-photo-${Date.now()}.jpg`,
           fileType: 'image/jpeg',
           purpose: 'DELIVERY_REQUEST_PHOTO',
           prefix: 'delivery',
         });
 
-        if (uploadedUrl) {
+        if (publicUrl) {
           // Step 2: Save to backend
-          await onUpload({ photoUrls: [uploadedUrl] });
+          await onUpload({ photos: [{ publicUrl, key }] });
         }
       } catch (error) {
         logError('Failed to upload photo', error, {
@@ -38,7 +38,7 @@ export function DeliveryPhotoUpload({ opened, onClose, onUpload }: DeliveryPhoto
         });
         showErrorNotification(
           t('common.errors.notificationTitle'),
-          t('delivery.messages.uploadFailed'),
+          t('common.messages.uploadFailed'),
         );
         throw error; // Re-throw to prevent closing the modal
       }

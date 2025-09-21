@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import {
   Alert,
   Button,
@@ -22,12 +20,12 @@ import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
 import { FirstNameAndLastNameInForm } from '@/components/form/FirstNameAndLastNameInForm';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { Unit } from '@/services/hr/employee';
+import { useDepartmentOptions } from '@/stores/useAppStore';
 
 type SingleEmployeeFormValues = {
   firstName: string;
   lastName: string;
-  unitId?: string;
+  departmentId?: string;
   email?: string;
   phone?: string;
   workType?: 'FULL_TIME' | 'PART_TIME';
@@ -40,7 +38,6 @@ type SingleEmployeeFormValues = {
 
 type SingleEmployeeFormProps = {
   readonly form: UseFormReturnType<SingleEmployeeFormValues>;
-  readonly units: readonly Unit[];
   readonly isLoading: boolean;
   readonly showAlert: boolean;
   readonly error?: string;
@@ -53,7 +50,6 @@ type SingleEmployeeFormProps = {
 
 export function SingleEmployeeForm({
   form,
-  units,
   isLoading,
   showAlert,
   error,
@@ -64,15 +60,7 @@ export function SingleEmployeeForm({
   isEditMode = false,
 }: SingleEmployeeFormProps) {
   const { t } = useTranslation();
-
-  const unitOptions = useMemo(
-    () =>
-      units.map((unit) => ({
-        value: unit.id,
-        label: unit.name,
-      })),
-    [units],
-  );
+  const departmentOptions = useDepartmentOptions();
   return (
     <Card withBorder radius="md" p="xl">
       <form onSubmit={form.onSubmit(onSubmit)}>
@@ -101,10 +89,10 @@ export function SingleEmployeeForm({
           <Select
             searchable
             clearable
-            label={t('employee.unit')}
-            placeholder={t('employee.selectUnit')}
-            data={unitOptions}
-            {...form.getInputProps('unitId')}
+            label={t('employee.department')}
+            placeholder={t('employee.selectDepartment')}
+            data={departmentOptions}
+            {...form.getInputProps('departmentId')}
           />
           <TextInput
             label={t('common.form.email')}

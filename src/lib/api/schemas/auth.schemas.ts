@@ -13,7 +13,7 @@ import {
   passwordSchema,
   stringSchema,
 } from './common.schemas';
-import { DepartmentSchema, EmployeeSchema } from './hr.schemas';
+import { EmployeeSchema } from './hr.schemas';
 
 // Schemas
 export const LoginRequestSchema = z.object({
@@ -80,6 +80,7 @@ const PermissionSchema = z.object({
     actions: z
       .object({
         canSetPassword: booleanSchema,
+        canIssueMagicLink: booleanSchema,
       })
       .optional(),
   }),
@@ -93,6 +94,7 @@ const PermissionSchema = z.object({
       canViewAll: booleanSchema,
     }),
     actions: z.object({
+      canTakePhoto: booleanSchema,
       canConfirm: booleanSchema,
       canProcess: booleanSchema,
       canShip: booleanSchema,
@@ -131,12 +133,18 @@ export const GetMeResponseSchema = z
     isRoot: booleanSchema,
     clientConfig: ClientConfigSchema.optional(),
     employee: EmployeeSchema.optional(),
-    department: DepartmentSchema.optional(),
+    department: z
+      .object({
+        id: idSchema,
+        name: stringSchema,
+        code: stringSchema,
+      })
+      .optional(),
     permissions: PermissionSchema,
     navigationOverrides: z
       .object({
-        granted: z.array(stringSchema),
-        denied: z.array(stringSchema),
+        granted: z.array(stringSchema).default([]),
+        denied: z.array(stringSchema).default([]),
       })
       .optional(),
   })

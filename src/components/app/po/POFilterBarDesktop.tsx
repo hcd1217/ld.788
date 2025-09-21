@@ -6,10 +6,10 @@ import { IconClearAll } from '@tabler/icons-react';
 import { DatePickerInput, SearchBar } from '@/components/common';
 import { PO_STATUS, type POStatusType } from '@/constants/purchaseOrder';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { CustomerOverview as Customer } from '@/services/client/overview';
 import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
-import { usePermissions } from '@/stores/useAppStore';
+import { useCustomerOptions, usePermissions } from '@/stores/useAppStore';
+import { canFilterPurchaseOrder } from '@/utils/permission.utils';
 
 interface POFilterBarDesktopProps {
   readonly searchQuery: string;
@@ -19,7 +19,6 @@ interface POFilterBarDesktopProps {
   readonly orderDateEnd?: Date;
   readonly deliveryDateStart?: Date;
   readonly deliveryDateEnd?: Date;
-  readonly customers: readonly Customer[];
   readonly hasActiveFilters: boolean;
   readonly onSearchChange: (query: string) => void;
   readonly onCustomerChange: (customerId: string | undefined) => void;
@@ -37,7 +36,6 @@ export function POFilterBarDesktop({
   orderDateEnd,
   deliveryDateStart,
   deliveryDateEnd,
-  customers,
   hasActiveFilters,
   onSearchChange,
   onCustomerChange,
@@ -49,16 +47,7 @@ export function POFilterBarDesktop({
   const { t } = useTranslation();
   const permissions = usePermissions();
 
-  // Customer options for Select
-  const customerOptions = useMemo(() => {
-    return [
-      { value: '', label: t('po.allCustomers') },
-      ...customers.map((customer) => ({
-        value: customer.id,
-        label: customer.name,
-      })),
-    ];
-  }, [customers, t]);
+  const customerOptions = useCustomerOptions();
 
   // Status options for MultiSelect
   const statusOptions = useMemo(() => {
@@ -97,7 +86,7 @@ export function POFilterBarDesktop({
     };
   }, [selectedStatuses, statusOptions, t]);
 
-  if (!permissions.purchaseOrder.query.canFilter) {
+  if (!canFilterPurchaseOrder(permissions)) {
     return null;
   }
 

@@ -15,8 +15,6 @@ import { EmployeeDangerZone } from './EmployeeDangerZone';
 
 type EmployeeDetailAccordionProps = {
   readonly employee: Employee;
-  readonly canEdit: boolean;
-  readonly canSetPassword?: boolean;
   readonly onActivate: () => void;
   readonly onDeactivate: () => void;
   readonly onEdit: () => void;
@@ -25,8 +23,6 @@ type EmployeeDetailAccordionProps = {
 
 export function EmployeeDetailAccordion({
   employee,
-  canEdit,
-  canSetPassword = false,
   onActivate,
   onDeactivate,
   onEdit,
@@ -42,7 +38,7 @@ export function EmployeeDetailAccordion({
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap="xl" pt="md">
-            <EmployeeBasicInfoCard employee={employee} canEdit={canEdit} onEdit={onEdit} />
+            <EmployeeBasicInfoCard employee={employee} onEdit={onEdit} />
           </Stack>
         </Accordion.Panel>
       </Accordion.Item>
@@ -96,8 +92,6 @@ export function EmployeeDetailAccordion({
         <Accordion.Panel>
           <Stack gap="xl" pt="md">
             <EmployeeDangerZone
-              canEdit={canEdit}
-              canSetPassword={canSetPassword}
               employee={employee}
               onActivate={onActivate}
               onDeactivate={onDeactivate}

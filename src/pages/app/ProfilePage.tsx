@@ -106,16 +106,6 @@ export function ProfilePage() {
                     {me.employee.employeeCode}
                   </Text>
                 </Group>
-                {me.employee.email && (
-                  <Group justify="space-between">
-                    <Text size="sm" c="dimmed">
-                      {t('profile.workEmail')}
-                    </Text>
-                    <Text size="sm" fw={500}>
-                      {me.employee.email}
-                    </Text>
-                  </Group>
-                )}
                 <Group justify="space-between">
                   <Text size="sm" c="dimmed">
                     {t('profile.phone')}

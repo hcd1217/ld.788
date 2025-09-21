@@ -6,7 +6,7 @@ import { Group, ScrollArea, Table, Text } from '@mantine/core';
 
 import { UrgentBadge } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
+import type { DeliveryRequest } from '@/services/sales';
 import { formatDate } from '@/utils/time';
 
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';

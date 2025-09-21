@@ -6,8 +6,6 @@ import {
   GetUsersRequestSchema,
   type GetUsersResponse,
   GetUsersResponseSchema,
-  type RevokeSessionsResponse,
-  RevokeSessionsResponseSchema,
 } from '../schemas/user.schemas';
 
 export class UserApi extends BaseApiClient {
@@ -23,13 +21,5 @@ export class UserApi extends BaseApiClient {
 
   async getUsers(params?: GetUsersRequest): Promise<GetUsersResponse> {
     return this.get('/api/users', params, GetUsersResponseSchema, GetUsersRequestSchema);
-  }
-
-  async revokeUserSessions(userId: string): Promise<RevokeSessionsResponse> {
-    return this.post(
-      `/api/users/${userId}/revoke-sessions`,
-      undefined,
-      RevokeSessionsResponseSchema,
-    );
   }
 }

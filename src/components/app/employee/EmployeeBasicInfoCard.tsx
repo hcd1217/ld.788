@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Button, Card, Divider, Grid, Group, Stack, Text, Title, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -11,7 +11,9 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
 import { userService } from '@/services/user/user';
 import { useClientConfig } from '@/stores/useAppStore';
+import { usePermissions } from '@/stores/useAppStore';
 import { logError } from '@/utils/logger';
+import { canEditEmployee, canIssueMagicLinkForEmployee } from '@/utils/permission.utils';
 import { generateQRCodeWithLogo } from '@/utils/qr';
 import { formatCurrency, formatDate, renderFullName } from '@/utils/string';
 
@@ -21,16 +23,22 @@ import { WorkTypeBadge } from './WorkTypeBadge';
 type EmployeeBasicInfoCardProps = {
   readonly employee: Employee;
   readonly onEdit?: () => void;
-  readonly canEdit: boolean;
 };
 
-export function EmployeeBasicInfoCard({ employee, canEdit, onEdit }: EmployeeBasicInfoCardProps) {
+export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCardProps) {
   const { t } = useTranslation();
   const [opened, { open, close }] = useDisclosure(false);
   const clientCode = useClientCode();
   const clientConfig = useClientConfig();
   const [magicLink, setMagicLink] = useState<string>('');
   const [qrCodeData, setQrCodeData] = useState<string>('');
+  const permissions = usePermissions();
+  const { canEdit, canIssueMagicLink } = useMemo(() => {
+    return {
+      canEdit: canEditEmployee(permissions),
+      canIssueMagicLink: canIssueMagicLinkForEmployee(permissions),
+    };
+  }, [permissions]);
 
   // Generate QR code when magic link changes
   useEffect(() => {
@@ -53,6 +61,9 @@ export function EmployeeBasicInfoCard({ employee, canEdit, onEdit }: EmployeeBas
     async () => {
       if (!employee.userId) {
         throw new Error('No user ID available');
+      }
+      if (!canIssueMagicLink) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
       }
 
       const link = await userService.getLoginMagicLink(employee.userId, clientCode);
@@ -89,7 +100,7 @@ export function EmployeeBasicInfoCard({ employee, canEdit, onEdit }: EmployeeBas
                     onClick={() => {
                       getMagicLinkAction.trigger();
                     }}
-                    disabled={!employee.isActive || !canEdit}
+                    disabled={!employee.isActive || !canIssueMagicLink}
                   >
                     {t('employee.magicLink')}
                   </Button>
@@ -130,9 +141,9 @@ export function EmployeeBasicInfoCard({ employee, canEdit, onEdit }: EmployeeBas
             <Grid.Col span={{ base: 6 }}>
               <Stack gap="xs">
                 <Text c="dimmed" size="sm">
-                  {t('employee.unit')}
+                  {t('employee.department')}
                 </Text>
-                <Text fw={500}>{employee.unit ?? '-'}</Text>
+                <Text fw={500}>{employee.department ?? '-'}</Text>
               </Stack>
             </Grid.Col>
 

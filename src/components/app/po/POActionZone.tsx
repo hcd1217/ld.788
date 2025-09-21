@@ -1,20 +1,24 @@
+import { useMemo } from 'react';
+
 import { Button, Card, Group, Stack, Title } from '@mantine/core';
 
 import { usePOActions } from '@/hooks/usePOActions';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { usePermissions } from '@/stores/useAppStore';
+import {
+  canCancelPurchaseOrder,
+  canConfirmPurchaseOrder,
+  canDeliverPurchaseOrder,
+  canMarkReadyPurchaseOrder,
+  canProcessPurchaseOrder,
+  canRefundPurchaseOrder,
+  canShipPurchaseOrder,
+} from '@/utils/permission.utils';
 
 type POActionZoneProps = {
-  readonly canEdit: boolean;
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading: boolean;
-  readonly canConfirm: boolean;
-  readonly canCancel: boolean;
-  readonly canProcess: boolean;
-  readonly canMarkReady: boolean;
-  readonly canShip: boolean;
-  readonly canDeliver: boolean;
-  readonly canRefund: boolean;
   readonly onConfirm: () => void;
   readonly onProcess: () => void;
   readonly onMarkReady: () => void;
@@ -28,13 +32,6 @@ type POActionZoneProps = {
 export function POActionZone({
   purchaseOrder,
   isLoading,
-  canConfirm,
-  canCancel,
-  canProcess,
-  canMarkReady,
-  canShip,
-  canDeliver,
-  canRefund,
   onConfirm,
   onProcess,
   onMarkReady,
@@ -46,10 +43,24 @@ export function POActionZone({
 }: POActionZoneProps) {
   const { t } = useTranslation();
 
+  const permissions = usePermissions();
+  const { canConfirm, canProcess, canShip, canMarkReady, canDeliver, canRefund, canCancel } =
+    useMemo(
+      () => ({
+        canConfirm: canConfirmPurchaseOrder(permissions),
+        canProcess: canProcessPurchaseOrder(permissions),
+        canShip: canShipPurchaseOrder(permissions),
+        canMarkReady: canMarkReadyPurchaseOrder(permissions),
+        canDeliver: canDeliverPurchaseOrder(permissions),
+        canRefund: canRefundPurchaseOrder(permissions),
+        canCancel: canCancelPurchaseOrder(permissions),
+      }),
+      [permissions],
+    );
+
   // Use the centralized hook for action logic
   const actions = usePOActions({
     purchaseOrder,
-    isLoading,
     // POActionZone uses canEdit for all permissions
     permissions: {
       canConfirm,

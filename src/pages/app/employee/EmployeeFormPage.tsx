@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router';
 
-import { Center, Loader, rem } from '@mantine/core';
-import { IconFileSpreadsheet, IconUser } from '@tabler/icons-react';
+import { Center, Loader } from '@mantine/core';
+import { IconFileSpreadsheet, IconUserPlus } from '@tabler/icons-react';
 
 import { BulkImportForm, EmployeeFormLayout, SingleEmployeeForm } from '@/components/app/employee';
 import { PermissionDeniedPage, Tabs } from '@/components/common';
@@ -14,22 +14,13 @@ import { useOnce } from '@/hooks/useOnce';
 import { useSWRAction } from '@/hooks/useSWRAction';
 import { useTranslation } from '@/hooks/useTranslation';
 import { employeeService } from '@/services/hr/employee';
-import { useAppStore, useClientConfig, usePermissions } from '@/stores/useAppStore';
+import { useClientConfig, useDepartmentOptions, usePermissions } from '@/stores/useAppStore';
 import { useHrActions, useHrError, useHrLoading } from '@/stores/useHrStore';
-import {
-  generateSampleExcel,
-  type ImportResult,
-  parseExcelFile,
-  type SingleEmployeeFormValues,
-  validateFileType,
-} from '@/utils/employee.utils';
+import { type SingleEmployeeFormValues, validateFileType } from '@/utils/employee.utils';
+import { generateEmployeeExcelTemplate, parseEmployeeExcelFile } from '@/utils/excelParser';
 import { logError } from '@/utils/logger';
-import {
-  showErrorNotification,
-  showInfoNotification,
-  showSuccessNotification,
-} from '@/utils/notifications';
-import { delay } from '@/utils/time';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
+import { canCreateEmployee, canEditEmployee, canViewEmployee } from '@/utils/permission.utils';
 
 type EmployeeFormPageProps = {
   readonly mode: 'create' | 'edit';
@@ -38,49 +29,44 @@ type EmployeeFormPageProps = {
 export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
   const { employeeId: id } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t, currentLanguage } = useTranslation();
   const { isMobile } = useDeviceType();
   const permissions = usePermissions();
   const isLoading = useHrLoading();
   const error = useHrError();
   const { clearError, addEmployee, addBulkEmployees } = useHrActions();
-  const { overviewData } = useAppStore();
   const clientConfig = useClientConfig();
+  const { canEdit, canCreate, canView } = useMemo(() => {
+    return {
+      canEdit: canEditEmployee(permissions),
+      canCreate: canCreateEmployee(permissions),
+      canView: canViewEmployee(permissions),
+    };
+  }, [permissions]);
 
   // Mode-specific state
   const isEditMode = mode === 'edit';
-  const [activeTab, setActiveTab] = useState<string | undefined>('single');
   const [isLoadingEmployee, setIsLoadingEmployee] = useState(isEditMode);
+  const [activeTab, setActiveTab] = useState<string | null>('single');
 
   // Single employee form state
   const [isSingleLoading, setIsSingleLoading] = useState(false);
   const [showSingleAlert, setShowSingleAlert] = useState(false);
   const [singleError, setSingleError] = useState<string | undefined>();
 
-  // Bulk import state (create mode only)
+  // Bulk import state
   const [isBulkLoading, setIsBulkLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [file, setFile] = useState<File | undefined>(undefined);
-  const [importResult, setImportResult] = useState<ImportResult | undefined>(undefined);
+  const fileRef = useRef<File | undefined>(undefined);
+  const [file, setFile] = useState<File | undefined>();
+  const [importResult, setImportResult] = useState<
+    { summary: { total: number; success: number; failed: number }; errors?: string[] } | undefined
+  >();
 
-  const keyMap = useMemo(
-    () => ({
-      firstName: t('common.firstName'),
-      lastName: t('common.lastName'),
-      unit: t('employee.unit'),
-      [t('common.firstName')]: 'firstName',
-      [t('common.lastName')]: 'lastName',
-      [t('employee.unit')]: 'unit',
-    }),
-    [t],
-  );
-
-  const units = useMemo(() => {
-    return overviewData?.departments ?? [];
-  }, [overviewData]);
+  const departmentOptions = useDepartmentOptions();
 
   // Use custom hook for form
-  const form = useEmployeeForm({ isEditMode, units });
+  const form = useEmployeeForm({ isEditMode });
 
   // Load employee data for edit mode
   const loadEmployee = async () => {
@@ -100,7 +86,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
       form.setValues({
         firstName: employee.firstName,
         lastName: employee.lastName,
-        unitId: employee.unitId,
+        departmentId: employee.departmentId,
         email: employee.email,
         phone: employee.phone,
         workType: employee.workType,
@@ -123,7 +109,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
     }
   };
 
-  // Load units and employee data on mount
+  // Load departments and employee data on mount
   useOnce(() => {
     if (isEditMode) {
       void loadEmployee();
@@ -137,13 +123,13 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
       if (!values) {
         throw new Error(t('common.invalidFormData'));
       }
-      if (isEditMode && !permissions.employee.canEdit) {
+      if (isEditMode && !canEdit) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (isEditMode && !id) {
         throw new Error(t('common.invalidFormData'));
       }
-      if (!isEditMode && !permissions.employee.canCreate) {
+      if (!isEditMode && !canCreate) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
 
@@ -156,7 +142,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
         const result = await employeeService.updateEmployee(id, {
           firstName: values.firstName,
           lastName: values.lastName,
-          unitId: values.unitId,
+          departmentId: values.departmentId,
           email: values.email,
           phone: values.phone,
           workType: values.workType,
@@ -172,7 +158,7 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
         await addEmployee({
           firstName: values.firstName,
           lastName: values.lastName,
-          unitId: values.unitId,
+          departmentId: values.departmentId,
           email: values.email,
           phone: values.phone,
           workType: values.workType,
@@ -200,129 +186,101 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
     },
   );
 
-  // Bulk import handlers (create mode only)
-  const handleDownloadSample = useSWRAction(
-    'download-employee-sample',
-    async () => {
-      setIsDownloading(true);
-      showInfoNotification(t('common.downloading'), t('employee.creatingSampleFile'));
-      await delay(1000);
-      const unitOptions = units.map((unit) => ({
-        value: unit.id,
-        label: unit.name,
-      }));
+  const pageTitle = isEditMode ? t('employee.editEmployee') : t('employee.addEmployee');
+  const navigateToList = () => navigate(ROUTERS.EMPLOYEE_MANAGEMENT);
 
-      generateSampleExcel({
-        keyMap,
-        unitOptions,
-        isVietnamese: i18n.language === 'vi',
-      });
-    },
-    {
-      notifications: {
-        successTitle: t('common.success'),
-        successMessage: t('employee.sampleFileDownloaded'),
-        errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('employee.failedToDownloadSample'),
-      },
-      onSettled: () => {
-        setIsDownloading(false);
-      },
-    },
-  );
-
-  const handleFileSelect = (selectedFile: File) => {
+  // Bulk import handlers
+  const handleDownloadSample = async () => {
+    setIsDownloading(true);
     try {
-      if (validateFileType(selectedFile, t)) {
-        setFile(selectedFile);
-        setImportResult(undefined);
-      }
-    } catch (error) {
-      showErrorNotification(
-        t('common.errors.notificationTitle'),
-        error instanceof Error ? error.message : t('common.file.pleaseSelectExcelFile'),
+      generateEmployeeExcelTemplate(
+        currentLanguage,
+        departmentOptions.map((u) => u.label),
       );
+      showSuccessNotification(t('common.success'), t('employee.sampleFileDownloaded'));
+    } catch (error) {
+      logError('Failed to download sample', error, {
+        module: 'EmployeeFormPage',
+        action: 'handleDownloadSample',
+      });
+      showErrorNotification(t('common.errors.notificationTitle'), t('common.download'));
+    } finally {
+      setIsDownloading(false);
     }
   };
 
+  const handleFileSelect = (selectedFile: File) => {
+    fileRef.current = selectedFile;
+    setFile(selectedFile);
+    setImportResult(undefined);
+  };
+
   const handleFileRemove = () => {
+    fileRef.current = undefined;
     setFile(undefined);
     setImportResult(undefined);
   };
 
-  const handleBulkUpload = useSWRAction(
-    'bulk-upload-employees',
-    async () => {
-      if (!file) {
-        throw new Error(t('common.file.pleaseSelectFileFirst'));
-      }
+  const handleBulkUpload = async () => {
+    if (!fileRef.current) {
+      return;
+    }
 
-      setIsBulkLoading(true);
-      setImportResult(undefined);
-      const employees = await parseExcelFile(file, units, t, keyMap);
+    setIsBulkLoading(true);
+    setImportResult(undefined);
+
+    try {
+      const employees = await parseEmployeeExcelFile(fileRef.current);
 
       if (employees.length === 0) {
-        throw new Error(t('employee.noValidEmployeesFound'));
+        showErrorNotification(
+          t('common.errors.notificationTitle'),
+          t('employee.noValidEmployeesFound'),
+        );
+        return;
       }
 
-      await addBulkEmployees(employees);
+      // Map employees to the format expected by addBulkEmployees
+      const employeesData = employees.map((emp) => {
+        const department = departmentOptions.find(
+          (u) => u.label.toLowerCase() === emp.departmentName?.toLowerCase(),
+        );
+        return {
+          firstName: emp.firstName,
+          lastName: emp.lastName,
+          departmentId: department?.id,
+          email: emp.email,
+          phone: emp.phone,
+        };
+      });
 
-      const result: ImportResult = {
+      // Use bulk import function
+      await addBulkEmployees(employeesData);
+
+      setImportResult({
         summary: {
           total: employees.length,
           success: employees.length,
           failed: 0,
         },
-      };
+        errors: undefined,
+      });
 
-      setImportResult(result);
+      showSuccessNotification(t('common.success'), t('employee.bulkImportEmployeesSuccess'));
 
-      showSuccessNotification(
-        t('common.bulkImport.importSuccess', { entity: t('common.entity.employee') }),
-        t('employee.importedEmployees', {
-          success: result.summary.success,
-          total: result.summary.total,
-        }),
-      );
-
-      return result;
-    },
-    {
-      notifications: {
-        errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('common.bulkImport.importFailed', { entity: t('common.entity.employee') }),
-      },
-      onSuccess: () => {
-        setTimeout(() => {
-          navigate(ROUTERS.EMPLOYEE_MANAGEMENT);
-        }, 2000);
-      },
-      onError: (error) => {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : t('common.bulkImport.importFailed', { entity: t('common.entity.employee') });
-
-        const result: ImportResult = {
-          summary: {
-            total: 0,
-            success: 0,
-            failed: 0,
-          },
-          errors: [String(errorMessage)],
-        };
-
-        setImportResult(result);
-      },
-      onSettled: () => {
-        setIsBulkLoading(false);
-      },
-    },
-  );
-
-  const iconStyle = useMemo(() => ({ width: rem(12), height: rem(12) }), []);
-  const pageTitle = isEditMode ? t('employee.editEmployee') : t('employee.addEmployee');
-  const navigateToList = () => navigate(ROUTERS.EMPLOYEE_MANAGEMENT);
+      setTimeout(() => {
+        navigate(ROUTERS.EMPLOYEE_MANAGEMENT);
+      }, 2000);
+    } catch (error) {
+      logError('Failed to parse/upload file', error, {
+        module: 'EmployeeFormPage',
+        action: 'handleBulkUpload',
+      });
+      showErrorNotification(t('common.errors.notificationTitle'), t('auth.invalidFileType'));
+    } finally {
+      setIsBulkLoading(false);
+    }
+  };
 
   // Show loader while loading employee data in edit mode
   if (isLoadingEmployee) {
@@ -336,7 +294,6 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
   // Common form props
   const formProps = {
     form,
-    units,
     isLoading: isSingleLoading,
     showAlert: showSingleAlert,
     error: singleError,
@@ -346,13 +303,13 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
     isEditMode,
   };
 
-  if (!permissions.employee.canView) {
+  if (!canView) {
     return <PermissionDeniedPage />;
   }
-  if (isEditMode && !permissions.employee.canEdit) {
+  if (isEditMode && !canEdit) {
     return <PermissionDeniedPage />;
   }
-  if (!isEditMode && !permissions.employee.canCreate) {
+  if (!isEditMode && !canCreate) {
     return <PermissionDeniedPage />;
   }
 
@@ -365,48 +322,41 @@ export function EmployeeFormPage({ mode }: EmployeeFormPageProps) {
       isEditMode={isEditMode}
       isMobile={isMobile}
     >
-      {isMobile || isEditMode ? (
+      {isEditMode ? (
         <SingleEmployeeForm
           {...formProps}
           hasWorkType={clientConfig.features?.employee?.workType ?? false}
         />
       ) : (
-        <Tabs
-          value={activeTab}
-          onChange={(value) => {
-            if (value) {
-              setActiveTab(value);
-            }
-          }}
-        >
+        <Tabs value={activeTab} onChange={setActiveTab}>
           <Tabs.List>
-            <Tabs.Tab value="single" leftSection={<IconUser style={iconStyle} />}>
+            <Tabs.Tab value="single" leftSection={<IconUserPlus size={16} />}>
               {t('employee.addSingleEmployee')}
             </Tabs.Tab>
-            <Tabs.Tab value="bulk" leftSection={<IconFileSpreadsheet style={iconStyle} />}>
+            <Tabs.Tab value="bulk" leftSection={<IconFileSpreadsheet size={16} />}>
               {t('employee.bulkImportEmployees')}
             </Tabs.Tab>
           </Tabs.List>
 
-          <Tabs.Panel value="single" pt="xl">
+          <Tabs.Panel value="single" pt="md">
             <SingleEmployeeForm
               {...formProps}
               hasWorkType={clientConfig.features?.employee?.workType ?? false}
             />
           </Tabs.Panel>
 
-          <Tabs.Panel value="bulk" pt="xl">
+          <Tabs.Panel value="bulk" pt="md">
             <BulkImportForm
               isLoading={isBulkLoading}
               isDownloading={isDownloading}
               file={file}
               importResult={importResult}
-              validateFileType={(file) => validateFileType(file, t)}
-              onDownloadSample={handleDownloadSample.trigger}
+              onDownloadSample={handleDownloadSample}
               onFileSelect={handleFileSelect}
               onFileRemove={handleFileRemove}
-              onImport={handleBulkUpload.trigger}
+              onImport={handleBulkUpload}
               onCancel={navigateToList}
+              validateFileType={(file) => validateFileType(file, t)}
             />
           </Tabs.Panel>
         </Tabs>

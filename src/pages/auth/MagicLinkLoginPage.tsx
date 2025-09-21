@@ -28,6 +28,7 @@ export function MagicLinkLoginPage() {
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [manualCode, setManualCode] = useState('');
   const [showOptions, setShowOptions] = useState(false);
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
   const { t } = useTranslation();
   const verificationInProgress = useRef(false);
 
@@ -89,11 +90,21 @@ export function MagicLinkLoginPage() {
       // Use the new store function that properly sets isAuthenticated
       await loginWithMagicLink({ clientCode, token });
       setError(undefined);
+      setVerificationSuccess(true);
     },
     {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('auth.magicLink.success'),
+      },
+      onError: (error_) => {
+        // Set error state when verification fails
+        setError(t('auth.magicLink.verificationFailed'));
+        setVerificationSuccess(false);
+        logError('Magic link verification failed', error_, {
+          module: 'MagicLinkLoginPage',
+          action: 'verifyMagicLink',
+        });
       },
       onSettled: () => {
         // Clear stored params on error or after successful verification
@@ -136,8 +147,10 @@ export function MagicLinkLoginPage() {
   const handleQrScan = (data: string) => {
     try {
       const trimmedData = data.trim();
-      // Reset the flag to allow new verification attempt
+      // Reset the flag and states to allow new verification attempt
       verificationInProgress.current = false;
+      setVerificationSuccess(false);
+      setError(undefined);
 
       // Try to parse as URL first
       if (trimmedData.includes('?') || trimmedData.startsWith('http')) {
@@ -174,8 +187,10 @@ export function MagicLinkLoginPage() {
   const handleManualCodeSubmit = () => {
     try {
       const trimmedCode = manualCode.trim();
-      // Reset the flag to allow new verification attempt
+      // Reset the flag and states to allow new verification attempt
       verificationInProgress.current = false;
+      setVerificationSuccess(false);
+      setError(undefined);
 
       // If it looks like a URL, try parsing it
       if (trimmedCode.includes('?') || trimmedCode.startsWith('http')) {
@@ -212,7 +227,7 @@ export function MagicLinkLoginPage() {
             </Text>
           ) : null}
 
-          {!isLoading && !error && !showOptions && (
+          {!isLoading && verificationSuccess && (
             <>
               <IconCheck size={48} color="var(--mantine-color-green-6)" />
               <Text size="md" ta="center" c="green">

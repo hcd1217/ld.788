@@ -403,6 +403,7 @@ function generateDepartmentPermissions() {
         ...basePermission,
         actions: {
           canSetPassword: false,
+          canIssueMagicLink: false,
         },
       },
       purchaseOrder: {
@@ -412,6 +413,7 @@ function generateDepartmentPermissions() {
           canViewAll: false,
         },
         actions: {
+          canTakePhoto: false,
           canConfirm: false,
           canProcess: false,
           canShip: false,

@@ -3,11 +3,12 @@ import { Badge, type BadgeVariant } from '@mantine/core';
 import { useTranslation } from '@/hooks/useTranslation';
 
 type ActiveBadgeProps = {
+  readonly label?: string;
   readonly isActive?: boolean;
   readonly variant?: BadgeVariant;
 };
 
-export function ActiveBadge({ variant, isActive }: ActiveBadgeProps) {
+export function ActiveBadge({ variant, isActive, label }: ActiveBadgeProps) {
   const { t } = useTranslation();
   return (
     <Badge
@@ -15,7 +16,7 @@ export function ActiveBadge({ variant, isActive }: ActiveBadgeProps) {
       variant={variant}
       size="sm"
     >
-      {isActive ? t('employee.active') : t('employee.inactive')}
+      {label ?? (isActive ? t('employee.active') : t('employee.inactive'))}
     </Badge>
   );
 }

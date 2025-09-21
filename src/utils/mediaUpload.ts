@@ -10,7 +10,7 @@ export type MediaUploadOptions = {
 };
 
 export type MediaUploadResult = {
-  fileUrl: string;
+  publicUrl: string;
   key: string;
 };
 
@@ -80,7 +80,7 @@ export const uploadToS3 = async (
       throw new Error('Failed to get upload URL');
     }
 
-    const { uploadUrl, fileUrl, key } = uploadUrlResponse;
+    const { uploadUrl, fileUrl: publicUrl, key } = uploadUrlResponse;
 
     // Step 2: Upload file to S3
     await mediaApi.uploadToS3(uploadUrl, file);
@@ -89,13 +89,13 @@ export const uploadToS3 = async (
       module: 'MediaUpload',
       action: 'uploadToS3',
       metadata: {
-        fileUrl,
+        publicUrl,
         key,
       },
     });
 
     return {
-      fileUrl,
+      publicUrl,
       key,
     };
   } catch (error) {
@@ -126,8 +126,11 @@ export const uploadMultipleToS3 = async (
 export const uploadBase64ToS3 = async (
   base64Image: string,
   options: MediaUploadOptions,
-): Promise<string> => {
+): Promise<MediaUploadResult> => {
   const file = base64ToFile(base64Image, options.fileName);
   const result = await uploadToS3(file, options);
-  return result.fileUrl;
+  return {
+    publicUrl: result.publicUrl,
+    key: result.key,
+  };
 };

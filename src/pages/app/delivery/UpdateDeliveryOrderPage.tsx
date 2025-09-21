@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   ActionIcon,
@@ -25,7 +25,7 @@ import {
 import { ROUTERS } from '@/config/routeConfig';
 import { useSWRAction } from '@/hooks/useSWRAction';
 import { useTranslation } from '@/hooks/useTranslation';
-import { type DeliveryRequest } from '@/services/sales/deliveryRequest';
+import { type DeliveryRequest } from '@/services/sales';
 import { usePermissions } from '@/stores/useAppStore';
 import {
   useDeliveryAssigneeOptions,
@@ -36,11 +36,17 @@ import {
 import { xOr } from '@/utils/boolean';
 import { logError } from '@/utils/logger';
 import { showErrorNotification } from '@/utils/notifications';
+import { canUpdateDeliveryOrderInDay } from '@/utils/permission.utils';
 
 export function UpdateDeliveryOrderPage() {
   const { t } = useTranslation();
   const permissions = usePermissions();
   const assigneeOptions = useDeliveryAssigneeOptions();
+
+  const canUpdateOrderInDay = useMemo(
+    () => canUpdateDeliveryOrderInDay(permissions),
+    [permissions],
+  );
   const isLoading = useDeliveryRequestLoading();
   const error = useDeliveryRequestError();
   const { loadDeliveryRequestsForDate, clearError, updateDeliveryOrderInDay } =
@@ -117,7 +123,7 @@ export function UpdateDeliveryOrderPage() {
     'save-delivery-order',
     async () => {
       if (!selectedDate || !hasChanges || !selectedAssignee) return;
-      if (!permissions.deliveryRequest.actions?.canUpdateDeliveryOrderInDay) {
+      if (!canUpdateOrderInDay) {
         throw new Error(t('common.failed'));
       }
       await updateDeliveryOrderInDay(
@@ -141,7 +147,7 @@ export function UpdateDeliveryOrderPage() {
     }
   }, [loadDeliveryRequests, selectedDate, selectedAssignee]);
 
-  if (!permissions.deliveryRequest.actions?.canUpdateDeliveryOrderInDay) {
+  if (!canUpdateOrderInDay) {
     return <PermissionDeniedPage />;
   }
 

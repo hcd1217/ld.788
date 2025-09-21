@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { Alert, Button, Group, LoadingOverlay, Stack, Text } from '@mantine/core';
 import { IconAlertTriangle } from '@tabler/icons-react';
 
@@ -15,7 +17,7 @@ type POStatusModalContentProps = {
   readonly mode: POModalMode;
   readonly config: ModalConfig;
   readonly purchaseOrder: PurchaseOrder;
-  readonly loading?: boolean;
+  readonly isLoading?: boolean;
   readonly reason: string;
   readonly setReason: (value: string) => void;
   readonly deliveryNotes: string;
@@ -33,7 +35,7 @@ export function POStatusModalContent({
   mode,
   config,
   purchaseOrder,
-  loading = false,
+  isLoading = false,
   reason,
   setReason,
   deliveryNotes,
@@ -49,9 +51,34 @@ export function POStatusModalContent({
   const { t } = useTranslation();
   const customerMapByCustomerId = useCustomerMapByCustomerId();
 
+  const isDisabled = useMemo(() => {
+    if (isConfirmDisabled || isLoading) {
+      return true;
+    }
+    if (purchaseOrder.isInternalDelivery) {
+      return false;
+    }
+    if (mode === 'ship') {
+      if (!trackingNumber.trim()) {
+        return true;
+      }
+      if (!carrier.trim()) {
+        return true;
+      }
+    }
+    return false;
+  }, [
+    isConfirmDisabled,
+    isLoading,
+    purchaseOrder.isInternalDelivery,
+    mode,
+    trackingNumber,
+    carrier,
+  ]);
+
   return (
     <Stack gap="md" pos="relative">
-      <LoadingOverlay visible={loading} />
+      <LoadingOverlay visible={isLoading} />
 
       <Alert icon={<IconAlertTriangle size={16} />} color={config.alertColor} variant="light">
         {config.description}
@@ -91,18 +118,19 @@ export function POStatusModalContent({
         setTrackingNumber={setTrackingNumber}
         carrier={carrier}
         setCarrier={setCarrier}
+        isInternalDelivery={purchaseOrder.isInternalDelivery}
       />
 
       <Group justify="flex-end">
-        <Button variant="outline" onClick={onClose} disabled={loading}>
+        <Button variant="outline" onClick={onClose} disabled={isLoading}>
           {t('common.cancel')}
         </Button>
         <Button
           color={config.buttonColor}
           leftSection={config.icon}
           onClick={onConfirm}
-          disabled={isConfirmDisabled || loading}
-          loading={loading}
+          disabled={isDisabled}
+          loading={isLoading}
         >
           {config.buttonText}
         </Button>

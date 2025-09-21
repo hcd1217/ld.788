@@ -45,9 +45,9 @@ export function EmployeeDataTable({ employees }: EmployeeDataTableProps) {
           ),
         },
         {
-          key: 'unit',
-          header: t('employee.unit'),
-          accessor: 'unit' as keyof Employee,
+          key: 'department',
+          header: t('employee.department'),
+          accessor: 'department' as keyof Employee,
         },
         {
           key: 'contact',

@@ -3,7 +3,6 @@ import { type ReactNode, useCallback } from 'react';
 import { useRouteChange } from '@/hooks/useRouteChange';
 import { useTheme } from '@/hooks/useTheme';
 import { routeObjects } from '@/routers';
-import { useAppStore } from '@/stores/useAppStore';
 import { refreshNavigationCacheTTL } from '@/utils/navigationCache';
 import { getThemeForRoute } from '@/utils/routeTheme';
 import { routeTracker } from '@/utils/routeTracking';
@@ -19,7 +18,6 @@ interface RouteChangeProviderProps {
  */
 export function RouteChangeProvider({ children, onRouteChange }: RouteChangeProviderProps) {
   const { themeName, setThemeName } = useTheme();
-  const setPermissionError = useAppStore((state) => state.setPermissionError);
 
   const handleRouteChange = useCallback(
     (routeChange: { from: string | null; to: string; isFirstMount: boolean }) => {
@@ -39,10 +37,6 @@ export function RouteChangeProvider({ children, onRouteChange }: RouteChangeProv
       // Refresh navigation cache TTL on user activity
       refreshNavigationCacheTTL();
 
-      // Clear permission error on route change
-      // This prevents users from being stuck on the NoPermission screen
-      setPermissionError(false);
-
       // Scroll to top on route change (common UX pattern)
       if (!isFirstMount && typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -61,7 +55,7 @@ export function RouteChangeProvider({ children, onRouteChange }: RouteChangeProv
       // - Update breadcrumbs
       // - Clear errors from error store
     },
-    [themeName, setThemeName, onRouteChange, setPermissionError],
+    [themeName, setThemeName, onRouteChange],
   );
 
   useRouteChange(handleRouteChange);

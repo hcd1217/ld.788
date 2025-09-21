@@ -5,6 +5,7 @@ import { notifications } from '@mantine/notifications';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
 import { useTranslation } from '@/hooks/useTranslation';
+import { isDevelopment } from '@/utils/env';
 import { logError } from '@/utils/logger';
 import { showSuccessNotification } from '@/utils/notifications';
 
@@ -33,6 +34,8 @@ const clearSafariCaches = async () => {
     await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
   }
 };
+
+let lastCheck = 0;
 
 export function usePWA() {
   const { t } = useTranslation();
@@ -76,6 +79,13 @@ export function usePWA() {
 
   // LocalStorage-based version checking
   const checkForUpdates = useCallback(async () => {
+    if (isDevelopment) {
+      return;
+    }
+    if (Date.now() - lastCheck < 3000) {
+      return;
+    }
+    lastCheck = Date.now();
     try {
       // Fetch current build from version.json
       const currentBuild = await fetchVersionWithRetry();
@@ -163,6 +173,8 @@ export function usePWA() {
       }
     } catch (error) {
       console.error('Failed to check for updates:', error);
+    } finally {
+      // do nothing
     }
   }, [autoUpdate, updateServiceWorker, storedVersion, setStoredVersion, t]);
 

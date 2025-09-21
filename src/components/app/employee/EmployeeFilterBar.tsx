@@ -6,38 +6,37 @@ import { IconChevronDown, IconClearAll } from '@tabler/icons-react';
 import { SearchBar } from '@/components/common';
 import { EMPLOYEE_STATUS } from '@/constants/employee';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { Unit } from '@/services/hr/employee';
+import { useDepartmentOptions } from '@/stores/useAppStore';
 
 interface EmployeeFilterBarProps {
   readonly searchQuery: string;
-  readonly unitId?: string;
+  readonly departmentId?: string;
   readonly status: (typeof EMPLOYEE_STATUS)[keyof typeof EMPLOYEE_STATUS];
-  readonly units: readonly Unit[];
   readonly hasActiveFilters: boolean;
   readonly onSearchChange: (query: string) => void;
-  readonly onUnitClick: () => void;
+  readonly onDepartmentClick: () => void;
   readonly onStatusClick: () => void;
   readonly onClearFilters: () => void;
 }
 
 export function EmployeeFilterBar({
   searchQuery,
-  unitId,
+  departmentId,
   status,
-  units,
   hasActiveFilters,
   onSearchChange,
-  onUnitClick,
+  onDepartmentClick,
   onStatusClick,
   onClearFilters,
 }: EmployeeFilterBarProps) {
   const { t } = useTranslation();
+  const departmentOptions = useDepartmentOptions();
 
-  const selectedUnitName = useMemo(() => {
-    if (!unitId) return t('employee.allUnit');
-    const unit = units.find((unit) => unit.id === unitId);
-    return unit?.name || t('employee.allUnit');
-  }, [unitId, units, t]);
+  const selectedDepartmentName = useMemo(() => {
+    if (!departmentId) return t('employee.allDepartment');
+    const department = departmentOptions.find((department) => department.id === departmentId);
+    return department?.label || t('employee.allDepartment');
+  }, [departmentId, departmentOptions, t]);
 
   return (
     <Box p="sm" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
@@ -53,12 +52,12 @@ export function EmployeeFilterBar({
         <Group gap="xs">
           <Button
             size="xs"
-            variant={unitId ? 'filled' : 'light'}
+            variant={departmentId ? 'filled' : 'light'}
             rightSection={<IconChevronDown size={16} />}
-            onClick={onUnitClick}
+            onClick={onDepartmentClick}
             style={{ flex: 1 }}
           >
-            {selectedUnitName}
+            {selectedDepartmentName}
           </Button>
 
           <Button

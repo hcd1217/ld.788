@@ -1,19 +1,18 @@
 import { useMemo, useState } from 'react';
 
-import { Button, Group, Paper, Text } from '@mantine/core';
+import { Box, Button, Group, Paper, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { IconPlus, IconUpload } from '@tabler/icons-react';
 
+import { ProductCard, ProductFormModal, type ProductFormValues } from '@/components/app/config';
 import {
-  ProductFormModal,
-  type ProductFormValues,
-  ProductStatusBadge,
-} from '@/components/app/config';
-import {
+  ActiveBadge,
   AppDesktopLayout,
+  AppMobileLayout,
   AppPageTitle,
+  BlankState,
   BulkImportModalContent,
   DataTable,
   Pagination,
@@ -21,23 +20,24 @@ import {
   SearchBar,
 } from '@/components/common';
 import { useClientSidePagination } from '@/hooks/useClientSidePagination';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useOnce } from '@/hooks/useOnce';
 import { useSimpleSWRAction, useSWRAction } from '@/hooks/useSWRAction';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   type BulkUpsertProductsRequest,
   type BulkUpsertProductsResponse,
-  type CreateProductRequest,
   type Product,
   productService,
-  type ProductStatus,
 } from '@/services/sales/product';
 import { usePermissions } from '@/stores/useAppStore';
 import { generateProductExcelTemplate, parseProductExcelFile } from '@/utils/excelParser';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
+import { canCreateProduct, canEditProduct, canViewProduct } from '@/utils/permission.utils';
 
 export function ProductConfigPage() {
-  const { t, i18n } = useTranslation();
+  const { t, currentLanguage } = useTranslation();
+  const { isMobile } = useDeviceType();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -47,15 +47,22 @@ export function ProductConfigPage() {
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
   const permissions = usePermissions();
 
+  const { canView, canCreate, canEdit } = useMemo(() => {
+    return {
+      canView: canViewProduct(permissions),
+      canCreate: canCreateProduct(permissions),
+      canEdit: canEditProduct(permissions),
+    };
+  }, [permissions]);
+
   const form = useForm<ProductFormValues>({
     initialValues: {
       productCode: '',
       name: '',
       description: '',
       category: '',
-      color: '',
-      status: 'ACTIVE',
       unit: '',
+      color: '',
     },
     validate: {
       productCode: (value) => (!value ? t('common.errors.notificationTitle') : null),
@@ -71,15 +78,13 @@ export function ProductConfigPage() {
       (product) =>
         product.name.toLowerCase().includes(query) ||
         product.productCode.toLowerCase().includes(query) ||
-        product.category?.toLowerCase().includes(query) ||
-        product.sku?.toLowerCase().includes(query) ||
-        product.barcode?.toLowerCase().includes(query),
+        product.category?.toLowerCase().includes(query),
     );
   }, [products, searchQuery]);
 
   const [paginatedProducts, paginationState, paginationHandlers] = useClientSidePagination({
     data: filteredProducts,
-    defaultPageSize: 20,
+    defaultPageSize: isMobile ? 1000 : 20,
   });
 
   const loadProductsAction = useSimpleSWRAction(
@@ -87,7 +92,7 @@ export function ProductConfigPage() {
     async () => {
       setIsLoading(true);
       setError(undefined);
-      if (!permissions.product.canView) {
+      if (!canView) {
         return [];
       }
       const data = await productService.getAllProducts();
@@ -111,23 +116,22 @@ export function ProductConfigPage() {
   const handleCreateProductAction = useSWRAction(
     'create-product',
     async (values: ProductFormValues): Promise<Product> => {
-      if (!permissions.product.canCreate) {
+      if (!canCreate) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!values) {
         throw new Error(t('common.invalidFormData'));
       }
       setIsLoading(true);
-      const data: CreateProductRequest = {
+      const product = await productService.createProduct({
         productCode: values.productCode,
-        name: values.name,
-        description: values.description || undefined,
-        category: values.category || undefined,
-        color: values.color || undefined,
-        status: values.status,
-        unit: values.unit || undefined,
-      };
-      const product = await productService.createProduct(data);
+        metadata: {
+          name: values.name,
+          description: values.description || undefined,
+          category: values.category || undefined,
+          unit: values.unit || undefined,
+        },
+      });
       return product;
     },
     {
@@ -150,14 +154,22 @@ export function ProductConfigPage() {
   const handleUpdateProductAction = useSWRAction(
     'update-product',
     async (values: ProductFormValues) => {
-      if (!permissions.product.canEdit) {
+      if (!canEdit) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedProduct) {
         throw new Error(t('common.invalidFormData'));
       }
       setIsLoading(true);
-      return await productService.updateProduct(selectedProduct?.id, values);
+      await productService.updateProduct(selectedProduct?.id, {
+        metadata: {
+          name: values.name,
+          description: values.description || undefined,
+          category: values.category || undefined,
+          unit: values.unit || undefined,
+        },
+      });
+      return selectedProduct;
     },
     {
       notifications: {
@@ -179,22 +191,30 @@ export function ProductConfigPage() {
     },
   );
 
-  const deleteProductAction = useSWRAction(
-    'delete-product',
+  const handleActivateProductAction = useSWRAction(
+    'activate-product',
     async (product: Product) => {
-      await productService.deleteProduct(product.id);
+      if (!canEdit) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      setIsLoading(true);
+      await productService.activateProduct(product.id);
       return product;
     },
     {
       notifications: {
         errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('common.deleteFailed', { entity: t('common.entity.product') }),
+        errorMessage: t('common.updateFailed', { entity: t('common.entity.product') }),
       },
       onSuccess: (product: Product) => {
         showSuccessNotification(
-          t('product.deleted'),
-          t('product.deletedMessage', { name: product.name }),
+          t('common.activated', {
+            entity: t('common.entity.product'),
+          }),
+          t('product.updatedMessage', { name: product.name }),
         );
+        closeEdit();
+        form.reset();
         loadProductsAction.trigger();
       },
       onSettled: () => {
@@ -203,21 +223,40 @@ export function ProductConfigPage() {
     },
   );
 
-  const handleDeleteProduct = (product: Product) => {
-    if (!permissions.product.canDelete) {
-      throw new Error(t('common.doNotHavePermissionForAction'));
-    }
-    modals.openConfirmModal({
-      title: t('common.confirmDelete'),
-      children: <Text size="sm">{t('common.confirmDeleteMessage', { name: product.name })}</Text>,
-      labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
-      confirmProps: { color: 'red' },
-      onConfirm: () => deleteProductAction.trigger(product),
-    });
-  };
+  const handleDeactivateProductAction = useSWRAction(
+    'deactivate-product',
+    async (product: Product) => {
+      if (!canEdit) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      setIsLoading(true);
+      await productService.deactivateProduct(product.id);
+      return product;
+    },
+    {
+      notifications: {
+        errorTitle: t('common.errors.notificationTitle'),
+        errorMessage: t('common.updateFailed', { entity: t('common.entity.product') }),
+      },
+      onSuccess: (product: Product) => {
+        showSuccessNotification(
+          t('common.deactivated', {
+            entity: t('common.entity.product'),
+          }),
+          t('product.updatedMessage', { name: product.name }),
+        );
+        closeEdit();
+        form.reset();
+        loadProductsAction.trigger();
+      },
+      onSettled: () => {
+        setIsLoading(false);
+      },
+    },
+  );
 
   const openEditModal = (product: Product) => {
-    if (!permissions.product.canEdit) {
+    if (!canEdit) {
       return;
     }
     setSelectedProduct(product);
@@ -226,17 +265,14 @@ export function ProductConfigPage() {
       name: product.name,
       description: product.description || '',
       category: product.category || '',
-      color: product.color || '',
-      status: product.status,
       unit: product.unit || 'pcs',
-      sku: product.sku || '',
-      barcode: product.barcode || '',
+      color: product.color || '',
     });
     openEdit();
   };
 
   const openCreateModal = () => {
-    if (!permissions.product.canCreate) {
+    if (!canCreate) {
       return;
     }
     form.reset();
@@ -262,14 +298,13 @@ export function ProductConfigPage() {
       const request: BulkUpsertProductsRequest = {
         products: products.map((p) => ({
           productCode: p.productCode,
-          name: p.name,
-          description: p.description || undefined,
-          category: p.category || undefined,
-          color: p.color || undefined,
-          status: (p.status as ProductStatus) || 'ACTIVE',
-          unit: p.unit || undefined,
-          sku: p.sku || undefined,
-          barcode: p.barcode || undefined,
+          metadata: {
+            name: p.name,
+            description: p.description || undefined,
+            category: p.category || undefined,
+            unit: p.unit || undefined,
+            color: p.color || undefined,
+          },
         })),
         skipInvalid: false,
       };
@@ -283,7 +318,7 @@ export function ProductConfigPage() {
         errorMessage: t('common.bulkImport.importFailed', { entity: t('common.entity.product') }),
       },
       onSuccess: async (result: BulkUpsertProductsResponse) => {
-        const message = t('product.bulkImportSuccess', {
+        const message = t('common.bulkImportSuccess', {
           created: result.created,
           updated: result.updated,
           failed: result.failed,
@@ -304,7 +339,7 @@ export function ProductConfigPage() {
 
   // Open bulk import modal
   const openBulkImportModal = () => {
-    if (!permissions.product.canCreate) {
+    if (!canCreate) {
       return;
     }
     let selectedFile: File | undefined;
@@ -317,9 +352,9 @@ export function ProductConfigPage() {
           onFileSelect={(file) => {
             selectedFile = file;
           }}
-          onDownloadTemplate={() => generateProductExcelTemplate(i18n.language)}
+          onDownloadTemplate={() => generateProductExcelTemplate(currentLanguage)}
           entityType="product"
-          language={i18n.language}
+          language={currentLanguage}
         />
       ),
       labels: {
@@ -331,7 +366,7 @@ export function ProductConfigPage() {
         leftSection: <IconUpload size={16} />,
       },
       onConfirm: () => {
-        if (!permissions.product.canCreate) {
+        if (!canCreate) {
           throw new Error(t('common.doNotHavePermissionForAction'));
         }
         if (selectedFile) {
@@ -346,8 +381,66 @@ export function ProductConfigPage() {
     });
   };
 
-  if (!permissions.product.canView) {
+  if (!canView) {
     return <PermissionDeniedPage />;
+  }
+
+  if (isMobile) {
+    return (
+      <AppMobileLayout
+        showLogo
+        withGoBack
+        isLoading={isLoading}
+        error={error}
+        clearError={() => setError(undefined)}
+        header={<AppPageTitle title={t('common.pages.productManagement')} />}
+      >
+        {/* Sticky Search Bar */}
+        <Box
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
+            backgroundColor: 'var(--mantine-color-body)',
+            paddingTop: '0.5rem',
+            paddingBottom: '0.5rem',
+          }}
+        >
+          <SearchBar
+            placeholder={t('product.searchPlaceholder')}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
+        </Box>
+
+        {/* Blank State for no results */}
+        <BlankState
+          hidden={paginatedProducts.length > 0 || isLoading}
+          title={searchQuery ? t('common.noDataFound') : t('common.noDataFound')}
+          description={searchQuery ? t('common.tryDifferentSearch') : t('common.noDataFound')}
+        />
+
+        {/* Product List */}
+        <Box mt="md">
+          {paginatedProducts.length > 0 && (
+            <Stack gap="sm" px="sm">
+              {paginatedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </Stack>
+          )}
+        </Box>
+
+        {/* Pagination */}
+        <Pagination
+          totalPages={paginationState.totalPages}
+          pageSize={paginationState.pageSize}
+          currentPage={paginationState.currentPage}
+          onPageSizeChange={paginationHandlers.setPageSize}
+          onPageChange={paginationHandlers.setCurrentPage}
+        />
+      </AppMobileLayout>
+    );
   }
 
   return (
@@ -365,13 +458,13 @@ export function ProductConfigPage() {
           <Button
             variant="light"
             leftSection={<IconUpload size={16} />}
-            disabled={!permissions.product.canCreate}
+            disabled={!canCreate}
             onClick={openBulkImportModal}
           >
             {t('product.bulkImport')}
           </Button>
           <Button
-            disabled={!permissions.product.canCreate}
+            disabled={!canCreate}
             leftSection={<IconPlus size={16} />}
             onClick={openCreateModal}
           >
@@ -408,23 +501,27 @@ export function ProductConfigPage() {
             {
               key: 'unit',
               header: t('product.unit'),
+              width: '100px',
               render: (product: Product) => product.unit || '-',
             },
             {
               key: 'category',
               header: t('product.category'),
+              width: '200px',
               render: (product: Product) => product.category || '-',
             },
             {
-              key: 'color',
-              header: t('product.color'),
-              render: (product: Product) => product.color || '-',
-            },
-            {
               key: 'status',
-              width: '200px',
               header: t('common.status'),
-              render: (product: Product) => <ProductStatusBadge status={product.status} />,
+              width: '200px',
+              render: (product: Product) => {
+                return (
+                  <ActiveBadge
+                    isActive={!product.isDeleted}
+                    label={product.isDeleted ? t('product.inactive') : t('product.active')}
+                  />
+                );
+              },
             },
           ]}
         />
@@ -440,9 +537,6 @@ export function ProductConfigPage() {
 
       <ProductFormModal
         mode="create"
-        canCreate={permissions.product.canCreate}
-        canDelete={permissions.product.canDelete}
-        canEdit={permissions.product.canEdit}
         form={form}
         isLoading={isLoading}
         opened={createOpened}
@@ -452,20 +546,16 @@ export function ProductConfigPage() {
 
       <ProductFormModal
         mode="edit"
-        canCreate={permissions.product.canCreate}
-        canEdit={permissions.product.canEdit}
-        canDelete={permissions.product.canDelete}
+        product={selectedProduct}
         opened={editOpened}
         form={form}
         isLoading={isLoading}
         onClose={closeEdit}
         onSubmit={handleUpdateProductAction.trigger}
-        onDelete={() => {
-          if (selectedProduct) {
-            handleDeleteProduct(selectedProduct);
-            closeEdit();
-          }
-        }}
+        onActivate={() => selectedProduct && handleActivateProductAction.trigger(selectedProduct)}
+        onDeactivate={() =>
+          selectedProduct && handleDeactivateProductAction.trigger(selectedProduct)
+        }
       />
     </AppDesktopLayout>
   );

@@ -40,8 +40,7 @@ export interface DashboardData {
     readonly firstName: string;
     readonly lastName: string;
     readonly fullName: string;
-    readonly position?: string;
-    readonly unit?: string;
+    readonly department?: string;
   };
   readonly currentClock?: {
     readonly clockInTime: Date;
@@ -75,8 +74,8 @@ export interface Shift {
   readonly startTime: string; // HH:mm format
   readonly endTime: string; // HH:mm format
   readonly status: ShiftStatus;
-  readonly unitId?: string;
-  readonly unit?: string;
+  readonly departmentId?: string;
+  readonly department?: string;
   readonly notes?: string;
   readonly createdAt: Date;
   readonly updatedAt: Date;

@@ -1,5 +1,11 @@
 import { Accordion, Group, Stack, Text } from '@mantine/core';
-import { IconClipboardList, IconHistory, IconInfoCircle, IconMapPin } from '@tabler/icons-react';
+import {
+  IconClipboardList,
+  IconHistory,
+  IconInfoCircle,
+  IconMapPin,
+  IconPhoto,
+} from '@tabler/icons-react';
 
 import { ViewOnMap } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -9,18 +15,11 @@ import { POAccordionActions } from './POAccordionActions';
 import { POAccordionHistoryPanel } from './POAccordionHistoryPanel';
 import { POAccordionInfoPanel } from './POAccordionInfoPanel';
 import { POAccordionItemsPanel } from './POAccordionItemsPanel';
+import { POPhotoGallery } from './POPhotoGallery';
 
 type PODetailAccordionProps = {
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading?: boolean;
-  readonly canEdit: boolean;
-  readonly canConfirm?: boolean;
-  readonly canProcess?: boolean;
-  readonly canShip?: boolean;
-  readonly canMarkReady?: boolean;
-  readonly canDeliver?: boolean;
-  readonly canRefund?: boolean;
-  readonly canCancel?: boolean;
   readonly onEdit: () => void;
   readonly onConfirm: () => void;
   readonly onProcess: () => void;
@@ -34,14 +33,6 @@ type PODetailAccordionProps = {
 
 export function PODetailAccordion({
   purchaseOrder,
-  canEdit = false,
-  canConfirm = false,
-  canProcess = false,
-  canShip = false,
-  canMarkReady = false,
-  canDeliver = false,
-  canRefund = false,
-  canCancel = false,
   isLoading = false,
   onEdit,
   onConfirm,
@@ -54,7 +45,6 @@ export function PODetailAccordion({
   onCreateDelivery,
 }: PODetailAccordionProps) {
   const { t } = useTranslation();
-
   return (
     <Stack gap="md">
       <Accordion defaultValue="info" variant="contained">
@@ -66,7 +56,6 @@ export function PODetailAccordion({
             <POAccordionInfoPanel
               purchaseOrder={purchaseOrder}
               isLoading={isLoading}
-              canEdit={canEdit}
               onEdit={onEdit}
             />
           </Accordion.Panel>
@@ -107,17 +96,25 @@ export function PODetailAccordion({
             </Accordion.Panel>
           </Accordion.Item>
         )}
+
+        {/* Photos Accordion */}
+        {purchaseOrder.photos && purchaseOrder.photos.length > 0 && (
+          <Accordion.Item value="photos">
+            <Accordion.Control icon={<IconPhoto size={16} />}>
+              {t('delivery.photos')}
+            </Accordion.Control>
+            <Accordion.Panel>
+              <POPhotoGallery
+                photos={purchaseOrder.photos}
+                withScrollArea
+                scrollAreaHeight="30vh"
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
+        )}
       </Accordion>
 
       <POAccordionActions
-        canEdit={canEdit}
-        canConfirm={canConfirm}
-        canProcess={canProcess}
-        canShip={canShip}
-        canMarkReady={canMarkReady}
-        canDeliver={canDeliver}
-        canRefund={canRefund}
-        canCancel={canCancel}
         purchaseOrder={purchaseOrder}
         isLoading={isLoading}
         onConfirm={onConfirm}

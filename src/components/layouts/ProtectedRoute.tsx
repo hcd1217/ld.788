@@ -2,8 +2,9 @@ import React from 'react';
 
 import { Navigate } from 'react-router';
 
-import { NoPermission } from '@/components/common';
-import { useAppStore } from '@/stores/useAppStore';
+import { LoadingOverlay } from '@mantine/core';
+
+import { useAppStore, useMe } from '@/stores/useAppStore';
 
 type ProtectedRouteProps = {
   readonly children: React.ReactNode;
@@ -12,16 +13,16 @@ type ProtectedRouteProps = {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   // Use separate selectors to avoid creating new objects on every render
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
-  const permissionError = useAppStore((state) => state.permissionError);
+  const currentUser = useMe();
 
   // Not authenticated - redirect to login
   if (!isAuthenticated) {
     return <Navigate replace to="/login" />;
   }
 
-  // Authenticated but no permission - show NoPermission component
-  if (permissionError) {
-    return <NoPermission />;
+  // Waiting for current user to be loaded
+  if (!currentUser) {
+    return <LoadingOverlay visible={true} />;
   }
 
   // Authenticated and has permission - render children

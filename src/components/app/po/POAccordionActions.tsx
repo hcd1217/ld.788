@@ -1,18 +1,22 @@
+import { useMemo } from 'react';
+
 import { Button, Group } from '@mantine/core';
 
 import { usePOActions } from '@/hooks/usePOActions';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { usePermissions } from '@/stores/useAppStore';
+import {
+  canCancelPurchaseOrder,
+  canConfirmPurchaseOrder,
+  canDeliverPurchaseOrder,
+  canMarkReadyPurchaseOrder,
+  canProcessPurchaseOrder,
+  canRefundPurchaseOrder,
+  canShipPurchaseOrder,
+} from '@/utils/permission.utils';
 
 type POAccordionActionsProps = {
-  readonly canEdit: boolean;
-  readonly canConfirm: boolean;
-  readonly canProcess: boolean;
-  readonly canShip: boolean;
-  readonly canMarkReady: boolean;
-  readonly canDeliver: boolean;
-  readonly canRefund: boolean;
-  readonly canCancel: boolean;
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading: boolean;
   readonly onConfirm: () => void;
@@ -26,13 +30,6 @@ type POAccordionActionsProps = {
 };
 
 export function POAccordionActions({
-  canConfirm,
-  canProcess,
-  canShip,
-  canMarkReady,
-  canDeliver,
-  canRefund,
-  canCancel,
   purchaseOrder,
   isLoading,
   onConfirm,
@@ -46,10 +43,24 @@ export function POAccordionActions({
 }: POAccordionActionsProps) {
   const { t } = useTranslation();
 
+  const permissions = usePermissions();
+  const { canConfirm, canCancel, canProcess, canMarkReady, canShip, canDeliver, canRefund } =
+    useMemo(
+      () => ({
+        canConfirm: canConfirmPurchaseOrder(permissions),
+        canCancel: canCancelPurchaseOrder(permissions),
+        canProcess: canProcessPurchaseOrder(permissions),
+        canMarkReady: canMarkReadyPurchaseOrder(permissions),
+        canShip: canShipPurchaseOrder(permissions),
+        canDeliver: canDeliverPurchaseOrder(permissions),
+        canRefund: canRefundPurchaseOrder(permissions),
+      }),
+      [permissions],
+    );
+
   // Use the centralized hook for action logic
   const actions = usePOActions({
     purchaseOrder,
-    isLoading,
     permissions: {
       canConfirm,
       canCancel,

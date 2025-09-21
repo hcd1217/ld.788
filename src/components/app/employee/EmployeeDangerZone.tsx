@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { Box, Button, Card, Divider, Group, Paper, Stack, Text, Title } from '@mantine/core';
 import {
   IconAlertTriangle,
@@ -10,26 +12,31 @@ import {
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
+import { usePermissions } from '@/stores/useAppStore';
+import { canEditEmployee, canSetPasswordForEmployee } from '@/utils/permission.utils';
 
 type EmployeeDangerZoneProps = {
   readonly employee: Employee;
-  readonly canEdit: boolean;
-  readonly canSetPassword: boolean;
   readonly onActivate: () => void;
   readonly onDeactivate: () => void;
   readonly onSetPassword: () => void;
 };
 
 export function EmployeeDangerZone({
-  canEdit,
   employee,
-  canSetPassword,
   onActivate,
   onDeactivate,
   onSetPassword,
 }: EmployeeDangerZoneProps) {
   const { t } = useTranslation();
   const { isDesktop } = useDeviceType();
+  const permissions = usePermissions();
+  const { canEdit, canSetPassword } = useMemo(() => {
+    return {
+      canEdit: canEditEmployee(permissions),
+      canSetPassword: canSetPasswordForEmployee(permissions),
+    };
+  }, [permissions]);
 
   return (
     <Card
@@ -103,10 +110,11 @@ export function EmployeeDangerZone({
                   </Box>
                   <Button
                     color="red"
+                    disabled={!canEdit}
                     leftSection={<IconUserOff size={16} />}
                     onClick={onDeactivate}
                   >
-                    {t('employee.deactivate')}
+                    {t('common.deactivate')}
                   </Button>
                 </Group>
               ) : (
@@ -120,10 +128,11 @@ export function EmployeeDangerZone({
                   <Button
                     fullWidth
                     color="red"
+                    disabled={!canEdit}
                     leftSection={<IconUserOff size={16} />}
                     onClick={onDeactivate}
                   >
-                    {t('employee.deactivate')}
+                    {t('common.deactivate')}
                   </Button>
                 </Stack>
               )}
@@ -144,7 +153,7 @@ export function EmployeeDangerZone({
                     disabled={!canEdit}
                     onClick={onActivate}
                   >
-                    {t('employee.activate')}
+                    {t('common.activate')}
                   </Button>
                 </Group>
               ) : (
@@ -162,7 +171,7 @@ export function EmployeeDangerZone({
                     disabled={!canEdit}
                     onClick={onActivate}
                   >
-                    {t('employee.activate')}
+                    {t('common.activate')}
                   </Button>
                 </Stack>
               )}

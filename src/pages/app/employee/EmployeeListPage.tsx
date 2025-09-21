@@ -9,11 +9,11 @@ import { IconClearAll } from '@tabler/icons-react';
 import {
   EmployeeCard,
   EmployeeDataTable,
+  EmployeeDepartmentDrawer,
   EmployeeFilterBar,
   EmployeeGridCard,
   EmployeeListSkeleton,
   EmployeeStatusDrawer,
-  EmployeeUnitDrawer,
 } from '@/components/app/employee';
 import {
   AppDesktopLayout,
@@ -33,28 +33,40 @@ import { useEmployeeFilters } from '@/hooks/useEmployeeFilters';
 import { useOnce } from '@/hooks/useOnce';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useViewMode } from '@/hooks/useViewMode';
-import { useAppStore, usePermissions } from '@/stores/useAppStore';
+import { useDepartmentOptions, usePermissions } from '@/stores/useAppStore';
 import { useEmployeeList, useHrActions, useHrError, useHrLoading } from '@/stores/useHrStore';
+import { canCreateEmployee, canViewEmployee } from '@/utils/permission.utils';
 
 export function EmployeeListPage() {
   const navigate = useNavigate();
   const { isMobile } = useDeviceType();
+  const { viewMode, isTableView, setViewMode } = useViewMode();
   const { t } = useTranslation();
   const permissions = usePermissions();
   const employees = useEmployeeList();
+  const departmentOptions = useDepartmentOptions();
   const isLoading = useHrLoading();
   const error = useHrError();
   const { refreshEmployees, clearError } = useHrActions();
+  const { canView, canCreate } = useMemo(() => {
+    return {
+      canView: canViewEmployee(permissions),
+      canCreate: canCreateEmployee(permissions),
+    };
+  }, [permissions]);
+
+  // Memoize the combined department options to prevent re-renders
+  const departmentSelectData = useMemo(() => {
+    return [{ value: '', label: t('employee.allDepartment') }, ...departmentOptions];
+  }, [departmentOptions, t]);
 
   // Use the new employee filters hook
   const { filteredEmployees, filters, filterHandlers, hasActiveFilters, clearAllFilters } =
     useEmployeeFilters(employees);
 
-  const { viewMode, isTableView, setViewMode } = useViewMode();
-  const { overviewData } = useAppStore();
-
   // Drawer states using Mantine's useDisclosure directly
-  const [unitDrawerOpened, { open: openUnitDrawer, close: closeUnitDrawer }] = useDisclosure(false);
+  const [departmentDrawerOpened, { open: openDepartmentDrawer, close: closeDepartmentDrawer }] =
+    useDisclosure(false);
   const [statusDrawerOpened, { open: openStatusDrawer, close: closeStatusDrawer }] =
     useDisclosure(false);
 
@@ -64,23 +76,13 @@ export function EmployeeListPage() {
     defaultPageSize: isMobile ? 1000 : undefined,
   });
 
-  // Prepare department options for select
-  const { units, unitOptions } = useMemo(() => {
-    return {
-      units: overviewData?.departments ?? [],
-      unitOptions:
-        overviewData?.departments.map((unit) => ({
-          value: unit.id,
-          label: unit.name,
-        })) ?? [],
-    };
-  }, [overviewData]);
-
   useOnce(() => {
-    void refreshEmployees();
+    if (canView) {
+      void refreshEmployees();
+    }
   });
 
-  if (!permissions.employee.canView) {
+  if (!canView) {
     return <PermissionDeniedPage />;
   }
 
@@ -96,23 +98,21 @@ export function EmployeeListPage() {
         {/* Filter Bar */}
         <EmployeeFilterBar
           searchQuery={filters.searchQuery}
-          unitId={filters.unitId}
+          departmentId={filters.departmentId}
           status={filters.status}
-          units={units}
           hasActiveFilters={hasActiveFilters}
           onSearchChange={filterHandlers.setSearchQuery}
-          onUnitClick={openUnitDrawer}
+          onDepartmentClick={openDepartmentDrawer}
           onStatusClick={openStatusDrawer}
           onClearFilters={clearAllFilters}
         />
 
-        {/* Unit Selection Drawer */}
-        <EmployeeUnitDrawer
-          opened={unitDrawerOpened}
-          units={units}
-          selectedUnitId={filters.unitId}
-          onClose={closeUnitDrawer}
-          onUnitSelect={filterHandlers.setUnitId}
+        {/* Department Selection Drawer */}
+        <EmployeeDepartmentDrawer
+          opened={departmentDrawerOpened}
+          selectedDepartmentId={filters.departmentId}
+          onClose={closeDepartmentDrawer}
+          onDepartmentSelect={filterHandlers.setDepartmentId}
         />
 
         {/* Status Selection Drawer */}
@@ -132,7 +132,7 @@ export function EmployeeListPage() {
           }
           description={
             filters.searchQuery
-              ? t('employee.tryDifferentSearch')
+              ? t('common.tryDifferentSearch')
               : t('employee.createFirstEmployeeDescription')
           }
         />
@@ -142,7 +142,7 @@ export function EmployeeListPage() {
           ) : (
             <Stack gap="sm" px="sm">
               {paginatedEmployees.map((employee) => (
-                <EmployeeCard key={employee.id} noActions employee={employee} />
+                <EmployeeCard key={employee.id} employee={employee} />
               ))}
             </Stack>
           )}
@@ -157,7 +157,7 @@ export function EmployeeListPage() {
         title={t('employee.title')}
         button={{
           label: t('employee.addEmployee'),
-          disabled: !permissions.employee.canCreate,
+          disabled: !canCreate,
           onClick() {
             navigate(ROUTERS.EMPLOYEES_ADD);
           },
@@ -175,11 +175,11 @@ export function EmployeeListPage() {
         <Select
           clearable
           searchable
-          placeholder={t('employee.selectUnit')}
-          data={[{ value: '', label: t('employee.allUnit') }, ...unitOptions]}
-          value={filters.unitId || ''}
+          placeholder={t('employee.selectDepartment')}
+          data={departmentSelectData}
+          value={filters.departmentId || ''}
           style={{ flex: 1, maxWidth: 300 }}
-          onChange={(value) => filterHandlers.setUnitId(value || undefined)}
+          onChange={(value) => filterHandlers.setDepartmentId(value || undefined)}
         />
         {/* Filter Controls */}
         <Group justify="space-between" align="center" gap="xl">
@@ -216,7 +216,7 @@ export function EmployeeListPage() {
           }
           description={
             hasActiveFilters
-              ? t('employee.tryDifferentSearch')
+              ? t('common.tryDifferentSearch')
               : t('employee.createFirstEmployeeDescription')
           }
           button={
@@ -224,7 +224,7 @@ export function EmployeeListPage() {
               ? undefined
               : {
                   label: t('employee.createFirstEmployee'),
-                  disabled: !permissions.employee.canCreate,
+                  disabled: !canCreate,
                   onClick: () => navigate(ROUTERS.EMPLOYEES_ADD),
                 }
           }
@@ -249,6 +249,7 @@ export function EmployeeListPage() {
       </div>
 
       <Pagination
+        hidden={employees.length < 20}
         totalPages={paginationState.totalPages}
         pageSize={paginationState.pageSize}
         currentPage={paginationState.currentPage}

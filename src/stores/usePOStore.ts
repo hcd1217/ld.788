@@ -65,7 +65,13 @@ type POState = {
   createPO: (
     po: Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber'>,
   ) => Promise<void>;
-  updatePO: (id: string, data: Partial<PurchaseOrder>) => Promise<void>;
+  updatePO: (
+    id: string,
+    data: Omit<
+      PurchaseOrder,
+      'id' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber' | 'status'
+    >,
+  ) => Promise<void>;
   confirmPO: (id: string) => Promise<void>;
   processPO: (id: string) => Promise<void>;
   markPOReady: (id: string, data?: UpdatePOStatusRequest) => Promise<void>;
@@ -73,6 +79,7 @@ type POState = {
   deliverPO: (id: string, data?: { deliveryNotes?: string }) => Promise<void>;
   cancelPO: (id: string, data?: { cancelReason?: string }) => Promise<void>;
   refundPO: (id: string, data?: { refundReason?: string }) => Promise<void>;
+  uploadPhotos: (id: string, photos: { publicUrl: string; key: string }[]) => Promise<void>;
   clearError: () => void;
 
   // Selectors
@@ -283,27 +290,19 @@ export const usePOStore = create<POState>()(
           const createData = {
             customerId: poData.customerId,
             items: poData.items,
+            salesId: poData.salesId,
             metadata: {
               shippingAddress: {
                 oneLineAddress: poData.address,
                 googleMapsUrl: poData.googleMapsUrl,
               },
             },
+            isInternalDelivery: poData.isInternalDelivery,
             address: poData.address,
             googleMapsUrl: poData.googleMapsUrl,
             notes: poData.notes,
-            orderDate:
-              poData.orderDate instanceof Date
-                ? poData.orderDate
-                : poData.orderDate
-                  ? new Date(poData.orderDate)
-                  : undefined,
-            deliveryDate:
-              poData.deliveryDate instanceof Date
-                ? poData.deliveryDate
-                : poData.deliveryDate
-                  ? new Date(poData.deliveryDate)
-                  : undefined,
+            orderDate: poData.orderDate,
+            deliveryDate: poData.deliveryDate,
           };
 
           // Call service and get created PO (ignore response, we'll refresh)
@@ -311,14 +310,14 @@ export const usePOStore = create<POState>()(
 
           // Force refresh to get the latest list with the new PO
           await get().refreshPOs();
-
-          set({ isLoading: false });
         } catch (error) {
           set({
             isLoading: false,
             error: getErrorMessage(error, 'Failed to create purchase order'),
           });
           throw error; // Re-throw for form handling
+        } finally {
+          set({ isLoading: false });
         }
       },
 
@@ -341,6 +340,7 @@ export const usePOStore = create<POState>()(
         get()._optimisticUpdate(id, {
           ...data,
         });
+        set({ isLoading: true, error: undefined });
 
         try {
           // Call service (ignore response - we'll force reload)
@@ -359,6 +359,7 @@ export const usePOStore = create<POState>()(
           throw error;
         } finally {
           get()._removePending(id);
+          set({ isLoading: false });
         }
       },
 
@@ -430,6 +431,33 @@ export const usePOStore = create<POState>()(
           data,
           'Failed to refund purchase order',
         );
+      },
+
+      async uploadPhotos(id: string, photos: { publicUrl: string; key: string }[]) {
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
+          return;
+        }
+
+        // Mark as pending
+        state._markPending(id);
+
+        try {
+          // Call service
+          await purchaseOrderService.uploadPhotos(id, photos);
+
+          // Force reload to get latest data from server
+          get()._forceReload(id);
+        } catch (error) {
+          const errorMessage = getErrorMessage(error, 'Failed to upload photos');
+          set({ error: errorMessage });
+          throw error;
+        } finally {
+          // Clear pending
+          state._removePending(id);
+        }
       },
 
       clearError() {
@@ -612,6 +640,7 @@ export const usePOActions = () => {
   const deliverPO = usePOStore((state) => state.deliverPO);
   const cancelPO = usePOStore((state) => state.cancelPO);
   const refundPO = usePOStore((state) => state.refundPO);
+  const uploadPhotos = usePOStore((state) => state.uploadPhotos);
   const clearError = usePOStore((state) => state.clearError);
 
   return {
@@ -632,6 +661,7 @@ export const usePOActions = () => {
     deliverPurchaseOrder: deliverPO,
     cancelPurchaseOrder: cancelPO,
     refundPurchaseOrder: refundPO,
+    uploadPhotos,
   };
 };
 

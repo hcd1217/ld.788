@@ -11,17 +11,10 @@ import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { formatDate } from '@/utils/time';
 
+import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
 
 type PODataTableProps = {
-  readonly canEdit: boolean;
-  readonly canConfirm?: boolean;
-  readonly canProcess?: boolean;
-  readonly canShip?: boolean;
-  readonly canMarkReady?: boolean;
-  readonly canDeliver?: boolean;
-  readonly canRefund?: boolean;
-  readonly canCancel?: boolean;
   readonly purchaseOrders: readonly PurchaseOrder[];
   readonly noAction?: boolean;
   readonly isLoading?: boolean;
@@ -92,6 +85,7 @@ function PODataTableComponent({ purchaseOrders }: PODataTableProps) {
                 </Table.Td>
                 <Table.Td>
                   <POStatusBadge status={po.status} />
+                  <PODeliveryBadge isInternalDelivery={po.isInternalDelivery} />
                 </Table.Td>
               </Table.Tr>
             );

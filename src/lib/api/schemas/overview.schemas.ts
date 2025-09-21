@@ -1,7 +1,13 @@
 import * as z from 'zod/v4';
 
-import { idSchema, numberSchema, optionalStringSchema, stringSchema } from './common.schemas';
-import { ProductStatusSchema } from './product.schemas';
+import {
+  booleanSchema,
+  idSchema,
+  numberSchema,
+  optionalBooleanSchema,
+  optionalStringSchema,
+  stringSchema,
+} from './common.schemas';
 
 // Employee overview schema
 export const EmployeeOverviewSchema = z.object({
@@ -11,7 +17,6 @@ export const EmployeeOverviewSchema = z.object({
   lastName: stringSchema.describe('Employee last name'),
   departmentId: idSchema.optional().describe('Department ID'),
   departmentName: stringSchema.optional().describe('Department name'),
-  positionName: stringSchema.optional().describe('Position name'),
   employeeCode: optionalStringSchema.describe('Employee code'),
 });
 
@@ -28,13 +33,15 @@ export const ProductOverviewSchema = z.object({
   name: stringSchema.describe('Product name'),
   code: stringSchema.describe('Product code'),
   unit: stringSchema.describe('Product unit'),
-  status: ProductStatusSchema.describe('Product status'),
+  isDeleted: optionalBooleanSchema.describe('Product is deleted'),
 });
 
 export const CustomerOverviewSchema = z.object({
   id: idSchema.describe('Customer ID'),
   name: stringSchema.describe('Customer name'),
+  isActive: booleanSchema.describe('Customer is active'),
   address: optionalStringSchema.describe('Customer address'),
+  deliveryAddress: optionalStringSchema.describe('Customer delivery address'),
   pic: optionalStringSchema.describe('Customer PIC'),
   phone: optionalStringSchema.describe('Customer phone'),
   email: optionalStringSchema.describe('Customer email'),

@@ -6,7 +6,7 @@ import { IconCalendar, IconEdit, IconUrgent } from '@tabler/icons-react';
 import { DateInput, UrgentBadge } from '@/components/common';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
+import type { DeliveryRequest } from '@/services/sales';
 import { useClientConfig, useEmployees } from '@/stores/useAppStore';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
@@ -17,7 +17,6 @@ type DeliveryUpdateModalProps = {
   readonly onClose: () => void;
   readonly onConfirm: (data: {
     assignedTo: string;
-    assignedType: 'EMPLOYEE' | 'USER';
     scheduledDate: string;
     notes: string;
     isUrgentDelivery?: boolean;
@@ -87,7 +86,6 @@ export function DeliveryUpdateModal({
     try {
       await onConfirm({
         assignedTo: selectedEmployeeId,
-        assignedType: 'EMPLOYEE',
         scheduledDate: scheduledDate.toISOString(),
         notes,
         isUrgentDelivery,

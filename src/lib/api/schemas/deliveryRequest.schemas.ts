@@ -5,11 +5,15 @@ import {
   idSchema,
   numberSchema,
   optionalBooleanSchema,
+  optionalIdSchema,
   optionalNumberSchema,
   optionalStringSchema,
+  optionalTimestampSchema,
   paginationSchema,
+  PhotoDataSchema,
   stringSchema,
   timestampSchema,
+  UploadPhotoSchema,
 } from './common.schemas';
 
 // ========== Delivery Request Schemas ==========
@@ -18,33 +22,26 @@ import {
 export const DeliveryStatusSchema = z.enum(['PENDING', 'IN_TRANSIT', 'COMPLETED']);
 export type DeliveryStatus = z.infer<typeof DeliveryStatusSchema>;
 
-// PIC Type enum
-export const PICTypeSchema = z.enum(['EMPLOYEE', 'USER']);
-export type PICType = z.infer<typeof PICTypeSchema>;
-
 // Delivery Request base schema
 export const DeliveryRequestSchema = z.object({
   id: idSchema,
   deliveryRequestNumber: stringSchema,
   status: DeliveryStatusSchema,
-  assignedTo: idSchema.optional(),
-  assignedType: PICTypeSchema.optional(),
+  assignedTo: optionalIdSchema,
   scheduledDate: timestampSchema,
-  completedDate: timestampSchema.optional(),
-  metadata: z.looseObject({
-    isUrgentDelivery: optionalBooleanSchema,
-    deliveryOrderInDay: optionalNumberSchema,
-    photoUrls: z.array(stringSchema).optional(),
-    deliveryAddress: AddressSchema.optional(),
-    po: z
-      .looseObject({
-        poId: idSchema,
-        poNumber: stringSchema,
-        customerId: idSchema,
-      })
-      .optional(),
-  }),
-  notes: stringSchema.optional(),
+  completedDate: optionalTimestampSchema,
+  isUrgentDelivery: optionalBooleanSchema,
+  deliveryOrderInDay: optionalNumberSchema,
+  purchaseOrder: z
+    .object({
+      poId: idSchema,
+      poNumber: stringSchema,
+      customerId: idSchema,
+    })
+    .optional(),
+  photos: z.array(PhotoDataSchema).optional(),
+  deliveryAddress: AddressSchema.optional(),
+  notes: optionalStringSchema,
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
 });
@@ -54,16 +51,14 @@ export const DeliveryRequestSchema = z.object({
 export const CreateDeliveryRequestSchema = z.object({
   purchaseOrderId: idSchema,
   assignedTo: idSchema,
-  assignedType: PICTypeSchema,
   scheduledDate: stringSchema,
   notes: optionalStringSchema,
   isUrgentDelivery: optionalBooleanSchema,
 });
 
 export const UpdateDeliveryRequestSchema = z.object({
-  assignedTo: idSchema.optional(),
-  assignedType: PICTypeSchema.optional(),
-  scheduledDate: stringSchema.optional(),
+  assignedTo: optionalIdSchema,
+  scheduledDate: optionalStringSchema,
   notes: optionalStringSchema,
   isUrgentDelivery: optionalBooleanSchema,
 });
@@ -74,11 +69,11 @@ export const UpdateDeliveryStatusSchema = z.object({
 });
 
 export const UploadPhotosSchema = z.object({
-  photoUrls: z.array(stringSchema),
+  photos: z.array(UploadPhotoSchema),
 });
 
 export const CompleteDeliverySchema = z.object({
-  photoUrls: z.array(stringSchema).optional(),
+  photos: z.array(UploadPhotoSchema),
   notes: optionalStringSchema,
 });
 

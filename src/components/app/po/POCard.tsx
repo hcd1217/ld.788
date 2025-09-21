@@ -2,15 +2,17 @@ import { useCallback } from 'react';
 
 import { useNavigate } from 'react-router';
 
-import { Badge, Box, Card, Group, type MantineStyleProp, Text } from '@mantine/core';
+import { Box, Card, Group, type MantineStyleProp, Stack, Text } from '@mantine/core';
 
 import { getPODetailRoute } from '@/config/routeConfig';
-import { PO_STATUS_COLORS } from '@/constants/purchaseOrder';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { formatDate } from '@/utils/time';
+
+import { PODeliveryBadge } from './PODeliveryBadge';
+import { POStatusBadge } from './POStatusBadge';
 
 type POCardProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -32,8 +34,6 @@ export function POCard({ purchaseOrder, style, className }: POCardProps) {
   const handleCardClick = useCallback(() => {
     navigate(getPODetailRoute(purchaseOrder.id));
   }, [navigate, purchaseOrder.id]);
-
-  const statusColor = PO_STATUS_COLORS[purchaseOrder.status] || 'gray';
 
   return (
     <Card
@@ -82,9 +82,10 @@ export function POCard({ purchaseOrder, style, className }: POCardProps) {
             </Text>
           </Group>
         </Box>
-        <Badge color={statusColor} size="sm">
-          {t(`po.status.${purchaseOrder.status}`)}
-        </Badge>
+        <Stack gap="xs" align="flex-end">
+          <POStatusBadge status={purchaseOrder.status} />
+          <PODeliveryBadge isInternalDelivery={purchaseOrder.isInternalDelivery} />
+        </Stack>
       </Group>
     </Card>
   );

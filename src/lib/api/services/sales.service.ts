@@ -7,7 +7,6 @@ import {
   CreateCustomerResponseSchema,
   GetCustomersResponseSchema,
   UpdateCustomerRequestSchema,
-  UpdateCustomerResponseSchema,
 
   // Purchase Order schemas
   // eslint-disable-next-line sort-imports
@@ -17,21 +16,18 @@ import {
   type CreateCustomerResponse,
   type GetCustomersResponse,
   type UpdateCustomerRequest,
-  type UpdateCustomerResponse,
 
   // Purchase Order schemas
   GetPurchaseOrdersResponseSchema,
   CreatePurchaseOrderRequestSchema,
   CreatePurchaseOrderResponseSchema,
   UpdatePurchaseOrderRequestSchema,
-  UpdatePurchaseOrderResponseSchema,
   GetPurchaseOrderResponseSchema,
   UpdatePOStatusRequestSchema,
   type GetPurchaseOrdersResponse,
   type CreatePurchaseOrderRequest,
   type CreatePurchaseOrderResponse,
   type UpdatePurchaseOrderRequest,
-  type UpdatePurchaseOrderResponse,
   type GetPurchaseOrderResponse,
   type UpdatePOStatusRequest,
   type POStatus,
@@ -40,19 +36,16 @@ import {
   CreateProductRequestSchema,
   CreateProductResponseSchema,
   UpdateProductRequestSchema,
-  UpdateProductResponseSchema,
-  GetProductResponseSchema,
   BulkUpsertProductsRequestSchema,
   BulkUpsertProductsResponseSchema,
   type GetProductsResponse,
   type CreateProductRequest,
   type CreateProductResponse,
   type UpdateProductRequest,
-  type UpdateProductResponse,
-  type GetProductResponse,
   type BulkUpsertProductsRequest,
   type BulkUpsertProductsResponse,
-  type ProductStatus,
+  type UploadPhotosRequest,
+  UploadPhotosRequestSchema,
 } from '../schemas/sales.schemas';
 
 export class SalesApi extends BaseApiClient {
@@ -91,11 +84,11 @@ export class SalesApi extends BaseApiClient {
     );
   }
 
-  async updateCustomer(id: string, data: UpdateCustomerRequest): Promise<UpdateCustomerResponse> {
-    return this.patch<UpdateCustomerResponse, UpdateCustomerRequest>(
+  async updateCustomer(id: string, data: UpdateCustomerRequest): Promise<void> {
+    return this.patch<void, UpdateCustomerRequest>(
       `/api/sales/customers/${id}`,
       data,
-      UpdateCustomerResponseSchema,
+      undefined,
       UpdateCustomerRequestSchema,
     );
   }
@@ -180,14 +173,11 @@ export class SalesApi extends BaseApiClient {
     );
   }
 
-  async updatePurchaseOrder(
-    id: string,
-    data: UpdatePurchaseOrderRequest,
-  ): Promise<UpdatePurchaseOrderResponse> {
-    return this.patch<UpdatePurchaseOrderResponse, UpdatePurchaseOrderRequest>(
+  async updatePurchaseOrder(id: string, data: UpdatePurchaseOrderRequest): Promise<void> {
+    await this.patch<void, UpdatePurchaseOrderRequest>(
       `/api/sales/purchase-orders/${id}`,
       data,
-      UpdatePurchaseOrderResponseSchema,
+      undefined,
       UpdatePurchaseOrderRequestSchema,
     );
   }
@@ -255,45 +245,21 @@ export class SalesApi extends BaseApiClient {
     );
   }
 
-  // ========== Product APIs ==========
-  async getProducts(params?: {
-    search?: string;
-    category?: string;
-    color?: string;
-    status?: ProductStatus;
-    minPrice?: number;
-    maxPrice?: number;
-    lowStock?: boolean;
-    limit?: number;
-    offset?: number;
-    sortBy?: 'name' | 'productCode' | 'status' | 'category' | 'createdAt' | 'updatedAt';
-    sortOrder?: 'asc' | 'desc';
-  }): Promise<GetProductsResponse> {
-    const queryParams = new URLSearchParams();
-    if (params?.search) queryParams.append('search', params.search);
-    if (params?.category) queryParams.append('category', params.category);
-    if (params?.color) queryParams.append('color', params.color);
-    if (params?.status) queryParams.append('status', params.status);
-    if (params?.minPrice !== undefined) queryParams.append('minPrice', String(params.minPrice));
-    if (params?.maxPrice !== undefined) queryParams.append('maxPrice', String(params.maxPrice));
-    if (params?.lowStock !== undefined) queryParams.append('lowStock', String(params.lowStock));
-    if (params?.limit) queryParams.append('limit', String(params.limit));
-    if (params?.offset) queryParams.append('offset', String(params.offset));
-    if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
-    if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
-
-    // Default limit if not provided
-    if (!params?.limit) queryParams.append('limit', '1000');
-
-    const url = `/api/sales/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return this.get<GetProductsResponse, void>(url, undefined, GetProductsResponseSchema);
+  async uploadPhotos(id: string, data: UploadPhotosRequest): Promise<void> {
+    return this.post<void, UploadPhotosRequest>(
+      `/api/sales/purchase-orders/${id}/photos`,
+      data,
+      undefined,
+      UploadPhotosRequestSchema,
+    );
   }
 
-  async getProductById(id: string): Promise<GetProductResponse> {
-    return this.get<GetProductResponse, void>(
-      `/api/sales/products/${id}`,
+  // ========== Product APIs ==========
+  async getProducts(): Promise<GetProductsResponse> {
+    return this.get<GetProductsResponse, void>(
+      '/api/sales/products',
       undefined,
-      GetProductResponseSchema,
+      GetProductsResponseSchema,
     );
   }
 
@@ -306,27 +272,12 @@ export class SalesApi extends BaseApiClient {
     );
   }
 
-  async updateProduct(id: string, data: UpdateProductRequest): Promise<UpdateProductResponse> {
-    return this.patch<UpdateProductResponse, UpdateProductRequest>(
+  async updateProduct(id: string, data: UpdateProductRequest): Promise<void> {
+    await this.patch<void, UpdateProductRequest>(
       `/api/sales/products/${id}`,
       data,
-      UpdateProductResponseSchema,
+      undefined,
       UpdateProductRequestSchema,
-    );
-  }
-
-  async deleteProduct(id: string): Promise<void> {
-    return this.delete(`/api/sales/products/${id}`);
-  }
-
-  async updateProductStock(
-    id: string,
-    data: { stockLevel: number },
-  ): Promise<UpdateProductResponse> {
-    return this.patch<UpdateProductResponse, { stockLevel: number }>(
-      `/api/sales/products/${id}/stock`,
-      data,
-      UpdateProductResponseSchema,
     );
   }
 

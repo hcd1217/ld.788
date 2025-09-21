@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 
 import { Alert, Center, Container, Loader } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -25,6 +25,7 @@ import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { useCustomers, usePermissions } from '@/stores/useAppStore';
 import { usePOActions, usePOError, usePOLoading } from '@/stores/usePOStore';
 import { logError } from '@/utils/logger';
+import { canCreatePurchaseOrder, canEditPurchaseOrder } from '@/utils/permission.utils';
 import { isPOLocked } from '@/utils/purchaseOrder';
 
 type PageMode = 'create' | 'edit';
@@ -36,6 +37,7 @@ type POFormPageProps = {
 export function POFormPage({ mode }: POFormPageProps) {
   const { poId: id } = useParams<{ poId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
   const permissions = usePermissions();
@@ -48,6 +50,13 @@ export function POFormPage({ mode }: POFormPageProps) {
   const [currentPO, setCurrentPO] = useState<PurchaseOrder | null>(null);
 
   const isEditMode = mode === 'edit';
+  const { canEdit, canCreate } = useMemo(
+    () => ({
+      canEdit: canEditPurchaseOrder(permissions),
+      canCreate: canCreatePurchaseOrder(permissions),
+    }),
+    [permissions],
+  );
 
   // Use the PO form hook
   const { initialValues, validation } = usePOForm({ isEditMode });
@@ -55,6 +64,25 @@ export function POFormPage({ mode }: POFormPageProps) {
   const form = useForm<POFormValues>({
     initialValues,
     validate: validation,
+  });
+
+  // Handle copied PO data from navigation state
+  useOnce(() => {
+    if (mode === 'create' && location.state?.copyFrom) {
+      const copyData = location.state.copyFrom;
+      form.setValues({
+        ...initialValues,
+        customerId: copyData.customerId,
+        salesId: copyData.salesId,
+        items: copyData.items,
+        shippingAddress: copyData.shippingAddress || initialValues.shippingAddress,
+        notes: copyData.notes || '',
+        isInternalDelivery: copyData.isInternalDelivery,
+        // Don't copy dates - use fresh dates for new PO
+        orderDate: initialValues.orderDate,
+        deliveryDate: initialValues.deliveryDate,
+      });
+    }
   });
 
   // Load PO data for edit mode
@@ -96,6 +124,7 @@ export function POFormPage({ mode }: POFormPageProps) {
               }
             : initialValues.shippingAddress,
         notes: po.notes || '',
+        isInternalDelivery: po.isInternalDelivery,
       });
     } catch (error) {
       logError('Failed to load PO:', error, {
@@ -132,15 +161,18 @@ export function POFormPage({ mode }: POFormPageProps) {
       const poData = {
         customerId: values.customerId,
         salesId: values.salesId,
-        customer,
         items: values.items,
         orderDate: values.orderDate,
         deliveryDate: values.deliveryDate,
         address: values.shippingAddress?.oneLineAddress,
         googleMapsUrl: values.shippingAddress?.googleMapsUrl,
         notes: values.notes,
-      };
-
+        isInternalDelivery: values.isInternalDelivery,
+      } satisfies Omit<
+        PurchaseOrder,
+        'id' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber' | 'status'
+      >;
+      setIsLoadingPO(true);
       if (isEditMode && id) {
         await updatePurchaseOrder(id, poData);
       } else {
@@ -148,6 +180,7 @@ export function POFormPage({ mode }: POFormPageProps) {
           ...poData,
           status: 'NEW' as const,
           orderDate: poData.orderDate || new Date(),
+          isInternalDelivery: poData.isInternalDelivery,
         };
         await createPurchaseOrder(newPO);
       }
@@ -176,11 +209,11 @@ export function POFormPage({ mode }: POFormPageProps) {
     }
   };
 
-  if (isEditMode && !permissions.purchaseOrder.canEdit) {
+  if (isEditMode && !canEdit) {
     return <PermissionDeniedPage />;
   }
 
-  if (!isEditMode && !permissions.purchaseOrder.canCreate) {
+  if (!isEditMode && !canCreate) {
     return <PermissionDeniedPage />;
   }
 
@@ -197,7 +230,6 @@ export function POFormPage({ mode }: POFormPageProps) {
       ) : (
         <POForm
           form={form}
-          customers={customers}
           isLoading={isLoading}
           error={error}
           onSubmit={handleSubmit.trigger}

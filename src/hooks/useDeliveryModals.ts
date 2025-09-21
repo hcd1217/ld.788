@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
+import type { DeliveryRequest } from '@/services/sales';
 
 type DeliveryModalState = {
   startTransit: boolean;

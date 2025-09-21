@@ -95,9 +95,9 @@ export const themeConfig: Record<string, CustomThemeConfig> = {
       },
       inputBorderColor: '#9bc1e7',
       borderColor: '#3e618c',
-      dangerColor: '#FF5630',
+      dangerColor: '#F2340A',
       activeColor: '#2b8a3e',
-      inActiveColor: '#2e2e2e',
+      inActiveColor: '#F2340A',
     },
   },
   origin: {

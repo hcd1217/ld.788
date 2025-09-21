@@ -1,19 +1,18 @@
+import { useMemo } from 'react';
+
 import { useNavigate } from 'react-router';
 
-import { Anchor, Badge, Button, Grid, Group, Stack, Text } from '@mantine/core';
-import {
-  IconBuilding,
-  IconCalendar,
-  IconEdit,
-  IconTruckDelivery,
-  IconUser,
-} from '@tabler/icons-react';
+import { Anchor, Button, Grid, Group, Stack, Text } from '@mantine/core';
+import { IconEdit, IconTruckDelivery, IconUser } from '@tabler/icons-react';
 
+import { InfoField } from '@/components/common';
 import { getDeliveryDetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
+import { useCustomerMapByCustomerId, usePermissions } from '@/stores/useAppStore';
+import { IconIdentifiers } from '@/utils/iconRegistry';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
+import { canEditPurchaseOrder } from '@/utils/permission.utils';
 import {
   getCancelReason,
   getDeliveryNotes,
@@ -25,37 +24,57 @@ import { formatDate, formatDateTime } from '@/utils/time';
 
 import { DeliveryStatusBadge } from '../delivery/DeliveryStatusBadge';
 
+import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
 
 type POAccordionInfoPanelProps = {
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading: boolean;
-  readonly canEdit: boolean;
   readonly onEdit: () => void;
 };
 
 export function POAccordionInfoPanel({
   purchaseOrder,
   isLoading,
-  canEdit,
   onEdit,
 }: POAccordionInfoPanelProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const customerMapByCustomerId = useCustomerMapByCustomerId();
   const isEditable = isPOEditable(purchaseOrder);
-  const shippingInfo = getShippingInfo(purchaseOrder.statusHistory);
+  const permissions = usePermissions();
+  const { canEdit } = useMemo(
+    () => ({
+      canEdit: canEditPurchaseOrder(permissions),
+    }),
+    [permissions],
+  );
+
+  const notes = useMemo(() => {
+    return {
+      cancelReason: getCancelReason(purchaseOrder.statusHistory),
+      deliveryNotes: getDeliveryNotes(purchaseOrder.statusHistory),
+      refundReason: getRefundReason(purchaseOrder.statusHistory),
+      shippingInfo: getShippingInfo(purchaseOrder.statusHistory),
+    };
+  }, [purchaseOrder.statusHistory]);
 
   return (
     <Stack gap="md">
       <Grid>
         <Grid.Col span={6}>
-          <Text size="xs" fw={500} c="dimmed">
-            {t('po.poNumber')}
-          </Text>
-          <Text size="sm" fw={600}>
-            {purchaseOrder.poNumber}
-          </Text>
+          <InfoField
+            label={
+              <Group gap="xs">
+                <Text size="xs" fw={500} c="dimmed">
+                  {t('po.poNumber')}
+                </Text>
+                <PODeliveryBadge isInternalDelivery={purchaseOrder.isInternalDelivery} />
+              </Group>
+            }
+            value={purchaseOrder.poNumber}
+            valueProps={{ fw: 600 }}
+          />
         </Grid.Col>
         <Grid.Col span={6}>
           <Text size="xs" fw={500} c="dimmed">
@@ -78,88 +97,50 @@ export function POAccordionInfoPanel({
           )}
         </Grid.Col>
         <Grid.Col span={6}>
-          <Text size="xs" fw={500} c="dimmed">
-            {t('po.customer')}
-          </Text>
-          <Group gap="xs">
-            <IconBuilding size={14} color="var(--mantine-color-gray-6)" />
-            <Text size="sm">
-              {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
-            </Text>
-          </Group>
+          <InfoField
+            label={t('po.customer')}
+            icon={IconIdentifiers.BUILDING}
+            value={getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
+          />
         </Grid.Col>
         <Grid.Col span={6}>
-          <Text size="xs" fw={500} c="dimmed">
-            {t('po.orderDate')}
-          </Text>
-          <Group gap="xs">
-            <IconCalendar size={14} color="var(--mantine-color-gray-6)" />
-            <Text size="sm">{formatDate(purchaseOrder.orderDate)}</Text>
-          </Group>
+          <InfoField label={t('po.salesPerson')} value={purchaseOrder.salesPerson} />
         </Grid.Col>
         <Grid.Col span={6}>
-          <Text size="xs" fw={500} c="dimmed">
-            {t('po.items')}
-          </Text>
-          <Badge variant="light" size="sm">
-            {purchaseOrder.items.length}
-          </Badge>
+          <InfoField
+            label={t('po.orderDate')}
+            icon={IconIdentifiers.CALENDAR}
+            value={formatDate(purchaseOrder.orderDate)}
+          />
         </Grid.Col>
-        {purchaseOrder.deliveryDate && (
-          <Grid.Col span={6}>
-            <Text size="xs" fw={500} c="dimmed">
-              {t('po.deliveryDate')}
-            </Text>
-            <Group gap="xs">
-              <IconCalendar size={14} color="var(--mantine-color-gray-6)" />
-              <Text size="sm">{formatDate(purchaseOrder.deliveryDate)}</Text>
-            </Group>
-          </Grid.Col>
-        )}
-        {purchaseOrder.completedDate && (
-          <Grid.Col span={6}>
-            <Text size="xs" fw={500} c="dimmed">
-              {t('po.completedDate')}
-            </Text>
-            <Group gap="xs">
-              <IconCalendar size={14} color="var(--mantine-color-gray-6)" />
-              <Text size="sm">{formatDateTime(purchaseOrder.completedDate)}</Text>
-            </Group>
-          </Grid.Col>
-        )}
+        <Grid.Col span={6}>
+          <InfoField
+            label={t('po.deliveryDate')}
+            icon={IconIdentifiers.CALENDAR}
+            value={formatDate(purchaseOrder.deliveryDate)}
+          />
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <InfoField
+            label={t('po.completedDate')}
+            icon={IconIdentifiers.CALENDAR}
+            value={formatDateTime(purchaseOrder.completedDate)}
+          />
+        </Grid.Col>
       </Grid>
 
-      <div>
-        <Text size="xs" fw={500} c="dimmed" mb={4}>
-          {t('common.notes')}
-        </Text>
-        <Text size="sm">{purchaseOrder.notes || '-'}</Text>
-      </div>
+      <InfoField
+        label={t('common.notes')}
+        labelProps={{ size: 'xs', fw: 600, c: 'dimmed' }}
+        value={purchaseOrder.notes ?? ''}
+      />
 
-      {getCancelReason(purchaseOrder.statusHistory) && (
-        <div>
-          <Text size="xs" fw={500} c="red" mb={4}>
-            {t('po.cancelReason')}
-          </Text>
-          <Text size="sm">{getCancelReason(purchaseOrder.statusHistory)}</Text>
-        </div>
-      )}
-
-      {getRefundReason(purchaseOrder.statusHistory) && (
-        <div>
-          <Text size="xs" fw={500} c="orange" mb={4}>
-            {t('po.refundReason')}
-          </Text>
-          <Text size="sm">{getRefundReason(purchaseOrder.statusHistory)}</Text>
-        </div>
-      )}
-
-      {getDeliveryNotes(purchaseOrder.statusHistory) && (
+      {notes.deliveryNotes && (
         <div>
           <Text size="xs" fw={500} c="blue" mb={4}>
             {t('po.deliveryNotes')}
           </Text>
-          <Text size="sm">{getDeliveryNotes(purchaseOrder.statusHistory)}</Text>
+          <Text size="sm">{notes.deliveryNotes}</Text>
         </div>
       )}
 
@@ -192,45 +173,67 @@ export function POAccordionInfoPanel({
               </Text>
               <DeliveryStatusBadge status={purchaseOrder.deliveryRequest.status} />
             </Group>
-            {purchaseOrder.deliveryRequest.assignedTo && (
-              <Group gap="xs">
+            <InfoField
+              label={
                 <Text size="xs" c="dimmed">
                   {t('delivery.assignedTo')}:
                 </Text>
+              }
+              layout="horizontal"
+              value={
                 <Group gap={4}>
                   <IconUser size={14} color="var(--mantine-color-gray-6)" />
                   <Text size="sm">{purchaseOrder.deliveryRequest.deliveryPerson}</Text>
                 </Group>
-              </Group>
-            )}
-            <Group gap="xs">
-              <Text size="xs" c="dimmed">
-                {t('delivery.scheduledDate')}:
-              </Text>
-              <Group gap={4}>
-                <IconCalendar size={14} color="var(--mantine-color-gray-6)" />
-                <Text size="sm">{formatDate(purchaseOrder.deliveryRequest.scheduledDate)}</Text>
-              </Group>
-            </Group>
+              }
+            />
+            <InfoField
+              label={
+                <Text size="xs" c="dimmed">
+                  {t('delivery.scheduledDate')}:
+                </Text>
+              }
+              layout="horizontal"
+              value={formatDate(purchaseOrder.deliveryRequest.scheduledDate)}
+              icon={IconIdentifiers.CALENDAR}
+            />
           </Stack>
         </div>
       )}
 
-      {shippingInfo && (
+      {notes.shippingInfo && (
         <div>
           <Text size="xs" fw={500} c="cyan" mb={4}>
             {t('po.shippingInfo')}
           </Text>
-          {shippingInfo.trackingNumber && (
+          {notes.shippingInfo.trackingNumber && (
             <Text size="sm">
-              {t('po.trackingNumber')}: {shippingInfo.trackingNumber}
+              {t('po.trackingNumber')}: {notes.shippingInfo.trackingNumber}
             </Text>
           )}
-          {shippingInfo.carrier && (
+          {notes.shippingInfo.carrier && (
             <Text size="sm">
-              {t('po.carrier')}: {shippingInfo.carrier}
+              {t('po.carrier')}: {notes.shippingInfo.carrier}
             </Text>
           )}
+        </div>
+      )}
+
+      {notes.cancelReason && (
+        <div>
+          <Text size="xs" fw={500} c="red" mb={4}>
+            {t('po.cancelReason')}
+          </Text>
+          <Text size="sm">{notes.cancelReason}</Text>
+        </div>
+      )}
+
+      {notes.refundReason && (
+        <div>
+          <Text size="xs" fw={500} c="orange" mb={4}>
+            {t('po.refundReason')}
+          </Text>
+          <Text size="sm">{notes.refundReason}</Text>
         </div>
       )}
     </Stack>

@@ -4,14 +4,12 @@ import {
   type BulkUpsertProductsResponse,
   type CreateProductRequest,
   type Product,
-  type ProductStatus,
   type UpdateProductRequest,
 } from '@/lib/api/schemas/sales.schemas';
 
 // Re-export types for compatibility
 export type {
   Product,
-  ProductStatus,
   CreateProductRequest,
   UpdateProductRequest,
   BulkUpsertProductsRequest,
@@ -24,45 +22,41 @@ export type BulkUpsertProductItem = {
   name: string;
   description?: string;
   category?: string;
-  color?: string;
-  status?: ProductStatus;
   unit?: string;
-  sku?: string;
-  barcode?: string;
 };
 
 export const productService = {
-  async getAllProducts(params?: {
-    search?: string;
-    category?: string;
-    status?: ProductStatus;
-    lowStock?: boolean;
-  }): Promise<Product[]> {
-    const response = await salesApi.getProducts({
-      ...params,
-      limit: 100,
+  async getAllProducts(): Promise<Product[]> {
+    const response = await salesApi.getProducts();
+    return response.products.sort((a, b) => {
+      if (a.isDeleted && !b.isDeleted) return 1;
+      if (!a.isDeleted && b.isDeleted) return -1;
+      return a.name.localeCompare(b.name);
     });
-    return response.products;
-  },
-
-  async getProduct(id: string): Promise<Product | undefined> {
-    try {
-      return await salesApi.getProductById(id);
-    } catch {
-      return undefined;
-    }
   },
 
   async createProduct(data: CreateProductRequest): Promise<Product> {
     return salesApi.createProduct(data);
   },
 
-  async updateProduct(id: string, data: UpdateProductRequest): Promise<Product> {
-    return salesApi.updateProduct(id, data);
+  async updateProduct(id: string, data: UpdateProductRequest): Promise<void> {
+    await salesApi.updateProduct(id, data);
   },
 
-  async deleteProduct(id: string): Promise<void> {
-    await salesApi.deleteProduct(id);
+  async activateProduct(id: string): Promise<void> {
+    await salesApi.updateProduct(id, {
+      metadata: {
+        isDeleted: false,
+      },
+    });
+  },
+
+  async deactivateProduct(id: string): Promise<void> {
+    await salesApi.updateProduct(id, {
+      metadata: {
+        isDeleted: true,
+      },
+    });
   },
 
   async bulkUpsertProducts(data: BulkUpsertProductsRequest): Promise<BulkUpsertProductsResponse> {

@@ -19,9 +19,10 @@ import { DRAWER_BODY_PADDING_BOTTOM, DRAWER_HEADER_PADDING } from '@/constants/p
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useSWRAction } from '@/hooks/useSWRAction';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
+import type { DeliveryRequest } from '@/services/sales';
 import { usePermissions } from '@/stores/useAppStore';
 import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
+import { canTakePhotoDeliveryRequest } from '@/utils/permission.utils';
 import { formatDate } from '@/utils/time';
 
 import { DeliveryPhotoUpload } from './DeliveryPhotoUpload';
@@ -49,7 +50,7 @@ const getModalConfig = (mode: DeliveryModalMode, t: any) => {
       requiresNotes: false,
     },
     complete: {
-      title: t('actions.complete'),
+      title: t('delivery.actions.complete'),
       description: t('delivery.descriptions.completeDelivery'),
       buttonText: t('delivery.actions.markAsCompleted'),
       buttonColor: 'red',
@@ -57,7 +58,7 @@ const getModalConfig = (mode: DeliveryModalMode, t: any) => {
       alertColor: 'red',
       requiresNotes: true,
       notesLabel: t('delivery.completionNotes'),
-      notesPlaceholder: t('delivery.enterCompletionNotes'),
+      notesPlaceholder: t('delivery.actions.enterCompletionNotes'),
     },
   };
 
@@ -77,10 +78,14 @@ export function DeliveryStatusDrawer({
   const [recipient, setRecipient] = useState('');
   const [deliveryTime, setDeliveryTime] = useState('');
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
-  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>(deliveryRequest?.photoUrls || []);
+  const [uploadedPhotos, setUploadedPhotos] = useState<{ publicUrl: string; key: string }[]>(
+    deliveryRequest?.photos?.map((photo) => ({ publicUrl: photo.publicUrl, key: photo.key })) || [],
+  );
   const permissions = usePermissions();
   const { uploadPhotos } = useDeliveryRequestActions();
   const isComplete = mode === 'complete';
+
+  const canTakePhoto = useMemo(() => canTakePhotoDeliveryRequest(permissions), [permissions]);
 
   // Get modal configuration - memoized
   const config = useMemo(() => getModalConfig(mode, t), [mode, t]);
@@ -89,24 +94,24 @@ export function DeliveryStatusDrawer({
   const uploadPhotosAction = useSWRAction(
     // Unique key that includes the delivery request ID for proper caching
     deliveryRequest ? `upload-photos-${deliveryRequest.id}` : 'upload-photos',
-    async (data: { photoUrls: string[] }) => {
+    async (data: { photos: { publicUrl: string; key: string }[] }) => {
       // Validation
-      if (!permissions.deliveryRequest.actions?.canTakePhoto) {
-        throw new Error(t('delivery.messages.uploadFailed'));
+      if (!canTakePhoto) {
+        throw new Error(t('common.messages.uploadFailed'));
       }
-      if (!deliveryRequest || !data?.photoUrls || data.photoUrls.length === 0) {
-        throw new Error(t('delivery.messages.uploadFailed'));
+      if (!deliveryRequest || !data?.photos || data.photos.length === 0) {
+        throw new Error(t('common.messages.uploadFailed'));
       }
 
       // Perform the upload
-      return await uploadPhotos(deliveryRequest.id, data.photoUrls);
+      return await uploadPhotos(deliveryRequest.id, data.photos);
     },
     {
       notifications: {
         successTitle: t('common.success'),
         successMessage: t('delivery.messages.photosUploaded'),
         errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('delivery.messages.uploadFailed'),
+        errorMessage: t('common.messages.uploadFailed'),
       },
       onSuccess: () => {
         // Update the local state only after successful upload
@@ -116,12 +121,12 @@ export function DeliveryStatusDrawer({
     },
   );
 
-  const handlePhotoUpload = async (data: { photoUrls: string[] }) => {
+  const handlePhotoUpload = async (data: { photos: { publicUrl: string; key: string }[] }) => {
     // Simply trigger the upload action
     // Update state after successful upload
     await uploadPhotosAction.trigger(data);
     // Only update photos if the upload was successful (no error thrown)
-    setUploadedPhotos((prev) => [...prev, ...data.photoUrls]);
+    setUploadedPhotos((prev) => [...prev, ...data.photos]);
   };
 
   const handleConfirm = async () => {
@@ -131,14 +136,14 @@ export function DeliveryStatusDrawer({
       data = {
         transitNotes: notes.trim(),
         startedAt: new Date().toISOString(),
-        photoUrls: uploadedPhotos,
+        photos: uploadedPhotos,
       };
     } else if (mode === 'complete') {
       data = {
         completionNotes: notes.trim(),
         recipient: recipient.trim(),
         deliveredAt: deliveryTime || new Date().toISOString(),
-        photoUrls: uploadedPhotos,
+        photos: uploadedPhotos,
       };
     }
 
@@ -238,10 +243,10 @@ export function DeliveryStatusDrawer({
                 {uploadedPhotos.length > 0 && (
                   <>
                     <Grid mb="xs">
-                      {uploadedPhotos.map((url, index) => (
+                      {uploadedPhotos.map((photo, index) => (
                         <Grid.Col key={index} span={4}>
                           <Image
-                            src={url}
+                            src={photo.publicUrl}
                             alt={`Photo ${index + 1}`}
                             height={80}
                             fit="cover"

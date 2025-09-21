@@ -16,7 +16,6 @@ export type EmployeeOverview = {
   employeeCode: string;
   fullName: string;
   departmentName: string | undefined;
-  positionName: string | undefined;
 };
 
 export type DepartmentOverview = {
@@ -35,6 +34,8 @@ export type ProductOverview = {
 export type CustomerOverview = {
   id: string;
   name: string;
+  isActive: boolean;
+  deliveryAddress: string | undefined;
   address: string | undefined;
   pic: string | undefined;
   phone: string | undefined;
@@ -104,6 +105,8 @@ export const overviewService = {
       phone: beCustomer.phone ?? undefined,
       email: beCustomer.email ?? undefined,
       googleMapsUrl: beCustomer.googleMapsUrl ?? undefined,
+      isActive: beCustomer.isActive,
+      deliveryAddress: beCustomer.deliveryAddress ?? beCustomer.address ?? undefined,
     };
   },
 
@@ -122,7 +125,6 @@ export const overviewService = {
       fullName,
       employeeCode: beEmployee.employeeCode ?? '',
       departmentName: beEmployee.departmentName ?? undefined,
-      positionName: beEmployee.positionName ?? undefined,
     };
   },
 

@@ -1,6 +1,15 @@
 import { useState } from 'react';
 
-import { Alert, Button, Flex, Modal, PasswordInput, Stack, Text } from '@mantine/core';
+import {
+  Alert,
+  Button,
+  Flex,
+  LoadingOverlay,
+  Modal,
+  PasswordInput,
+  Stack,
+  Text,
+} from '@mantine/core';
 import { IconAlertTriangle, IconLock } from '@tabler/icons-react';
 
 import { useSWRAction } from '@/hooks/useSWRAction';
@@ -49,7 +58,7 @@ export function ChangePasswordModal({ opened, onClose }: ChangePasswordModalProp
         throw new Error(t('common.invalidFormData')); // Using generic error for same password
       }
 
-      await authService.changePassword(me.id, currentPassword, newPassword);
+      await authService.changePassword(currentPassword, newPassword);
     },
     {
       notifications: {
@@ -61,6 +70,8 @@ export function ChangePasswordModal({ opened, onClose }: ChangePasswordModalProp
       onSuccess: () => {
         setTimeout(() => {
           authService.logout();
+          window.location.reload();
+          onClose();
         }, 3000);
       },
       onError: (error) => {
@@ -94,6 +105,7 @@ export function ChangePasswordModal({ opened, onClose }: ChangePasswordModalProp
       trapFocus
       returnFocus
     >
+      <LoadingOverlay visible={changePasswordAction.isMutating} />
       <Stack gap="md">
         <Text size="sm" c="dimmed">
           {t('profile.changePasswordDescription')}

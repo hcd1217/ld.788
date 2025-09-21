@@ -9,6 +9,7 @@ import {
   IconFileTypePdf,
   IconInfoCircle,
   IconMessage,
+  IconPhoto,
   IconPrinter,
   IconTruck,
 } from '@tabler/icons-react';
@@ -21,19 +22,12 @@ import { POActionZone } from './POActionZone';
 import { POBasicInfoCard } from './POBasicInfoCard';
 import { POErrorBoundary } from './POErrorBoundary';
 import { POItemsList } from './POItemsList';
+import { POPhotoGallery } from './POPhotoGallery';
 import { POTimeline } from './POTimeline';
 
 type PODetailTabsProps = {
-  readonly canEdit: boolean;
   readonly purchaseOrder: PurchaseOrder;
   readonly isLoading: boolean;
-  readonly canConfirm: boolean;
-  readonly canCancel: boolean;
-  readonly canProcess: boolean;
-  readonly canMarkReady: boolean;
-  readonly canShip: boolean;
-  readonly canDeliver: boolean;
-  readonly canRefund: boolean;
   readonly onConfirm: () => void;
   readonly onProcess: () => void;
   readonly onMarkReady: () => void;
@@ -45,16 +39,8 @@ type PODetailTabsProps = {
 };
 
 export function PODetailTabs({
-  canEdit,
   purchaseOrder,
   isLoading = false,
-  canConfirm,
-  canCancel,
-  canProcess,
-  canMarkReady,
-  canShip,
-  canDeliver,
-  canRefund,
   onConfirm,
   onProcess,
   onMarkReady,
@@ -66,9 +52,9 @@ export function PODetailTabs({
 }: PODetailTabsProps) {
   const { t } = useTranslation();
 
-  const [value, setValue] = useState<'info' | 'items' | 'timeline' | 'documents' | 'communication'>(
-    'info',
-  );
+  const [value, setValue] = useState<
+    'info' | 'items' | 'timeline' | 'photos' | 'documents' | 'communication'
+  >('info');
 
   const handlePrint = () => {
     window.print();
@@ -104,6 +90,9 @@ export function PODetailTabs({
           <Tabs.Tab value="info" leftSection={<IconInfoCircle size={16} />}>
             {t('po.orderInformation')}
           </Tabs.Tab>
+          <Tabs.Tab value="photos" leftSection={<IconPhoto size={16} />}>
+            {t('delivery.photos')}
+          </Tabs.Tab>
           <Tabs.Tab value="items" leftSection={<IconClipboardList size={16} />}>
             {t('po.orderItems')}
           </Tabs.Tab>
@@ -122,14 +111,6 @@ export function PODetailTabs({
       <Tabs.Panel value="info" pt="xl">
         <Stack gap="sm">
           <POActionZone
-            canEdit={canEdit}
-            canConfirm={canConfirm}
-            canCancel={canCancel}
-            canProcess={canProcess}
-            canMarkReady={canMarkReady}
-            canShip={canShip}
-            canDeliver={canDeliver}
-            canRefund={canRefund}
             purchaseOrder={purchaseOrder}
             isLoading={isLoading}
             onConfirm={onConfirm}
@@ -158,6 +139,16 @@ export function PODetailTabs({
 
       <Tabs.Panel value="timeline" pt="xl">
         <POTimeline purchaseOrder={purchaseOrder} />
+      </Tabs.Panel>
+
+      <Tabs.Panel value="photos" pt="xl">
+        <POPhotoGallery
+          photos={purchaseOrder.photos}
+          columns={2}
+          withScrollArea
+          scrollAreaHeight="65vh"
+          // imageHeight={320}
+        />
       </Tabs.Panel>
 
       <Tabs.Panel value="documents" pt="xl">

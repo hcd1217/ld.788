@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router';
 
-import { LoadingOverlay, Stack } from '@mantine/core';
-import { IconEdit } from '@tabler/icons-react';
+import { Affix, Button, Group, LoadingOverlay, Stack } from '@mantine/core';
+import { IconCamera, IconCopy, IconEdit } from '@tabler/icons-react';
 
 import {
   DeliveryRequestModal,
@@ -11,6 +11,7 @@ import {
   PODetailTabs,
   PODetailTabsSkeleton,
   POErrorBoundary,
+  POPhotoUpload,
   POStatusModal,
 } from '@/components/app/po';
 import { AppPageTitle, PermissionDeniedPage } from '@/components/common';
@@ -24,6 +25,19 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { usePermissions } from '@/stores/useAppStore';
 import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
 import { useCurrentPO, usePOActions, usePOError, usePOLoading } from '@/stores/usePOStore';
+import {
+  canCancelPurchaseOrder,
+  canConfirmPurchaseOrder,
+  canCreatePurchaseOrder,
+  canDeliverPurchaseOrder,
+  canEditPurchaseOrder,
+  canMarkReadyPurchaseOrder,
+  canProcessPurchaseOrder,
+  canRefundPurchaseOrder,
+  canShipPurchaseOrder,
+  canTakePhotoPurchaseOrder,
+  canViewPurchaseOrder,
+} from '@/utils/permission.utils';
 import { isPOEditable } from '@/utils/purchaseOrder';
 
 export function PODetailPage() {
@@ -47,23 +61,64 @@ export function PODetailPage() {
     clearError,
   } = usePOActions();
 
+  const { canEdit, canCreate, canTakePhoto } = useMemo(
+    () => ({
+      canEdit: canEditPurchaseOrder(permissions),
+      canCreate: canCreatePurchaseOrder(permissions),
+      canTakePhoto: canTakePhotoPurchaseOrder(permissions),
+    }),
+    [permissions],
+  );
+
   // Use the centralized modal hook
   const { modals, selectedPO, closeModal, handlers } = usePOModals();
+  const { uploadPhotos } = usePOActions();
 
   // Delivery modal state
   const [deliveryModalOpened, setDeliveryModalOpened] = useState(false);
 
   // Memoized modal close handler
   const handleCloseModal = useCallback(
-    (modalType: 'confirm' | 'process' | 'markReady' | 'ship' | 'deliver' | 'cancel' | 'refund') =>
+    (
+      modalType:
+        | 'confirm'
+        | 'process'
+        | 'markReady'
+        | 'ship'
+        | 'deliver'
+        | 'cancel'
+        | 'refund'
+        | 'uploadPhotos',
+    ) =>
       () =>
         closeModal(modalType),
     [closeModal],
   );
 
   const handleEdit = () => {
-    if (purchaseOrder && isPOEditable(purchaseOrder) && permissions.purchaseOrder.canEdit) {
+    if (purchaseOrder && isPOEditable(purchaseOrder) && canEdit) {
       navigate(getPOEditRoute(purchaseOrder.id));
+    }
+  };
+
+  const handleCopy = () => {
+    if (purchaseOrder && canCreate) {
+      // Navigate to create page with PO data as state
+      navigate(ROUTERS.PO_ADD, {
+        state: {
+          copyFrom: {
+            customerId: purchaseOrder.customerId,
+            salesId: purchaseOrder.salesId,
+            items: purchaseOrder.items,
+            shippingAddress: {
+              oneLineAddress: purchaseOrder.address,
+              googleMapsUrl: purchaseOrder.googleMapsUrl,
+            },
+            notes: purchaseOrder.notes,
+            isInternalDelivery: purchaseOrder.isInternalDelivery,
+          },
+        },
+      });
     }
   };
 
@@ -115,13 +170,19 @@ export function PODetailPage() {
     }
   };
 
+  const handleTakePhoto = () => {
+    if (purchaseOrder) {
+      handlers.handleTakePhoto(purchaseOrder);
+    }
+  };
+
   const confirmPOAction = useSWRAction(
     'confirm-po',
     async () => {
       if (!selectedPO) {
         throw new Error(t('common.invalidFormData'));
       }
-      if (!permissions.purchaseOrder.actions?.canConfirm) {
+      if (!canConfirmPurchaseOrder(permissions)) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       await confirmPurchaseOrder(selectedPO.id);
@@ -142,7 +203,7 @@ export function PODetailPage() {
   const processPOAction = useSWRAction(
     'process-po',
     async () => {
-      if (!permissions.purchaseOrder.actions?.canProcess) {
+      if (!canProcessPurchaseOrder(permissions)) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedPO) {
@@ -168,7 +229,7 @@ export function PODetailPage() {
   >(
     'mark-ready-po',
     async (data) => {
-      if (!permissions.purchaseOrder.actions?.canMarkReady) {
+      if (!canMarkReadyPurchaseOrder(permissions)) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedPO) {
@@ -193,7 +254,7 @@ export function PODetailPage() {
   const shipPOAction = useSWRAction<any>(
     'ship-po',
     async (data) => {
-      if (!permissions.purchaseOrder.actions?.canShip) {
+      if (!canShipPurchaseOrder(permissions)) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedPO) {
@@ -217,7 +278,7 @@ export function PODetailPage() {
   const deliverPOAction = useSWRAction<{ deliveryNotes?: string } | undefined>(
     'deliver-po',
     async (data) => {
-      if (!permissions.purchaseOrder.actions?.canDeliver) {
+      if (!canDeliverPurchaseOrder(permissions)) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedPO) {
@@ -242,7 +303,7 @@ export function PODetailPage() {
   const cancelPOAction = useSWRAction<any>(
     'cancel-po',
     async (data) => {
-      if (!permissions.purchaseOrder.actions?.canCancel) {
+      if (!canCancelPurchaseOrder(permissions)) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedPO) {
@@ -267,7 +328,7 @@ export function PODetailPage() {
   const refundPOAction = useSWRAction<{ refundReason?: string } | undefined>(
     'refund-po',
     async (data) => {
-      if (!permissions.purchaseOrder.actions?.canRefund) {
+      if (!canRefundPurchaseOrder(permissions)) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedPO) {
@@ -290,16 +351,37 @@ export function PODetailPage() {
 
   const { createDeliveryRequest } = useDeliveryRequestActions();
 
+  // Upload photos action
+  const uploadPhotosAction = useSWRAction(
+    'upload-photos',
+    async (data?: { photos: { publicUrl: string; key: string }[] }) => {
+      // Note: No permission check as per requirement (anyone can take photo)
+      if (!selectedPO || !data?.photos) {
+        throw new Error(t('common.invalidFormData'));
+      }
+      await uploadPhotos(selectedPO.id, data.photos);
+      closeModal('uploadPhotos');
+    },
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('delivery.messages.photosUploaded'),
+        errorTitle: t('common.errors.notificationTitle'),
+        errorMessage: t('common.messages.uploadFailed'),
+      },
+    },
+  );
+
   const createDeliveryAction = useSWRAction<
     | { assignedTo: string; scheduledDate: string; notes?: string; isUrgentDelivery?: boolean }
     | undefined
   >(
     'create-delivery-request',
     async (data) => {
-      if (!permissions.purchaseOrder.actions?.canShip) {
+      if (!canShipPurchaseOrder(permissions)) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
-      if (!permissions.deliveryRequest.canCreate) {
+      if (!canCreate) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!data || !purchaseOrder) {
@@ -308,7 +390,6 @@ export function PODetailPage() {
       await createDeliveryRequest({
         purchaseOrderId: purchaseOrder.id,
         assignedTo: data.assignedTo,
-        assignedType: 'EMPLOYEE' as const,
         scheduledDate: data.scheduledDate,
         notes: data.notes,
         isUrgentDelivery: data.isUrgentDelivery,
@@ -341,7 +422,7 @@ export function PODetailPage() {
         opened={modals.confirmModalOpened}
         purchaseOrder={selectedPO}
         mode="confirm"
-        loading={confirmPOAction.isMutating}
+        isLoading={confirmPOAction.isMutating}
         onClose={handleCloseModal('confirm')}
         onConfirm={async () => {
           await confirmPOAction.trigger();
@@ -351,7 +432,7 @@ export function PODetailPage() {
         opened={modals.processModalOpened}
         purchaseOrder={selectedPO}
         mode="process"
-        loading={processPOAction.isMutating}
+        isLoading={processPOAction.isMutating}
         onClose={handleCloseModal('process')}
         onConfirm={async () => {
           await processPOAction.trigger();
@@ -361,7 +442,7 @@ export function PODetailPage() {
         opened={modals.markReadyModalOpened}
         purchaseOrder={selectedPO}
         mode="markReady"
-        loading={markReadyPOAction.isMutating}
+        isLoading={markReadyPOAction.isMutating}
         onClose={handleCloseModal('markReady')}
         onConfirm={markReadyPOAction.trigger}
       />
@@ -369,7 +450,7 @@ export function PODetailPage() {
         opened={modals.shipModalOpened}
         purchaseOrder={selectedPO}
         mode="ship"
-        loading={shipPOAction.isMutating}
+        isLoading={shipPOAction.isMutating}
         onClose={handleCloseModal('ship')}
         onConfirm={shipPOAction.trigger}
       />
@@ -377,7 +458,7 @@ export function PODetailPage() {
         opened={modals.deliverModalOpened}
         purchaseOrder={selectedPO}
         mode="deliver"
-        loading={deliverPOAction.isMutating}
+        isLoading={deliverPOAction.isMutating}
         onClose={handleCloseModal('deliver')}
         onConfirm={deliverPOAction.trigger}
       />
@@ -385,7 +466,7 @@ export function PODetailPage() {
         opened={modals.cancelModalOpened}
         purchaseOrder={selectedPO}
         mode="cancel"
-        loading={cancelPOAction.isMutating}
+        isLoading={cancelPOAction.isMutating}
         onClose={handleCloseModal('cancel')}
         onConfirm={cancelPOAction.trigger}
       />
@@ -393,16 +474,21 @@ export function PODetailPage() {
         opened={modals.refundModalOpened}
         purchaseOrder={selectedPO}
         mode="refund"
-        loading={refundPOAction.isMutating}
+        isLoading={refundPOAction.isMutating}
         onClose={handleCloseModal('refund')}
         onConfirm={refundPOAction.trigger}
       />
       <DeliveryRequestModal
         opened={deliveryModalOpened}
         purchaseOrder={purchaseOrder}
-        loading={createDeliveryAction.isMutating}
+        isLoading={createDeliveryAction.isMutating}
         onClose={() => setDeliveryModalOpened(false)}
         onConfirm={createDeliveryAction.trigger}
+      />
+      <POPhotoUpload
+        opened={modals.uploadPhotosModalOpened}
+        onClose={handleCloseModal('uploadPhotos')}
+        onUpload={uploadPhotosAction.trigger}
       />
     </>
   );
@@ -411,8 +497,9 @@ export function PODetailPage() {
 
   // Show edit button when PO is editable (status = NEW) - moved before early returns
   const isEditable = purchaseOrder && isPOEditable(purchaseOrder);
+  const canCopy = purchaseOrder && canCreate;
 
-  if (!permissions.purchaseOrder.canView) {
+  if (!canViewPurchaseOrder(permissions)) {
     return <PermissionDeniedPage />;
   }
 
@@ -444,16 +531,8 @@ export function PODetailPage() {
         clearError={clearError}
         header={<AppPageTitle title={title} />}
       >
-        <Stack gap="md">
+        <Stack gap="md" style={{ position: 'relative' }} h="100%">
           <PODetailAccordion
-            canEdit={permissions.purchaseOrder.canEdit}
-            canConfirm={permissions.purchaseOrder.actions?.canConfirm}
-            canProcess={permissions.purchaseOrder.actions?.canProcess}
-            canShip={permissions.purchaseOrder.actions?.canShip}
-            canDeliver={permissions.purchaseOrder.actions?.canDeliver}
-            canMarkReady={permissions.purchaseOrder.actions?.canMarkReady}
-            canRefund={permissions.purchaseOrder.actions?.canRefund}
-            canCancel={permissions.purchaseOrder.actions?.canCancel}
             purchaseOrder={purchaseOrder}
             isLoading={isLoading}
             onEdit={handleEdit}
@@ -466,6 +545,36 @@ export function PODetailPage() {
             onRefund={handleRefund}
             onCreateDelivery={handleCreateDelivery}
           />
+          <Affix w="100%" position={{ bottom: 0 }} m="0" bg="white">
+            <Group justify="end" m="sm">
+              {canTakePhoto && (
+                <Button
+                  leftSection={<IconCamera size={16} />}
+                  variant="outline"
+                  size="xs"
+                  onClick={handleTakePhoto}
+                  disabled={isLoading}
+                >
+                  {t('common.photos.takePhoto')}
+                </Button>
+              )}
+              {canCopy && (
+                <Button
+                  key="copy"
+                  variant="filled"
+                  color="orange"
+                  size="xs"
+                  m={1}
+                  loading={isLoading}
+                  disabled={!canCopy}
+                  leftSection={<IconCopy size={14} />}
+                  onClick={handleCopy}
+                >
+                  {t('common.copy')}
+                </Button>
+              )}
+            </Group>
+          </Affix>
         </Stack>
         {modalComponents}
       </AppMobileLayout>
@@ -478,14 +587,32 @@ export function PODetailPage() {
         withGoBack
         route={ROUTERS.PO_MANAGEMENT}
         title={title}
-        button={
-          isEditable
-            ? {
-                label: t('common.edit'),
-                onClick: handleEdit,
-                disabled: !permissions.purchaseOrder.canEdit,
-                icon: <IconEdit size={16} />,
-              }
+        buttons={
+          purchaseOrder
+            ? ([
+                ...(isEditable
+                  ? [
+                      {
+                        label: t('common.edit'),
+                        onClick: handleEdit,
+                        disabled: !canEdit,
+                        icon: <IconEdit size={16} />,
+                      },
+                    ]
+                  : []),
+                ...(canCopy
+                  ? [
+                      {
+                        label: t('common.copy'),
+                        onClick: handleCopy,
+                        disabled: !canCreate,
+                        icon: <IconCopy size={16} />,
+                        variant: 'filled' as const,
+                        color: 'orange',
+                      },
+                    ]
+                  : []),
+              ].filter(Boolean) as any)
             : undefined
         }
       />
@@ -495,14 +622,6 @@ export function PODetailPage() {
       ) : purchaseOrder ? (
         <POErrorBoundary componentName="PODetailTabs">
           <PODetailTabs
-            canEdit={permissions.purchaseOrder.canEdit}
-            canConfirm={permissions.purchaseOrder.actions?.canConfirm ?? false}
-            canProcess={permissions.purchaseOrder.actions?.canProcess ?? false}
-            canShip={permissions.purchaseOrder.actions?.canShip ?? false}
-            canDeliver={permissions.purchaseOrder.actions?.canDeliver ?? false}
-            canMarkReady={permissions.purchaseOrder.actions?.canMarkReady ?? false}
-            canRefund={permissions.purchaseOrder.actions?.canRefund ?? false}
-            canCancel={permissions.purchaseOrder.actions?.canCancel ?? false}
             purchaseOrder={purchaseOrder}
             isLoading={isLoading}
             onConfirm={handleConfirm}

@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { useNavigate } from 'react-router';
 
 import { Anchor, Button, Card, Grid, Group, Stack, Text } from '@mantine/core';
@@ -6,7 +8,9 @@ import { IconEdit, IconMapPin } from '@tabler/icons-react';
 import { UrgentBadge, ViewOnMap } from '@/components/common';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
+import type { DeliveryRequest } from '@/services/sales';
+import { usePermissions } from '@/stores/useAppStore';
+import { canEditDeliveryRequest } from '@/utils/permission.utils';
 import { formatDate } from '@/utils/time';
 
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
@@ -15,18 +19,18 @@ import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 type DeliveryDetailTabsProps = {
   readonly deliveryRequest: DeliveryRequest;
   readonly isLoading?: boolean;
-  readonly canEdit?: boolean;
   readonly onUpdate?: () => void;
 };
 
 export function DeliveryDetailTabs({
   deliveryRequest,
   isLoading: _isLoading,
-  canEdit = false,
   onUpdate,
 }: DeliveryDetailTabsProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const permissions = usePermissions();
+  const canEdit = useMemo(() => canEditDeliveryRequest(permissions), [permissions]);
 
   return (
     <Stack gap="lg">

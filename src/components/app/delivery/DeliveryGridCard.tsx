@@ -5,7 +5,7 @@ import { Group, Stack, Text } from '@mantine/core';
 import { SelectableCard, UrgentBadge } from '@/components/common';
 import { getDeliveryDetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { DeliveryRequest } from '@/services/sales/deliveryRequest';
+import type { DeliveryRequest } from '@/services/sales';
 import { formatDate, formatDateTime } from '@/utils/time';
 
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';

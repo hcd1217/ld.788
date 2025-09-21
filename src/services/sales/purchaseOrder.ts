@@ -12,33 +12,27 @@ import type { EmployeeOverview } from '@/services/client/overview';
 
 import { overviewService } from '../client/overview';
 
-import type { DeliveryStatus, PICType } from './deliveryRequest';
+import type { DeliveryStatus } from './deliveryRequest';
 
 // Re-export types for compatibility
 export type { POStatus, UpdatePOStatusRequest } from '@/lib/api/schemas/sales.schemas';
 
-export type POItem = Omit<ApiPOItem, 'metadata'> & {
-  notes: string;
-  unit: string;
-  productId: string;
-};
+export type POItem = ApiPOItem;
 
-export type PurchaseOrder = Omit<ApiPurchaseOrder, 'metadata' | 'items'> & {
+export type PurchaseOrder = Omit<ApiPurchaseOrder, 'deliveryRequest' | 'items'> & {
   items: POItem[];
   address?: string;
   googleMapsUrl?: string;
   statusHistory?: POStatusHistory[];
   salesPerson?: string;
+  isInternalDelivery: boolean;
   deliveryRequest?: {
     deliveryRequestId: string;
     deliveryRequestNumber?: string;
+    isUrgentDelivery?: boolean;
     status: DeliveryStatus;
-    assignedType: PICType;
     deliveryPerson?: string;
     scheduledDate: Date | string;
-    assignedTo?: string;
-    createdAt?: string;
-    createdBy?: string;
   };
 };
 
@@ -49,28 +43,37 @@ function transformApiToFrontend(
   apiPO: ApiPurchaseOrder,
   employeeMapByEmployeeId: Map<string, EmployeeOverview>,
 ): Omit<PurchaseOrder, 'customer'> {
-  const { metadata, ...rest } = apiPO;
   const salesPerson = apiPO.salesId
     ? employeeMapByEmployeeId.get(apiPO.salesId)?.fullName
     : undefined;
-  const deliveryRequest = metadata?.deliveryRequest;
+  const deliveryRequest = apiPO?.deliveryRequest;
   const deliveryPerson = deliveryRequest?.assignedTo
     ? employeeMapByEmployeeId.get(deliveryRequest.assignedTo)?.fullName
     : undefined;
   return {
-    ...rest,
+    ...apiPO,
     salesPerson,
+    isInternalDelivery: apiPO.isInternalDelivery,
     customerId: apiPO.customerId,
-    address: metadata?.shippingAddress?.oneLineAddress,
-    googleMapsUrl: metadata?.shippingAddress?.googleMapsUrl,
-    statusHistory: metadata?.statusHistory,
-    deliveryRequest: metadata?.deliveryRequest,
-    items: apiPO.items.map(({ metadata, ...item }) => ({
+    address: apiPO?.shippingAddress?.oneLineAddress,
+    googleMapsUrl: apiPO?.shippingAddress?.googleMapsUrl,
+    statusHistory: apiPO?.statusHistory,
+    deliveryRequest: apiPO?.deliveryRequest
+      ? {
+          deliveryRequestId: apiPO.deliveryRequest.deliveryRequestId,
+          deliveryRequestNumber: apiPO.deliveryRequest.deliveryRequestNumber,
+          deliveryPerson,
+          isUrgentDelivery: apiPO.deliveryRequest.isUrgentDelivery,
+          status: apiPO.deliveryRequest.status,
+          scheduledDate: apiPO.deliveryRequest.scheduledDate,
+        }
+      : undefined,
+    items: apiPO.items.map((item) => ({
       ...item,
-      deliveryPerson,
-      notes: metadata.notes ?? '',
-      unit: metadata.unit ?? '',
-      productId: metadata.productId ?? '',
+      deliveryPerson: 'TODO',
+      notes: item.notes ?? '',
+      unit: item.unit ?? '',
+      productId: item.productId ?? '',
     })),
   };
 }
@@ -167,19 +170,20 @@ export const purchaseOrderService = {
       orderDate: data.orderDate ? data.orderDate.toISOString() : new Date().toISOString(),
       deliveryDate: data.deliveryDate ? data.deliveryDate.toISOString() : undefined,
       items: data.items.map((item) => ({
-        productCode: item.productCode,
-        description: item.description,
-        color: item.color,
-        quantity: item.quantity,
-        category: item.category,
         metadata: {
           productId: item.productId,
+          productCode: item.productCode,
+          description: item.description,
+          color: item.color,
+          quantity: item.quantity,
+          category: item.category,
           notes: item.notes,
           unit: item.unit,
         },
       })),
-      notes: data.notes,
       metadata: {
+        isInternalDelivery: data.isInternalDelivery,
+        notes: data.notes,
         shippingAddress: {
           oneLineAddress: data.address,
           googleMapsUrl: data.googleMapsUrl,
@@ -190,50 +194,40 @@ export const purchaseOrderService = {
     await salesApi.createPurchaseOrder(createRequest);
   },
 
-  async updatePO(id: string, data: Partial<PurchaseOrder>): Promise<void> {
+  async updatePO(
+    id: string,
+    data: Omit<
+      PurchaseOrder,
+      'id' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber' | 'status'
+    >,
+  ): Promise<void> {
     if (!data.items) {
       throw new Error('Items are required');
     }
-
     const updateRequest: UpdatePurchaseOrderRequest = {
       salesId: data.salesId,
-      status: data.status,
-      items: data.items.map(({ productId, notes, unit, ...item }) => ({
-        ...item,
+      items: data.items.map((item) => ({
         metadata: {
-          productId,
-          notes,
-          unit,
+          productCode: item.productCode,
+          description: item.description,
+          color: item.color,
+          quantity: item.quantity,
+          category: item.category,
+          productId: item.productId,
+          notes: item.notes,
+          unit: item.unit,
         },
       })),
-      orderDate:
-        data.orderDate instanceof Date
-          ? data.orderDate.toISOString()
-          : data.orderDate
-            ? String(data.orderDate)
-            : undefined,
-      deliveryDate:
-        data.deliveryDate instanceof Date
-          ? data.deliveryDate.toISOString()
-          : data.deliveryDate
-            ? String(data.deliveryDate)
-            : undefined,
-      completedDate:
-        data.completedDate instanceof Date
-          ? data.completedDate.toISOString()
-          : data.completedDate
-            ? String(data.completedDate)
-            : undefined,
-      notes: data.notes,
-      metadata:
-        data.address || data.googleMapsUrl
-          ? {
-              shippingAddress: {
-                oneLineAddress: data.address,
-                googleMapsUrl: data.googleMapsUrl,
-              },
-            }
-          : undefined,
+      orderDate: data.orderDate.toISOString(),
+      deliveryDate: data.deliveryDate?.toISOString(),
+      metadata: {
+        isInternalDelivery: data.isInternalDelivery,
+        notes: data.notes,
+        shippingAddress: {
+          oneLineAddress: data.address,
+          googleMapsUrl: data.googleMapsUrl,
+        },
+      },
     };
 
     await salesApi.updatePurchaseOrder(id, updateRequest);
@@ -267,6 +261,23 @@ export const purchaseOrderService = {
   async refundPO(id: string, data?: { refundReason?: string }): Promise<void> {
     await salesApi.refundPurchaseOrder(id, {
       refundReason: data?.refundReason,
+    });
+  },
+
+  async uploadPhotos(
+    id: string,
+    photos: {
+      publicUrl: string;
+      key: string;
+      caption?: string;
+    }[],
+  ): Promise<void> {
+    await salesApi.uploadPhotos(id, {
+      photos: photos.map((photo) => ({
+        publicUrl: photo.publicUrl,
+        key: photo.key,
+        caption: photo.caption,
+      })),
     });
   },
 };

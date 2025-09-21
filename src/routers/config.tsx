@@ -1,15 +1,18 @@
+import { lazy } from 'react';
+
 import { ROUTERS } from '@/config/routeConfig';
 
-import { CustomerConfigPage, PCOnlyLayout, ProductConfigPage } from './components';
+const CustomerConfigPage = lazy(async () => {
+  const module = await import('@/pages/app/config/CustomerConfigPage');
+  return { default: module.CustomerConfigPage };
+});
+
+const ProductConfigPage = lazy(async () => {
+  const module = await import('@/pages/app/config/ProductConfigPage');
+  return { default: module.ProductConfigPage };
+});
 
 export const configRouteObjects = [
-  {
-    path: '',
-    Component: PCOnlyLayout,
-    children: [
-      // Customer & Product Config
-      { path: ROUTERS.CUSTOMER_CONFIG, Component: CustomerConfigPage },
-      { path: ROUTERS.PRODUCT_CONFIG, Component: ProductConfigPage },
-    ],
-  },
+  { path: ROUTERS.PRODUCT_CONFIG, Component: ProductConfigPage },
+  { path: ROUTERS.CUSTOMER_CONFIG, Component: CustomerConfigPage },
 ];

@@ -10,6 +10,7 @@ import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { formatDate } from '@/utils/time';
 
+import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
 
 type POGridCardProps = {
@@ -91,15 +92,18 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
               </div>
             </Group>
           </Stack>
-          <div
+          <Stack
             style={{
               position: 'absolute',
               top: 0,
               right: 0,
             }}
+            gap="xs"
+            align="flex-end"
           >
             <POStatusBadge status={purchaseOrder.status} />
-          </div>
+            <PODeliveryBadge isInternalDelivery={purchaseOrder.isInternalDelivery} />
+          </Stack>
         </Group>
       </Stack>
     </SelectableCard>

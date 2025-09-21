@@ -1,4 +1,4 @@
-import type { DeliveryStatus } from '@/services/sales/deliveryRequest';
+import type { DeliveryStatus } from '@/services/sales';
 
 export const DELIVERY_STATUS = {
   ALL: 'ALL',

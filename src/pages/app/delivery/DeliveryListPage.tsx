@@ -31,7 +31,7 @@ import { useDeliveryRequestFilters } from '@/hooks/useDeliveryRequestFilters';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useViewMode } from '@/hooks/useViewMode';
-import { useCustomers, useMe, usePermissions } from '@/stores/useAppStore';
+import { useMe, usePermissions } from '@/stores/useAppStore';
 import {
   useDeliveryRequestActions,
   useDeliveryRequestError,
@@ -41,6 +41,11 @@ import {
 } from '@/stores/useDeliveryRequestStore';
 import type { Timeout } from '@/types';
 import { xOr } from '@/utils/boolean';
+import {
+  canUpdateDeliveryOrderInDay,
+  canViewAllDeliveryRequest,
+  canViewDeliveryRequest,
+} from '@/utils/permission.utils';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 export function DeliveryListPage() {
@@ -50,16 +55,18 @@ export function DeliveryListPage() {
   const currentUser = useMe();
   const permissions = usePermissions();
   const deliveryRequests = useDeliveryRequests();
-  const customers = useCustomers();
   const isLoading = useDeliveryRequestLoading();
   const error = useDeliveryRequestError();
-  const { currentEmployeeId, canViewAll } = useMemo(() => {
+
+  const { currentEmployeeId, canView, canViewAll, canUpdateOrderInDay } = useMemo(() => {
     const employeeId = currentUser?.employee?.id ?? '-';
     return {
       currentEmployeeId: employeeId,
-      canViewAll: permissions.deliveryRequest.query?.canViewAll ?? false,
+      canView: canViewDeliveryRequest(permissions),
+      canViewAll: canViewAllDeliveryRequest(permissions),
+      canUpdateOrderInDay: canUpdateDeliveryOrderInDay(permissions),
     };
-  }, [currentUser, permissions.deliveryRequest]);
+  }, [currentUser, permissions]);
 
   const {
     loadDeliveryRequestsWithFilter,
@@ -195,7 +202,7 @@ export function DeliveryListPage() {
         ? t('delivery.noDeliveryRequestsFoundSearch')
         : t('delivery.noDeliveryRequestsFound'),
       description: hasActiveFilters
-        ? t('delivery.tryDifferentSearch')
+        ? t('common.tryDifferentSearch')
         : t('delivery.descriptions.createFirstDeliveryRequest'),
     }),
     [deliveryRequests.length, isLoading, hasActiveFilters, t],
@@ -221,7 +228,7 @@ export function DeliveryListPage() {
   };
 
   // Check view permission
-  if (!permissions.deliveryRequest.canView) {
+  if (!canView) {
     return <PermissionDeniedPage />;
   }
 
@@ -330,7 +337,7 @@ export function DeliveryListPage() {
               leftSection={<IconSortAscending size={16} />}
               variant="light"
               onClick={() => navigate(ROUTERS.DELIVERY_UPDATE_ORDER)}
-              disabled={!permissions.deliveryRequest.actions?.canUpdateDeliveryOrderInDay}
+              disabled={!canUpdateOrderInDay}
             >
               {t('delivery.actions.arrangeDeliveryOrder')}
             </Button>
@@ -347,7 +354,6 @@ export function DeliveryListPage() {
           selectedStatuses={filters.statuses}
           scheduledDateStart={filters.scheduledDateRange.start}
           scheduledDateEnd={filters.scheduledDateRange.end}
-          customers={customers}
           hasActiveFilters={hasActiveFilters}
           onSearchChange={filterHandlers.setSearchQuery}
           onCustomerChange={filterHandlers.setCustomerId}

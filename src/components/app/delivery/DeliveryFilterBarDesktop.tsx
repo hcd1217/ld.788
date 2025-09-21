@@ -7,8 +7,13 @@ import { DatePickerInput } from '@/components/common';
 import { SearchBar } from '@/components/common';
 import { DELIVERY_STATUS, type DeliveryStatusType } from '@/constants/deliveryRequest';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { CustomerOverview as Customer } from '@/services/client/overview';
-import { useClientConfig, useEmployees, usePermissions } from '@/stores/useAppStore';
+import {
+  useClientConfig,
+  useCustomerOptions,
+  useEmployees,
+  usePermissions,
+} from '@/stores/useAppStore';
+import { canFilterDeliveryRequest } from '@/utils/permission.utils';
 import 'dayjs/locale/vi';
 import 'dayjs/locale/en';
 
@@ -19,7 +24,6 @@ interface DeliveryFilterBarDesktopProps {
   readonly selectedStatuses: DeliveryStatusType[];
   readonly scheduledDateStart?: Date;
   readonly scheduledDateEnd?: Date;
-  readonly customers: readonly Customer[];
   readonly hasActiveFilters: boolean;
   readonly onSearchChange: (query: string) => void;
   readonly onCustomerChange: (customerId: string | undefined) => void;
@@ -36,7 +40,6 @@ export function DeliveryFilterBarDesktop({
   selectedStatuses,
   scheduledDateStart,
   scheduledDateEnd,
-  customers,
   hasActiveFilters,
   onSearchChange,
   onCustomerChange,
@@ -49,18 +52,9 @@ export function DeliveryFilterBarDesktop({
   const permissions = usePermissions();
   const employees = useEmployees();
   const clientConfig = useClientConfig();
+  const customerOptions = useCustomerOptions();
 
-  // Customer options for Select
-  const customerOptions = useMemo(
-    () => [
-      { value: '', label: t('common.filters.selectCustomer') },
-      ...customers.map((customer) => ({
-        value: customer.id,
-        label: customer.name,
-      })),
-    ],
-    [customers, t],
-  );
+  const canFilter = useMemo(() => canFilterDeliveryRequest(permissions), [permissions]);
 
   // Employee options for Select - filtered by assigneeIds from clientConfig
   const employeeOptions = useMemo(() => {
@@ -105,7 +99,7 @@ export function DeliveryFilterBarDesktop({
     };
   }, [selectedStatuses, t]);
 
-  if (!permissions.deliveryRequest.query.canFilter) {
+  if (!canFilter) {
     return null;
   }
 

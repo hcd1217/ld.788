@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { useParams } from 'react-router';
 
@@ -18,7 +18,6 @@ import { useDeliveryModals } from '@/hooks/useDeliveryModals';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useSWRAction } from '@/hooks/useSWRAction';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { PICType } from '@/services/sales/deliveryRequest';
 import { usePermissions } from '@/stores/useAppStore';
 import {
   useCurrentDeliveryRequest,
@@ -26,12 +25,30 @@ import {
   useDeliveryRequestError,
   useDeliveryRequestLoading,
 } from '@/stores/useDeliveryRequestStore';
+import {
+  canCompleteDeliveryRequest,
+  canEditDeliveryRequest,
+  canStartTransitDeliveryRequest,
+  canTakePhotoDeliveryRequest,
+  canViewDeliveryRequest,
+} from '@/utils/permission.utils';
 
 export function DeliveryDetailPage() {
   const { deliveryId } = useParams<{ deliveryId: string }>();
   const { t } = useTranslation();
   const { isMobile } = useDeviceType();
   const permissions = usePermissions();
+
+  const { canView, canEdit, canStartTransit, canComplete, canTakePhoto } = useMemo(
+    () => ({
+      canView: canViewDeliveryRequest(permissions),
+      canEdit: canEditDeliveryRequest(permissions),
+      canStartTransit: canStartTransitDeliveryRequest(permissions),
+      canComplete: canCompleteDeliveryRequest(permissions),
+      canTakePhoto: canTakePhotoDeliveryRequest(permissions),
+    }),
+    [permissions],
+  );
 
   // Store selectors
   const deliveryRequest = useCurrentDeliveryRequest();
@@ -94,7 +111,7 @@ export function DeliveryDetailPage() {
   const startTransitAction = useSWRAction(
     'start-transit',
     async (data?: { transitNotes?: string }) => {
-      if (!permissions.deliveryRequest.actions?.canStartTransit) {
+      if (!canStartTransit) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedDeliveryRequest) {
@@ -119,7 +136,7 @@ export function DeliveryDetailPage() {
   const completeDeliveryAction = useSWRAction(
     'complete-delivery',
     async (data?: { completionNotes?: string; recipient?: string }) => {
-      if (!permissions.deliveryRequest.actions?.canComplete) {
+      if (!canComplete) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedDeliveryRequest) {
@@ -143,14 +160,14 @@ export function DeliveryDetailPage() {
   // Upload photos action
   const uploadPhotosAction = useSWRAction(
     'upload-photos',
-    async (data?: { photoUrls: string[] }) => {
-      if (!permissions.deliveryRequest.actions?.canTakePhoto) {
+    async (data?: { photos: { publicUrl: string; key: string }[] }) => {
+      if (!canTakePhoto) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
-      if (!selectedDeliveryRequest || !data?.photoUrls) {
+      if (!selectedDeliveryRequest || !data?.photos) {
         throw new Error(t('common.invalidFormData'));
       }
-      await uploadPhotos(selectedDeliveryRequest.id, data.photoUrls);
+      await uploadPhotos(selectedDeliveryRequest.id, data.photos);
       closeModal('uploadPhotos');
     },
     {
@@ -158,7 +175,7 @@ export function DeliveryDetailPage() {
         successTitle: t('common.success'),
         successMessage: t('delivery.messages.photosUploaded'),
         errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('delivery.messages.uploadFailed'),
+        errorMessage: t('common.messages.uploadFailed'),
       },
     },
   );
@@ -168,12 +185,11 @@ export function DeliveryDetailPage() {
     'update-delivery-request',
     async (data?: {
       assignedTo?: string;
-      assignedType?: PICType;
       scheduledDate?: string;
       notes?: string;
       isUrgentDelivery?: boolean;
     }) => {
-      if (!permissions.deliveryRequest.canEdit) {
+      if (!canEdit) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
       if (!selectedDeliveryRequest) {
@@ -181,7 +197,6 @@ export function DeliveryDetailPage() {
       }
       await updateDeliveryRequest(selectedDeliveryRequest.id, {
         assignedTo: data?.assignedTo,
-        assignedType: data?.assignedType,
         scheduledDate: data?.scheduledDate,
         notes: data?.notes,
         isUrgentDelivery: data?.isUrgentDelivery,
@@ -193,7 +208,7 @@ export function DeliveryDetailPage() {
   const title = deliveryRequest ? `${deliveryRequest.deliveryRequestNumber}` : t('delivery.detail');
 
   // Check view permission
-  if (!permissions.deliveryRequest.canView) {
+  if (!canView) {
     return <PermissionDeniedPage />;
   }
 
@@ -238,16 +253,12 @@ export function DeliveryDetailPage() {
       >
         <Stack gap="md">
           <DeliveryDetailAccordion
-            canEdit={permissions.deliveryRequest.canEdit}
             deliveryRequest={deliveryRequest}
             isLoading={isLoading}
-            canStartTransit={permissions.deliveryRequest.actions?.canStartTransit}
-            canComplete={permissions.deliveryRequest.actions?.canComplete}
-            canTakePhoto={permissions.deliveryRequest.actions?.canTakePhoto}
-            onStartTransit={handleStartTransit}
             onComplete={handleComplete}
             onTakePhoto={handleTakeDeliveryPhoto}
             onUpdate={handleUpdate}
+            onStartTransit={handleStartTransit}
           />
         </Stack>
 
@@ -288,7 +299,6 @@ export function DeliveryDetailPage() {
           <DeliveryDetailTabs
             deliveryRequest={deliveryRequest}
             isLoading={isLoading}
-            canEdit={permissions.deliveryRequest.canEdit}
             onUpdate={handleUpdate}
           />
           <DeliveryUpdateModal

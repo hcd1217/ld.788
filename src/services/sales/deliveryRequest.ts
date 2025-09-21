@@ -14,7 +14,6 @@ import { overviewService } from '../client/overview';
 // Re-export types for compatibility
 export type {
   DeliveryStatus,
-  PICType,
   CreateDeliveryRequest,
   UpdateDeliveryRequest,
   UpdateDeliveryStatus,
@@ -45,7 +44,7 @@ function transformApiToFrontend(
   employeeMapByEmployeeId: Map<string, EmployeeOverview>,
 ): DeliveryRequest {
   const { ...rest } = apiDR;
-  const customerId = apiDR.metadata?.po?.customerId;
+  const customerId = apiDR.purchaseOrder?.customerId;
   const customerName = customerId ? (customerMapByCustomerId.get(customerId)?.name ?? '') : '';
 
   const employee = apiDR.assignedTo ? employeeMapByEmployeeId.get(apiDR.assignedTo) : undefined;
@@ -53,13 +52,13 @@ function transformApiToFrontend(
   return {
     ...rest,
     deliveryPerson,
-    isUrgentDelivery: apiDR.metadata?.isUrgentDelivery ?? false,
-    purchaseOrderId: apiDR.metadata?.po?.poId,
-    purchaseOrderNumber: apiDR.metadata?.po?.poNumber as string,
+    isUrgentDelivery: apiDR?.isUrgentDelivery ?? false,
+    purchaseOrderId: apiDR?.purchaseOrder?.poId,
+    purchaseOrderNumber: apiDR?.purchaseOrder?.poNumber as string,
     customerName,
-    customerId: apiDR.metadata?.po?.customerId,
-    photoUrls: apiDR.metadata?.photoUrls ?? [],
-    deliveryAddress: apiDR.metadata?.deliveryAddress ?? {},
+    customerId: apiDR?.purchaseOrder?.customerId,
+    photoUrls: apiDR.photos?.map((photo) => photo.publicUrl) ?? [],
+    deliveryAddress: apiDR.deliveryAddress ?? {},
   };
 }
 
@@ -115,13 +114,13 @@ export const deliveryRequestService = {
     const response = await deliveryRequestApi.getDeliveryRequests(apiParams);
     const deliveryRequests = response.deliveryRequests
       .sort((a, b) => {
-        if (a.metadata?.isUrgentDelivery && !b.metadata?.isUrgentDelivery) return -1;
-        if (!a.metadata?.isUrgentDelivery && b.metadata?.isUrgentDelivery) return 1;
+        if (a.isUrgentDelivery && !b.isUrgentDelivery) return -1;
+        if (!a.isUrgentDelivery && b.isUrgentDelivery) return 1;
         const _a = a.scheduledDate.setHours(0, 0, 0, 0);
         const _b = b.scheduledDate.setHours(0, 0, 0, 0);
         if (_a === _b) {
-          const _a = a.metadata?.deliveryOrderInDay ?? 0;
-          const _b = b.metadata?.deliveryOrderInDay ?? 0;
+          const _a = a.deliveryOrderInDay ?? 0;
+          const _b = b.deliveryOrderInDay ?? 0;
           return _a - _b;
         }
         return _a - _b;
@@ -162,15 +161,36 @@ export const deliveryRequestService = {
     await deliveryRequestApi.updateDeliveryStatus(id, { status, notes });
   },
 
-  async uploadPhotos(id: string, photoUrls: string[]): Promise<void> {
-    await deliveryRequestApi.uploadDeliveryPhotos(id, { photoUrls });
+  async uploadPhotos(
+    id: string,
+    photos: {
+      caption?: string;
+      publicUrl: string;
+      key: string;
+    }[],
+  ): Promise<void> {
+    await deliveryRequestApi.uploadDeliveryPhotos(id, {
+      photos: photos.map((photo) => ({
+        publicUrl: photo.publicUrl,
+        key: photo.key,
+        caption: photo.caption,
+      })),
+    });
   },
 
   async completeDelivery(
     id: string,
-    data?: { photoUrls?: string[]; notes?: string },
+    data?: { photos?: { publicUrl: string; key: string; caption?: string }[]; notes?: string },
   ): Promise<void> {
-    await deliveryRequestApi.completeDelivery(id, data || {});
+    await deliveryRequestApi.completeDelivery(id, {
+      photos:
+        data?.photos?.map((photo) => ({
+          publicUrl: photo.publicUrl,
+          key: photo.key,
+          caption: photo.caption,
+        })) ?? [],
+      notes: data?.notes,
+    });
   },
 
   async updateDeliveryOrderInDay(

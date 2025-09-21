@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useNavigate, useParams } from 'react-router';
 
@@ -24,17 +24,29 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { userService } from '@/services/user/user';
 import { usePermissions } from '@/stores/useAppStore';
 import { useEmployeeList, useHrActions, useHrLoading } from '@/stores/useHrStore';
-import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
+import {
+  canEditEmployee,
+  canSetPasswordForEmployee,
+  canViewEmployee,
+} from '@/utils/permission.utils';
 
 export function EmployeeDetailPage() {
-  const { employeeId } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { employeeId } = useParams<{ employeeId: string }>();
   const { isMobile } = useDeviceType();
+  const { t } = useTranslation();
   const permissions = usePermissions();
   const employees = useEmployeeList();
   const isLoading = useHrLoading();
   const { loadEmployees, deactivateEmployee, activateEmployee } = useHrActions();
+  const { canView, canEdit, canSetPassword } = useMemo(() => {
+    return {
+      canView: canViewEmployee(permissions),
+      canEdit: canEditEmployee(permissions),
+      canSetPassword: canSetPasswordForEmployee(permissions),
+    };
+  }, [permissions]);
+
   const { targetEmployee, deactivateModal, activateModal, passwordModal } = useEmployeeModal();
 
   // Memoize employee lookup for better performance
@@ -43,47 +55,53 @@ export function EmployeeDetailPage() {
     [employees, employeeId],
   );
 
-  const handleEdit = () => {
-    if (employee && employee.isActive && permissions.employee.canEdit) {
+  const handleEdit = useCallback(() => {
+    if (employee && employee.isActive && canEdit) {
       navigate(getEmployeeEditRoute(employee.id));
     }
-  };
+  }, [employee, canEdit, navigate]);
 
-  const handleDeactivate = () => {
-    if (employee && permissions.employee.canEdit) {
+  const handleDeactivate = useCallback(() => {
+    if (employee && canEdit) {
       deactivateModal.open(employee);
     }
-  };
+  }, [employee, canEdit, deactivateModal]);
 
-  const handleActivate = () => {
-    if (employee && permissions.employee.canEdit) {
+  const handleActivate = useCallback(() => {
+    if (employee && canEdit) {
       activateModal.open(employee);
     }
-  };
+  }, [employee, canEdit, activateModal]);
 
-  const handleSetPassword = () => {
-    if (employee && permissions.employee.actions?.canSetPassword) {
+  const handleSetPassword = useCallback(() => {
+    if (employee && canSetPassword) {
       passwordModal.open(employee);
     }
-  };
+  }, [employee, canSetPassword, passwordModal]);
 
-  const confirmSetPassword = async (password: string) => {
-    if (!targetEmployee) {
-      return;
-    }
-
-    try {
-      await userService.setPasswordForUser(targetEmployee.id, password);
-      showSuccessNotification(t('common.success'), t('employee.passwordSetSuccessfully'));
-      passwordModal.close();
-    } catch (error) {
-      showErrorNotification(
-        t('common.errors.notificationTitle'),
-        error instanceof Error ? error.message : t('common.errors.setPasswordFailed'),
-      );
-      console.error('Failed to set password:', error);
-    }
-  };
+  const confirmSetPassword = useSWRAction(
+    'confirm-set-password',
+    async (password: string) => {
+      if (!targetEmployee?.userId) {
+        return;
+      }
+      if (!canSetPassword) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      await userService.setPasswordForUser(targetEmployee.userId, password);
+    },
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('employee.passwordSetSuccessfully'),
+        errorTitle: t('common.errors.notificationTitle'),
+        errorMessage: t('common.errors.setPasswordFailed'),
+      },
+      onSuccess: () => {
+        passwordModal.close();
+      },
+    },
+  );
 
   const confirmDeactivateEmployee = useSWRAction(
     'deactivate-employee',
@@ -91,7 +109,7 @@ export function EmployeeDetailPage() {
       if (!targetEmployee) {
         throw new Error(t('common.invalidFormData'));
       }
-      if (!permissions.employee.canEdit) {
+      if (!canEdit) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
 
@@ -116,7 +134,7 @@ export function EmployeeDetailPage() {
       if (!targetEmployee) {
         throw new Error(t('common.invalidFormData'));
       }
-      if (!permissions.employee.canEdit) {
+      if (!canEdit) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
 
@@ -160,14 +178,14 @@ export function EmployeeDetailPage() {
         opened={passwordModal.opened}
         employee={targetEmployee}
         onClose={passwordModal.close}
-        onConfirm={confirmSetPassword}
+        onConfirm={confirmSetPassword.trigger}
       />
     </>
   );
 
   const title = employee ? employee.fullName : t('employee.employeeDetails');
 
-  if (!permissions.employee.canView) {
+  if (!canView) {
     return <PermissionDeniedPage />;
   }
 
@@ -194,8 +212,6 @@ export function EmployeeDetailPage() {
         <Stack gap="md">
           <EmployeeDetailAlert endDate={employee.endDate} isActive={employee.isActive} />
           <EmployeeDetailAccordion
-            canEdit={permissions.employee.canEdit}
-            canSetPassword={permissions.employee.actions?.canSetPassword}
             employee={employee}
             onActivate={handleActivate}
             onDeactivate={handleDeactivate}
@@ -214,8 +230,6 @@ export function EmployeeDetailPage() {
         <Stack gap="md">
           <EmployeeDetailAlert endDate={employee.endDate} isActive={employee.isActive} />
           <EmployeeDetailTabs
-            canEdit={permissions.employee.canEdit}
-            canSetPassword={permissions.employee.actions?.canSetPassword}
             employee={employee}
             onEdit={handleEdit}
             onActivate={handleActivate}

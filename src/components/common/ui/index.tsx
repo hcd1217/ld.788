@@ -15,6 +15,7 @@ export { DataTable } from './DataTable';
 export { DateInput } from './DateInput';
 export { DatePickerInput } from './DatePickerInput';
 export { Drawer } from './Drawer';
+export { InfoField } from './InfoField';
 export { SearchBar } from './SearchBar';
 export { SelectableCard } from './SelectableCard';
 export { SwitchView } from './SwitchView';

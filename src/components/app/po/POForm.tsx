@@ -12,21 +12,19 @@ import {
 } from '@/constants/po.constants';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import type { POFormValues } from '@/hooks/usePOForm';
-import type { CustomerOverview as Customer } from '@/services/client/overview';
+import { useCustomers } from '@/stores/useAppStore';
 
 import { POAdditionalInfo } from './POAdditionalInfo';
 import { POCustomerAndSalesSelection } from './POCustomerAndSalesSelection';
 import { POFormActions } from './POFormActions';
 import { POFormAddressSection } from './POFormAddressSection';
 import { POFormDateSection } from './POFormDateSection';
-import { createAddressFromCustomer } from './POFormHelpers';
 import { POFormItemsSection } from './POFormItemsSection';
 
 import type { UseFormReturnType } from '@mantine/form';
 
 type POFormProps = {
   readonly form: UseFormReturnType<POFormValues>;
-  readonly customers: readonly Customer[];
   readonly isLoading: boolean;
   readonly error?: string | null;
   readonly onSubmit: (values: POFormValues) => void;
@@ -36,7 +34,6 @@ type POFormProps = {
 
 export function POForm({
   form,
-  customers,
   isLoading,
   error,
   onSubmit,
@@ -44,6 +41,7 @@ export function POForm({
   isEditMode = false,
 }: POFormProps) {
   const { isMobile } = useDeviceType();
+  const customers = useCustomers();
 
   // Computed values
   const selectedCustomer = useMemo(
@@ -55,6 +53,9 @@ export function POForm({
     if (form.values.items.length === 0) {
       return true;
     }
+    if (!form.values.orderDate) {
+      return true;
+    }
     if (!form.values.customerId) {
       return true;
     }
@@ -63,12 +64,11 @@ export function POForm({
 
   // Auto-fill shipping address when customer is selected
   useEffect(() => {
-    if (selectedCustomer?.address && !isEditMode) {
-      const address = createAddressFromCustomer(
-        selectedCustomer.address,
-        selectedCustomer.googleMapsUrl,
-      );
-      form.setFieldValue('shippingAddress', address);
+    if (!isEditMode) {
+      form.setFieldValue('shippingAddress', {
+        oneLineAddress: selectedCustomer?.deliveryAddress ?? '',
+        googleMapsUrl: selectedCustomer?.googleMapsUrl ?? '',
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCustomer?.id, isEditMode]);
@@ -85,12 +85,11 @@ export function POForm({
       {/* Customer and Sales Selection */}
       <POCustomerAndSalesSelection
         form={form}
-        customers={customers}
         selectedCustomer={selectedCustomer}
         isEditMode={isEditMode}
       />
 
-      {/* Date Fields */}
+      {/* Date Fields and Internal Delivery */}
       <POFormDateSection form={form} isLoading={isLoading} />
 
       {/* Order Items */}

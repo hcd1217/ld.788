@@ -6,7 +6,6 @@ import { IconCalendar, IconTruck, IconUrgent } from '@tabler/icons-react';
 import { DateInput, UrgentBadge } from '@/components/common';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { PICType } from '@/services/sales/deliveryRequest';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
 import { useDeliveryAssigneeOptions } from '@/stores/useDeliveryRequestStore';
@@ -16,11 +15,10 @@ import { formatDate } from '@/utils/time';
 type DeliveryRequestModalProps = {
   readonly opened: boolean;
   readonly purchaseOrder?: PurchaseOrder;
-  readonly loading?: boolean;
+  readonly isLoading?: boolean;
   readonly onClose: () => void;
   readonly onConfirm: (data: {
     assignedTo: string;
-    assignedType: PICType;
     scheduledDate: string;
     notes: string;
     isUrgentDelivery?: boolean;
@@ -30,7 +28,7 @@ type DeliveryRequestModalProps = {
 export function DeliveryRequestModal({
   opened,
   purchaseOrder,
-  loading = false,
+  isLoading = false,
   onClose,
   onConfirm,
 }: DeliveryRequestModalProps) {
@@ -56,7 +54,7 @@ export function DeliveryRequestModal({
       setIsUrgentDelivery(false);
     } else if (purchaseOrder && !notes) {
       // Only set default notes if empty (preserves user input)
-      setNotes(`Delivery request for PO ${purchaseOrder.poNumber}`);
+      setNotes(purchaseOrder.poNumber);
     }
   }, [opened, purchaseOrder?.poNumber]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -70,7 +68,6 @@ export function DeliveryRequestModal({
     try {
       await onConfirm({
         assignedTo: selectedEmployeeId,
-        assignedType: 'EMPLOYEE',
         scheduledDate: scheduledDate.toISOString(),
         notes,
         isUrgentDelivery,
@@ -158,13 +155,13 @@ export function DeliveryRequestModal({
       />
 
       <Group justify="flex-end" gap="sm">
-        <Button variant="light" onClick={onClose} disabled={isSubmitting || loading}>
+        <Button variant="light" onClick={onClose} disabled={isSubmitting || isLoading}>
           {t('common.cancel')}
         </Button>
         <Button
           onClick={handleSubmit}
-          loading={isSubmitting || loading}
-          disabled={!selectedEmployeeId || !scheduledDate || loading}
+          loading={isSubmitting || isLoading}
+          disabled={!selectedEmployeeId || !scheduledDate || isLoading}
           leftSection={<IconTruck size={16} />}
         >
           {t('delivery.actions.create')}

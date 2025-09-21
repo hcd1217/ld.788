@@ -11,7 +11,8 @@ export type ModalType =
   | 'ship'
   | 'deliver'
   | 'cancel'
-  | 'refund';
+  | 'refund'
+  | 'uploadPhotos';
 
 export function usePOModals() {
   const [selectedPO, setSelectedPO] = useState<PurchaseOrder | undefined>(undefined);
@@ -30,6 +31,8 @@ export function usePOModals() {
   const [cancelModalOpened, { open: openCancelModal, close: closeCancelModal }] =
     useDisclosure(false);
   const [refundModalOpened, { open: openRefundModal, close: closeRefundModal }] =
+    useDisclosure(false);
+  const [uploadPhotosModalOpened, { open: openUploadPhotosModal, close: closeUploadPhotosModal }] =
     useDisclosure(false);
 
   // Modal handlers
@@ -67,6 +70,10 @@ export function usePOModals() {
           openRefundModal();
           break;
         }
+        case 'uploadPhotos': {
+          openUploadPhotosModal();
+          break;
+        }
       }
     },
     [
@@ -77,6 +84,7 @@ export function usePOModals() {
       openDeliverModal,
       openCancelModal,
       openRefundModal,
+      openUploadPhotosModal,
     ],
   );
 
@@ -114,6 +122,10 @@ export function usePOModals() {
           closeRefundModal();
           break;
         }
+        case 'uploadPhotos': {
+          closeUploadPhotosModal();
+          break;
+        }
       }
     },
     [
@@ -124,6 +136,7 @@ export function usePOModals() {
       closeDeliverModal,
       closeCancelModal,
       closeRefundModal,
+      closeUploadPhotosModal,
     ],
   );
 
@@ -177,6 +190,13 @@ export function usePOModals() {
     [openModal],
   );
 
+  const handleTakePhoto = useCallback(
+    (purchaseOrder: PurchaseOrder) => {
+      openModal('uploadPhotos', purchaseOrder);
+    },
+    [openModal],
+  );
+
   return {
     // Modal states
     modals: {
@@ -187,6 +207,7 @@ export function usePOModals() {
       deliverModalOpened,
       cancelModalOpened,
       refundModalOpened,
+      uploadPhotosModalOpened,
     },
 
     // Selected PO for modals
@@ -205,6 +226,7 @@ export function usePOModals() {
       handleDeliver,
       handleCancel,
       handleRefund,
+      handleTakePhoto,
     },
   };
 }

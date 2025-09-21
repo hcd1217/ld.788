@@ -11,7 +11,7 @@ import {
   deliveryRequestService,
   type DeliveryStatus,
   type UpdateDeliveryRequest,
-} from '@/services/sales/deliveryRequest';
+} from '@/services/sales';
 import { getErrorMessage } from '@/utils/errorUtils';
 import { endOfDay, startOfDay } from '@/utils/time';
 
@@ -66,7 +66,7 @@ type DeliveryRequestState = {
   createDeliveryRequest: (data: CreateDeliveryRequest) => Promise<DeliveryRequest>;
   updateDeliveryRequest: (id: string, data: UpdateDeliveryRequest) => Promise<void>;
   updateDeliveryStatus: (id: string, status: DeliveryStatus, notes?: string) => Promise<void>;
-  uploadPhotos: (id: string, photoUrls: string[]) => Promise<void>;
+  uploadPhotos: (id: string, photos: { publicUrl: string; key: string }[]) => Promise<void>;
   completeDelivery: (id: string, data?: { photoUrls?: string[]; notes?: string }) => Promise<void>;
   updateDeliveryOrderInDay: (assignedTo: string, date: Date, requestIds: string[]) => Promise<void>;
   loadDeliveryRequestsForDate: (assignedTo: string, date: Date) => Promise<DeliveryRequest[]>;
@@ -353,7 +353,7 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
         }
       },
 
-      async uploadPhotos(id: string, photoUrls: string[]) {
+      async uploadPhotos(id: string, photos: { publicUrl: string; key: string }[]) {
         const state = get();
 
         // Check if action is already pending
@@ -366,7 +366,7 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
 
         try {
           // Call service and use the response
-          await deliveryRequestService.uploadPhotos(id, photoUrls);
+          await deliveryRequestService.uploadPhotos(id, photos);
 
           // Force reload to get latest data from server
           get()._forceReload(id);

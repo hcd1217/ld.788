@@ -6,66 +6,55 @@ import {
   numberSchema,
   optionalBooleanSchema,
   optionalStringSchema,
-  paginationSchema,
   phoneNumberSchema,
   stringSchema,
 } from './common.schemas';
 
 // ========== Customer Schemas ==========
 
-const CustomerMetadataSchema = z
-  .looseObject({
-    pic: optionalStringSchema,
-    googleMapsUrl: optionalStringSchema,
-    memo: optionalStringSchema,
-  })
-  .optional();
+const CustomerMetadataSchema = z.looseObject({
+  companyName: optionalStringSchema,
+  contactEmail: emailSchema.optional(),
+  contactPhone: phoneNumberSchema.optional(),
+  address: optionalStringSchema,
+  deliveryAddress: optionalStringSchema,
+  taxCode: optionalStringSchema,
+  isActive: optionalBooleanSchema,
+  googleMapsUrl: optionalStringSchema,
+  memo: optionalStringSchema,
+  pic: optionalStringSchema,
+});
 
 // Customer base schema
 export const CustomerSchema = z.object({
   id: idSchema,
-  clientId: idSchema,
   name: stringSchema,
   companyName: optionalStringSchema,
-  contactEmail: optionalStringSchema,
-  contactPhone: phoneNumberSchema,
+  contactEmail: emailSchema.optional(),
+  contactPhone: phoneNumberSchema.optional(),
   address: optionalStringSchema,
-  metadata: CustomerMetadataSchema,
+  deliveryAddress: optionalStringSchema,
   taxCode: optionalStringSchema,
-  isActive: z.boolean(),
+  isActive: optionalBooleanSchema,
+  googleMapsUrl: optionalStringSchema,
+  memo: optionalStringSchema,
+  pic: optionalStringSchema,
 });
 
 // Customer request schemas
 export const CreateCustomerRequestSchema = z.object({
   name: stringSchema,
-  companyName: optionalStringSchema,
-  contactEmail: emailSchema.optional(),
-  contactPhone: optionalStringSchema,
-  address: optionalStringSchema,
   metadata: CustomerMetadataSchema,
-  taxCode: optionalStringSchema,
 });
 
 export const UpdateCustomerRequestSchema = z.object({
-  name: stringSchema.optional(),
-  companyName: optionalStringSchema,
-  contactEmail: emailSchema.optional(),
-  contactPhone: optionalStringSchema,
-  address: optionalStringSchema,
-  metadata: CustomerMetadataSchema,
-  taxCode: optionalStringSchema,
-  isActive: optionalBooleanSchema,
+  metadata: CustomerMetadataSchema.partial(),
 });
 
 // Bulk upsert schema for customers
 export const BulkUpsertCustomerItemSchema = z.object({
   name: stringSchema,
-  companyName: optionalStringSchema,
-  contactEmail: emailSchema.optional(),
-  contactPhone: optionalStringSchema,
-  address: optionalStringSchema,
-  taxCode: optionalStringSchema,
-  metadata: CustomerMetadataSchema,
+  metadata: CustomerMetadataSchema.partial(),
 });
 
 export const BulkUpsertCustomersRequestSchema = z.object({
@@ -90,11 +79,9 @@ export const BulkUpsertCustomersResponseSchema = z.object({
 // Customer response schemas
 export const GetCustomersResponseSchema = z.object({
   customers: z.array(CustomerSchema),
-  pagination: paginationSchema,
 });
 
 export const CreateCustomerResponseSchema = CustomerSchema;
-export const UpdateCustomerResponseSchema = CustomerSchema;
 
 // ========== Type Exports ==========
 
@@ -106,4 +93,3 @@ export type BulkUpsertCustomersRequest = z.infer<typeof BulkUpsertCustomersReque
 export type BulkUpsertCustomersResponse = z.infer<typeof BulkUpsertCustomersResponseSchema>;
 export type GetCustomersResponse = z.infer<typeof GetCustomersResponseSchema>;
 export type CreateCustomerResponse = z.infer<typeof CreateCustomerResponseSchema>;
-export type UpdateCustomerResponse = z.infer<typeof UpdateCustomerResponseSchema>;

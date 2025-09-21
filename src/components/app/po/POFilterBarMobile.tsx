@@ -6,6 +6,7 @@ import { IconChevronDown, IconClearAll } from '@tabler/icons-react';
 import { SearchBar } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import { usePermissions } from '@/stores/useAppStore';
+import { canFilterPurchaseOrder } from '@/utils/permission.utils';
 
 interface POFilterBarMobileProps {
   readonly searchQuery: string;
@@ -56,7 +57,7 @@ export function POFilterBarMobile({
     return t('po.dateRange');
   }, [hasOrderDateFilter, hasDeliveryDateFilter, t]);
 
-  if (!permissions.purchaseOrder.query.canFilter) {
+  if (!canFilterPurchaseOrder(permissions)) {
     return null;
   }
 

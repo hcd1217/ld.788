@@ -8,28 +8,15 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
 import { getEndDateHighlightStyles } from '@/utils/time';
 
-import { EmployeeActions } from './EmployeeActions';
-
 type EmployeeCardProps = {
   readonly employee: Employee;
-  readonly onDeactivate?: () => void;
-  readonly onActivate?: () => void;
   /** Custom styles for the card container */
   readonly style?: MantineStyleProp;
   /** Custom className for the card container */
   readonly className?: string;
-  /** Whether to hide the actions */
-  readonly noActions?: boolean;
 };
 
-export function EmployeeCard({
-  employee,
-  onDeactivate,
-  onActivate,
-  style,
-  className,
-  noActions,
-}: EmployeeCardProps) {
+export function EmployeeCard({ employee, style, className }: EmployeeCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -51,12 +38,19 @@ export function EmployeeCard({
     >
       <Group justify="space-between" align="flex-start" style={{ position: 'relative' }}>
         <Box>
-          <Text fw={500} size="sm">
-            {employee.fullName}
-          </Text>
-          {employee.unitId ? (
+          <Group gap="xs" wrap="nowrap">
+            <Text fw={500} size="sm">
+              {employee.fullName}
+            </Text>
+            {employee?.position ? (
+              <Text c="dimmed" size="sm">
+                ({employee?.position})
+              </Text>
+            ) : null}
+          </Group>
+          {employee.departmentId ? (
             <Text size="xs" c="dimmed">
-              {t('employee.unit')}: {employee.unit ?? '-'}
+              {t('employee.department')}: {employee.department ?? '-'}
             </Text>
           ) : null}
           {employee.email ? (
@@ -70,15 +64,15 @@ export function EmployeeCard({
             </Text>
           ) : null}
         </Box>
-        {noActions ? null : (
-          <EmployeeActions
-            employeeId={employee.id}
-            isActive={employee.isActive}
-            onDeactivate={onDeactivate}
-            onActivate={onActivate}
-          />
-        )}
-        <ActiveBadge isActive={employee.isActive} />
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+          }}
+        >
+          <ActiveBadge isActive={employee.isActive} />
+        </div>
       </Group>
     </Card>
   );

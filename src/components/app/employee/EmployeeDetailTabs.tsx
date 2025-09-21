@@ -15,8 +15,6 @@ import { EmployeeDangerZone } from './EmployeeDangerZone';
 
 type EmployeeDetailTabsProps = {
   readonly employee: Employee;
-  readonly canEdit: boolean;
-  readonly canSetPassword?: boolean;
   readonly onEdit: () => void;
   readonly onActivate: () => void;
   readonly onDeactivate: () => void;
@@ -25,8 +23,6 @@ type EmployeeDetailTabsProps = {
 
 export function EmployeeDetailTabs({
   employee,
-  canEdit,
-  canSetPassword = false,
   onEdit,
   onActivate,
   onDeactivate,
@@ -63,11 +59,9 @@ export function EmployeeDetailTabs({
         >
           <Box style={{ maxWidth: '800px', width: '100%' }}>
             <Stack gap="xl">
-              <EmployeeBasicInfoCard employee={employee} canEdit={canEdit} onEdit={onEdit} />
+              <EmployeeBasicInfoCard employee={employee} onEdit={onEdit} />
               <EmployeeDangerZone
                 employee={employee}
-                canEdit={canEdit}
-                canSetPassword={canSetPassword}
                 onActivate={onActivate}
                 onDeactivate={onDeactivate}
                 onSetPassword={onSetPassword}

@@ -1,10 +1,12 @@
+import React from 'react';
+
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
-import { authApi, clientApi, type ClientConfig, type ClientPublicConfigResponse } from '@/lib/api';
-import type { GetMeResponse } from '@/lib/api/schemas/auth.schemas';
+import { clientApi, type ClientConfig, type ClientPublicConfigResponse } from '@/lib/api';
 import { clearClientTranslations, updateClientTranslations } from '@/lib/i18n';
 import { authService } from '@/services/auth/auth';
+import type { Permission, User } from '@/services/auth/auth';
 import {
   type CustomerOverview,
   type EmployeeOverview,
@@ -16,8 +18,6 @@ import { cacheNavigationConfig, clearNavigationCache } from '@/utils/navigationC
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 
 type ClientPublicConfig = ClientPublicConfigResponse;
-type User = GetMeResponse; // Unified user type from /auth/me
-type Permission = User['permissions'];
 type AppState = {
   publicClientConfig?: ClientPublicConfig;
   clientCode: string;
@@ -102,7 +102,7 @@ export const useAppStore = create<AppState>()(
         setUser: (user) => set({ user, isAuthenticated: Boolean(user) }),
         async fetchUserProfile() {
           try {
-            const user = await authApi.getMe();
+            const user = await authService.getMe();
             const DEFAULT_DELAY = 500;
             let delay = Number(user.clientConfig?.features?.apiCall?.delay ?? DEFAULT_DELAY);
             if (!Number.isNaN(delay)) {
@@ -274,6 +274,8 @@ export const useAppStore = create<AppState>()(
 // Stable empty arrays to avoid infinite re-renders (as per CLAUDE.md line 52)
 const EMPTY_CUSTOMERS_ARRAY: readonly CustomerOverview[] = [];
 const EMPTY_EMPLOYEES_ARRAY: readonly EmployeeOverview[] = [];
+const EMPTY_CUSTOMER_OPTIONS_ARRAY: readonly { id: string; value: string; label: string }[] = [];
+const EMPTY_DEPARTMENT_OPTIONS_ARRAY: readonly { id: string; value: string; label: string }[] = [];
 const EMPTY_PERMISSIONS: Permission = Object.freeze({
   customer: {
     canView: false,
@@ -303,6 +305,7 @@ const EMPTY_PERMISSIONS: Permission = Object.freeze({
       canViewAll: false,
     },
     actions: {
+      canTakePhoto: false,
       canConfirm: false,
       canProcess: false,
       canShip: false,
@@ -320,6 +323,7 @@ const EMPTY_PERMISSIONS: Permission = Object.freeze({
     query: {
       canFilter: false,
       canViewAll: false,
+      canViewDeliverFromMyPO: false,
     },
     actions: {
       canUpdateDeliveryOrderInDay: false,
@@ -352,6 +356,22 @@ export const useCustomerMapByCustomerId = () =>
 // Customer selectors - use stable empty array reference
 export const useCustomers = () =>
   useAppStore((state) => state.overviewData?.customers ?? EMPTY_CUSTOMERS_ARRAY);
+
+export const useCustomerOptions = () => {
+  const customers = useAppStore((state) => state.overviewData?.customers);
+  // Use useMemo to create stable reference (as per CLAUDE.md line 52)
+  return React.useMemo(() => {
+    if (!customers) return EMPTY_CUSTOMER_OPTIONS_ARRAY;
+    return customers
+      .filter((customer) => customer.isActive)
+      .map((customer) => ({
+        id: customer.id,
+        value: customer.id,
+        label: customer.name,
+      }));
+  }, [customers]);
+};
+
 // Employee selectors - use stable empty array reference
 export const useEmployees = () =>
   useAppStore((state) => state.overviewData?.employees ?? EMPTY_EMPLOYEES_ARRAY);
@@ -366,3 +386,18 @@ export const useClientConfig = () =>
 export const useMe = () => useAppStore((state) => state.user);
 
 export const useLogout = () => useAppStore((state) => state.logout);
+
+// Department data - memoized selector to prevent infinite re-renders
+export const useDepartmentOptions = () => {
+  const departments = useAppStore((state) => state.overviewData?.departments);
+
+  // Use useMemo to create stable reference (as per CLAUDE.md line 52)
+  return React.useMemo(() => {
+    if (!departments) return EMPTY_DEPARTMENT_OPTIONS_ARRAY;
+    return departments.map((department) => ({
+      id: department.id,
+      value: department.id,
+      label: department.name,
+    }));
+  }, [departments]);
+};

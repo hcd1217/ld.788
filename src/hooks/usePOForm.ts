@@ -8,8 +8,9 @@ export type POFormValues = {
   customerId: string;
   salesId?: string;
   items: POItem[];
-  orderDate?: Date;
+  orderDate: Date;
   deliveryDate?: Date;
+  isInternalDelivery: boolean;
   shippingAddress?: {
     oneLineAddress?: string;
     googleMapsUrl?: string;
@@ -30,6 +31,7 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
     () => ({
       customerId: '',
       items: [],
+      isInternalDelivery: true,
       orderDate: new Date(new Date().setHours(0, 0, 0, 1)),
     }),
     [],
@@ -50,13 +52,6 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
     [t, validators],
   );
 
-  // Generate PO number for new orders
-  const generatePONumber = (): string => {
-    const year = new Date().getFullYear();
-    const timestamp = String(Date.now()).slice(-6);
-    return `PO-${year}-${timestamp}`;
-  };
-
   // Prepare form data for submission
   const prepareFormData = (values: POFormValues, currentUserId: string = 'Current User') => {
     const baseData = {
@@ -64,6 +59,7 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
       items: values.items,
       shippingAddress: values.shippingAddress,
       notes: values.notes,
+      isInternalDelivery: values.isInternalDelivery ?? false,
     };
 
     if (!isEditMode) {
@@ -72,7 +68,6 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
         status: 'NEW' as const,
         orderDate: new Date(),
         createdBy: currentUserId,
-        poNumber: generatePONumber(),
       };
     }
 
@@ -82,7 +77,6 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
   return {
     initialValues,
     validation,
-    generatePONumber,
     prepareFormData,
   };
 }
