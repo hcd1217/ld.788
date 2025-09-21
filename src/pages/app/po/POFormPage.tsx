@@ -246,6 +246,8 @@ export function POFormPage({ mode }: POFormPageProps) {
         showLogo
         withGoBack
         isLoading={isLoading}
+        goBackRoute={isEditMode && id ? getPODetailRoute(id) : ROUTERS.PO_MANAGEMENT}
+        noFooter
         error={error}
         clearError={clearError}
         header={<AppPageTitle title={pageTitle} />}

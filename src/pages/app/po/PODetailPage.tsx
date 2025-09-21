@@ -510,6 +510,9 @@ export function PODetailPage() {
           showLogo
           isLoading={isLoading}
           error={error}
+          noFooter
+          withGoBack
+          goBackRoute={ROUTERS.PO_MANAGEMENT}
           clearError={clearError}
           header={<AppPageTitle title={title} />}
         >
@@ -546,36 +549,38 @@ export function PODetailPage() {
             onRefund={handleRefund}
             onCreateDelivery={handleCreateDelivery}
           />
-          <Affix w="100%" position={{ bottom: 0 }} m="0" bg="white">
-            <Group justify="end" m="sm">
-              {canTakePhoto && (
-                <Button
-                  leftSection={<IconCamera size={16} />}
-                  variant="outline"
-                  size="xs"
-                  onClick={handleTakePhoto}
-                  disabled={isLoading}
-                >
-                  {t('common.photos.takePhoto')}
-                </Button>
-              )}
-              {canCopy && (
-                <Button
-                  key="copy"
-                  variant="filled"
-                  color="orange"
-                  size="xs"
-                  m={1}
-                  loading={isLoading}
-                  disabled={!canCopy}
-                  leftSection={<IconCopy size={14} />}
-                  onClick={handleCopy}
-                >
-                  {t('common.copy')}
-                </Button>
-              )}
-            </Group>
-          </Affix>
+          {!modals.uploadPhotosModalOpened && (
+            <Affix w="100%" position={{ bottom: 0 }} m="0" bg="white">
+              <Group justify="end" m="sm">
+                {canTakePhoto && (
+                  <Button
+                    leftSection={<IconCamera size={16} />}
+                    variant="outline"
+                    size="xs"
+                    onClick={handleTakePhoto}
+                    disabled={isLoading}
+                  >
+                    {t('common.photos.takePhoto')}
+                  </Button>
+                )}
+                {canCopy && (
+                  <Button
+                    key="copy"
+                    variant="filled"
+                    color="orange"
+                    size="xs"
+                    m={1}
+                    loading={isLoading}
+                    disabled={!canCopy}
+                    leftSection={<IconCopy size={14} />}
+                    onClick={handleCopy}
+                  >
+                    {t('common.copy')}
+                  </Button>
+                )}
+              </Group>
+            </Affix>
+          )}
         </Stack>
         {modalComponents}
       </AppMobileLayout>

@@ -2,11 +2,10 @@ import React from 'react';
 
 import { useNavigate } from 'react-router';
 
-import { ActionIcon, AppShell, Container, Group, LoadingOverlay, Tooltip } from '@mantine/core';
+import { ActionIcon, Affix, AppShell, Container, Group, LoadingOverlay } from '@mantine/core';
 import { IconHome } from '@tabler/icons-react';
 
 import { ROUTERS } from '@/config/routeConfig';
-import { useTranslation } from '@/hooks/useTranslation';
 import { useAppStore } from '@/stores/useAppStore';
 
 import { ErrorAlert } from '../feedback';
@@ -46,7 +45,6 @@ export function AppMobileLayout({
   clearError,
 }: AppMobileLayoutProps) {
   const isDefaultHeader = !header && !noHeader;
-  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // Check if user profile is loading
@@ -98,7 +96,7 @@ export function AppMobileLayout({
       </AppShell.Main>
       {noFooter ? (
         /* Floating Home Button - always visible on mobile layouts */
-        <Tooltip label={t('common.pages.home')} position="top">
+        <Affix>
           <ActionIcon
             onClick={handleHomeClick}
             size="lg"
@@ -114,7 +112,7 @@ export function AppMobileLayout({
           >
             <IconHome size={20} />
           </ActionIcon>
-        </Tooltip>
+        </Affix>
       ) : (
         <AppShell.Footer className={classes.footer}>
           {footer ?? (isProfileLoading ? <CommonMobileFooterSkeleton /> : <CommonMobileFooter />)}
