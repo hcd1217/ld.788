@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { Autocomplete } from '@mantine/core';
 
@@ -11,24 +11,21 @@ type POProductSearchProps = {
   readonly placeholder?: string;
   readonly size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   readonly limit?: number;
+  readonly productOptions: string[];
   readonly onChange: (product?: ProductOverview) => void;
 };
 
 export function POProductSearch({
   value,
+  limit,
   placeholder,
   size = 'sm',
-  limit = 10,
+  productOptions,
   onChange,
 }: POProductSearchProps) {
   const { t } = useTranslation();
   const { overviewData } = useAppStore();
   const [searchValue, setSearchValue] = useState(value || '');
-
-  // Generate autocomplete options from products
-  const productOptions = useMemo(() => {
-    return overviewData?.products.map((p) => `${p.code} - ${p.name}`) || [];
-  }, [overviewData]);
 
   // Handle product selection
   const handleProductSelection = useCallback(

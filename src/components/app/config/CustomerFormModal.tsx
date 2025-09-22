@@ -6,6 +6,7 @@ import {
   Button,
   Group,
   LoadingOverlay,
+  ScrollArea,
   Stack,
   Textarea,
   TextInput,
@@ -16,6 +17,7 @@ import { ModalOrDrawer } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Customer } from '@/services/sales/customer';
 import { useClientConfig, usePermissions } from '@/stores/useAppStore';
+import { confirmAction } from '@/utils/modals';
 import { canCreateCustomer, canDeleteCustomer, canEditCustomer } from '@/utils/permission.utils';
 
 import type { UseFormReturnType } from '@mantine/form';
@@ -95,89 +97,99 @@ export function CustomerFormModal({
                 {!customer.isActive ? t('employee.inactive') : t('common.active')}
               </Alert>
             )}
+            <ScrollArea style={{ height: '50vh' }}>
+              <TextInput
+                required
+                label={t('common.name')}
+                placeholder={t('customer.namePlaceholder')}
+                error={form.errors.name}
+                disabled={isLoading}
+                {...form.getInputProps('name')}
+              />
 
-            <TextInput
-              required
-              label={t('common.name')}
-              placeholder={t('customer.namePlaceholder')}
-              error={form.errors.name}
-              disabled={isLoading}
-              {...form.getInputProps('name')}
-            />
-            <TextInput
-              label={t('customer.company')}
-              placeholder={t('customer.companyPlaceholder')}
-              error={form.errors.companyName}
-              disabled={isLoading}
-              {...form.getInputProps('companyName')}
-            />
-            <TextInput
-              label={t('common.form.pic')}
-              placeholder={t('common.form.picPlaceholder')}
-              error={form.errors.pic}
-              disabled={isLoading}
-              {...form.getInputProps('pic')}
-            />
-            {!noEmail && (
               <TextInput
-                label={t('common.form.email')}
-                placeholder={t('common.form.emailPlaceholder')}
-                error={form.errors.contactEmail}
+                label={t('customer.company')}
+                placeholder={t('customer.companyPlaceholder')}
+                error={form.errors.companyName}
                 disabled={isLoading}
-                {...form.getInputProps('contactEmail')}
+                {...form.getInputProps('companyName')}
               />
-            )}
-            <TextInput
-              label={t('common.phone')}
-              placeholder={t('customer.phonePlaceholder')}
-              error={form.errors.contactPhone}
-              disabled={isLoading}
-              {...form.getInputProps('contactPhone')}
-            />
-            <TextInput
-              label={t('customer.address')}
-              placeholder={t('customer.addressPlaceholder')}
-              error={form.errors.address}
-              disabled={isLoading}
-              {...form.getInputProps('address')}
-            />
-            <TextInput
-              label={t('customer.deliveryAddress')}
-              placeholder={t('customer.deliveryAddressPlaceholder')}
-              error={form.errors.deliveryAddress}
-              disabled={isLoading}
-              {...form.getInputProps('deliveryAddress')}
-            />
-            <TextInput
-              label={
-                form.values.deliveryAddress
-                  ? t('common.googleMapsUrlForDelivery')
-                  : t('common.googleMapsUrlForMain')
-              }
-              placeholder={t('common.googleMapsUrlPlaceholder')}
-              error={form.errors.googleMapsUrl}
-              disabled={isLoading}
-              {...form.getInputProps('googleMapsUrl')}
-            />
-            {!noTaxCode && (
+
               <TextInput
-                label={t('customer.taxCode')}
-                placeholder={t('customer.taxCodePlaceholder')}
-                error={form.errors.taxCode}
+                label={t('common.form.pic')}
+                placeholder={t('common.form.picPlaceholder')}
+                error={form.errors.pic}
                 disabled={isLoading}
-                {...form.getInputProps('taxCode')}
+                {...form.getInputProps('pic')}
               />
-            )}
-            <Textarea
-              label={t('common.form.memo')}
-              placeholder={t('common.form.memoPlaceholder')}
-              minRows={4}
-              autosize
-              maxRows={4}
-              error={form.errors.memo}
-              disabled={isLoading}
-              {...form.getInputProps('memo')}
-            />
+
+              {!noEmail && (
+                <TextInput
+                  label={t('common.form.email')}
+                  placeholder={t('common.form.emailPlaceholder')}
+                  error={form.errors.contactEmail}
+                  disabled={isLoading}
+                  {...form.getInputProps('contactEmail')}
+                />
+              )}
+
+              <TextInput
+                label={t('common.phone')}
+                placeholder={t('customer.phonePlaceholder')}
+                error={form.errors.contactPhone}
+                disabled={isLoading}
+                {...form.getInputProps('contactPhone')}
+              />
+
+              <TextInput
+                label={t('customer.address')}
+                placeholder={t('customer.addressPlaceholder')}
+                error={form.errors.address}
+                disabled={isLoading}
+                {...form.getInputProps('address')}
+              />
+
+              <TextInput
+                label={t('customer.deliveryAddress')}
+                placeholder={t('customer.deliveryAddressPlaceholder')}
+                error={form.errors.deliveryAddress}
+                disabled={isLoading}
+                {...form.getInputProps('deliveryAddress')}
+              />
+
+              <TextInput
+                label={
+                  form.values.deliveryAddress
+                    ? t('common.googleMapsUrlForDelivery')
+                    : t('common.googleMapsUrlForMain')
+                }
+                placeholder={t('common.googleMapsUrlPlaceholder')}
+                error={form.errors.googleMapsUrl}
+                disabled={isLoading}
+                {...form.getInputProps('googleMapsUrl')}
+              />
+
+              {!noTaxCode && (
+                <TextInput
+                  label={t('customer.taxCode')}
+                  placeholder={t('customer.taxCodePlaceholder')}
+                  error={form.errors.taxCode}
+                  disabled={isLoading}
+                  {...form.getInputProps('taxCode')}
+                />
+              )}
+
+              <Textarea
+                label={t('common.form.memo')}
+                placeholder={t('common.form.memoPlaceholder')}
+                minRows={4}
+                autosize
+                maxRows={4}
+                error={form.errors.memo}
+                disabled={isLoading}
+                {...form.getInputProps('memo')}
+              />
+            </ScrollArea>
             <Group justify="space-between" mt="md">
               <Group>
                 {mode === 'edit' && customer && (
@@ -186,7 +198,16 @@ export function CustomerFormModal({
                       <Button
                         color="var(--app-active-color)"
                         leftSection={<IconCheck size={16} />}
-                        onClick={onActivate}
+                        onClick={() => {
+                          confirmAction({
+                            title: t('common.activate'),
+                            message: `${t('common.activate')} "${customer.name}"?`,
+                            confirmLabel: t('common.activate'),
+                            cancelLabel: t('common.cancel'),
+                            confirmColor: 'var(--app-active-color)',
+                            onConfirm: () => onActivate?.(),
+                          });
+                        }}
                         disabled={isLoading || !canEdit}
                       >
                         {t('common.activate')}
@@ -195,7 +216,16 @@ export function CustomerFormModal({
                       <Button
                         color="var(--app-inactive-color)"
                         leftSection={<IconTrash size={16} />}
-                        onClick={onDeactivate}
+                        onClick={() => {
+                          confirmAction({
+                            title: t('common.deactivate'),
+                            message: `${t('common.deactivate')} "${customer.name}"?`,
+                            confirmLabel: t('common.deactivate'),
+                            cancelLabel: t('common.cancel'),
+                            confirmColor: 'var(--app-inactive-color)',
+                            onConfirm: () => onDeactivate?.(),
+                          });
+                        }}
                         disabled={isLoading || !canDelete}
                       >
                         {t('common.deactivate')}

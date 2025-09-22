@@ -6,6 +6,7 @@ import {
   Button,
   Group,
   LoadingOverlay,
+  ScrollArea,
   Stack,
   Textarea,
   TextInput,
@@ -16,6 +17,7 @@ import { ModalOrDrawer } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Product } from '@/services/sales/product';
 import { usePermissions } from '@/stores/useAppStore';
+import { confirmAction } from '@/utils/modals';
 import { canCreateProduct, canEditProduct } from '@/utils/permission.utils';
 
 import type { UseFormReturnType } from '@mantine/form';
@@ -84,57 +86,68 @@ export function ProductFormModal({
                 {product.isDeleted ? t('product.inactive') : t('product.active')}
               </Alert>
             )}
-
-            {/* Basic Information */}
-            <TextInput
-              required
-              label={t('product.productCode')}
-              placeholder={t('product.productCodePlaceholder')}
-              error={form.errors.productCode}
-              disabled={isLoading || mode === 'edit'}
-              {...form.getInputProps('productCode')}
-            />
-            <TextInput
-              required
-              label={t('common.name')}
-              placeholder={t('product.namePlaceholder')}
-              error={form.errors.name}
-              disabled={isLoading}
-              {...form.getInputProps('name')}
-            />
-            <Textarea
-              label={t('common.description')}
-              placeholder={t('product.descriptionPlaceholder')}
-              error={form.errors.description}
-              disabled={isLoading}
-              minRows={2}
-              {...form.getInputProps('description')}
-            />
-            <Group grow>
+            <ScrollArea style={{ height: '50vh' }}>
+              {/* Basic Information */}
               <TextInput
-                label={t('product.category')}
-                placeholder={t('product.categoryPlaceholder')}
-                error={form.errors.category}
-                disabled={isLoading}
-                {...form.getInputProps('category')}
+                required
+                label={t('product.productCode')}
+                placeholder={t('product.productCodePlaceholder')}
+                error={form.errors.productCode}
+                disabled={isLoading || mode === 'edit'}
+                {...form.getInputProps('productCode')}
               />
               <TextInput
-                label={t('product.color')}
-                placeholder={t('product.colorPlaceholder')}
-                error={form.errors.color}
+                required
+                label={t('common.name')}
+                placeholder={t('product.namePlaceholder')}
+                error={form.errors.name}
                 disabled={isLoading}
-                {...form.getInputProps('color')}
+                {...form.getInputProps('name')}
               />
-            </Group>
+              <Textarea
+                label={t('common.description')}
+                placeholder={t('product.descriptionPlaceholder')}
+                error={form.errors.description}
+                disabled={isLoading}
+                minRows={2}
+                {...form.getInputProps('description')}
+              />
+              <Group grow>
+                <TextInput
+                  label={t('product.category')}
+                  placeholder={t('product.categoryPlaceholder')}
+                  error={form.errors.category}
+                  disabled={isLoading}
+                  {...form.getInputProps('category')}
+                />
+                <TextInput
+                  label={t('product.color')}
+                  placeholder={t('product.colorPlaceholder')}
+                  error={form.errors.color}
+                  disabled={isLoading}
+                  {...form.getInputProps('color')}
+                />
+              </Group>
 
-            {/* Unit */}
-            <TextInput
-              label={t('product.unit')}
-              placeholder={t('product.unitPlaceholder')}
-              error={form.errors.unit}
-              disabled={isLoading}
-              {...form.getInputProps('unit')}
-            />
+              {/* Unit */}
+              <TextInput
+                label={t('product.unit')}
+                placeholder={t('product.unitPlaceholder')}
+                error={form.errors.unit}
+                disabled={isLoading}
+                {...form.getInputProps('unit')}
+              />
+              <Textarea
+                label={t('common.form.memo')}
+                placeholder={t('common.form.memoPlaceholder')}
+                minRows={4}
+                autosize
+                maxRows={4}
+                error={form.errors.memo}
+                disabled={isLoading}
+                {...form.getInputProps('memo')}
+              />
+            </ScrollArea>
 
             {/* Action Buttons */}
             <Group justify="space-between" mt="md">
@@ -145,7 +158,16 @@ export function ProductFormModal({
                       <Button
                         color="var(--app-active-color)"
                         leftSection={<IconCheck size={16} />}
-                        onClick={onActivate}
+                        onClick={() => {
+                          confirmAction({
+                            title: t('common.activate'),
+                            message: `${t('common.activate')} "${product.name}"?`,
+                            confirmLabel: t('common.activate'),
+                            cancelLabel: t('common.cancel'),
+                            confirmColor: 'var(--app-active-color)',
+                            onConfirm: () => onActivate?.(),
+                          });
+                        }}
                         disabled={isLoading || !canEdit}
                       >
                         {t('common.activate')}
@@ -154,7 +176,16 @@ export function ProductFormModal({
                       <Button
                         color="var(--app-inactive-color)"
                         leftSection={<IconTrash size={16} />}
-                        onClick={onDeactivate}
+                        onClick={() => {
+                          confirmAction({
+                            title: t('common.deactivate'),
+                            message: `${t('common.deactivate')} "${product.name}"?`,
+                            confirmLabel: t('common.deactivate'),
+                            cancelLabel: t('common.cancel'),
+                            confirmColor: 'var(--app-inactive-color)',
+                            onConfirm: () => onDeactivate?.(),
+                          });
+                        }}
                         disabled={isLoading || !canEdit}
                       >
                         {t('common.deactivate')}

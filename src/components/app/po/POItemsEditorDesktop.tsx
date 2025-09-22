@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   ActionIcon,
@@ -17,6 +17,7 @@ import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { ProductOverview } from '@/lib/api';
 import type { POItem } from '@/services/sales/purchaseOrder';
+import { useAppStore } from '@/stores/useAppStore';
 import { showErrorNotification } from '@/utils/notifications';
 import { createPOItem } from '@/utils/poItemUtils';
 
@@ -46,7 +47,7 @@ export function POItemsEditorDesktop({
   isReadOnly = false,
 }: POItemsEditorDesktopProps) {
   const { t } = useTranslation();
-
+  const { overviewData } = useAppStore();
   const [newItem, setNewItem] = useState<NewItem>({
     ...DEFAULT_NEW_ITEM,
   });
@@ -116,6 +117,15 @@ export function POItemsEditorDesktop({
     [newItem, items, handleUpdateItem],
   );
 
+  // Generate autocomplete options from products
+  const productOptions = useMemo(() => {
+    const map = new Map(items.map((item) => [item.productCode, 1]));
+    return (
+      overviewData?.products.filter((p) => !map.has(p.code)).map((p) => `${p.code} - ${p.name}`) ||
+      []
+    );
+  }, [overviewData, items]);
+
   // Empty state
   if (!isReadOnly && items.length === 0) {
     return (
@@ -131,7 +141,10 @@ export function POItemsEditorDesktop({
               {t('po.addFirstItem')}
             </Text>
             <Stack gap="sm">
-              <POProductSearch onChange={(product) => handleProductSelection('new', product)} />
+              <POProductSearch
+                productOptions={productOptions}
+                onChange={(product) => handleProductSelection('new', product)}
+              />
               <TextInput
                 placeholder={t('po.description')}
                 value={newItem.description || ''}
@@ -193,9 +206,9 @@ export function POItemsEditorDesktop({
                       <Text size="sm">{item.productCode}</Text>
                     ) : (
                       <POProductSearch
-                        value={`${item.productCode} - ${item.description}`}
                         size="xs"
-                        limit={5}
+                        value={`${item.productCode} - ${item.description}`}
+                        productOptions={productOptions}
                         onChange={(product) => handleProductSelection(item.id, product)}
                       />
                     )}
@@ -256,7 +269,8 @@ export function POItemsEditorDesktop({
                   <Table.Td>
                     <POProductSearch
                       size="xs"
-                      limit={5}
+                      productOptions={productOptions}
+                      key={items.length}
                       onChange={(product) => handleProductSelection('new', product)}
                     />
                   </Table.Td>
