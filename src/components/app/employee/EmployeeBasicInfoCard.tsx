@@ -15,7 +15,8 @@ import { usePermissions } from '@/stores/useAppStore';
 import { logError } from '@/utils/logger';
 import { canEditEmployee, canIssueMagicLinkForEmployee } from '@/utils/permission.utils';
 import { generateQRCodeWithLogo } from '@/utils/qr';
-import { formatCurrency, formatDate, renderFullName } from '@/utils/string';
+import { formatCurrency, renderFullName } from '@/utils/string';
+import { formatDate } from '@/utils/time';
 
 import { EmployeeMagicLinkModal } from './EmployeeMagicLinkModal';
 import { WorkTypeBadge } from './WorkTypeBadge';

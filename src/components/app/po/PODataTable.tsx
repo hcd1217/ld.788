@@ -77,7 +77,7 @@ function PODataTableComponent({ purchaseOrders }: PODataTableProps) {
                   <Text size="sm">{po.salesPerson}</Text>
                 </Table.Td>
                 <Table.Td>{formatDate(po.orderDate)}</Table.Td>
-                <Table.Td>{po.deliveryDate ? formatDate(po.deliveryDate) : '-'}</Table.Td>
+                <Table.Td>{formatDate(po.deliveryDate)}</Table.Td>
                 <Table.Td>
                   <Text size="sm">
                     {po.items.length} {t('po.itemsCount')}

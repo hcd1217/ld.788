@@ -10,7 +10,7 @@ import { getEmployeeDetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
 import { useClientConfig } from '@/stores/useAppStore';
-import { formatDate } from '@/utils/string';
+import { formatDate } from '@/utils/time';
 import { getEndDateHighlightStyles } from '@/utils/time';
 
 import { WorkTypeBadge } from './WorkTypeBadge';
@@ -66,8 +66,8 @@ export function EmployeeDataTable({ employees }: EmployeeDataTableProps) {
           hidden: !clientConfig.features?.employee?.workType,
           render: (employee: Employee) => (
             <>
-              {employee.startDate ? formatDate(employee.startDate) : '-'}
-              {employee.endDate ? formatDate(employee.endDate) : '-'}
+              {formatDate(employee.startDate)}
+              {formatDate(employee.endDate)}
             </>
           ),
         },

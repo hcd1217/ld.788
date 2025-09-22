@@ -91,9 +91,8 @@ export function POFilterBarDesktop({
   }
 
   return (
-    <Group justify="start" align="flex-end" gap="sm" wrap="nowrap" mb="xl">
-      {/* Search Bar - flex 2 */}
-      <div style={{ flex: 2, minWidth: 200 }}>
+    <Group justify="start" align="end" gap="sm" wrap="nowrap" mb="xl">
+      <div style={{ minWidth: 200 }}>
         <SearchBar
           placeholder={t('po.searchPlaceholder')}
           searchQuery={searchQuery}

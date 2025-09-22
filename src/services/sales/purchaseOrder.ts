@@ -143,11 +143,13 @@ export const purchaseOrderService = {
 
     const response = await salesApi.getPurchaseOrders(apiParams);
     const employeeMapByEmployeeId = await overviewService.getEmployeeOverview();
-
+    const purchaseOrders = response.purchaseOrders
+      .sort((a, b) => {
+        return a.poNumber.localeCompare(b.poNumber);
+      })
+      .map((po) => transformApiToFrontend(po, employeeMapByEmployeeId));
     return {
-      purchaseOrders: response.purchaseOrders.map((po) =>
-        transformApiToFrontend(po, employeeMapByEmployeeId),
-      ),
+      purchaseOrders,
       pagination: response.pagination,
     };
   },

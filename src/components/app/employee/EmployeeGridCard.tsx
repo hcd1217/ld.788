@@ -8,7 +8,7 @@ import { getEmployeeDetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Employee } from '@/services/hr/employee';
 import { useClientConfig } from '@/stores/useAppStore';
-import { formatDate } from '@/utils/string';
+import { formatDate } from '@/utils/time';
 import { getEndDateHighlightStyles } from '@/utils/time';
 
 import { WorkTypeBadge } from './WorkTypeBadge';

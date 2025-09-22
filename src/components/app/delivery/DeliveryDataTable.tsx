@@ -63,9 +63,7 @@ function DeliveryDataTableComponent({ deliveryRequests }: DeliveryDataTableProps
                   </Group>
                 </Table.Td>
                 <Table.Td>{formatDate(delivery.scheduledDate)}</Table.Td>
-                <Table.Td>
-                  {delivery.completedDate ? formatDate(delivery.completedDate) : '-'}
-                </Table.Td>
+                <Table.Td>{formatDate(delivery.completedDate)}</Table.Td>
                 <Table.Td>
                   <Text size="sm">{delivery.deliveryPerson}</Text>
                 </Table.Td>

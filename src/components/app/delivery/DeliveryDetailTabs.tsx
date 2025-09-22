@@ -118,9 +118,7 @@ export function DeliveryDetailTabs({
                         {t('delivery.scheduledDate')}
                       </Text>
                       <Text size="sm" fw={500}>
-                        {deliveryRequest.scheduledDate
-                          ? formatDate(deliveryRequest.scheduledDate)
-                          : t('common.notScheduled')}
+                        {formatDate(deliveryRequest.scheduledDate, t('common.notScheduled'))}
                       </Text>
                     </div>
                     {deliveryRequest.completedDate && (

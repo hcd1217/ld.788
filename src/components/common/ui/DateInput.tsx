@@ -4,6 +4,7 @@ import {
   type DateInputProps as MantineDateInputProps,
 } from '@mantine/dates';
 
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { useTranslation } from '@/hooks/useTranslation';
 
 type DateInputProps = Omit<MantineDateInputProps, 'valueFormat' | 'onChange'> & {
@@ -14,9 +15,12 @@ type DateInputProps = Omit<MantineDateInputProps, 'valueFormat' | 'onChange'> & 
 export function DateInput({ dateOnly = true, onChange, ...props }: DateInputProps) {
   const { currentLanguage } = useTranslation();
   const valueFormat = currentLanguage === 'vi' ? 'DD/MM/YYYY' : 'MMM DD, YYYY';
+  const { isMobile } = useDeviceType();
+
   return (
     <MantineDateInput
       {...props}
+      readOnly={isMobile}
       valueFormat={valueFormat}
       onChange={(date) => {
         if (!onChange) {

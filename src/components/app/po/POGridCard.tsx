@@ -87,7 +87,7 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
                   {t('po.deliveryDate')}
                 </Text>
                 <Text size="sm" fw={500}>
-                  {formatDate(purchaseOrder.deliveryRequest?.scheduledDate)}
+                  {formatDate(purchaseOrder.deliveryDate)}
                 </Text>
               </div>
             </Group>

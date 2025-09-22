@@ -28,9 +28,9 @@ export function getLocaleFormat(language: string): string {
  * @param options - Intl.DateTimeFormat options
  * @returns Formatted date string
  */
-export function formatDate(date: Date | string | undefined): string {
+export function formatDate(date: Date | string | undefined, emptyValue = '-'): string {
   if (!date) {
-    return '-';
+    return emptyValue;
   }
 
   const dateObj = typeof date === 'string' ? new Date(date) : date;

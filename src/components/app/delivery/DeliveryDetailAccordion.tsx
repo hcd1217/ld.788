@@ -109,9 +109,7 @@ export function DeliveryDetailAccordion({
       },
       {
         label: t('delivery.scheduledDate'),
-        value: deliveryRequest.scheduledDate
-          ? formatDate(deliveryRequest.scheduledDate)
-          : t('common.notScheduled'),
+        value: formatDate(deliveryRequest.scheduledDate, t('common.notScheduled')),
       },
       ...(deliveryRequest.completedDate
         ? [

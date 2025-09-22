@@ -66,7 +66,7 @@ export function DeliveryDetailPage() {
   } = useDeliveryRequestActions();
 
   // Modal management
-  const { modals, selectedDeliveryRequest, closeModal, handlers } = useDeliveryModals();
+  const { modals, openModal, closeModal } = useDeliveryModals();
 
   // Load delivery request on mount
   useEffect(() => {
@@ -75,37 +75,15 @@ export function DeliveryDetailPage() {
     }
   }, [deliveryId, loadDeliveryRequest]);
 
-  // Memoized modal close handlers
-  const handleCloseModal = useCallback(
-    (modalType: 'startTransit' | 'complete' | 'uploadPhotos' | 'update') => () =>
-      closeModal(modalType),
-    [closeModal],
+  // Generic modal handler
+  const handleOpenModal = useCallback(
+    (modalType: keyof typeof modals) => () => {
+      if (deliveryRequest) {
+        openModal(modalType);
+      }
+    },
+    [deliveryRequest, openModal],
   );
-
-  // Action handlers
-  const handleStartTransit = () => {
-    if (deliveryRequest) {
-      handlers.handleStartTransit(deliveryRequest);
-    }
-  };
-
-  const handleComplete = () => {
-    if (deliveryRequest) {
-      handlers.handleComplete(deliveryRequest);
-    }
-  };
-
-  const handleTakeDeliveryPhoto = () => {
-    if (deliveryRequest) {
-      handlers.handleTakeDeliveryPhoto(deliveryRequest);
-    }
-  };
-
-  const handleUpdate = () => {
-    if (deliveryRequest) {
-      handlers.handleUpdate(deliveryRequest);
-    }
-  };
 
   // Start transit action
   const startTransitAction = useSWRAction(
@@ -114,10 +92,10 @@ export function DeliveryDetailPage() {
       if (!canStartTransit) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
-      if (!selectedDeliveryRequest) {
+      if (!deliveryRequest) {
         throw new Error(t('common.invalidFormData'));
       }
-      await updateDeliveryStatus(selectedDeliveryRequest.id, 'IN_TRANSIT', data?.transitNotes);
+      await updateDeliveryStatus(deliveryRequest.id, 'IN_TRANSIT', data?.transitNotes);
       closeModal('startTransit');
     },
     {
@@ -143,10 +121,10 @@ export function DeliveryDetailPage() {
       if (!canComplete) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
-      if (!selectedDeliveryRequest) {
+      if (!deliveryRequest) {
         throw new Error(t('common.invalidFormData'));
       }
-      await completeDelivery(selectedDeliveryRequest.id, {
+      await completeDelivery(deliveryRequest.id, {
         photos: data.photos,
         receivedBy: data.receivedBy,
         notes: data.completionNotes,
@@ -170,10 +148,10 @@ export function DeliveryDetailPage() {
       if (!canTakePhoto) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
-      if (!selectedDeliveryRequest || !data?.photos) {
+      if (!deliveryRequest || !data?.photos) {
         throw new Error(t('common.invalidFormData'));
       }
-      await uploadPhotos(selectedDeliveryRequest.id, data.photos);
+      await uploadPhotos(deliveryRequest.id, data.photos);
       closeModal('uploadPhotos');
     },
     {
@@ -198,10 +176,10 @@ export function DeliveryDetailPage() {
       if (!canEdit) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
-      if (!selectedDeliveryRequest) {
+      if (!deliveryRequest) {
         throw new Error(t('common.invalidFormData'));
       }
-      await updateDeliveryRequest(selectedDeliveryRequest.id, {
+      await updateDeliveryRequest(deliveryRequest.id, {
         assignedTo: data?.assignedTo,
         scheduledDate: data?.scheduledDate,
         notes: data?.notes,
@@ -211,7 +189,7 @@ export function DeliveryDetailPage() {
     },
   );
 
-  const title = deliveryRequest ? `${deliveryRequest.deliveryRequestNumber}` : t('delivery.detail');
+  const title = deliveryRequest?.deliveryRequestNumber ?? t('delivery.detail');
 
   // Check view permission
   if (!canView) {
@@ -220,75 +198,61 @@ export function DeliveryDetailPage() {
 
   // Mobile layout
   if (isMobile) {
-    if (isLoading || !deliveryRequest) {
-      return (
-        <AppMobileLayout
-          showLogo
-          isLoading={isLoading}
-          error={error}
-          clearError={clearError}
-          header={<AppPageTitle title={title} />}
-        >
-          {isLoading ? (
-            <LoadingOverlay visible />
-          ) : (
-            <ResourceNotFound withGoBack message={t('delivery.notFound')} />
-          )}
-        </AppMobileLayout>
-      );
-    }
-
-    if (modals.uploadPhotos) {
-      return (
-        <DeliveryPhotoUpload
-          opened={modals.uploadPhotos}
-          onClose={handleCloseModal('uploadPhotos')}
-          onUpload={uploadPhotosAction.trigger}
-        />
-      );
-    }
-
     return (
       <AppMobileLayout
-        withGoBack
-        noFooter
+        withGoBack={!!deliveryRequest}
+        showLogo={!deliveryRequest}
+        noFooter={!!deliveryRequest}
         isLoading={isLoading}
         error={error}
         clearError={clearError}
         header={<AppPageTitle title={title} />}
       >
-        <Stack gap="md">
-          <DeliveryDetailAccordion
-            deliveryRequest={deliveryRequest}
-            isLoading={isLoading}
-            onComplete={handleComplete}
-            onTakePhoto={handleTakeDeliveryPhoto}
-            onUpdate={handleUpdate}
-            onStartTransit={handleStartTransit}
-          />
-        </Stack>
+        {isLoading ? (
+          <LoadingOverlay visible />
+        ) : !deliveryRequest ? (
+          <ResourceNotFound withGoBack message={t('delivery.notFound')} />
+        ) : (
+          <>
+            <Stack gap="md">
+              <DeliveryDetailAccordion
+                deliveryRequest={deliveryRequest}
+                isLoading={isLoading}
+                onComplete={handleOpenModal('complete')}
+                onTakePhoto={handleOpenModal('uploadPhotos')}
+                onUpdate={handleOpenModal('update')}
+                onStartTransit={handleOpenModal('startTransit')}
+              />
+            </Stack>
 
-        {/* Drawer components */}
-        <DeliveryStatusDrawer
-          opened={modals.startTransit}
-          mode="start_transit"
-          deliveryRequest={selectedDeliveryRequest}
-          onClose={handleCloseModal('startTransit')}
-          onConfirm={startTransitAction.trigger}
-        />
-        <DeliveryStatusDrawer
-          opened={modals.complete}
-          mode="complete"
-          deliveryRequest={selectedDeliveryRequest}
-          onClose={handleCloseModal('complete')}
-          onComplete={completeDeliveryAction.trigger}
-        />
-        <DeliveryUpdateModal
-          opened={modals.update}
-          deliveryRequest={selectedDeliveryRequest}
-          onClose={handleCloseModal('update')}
-          onConfirm={updateDeliveryRequestAction.trigger}
-        />
+            {/* Modal components */}
+            <DeliveryStatusDrawer
+              opened={modals.startTransit}
+              mode="start_transit"
+              deliveryRequest={deliveryRequest}
+              onClose={() => closeModal('startTransit')}
+              onConfirm={startTransitAction.trigger}
+            />
+            <DeliveryStatusDrawer
+              opened={modals.complete}
+              mode="complete"
+              deliveryRequest={deliveryRequest}
+              onClose={() => closeModal('complete')}
+              onComplete={completeDeliveryAction.trigger}
+            />
+            <DeliveryPhotoUpload
+              opened={modals.uploadPhotos}
+              onClose={() => closeModal('uploadPhotos')}
+              onUpload={uploadPhotosAction.trigger}
+            />
+            <DeliveryUpdateModal
+              opened={modals.update}
+              deliveryRequest={deliveryRequest}
+              onClose={() => closeModal('update')}
+              onConfirm={updateDeliveryRequestAction.trigger}
+            />
+          </>
+        )}
       </AppMobileLayout>
     );
   }
@@ -305,12 +269,12 @@ export function DeliveryDetailPage() {
           <DeliveryDetailTabs
             deliveryRequest={deliveryRequest}
             isLoading={isLoading}
-            onUpdate={handleUpdate}
+            onUpdate={handleOpenModal('update')}
           />
           <DeliveryUpdateModal
             opened={modals.update}
-            deliveryRequest={selectedDeliveryRequest}
-            onClose={handleCloseModal('update')}
+            deliveryRequest={deliveryRequest}
+            onClose={() => closeModal('update')}
             onConfirm={updateDeliveryRequestAction.trigger}
           />
         </>

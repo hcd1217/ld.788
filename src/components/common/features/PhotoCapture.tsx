@@ -4,8 +4,10 @@ import { Badge, Button, Group, Image, Loader, Stack, Text } from '@mantine/core'
 import { IconCamera, IconCheck, IconRotate, IconX } from '@tabler/icons-react';
 
 import { useTranslation } from '@/hooks/useTranslation';
+import { useMe } from '@/stores/useAppStore';
 import { logError } from '@/utils/logger';
 import { showErrorNotification } from '@/utils/notifications';
+import { renderFullName } from '@/utils/string';
 import { formatDateTime } from '@/utils/time';
 
 export type PhotoConfig = {
@@ -53,6 +55,7 @@ type ViewMode = 'camera' | 'review';
 
 export function PhotoCapture({ opened, onClose, onCapture, config, labels }: PhotoCaptureProps) {
   const { t } = useTranslation();
+  const me = useMe();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -166,6 +169,14 @@ export function PhotoCapture({ opened, onClose, onCapture, config, labels }: Pho
       // Prepare overlay text
       const overlayLines: string[] = [];
 
+      // Add user's full name
+      if (me?.employee) {
+        const fullName = renderFullName(me.employee);
+        if (fullName) {
+          overlayLines.push(fullName);
+        }
+      }
+
       // Add timestamp
       if (mergedConfig.includeTimestamp) {
         const now = new Date();
@@ -217,7 +228,7 @@ export function PhotoCapture({ opened, onClose, onCapture, config, labels }: Pho
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
     },
-    [mergedConfig.includeTimestamp, mergedConfig.includeLocation, location],
+    [mergedConfig.includeTimestamp, mergedConfig.includeLocation, location, me],
   );
 
   // Capture photo
