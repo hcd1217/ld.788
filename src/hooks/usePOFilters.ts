@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { PO_STATUS, type POStatusType } from '@/constants/purchaseOrder';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
+import { endOfDay, startOfDay } from '@/utils/time';
 
 import { useOnce } from './useOnce';
 
@@ -58,28 +59,8 @@ export interface POFilterHandlers {
   resetFilters: () => void;
 }
 
-const defaultFilters: POFilters = {
-  searchQuery: '',
-  customerId: undefined,
-  statuses: [
-    PO_STATUS.NEW,
-    PO_STATUS.CONFIRMED,
-    PO_STATUS.PROCESSING,
-    PO_STATUS.READY_FOR_PICKUP,
-    PO_STATUS.SHIPPED,
-  ],
-  orderDateRange: {
-    start: undefined,
-    end: undefined,
-  },
-  deliveryDateRange: {
-    start: undefined,
-    end: undefined,
-  },
-};
-
 export function usePOFilters() {
-  const [filters, setFilters] = useState<POFilters>(defaultFilters);
+  const [filters, setFilters] = useState<POFilters>(generateDefaultFilters());
   const hasActiveFilters = useMemo(() => {
     if (filters.customerId) {
       return true;
@@ -150,19 +131,7 @@ export function usePOFilters() {
   }, []);
 
   const resetFilters = useCallback(() => {
-    setFilters({
-      searchQuery: '',
-      customerId: undefined,
-      statuses: [],
-      orderDateRange: {
-        start: undefined,
-        end: undefined,
-      },
-      deliveryDateRange: {
-        start: undefined,
-        end: undefined,
-      },
-    });
+    setFilters(generateDefaultFilters());
   }, []);
 
   const filterHandlers: POFilterHandlers = useMemo(() => {
@@ -194,7 +163,7 @@ export function usePOFilters() {
       if (parsedFilters.success) {
         setFilters(parsedFilters.data as POFilters);
       } else {
-        setFilters(defaultFilters);
+        setFilters(generateDefaultFilters());
       }
     }
   });
@@ -204,4 +173,27 @@ export function usePOFilters() {
   }, [filters]);
 
   return { filters, filterHandlers, hasActiveFilters };
+}
+
+function generateDefaultFilters(): POFilters {
+  const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
+  return {
+    searchQuery: '',
+    customerId: undefined,
+    statuses: [
+      PO_STATUS.NEW,
+      PO_STATUS.CONFIRMED,
+      PO_STATUS.PROCESSING,
+      PO_STATUS.READY_FOR_PICKUP,
+      PO_STATUS.SHIPPED,
+    ],
+    orderDateRange: {
+      start: undefined,
+      end: undefined,
+    },
+    deliveryDateRange: {
+      start: startOfDay(new Date()),
+      end: endOfDay(new Date(Date.now() + ONE_WEEK)),
+    },
+  };
 }

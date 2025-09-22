@@ -198,7 +198,7 @@ export function DeliveryDetailAccordion({
           </Accordion.Control>
           <Accordion.Panel>
             <DeliveryPhotoGallery
-              photoUrls={deliveryRequest.photoUrls}
+              photos={deliveryRequest.photos}
               withScrollArea
               scrollAreaHeight="50vh"
             />

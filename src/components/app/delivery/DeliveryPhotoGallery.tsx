@@ -3,9 +3,10 @@ import { useState } from 'react';
 import { Grid, Image, Modal, ScrollArea, Text } from '@mantine/core';
 
 import { useTranslation } from '@/hooks/useTranslation';
+import type { PhotoData } from '@/types';
 
 type DeliveryPhotoGalleryProps = {
-  readonly photoUrls?: string[];
+  readonly photos?: PhotoData[];
   readonly columns?: number;
   readonly imageHeight?: number;
   readonly withScrollArea?: boolean;
@@ -13,7 +14,7 @@ type DeliveryPhotoGalleryProps = {
 };
 
 export function DeliveryPhotoGallery({
-  photoUrls,
+  photos,
   columns = 6,
   imageHeight = 150,
   withScrollArea = false,
@@ -22,7 +23,7 @@ export function DeliveryPhotoGallery({
   const { t } = useTranslation();
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
-  if (!photoUrls || photoUrls.length === 0) {
+  if (!photos || photos.length === 0) {
     return (
       <Text size="sm" c="dimmed" ta="center" py="xl">
         {t('delivery.noPhotos')}
@@ -32,11 +33,11 @@ export function DeliveryPhotoGallery({
 
   const photoGrid = (
     <Grid>
-      {photoUrls.map((url, index) => (
-        <Grid.Col key={index} span={columns}>
+      {photos.map((photo, index) => (
+        <Grid.Col key={photo.id} span={columns}>
           <Image
-            src={url}
-            alt={`Delivery photo ${index + 1}`}
+            src={photo.publicUrl}
+            alt={photo.caption ?? `Delivery photo ${index + 1}`}
             style={{ cursor: 'pointer' }}
             onClick={() => setSelectedPhotoIndex(index)}
             radius="sm"
@@ -84,10 +85,10 @@ export function DeliveryPhotoGallery({
           },
         }}
       >
-        {selectedPhotoIndex !== null && (
+        {selectedPhotoIndex !== null && photos[selectedPhotoIndex] && (
           <Image
-            src={photoUrls[selectedPhotoIndex]}
-            alt={`Delivery photo ${selectedPhotoIndex + 1}`}
+            src={photos[selectedPhotoIndex].publicUrl}
+            alt={photos[selectedPhotoIndex].caption ?? `Delivery photo ${selectedPhotoIndex + 1}`}
             fit="contain"
             onClick={() => setSelectedPhotoIndex(null)}
             style={{

@@ -6,6 +6,7 @@ import {
   type UpdateDeliveryRequest,
 } from '@/lib/api/schemas/deliveryRequest.schemas';
 import type { CustomerOverview, EmployeeOverview } from '@/services/client/overview';
+import type { PhotoData } from '@/types';
 import { startOfDay } from '@/utils/time';
 import { endOfDay } from '@/utils/time';
 
@@ -27,7 +28,7 @@ export type DeliveryRequest = Omit<ApiDeliveryRequest, 'metadata'> & {
   purchaseOrderId?: string | undefined;
   customerName?: string | undefined;
   customerId?: string | undefined;
-  photoUrls: string[];
+  photos: PhotoData[];
   deliveryPerson: string | undefined;
   deliveryAddress?: {
     oneLineAddress?: string;
@@ -57,7 +58,7 @@ function transformApiToFrontend(
     purchaseOrderNumber: apiDR?.purchaseOrder?.poNumber as string,
     customerName,
     customerId: apiDR?.purchaseOrder?.customerId,
-    photoUrls: apiDR.photos?.map((photo) => photo.publicUrl) ?? [],
+    photos: apiDR.photos ?? [],
     deliveryAddress: apiDR.deliveryAddress ?? {},
   };
 }

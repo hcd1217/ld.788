@@ -37,8 +37,8 @@ type UseSWRActionReturn<TArgs, TData> = {
  * @example
  * const uploadPhotos = useSWRAction(
  *   'upload-photos',
- *   async (photoUrls: string[]) => {
- *     return await api.uploadPhotos(deliveryId, photoUrls);
+ *   async (photos: { publicUrl: string; key: string; caption?: string }[]) => {
+ *     return await api.uploadPhotos(deliveryId, photos);
  *   },
  *   {
  *     notifications: {

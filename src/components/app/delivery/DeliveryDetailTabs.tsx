@@ -191,11 +191,7 @@ export function DeliveryDetailTabs({
             <Text fw={500} mb="md">
               {t('delivery.photos')}
             </Text>
-            <DeliveryPhotoGallery
-              photoUrls={deliveryRequest.photoUrls}
-              columns={12}
-              imageHeight={120}
-            />
+            <DeliveryPhotoGallery photos={deliveryRequest.photos} columns={6} imageHeight={120} />
           </Card>
         </Grid.Col>
       </Grid>
