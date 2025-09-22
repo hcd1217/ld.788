@@ -72,6 +72,10 @@ export const UploadPhotosSchema = z.object({
   photos: z.array(UploadPhotoSchema),
 });
 
+export const DeletePhotoRequestSchema = z.object({
+  photoId: idSchema,
+});
+
 export const CompleteDeliverySchema = z.object({
   photos: z.array(UploadPhotoSchema),
   deliveryNotes: optionalStringSchema,
@@ -110,6 +114,7 @@ export type CreateDeliveryRequest = z.infer<typeof CreateDeliveryRequestSchema>;
 export type UpdateDeliveryRequest = z.infer<typeof UpdateDeliveryRequestSchema>;
 export type UpdateDeliveryStatus = z.infer<typeof UpdateDeliveryStatusSchema>;
 export type UploadPhotos = z.infer<typeof UploadPhotosSchema>;
+export type DeletePhotoRequest = z.infer<typeof DeletePhotoRequestSchema>;
 export type CompleteDelivery = z.infer<typeof CompleteDeliverySchema>;
 export type UpdateDeliveryOrderInDay = z.infer<typeof UpdateDeliveryOrderInDaySchema>;
 

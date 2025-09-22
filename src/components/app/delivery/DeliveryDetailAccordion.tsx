@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { Accordion, Anchor, Button, Grid, Group, Stack, Text } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import {
   IconCamera,
   IconCheck,
@@ -18,8 +19,10 @@ import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales';
 import { useCustomers, usePermissions } from '@/stores/useAppStore';
+import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
 import {
   canCompleteDeliveryRequest,
+  canDeletePhotoDeliveryRequest,
   canEditDeliveryRequest,
   canStartTransitDeliveryRequest,
   canTakePhotoDeliveryRequest,
@@ -49,6 +52,7 @@ export function DeliveryDetailAccordion({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const permissions = usePermissions();
+  const { deletePhoto } = useDeliveryRequestActions();
   const { canStartTransitBased, canCompleteBased, canTakePhotoBased } = useMemo(() => {
     const canStartTransitBased = deliveryRequest.status === 'PENDING';
     const canCompleteBased = deliveryRequest.status === 'IN_TRANSIT';
@@ -60,14 +64,32 @@ export function DeliveryDetailAccordion({
     };
   }, [deliveryRequest.status]);
 
-  const { canEdit, canStartTransit, canComplete, canTakePhoto } = useMemo(() => {
+  const { canEdit, canStartTransit, canComplete, canTakePhoto, canDelete } = useMemo(() => {
     return {
       canEdit: canEditDeliveryRequest(permissions),
       canStartTransit: canStartTransitDeliveryRequest(permissions),
       canComplete: canCompleteDeliveryRequest(permissions),
       canTakePhoto: canTakePhotoDeliveryRequest(permissions),
+      canDelete: canDeletePhotoDeliveryRequest(permissions),
     };
   }, [permissions]);
+
+  const handleDeletePhoto = async (photoId: string) => {
+    try {
+      await deletePhoto(deliveryRequest.id, photoId);
+      notifications.show({
+        title: t('common.success'),
+        message: 'Photo deleted successfully',
+        color: 'green',
+      });
+    } catch {
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to delete photo',
+        color: 'red',
+      });
+    }
+  };
 
   // Delivery info fields for cleaner rendering
   const deliveryInfoFields = useMemo(
@@ -201,6 +223,8 @@ export function DeliveryDetailAccordion({
               photos={deliveryRequest.photos}
               withScrollArea
               scrollAreaHeight="50vh"
+              canDelete={canDelete}
+              onDeletePhoto={handleDeletePhoto}
             />
           </Accordion.Panel>
         </Accordion.Item>

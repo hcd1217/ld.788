@@ -70,7 +70,7 @@ export const uploadToS3 = async (
     const uploadUrlRequest: UploadUrlRequest = {
       fileName: options.fileName,
       fileType: options.fileType,
-      purpose: 'DELIVERY_REQUEST_PHOTO',
+      purpose: options.purpose,
       ...(options.prefix && { prefix: options.prefix }),
     };
 

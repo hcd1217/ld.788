@@ -1,8 +1,11 @@
+import React from 'react';
 import { useState } from 'react';
 
-import { Grid, Image, Modal, ScrollArea, Text } from '@mantine/core';
+import { ActionIcon, Box, Grid, Image, Modal, ScrollArea, Text } from '@mantine/core';
+import { IconTrash } from '@tabler/icons-react';
 
 import { useTranslation } from '@/hooks/useTranslation';
+import { confirmAction } from '@/utils/modals';
 
 type PhotoData = {
   id?: string;
@@ -19,6 +22,8 @@ type POPhotoGalleryProps = {
   readonly imageHeight?: number;
   readonly withScrollArea?: boolean;
   readonly scrollAreaHeight?: string;
+  readonly canDelete?: boolean;
+  readonly onDeletePhoto?: (photoId: string) => Promise<void>;
 };
 
 export function POPhotoGallery({
@@ -27,9 +32,28 @@ export function POPhotoGallery({
   imageHeight = 150,
   withScrollArea = false,
   scrollAreaHeight = '50vh',
+  canDelete = false,
+  onDeletePhoto,
 }: POPhotoGalleryProps) {
   const { t } = useTranslation();
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  const [hoveredPhotoId, setHoveredPhotoId] = useState<string | null>(null);
+
+  const handleDeletePhoto = (photoId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    confirmAction({
+      title: t('common.delete'),
+      message: t('common.deleteConfirmationMessage'),
+      confirmLabel: t('common.delete'),
+      cancelLabel: t('common.cancel'),
+      confirmColor: 'red',
+      onConfirm: async () => {
+        if (onDeletePhoto) {
+          await onDeletePhoto(photoId);
+        }
+      },
+    });
+  };
 
   if (photos.length === 0) {
     return (
@@ -43,16 +67,36 @@ export function POPhotoGallery({
     <Grid>
       {photos.map((photo, index) => (
         <Grid.Col key={photo.id || index} span={columns}>
-          <Image
-            src={photo.publicUrl}
-            alt={`PO photo ${index + 1}`}
-            style={{ cursor: 'pointer' }}
-            onClick={() => setSelectedPhotoIndex(index)}
-            radius="sm"
-            h={imageHeight}
-            fit="cover"
-            fallbackSrc="/photos/no-photo.svg"
-          />
+          <Box
+            pos="relative"
+            onMouseEnter={() => setHoveredPhotoId(photo.id || String(index))}
+            onMouseLeave={() => setHoveredPhotoId(null)}
+          >
+            <Image
+              src={photo.publicUrl}
+              alt={`PO photo ${index + 1}`}
+              style={{ cursor: 'pointer' }}
+              onClick={() => setSelectedPhotoIndex(index)}
+              radius="sm"
+              h={imageHeight}
+              fit="cover"
+              fallbackSrc="/photos/no-photo.svg"
+            />
+            {canDelete && photo.id && hoveredPhotoId === photo.id && (
+              <ActionIcon
+                pos="absolute"
+                top={8}
+                right={8}
+                color="red"
+                variant="filled"
+                size="sm"
+                onClick={(e) => handleDeletePhoto(photo.id!, e)}
+                style={{ zIndex: 1 }}
+              >
+                <IconTrash size={16} />
+              </ActionIcon>
+            )}
+          </Box>
         </Grid.Col>
       ))}
     </Grid>

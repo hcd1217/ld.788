@@ -179,6 +179,10 @@ export const deliveryRequestService = {
     });
   },
 
+  async deletePhoto(id: string, photoId: string): Promise<void> {
+    await deliveryRequestApi.deleteDeliveryPhoto(id, { photoId });
+  },
+
   async completeDelivery(
     id: string,
     data: { photos: { publicUrl: string; key: string; caption?: string }[]; notes?: string },

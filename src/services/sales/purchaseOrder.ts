@@ -282,4 +282,8 @@ export const purchaseOrderService = {
       })),
     });
   },
+
+  async deletePhoto(id: string, photoId: string): Promise<void> {
+    await salesApi.deletePhoto(id, { photoId });
+  },
 };

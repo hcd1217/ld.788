@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { Anchor, Button, Card, Grid, Group, Stack, Text } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { IconEdit, IconMapPin } from '@tabler/icons-react';
 
 import { UrgentBadge, ViewOnMap } from '@/components/common';
@@ -10,7 +11,8 @@ import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales';
 import { usePermissions } from '@/stores/useAppStore';
-import { canEditDeliveryRequest } from '@/utils/permission.utils';
+import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
+import { canDeletePhotoDeliveryRequest, canEditDeliveryRequest } from '@/utils/permission.utils';
 import { formatDate } from '@/utils/time';
 
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
@@ -30,7 +32,26 @@ export function DeliveryDetailTabs({
   const navigate = useNavigate();
   const { t } = useTranslation();
   const permissions = usePermissions();
+  const { deletePhoto } = useDeliveryRequestActions();
   const canEdit = useMemo(() => canEditDeliveryRequest(permissions), [permissions]);
+  const canDelete = useMemo(() => canDeletePhotoDeliveryRequest(permissions), [permissions]);
+
+  const handleDeletePhoto = async (photoId: string) => {
+    try {
+      await deletePhoto(deliveryRequest.id, photoId);
+      notifications.show({
+        title: t('common.success'),
+        message: 'Photo deleted successfully',
+        color: 'green',
+      });
+    } catch {
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to delete photo',
+        color: 'red',
+      });
+    }
+  };
 
   return (
     <Stack gap="lg">
@@ -191,7 +212,13 @@ export function DeliveryDetailTabs({
             <Text fw={500} mb="md">
               {t('delivery.photos')}
             </Text>
-            <DeliveryPhotoGallery photos={deliveryRequest.photos} columns={6} imageHeight={120} />
+            <DeliveryPhotoGallery
+              photos={deliveryRequest.photos}
+              columns={6}
+              imageHeight={120}
+              canDelete={canDelete}
+              onDeletePhoto={handleDeletePhoto}
+            />
           </Card>
         </Grid.Col>
       </Grid>

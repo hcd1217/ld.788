@@ -4,7 +4,7 @@ import { z } from 'zod/v4';
 export const UploadUrlRequestSchema = z.object({
   fileName: z.string(),
   fileType: z.string(),
-  purpose: z.enum(['DELIVERY_REQUEST_PHOTO']),
+  purpose: z.enum(['DELIVERY_REQUEST_PHOTO', 'PURCHASE_ORDER_PHOTO']),
   prefix: z.string().optional(),
 });
 

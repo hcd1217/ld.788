@@ -14,6 +14,7 @@ import {
   stringSchema,
 } from './common.schemas';
 import { EmployeeSchema } from './hr.schemas';
+import { PermissionSchema } from './permission.schema';
 
 // Schemas
 export const LoginRequestSchema = z.object({
@@ -57,69 +58,6 @@ export const JWTPayloadSchema = z.object({
 export const RoleSchema = z.object({
   name: stringSchema,
   level: numberSchema,
-});
-
-const PermissionSchema = z.object({
-  customer: z.object({
-    canView: booleanSchema,
-    canCreate: booleanSchema,
-    canEdit: booleanSchema,
-    canDelete: booleanSchema,
-  }),
-  product: z.object({
-    canView: booleanSchema,
-    canCreate: booleanSchema,
-    canEdit: booleanSchema,
-    canDelete: booleanSchema,
-  }),
-  employee: z.object({
-    canView: booleanSchema,
-    canCreate: booleanSchema,
-    canEdit: booleanSchema,
-    canDelete: booleanSchema,
-    actions: z
-      .object({
-        canSetPassword: booleanSchema,
-        canIssueMagicLink: booleanSchema,
-      })
-      .optional(),
-  }),
-  purchaseOrder: z.object({
-    canView: booleanSchema,
-    canCreate: booleanSchema,
-    canEdit: booleanSchema,
-    canDelete: booleanSchema,
-    query: z.object({
-      canFilter: booleanSchema,
-      canViewAll: booleanSchema,
-    }),
-    actions: z.object({
-      canTakePhoto: booleanSchema,
-      canConfirm: booleanSchema,
-      canProcess: booleanSchema,
-      canShip: booleanSchema,
-      canDeliver: booleanSchema,
-      canMarkReady: booleanSchema,
-      canRefund: booleanSchema,
-      canCancel: booleanSchema,
-    }),
-  }),
-  deliveryRequest: z.object({
-    canView: booleanSchema,
-    canCreate: booleanSchema,
-    canEdit: booleanSchema,
-    canDelete: booleanSchema,
-    query: z.object({
-      canFilter: booleanSchema,
-      canViewAll: booleanSchema,
-    }),
-    actions: z.object({
-      canUpdateDeliveryOrderInDay: booleanSchema,
-      canStartTransit: booleanSchema,
-      canComplete: booleanSchema,
-      canTakePhoto: booleanSchema,
-    }),
-  }),
 });
 
 // Schema for GET /auth/me response

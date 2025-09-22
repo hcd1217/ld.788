@@ -72,6 +72,7 @@
     "deactivate": "Deactivate",
     "deactivated": " {{entity}}Deactivated",
     "delete": "Delete",
+    "deleteConfirmationMessage": "Are you sure you want to delete this photo?",
     "description": "Description",
     "doNotHavePermissionForAction": "You don't have permission to perform this action",
     "download": "Download",

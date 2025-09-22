@@ -367,6 +367,7 @@ function generateDepartmentPermissions() {
         ) as Permissions['deliveryRequest'];
         const actions = permissions.deliveryRequest.actions || {};
         actions.canTakePhoto = false;
+        actions.canDeletePhoto = false;
         actions.canComplete = false;
       }
       return permissions;
@@ -378,6 +379,7 @@ function generateDepartmentPermissions() {
         canUpdateDeliveryOrderInDay: true,
         canStartTransit: true,
         canTakePhoto: true,
+        canDeletePhoto: false,
         canComplete: true,
       };
       return permissions;
@@ -414,6 +416,7 @@ function generateDepartmentPermissions() {
         },
         actions: {
           canTakePhoto: false,
+          canDeletePhoto: false,
           canConfirm: false,
           canProcess: false,
           canShip: false,
@@ -434,6 +437,7 @@ function generateDepartmentPermissions() {
           canStartTransit: false,
           canComplete: false,
           canTakePhoto: false,
+          canDeletePhoto: false,
         },
       },
     };

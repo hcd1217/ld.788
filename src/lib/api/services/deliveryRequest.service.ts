@@ -6,6 +6,8 @@ import {
   type CreateDeliveryRequestResponse,
   CreateDeliveryRequestResponseSchema,
   CreateDeliveryRequestSchema,
+  type DeletePhotoRequest,
+  DeletePhotoRequestSchema,
   type DeliveryStatus,
   type GetDeliveryRequestResponse,
   GetDeliveryRequestResponseSchema,
@@ -111,6 +113,15 @@ export class DeliveryRequestApi extends BaseApiClient {
       },
       undefined,
       UploadPhotosSchema,
+    );
+  }
+
+  async deleteDeliveryPhoto(id: string, data: DeletePhotoRequest): Promise<void> {
+    await this.delete(
+      `/api/sales/delivery-requests/${id}/photos`,
+      data,
+      undefined,
+      DeletePhotoRequestSchema,
     );
   }
 

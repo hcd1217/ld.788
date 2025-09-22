@@ -23,7 +23,7 @@ export function POPhotoUpload({ opened, onClose, onUpload }: POPhotoUploadProps)
         const { publicUrl, key } = await uploadBase64ToS3(capturedPhoto, {
           fileName: `po-photo-${Date.now()}.jpg`,
           fileType: 'image/jpeg',
-          purpose: 'DELIVERY_REQUEST_PHOTO', // Same purpose type for all photos
+          purpose: 'PURCHASE_ORDER_PHOTO', // Same purpose type for all photos
           prefix: 'purchase-order',
         });
 

@@ -67,6 +67,7 @@ type DeliveryRequestState = {
   updateDeliveryRequest: (id: string, data: UpdateDeliveryRequest) => Promise<void>;
   updateDeliveryStatus: (id: string, status: DeliveryStatus, notes?: string) => Promise<void>;
   uploadPhotos: (id: string, photos: { publicUrl: string; key: string }[]) => Promise<void>;
+  deletePhoto: (id: string, photoId: string) => Promise<void>;
   completeDelivery: (
     id: string,
     data?: {
@@ -385,6 +386,31 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
         }
       },
 
+      async deletePhoto(id: string, photoId: string) {
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
+          return;
+        }
+
+        // Mark as pending
+        get()._markPending(id);
+
+        try {
+          // Call service
+          await deliveryRequestService.deletePhoto(id, photoId);
+
+          // Force reload to get latest data from server
+          get()._forceReload(id);
+        } catch (error) {
+          set({ error: getErrorMessage(error, 'Failed to delete photo') });
+          throw error;
+        } finally {
+          get()._removePending(id);
+        }
+      },
+
       async completeDelivery(
         id: string,
         data: { photos: { publicUrl: string; key: string }[]; notes?: string },
@@ -597,6 +623,7 @@ export const useDeliveryRequestActions = () => {
   const updateDeliveryRequest = useDeliveryRequestStore((state) => state.updateDeliveryRequest);
   const updateDeliveryStatus = useDeliveryRequestStore((state) => state.updateDeliveryStatus);
   const uploadPhotos = useDeliveryRequestStore((state) => state.uploadPhotos);
+  const deletePhoto = useDeliveryRequestStore((state) => state.deletePhoto);
   const completeDelivery = useDeliveryRequestStore((state) => state.completeDelivery);
   const updateDeliveryOrderInDay = useDeliveryRequestStore(
     (state) => state.updateDeliveryOrderInDay,
@@ -618,6 +645,7 @@ export const useDeliveryRequestActions = () => {
     updateDeliveryRequest,
     updateDeliveryStatus,
     uploadPhotos,
+    deletePhoto,
     completeDelivery,
     updateDeliveryOrderInDay,
     loadDeliveryRequestsForDate,

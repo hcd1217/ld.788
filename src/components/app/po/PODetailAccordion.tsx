@@ -1,4 +1,5 @@
 import { Accordion, Group, Stack, Text } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import {
   IconClipboardList,
   IconHistory,
@@ -10,6 +11,9 @@ import {
 import { ViewOnMap } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { usePermissions } from '@/stores/useAppStore';
+import { usePOActions } from '@/stores/usePOStore';
+import { canDeletePhotoPurchaseOrder } from '@/utils/permission.utils';
 
 import { POAccordionActions } from './POAccordionActions';
 import { POAccordionHistoryPanel } from './POAccordionHistoryPanel';
@@ -45,6 +49,26 @@ export function PODetailAccordion({
   onCreateDelivery,
 }: PODetailAccordionProps) {
   const { t } = useTranslation();
+  const permissions = usePermissions();
+  const { deletePhoto } = usePOActions();
+  const canDelete = canDeletePhotoPurchaseOrder(permissions);
+
+  const handleDeletePhoto = async (photoId: string) => {
+    try {
+      await deletePhoto(purchaseOrder.id, photoId);
+      notifications.show({
+        title: t('common.success'),
+        message: 'Photo deleted successfully',
+        color: 'green',
+      });
+    } catch {
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to delete photo',
+        color: 'red',
+      });
+    }
+  };
   return (
     <Stack gap="md">
       <Accordion defaultValue="info" variant="contained">
@@ -108,6 +132,8 @@ export function PODetailAccordion({
                 photos={purchaseOrder.photos}
                 withScrollArea
                 scrollAreaHeight="30vh"
+                canDelete={canDelete}
+                onDeletePhoto={handleDeletePhoto}
               />
             </Accordion.Panel>
           </Accordion.Item>

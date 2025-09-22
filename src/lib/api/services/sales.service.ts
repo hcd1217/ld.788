@@ -46,6 +46,8 @@ import {
   type BulkUpsertProductsResponse,
   type UploadPhotosRequest,
   UploadPhotosRequestSchema,
+  DeletePhotoRequestSchema,
+  type DeletePhotoRequest,
 } from '../schemas/sales.schemas';
 
 export class SalesApi extends BaseApiClient {
@@ -251,6 +253,15 @@ export class SalesApi extends BaseApiClient {
       data,
       undefined,
       UploadPhotosRequestSchema,
+    );
+  }
+
+  async deletePhoto(id: string, data: DeletePhotoRequest): Promise<void> {
+    await this.delete(
+      `/api/sales/purchase-orders/${id}/photos`,
+      data,
+      undefined,
+      DeletePhotoRequestSchema,
     );
   }
 

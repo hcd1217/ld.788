@@ -72,6 +72,7 @@
     "deactivate": "Khoá",
     "deactivated": "Đã Khóa {{entity}}",
     "delete": "Xóa",
+    "deleteConfirmationMessage": "Bạn có chắc chắn muốn xóa ảnh này không?",
     "description": "Mô Tả",
     "doNotHavePermissionForAction": "Không có quyền thực hiện thao tác này",
     "download": "Tải xuống",

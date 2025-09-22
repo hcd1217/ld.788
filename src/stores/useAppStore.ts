@@ -294,6 +294,10 @@ const EMPTY_PERMISSIONS: Permission = Object.freeze({
     canCreate: false,
     canEdit: false,
     canDelete: false,
+    actions: {
+      canIssueMagicLink: false,
+      canSetPassword: false,
+    },
   },
   purchaseOrder: {
     canView: false,
@@ -306,6 +310,7 @@ const EMPTY_PERMISSIONS: Permission = Object.freeze({
     },
     actions: {
       canTakePhoto: false,
+      canDeletePhoto: false,
       canConfirm: false,
       canProcess: false,
       canShip: false,
@@ -330,6 +335,7 @@ const EMPTY_PERMISSIONS: Permission = Object.freeze({
       canStartTransit: false,
       canComplete: false,
       canTakePhoto: false,
+      canDeletePhoto: false,
     },
   },
 });

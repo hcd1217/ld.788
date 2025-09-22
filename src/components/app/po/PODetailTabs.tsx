@@ -17,6 +17,9 @@ import {
 import { ComingSoonCard, Tabs } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { usePermissions } from '@/stores/useAppStore';
+import { usePOActions } from '@/stores/usePOStore';
+import { canDeletePhotoPurchaseOrder } from '@/utils/permission.utils';
 
 import { POActionZone } from './POActionZone';
 import { POBasicInfoCard } from './POBasicInfoCard';
@@ -51,6 +54,9 @@ export function PODetailTabs({
   onCreateDelivery,
 }: PODetailTabsProps) {
   const { t } = useTranslation();
+  const permissions = usePermissions();
+  const { deletePhoto } = usePOActions();
+  const canDelete = canDeletePhotoPurchaseOrder(permissions);
 
   const [value, setValue] = useState<
     'info' | 'items' | 'timeline' | 'photos' | 'documents' | 'communication'
@@ -81,6 +87,23 @@ export function PODetailTabs({
       message: t('po.exportExcelComingSoon'),
       color: 'blue',
     });
+  };
+
+  const handleDeletePhoto = async (photoId: string) => {
+    try {
+      await deletePhoto(purchaseOrder.id, photoId);
+      notifications.show({
+        title: t('common.success'),
+        message: 'Photo deleted successfully',
+        color: 'green',
+      });
+    } catch {
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to delete photo',
+        color: 'red',
+      });
+    }
   };
 
   return (
@@ -147,6 +170,8 @@ export function PODetailTabs({
           columns={2}
           withScrollArea
           scrollAreaHeight="65vh"
+          canDelete={canDelete}
+          onDeletePhoto={handleDeletePhoto}
           // imageHeight={320}
         />
       </Tabs.Panel>

@@ -80,6 +80,7 @@ type POState = {
   cancelPO: (id: string, data?: { cancelReason?: string }) => Promise<void>;
   refundPO: (id: string, data?: { refundReason?: string }) => Promise<void>;
   uploadPhotos: (id: string, photos: { publicUrl: string; key: string }[]) => Promise<void>;
+  deletePhoto: (id: string, photoId: string) => Promise<void>;
   clearError: () => void;
 
   // Selectors
@@ -460,6 +461,33 @@ export const usePOStore = create<POState>()(
         }
       },
 
+      async deletePhoto(id: string, photoId: string) {
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
+          return;
+        }
+
+        // Mark as pending
+        state._markPending(id);
+
+        try {
+          // Call service
+          await purchaseOrderService.deletePhoto(id, photoId);
+
+          // Force reload to get latest data from server
+          get()._forceReload(id);
+        } catch (error) {
+          const errorMessage = getErrorMessage(error, 'Failed to delete photo');
+          set({ error: errorMessage });
+          throw error;
+        } finally {
+          // Clear pending
+          state._removePending(id);
+        }
+      },
+
       clearError() {
         set({ error: undefined });
       },
@@ -641,6 +669,7 @@ export const usePOActions = () => {
   const cancelPO = usePOStore((state) => state.cancelPO);
   const refundPO = usePOStore((state) => state.refundPO);
   const uploadPhotos = usePOStore((state) => state.uploadPhotos);
+  const deletePhoto = usePOStore((state) => state.deletePhoto);
   const clearError = usePOStore((state) => state.clearError);
 
   return {
@@ -662,6 +691,7 @@ export const usePOActions = () => {
     cancelPurchaseOrder: cancelPO,
     refundPurchaseOrder: refundPO,
     uploadPhotos,
+    deletePhoto,
   };
 };
 

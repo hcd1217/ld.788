@@ -140,6 +140,10 @@ export const UploadPhotosRequestSchema = z.object({
   photos: z.array(UploadPhotoSchema),
 });
 
+export const DeletePhotoRequestSchema = z.object({
+  photoId: idSchema,
+});
+
 // Purchase Order response schemas
 export const GetPurchaseOrdersResponseSchema = z.object({
   purchaseOrders: z.array(PurchaseOrderSchema),
@@ -158,6 +162,7 @@ export type CreatePurchaseOrderRequest = z.infer<typeof CreatePurchaseOrderReque
 export type UpdatePurchaseOrderRequest = z.infer<typeof UpdatePurchaseOrderRequestSchema>;
 export type UpdatePOStatusRequest = z.infer<typeof UpdatePOStatusRequestSchema>;
 export type UploadPhotosRequest = z.infer<typeof UploadPhotosRequestSchema>;
+export type DeletePhotoRequest = z.infer<typeof DeletePhotoRequestSchema>;
 export type GetPurchaseOrdersResponse = z.infer<typeof GetPurchaseOrdersResponseSchema>;
 export type CreatePurchaseOrderResponse = z.infer<typeof CreatePurchaseOrderResponseSchema>;
 export type GetPurchaseOrderResponse = z.infer<typeof GetPurchaseOrderResponseSchema>;
