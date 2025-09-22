@@ -42,7 +42,7 @@ export function DeliveryFilterBarMobile({
       return t('common.filters.allStatus');
     }
     if (selectedStatuses.length === 1) {
-      const statusKey = `delivery.status.${selectedStatuses[0].toLowerCase()}` as any;
+      const statusKey = `delivery.statuses.${selectedStatuses[0].toLowerCase()}` as any;
       return t(statusKey);
     }
     return `${t('delivery.status')} (${selectedStatuses.length})`;

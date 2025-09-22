@@ -167,6 +167,7 @@
     "phone": "Phone",
     "photos": {
       "capture": "Capture",
+      "deleted": "Photo deleted successfully",
       "permissionDenied": "Permission denied",
       "retake": "Retake",
       "takePhoto": "Take Photo",

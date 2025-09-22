@@ -79,7 +79,7 @@ export function DeliveryDetailAccordion({
       await deletePhoto(deliveryRequest.id, photoId);
       notifications.show({
         title: t('common.success'),
-        message: 'Photo deleted successfully',
+        message: t('common.photos.deleted'),
         color: 'green',
       });
     } catch {

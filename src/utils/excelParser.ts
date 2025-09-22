@@ -265,7 +265,7 @@ export const generateEmployeeExcelTemplate = (language?: string, departments?: s
 
   // Build headers based on locale
   const headers = isVietnamese
-    ? ['Họ', 'Tên', 'Bộ phận', 'Email', 'Điện thoại', 'Người liên hệ']
+    ? ['Họ', 'Tên', 'Bộ phận', 'Email', 'Điện thoại']
     : ['FirstName', 'LastName', 'Department', 'Email', 'Phone'];
 
   // Build sample data

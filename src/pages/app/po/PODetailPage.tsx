@@ -402,7 +402,11 @@ export function PODetailPage() {
         errorTitle: t('common.errors.notificationTitle'),
         errorMessage: t('po.deliveryRequestCreateFailed'),
       },
-      onSuccess: () => {
+      onSuccess: async () => {
+        if (poId) {
+          // Reload PO
+          void (await loadPO(poId));
+        }
         setDeliveryModalOpened(false);
         navigate(ROUTERS.DELIVERY_MANAGEMENT);
       },

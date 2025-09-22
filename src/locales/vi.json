@@ -167,6 +167,7 @@
     "phone": "Điện thoại",
     "photos": {
       "capture": "Chụp Ảnh",
+      "deleted": "Ảnh đã được xóa thành công",
       "permissionDenied": "Không có quyền truy cập máy ảnh",
       "retake": "Chụp Lại",
       "takePhoto": "Chụp Ảnh",
