@@ -7,8 +7,6 @@ import { Checkbox, Group, ScrollArea, Table, Text } from '@mantine/core';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { formatDate } from '@/utils/time';
 
 import { PODeliveryBadge } from './PODeliveryBadge';
@@ -39,7 +37,6 @@ function PODataTableComponent({
 }: PODataTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const customerMapByCustomerId = useCustomerMapByCustomerId();
   // Memoized navigation handler
   const handleRowClick = useCallback(
     (poId: string) => () => {
@@ -156,9 +153,7 @@ function PODataTableComponent({
                 </Table.Td>
                 <Table.Td>
                   <Group gap="sm" justify="start">
-                    <Text fw={400}>
-                      {getCustomerNameByCustomerId(customerMapByCustomerId, po.customerId)}
-                    </Text>
+                    <Text fw={400}>{po.customerName ?? '-'}</Text>
                   </Group>
                 </Table.Td>
                 <Table.Td>

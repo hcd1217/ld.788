@@ -7,10 +7,9 @@ import { Box, Card, Group, type MantineStyleProp, Text } from '@mantine/core';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { formatDate } from '@/utils/time';
 
+import { POCustomer } from './POCustomer';
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
 import { POUrgentBadge } from './POUrgentBadge';
@@ -30,7 +29,6 @@ type POCardProps = {
 export function POCard({ purchaseOrder, style, className }: POCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const customerMapByCustomerId = useCustomerMapByCustomerId();
   // Memoized navigation handler
   const handleCardClick = useCallback(() => {
     navigate(getPODetailRoute(purchaseOrder.id));
@@ -60,7 +58,7 @@ export function POCard({ purchaseOrder, style, className }: POCardProps) {
               {t('common.customer')}:
             </Text>
             <Text size="xs" fw={500}>
-              {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
+              <POCustomer purchaseOrder={purchaseOrder} />
             </Text>
           </Group>
 

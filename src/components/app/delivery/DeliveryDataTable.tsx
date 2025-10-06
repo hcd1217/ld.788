@@ -7,7 +7,7 @@ import { Group, ScrollArea, Table, Text } from '@mantine/core';
 import { UrgentBadge } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales';
-import { formatDate } from '@/utils/time';
+import { formatDate, formatDateTime } from '@/utils/time';
 
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
 import { DeliveryTypeBadge } from './DeliveryTypeBadge';
@@ -72,7 +72,7 @@ function DeliveryDataTableComponent({ deliveryRequests }: DeliveryDataTableProps
                   </Group>
                 </Table.Td>
                 <Table.Td>{formatDate(delivery.scheduledDate)}</Table.Td>
-                <Table.Td>{formatDate(delivery.completedDate)}</Table.Td>
+                <Table.Td>{formatDateTime(delivery.completedDate)}</Table.Td>
                 <Table.Td>
                   <Text size="sm">{delivery.deliveryPerson}</Text>
                 </Table.Td>

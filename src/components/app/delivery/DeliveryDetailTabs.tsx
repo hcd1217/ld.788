@@ -17,7 +17,7 @@ import {
   canDeletePhotoDeliveryRequest,
   canEditDeliveryRequest,
 } from '@/utils/permission.utils';
-import { formatDate } from '@/utils/time';
+import { formatDate, formatDateTime } from '@/utils/time';
 
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
@@ -183,7 +183,7 @@ export function DeliveryDetailTabs({
                           {t('delivery.completedDate')}
                         </Text>
                         <Text size="sm" fw={500}>
-                          {formatDate(deliveryRequest.completedDate)}
+                          {formatDateTime(deliveryRequest.completedDate)}
                         </Text>
                       </div>
                     )}

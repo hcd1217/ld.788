@@ -3,9 +3,8 @@ import { IconBuilding } from '@tabler/icons-react';
 
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
 
+import { POCustomer } from './POCustomer';
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
 import { POUrgentBadge } from './POUrgentBadge';
@@ -19,7 +18,6 @@ const span = { base: 12, md: 6 };
 
 export function POInfoSection({ purchaseOrder, onNavigateToItemsList }: POInfoSectionProps) {
   const { t } = useTranslation();
-  const customerMapByCustomerId = useCustomerMapByCustomerId();
 
   return (
     <Grid>
@@ -65,7 +63,7 @@ export function POInfoSection({ purchaseOrder, onNavigateToItemsList }: POInfoSe
               <IconBuilding size={16} color="var(--mantine-color-gray-6)" />
               <div>
                 <Text fw={500}>
-                  {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
+                  <POCustomer purchaseOrder={purchaseOrder} />
                 </Text>
               </div>
             </Group>

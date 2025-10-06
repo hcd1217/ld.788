@@ -1,4 +1,4 @@
-import { type ProductOverview, salesApi } from '@/lib/api';
+import { type CustomerOverview, type ProductOverview, salesApi } from '@/lib/api';
 import {
   type POItem as ApiPOItem,
   type PurchaseOrder as ApiPurchaseOrder,
@@ -23,10 +23,13 @@ export type POItem = ApiPOItem;
 export type PurchaseOrder = Omit<ApiPurchaseOrder, 'deliveryRequest' | 'items'> & {
   items: POItem[];
   address?: string;
+  customerName: string;
   googleMapsUrl?: string;
   statusHistory?: POStatusHistory[];
   salesPerson?: string;
   isInternalDelivery: boolean;
+  isPersonalCustomer?: boolean;
+  personalCustomerName?: string;
   isUrgentPO: boolean;
   customerPONumber?: string;
   deliveryRequest?: {
@@ -54,6 +57,7 @@ function transformApiToFrontend(
   apiPO: ApiPurchaseOrder,
   employeeMapByEmployeeId: Map<string, EmployeeOverview>,
   productMapByProductId: Map<string, ProductOverview>,
+  customerMapByCustomerId: Map<string, CustomerOverview>,
 ): Omit<PurchaseOrder, 'customer'> {
   const salesPerson = apiPO.salesId
     ? employeeMapByEmployeeId.get(apiPO.salesId)?.fullName
@@ -62,13 +66,24 @@ function transformApiToFrontend(
   const deliveryPerson = deliveryRequest?.assignedTo
     ? employeeMapByEmployeeId.get(deliveryRequest.assignedTo)?.fullName
     : undefined;
+  let customerName = '';
+
+  if (apiPO.customerId) {
+    customerName = customerMapByCustomerId.get(apiPO.customerId)?.name ?? '';
+  }
+  if (apiPO.isPersonalCustomer) {
+    customerName = apiPO.personalCustomerName || '';
+  }
   return {
     ...apiPO,
     salesPerson,
     isUrgentPO: apiPO.isUrgentPO ?? false,
     isInternalDelivery: apiPO.isInternalDelivery,
+    isPersonalCustomer: apiPO.isPersonalCustomer,
+    personalCustomerName: apiPO.personalCustomerName,
     customerPONumber: apiPO.customerPONumber,
     customerId: apiPO.customerId,
+    customerName,
     address: apiPO?.shippingAddress?.oneLineAddress,
     googleMapsUrl: apiPO?.shippingAddress?.googleMapsUrl,
     statusHistory: apiPO?.statusHistory,
@@ -159,13 +174,21 @@ export const purchaseOrderService = {
     const response = await salesApi.getPurchaseOrders(apiParams);
     const employeeMapByEmployeeId = await overviewService.getEmployeeOverview();
     const productMapByProductId = await overviewService.getProductOverview();
+    const customerMapByCustomerId = await overviewService.getCustomerOverview();
     const purchaseOrders = response.purchaseOrders
       .sort((a, b) => {
         if (a.isUrgentPO && !b.isUrgentPO) return -1;
         if (!a.isUrgentPO && b.isUrgentPO) return 1;
         return a.poNumber.localeCompare(b.poNumber);
       })
-      .map((po) => transformApiToFrontend(po, employeeMapByEmployeeId, productMapByProductId));
+      .map((po) =>
+        transformApiToFrontend(
+          po,
+          employeeMapByEmployeeId,
+          productMapByProductId,
+          customerMapByCustomerId,
+        ),
+      );
     return {
       purchaseOrders,
       pagination: response.pagination,
@@ -176,8 +199,14 @@ export const purchaseOrderService = {
     const po = await salesApi.getPurchaseOrderById(id);
     const employeeMapByEmployeeId = await overviewService.getEmployeeOverview();
     const productMapByProductId = await overviewService.getProductOverview();
+    const customerMapByCustomerId = await overviewService.getCustomerOverview();
     return po
-      ? transformApiToFrontend(po, employeeMapByEmployeeId, productMapByProductId)
+      ? transformApiToFrontend(
+          po,
+          employeeMapByEmployeeId,
+          productMapByProductId,
+          customerMapByCustomerId,
+        )
       : undefined;
   },
 
@@ -190,7 +219,7 @@ export const purchaseOrderService = {
     },
   ): Promise<void> {
     const createRequest: CreatePurchaseOrderRequest = {
-      customerId: data.customerId,
+      customerId: data.isPersonalCustomer ? undefined : data.customerId,
       salesId: data.salesId,
       orderDate: data.orderDate ? data.orderDate.toISOString() : new Date().toISOString(),
       deliveryDate: data.deliveryDate ? data.deliveryDate.toISOString() : undefined,
@@ -209,6 +238,8 @@ export const purchaseOrderService = {
       metadata: {
         isInternalDelivery: data.isInternalDelivery,
         customerPONumber: data.customerPONumber,
+        isPersonalCustomer: data.isPersonalCustomer,
+        personalCustomerName: data.personalCustomerName,
         isUrgentPO: data.isUrgentPO,
         notes: data.notes,
         shippingAddress: {
@@ -252,6 +283,8 @@ export const purchaseOrderService = {
       deliveryDate: data.deliveryDate?.toISOString(),
       metadata: {
         isInternalDelivery: data.isInternalDelivery,
+        isPersonalCustomer: data.isPersonalCustomer,
+        personalCustomerName: data.personalCustomerName,
         customerPONumber: data.customerPONumber,
         isUrgentPO: data.isUrgentPO,
         notes: data.notes,

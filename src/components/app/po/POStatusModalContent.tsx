@@ -5,10 +5,9 @@ import { IconAlertTriangle } from '@tabler/icons-react';
 
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { formatDate } from '@/utils/time';
 
+import { POCustomer } from './POCustomer';
 import { POStatusModalFields } from './POStatusModalFields';
 
 import type { ModalConfig, POModalMode } from './POStatusModalConfig';
@@ -49,7 +48,6 @@ export function POStatusModalContent({
   isConfirmDisabled,
 }: POStatusModalContentProps) {
   const { t } = useTranslation();
-  const customerMapByCustomerId = useCustomerMapByCustomerId();
 
   const isDisabled = useMemo(() => {
     if (isConfirmDisabled || isLoading) {
@@ -100,8 +98,7 @@ export function POStatusModalContent({
           )}
         </Text>
         <Text size="sm" c="dimmed">
-          {t('common.customer')}:{' '}
-          {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
+          {t('common.customer')}: <POCustomer purchaseOrder={purchaseOrder} />
         </Text>
         <Text size="sm" c="dimmed">
           {t('po.items')}: {purchaseOrder.items.length} {t('po.itemsCount')}

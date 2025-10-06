@@ -29,7 +29,7 @@ import {
   canStartTransitDeliveryRequest,
   canTakePhotoDeliveryRequest,
 } from '@/utils/permission.utils';
-import { formatDate } from '@/utils/time';
+import { formatDate, formatDateTime } from '@/utils/time';
 
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
@@ -154,7 +154,7 @@ export function DeliveryDetailAccordion({
           ? [
               {
                 label: t('delivery.completedDate'),
-                value: formatDate(deliveryRequest.completedDate),
+                value: formatDateTime(deliveryRequest.completedDate),
               },
             ]
           : []),

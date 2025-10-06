@@ -54,7 +54,7 @@ export function POForm({
     if (!form.values.orderDate) {
       return true;
     }
-    if (!form.values.customerId) {
+    if (!form.values.customerId && !form.values.isPersonalCustomer) {
       return true;
     }
     return false;

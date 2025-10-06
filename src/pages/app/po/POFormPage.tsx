@@ -79,6 +79,8 @@ export function POFormPage({ mode }: POFormPageProps) {
         shippingAddress: copyData.shippingAddress || initialValues.shippingAddress,
         notes: copyData.notes || '',
         isInternalDelivery: copyData.isInternalDelivery,
+        isPersonalCustomer: copyData.isPersonalCustomer,
+        personalCustomerName: copyData.personalCustomerName,
         // Don't copy dates, customerPONumber - use fresh dates for new PO
         customerPONumber: initialValues.customerPONumber || '',
         orderDate: initialValues.orderDate,
@@ -127,6 +129,8 @@ export function POFormPage({ mode }: POFormPageProps) {
             : initialValues.shippingAddress,
         notes: po.notes || '',
         isInternalDelivery: po.isInternalDelivery ?? true,
+        isPersonalCustomer: po.isPersonalCustomer ?? false,
+        personalCustomerName: po.personalCustomerName || '',
         isUrgentPO: po.isUrgentPO ?? false,
         customerPONumber: po.customerPONumber || '',
       });
@@ -155,10 +159,15 @@ export function POFormPage({ mode }: POFormPageProps) {
       if (!values) return;
       if (isEditMode && (!id || !currentPO)) return;
 
+      let customerName = '';
+
       // Validate customer
-      const customer = customers.find((c) => c.id === values.customerId);
-      if (!customer) {
-        throw new Error(t('po.customerNotFound'));
+      if (!values.isPersonalCustomer) {
+        const customer = customers.find((c) => c.id === values.customerId);
+        if (!customer) {
+          throw new Error(t('po.customerNotFound'));
+        }
+        customerName = customer.name;
       }
 
       // Upload attachments to S3 if any
@@ -169,7 +178,7 @@ export function POFormPage({ mode }: POFormPageProps) {
                 uploadToS3(file, {
                   fileName: file.name,
                   fileType: file.type,
-                  purpose: 'PURCHASE_ORDER_DOCUMENT',
+                  purpose: 'PURCHASE_ORDER_ATTACHMENT',
                   prefix: 'purchase-order',
                 }),
               ),
@@ -178,6 +187,7 @@ export function POFormPage({ mode }: POFormPageProps) {
 
       // Prepare PO data
       const poData = {
+        customerName,
         customerId: values.customerId,
         salesId: values.salesId,
         items: values.items,
@@ -187,6 +197,8 @@ export function POFormPage({ mode }: POFormPageProps) {
         googleMapsUrl: values.shippingAddress?.googleMapsUrl,
         notes: values.notes,
         isInternalDelivery: values.isInternalDelivery,
+        isPersonalCustomer: values.isPersonalCustomer,
+        personalCustomerName: values.personalCustomerName,
         isUrgentPO: values.isUrgentPO,
         customerPONumber: values.customerPONumber,
         photos: uploadedAttachments.map(({ publicUrl, key }) => ({
@@ -204,6 +216,8 @@ export function POFormPage({ mode }: POFormPageProps) {
           status: 'NEW' as const,
           orderDate: poData.orderDate || new Date(),
           isInternalDelivery: poData.isInternalDelivery,
+          isPersonalCustomer: poData.isPersonalCustomer,
+          personalCustomerName: poData.personalCustomerName,
           isUrgentPO: poData.isUrgentPO,
           customerPONumber: poData.customerPONumber,
         };

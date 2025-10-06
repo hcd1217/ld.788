@@ -1,4 +1,4 @@
-import { Card, Select, Stack, Text } from '@mantine/core';
+import { Card, Select, Stack, Switch, Text, TextInput } from '@mantine/core';
 
 import { useTranslation } from '@/hooks/useTranslation';
 import type { CustomerOverview as Customer } from '@/services/client/overview';
@@ -30,12 +30,27 @@ export function POCustomerAndSalesSelection({
 
         <Select
           searchable
-          required
+          required={!form.values.isPersonalCustomer}
           label={t('common.customer')}
           placeholder={t('po.selectCustomer')}
           data={customerOptions}
-          disabled={isEditMode}
+          disabled={isEditMode || form.values.isPersonalCustomer}
           {...form.getInputProps('customerId')}
+        />
+
+        <TextInput
+          disabled={!form.values.isPersonalCustomer}
+          label={t('po.personalCustomerName')}
+          placeholder={t('po.personalCustomerName')}
+          value={form.values.personalCustomerName || ''}
+          onChange={(e) => form.setFieldValue('personalCustomerName', e.target.value)}
+        />
+
+        <Switch
+          disabled={isEditMode}
+          label={t('po.isPersonalCustomer')}
+          size="md"
+          {...form.getInputProps('isPersonalCustomer', { type: 'checkbox' })}
         />
 
         <Select

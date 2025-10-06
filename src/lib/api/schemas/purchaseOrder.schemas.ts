@@ -27,6 +27,8 @@ const POUpsertMetadataSchema = z.object({
   isInternalDelivery: optionalBooleanSchema,
   isUrgentPO: optionalBooleanSchema,
   customerPONumber: optionalStringSchema,
+  isPersonalCustomer: optionalBooleanSchema,
+  personalCustomerName: optionalStringSchema,
   attachments: z.array(UploadPhotoSchema),
 });
 
@@ -86,13 +88,15 @@ export const POStatusHistorySchema = z.object({
 export const PurchaseOrderSchema = z.object({
   id: idSchema,
   poNumber: stringSchema,
-  customerId: idSchema,
+  customerId: optionalIdSchema,
   salesId: optionalIdSchema,
   status: POStatusSchema,
   orderDate: timestampSchema,
   deliveryDate: optionalTimestampSchema,
   isInternalDelivery: booleanSchema,
   isUrgentPO: optionalBooleanSchema,
+  isPersonalCustomer: optionalBooleanSchema,
+  personalCustomerName: optionalStringSchema,
   customerPONumber: optionalStringSchema,
   completedDate: optionalTimestampSchema,
   notes: optionalStringSchema,
@@ -116,7 +120,7 @@ export const PurchaseOrderSchema = z.object({
 
 // Purchase Order request schemas
 export const CreatePurchaseOrderRequestSchema = z.object({
-  customerId: idSchema,
+  customerId: optionalIdSchema,
   salesId: optionalIdSchema,
   orderDate: backEndTimestampSchema,
   deliveryDate: optionalBackEndTimestampSchema,

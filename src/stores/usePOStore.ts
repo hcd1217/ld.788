@@ -307,12 +307,15 @@ export const usePOStore = create<POState>()(
             customerId: poData.customerId,
             items: poData.items,
             salesId: poData.salesId,
+            customerName: poData.customerName,
             metadata: {
               shippingAddress: {
                 oneLineAddress: poData.address,
                 googleMapsUrl: poData.googleMapsUrl,
               },
             },
+            isPersonalCustomer: poData.isPersonalCustomer,
+            personalCustomerName: poData.personalCustomerName,
             isInternalDelivery: poData.isInternalDelivery,
             isUrgentPO: poData.isUrgentPO,
             customerPONumber: poData.customerPONumber,

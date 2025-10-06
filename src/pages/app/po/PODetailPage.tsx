@@ -121,6 +121,8 @@ export function PODetailPage() {
             isUrgentPO: purchaseOrder.isUrgentPO,
             isInternalDelivery: purchaseOrder.isInternalDelivery,
             customerPONumber: purchaseOrder.customerPONumber,
+            isPersonalCustomer: purchaseOrder.isPersonalCustomer,
+            personalCustomerName: purchaseOrder.personalCustomerName,
           },
         },
       });

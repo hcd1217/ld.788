@@ -6,10 +6,9 @@ import { SelectableCard } from '@/components/common';
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { formatDate } from '@/utils/time';
 
+import { POCustomer } from './POCustomer';
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
 import { POUrgentBadge } from './POUrgentBadge';
@@ -21,7 +20,6 @@ type POGridCardProps = {
 export function POGridCard({ purchaseOrder }: POGridCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const customerMapByCustomerId = useCustomerMapByCustomerId();
   return (
     <SelectableCard
       withBorder
@@ -51,7 +49,7 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
                   {t('common.customer')}
                 </Text>
                 <Text size="sm" fw={500}>
-                  {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
+                  <POCustomer purchaseOrder={purchaseOrder} />
                 </Text>
               </div>
               <div>

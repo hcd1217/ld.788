@@ -9,9 +9,8 @@ import { InfoField } from '@/components/common';
 import { getDeliveryDetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
-import { useCustomerMapByCustomerId, usePermissions } from '@/stores/useAppStore';
+import { usePermissions } from '@/stores/useAppStore';
 import { IconIdentifiers } from '@/utils/iconRegistry';
-import { getCustomerNameByCustomerId } from '@/utils/overview';
 import { canEditPurchaseOrder } from '@/utils/permission.utils';
 import {
   getCancelReason,
@@ -24,6 +23,7 @@ import { formatDate, formatDateTime } from '@/utils/time';
 
 import { DeliveryStatusBadge } from '../delivery/DeliveryStatusBadge';
 
+import { POCustomer } from './POCustomer';
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
 import { POUrgentBadge } from './POUrgentBadge';
@@ -41,7 +41,6 @@ export function POAccordionInfoPanel({
 }: POAccordionInfoPanelProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const customerMapByCustomerId = useCustomerMapByCustomerId();
   const isEditable = isPOEditable(purchaseOrder);
   const permissions = usePermissions();
   const { canEdit } = useMemo(
@@ -99,7 +98,7 @@ export function POAccordionInfoPanel({
           <InfoField
             label={t('common.customer')}
             icon={IconIdentifiers.BUILDING}
-            value={getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
+            value={<POCustomer purchaseOrder={purchaseOrder} />}
           />
         </Grid.Col>
         {purchaseOrder.customerPONumber && (
