@@ -12,6 +12,7 @@ import {
   type DeliveryStatus,
   type UpdateDeliveryRequest,
 } from '@/services/sales';
+import type { UploadPhoto } from '@/types';
 import { getErrorMessage } from '@/utils/errorUtils';
 import { endOfDay, startOfDay } from '@/utils/time';
 
@@ -68,16 +69,18 @@ type DeliveryRequestState = {
   updateDeliveryStatus: (id: string, status: DeliveryStatus, notes?: string) => Promise<void>;
   uploadPhotos: (id: string, photos: { publicUrl: string; key: string }[]) => Promise<void>;
   deletePhoto: (id: string, photoId: string) => Promise<void>;
+  startTransit: (id: string, data: { transitNotes?: string }) => Promise<void>;
   completeDelivery: (
     id: string,
-    data?: {
+    data: {
       receivedBy: string;
-      photos: { publicUrl: string; key: string }[];
-      notes: string;
+      photos: UploadPhoto[];
+      deliveryNotes: string;
     },
   ) => Promise<void>;
-  updateDeliveryOrderInDay: (assignedTo: string, date: Date, requestIds: string[]) => Promise<void>;
+  updateDeliveryOrderInDay: (assignedTo: string, requestIds: string[]) => Promise<void>;
   loadDeliveryRequestsForDate: (assignedTo: string, date: Date) => Promise<DeliveryRequest[]>;
+  deleteDeliveryRequest: (id: string) => Promise<void>;
   clearError: () => void;
 
   // Selectors
@@ -411,9 +414,38 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
         }
       },
 
+      async startTransit(id: string, data: { transitNotes?: string }) {
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
+          return;
+        }
+
+        // Mark as pending
+        get()._markPending(id);
+
+        try {
+          // Call service and use the response
+          await deliveryRequestService.startTransit(id, data);
+
+          // Force reload to get latest data from server
+          get()._forceReload(id);
+        } catch (error) {
+          set({ error: getErrorMessage(error, 'Failed to start transit') });
+          throw error;
+        } finally {
+          get()._removePending(id);
+        }
+      },
+
       async completeDelivery(
         id: string,
-        data: { photos: { publicUrl: string; key: string }[]; notes?: string },
+        data: {
+          photos: UploadPhoto[];
+          deliveryNotes: string;
+          receivedBy: string;
+        },
       ) {
         const state = get();
 
@@ -452,10 +484,10 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
         }
       },
 
-      async updateDeliveryOrderInDay(assignedTo: string, date: Date, requestIds: string[]) {
+      async updateDeliveryOrderInDay(assignedTo: string, requestIds: string[]) {
         set({ isLoading: true, error: undefined });
         try {
-          await deliveryRequestService.updateDeliveryOrderInDay(assignedTo, date, requestIds);
+          await deliveryRequestService.updateDeliveryOrderInDay(assignedTo, requestIds);
           // No need to reload, the page will refresh the data
         } catch (error) {
           set({ error: getErrorMessage(error, 'Failed to update delivery order') });
@@ -480,6 +512,37 @@ export const useDeliveryRequestStore = create<DeliveryRequestState>()(
           throw error;
         } finally {
           set({ isLoading: false });
+        }
+      },
+
+      async deleteDeliveryRequest(id: string) {
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
+          return;
+        }
+
+        // Mark as pending
+        get()._markPending(id);
+
+        try {
+          // Call service
+          await deliveryRequestService.deleteDeliveryRequest(id);
+
+          // Remove from list and clear current if it's the same
+          set((state) => ({
+            deliveryRequests: state.deliveryRequests.filter((dr) => dr.id !== id),
+            currentDeliveryRequest:
+              state.currentDeliveryRequest?.id === id ? undefined : state.currentDeliveryRequest,
+          }));
+        } catch (error) {
+          const errorMessage = getErrorMessage(error, 'Failed to delete delivery request');
+          set({ error: errorMessage });
+          throw error;
+        } finally {
+          // Clear pending
+          get()._removePending(id);
         }
       },
 
@@ -625,12 +688,14 @@ export const useDeliveryRequestActions = () => {
   const uploadPhotos = useDeliveryRequestStore((state) => state.uploadPhotos);
   const deletePhoto = useDeliveryRequestStore((state) => state.deletePhoto);
   const completeDelivery = useDeliveryRequestStore((state) => state.completeDelivery);
+  const startTransit = useDeliveryRequestStore((state) => state.startTransit);
   const updateDeliveryOrderInDay = useDeliveryRequestStore(
     (state) => state.updateDeliveryOrderInDay,
   );
   const loadDeliveryRequestsForDate = useDeliveryRequestStore(
     (state) => state.loadDeliveryRequestsForDate,
   );
+  const deleteDeliveryRequest = useDeliveryRequestStore((state) => state.deleteDeliveryRequest);
   const clearError = useDeliveryRequestStore((state) => state.clearError);
 
   return {
@@ -647,8 +712,10 @@ export const useDeliveryRequestActions = () => {
     uploadPhotos,
     deletePhoto,
     completeDelivery,
+    startTransit,
     updateDeliveryOrderInDay,
     loadDeliveryRequestsForDate,
+    deleteDeliveryRequest,
     clearError,
   };
 };

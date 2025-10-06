@@ -395,6 +395,9 @@ function generateDepartmentPermissions() {
       canDelete: false,
     };
     return {
+      vendor: {
+        ...basePermission,
+      },
       customer: {
         ...basePermission,
       },

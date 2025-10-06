@@ -42,11 +42,13 @@ if (!existsSync(publicDir)) {
  */
 function hexToRgb(hex) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : { r: 50, g: 78, b: 113 }; // Default to #324e71
+  return result
+    ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      }
+    : { r: 50, g: 78, b: 113 }; // Default to #324e71
 }
 
 /**
@@ -54,33 +56,37 @@ function hexToRgb(hex) {
  */
 async function generateThemeColoredLogo() {
   console.log('\n🎨 Generating themed logo.svg...');
-  
+
   const logoPath = join(publicDir, 'logo.svg');
   const originalLogoPath = join(publicDir, 'logo-original.svg');
-  
+
   // Save original logo if it doesn't exist
   if (existsSync(logoPath) && !existsSync(originalLogoPath)) {
     const originalContent = readFileSync(logoPath, 'utf-8');
     writeFileSync(originalLogoPath, originalContent);
     console.log('✓ Backed up original logo to logo-original.svg');
   }
-  
+
   // Read the original logo or current logo
   const sourcePath = existsSync(originalLogoPath) ? originalLogoPath : logoPath;
   let svgContent = readFileSync(sourcePath, 'utf-8');
-  
+
   // Replace all occurrences of the old color with the new theme color
   // This regex matches hex colors in the format #RRGGBB or #RGB
   svgContent = svgContent.replace(/#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g, (match) => {
     // Keep white colors unchanged
-    if (match.toLowerCase() === '#ffffff' || match.toLowerCase() === '#fff' || 
-        match.toLowerCase() === '#fdfefe' || match.toLowerCase() === '#fefefe') {
+    if (
+      match.toLowerCase() === '#ffffff' ||
+      match.toLowerCase() === '#fff' ||
+      match.toLowerCase() === '#fdfefe' ||
+      match.toLowerCase() === '#fefefe'
+    ) {
       return match;
     }
     // Replace any other color with theme color
     return THEME_COLOR;
   });
-  
+
   writeFileSync(logoPath, svgContent);
   console.log(`✓ Generated logo.svg with theme color ${THEME_COLOR}`);
 }
@@ -90,10 +96,10 @@ async function generateThemeColoredLogo() {
  */
 async function generatePWAIcons() {
   console.log('\n📱 Generating PWA icons...');
-  
+
   const svgBuffer = readFileSync(join(publicDir, 'logo.svg'));
   const rgb = hexToRgb(THEME_COLOR);
-  
+
   // Define icon sizes
   const iconSizes = [
     { size: 64, name: 'pwa-64x64.png' },
@@ -104,11 +110,11 @@ async function generatePWAIcons() {
     { size: 16, name: 'favicon-16x16.png' },
     { size: 32, name: 'favicon-32x32.png' },
   ];
-  
+
   for (const icon of iconSizes) {
     try {
       let img = sharp(svgBuffer).resize(icon.size, icon.size);
-      
+
       // Add padding for maskable icon
       if (icon.padding) {
         const paddingSize = Math.floor(icon.size * 0.1);
@@ -120,27 +126,27 @@ async function generatePWAIcons() {
           background: { r: 255, g: 255, b: 255, alpha: 0 },
         });
       }
-      
+
       await img.png().toFile(join(publicDir, icon.name));
       console.log(`✓ Generated ${icon.name}`);
     } catch (error) {
       console.error(`✗ Error generating ${icon.name}:`, error.message);
     }
   }
-  
+
   // Generate mask-icon.svg (monochrome version for Safari)
   try {
     const maskSvg = svgBuffer
       .toString()
       .replace(/fill="[^"]*"/g, 'fill="black"')
       .replace(/stroke="[^"]*"/g, 'stroke="black"');
-    
+
     await sharp(Buffer.from(maskSvg)).resize(16, 16).toFile(join(publicDir, 'mask-icon.svg'));
     console.log('✓ Generated mask-icon.svg');
   } catch (error) {
     console.error('✗ Error generating mask-icon.svg:', error.message);
   }
-  
+
   // Create a favicon.ico from the 32x32 PNG
   try {
     await sharp(svgBuffer).resize(32, 32).toFile(join(publicDir, 'favicon.ico'));
@@ -155,10 +161,10 @@ async function generatePWAIcons() {
  */
 async function generateSplashScreens() {
   console.log('\n📱 Generating iOS splash screens...');
-  
+
   const svgBuffer = readFileSync(join(publicDir, 'logo.svg'));
   const rgb = hexToRgb(THEME_COLOR);
-  
+
   // Define iOS splash screen sizes
   const splashScreenSizes = [
     { width: 1290, height: 2796, name: 'apple-splash-1290-2796.png' },
@@ -172,18 +178,18 @@ async function generateSplashScreens() {
     { width: 1668, height: 2224, name: 'apple-splash-1668-2224.png' },
     { width: 1620, height: 2160, name: 'apple-splash-1620-2160.png' },
   ];
-  
+
   for (const splash of splashScreenSizes) {
     try {
       const logoSize = Math.floor(Math.min(splash.width, splash.height) * 0.25);
-      
+
       const logo = await sharp(svgBuffer)
         .resize(logoSize, logoSize, {
           fit: 'contain',
           background: { r: 0, g: 0, b: 0, alpha: 0 },
         })
         .toBuffer();
-      
+
       const background = await sharp({
         create: {
           width: splash.width,
@@ -194,7 +200,7 @@ async function generateSplashScreens() {
       })
         .png()
         .toBuffer();
-      
+
       await sharp(background)
         .composite([
           {
@@ -203,7 +209,7 @@ async function generateSplashScreens() {
           },
         ])
         .toFile(join(publicDir, splash.name));
-      
+
       console.log(`✓ Generated ${splash.name}`);
     } catch (error) {
       console.error(`✗ Error generating ${splash.name}:`, error.message);
@@ -216,22 +222,22 @@ async function generateSplashScreens() {
  */
 async function generateOpenGraphImage() {
   console.log('\n🌐 Generating OpenGraph image...');
-  
+
   const svgBuffer = readFileSync(join(publicDir, 'logo.svg'));
   const rgb = hexToRgb(THEME_COLOR);
-  
+
   try {
     const width = 1200;
     const height = 630;
     const logoSize = Math.floor(Math.min(width, height) * 0.3);
-    
+
     const logo = await sharp(svgBuffer)
       .resize(logoSize, logoSize, {
         fit: 'contain',
         background: { r: 0, g: 0, b: 0, alpha: 0 },
       })
       .toBuffer();
-    
+
     const background = await sharp({
       create: {
         width,
@@ -242,7 +248,7 @@ async function generateOpenGraphImage() {
     })
       .png()
       .toBuffer();
-    
+
     await sharp(background)
       .composite([
         {
@@ -251,7 +257,7 @@ async function generateOpenGraphImage() {
         },
       ])
       .toFile(join(publicDir, 'og-image.png'));
-    
+
     console.log('✓ Generated og-image.png');
   } catch (error) {
     console.error('✗ Error generating og-image.png:', error.message);
@@ -263,7 +269,7 @@ async function generateOpenGraphImage() {
  */
 function generateManifest() {
   console.log('\n📋 Generating manifest.json...');
-  
+
   const manifest = {
     name: `${APP_NAME} App`,
     short_name: APP_SHORT_NAME,
@@ -298,9 +304,9 @@ function generateManifest() {
       },
     ],
   };
-  
+
   const outputPath = join(publicDir, 'manifest.json');
-  
+
   try {
     writeFileSync(outputPath, JSON.stringify(manifest, null, 2));
     console.log(`✓ Generated manifest.json with theme color ${THEME_COLOR}`);
@@ -315,7 +321,7 @@ function generateManifest() {
  */
 function generateOfflineHTML() {
   console.log('\n📄 Generating offline.html...');
-  
+
   const offlineHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -363,9 +369,9 @@ function generateOfflineHTML() {
     </div>
 </body>
 </html>`;
-  
+
   const outputPath = join(publicDir, 'offline.html');
-  
+
   try {
     writeFileSync(outputPath, offlineHtml);
     console.log(`✓ Generated offline.html with theme color ${THEME_COLOR}`);
@@ -380,22 +386,22 @@ function generateOfflineHTML() {
  */
 function updateViteConfig() {
   console.log('\n⚙️ Updating vite.config.ts...');
-  
+
   const viteConfigPath = join(rootDir, 'vite.config.ts');
   let viteConfig = readFileSync(viteConfigPath, 'utf-8');
-  
+
   // Update theme_color in manifest
   viteConfig = viteConfig.replace(
     /theme_color:\s*['"]#[0-9a-fA-F]{6}['"]/,
-    `theme_color: '#${THEME_COLOR_HEX}'`
+    `theme_color: '#${THEME_COLOR_HEX}'`,
   );
-  
+
   // Update background_color if needed (keeping it white for better UX)
   // viteConfig = viteConfig.replace(
   //   /background_color:\s*['"]#[0-9a-fA-F]{6}['"]/,
   //   `background_color: '#${THEME_COLOR_HEX}'`
   // );
-  
+
   writeFileSync(viteConfigPath, viteConfig);
   console.log(`✓ Updated vite.config.ts with theme color ${THEME_COLOR}`);
 }
@@ -405,25 +411,25 @@ function updateViteConfig() {
  */
 async function main() {
   console.log('🚀 Starting theme-based asset generation...\n');
-  
+
   try {
     // Generate themed logo first
     await generateThemeColoredLogo();
-    
+
     // Generate all assets
     await generatePWAIcons();
     await generateSplashScreens();
     await generateOpenGraphImage();
-    
+
     // Generate configuration files
     generateManifest();
     generateOfflineHTML();
     updateViteConfig();
-    
+
     // Generate version.json
     console.log('\n📦 Generating version.json...');
     execSync('node scripts/generate-version.js', { stdio: 'inherit', cwd: rootDir });
-    
+
     console.log('\n✨ All theme-based assets generated successfully!');
     console.log(`🎨 Theme color: ${THEME_COLOR}`);
     console.log(`📱 App name: ${APP_NAME}`);

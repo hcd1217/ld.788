@@ -409,6 +409,194 @@ export const generateCustomerExcelTemplate = (
   XLSX.writeFile(workbook, 'customers_template.xlsx');
 };
 
+// Vendor bulk import types and functions
+export type BulkVendor = {
+  name: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  address?: string;
+  taxCode?: string;
+};
+
+export const parseVendorExcelFile = async (file: File): Promise<BulkVendor[]> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.addEventListener('load', (event) => {
+      try {
+        const data = event.target?.result;
+        if (!data) {
+          reject(new Error('Failed to read file'));
+          return;
+        }
+
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+
+        const sheetData = XLSX.utils.sheet_to_json(worksheet, {
+          header: 1,
+          defval: '',
+        }) as string[][];
+
+        // Parse header row
+        const [headerRow, ...dataRows] = sheetData;
+        if (!headerRow || dataRows.length === 0) {
+          reject(new Error('Empty spreadsheet or missing header'));
+          return;
+        }
+
+        // Normalize headers for case-insensitive matching
+        const normalizedHeaders = headerRow.map((h) => String(h).toLowerCase().trim());
+
+        // Create header index map for flexible column mapping
+        const getColumnIndex = (possibleNames: string[]): number => {
+          for (const name of possibleNames) {
+            const index = normalizedHeaders.indexOf(name.toLowerCase());
+            if (index >= 0) return index;
+          }
+          return -1;
+        };
+
+        const nameCol = getColumnIndex(['name', 'tên', 'vendor name', 'tên nhà cung cấp']);
+        const emailCol = getColumnIndex(['contactemail', 'email', 'email liên hệ']);
+        const phoneCol = getColumnIndex(['contactphone', 'phone', 'điện thoại', 'phone number']);
+        const addressCol = getColumnIndex(['address', 'địa chỉ']);
+        const taxCodeCol = getColumnIndex(['taxcode', 'mã số thuế', 'tax code', 'mst']);
+
+        // Validate required columns
+        if (nameCol === -1) {
+          reject(
+            new Error('Missing required column: Name (Tên). Please check the template format.'),
+          );
+          return;
+        }
+
+        const vendors: BulkVendor[] = [];
+
+        for (const row of dataRows) {
+          // Skip empty rows
+          if (!row || row.every((cell) => !cell || String(cell).trim() === '')) {
+            continue;
+          }
+
+          const name = String(row[nameCol] || '').trim();
+
+          // Skip if name is empty
+          if (!name) continue;
+
+          const vendor: BulkVendor = {
+            name,
+            contactEmail: emailCol >= 0 ? String(row[emailCol] || '').trim() : undefined,
+            contactPhone: phoneCol >= 0 ? String(row[phoneCol] || '').trim() : undefined,
+            address: addressCol >= 0 ? String(row[addressCol] || '').trim() : undefined,
+            taxCode: taxCodeCol >= 0 ? String(row[taxCodeCol] || '').trim() : undefined,
+          };
+
+          // Remove undefined optional fields
+          Object.keys(vendor).forEach((key) => {
+            if (
+              vendor[key as keyof BulkVendor] === undefined ||
+              vendor[key as keyof BulkVendor] === ''
+            ) {
+              delete vendor[key as keyof BulkVendor];
+            }
+          });
+
+          vendors.push(vendor);
+        }
+
+        resolve(vendors);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          reject(error);
+        } else {
+          reject(new Error('Unknown error parsing Excel file'));
+        }
+      }
+    });
+
+    reader.addEventListener('error', () => {
+      reject(new Error('Failed to read file'));
+    });
+
+    reader.readAsArrayBuffer(file);
+  });
+};
+
+export const generateVendorExcelTemplate = (
+  language?: string,
+  features?: { noEmail?: boolean; noTaxCode?: boolean },
+) => {
+  const isVietnamese = language === 'vi';
+  const { noEmail = false, noTaxCode = false } = features ?? {};
+
+  // Build headers based on locale and features
+  const headers = [];
+
+  if (isVietnamese) {
+    headers.push('Tên');
+    if (!noEmail) headers.push('Email Liên hệ');
+    headers.push('Điện thoại', 'Địa chỉ');
+    if (!noTaxCode) headers.push('Mã số thuế');
+  } else {
+    headers.push('Name');
+    if (!noEmail) headers.push('ContactEmail');
+    headers.push('ContactPhone', 'Address');
+    if (!noTaxCode) headers.push('TaxCode');
+  }
+
+  // Build example data based on locale and features
+  const buildExampleRow = (
+    name: string,
+    email: string,
+    phone: string,
+    address: string,
+    taxCode: string,
+  ) => {
+    const row = [name];
+    if (!noEmail) row.push(email);
+    row.push(phone, address);
+    if (!noTaxCode) row.push(taxCode);
+    return row;
+  };
+
+  const exampleData = isVietnamese
+    ? buildExampleRow(
+        'Nhà Cung Cấp ABC',
+        'vendor@example.com',
+        '+84912345678',
+        '123 Đường ABC, Quận 1, TP.HCM',
+        '0123456789',
+      )
+    : buildExampleRow(
+        'ABC Supplier',
+        'vendor@example.com',
+        '+1234567890',
+        '123 Main St, City, Country',
+        'VAT123456',
+      );
+
+  const data = [headers, exampleData];
+
+  const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+  // Set column widths dynamically based on included columns
+  const columnWidths = [];
+  columnWidths.push({ width: 25 }); // Name
+  if (!noEmail) columnWidths.push({ width: 25 }); // Email
+  columnWidths.push({ width: 15 }); // Phone
+  columnWidths.push({ width: 35 }); // Address
+  if (!noTaxCode) columnWidths.push({ width: 15 }); // TaxCode
+
+  worksheet['!cols'] = columnWidths;
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Vendors');
+
+  XLSX.writeFile(workbook, 'vendors_template.xlsx');
+};
+
 // Product bulk import types and functions
 export type BulkProduct = {
   productCode: string;

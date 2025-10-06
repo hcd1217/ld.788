@@ -33,7 +33,7 @@ export const ProductOverviewSchema = z.object({
   name: stringSchema.describe('Product name'),
   code: stringSchema.describe('Product code'),
   unit: stringSchema.describe('Product unit'),
-  isDeleted: optionalBooleanSchema.describe('Product is deleted'),
+  isActive: optionalBooleanSchema.describe('Product is active'),
 });
 
 export const CustomerOverviewSchema = z.object({
@@ -48,12 +48,21 @@ export const CustomerOverviewSchema = z.object({
   googleMapsUrl: optionalStringSchema.describe('Google Maps URL'),
 });
 
+export const VendorOverviewSchema = z.object({
+  id: idSchema.describe('Vendor ID'),
+  name: stringSchema.describe('Vendor name'),
+  isActive: booleanSchema.describe('Customer is active'),
+  address: optionalStringSchema.describe('Vendor address'),
+  googleMapsUrl: optionalStringSchema.describe('Google Maps URL'),
+});
+
 // Combined overview response schema
 export const CombinedOverviewSchema = z.object({
   employees: z.array(EmployeeOverviewSchema).describe('List of employees'),
   departments: z.array(DepartmentOverviewSchema).describe('List of departments'),
   products: z.array(ProductOverviewSchema).describe('List of products'),
   customers: z.array(CustomerOverviewSchema).describe('List of customers'),
+  vendors: z.array(VendorOverviewSchema).describe('List of vendors'),
 });
 
 // Request params schema
@@ -67,5 +76,6 @@ export type EmployeeOverview = z.infer<typeof EmployeeOverviewSchema>;
 export type DepartmentOverview = z.infer<typeof DepartmentOverviewSchema>;
 export type ProductOverview = z.infer<typeof ProductOverviewSchema>;
 export type CustomerOverview = z.infer<typeof CustomerOverviewSchema>;
+export type VendorOverview = z.infer<typeof VendorOverviewSchema>;
 export type CombinedOverview = z.infer<typeof CombinedOverviewSchema>;
 export type OverviewParams = z.infer<typeof OverviewParamsSchema>;

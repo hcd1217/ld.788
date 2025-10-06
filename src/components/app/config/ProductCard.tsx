@@ -57,8 +57,8 @@ export function ProductCard({ product, style, className }: ProductCardProps) {
           }}
         >
           <ActiveBadge
-            isActive={!product.isDeleted}
-            label={product.isDeleted ? t('product.inactive') : t('product.active')}
+            isActive={product.isActive ?? true}
+            label={product.isActive ? t('product.active') : t('product.inactive')}
           />
         </Box>
       </Group>

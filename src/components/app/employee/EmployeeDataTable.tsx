@@ -90,6 +90,7 @@ export function EmployeeDataTable({ employees }: EmployeeDataTableProps) {
 
   return (
     <DataTable
+      withIndex
       data={employees as Employee[]}
       columns={columns}
       onRowClick={handleRowClick}

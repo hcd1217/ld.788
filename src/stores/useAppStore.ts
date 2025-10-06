@@ -277,6 +277,12 @@ const EMPTY_EMPLOYEES_ARRAY: readonly EmployeeOverview[] = [];
 const EMPTY_CUSTOMER_OPTIONS_ARRAY: readonly { id: string; value: string; label: string }[] = [];
 const EMPTY_DEPARTMENT_OPTIONS_ARRAY: readonly { id: string; value: string; label: string }[] = [];
 const EMPTY_PERMISSIONS: Permission = Object.freeze({
+  vendor: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+  },
   customer: {
     canView: false,
     canCreate: false,
@@ -406,4 +412,30 @@ export const useDepartmentOptions = () => {
       label: department.name,
     }));
   }, [departments]);
+};
+// Vendor selectors - stable empty array reference
+const EMPTY_VENDOR_OPTIONS_ARRAY: readonly {
+  id: string;
+  value: string;
+  label: string;
+  address: string | undefined;
+  googleMapsUrl: string | undefined;
+}[] = [];
+
+export const useVendorOptions = () => {
+  const vendors = useAppStore((state) => state.overviewData?.vendors);
+
+  // Use useMemo to create stable reference (as per CLAUDE.md line 52)
+  return React.useMemo(() => {
+    if (!vendors) return EMPTY_VENDOR_OPTIONS_ARRAY;
+    return vendors
+      .filter((vendor) => vendor.isActive)
+      .map((vendor) => ({
+        id: vendor.id,
+        value: vendor.id,
+        label: vendor.name,
+        address: vendor.address,
+        googleMapsUrl: vendor.googleMapsUrl,
+      }));
+  }, [vendors]);
 };

@@ -2,6 +2,8 @@ import { mediaApi } from '@/lib/api';
 import type { UploadUrlRequest } from '@/lib/api/schemas/media.schemas';
 import { logError, logInfo } from '@/utils/logger';
 
+import { isDevelopment } from './env';
+
 export type MediaUploadOptions = {
   fileName: string;
   fileType: string;
@@ -54,6 +56,13 @@ export const uploadToS3 = async (
   file: File,
   options: MediaUploadOptions,
 ): Promise<MediaUploadResult> => {
+  if (isDevelopment) {
+    return {
+      publicUrl:
+        'https://ctkper.s3.amazonaws.com/nktu/undefined/2025-10-02/d505ed07-ee27-415b-aeff-56ccb52a6806/delivery-request-photo/delivery/1759383029926-delivery-photo-1759383029879.jpg',
+      key: '1759383029926-delivery-photo-1759383029879.jpg',
+    };
+  }
   try {
     logInfo('Starting S3 upload', {
       module: 'MediaUpload',

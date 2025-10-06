@@ -5,11 +5,12 @@ import { Navigate, useNavigate } from 'react-router';
 import { Box, Button, Card, Divider, Group, rem, Stack, Text } from '@mantine/core';
 import {
   IconBell,
+  IconBuildingWarehouse,
   IconClock,
   IconExternalLink,
   IconLogout,
   IconPackage,
-  IconSettings,
+  IconShoppingCart,
   IconUser,
   IconUsersGroup,
 } from '@tabler/icons-react';
@@ -59,8 +60,15 @@ export function MorePage() {
       {
         title: t('common.pages.customerConfig'),
         description: t('common.pages.customerConfigDescription'),
-        icon: IconSettings,
+        icon: IconBuildingWarehouse,
         onClick: () => navigate(ROUTERS.CUSTOMER_CONFIG),
+        color: 'lime',
+      },
+      {
+        title: t('common.pages.vendorConfig'),
+        description: t('common.pages.vendorConfigDescription'),
+        icon: IconShoppingCart,
+        onClick: () => navigate(ROUTERS.VENDOR_CONFIG),
         color: 'lime',
       },
       {

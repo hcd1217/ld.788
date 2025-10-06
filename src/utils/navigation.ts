@@ -10,7 +10,11 @@ import { getIcon } from '@/utils/iconRegistry';
  * @param t Translation function for i18n
  * @returns Frontend navigation item with resolved icon component
  */
-function transformBackendItem(item: BackendNavigationItem, t: any): FrontendNavigationItem {
+function transformBackendItem(
+  item: BackendNavigationItem,
+  t: any,
+  isRootUser?: boolean,
+): FrontendNavigationItem {
   const iconComponent = getIcon(item.icon);
 
   const frontendItem: FrontendNavigationItem = {
@@ -27,7 +31,7 @@ function transformBackendItem(item: BackendNavigationItem, t: any): FrontendNavi
 
   // Transform nested items recursively
   if (item.subs?.length) {
-    frontendItem.subs = item.subs.map((subItem) => transformBackendItem(subItem, t));
+    frontendItem.subs = item.subs.map((subItem) => transformBackendItem(subItem, t, isRootUser));
   }
 
   return frontendItem;
@@ -42,6 +46,7 @@ function transformBackendItem(item: BackendNavigationItem, t: any): FrontendNavi
 function transformBackendNavigation(
   items: BackendNavigationItem[],
   t: any,
+  isRootUser?: boolean,
 ): FrontendNavigationItem[] {
   // Sort by order if provided
   const sortedItems = [...items].sort((a, b) => {
@@ -50,7 +55,7 @@ function transformBackendNavigation(
     return orderA - orderB;
   });
 
-  return sortedItems.map((item) => transformBackendItem(item, t));
+  return sortedItems.map((item) => transformBackendItem(item, t, isRootUser));
 }
 
 /**
@@ -78,16 +83,19 @@ export function getNavigationItems(
   t: any,
   userRoles?: string[],
   navigationOverrides?: { granted: string[]; denied: string[] },
+  isRootUser?: boolean,
 ): FrontendNavigationItem[] {
   // Use backend navigation if available
   if (backendNav?.length) {
     // Apply role-based access control if user roles are provided
-    let processedNav = userRoles ? applyRoleBasedAccess(backendNav, userRoles) : backendNav;
+    let processedNav = userRoles
+      ? applyRoleBasedAccess(backendNav, isRootUser ?? false, userRoles)
+      : backendNav;
 
     // Apply navigation overrides after role-based access
     processedNav = applyNavigationOverrides(processedNav, navigationOverrides);
 
-    return transformBackendNavigation(processedNav, t);
+    return transformBackendNavigation(processedNav, t, isRootUser);
   }
 
   throw new Error('No backend navigation found');
@@ -102,6 +110,7 @@ export function getNavigationItems(
  */
 function applyRoleBasedAccess(
   items: BackendNavigationItem[],
+  isRootUser: boolean,
   userRoles: string[],
 ): BackendNavigationItem[] {
   return items.map((item) => {
@@ -109,8 +118,9 @@ function applyRoleBasedAccess(
     const newItem = { ...item };
 
     // Check if user has required role (if roles are specified)
-    const hasRequiredRole =
-      !item.roles?.length || item.roles.some((role) => userRoles.includes(role));
+    const hasRequiredRole = isRootUser
+      ? true
+      : !item.roles?.length || item.roles.some((role) => userRoles.includes(role));
 
     // Mark as disabled if user lacks required role
     if (!hasRequiredRole) {
@@ -119,7 +129,7 @@ function applyRoleBasedAccess(
 
     // Process sub-items recursively
     if (item.subs?.length) {
-      const processedSubs = applyRoleBasedAccess(item.subs, userRoles);
+      const processedSubs = applyRoleBasedAccess(item.subs, isRootUser ?? false, userRoles);
 
       // If parent is disabled, all children should be disabled too
       if (newItem.disabled) {
@@ -247,18 +257,19 @@ export function getMobileNavigationItems(
   t: any,
   userRoles?: string[],
   navigationOverrides?: { granted: string[]; denied: string[] },
+  isRootUser?: boolean,
 ): FrontendNavigationItem[] {
   // Use backend mobile navigation if available
   if (backendMobileNav?.length) {
     // Apply role-based access control if user roles are provided
     let processedNav = userRoles
-      ? applyRoleBasedAccess(backendMobileNav, userRoles)
+      ? applyRoleBasedAccess(backendMobileNav, isRootUser ?? false, userRoles)
       : backendMobileNav;
 
     // Apply navigation overrides after role-based access
     processedNav = applyNavigationOverrides(processedNav, navigationOverrides);
 
-    return transformBackendNavigation(processedNav, t);
+    return transformBackendNavigation(processedNav, t, isRootUser);
   }
 
   throw new Error('No backend mobile navigation found');

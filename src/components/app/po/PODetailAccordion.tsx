@@ -32,6 +32,7 @@ type PODetailAccordionProps = {
   readonly onDeliver: () => void;
   readonly onCancel: () => void;
   readonly onRefund: () => void;
+  readonly onDelete?: () => void;
   readonly onCreateDelivery: () => void;
 };
 
@@ -46,6 +47,7 @@ export function PODetailAccordion({
   onDeliver,
   onCancel,
   onRefund,
+  onDelete,
   onCreateDelivery,
 }: PODetailAccordionProps) {
   const { t } = useTranslation();
@@ -122,7 +124,9 @@ export function PODetailAccordion({
         )}
 
         {/* Photos Accordion */}
-        {purchaseOrder.photos && purchaseOrder.photos.length > 0 && (
+        {((purchaseOrder.photos && purchaseOrder.photos.length > 0) ||
+          (purchaseOrder.deliveryRequest?.photos &&
+            purchaseOrder.deliveryRequest.photos.length > 0)) && (
           <Accordion.Item value="photos">
             <Accordion.Control icon={<IconPhoto size={16} />}>
               {t('delivery.photos')}
@@ -130,6 +134,7 @@ export function PODetailAccordion({
             <Accordion.Panel>
               <POPhotoGallery
                 photos={purchaseOrder.photos}
+                deliveryPhotos={purchaseOrder.deliveryRequest?.photos}
                 withScrollArea
                 scrollAreaHeight="30vh"
                 canDelete={canDelete}
@@ -150,6 +155,7 @@ export function PODetailAccordion({
         onDeliver={onDeliver}
         onCancel={onCancel}
         onRefund={onRefund}
+        onDelete={onDelete}
         onCreateDelivery={onCreateDelivery}
       />
     </Stack>

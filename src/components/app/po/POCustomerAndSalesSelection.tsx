@@ -31,7 +31,7 @@ export function POCustomerAndSalesSelection({
         <Select
           searchable
           required
-          label={t('po.customer')}
+          label={t('common.customer')}
           placeholder={t('po.selectCustomer')}
           data={customerOptions}
           disabled={isEditMode}

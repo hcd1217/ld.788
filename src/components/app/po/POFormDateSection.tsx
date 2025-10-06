@@ -1,4 +1,4 @@
-import { Card, SimpleGrid, Stack, Switch, Text } from '@mantine/core';
+import { Card, Group, SimpleGrid, Stack, Switch, Text, TextInput } from '@mantine/core';
 
 import { DateInput } from '@/components/common';
 import { useDeviceType } from '@/hooks/useDeviceType';
@@ -44,10 +44,24 @@ export function POFormDateSection({ form, isLoading }: POFormDateSectionProps) {
             minDate={form.values.orderDate || undefined}
           />
         </SimpleGrid>
-        <Switch
-          label={t('po.isInternalDelivery')}
-          size="md"
-          {...form.getInputProps('isInternalDelivery', { type: 'checkbox' })}
+        <Group gap="xs">
+          <Switch
+            label={t('po.isInternalDelivery')}
+            size="md"
+            {...form.getInputProps('isInternalDelivery', { type: 'checkbox' })}
+          />
+          <Switch
+            label={t('po.isUrgentPO')}
+            size="md"
+            color="red"
+            {...form.getInputProps('isUrgentPO', { type: 'checkbox' })}
+          />
+        </Group>
+        <TextInput
+          label={t('po.customerPONumber')}
+          placeholder={t('po.enterCustomerPONumber')}
+          value={form.values.customerPONumber}
+          onChange={(e) => form.setFieldValue('customerPONumber', e.target.value)}
         />
       </Stack>
     </Card>

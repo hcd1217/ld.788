@@ -11,6 +11,7 @@ import {
   IconMapPin,
   IconPackage,
   IconPhoto,
+  IconTrash,
   IconTruck,
 } from '@tabler/icons-react';
 
@@ -22,6 +23,7 @@ import { useCustomers, usePermissions } from '@/stores/useAppStore';
 import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
 import {
   canCompleteDeliveryRequest,
+  canDeleteDeliveryRequest,
   canDeletePhotoDeliveryRequest,
   canEditDeliveryRequest,
   canStartTransitDeliveryRequest,
@@ -31,6 +33,7 @@ import { formatDate } from '@/utils/time';
 
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
+import { DeliveryTypeBadge } from './DeliveryTypeBadge';
 
 type DeliveryDetailAccordionProps = {
   readonly deliveryRequest: DeliveryRequest;
@@ -39,6 +42,7 @@ type DeliveryDetailAccordionProps = {
   readonly onComplete: () => void;
   readonly onTakePhoto: () => void;
   readonly onUpdate: () => void;
+  readonly onDelete?: () => void;
 };
 
 export function DeliveryDetailAccordion({
@@ -48,6 +52,7 @@ export function DeliveryDetailAccordion({
   onComplete,
   onTakePhoto,
   onUpdate,
+  onDelete,
 }: DeliveryDetailAccordionProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -64,15 +69,17 @@ export function DeliveryDetailAccordion({
     };
   }, [deliveryRequest.status]);
 
-  const { canEdit, canStartTransit, canComplete, canTakePhoto, canDelete } = useMemo(() => {
-    return {
-      canEdit: canEditDeliveryRequest(permissions),
-      canStartTransit: canStartTransitDeliveryRequest(permissions),
-      canComplete: canCompleteDeliveryRequest(permissions),
-      canTakePhoto: canTakePhotoDeliveryRequest(permissions),
-      canDelete: canDeletePhotoDeliveryRequest(permissions),
-    };
-  }, [permissions]);
+  const { canEdit, canStartTransit, canComplete, canTakePhoto, canDeletePhoto, canDeleteDelivery } =
+    useMemo(() => {
+      return {
+        canEdit: canEditDeliveryRequest(permissions),
+        canStartTransit: canStartTransitDeliveryRequest(permissions),
+        canComplete: canCompleteDeliveryRequest(permissions),
+        canTakePhoto: canTakePhotoDeliveryRequest(permissions),
+        canDeletePhoto: canDeletePhotoDeliveryRequest(permissions),
+        canDeleteDelivery: canDeleteDeliveryRequest(permissions),
+      };
+    }, [permissions]);
 
   const handleDeletePhoto = async (photoId: string) => {
     try {
@@ -93,63 +100,73 @@ export function DeliveryDetailAccordion({
 
   // Delivery info fields for cleaner rendering
   const deliveryInfoFields = useMemo(
-    () => [
-      {
-        label: t('delivery.status'),
-        value: (
-          <Group gap="xs">
-            {deliveryRequest.isUrgentDelivery && <UrgentBadge size="xs" />}
-            <DeliveryStatusBadge status={deliveryRequest.status} />
-          </Group>
-        ),
-      },
-      {
-        label: t('delivery.poNumber'),
-        value: (
-          <Text size="sm" fw={500}>
-            <Anchor
-              size="sm"
-              c="blue"
-              fw="bold"
-              onClick={() => {
-                const purchaseOrderId = deliveryRequest.purchaseOrderId || '-';
-                navigate(getPODetailRoute(purchaseOrderId));
-              }}
-            >
-              {deliveryRequest.purchaseOrderNumber}
-            </Anchor>
-          </Text>
-        ),
-      },
-      {
-        label: t('common.customer'),
-        value: deliveryRequest.customerName,
-      },
-      {
-        label: t('common.contact'),
-        value: <DeliveryCustomerInfo customerId={deliveryRequest.customerId} />,
-      },
-      {
-        label: t('delivery.scheduledDate'),
-        value: formatDate(deliveryRequest.scheduledDate, t('common.notScheduled')),
-      },
-      ...(deliveryRequest.completedDate
-        ? [
-            {
-              label: t('delivery.completedDate'),
-              value: formatDate(deliveryRequest.completedDate),
-            },
-          ]
-        : []),
-      {
-        label: t('common.notes'),
-        value: deliveryRequest.notes || '-',
-      },
-      {
-        label: t('delivery.assignedTo'),
-        value: deliveryRequest.deliveryPerson,
-      },
-    ],
+    () =>
+      [
+        {
+          label: t('delivery.status'),
+          value: (
+            <Group gap="xs">
+              {deliveryRequest.isUrgentDelivery && <UrgentBadge size="xs" />}
+              <DeliveryTypeBadge type={deliveryRequest.type} size="xs" />
+              <DeliveryStatusBadge status={deliveryRequest.status} />
+            </Group>
+          ),
+        },
+        {
+          hidden: deliveryRequest.isReceive,
+          label: t('delivery.poNumber'),
+          value: (
+            <Text size="sm" fw={500}>
+              <Anchor
+                size="sm"
+                c="blue"
+                fw="bold"
+                onClick={() => {
+                  const purchaseOrderId = deliveryRequest.purchaseOrderId || '-';
+                  navigate(getPODetailRoute(purchaseOrderId));
+                }}
+              >
+                {deliveryRequest.purchaseOrderNumber}
+              </Anchor>
+            </Text>
+          ),
+        },
+        {
+          hidden: deliveryRequest.isReceive,
+          label: t('common.customer'),
+          value: deliveryRequest.customerName,
+        },
+        {
+          hidden: deliveryRequest.isDelivery,
+          label: t('common.vendor'),
+          value: deliveryRequest.vendorName,
+        },
+        {
+          hidden: deliveryRequest.isReceive,
+          label: t('common.contact'),
+          value: <DeliveryCustomerInfo customerId={deliveryRequest.customerId} />,
+        },
+        {
+          label: t('delivery.scheduledDate'),
+          value: formatDate(deliveryRequest.scheduledDate, t('common.notScheduled')),
+        },
+        ...(deliveryRequest.completedDate
+          ? [
+              {
+                label: t('delivery.completedDate'),
+                value: formatDate(deliveryRequest.completedDate),
+              },
+            ]
+          : []),
+        {
+          label: t('common.notes'),
+          value: deliveryRequest.notes || '-',
+        },
+        {
+          label: t('delivery.assignedTo'),
+          value: deliveryRequest.deliveryPerson,
+        },
+      ].filter((el) => !el.hidden),
     [t, deliveryRequest, navigate],
   );
 
@@ -199,19 +216,38 @@ export function DeliveryDetailAccordion({
         </Accordion.Item>
 
         {/* Delivery Address */}
-        <Accordion.Item value="address">
-          <Accordion.Control icon={<IconMapPin size={20} />}>
-            <Group justify="start" align="center" gap="sm">
-              <Text size="sm">{t('po.shippingAddress')}</Text>
-              <ViewOnMap googleMapsUrl={deliveryRequest.deliveryAddress?.googleMapsUrl} />
-            </Group>
-          </Accordion.Control>
-          <Accordion.Panel>
-            <Group justify="space-between" align="flex-start">
-              <Text size="sm">{deliveryRequest.deliveryAddress?.oneLineAddress || '-'}</Text>
-            </Group>
-          </Accordion.Panel>
-        </Accordion.Item>
+        {deliveryRequest.isDelivery && (
+          <Accordion.Item value="address">
+            <Accordion.Control icon={<IconMapPin size={20} />}>
+              <Group justify="start" align="center" gap="sm">
+                <Text size="sm">{t('po.shippingAddress')}</Text>
+                <ViewOnMap googleMapsUrl={deliveryRequest.deliveryAddress?.googleMapsUrl} />
+              </Group>
+            </Accordion.Control>
+            <Accordion.Panel>
+              <Group justify="space-between" align="flex-start">
+                <Text size="sm">{deliveryRequest.deliveryAddress?.oneLineAddress || '-'}</Text>
+              </Group>
+            </Accordion.Panel>
+          </Accordion.Item>
+        )}
+
+        {/* Receiving Address */}
+        {deliveryRequest.isReceive && (
+          <Accordion.Item value="address">
+            <Accordion.Control icon={<IconMapPin size={20} />}>
+              <Group justify="start" align="center" gap="sm">
+                <Text size="sm">{t('po.receiveAddress')}</Text>
+                <ViewOnMap googleMapsUrl={deliveryRequest.receiveAddress?.googleMapsUrl} />
+              </Group>
+            </Accordion.Control>
+            <Accordion.Panel>
+              <Group justify="space-between" align="flex-start">
+                <Text size="sm">{deliveryRequest.receiveAddress?.oneLineAddress || '-'}</Text>
+              </Group>
+            </Accordion.Panel>
+          </Accordion.Item>
+        )}
 
         {/* Photos */}
         <Accordion.Item value="photos">
@@ -223,7 +259,7 @@ export function DeliveryDetailAccordion({
               photos={deliveryRequest.photos}
               withScrollArea
               scrollAreaHeight="50vh"
-              canDelete={canDelete}
+              canDelete={canDeletePhoto}
               onDeletePhoto={handleDeletePhoto}
             />
           </Accordion.Panel>
@@ -243,14 +279,27 @@ export function DeliveryDetailAccordion({
               {t('common.photos.takePhoto')}
             </Button>
           )}
-          <Button
-            leftSection={<IconEdit size={16} />}
-            variant="outline"
-            onClick={onUpdate}
-            disabled={isLoading || !canEdit}
-          >
-            {t('common.edit')}
-          </Button>
+          {deliveryRequest.status === 'PENDING' && (
+            <Button
+              leftSection={<IconEdit size={16} />}
+              variant="outline"
+              onClick={onUpdate}
+              disabled={isLoading || !canEdit}
+            >
+              {t('common.edit')}
+            </Button>
+          )}
+          {canDeleteDelivery && onDelete && (
+            <Button
+              leftSection={<IconTrash size={16} />}
+              variant="outline"
+              color="red"
+              onClick={onDelete}
+              disabled={isLoading}
+            >
+              {t('common.delete')}
+            </Button>
+          )}
         </Group>
         <Group gap="sm">
           {canStartTransitBased && canStartTransit && (

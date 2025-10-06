@@ -9,47 +9,50 @@ export function htmlTransformPlugin(): Plugin {
     name: 'html-transform',
     transformIndexHtml(html) {
       const appName = process.env.VITE_APP_NAME || 'Credo';
-      const appDescription = process.env.VITE_APP_DESCRIPTION || 'Credo Progressive Web Application';
-      
-      return html
-        // Replace title
-        .replace(/<title>.*?<\/title>/, `<title>${appName} App</title>`)
-        // Replace meta description
-        .replace(
-          /<meta name="description" content=".*?"/, 
-          `<meta name="description" content="${appDescription}"`
-        )
-        // Replace OpenGraph tags
-        .replace(
-          /<meta property="og:title" content=".*?"/,
-          `<meta property="og:title" content="${appName} App"`
-        )
-        .replace(
-          /<meta property="og:description" content=".*?"/,
-          `<meta property="og:description" content="${appDescription} - Your trusted business management platform"`
-        )
-        .replace(
-          /<meta property="og:site_name" content=".*?"/,
-          `<meta property="og:site_name" content="${appName} App"`
-        )
-        // Replace Twitter Card tags
-        .replace(
-          /<meta name="twitter:title" content=".*?"/,
-          `<meta name="twitter:title" content="${appName} App"`
-        )
-        .replace(
-          /<meta name="twitter:description" content=".*?"/,
-          `<meta name="twitter:description" content="${appDescription} - Your trusted business management platform"`
-        )
-        .replace(
-          /<meta name="twitter:image:alt" content=".*?"/,
-          `<meta name="twitter:image:alt" content="${appName} App Logo"`
-        )
-        // Replace apple-mobile-web-app-title
-        .replace(
-          /<meta name="apple-mobile-web-app-title" content=".*?"/,
-          `<meta name="apple-mobile-web-app-title" content="${appName}"`
-        );
-    }
+      const appDescription =
+        process.env.VITE_APP_DESCRIPTION || 'Credo Progressive Web Application';
+
+      return (
+        html
+          // Replace title
+          .replace(/<title>.*?<\/title>/, `<title>${appName} App</title>`)
+          // Replace meta description
+          .replace(
+            /<meta name="description" content=".*?"/,
+            `<meta name="description" content="${appDescription}"`,
+          )
+          // Replace OpenGraph tags
+          .replace(
+            /<meta property="og:title" content=".*?"/,
+            `<meta property="og:title" content="${appName} App"`,
+          )
+          .replace(
+            /<meta property="og:description" content=".*?"/,
+            `<meta property="og:description" content="${appDescription} - Your trusted business management platform"`,
+          )
+          .replace(
+            /<meta property="og:site_name" content=".*?"/,
+            `<meta property="og:site_name" content="${appName} App"`,
+          )
+          // Replace Twitter Card tags
+          .replace(
+            /<meta name="twitter:title" content=".*?"/,
+            `<meta name="twitter:title" content="${appName} App"`,
+          )
+          .replace(
+            /<meta name="twitter:description" content=".*?"/,
+            `<meta name="twitter:description" content="${appDescription} - Your trusted business management platform"`,
+          )
+          .replace(
+            /<meta name="twitter:image:alt" content=".*?"/,
+            `<meta name="twitter:image:alt" content="${appName} App Logo"`,
+          )
+          // Replace apple-mobile-web-app-title
+          .replace(
+            /<meta name="apple-mobile-web-app-title" content=".*?"/,
+            `<meta name="apple-mobile-web-app-title" content="${appName}"`,
+          )
+      );
+    },
   };
 }

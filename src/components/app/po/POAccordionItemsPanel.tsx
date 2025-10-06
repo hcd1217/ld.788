@@ -32,6 +32,11 @@ export function POAccordionItemsPanel({ purchaseOrder }: POAccordionItemsPanelPr
               {t('po.quantity')}: {item.quantity}
             </Text>
           </div>
+          <div style={{ textAlign: 'right' }}>
+            <Text size="sm">
+              {t('common.unit')}: {item.unit}
+            </Text>
+          </div>
         </Group>
       ))}
     </Stack>

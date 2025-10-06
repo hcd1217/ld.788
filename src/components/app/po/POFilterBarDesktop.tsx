@@ -3,17 +3,18 @@ import { useMemo } from 'react';
 import { Button, Group, MultiSelect, Select } from '@mantine/core';
 import { IconClearAll } from '@tabler/icons-react';
 
-import { DatePickerInput, SearchBar } from '@/components/common';
+import { SearchBar } from '@/components/common';
 import { PO_STATUS, type POStatusType } from '@/constants/purchaseOrder';
 import { useTranslation } from '@/hooks/useTranslation';
-import 'dayjs/locale/vi';
-import 'dayjs/locale/en';
 import { useCustomerOptions, usePermissions } from '@/stores/useAppStore';
 import { canFilterPurchaseOrder } from '@/utils/permission.utils';
+
+import { POAdvancedFiltersPopover } from './POAdvancedFiltersPopover';
 
 interface POFilterBarDesktopProps {
   readonly searchQuery: string;
   readonly customerId?: string;
+  readonly salesId?: string;
   readonly selectedStatuses: POStatusType[];
   readonly orderDateStart?: Date;
   readonly orderDateEnd?: Date;
@@ -22,6 +23,7 @@ interface POFilterBarDesktopProps {
   readonly hasActiveFilters: boolean;
   readonly onSearchChange: (query: string) => void;
   readonly onCustomerChange: (customerId: string | undefined) => void;
+  readonly onSalesIdChange: (salesId: string | undefined) => void;
   readonly onStatusesChange: (statuses: POStatusType[]) => void;
   readonly onOrderDateChange: (start: Date | undefined, end: Date | undefined) => void;
   readonly onDeliveryDateChange: (start: Date | undefined, end: Date | undefined) => void;
@@ -31,6 +33,7 @@ interface POFilterBarDesktopProps {
 export function POFilterBarDesktop({
   searchQuery,
   customerId,
+  salesId,
   selectedStatuses,
   orderDateStart,
   orderDateEnd,
@@ -39,6 +42,7 @@ export function POFilterBarDesktop({
   hasActiveFilters,
   onSearchChange,
   onCustomerChange,
+  onSalesIdChange,
   onStatusesChange,
   onOrderDateChange,
   onDeliveryDateChange,
@@ -109,7 +113,7 @@ export function POFilterBarDesktop({
         value={customerId || ''}
         style={{ flex: 1, minWidth: 150, borderRadius: '5px' }}
         onChange={(value) => onCustomerChange(value || undefined)}
-        label={t('po.customer')}
+        label={t('common.customer')}
       />
 
       {/* Status MultiSelect - flex 1 */}
@@ -134,40 +138,16 @@ export function POFilterBarDesktop({
         }}
       />
 
-      {/* Order Date Range */}
-      <DatePickerInput
-        label={t('po.orderDate')}
-        placeholder={t('po.selectDateRange')}
-        value={[orderDateStart, orderDateEnd]}
-        style={{ flex: 1.5, minWidth: 220 }}
-        onChange={(dates) => {
-          if (!dates) {
-            onOrderDateChange(undefined, undefined);
-          } else {
-            const [start, end] = dates;
-            const startDate = start ? new Date(start) : undefined;
-            const endDate = end ? new Date(end) : undefined;
-            onOrderDateChange(startDate, endDate);
-          }
-        }}
-      />
-
-      {/* Delivery Date Range */}
-      <DatePickerInput
-        label={t('po.deliveryDate')}
-        placeholder={t('po.selectDateRange')}
-        value={[deliveryDateStart, deliveryDateEnd]}
-        style={{ flex: 1.5, minWidth: 220 }}
-        onChange={(dates) => {
-          if (!dates) {
-            onDeliveryDateChange(undefined, undefined);
-          } else {
-            const [start, end] = dates;
-            const startDate = start ? new Date(start) : undefined;
-            const endDate = end ? new Date(end) : undefined;
-            onDeliveryDateChange(startDate, endDate);
-          }
-        }}
+      {/* Advanced Filters Popover */}
+      <POAdvancedFiltersPopover
+        salesId={salesId}
+        orderDateStart={orderDateStart}
+        orderDateEnd={orderDateEnd}
+        deliveryDateStart={deliveryDateStart}
+        deliveryDateEnd={deliveryDateEnd}
+        onSalesIdChange={onSalesIdChange}
+        onOrderDateChange={onOrderDateChange}
+        onDeliveryDateChange={onDeliveryDateChange}
       />
 
       {/* Clear Button */}

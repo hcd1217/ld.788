@@ -14,7 +14,7 @@ type PODeliveryBadgeProps = {
 
 export function PODeliveryBadge({
   size = 'sm',
-  variant = 'light',
+  variant = 'outline',
   radius = 'sm',
   isInternalDelivery,
 }: PODeliveryBadgeProps) {
@@ -23,7 +23,7 @@ export function PODeliveryBadge({
     return null;
   }
   return (
-    <Badge color="red" size={size} variant={variant} radius={radius}>
+    <Badge color="orange" size={size} variant={variant} radius={radius}>
       {t('po.externalDelivery')}
     </Badge>
   );

@@ -18,6 +18,7 @@ import { POAdditionalInfo } from './POAdditionalInfo';
 import { POCustomerAndSalesSelection } from './POCustomerAndSalesSelection';
 import { POFormActions } from './POFormActions';
 import { POFormAddressSection } from './POFormAddressSection';
+import { POFormAttachmentsSection } from './POFormAttachmentsSection';
 import { POFormDateSection } from './POFormDateSection';
 import { POFormItemsSection } from './POFormItemsSection';
 
@@ -50,9 +51,6 @@ export function POForm({
   );
 
   const isDisabled = useMemo(() => {
-    if (form.values.items.length === 0) {
-      return true;
-    }
     if (!form.values.orderDate) {
       return true;
     }
@@ -94,6 +92,9 @@ export function POForm({
 
       {/* Order Items */}
       <POFormItemsSection form={form} isLoading={isLoading} />
+
+      {/* Attachments */}
+      <POFormAttachmentsSection form={form} isLoading={isLoading} />
 
       {/* Shipping Address */}
       <POFormAddressSection form={form} selectedCustomer={selectedCustomer} />

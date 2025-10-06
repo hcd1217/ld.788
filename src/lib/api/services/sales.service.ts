@@ -1,3 +1,4 @@
+/* eslint-disable sort-imports */
 import { BaseApiClient } from '../base';
 import {
   // Customer schemas
@@ -8,14 +9,29 @@ import {
   GetCustomersResponseSchema,
   UpdateCustomerRequestSchema,
 
+  // Vendor schemas
+  BulkUpsertVendorsRequestSchema,
+  BulkUpsertVendorsResponseSchema,
+  CreateVendorRequestSchema,
+  CreateVendorResponseSchema,
+  GetVendorsResponseSchema,
+  UpdateVendorRequestSchema,
+
   // Purchase Order schemas
-  // eslint-disable-next-line sort-imports
   type BulkUpsertCustomersRequest,
   type BulkUpsertCustomersResponse,
   type CreateCustomerRequest,
   type CreateCustomerResponse,
   type GetCustomersResponse,
   type UpdateCustomerRequest,
+
+  // Vendor types
+  type BulkUpsertVendorsRequest,
+  type BulkUpsertVendorsResponse,
+  type CreateVendorRequest,
+  type CreateVendorResponse,
+  type GetVendorsResponse,
+  type UpdateVendorRequest,
 
   // Purchase Order schemas
   GetPurchaseOrdersResponseSchema,
@@ -107,6 +123,42 @@ export class SalesApi extends BaseApiClient {
       data,
       BulkUpsertCustomersResponseSchema,
       BulkUpsertCustomersRequestSchema,
+    );
+  }
+
+  // ========== Vendor APIs ==========
+  async getVendors(): Promise<GetVendorsResponse> {
+    return this.get<GetVendorsResponse, void>('/api/vendors', undefined, GetVendorsResponseSchema);
+  }
+
+  async createVendor(data: CreateVendorRequest): Promise<CreateVendorResponse> {
+    return this.post<CreateVendorResponse, CreateVendorRequest>(
+      '/api/vendors',
+      data,
+      CreateVendorResponseSchema,
+      CreateVendorRequestSchema,
+    );
+  }
+
+  async updateVendor(id: string, data: UpdateVendorRequest): Promise<void> {
+    return this.patch<void, UpdateVendorRequest>(
+      `/api/vendors/${id}`,
+      data,
+      undefined,
+      UpdateVendorRequestSchema,
+    );
+  }
+
+  async deleteVendor(id: string): Promise<void> {
+    return this.delete(`/api/vendors/${id}`);
+  }
+
+  async bulkUpsertVendors(data: BulkUpsertVendorsRequest): Promise<BulkUpsertVendorsResponse> {
+    return this.post<BulkUpsertVendorsResponse, BulkUpsertVendorsRequest>(
+      '/api/vendors/bulk-upsert',
+      data,
+      BulkUpsertVendorsResponseSchema,
+      BulkUpsertVendorsRequestSchema,
     );
   }
 
@@ -263,6 +315,10 @@ export class SalesApi extends BaseApiClient {
       undefined,
       DeletePhotoRequestSchema,
     );
+  }
+
+  async deletePurchaseOrder(id: string): Promise<void> {
+    return this.delete<void>(`/api/sales/purchase-orders/${id}`, undefined, undefined);
   }
 
   // ========== Product APIs ==========

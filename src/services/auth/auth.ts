@@ -1,11 +1,12 @@
 import { authApi, type GetMeResponse, type LoginRequest } from '@/lib/api';
+import type { Permission as PermissionType } from '@/lib/api/schemas/permission.schema';
 import { isTokenExpired } from '@/utils/jwt';
 import { logError } from '@/utils/logger';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 import { delay } from '@/utils/time';
 
 export type User = GetMeResponse;
-export type Permission = User['permissions'];
+export type Permission = PermissionType;
 
 export const authService = {
   async loginWithMagicToken(clientCode: string, token: string) {

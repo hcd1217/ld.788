@@ -29,8 +29,8 @@ export const productService = {
   async getAllProducts(): Promise<Product[]> {
     const response = await salesApi.getProducts();
     return response.products.sort((a, b) => {
-      if (a.isDeleted && !b.isDeleted) return 1;
-      if (!a.isDeleted && b.isDeleted) return -1;
+      if (a.isActive && !b.isActive) return -1;
+      if (!a.isActive && b.isActive) return 1;
       return a.name.localeCompare(b.name);
     });
   },
@@ -46,7 +46,7 @@ export const productService = {
   async activateProduct(id: string): Promise<void> {
     await salesApi.updateProduct(id, {
       metadata: {
-        isDeleted: false,
+        isActive: true,
       },
     });
   },
@@ -54,7 +54,7 @@ export const productService = {
   async deactivateProduct(id: string): Promise<void> {
     await salesApi.updateProduct(id, {
       metadata: {
-        isDeleted: true,
+        isActive: false,
       },
     });
   },

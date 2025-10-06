@@ -18,7 +18,7 @@ export const ProductSchema = z.object({
   category: optionalStringSchema,
   unit: optionalStringSchema,
   color: optionalStringSchema,
-  isDeleted: optionalBooleanSchema,
+  isActive: optionalBooleanSchema,
 });
 
 export const CreateProductRequestSchema = z.object({
@@ -36,7 +36,7 @@ export const UpdateProductRequestSchema = z.object({
   productCode: stringSchema.optional(),
   metadata: z
     .object({
-      isDeleted: optionalBooleanSchema,
+      isActive: optionalBooleanSchema,
       name: optionalStringSchema,
       description: optionalStringSchema,
       category: optionalStringSchema,

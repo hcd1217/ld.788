@@ -10,7 +10,7 @@ import type { POItem } from '@/services/sales/purchaseOrder';
  */
 export const createPOItem = (
   itemData: Partial<POItem>,
-  existingItems: POItem[],
+  _existingItems: POItem[],
 ): { item: POItem | null; error?: string } => {
   // Validation - ensure required fields are present
   if (!itemData.productCode || !itemData.description || !itemData.quantity) {
@@ -18,14 +18,14 @@ export const createPOItem = (
   }
 
   // Check for duplicate product
-  const isDuplicate = existingItems.some((item) => item.productCode === itemData.productCode);
+  // const isDuplicate = existingItems.some((item) => item.productCode === itemData.productCode);
 
-  if (isDuplicate) {
-    return {
-      item: null,
-      error: `Product ${itemData.productCode} is already added`,
-    };
-  }
+  // if (isDuplicate) {
+  //   return {
+  //     item: null,
+  //     error: `Product ${itemData.productCode} is already added`,
+  //   };
+  // }
 
   // Create the POItem with a unique ID
   const item: POItem = {

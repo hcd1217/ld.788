@@ -1,14 +1,15 @@
 import { deliveryRequestApi } from '@/lib/api';
 import {
   type DeliveryRequest as ApiDeliveryRequest,
+  type CompleteDelivery,
   type CreateDeliveryRequest,
+  type DeliveryRequestType,
   type DeliveryStatus,
+  type StartTransit,
   type UpdateDeliveryRequest,
 } from '@/lib/api/schemas/deliveryRequest.schemas';
 import type { CustomerOverview, EmployeeOverview } from '@/services/client/overview';
-import type { PhotoData } from '@/types';
-import { startOfDay } from '@/utils/time';
-import { endOfDay } from '@/utils/time';
+import type { Address, PhotoData } from '@/types';
 
 import { overviewService } from '../client/overview';
 
@@ -22,18 +23,19 @@ export type {
 
 // Frontend types with transformed metadata
 export type DeliveryRequest = Omit<ApiDeliveryRequest, 'metadata'> & {
+  isReceive: boolean;
+  isDelivery: boolean;
   isUrgentDelivery?: boolean;
+  type: DeliveryRequestType;
   deliveryRequestNumber: string;
   purchaseOrderNumber?: string | undefined;
   purchaseOrderId?: string | undefined;
   customerName?: string | undefined;
   customerId?: string | undefined;
-  photos: PhotoData[];
   deliveryPerson: string | undefined;
-  deliveryAddress?: {
-    oneLineAddress?: string;
-    googleMapsUrl?: string;
-  };
+  deliveryAddress?: Address | undefined;
+  receiveAddress?: Address | undefined;
+  photos: PhotoData[];
 };
 
 /**
@@ -53,19 +55,24 @@ function transformApiToFrontend(
   return {
     ...rest,
     deliveryPerson,
+    isReceive: apiDR.type === 'RECEIVE',
+    isDelivery: apiDR.type === 'DELIVERY',
     isUrgentDelivery: apiDR?.isUrgentDelivery ?? false,
+    type: apiDR.type,
     purchaseOrderId: apiDR?.purchaseOrder?.poId,
     purchaseOrderNumber: apiDR?.purchaseOrder?.poNumber as string,
     customerName,
     customerId: apiDR?.purchaseOrder?.customerId,
     photos: apiDR.photos ?? [],
     deliveryAddress: apiDR.deliveryAddress ?? {},
+    receiveAddress: apiDR.receiveAddress ?? {},
   };
 }
 
 // Filter parameters for delivery requests
 export type DeliveryRequestFilterParams = {
   status?: DeliveryStatus;
+  statuses?: DeliveryStatus[];
   assignedTo?: string;
   scheduledDateFrom?: string | Date;
   scheduledDateTo?: string | Date;
@@ -94,6 +101,7 @@ export const deliveryRequestService = {
     const apiParams = filters
       ? {
           status: filters.status,
+          statuses: filters.statuses,
           assignedTo: filters.assignedTo,
           scheduledDateFrom:
             filters.scheduledDateFrom instanceof Date
@@ -183,35 +191,28 @@ export const deliveryRequestService = {
     await deliveryRequestApi.deleteDeliveryPhoto(id, { photoId });
   },
 
-  async completeDelivery(
-    id: string,
-    data: { photos: { publicUrl: string; key: string; caption?: string }[]; notes?: string },
-  ): Promise<void> {
-    await deliveryRequestApi.completeDelivery(id, {
-      photos: data.photos.map((photo) => ({
-        publicUrl: photo.publicUrl,
-        key: photo.key,
-        caption: photo.caption,
-      })),
-      deliveryNotes: data?.notes,
-      receivedBy: '',
-    });
+  async startTransit(id: string, data: StartTransit): Promise<void> {
+    await deliveryRequestApi.startTransit(id, data);
+  },
+
+  async completeDelivery(id: string, data: CompleteDelivery): Promise<void> {
+    await deliveryRequestApi.completeDelivery(id, data);
+  },
+
+  async deleteDeliveryRequest(id: string): Promise<void> {
+    await deliveryRequestApi.deleteDeliveryRequest(id);
   },
 
   async updateDeliveryOrderInDay(
     assignedTo: string,
-    scheduledDate: string | Date,
     orderedDeliveryRequestIds: string[],
   ): Promise<void> {
     const sortOrder = orderedDeliveryRequestIds.map((id, index) => ({
       id,
       deliveryOrderInDay: index + 1,
     }));
-    const date = scheduledDate instanceof Date ? scheduledDate : new Date(scheduledDate);
     await deliveryRequestApi.updateDeliveryOrderInDay({
       assignedTo: assignedTo,
-      startOfDay: startOfDay(date).toISOString(),
-      endOfDay: endOfDay(date).toISOString(),
       sortOrder,
     });
   },

@@ -15,6 +15,13 @@ import { getErrorMessage } from '@/utils/errorUtils';
 
 import { useAppStore } from './useAppStore';
 
+// Type for uploading photos during PO creation/update
+type POUploadPhoto = {
+  publicUrl: string;
+  key: string;
+  caption?: string;
+};
+
 type POState = {
   // PO data
   purchaseOrders: PurchaseOrder[];
@@ -63,14 +70,21 @@ type POState = {
   resetPagination: () => void;
   loadPO: (id: string) => Promise<void>;
   createPO: (
-    po: Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber'>,
+    po: Omit<
+      PurchaseOrder,
+      'id' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber' | 'photos'
+    > & {
+      photos?: POUploadPhoto[];
+    },
   ) => Promise<void>;
   updatePO: (
     id: string,
     data: Omit<
       PurchaseOrder,
-      'id' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber' | 'status'
-    >,
+      'id' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber' | 'status' | 'photos'
+    > & {
+      photos?: POUploadPhoto[];
+    },
   ) => Promise<void>;
   confirmPO: (id: string) => Promise<void>;
   processPO: (id: string) => Promise<void>;
@@ -81,6 +95,7 @@ type POState = {
   refundPO: (id: string, data?: { refundReason?: string }) => Promise<void>;
   uploadPhotos: (id: string, photos: { publicUrl: string; key: string }[]) => Promise<void>;
   deletePhoto: (id: string, photoId: string) => Promise<void>;
+  deletePurchaseOrder: (id: string) => Promise<void>;
   clearError: () => void;
 
   // Selectors
@@ -299,11 +314,14 @@ export const usePOStore = create<POState>()(
               },
             },
             isInternalDelivery: poData.isInternalDelivery,
+            isUrgentPO: poData.isUrgentPO,
+            customerPONumber: poData.customerPONumber,
             address: poData.address,
             googleMapsUrl: poData.googleMapsUrl,
             notes: poData.notes,
             orderDate: poData.orderDate,
             deliveryDate: poData.deliveryDate,
+            photos: poData.photos,
           };
 
           // Call service and get created PO (ignore response, we'll refresh)
@@ -337,10 +355,9 @@ export const usePOStore = create<POState>()(
         const previousPO = state.purchaseOrders.find((po) => po.id === id);
         const previousCurrentPO = state.currentPO;
 
-        // Apply optimistic update
-        get()._optimisticUpdate(id, {
-          ...data,
-        });
+        // Apply optimistic update (exclude photos since they'll be updated after force reload)
+        const { photos, ...updateData } = data;
+        get()._optimisticUpdate(id, updateData);
         set({ isLoading: true, error: undefined });
 
         try {
@@ -480,6 +497,36 @@ export const usePOStore = create<POState>()(
           get()._forceReload(id);
         } catch (error) {
           const errorMessage = getErrorMessage(error, 'Failed to delete photo');
+          set({ error: errorMessage });
+          throw error;
+        } finally {
+          // Clear pending
+          state._removePending(id);
+        }
+      },
+
+      async deletePurchaseOrder(id: string) {
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
+          return;
+        }
+
+        // Mark as pending
+        state._markPending(id);
+
+        try {
+          // Call service
+          await purchaseOrderService.deletePurchaseOrder(id);
+
+          // Remove from list and clear current if it's the same
+          set((state) => ({
+            purchaseOrders: state.purchaseOrders.filter((po) => po.id !== id),
+            currentPO: state.currentPO?.id === id ? undefined : state.currentPO,
+          }));
+        } catch (error) {
+          const errorMessage = getErrorMessage(error, 'Failed to delete purchase order');
           set({ error: errorMessage });
           throw error;
         } finally {
@@ -670,6 +717,7 @@ export const usePOActions = () => {
   const refundPO = usePOStore((state) => state.refundPO);
   const uploadPhotos = usePOStore((state) => state.uploadPhotos);
   const deletePhoto = usePOStore((state) => state.deletePhoto);
+  const deletePurchaseOrder = usePOStore((state) => state.deletePurchaseOrder);
   const clearError = usePOStore((state) => state.clearError);
 
   return {
@@ -692,6 +740,7 @@ export const usePOActions = () => {
     refundPurchaseOrder: refundPO,
     uploadPhotos,
     deletePhoto,
+    deletePurchaseOrder,
   };
 };
 

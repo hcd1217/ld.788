@@ -10,25 +10,27 @@ import { canFilterPurchaseOrder } from '@/utils/permission.utils';
 
 interface POFilterBarMobileProps {
   readonly searchQuery: string;
+  readonly salesId?: string;
   readonly selectedStatuses: string[];
   readonly hasOrderDateFilter: boolean;
   readonly hasDeliveryDateFilter: boolean;
   readonly hasActiveFilters: boolean;
   readonly onSearchChange: (query: string) => void;
   readonly onStatusClick: () => void;
-  readonly onDateClick: () => void;
+  readonly onAdvancedFiltersClick: () => void;
   readonly onClearFilters: () => void;
 }
 
 export function POFilterBarMobile({
   searchQuery,
+  salesId,
   selectedStatuses,
   hasOrderDateFilter,
   hasDeliveryDateFilter,
   hasActiveFilters,
   onSearchChange,
   onStatusClick,
-  onDateClick,
+  onAdvancedFiltersClick,
   onClearFilters,
 }: POFilterBarMobileProps) {
   const { t } = useTranslation();
@@ -47,15 +49,17 @@ export function POFilterBarMobile({
     return `${t('po.poStatus')} (${selectedStatuses.length})`;
   }, [selectedStatuses, t]);
 
-  const getDateLabel = useCallback(() => {
-    if (hasOrderDateFilter && hasDeliveryDateFilter) {
-      return `${t('po.dateRange')} (2)`;
+  const getAdvancedFiltersLabel = useCallback(() => {
+    let count = 0;
+    if (salesId) count++;
+    if (hasOrderDateFilter) count++;
+    if (hasDeliveryDateFilter) count++;
+
+    if (count === 0) {
+      return t('po.moreFilters');
     }
-    if (hasOrderDateFilter || hasDeliveryDateFilter) {
-      return `${t('po.dateRange')} (1)`;
-    }
-    return t('po.dateRange');
-  }, [hasOrderDateFilter, hasDeliveryDateFilter, t]);
+    return `${t('po.moreFilters')} (${count})`;
+  }, [salesId, hasOrderDateFilter, hasDeliveryDateFilter, t]);
 
   if (!canFilterPurchaseOrder(permissions)) {
     return null;
@@ -84,12 +88,12 @@ export function POFilterBarMobile({
 
         <Button
           size="xs"
-          variant={hasOrderDateFilter || hasDeliveryDateFilter ? 'filled' : 'light'}
+          variant={salesId || hasOrderDateFilter || hasDeliveryDateFilter ? 'filled' : 'light'}
           rightSection={<IconChevronDown size={16} />}
-          onClick={onDateClick}
+          onClick={onAdvancedFiltersClick}
           style={{ flex: 1 }}
         >
-          {getDateLabel()}
+          {getAdvancedFiltersLabel()}
         </Button>
 
         <Button

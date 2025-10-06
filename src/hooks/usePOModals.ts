@@ -12,6 +12,7 @@ export type ModalType =
   | 'deliver'
   | 'cancel'
   | 'refund'
+  | 'delete'
   | 'uploadPhotos';
 
 export function usePOModals() {
@@ -31,6 +32,8 @@ export function usePOModals() {
   const [cancelModalOpened, { open: openCancelModal, close: closeCancelModal }] =
     useDisclosure(false);
   const [refundModalOpened, { open: openRefundModal, close: closeRefundModal }] =
+    useDisclosure(false);
+  const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
   const [uploadPhotosModalOpened, { open: openUploadPhotosModal, close: closeUploadPhotosModal }] =
     useDisclosure(false);
@@ -70,6 +73,10 @@ export function usePOModals() {
           openRefundModal();
           break;
         }
+        case 'delete': {
+          openDeleteModal();
+          break;
+        }
         case 'uploadPhotos': {
           openUploadPhotosModal();
           break;
@@ -84,6 +91,7 @@ export function usePOModals() {
       openDeliverModal,
       openCancelModal,
       openRefundModal,
+      openDeleteModal,
       openUploadPhotosModal,
     ],
   );
@@ -122,6 +130,10 @@ export function usePOModals() {
           closeRefundModal();
           break;
         }
+        case 'delete': {
+          closeDeleteModal();
+          break;
+        }
         case 'uploadPhotos': {
           closeUploadPhotosModal();
           break;
@@ -136,6 +148,7 @@ export function usePOModals() {
       closeDeliverModal,
       closeCancelModal,
       closeRefundModal,
+      closeDeleteModal,
       closeUploadPhotosModal,
     ],
   );
@@ -190,6 +203,13 @@ export function usePOModals() {
     [openModal],
   );
 
+  const handleDelete = useCallback(
+    (purchaseOrder: PurchaseOrder) => {
+      openModal('delete', purchaseOrder);
+    },
+    [openModal],
+  );
+
   const handleTakePhoto = useCallback(
     (purchaseOrder: PurchaseOrder) => {
       openModal('uploadPhotos', purchaseOrder);
@@ -207,6 +227,7 @@ export function usePOModals() {
       deliverModalOpened,
       cancelModalOpened,
       refundModalOpened,
+      deleteModalOpened,
       uploadPhotosModalOpened,
     },
 
@@ -226,6 +247,7 @@ export function usePOModals() {
       handleDeliver,
       handleCancel,
       handleRefund,
+      handleDelete,
       handleTakePhoto,
     },
   };

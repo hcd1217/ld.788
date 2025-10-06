@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { useTranslation } from '@/hooks/useTranslation';
 import type { POItem } from '@/services/sales/purchaseOrder';
+import type { Address } from '@/types';
 import { getBasicValidators } from '@/utils/validation';
 
 export type POFormValues = {
@@ -10,12 +11,12 @@ export type POFormValues = {
   items: POItem[];
   orderDate: Date;
   deliveryDate?: Date;
+  customerPONumber?: string;
   isInternalDelivery: boolean;
-  shippingAddress?: {
-    oneLineAddress?: string;
-    googleMapsUrl?: string;
-  };
+  isUrgentPO: boolean;
+  shippingAddress?: Address;
   notes?: string;
+  attachments?: File[];
 };
 
 type UsePOFormOptions = {
@@ -32,6 +33,8 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
       customerId: '',
       items: [],
       isInternalDelivery: true,
+      isUrgentPO: false,
+      customerPONumber: '',
       orderDate: new Date(new Date().setHours(0, 0, 0, 1)),
     }),
     [],
@@ -41,12 +44,7 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
   const validation = useMemo(
     () => ({
       customerId: validators.required(t('po.customerRequired')),
-      items: (value: POItem[]) => {
-        if (!value || value.length === 0) {
-          return t('po.itemsRequired');
-        }
-        return null;
-      },
+      // Items are optional - PO can be created without items
       // No validation for address fields - all are optional
     }),
     [t, validators],
@@ -60,6 +58,8 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
       shippingAddress: values.shippingAddress,
       notes: values.notes,
       isInternalDelivery: values.isInternalDelivery ?? false,
+      isUrgentPO: values.isUrgentPO ?? false,
+      customerPONumber: values.customerPONumber,
     };
 
     if (!isEditMode) {

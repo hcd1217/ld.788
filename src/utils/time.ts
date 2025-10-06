@@ -42,6 +42,16 @@ export function formatDate(date: Date | string | undefined, emptyValue = '-'): s
   return `${year}-${month}-${day}`;
 }
 
+export function formatShortDate(date: Date | string | undefined, emptyValue = '-'): string {
+  if (!date) {
+    return emptyValue;
+  }
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+  const day = dateObj.getDate().toString().padStart(2, '0');
+  return `${day}/${month}`;
+}
+
 /**
  * Format a date with time to show hours and minutes
  * @param date - The date to format

@@ -13,6 +13,8 @@ import {
   GetDeliveryRequestResponseSchema,
   type GetDeliveryRequestsResponse,
   GetDeliveryRequestsResponseSchema,
+  type StartTransit,
+  StartTransitSchema,
   type UpdateDeliveryOrderInDay,
   UpdateDeliveryOrderInDaySchema,
   type UpdateDeliveryRequest,
@@ -28,6 +30,7 @@ export class DeliveryRequestApi extends BaseApiClient {
 
   async getDeliveryRequests(params?: {
     status?: DeliveryStatus;
+    statuses?: DeliveryStatus[];
     assignedTo?: string;
     scheduledDate?: string;
     scheduledDateFrom?: string;
@@ -41,6 +44,11 @@ export class DeliveryRequestApi extends BaseApiClient {
   }): Promise<GetDeliveryRequestsResponse> {
     const queryParams = new URLSearchParams();
     if (params?.status) queryParams.append('status', params.status);
+    if (params?.statuses) {
+      params.statuses.forEach((status) => {
+        queryParams.append('statuses', status);
+      });
+    }
     if (params?.assignedTo) queryParams.append('assignedTo', params.assignedTo);
     if (params?.scheduledDate) queryParams.append('scheduledDate', params.scheduledDate);
     if (params?.scheduledDateFrom)
@@ -125,6 +133,15 @@ export class DeliveryRequestApi extends BaseApiClient {
     );
   }
 
+  async startTransit(id: string, data: StartTransit): Promise<void> {
+    return this.patch<void, StartTransit>(
+      `/api/sales/delivery-requests/${id}/start-transit`,
+      data,
+      undefined,
+      StartTransitSchema,
+    );
+  }
+
   async completeDelivery(id: string, data: CompleteDelivery): Promise<void> {
     return this.patch<void, CompleteDelivery>(
       `/api/sales/delivery-requests/${id}/complete`,
@@ -141,5 +158,9 @@ export class DeliveryRequestApi extends BaseApiClient {
       undefined,
       UpdateDeliveryOrderInDaySchema,
     );
+  }
+
+  async deleteDeliveryRequest(id: string): Promise<void> {
+    return this.delete<void>(`/api/sales/delivery-requests/${id}`, undefined, undefined);
   }
 }

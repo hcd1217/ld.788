@@ -1,6 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { Button, Card, Divider, Grid, Group, Stack, Text, Title, Tooltip } from '@mantine/core';
+import {
+  Button,
+  Card,
+  Divider,
+  Grid,
+  Group,
+  LoadingOverlay,
+  Stack,
+  Text,
+  Title,
+  Tooltip,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconEdit, IconQrcode } from '@tabler/icons-react';
 
@@ -29,6 +40,7 @@ type EmployeeBasicInfoCardProps = {
 export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCardProps) {
   const { t } = useTranslation();
   const [opened, { open, close }] = useDisclosure(false);
+  const [isLoading, setIsLoading] = useState(false);
   const clientCode = useClientCode();
   const clientConfig = useClientConfig();
   const [magicLink, setMagicLink] = useState<string>('');
@@ -60,12 +72,14 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
   const getMagicLinkAction = useSimpleSWRAction(
     `get-magic-link-${employee.id}`,
     async () => {
+      setIsLoading(true);
       if (!employee.userId) {
         throw new Error('No user ID available');
       }
       if (!canIssueMagicLink) {
         throw new Error(t('common.doNotHavePermissionForAction'));
       }
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const link = await userService.getLoginMagicLink(employee.userId, clientCode);
       return link;
@@ -80,6 +94,7 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
       onSuccess: (link) => {
         setMagicLink(link);
         open();
+        setIsLoading(false);
       },
     },
   );
@@ -87,6 +102,7 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
   return (
     <>
       <Card shadow="sm" p={{ base: 'sm', md: 'xl' }} radius="md">
+        <LoadingOverlay visible={isLoading} />
         <Stack gap="lg">
           <Group justify="space-between" align="flex-start">
             <Title visibleFrom="md" order={3}>
@@ -99,9 +115,12 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
                     leftSection={<IconQrcode size={16} />}
                     variant="subtle"
                     onClick={() => {
+                      if (isLoading) {
+                        return;
+                      }
                       getMagicLinkAction.trigger();
                     }}
-                    disabled={!employee.isActive || !canIssueMagicLink}
+                    disabled={!employee.isActive || !canIssueMagicLink || isLoading}
                   >
                     {t('employee.magicLink')}
                   </Button>
@@ -111,7 +130,7 @@ export function EmployeeBasicInfoCard({ employee, onEdit }: EmployeeBasicInfoCar
                 leftSection={<IconEdit size={16} />}
                 variant="subtle"
                 onClick={onEdit}
-                disabled={!employee.isActive || !canEdit}
+                disabled={!employee.isActive || !canEdit || isLoading}
               >
                 {t('common.edit')}
               </Button>

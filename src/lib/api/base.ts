@@ -312,7 +312,7 @@ export class BaseApiClient {
 
     // Add configurable delay in development mode
     if (isDevelopment) {
-      const DELAY_MS = 500;
+      const DELAY_MS = Number(import.meta.env.VITE_API_DELAY ?? 500);
       await delay(DELAY_MS);
     }
 

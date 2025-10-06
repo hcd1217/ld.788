@@ -1,7 +1,7 @@
 {
   "name": "credo-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,8 +9,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,css}\" \"*.{js,ts,json}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,css}\" \"*.{js,ts,json}\"",
+    "format": "yarn prettier --write .",
+    "format:check": "yarn prettier --check .",
     "type-check": "tsc -p tsconfig.app.json --noEmit",
     "preview": "vite preview",
     "generate-pwa-assets": "node scripts/generate-pwa-assets.js",

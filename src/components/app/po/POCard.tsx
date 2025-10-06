@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import { useNavigate } from 'react-router';
 
-import { Box, Card, Group, type MantineStyleProp, Stack, Text } from '@mantine/core';
+import { Box, Card, Group, type MantineStyleProp, Text } from '@mantine/core';
 
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -13,6 +13,7 @@ import { formatDate } from '@/utils/time';
 
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
+import { POUrgentBadge } from './POUrgentBadge';
 
 type POCardProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -46,6 +47,7 @@ export function POCard({ purchaseOrder, style, className }: POCardProps) {
         ...style,
       }}
       className={className}
+      bg={purchaseOrder.isUrgentPO ? 'var(--mantine-color-red-1)' : undefined}
       onClick={handleCardClick}
     >
       <Group justify="space-between" align="flex-start" style={{ position: 'relative' }}>
@@ -55,14 +57,25 @@ export function POCard({ purchaseOrder, style, className }: POCardProps) {
           </Text>
           <Group gap="lg">
             <Text size="xs" c="dimmed">
-              {t('po.customer')}:
+              {t('common.customer')}:
             </Text>
             <Text size="xs" fw={500}>
               {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
             </Text>
           </Group>
 
-          {purchaseOrder.salesId && (
+          {purchaseOrder.customerPONumber && (
+            <Group gap="lg">
+              <Text size="xs" c="dimmed">
+                {t('po.customerPONumber')}:
+              </Text>
+              <Text size="xs" fw={500}>
+                {purchaseOrder.customerPONumber}
+              </Text>
+            </Group>
+          )}
+
+          {purchaseOrder.salesPerson && (
             <Group gap="lg">
               <Text size="xs" c="dimmed">
                 {t('po.salesPerson')}:
@@ -82,10 +95,11 @@ export function POCard({ purchaseOrder, style, className }: POCardProps) {
             </Text>
           </Group>
         </Box>
-        <Stack gap="xs" align="flex-end">
+        <Group gap="xs">
+          <POUrgentBadge isUrgentPO={purchaseOrder.isUrgentPO} />
           <POStatusBadge status={purchaseOrder.status} />
           <PODeliveryBadge isInternalDelivery={purchaseOrder.isInternalDelivery} />
-        </Stack>
+        </Group>
       </Group>
     </Card>
   );

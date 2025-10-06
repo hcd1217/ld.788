@@ -13,6 +13,7 @@ export type DateFilterType = 'orderDate' | 'deliveryDate';
 const POFiltersSchema = z.object({
   searchQuery: z.string(),
   customerId: z.string().optional(),
+  salesId: z.string().optional(),
   statuses: z.array(z.enum(Object.values(PO_STATUS) as [string, ...string[]])),
   orderDateRange: z
     .object({
@@ -37,6 +38,7 @@ const POFiltersSchema = z.object({
 export interface POFilters {
   searchQuery: string;
   customerId: string | undefined;
+  salesId: string | undefined;
   statuses: POStatusType[]; // Changed to array for multi-select
   orderDateRange: {
     start: Date | undefined;
@@ -51,6 +53,7 @@ export interface POFilters {
 export interface POFilterHandlers {
   setSearchQuery: (query: string) => void;
   setCustomerId: (customerId: string | undefined) => void;
+  setSalesId: (salesId: string | undefined) => void;
   setStatuses: (statuses: POStatusType[]) => void;
   toggleStatus: (status: POStatusType) => void;
   setOrderDateRange: (start: Date | undefined, end: Date | undefined) => void;
@@ -63,6 +66,9 @@ export function usePOFilters() {
   const [filters, setFilters] = useState<POFilters>(generateDefaultFilters());
   const hasActiveFilters = useMemo(() => {
     if (filters.customerId) {
+      return true;
+    }
+    if (filters.salesId) {
       return true;
     }
     if (filters.statuses.length > 0 && !filters.statuses.includes(PO_STATUS.ALL)) {
@@ -86,6 +92,10 @@ export function usePOFilters() {
 
   const setCustomerId = useCallback((customerId: string | undefined) => {
     setFilters((prev) => ({ ...prev, customerId }));
+  }, []);
+
+  const setSalesId = useCallback((salesId: string | undefined) => {
+    setFilters((prev) => ({ ...prev, salesId }));
   }, []);
 
   const setStatuses = useCallback((statuses: POStatusType[]) => {
@@ -138,6 +148,7 @@ export function usePOFilters() {
     return {
       setSearchQuery,
       setCustomerId,
+      setSalesId,
       setStatuses,
       toggleStatus,
       setOrderDateRange,
@@ -148,6 +159,7 @@ export function usePOFilters() {
   }, [
     setSearchQuery,
     setCustomerId,
+    setSalesId,
     setStatuses,
     toggleStatus,
     setOrderDateRange,
@@ -180,6 +192,7 @@ function generateDefaultFilters(): POFilters {
   return {
     searchQuery: '',
     customerId: undefined,
+    salesId: undefined,
     statuses: [
       PO_STATUS.NEW,
       PO_STATUS.CONFIRMED,

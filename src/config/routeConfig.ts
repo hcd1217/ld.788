@@ -30,6 +30,7 @@ const ROUTE_DEFINITIONS = {
   // Config routes
   CUSTOMER_CONFIG: { id: 'customer-config', path: '/customer-config' },
   PRODUCT_CONFIG: { id: 'product-config', path: '/product-config' },
+  VENDOR_CONFIG: { id: 'vendor-config', path: '/vendor-config' },
 
   // Employee management
   EMPLOYEE_MANAGEMENT: { id: 'employee-management', path: '/employee-management' },

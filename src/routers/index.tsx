@@ -1,3 +1,5 @@
+import { lazy } from 'react';
+
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 
 import { AppLayout } from '@/components/layouts/AppLayout';
@@ -13,7 +15,6 @@ import {
   MobileOnlyLayout,
   MyTimesheetPage,
   NotFound,
-  ServiceLayout,
   TimekeeperDashboardPage,
 } from './components';
 import { configRouteObjects } from './config';
@@ -84,6 +85,11 @@ export const routeObjects: ThemeRouteObject[] = [
     children: [...appRouteObjects],
   },
 ];
+
+const ServiceLayout = lazy(async () => {
+  const module = await import('@/components/layouts/ServiceLayout');
+  return { default: module.ServiceLayout };
+});
 
 export const router = createBrowserRouter([
   {

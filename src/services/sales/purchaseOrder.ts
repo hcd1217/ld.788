@@ -1,4 +1,4 @@
-import { salesApi } from '@/lib/api';
+import { type ProductOverview, salesApi } from '@/lib/api';
 import {
   type POItem as ApiPOItem,
   type PurchaseOrder as ApiPurchaseOrder,
@@ -9,6 +9,7 @@ import {
   type UpdatePurchaseOrderRequest,
 } from '@/lib/api/schemas/sales.schemas';
 import type { EmployeeOverview } from '@/services/client/overview';
+import type { PhotoData } from '@/types';
 
 import { overviewService } from '../client/overview';
 
@@ -26,6 +27,8 @@ export type PurchaseOrder = Omit<ApiPurchaseOrder, 'deliveryRequest' | 'items'> 
   statusHistory?: POStatusHistory[];
   salesPerson?: string;
   isInternalDelivery: boolean;
+  isUrgentPO: boolean;
+  customerPONumber?: string;
   deliveryRequest?: {
     deliveryRequestId: string;
     deliveryRequestNumber?: string;
@@ -33,7 +36,15 @@ export type PurchaseOrder = Omit<ApiPurchaseOrder, 'deliveryRequest' | 'items'> 
     status: DeliveryStatus;
     deliveryPerson?: string;
     scheduledDate: Date | string;
+    photos?: PhotoData[];
   };
+};
+
+// Type for creating/updating PO - uses simplified photo structure for upload
+type POUploadPhoto = {
+  publicUrl: string;
+  key: string;
+  caption?: string;
 };
 
 /**
@@ -42,6 +53,7 @@ export type PurchaseOrder = Omit<ApiPurchaseOrder, 'deliveryRequest' | 'items'> 
 function transformApiToFrontend(
   apiPO: ApiPurchaseOrder,
   employeeMapByEmployeeId: Map<string, EmployeeOverview>,
+  productMapByProductId: Map<string, ProductOverview>,
 ): Omit<PurchaseOrder, 'customer'> {
   const salesPerson = apiPO.salesId
     ? employeeMapByEmployeeId.get(apiPO.salesId)?.fullName
@@ -53,7 +65,9 @@ function transformApiToFrontend(
   return {
     ...apiPO,
     salesPerson,
+    isUrgentPO: apiPO.isUrgentPO ?? false,
     isInternalDelivery: apiPO.isInternalDelivery,
+    customerPONumber: apiPO.customerPONumber,
     customerId: apiPO.customerId,
     address: apiPO?.shippingAddress?.oneLineAddress,
     googleMapsUrl: apiPO?.shippingAddress?.googleMapsUrl,
@@ -66,13 +80,14 @@ function transformApiToFrontend(
           isUrgentDelivery: apiPO.deliveryRequest.isUrgentDelivery,
           status: apiPO.deliveryRequest.status,
           scheduledDate: apiPO.deliveryRequest.scheduledDate,
+          photos: apiPO.deliveryRequest.photos,
         }
       : undefined,
     items: apiPO.items.map((item) => ({
       ...item,
       deliveryPerson: 'TODO',
       notes: item.notes ?? '',
-      unit: item.unit ?? '',
+      unit: item.unit ?? productMapByProductId.get(item.productId)?.unit ?? '',
       productId: item.productId ?? '',
     })),
   };
@@ -143,11 +158,14 @@ export const purchaseOrderService = {
 
     const response = await salesApi.getPurchaseOrders(apiParams);
     const employeeMapByEmployeeId = await overviewService.getEmployeeOverview();
+    const productMapByProductId = await overviewService.getProductOverview();
     const purchaseOrders = response.purchaseOrders
       .sort((a, b) => {
+        if (a.isUrgentPO && !b.isUrgentPO) return -1;
+        if (!a.isUrgentPO && b.isUrgentPO) return 1;
         return a.poNumber.localeCompare(b.poNumber);
       })
-      .map((po) => transformApiToFrontend(po, employeeMapByEmployeeId));
+      .map((po) => transformApiToFrontend(po, employeeMapByEmployeeId, productMapByProductId));
     return {
       purchaseOrders,
       pagination: response.pagination,
@@ -157,14 +175,19 @@ export const purchaseOrderService = {
   async getPOById(id: string): Promise<PurchaseOrder | undefined> {
     const po = await salesApi.getPurchaseOrderById(id);
     const employeeMapByEmployeeId = await overviewService.getEmployeeOverview();
-    return po ? transformApiToFrontend(po, employeeMapByEmployeeId) : undefined;
+    const productMapByProductId = await overviewService.getProductOverview();
+    return po
+      ? transformApiToFrontend(po, employeeMapByEmployeeId, productMapByProductId)
+      : undefined;
   },
 
   async createPO(
     data: Omit<
       PurchaseOrder,
-      'id' | 'status' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber'
-    >,
+      'id' | 'status' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber' | 'photos'
+    > & {
+      photos?: POUploadPhoto[];
+    },
   ): Promise<void> {
     const createRequest: CreatePurchaseOrderRequest = {
       customerId: data.customerId,
@@ -185,11 +208,14 @@ export const purchaseOrderService = {
       })),
       metadata: {
         isInternalDelivery: data.isInternalDelivery,
+        customerPONumber: data.customerPONumber,
+        isUrgentPO: data.isUrgentPO,
         notes: data.notes,
         shippingAddress: {
           oneLineAddress: data.address,
           googleMapsUrl: data.googleMapsUrl,
         },
+        attachments: data.photos ?? [],
       },
     };
 
@@ -200,8 +226,10 @@ export const purchaseOrderService = {
     id: string,
     data: Omit<
       PurchaseOrder,
-      'id' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber' | 'status'
-    >,
+      'id' | 'createdAt' | 'updatedAt' | 'clientId' | 'poNumber' | 'status' | 'photos'
+    > & {
+      photos?: POUploadPhoto[];
+    },
   ): Promise<void> {
     if (!data.items) {
       throw new Error('Items are required');
@@ -224,11 +252,14 @@ export const purchaseOrderService = {
       deliveryDate: data.deliveryDate?.toISOString(),
       metadata: {
         isInternalDelivery: data.isInternalDelivery,
+        customerPONumber: data.customerPONumber,
+        isUrgentPO: data.isUrgentPO,
         notes: data.notes,
         shippingAddress: {
           oneLineAddress: data.address,
           googleMapsUrl: data.googleMapsUrl,
         },
+        attachments: data.photos ?? [],
       },
     };
 
@@ -285,5 +316,9 @@ export const purchaseOrderService = {
 
   async deletePhoto(id: string, photoId: string): Promise<void> {
     await salesApi.deletePhoto(id, { photoId });
+  },
+
+  async deletePurchaseOrder(id: string): Promise<void> {
+    await salesApi.deletePurchaseOrder(id);
   },
 };

@@ -1,7 +1,17 @@
 import React from 'react';
 import { useState } from 'react';
 
-import { ActionIcon, Box, Grid, Image, Modal, ScrollArea, Text } from '@mantine/core';
+import {
+  ActionIcon,
+  Box,
+  Divider,
+  Grid,
+  Image,
+  Modal,
+  ScrollArea,
+  Stack,
+  Text,
+} from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 
 import { useTranslation } from '@/hooks/useTranslation';
@@ -18,6 +28,7 @@ type PhotoData = {
 
 type POPhotoGalleryProps = {
   readonly photos?: PhotoData[];
+  readonly deliveryPhotos?: PhotoData[];
   readonly columns?: number;
   readonly imageHeight?: number;
   readonly withScrollArea?: boolean;
@@ -28,6 +39,7 @@ type POPhotoGalleryProps = {
 
 export function POPhotoGallery({
   photos = [],
+  deliveryPhotos = [],
   columns = 6,
   imageHeight = 150,
   withScrollArea = false,
@@ -36,7 +48,10 @@ export function POPhotoGallery({
   onDeletePhoto,
 }: POPhotoGalleryProps) {
   const { t } = useTranslation();
-  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<{
+    url: string;
+    type: 'po' | 'delivery';
+  } | null>(null);
   const [hoveredPhotoId, setHoveredPhotoId] = useState<string | null>(null);
 
   const handleDeletePhoto = (photoId: string, event: React.MouseEvent) => {
@@ -55,7 +70,10 @@ export function POPhotoGallery({
     });
   };
 
-  if (photos.length === 0) {
+  const hasPhotos = photos.length > 0;
+  const hasDeliveryPhotos = deliveryPhotos.length > 0;
+
+  if (!hasPhotos && !hasDeliveryPhotos) {
     return (
       <Text size="sm" c="dimmed" ta="center" py="xl">
         {t('delivery.noPhotos')}
@@ -63,9 +81,9 @@ export function POPhotoGallery({
     );
   }
 
-  const photoGrid = (
+  const renderPhotoGrid = (photoList: PhotoData[], photoType: 'po' | 'delivery') => (
     <Grid>
-      {photos.map((photo, index) => (
+      {photoList.map((photo, index) => (
         <Grid.Col key={photo.id || index} span={columns}>
           <Box
             pos="relative"
@@ -74,9 +92,9 @@ export function POPhotoGallery({
           >
             <Image
               src={photo.publicUrl}
-              alt={`PO photo ${index + 1}`}
+              alt={`${photoType === 'po' ? 'PO' : 'Delivery'} photo ${index + 1}`}
               style={{ cursor: 'pointer' }}
-              onClick={() => setSelectedPhotoIndex(index)}
+              onClick={() => setSelectedPhoto({ url: photo.publicUrl, type: photoType })}
               radius="sm"
               h={imageHeight}
               fit="cover"
@@ -102,22 +120,46 @@ export function POPhotoGallery({
     </Grid>
   );
 
-  const content = withScrollArea ? (
+  const content = (
+    <Stack gap="md">
+      {hasDeliveryPhotos && (
+        <>
+          <Text size="sm" fw={600} c="dimmed">
+            {t('delivery.photos')}
+          </Text>
+          {renderPhotoGrid(deliveryPhotos, 'delivery')}
+        </>
+      )}
+
+      {hasPhotos && hasDeliveryPhotos && <Divider my="sm" />}
+
+      {hasPhotos && (
+        <>
+          <Text size="sm" fw={600} c="dimmed">
+            {t('po.photos')}
+          </Text>
+          {renderPhotoGrid(photos, 'po')}
+        </>
+      )}
+    </Stack>
+  );
+
+  const wrappedContent = withScrollArea ? (
     <ScrollArea p={0} m={0} h={scrollAreaHeight} scrollbars="y">
-      {photoGrid}
+      {content}
     </ScrollArea>
   ) : (
-    photoGrid
+    content
   );
 
   return (
     <>
-      {content}
+      {wrappedContent}
 
       {/* Photo Modal for enlarged view */}
       <Modal
-        opened={selectedPhotoIndex !== null}
-        onClose={() => setSelectedPhotoIndex(null)}
+        opened={selectedPhoto !== null}
+        onClose={() => setSelectedPhoto(null)}
         size="xl"
         centered
         withCloseButton={false}
@@ -137,12 +179,12 @@ export function POPhotoGallery({
           },
         }}
       >
-        {selectedPhotoIndex !== null && photos[selectedPhotoIndex] && (
+        {selectedPhoto && (
           <Image
-            src={photos[selectedPhotoIndex].publicUrl}
-            alt={`PO photo ${selectedPhotoIndex + 1}`}
+            src={selectedPhoto.url}
+            alt={`${selectedPhoto.type === 'po' ? 'PO' : 'Delivery'} photo`}
             fit="contain"
-            onClick={() => setSelectedPhotoIndex(null)}
+            onClick={() => setSelectedPhoto(null)}
             style={{
               cursor: 'pointer',
               maxHeight: '90vh',

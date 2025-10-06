@@ -1,9 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { Box, Button, Group, Paper, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
-import { modals } from '@mantine/modals';
 import { IconPlus, IconUpload } from '@tabler/icons-react';
 
 import { ProductCard, ProductFormModal, type ProductFormValues } from '@/components/app/config';
@@ -13,38 +11,29 @@ import {
   AppMobileLayout,
   AppPageTitle,
   BlankState,
-  BulkImportModalContent,
   DataTable,
   Pagination,
   PermissionDeniedPage,
   SearchBar,
 } from '@/components/common';
-import { useClientSidePagination } from '@/hooks/useClientSidePagination';
+import { useConfigPage } from '@/hooks/useConfigPage';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { useOnce } from '@/hooks/useOnce';
-import { useSimpleSWRAction, useSWRAction } from '@/hooks/useSWRAction';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   type BulkUpsertProductsRequest,
   type BulkUpsertProductsResponse,
+  type CreateProductRequest,
   type Product,
   productService,
+  type UpdateProductRequest,
 } from '@/services/sales/product';
 import { usePermissions } from '@/stores/useAppStore';
 import { generateProductExcelTemplate, parseProductExcelFile } from '@/utils/excelParser';
-import { showErrorNotification, showSuccessNotification } from '@/utils/notifications';
 import { canCreateProduct, canEditProduct, canViewProduct } from '@/utils/permission.utils';
 
 export function ProductConfigPage() {
-  const { t, currentLanguage } = useTranslation();
+  const { t } = useTranslation();
   const { isMobile } = useDeviceType();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
-  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [editOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false);
-  const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
   const permissions = usePermissions();
 
   const { canView, canCreate, canEdit } = useMemo(() => {
@@ -65,321 +54,109 @@ export function ProductConfigPage() {
       color: '',
     },
     validate: {
-      productCode: (value) => (!value ? t('common.errors.notificationTitle') : null),
-      name: (value) => (!value ? t('common.errors.notificationTitle') : null),
+      productCode: (value) => (!value ? t('validation.fieldRequired') : null),
+      name: (value) => (!value ? t('validation.fieldRequired') : null),
     },
   });
 
-  const filteredProducts = useMemo(() => {
-    if (!searchQuery) return products;
-
-    const query = searchQuery.toLowerCase();
-    return products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(query) ||
-        product.productCode.toLowerCase().includes(query) ||
-        product.category?.toLowerCase().includes(query),
-    );
-  }, [products, searchQuery]);
-
-  const [paginatedProducts, paginationState, paginationHandlers] = useClientSidePagination({
-    data: filteredProducts,
-    defaultPageSize: isMobile ? 1000 : 20,
-  });
-
-  const loadProductsAction = useSimpleSWRAction(
-    'load-products',
-    async () => {
-      setIsLoading(true);
-      setError(undefined);
-      if (!canView) {
-        return [];
-      }
-      const data = await productService.getAllProducts();
-      setProducts(data);
-    },
-    {
-      notifications: {
-        errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('common.loadingFailed'),
+  // Service adapter for the generic hook
+  const service = useMemo(
+    () => ({
+      getAll: productService.getAllProducts,
+      create: productService.createProduct,
+      update: productService.updateProduct,
+      activate: async (product: Product) => {
+        await productService.activateProduct(product.id);
       },
-      onSettled: () => {
-        setIsLoading(false);
+      deactivate: async (product: Product) => {
+        await productService.deactivateProduct(product.id);
       },
-    },
+      bulkUpsert: productService.bulkUpsertProducts,
+    }),
+    [],
   );
 
-  useOnce(() => {
-    loadProductsAction.trigger();
-  });
-
-  const handleCreateProductAction = useSWRAction(
-    'create-product',
-    async (values: ProductFormValues): Promise<Product> => {
-      if (!canCreate) {
-        throw new Error(t('common.doNotHavePermissionForAction'));
-      }
-      if (!values) {
-        throw new Error(t('common.invalidFormData'));
-      }
-      setIsLoading(true);
-      const product = await productService.createProduct({
-        productCode: values.productCode,
+  const {
+    items: paginatedProducts,
+    allItems: products,
+    isLoading,
+    error,
+    searchQuery,
+    setSearchQuery,
+    selectedItem: selectedProduct,
+    editOpened,
+    createOpened,
+    closeEdit,
+    closeCreate,
+    handleCreate,
+    handleUpdate,
+    handleActivate,
+    handleDeactivate,
+    openEditModal,
+    openCreateModal,
+    openBulkImportModal,
+    paginationState,
+    paginationHandlers,
+    clearError,
+  } = useConfigPage<
+    Product,
+    ProductFormValues,
+    CreateProductRequest,
+    UpdateProductRequest,
+    BulkUpsertProductsRequest,
+    BulkUpsertProductsResponse
+  >({
+    service,
+    permissions: { canView, canCreate, canEdit },
+    entityName: 'product',
+    form,
+    transformToCreateRequest: (values) => ({
+      productCode: values.productCode,
+      metadata: {
+        name: values.name,
+        description: values.description || undefined,
+        category: values.category || undefined,
+        unit: values.unit || undefined,
+      },
+    }),
+    transformToUpdateRequest: (values) => ({
+      metadata: {
+        name: values.name,
+        description: values.description || undefined,
+        category: values.category || undefined,
+        unit: values.unit || undefined,
+      },
+    }),
+    transformToBulkRequest: (products) => ({
+      products: products.map((p) => ({
+        productCode: p.productCode,
         metadata: {
-          name: values.name,
-          description: values.description || undefined,
-          category: values.category || undefined,
-          unit: values.unit || undefined,
+          name: p.name,
+          description: p.description || undefined,
+          category: p.category || undefined,
+          unit: p.unit || undefined,
+          color: p.color || undefined,
         },
+      })),
+      skipInvalid: false,
+    }),
+    parseExcelFile: parseProductExcelFile,
+    generateExcelTemplate: generateProductExcelTemplate,
+    setFormValues: (product, form) => {
+      form.setValues({
+        productCode: product.productCode,
+        name: product.name,
+        description: product.description || '',
+        category: product.category || '',
+        unit: product.unit || 'pcs',
+        color: product.color || '',
       });
-      return product;
     },
-    {
-      notifications: {
-        errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('common.addFailed', { entity: t('common.entity.product') }),
-      },
-      onSuccess: (product: Product) => {
-        showSuccessNotification(
-          t('product.created'),
-          t('product.createdMessage', { name: product.name }),
-        );
-      },
-      onSettled: () => {
-        setIsLoading(false);
-      },
-    },
-  );
-
-  const handleUpdateProductAction = useSWRAction(
-    'update-product',
-    async (values: ProductFormValues) => {
-      if (!canEdit) {
-        throw new Error(t('common.doNotHavePermissionForAction'));
-      }
-      if (!selectedProduct) {
-        throw new Error(t('common.invalidFormData'));
-      }
-      setIsLoading(true);
-      await productService.updateProduct(selectedProduct?.id, {
-        metadata: {
-          name: values.name,
-          description: values.description || undefined,
-          category: values.category || undefined,
-          unit: values.unit || undefined,
-        },
-      });
-      return selectedProduct;
-    },
-    {
-      notifications: {
-        errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('common.updateFailed', { entity: t('common.entity.product') }),
-      },
-      onSuccess: (product: Product) => {
-        showSuccessNotification(
-          t('product.updated'),
-          t('product.updatedMessage', { name: product.name }),
-        );
-        closeEdit();
-        form.reset();
-        loadProductsAction.trigger();
-      },
-      onSettled: () => {
-        setIsLoading(false);
-      },
-    },
-  );
-
-  const handleActivateProductAction = useSWRAction(
-    'activate-product',
-    async (product: Product) => {
-      if (!canEdit) {
-        throw new Error(t('common.doNotHavePermissionForAction'));
-      }
-      setIsLoading(true);
-      await productService.activateProduct(product.id);
-      return product;
-    },
-    {
-      notifications: {
-        errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('common.updateFailed', { entity: t('common.entity.product') }),
-      },
-      onSuccess: (product: Product) => {
-        showSuccessNotification(
-          t('common.activated', {
-            entity: t('common.entity.product'),
-          }),
-          t('product.updatedMessage', { name: product.name }),
-        );
-        closeEdit();
-        form.reset();
-        loadProductsAction.trigger();
-      },
-      onSettled: () => {
-        setIsLoading(false);
-      },
-    },
-  );
-
-  const handleDeactivateProductAction = useSWRAction(
-    'deactivate-product',
-    async (product: Product) => {
-      if (!canEdit) {
-        throw new Error(t('common.doNotHavePermissionForAction'));
-      }
-      setIsLoading(true);
-      await productService.deactivateProduct(product.id);
-      return product;
-    },
-    {
-      notifications: {
-        errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('common.updateFailed', { entity: t('common.entity.product') }),
-      },
-      onSuccess: (product: Product) => {
-        showSuccessNotification(
-          t('common.deactivated', {
-            entity: t('common.entity.product'),
-          }),
-          t('product.updatedMessage', { name: product.name }),
-        );
-        closeEdit();
-        form.reset();
-        loadProductsAction.trigger();
-      },
-      onSettled: () => {
-        setIsLoading(false);
-      },
-    },
-  );
-
-  const openEditModal = (product: Product) => {
-    if (!canEdit) {
-      return;
-    }
-    setSelectedProduct(product);
-    form.setValues({
-      productCode: product.productCode,
-      name: product.name,
-      description: product.description || '',
-      category: product.category || '',
-      unit: product.unit || 'pcs',
-      color: product.color || '',
-    });
-    openEdit();
-  };
-
-  const openCreateModal = () => {
-    if (!canCreate) {
-      return;
-    }
-    form.reset();
-    openCreate();
-  };
-
-  // Handle Excel file import
-  const handleExcelImportAction = useSWRAction(
-    'handle-excel-import',
-    async (data: { file: File }): Promise<BulkUpsertProductsResponse> => {
-      const { file } = data;
-
-      setIsLoading(true);
-
-      // Parse Excel file
-      const products = await parseProductExcelFile(file);
-
-      if (products.length === 0) {
-        throw new Error(t('product.noValidDataFound'));
-      }
-
-      // Prepare request - convert parsed products to API format
-      const request: BulkUpsertProductsRequest = {
-        products: products.map((p) => ({
-          productCode: p.productCode,
-          metadata: {
-            name: p.name,
-            description: p.description || undefined,
-            category: p.category || undefined,
-            unit: p.unit || undefined,
-            color: p.color || undefined,
-          },
-        })),
-        skipInvalid: false,
-      };
-
-      const result = await productService.bulkUpsertProducts(request);
-      return result;
-    },
-    {
-      notifications: {
-        errorTitle: t('common.errors.notificationTitle'),
-        errorMessage: t('common.bulkImport.importFailed', { entity: t('common.entity.product') }),
-      },
-      onSuccess: async (result: BulkUpsertProductsResponse) => {
-        const message = t('common.bulkImportSuccess', {
-          created: result.created,
-          updated: result.updated,
-          failed: result.failed,
-        });
-
-        showSuccessNotification(
-          t('common.bulkImport.importSuccess', { entity: t('common.entity.product') }),
-          message,
-        );
-        modals.closeAll();
-        await loadProductsAction.trigger();
-      },
-      onSettled: () => {
-        setIsLoading(false);
-      },
-    },
-  );
-
-  // Open bulk import modal
-  const openBulkImportModal = () => {
-    if (!canCreate) {
-      return;
-    }
-    let selectedFile: File | undefined;
-
-    modals.openConfirmModal({
-      title: t('product.bulkImport'),
-      size: 'lg',
-      children: (
-        <BulkImportModalContent
-          onFileSelect={(file) => {
-            selectedFile = file;
-          }}
-          onDownloadTemplate={() => generateProductExcelTemplate(currentLanguage)}
-          entityType="product"
-          language={currentLanguage}
-        />
-      ),
-      labels: {
-        confirm: t('common.import'),
-        cancel: t('common.cancel'),
-      },
-      confirmProps: {
-        loading: isLoading,
-        leftSection: <IconUpload size={16} />,
-      },
-      onConfirm: () => {
-        if (!canCreate) {
-          throw new Error(t('common.doNotHavePermissionForAction'));
-        }
-        if (selectedFile) {
-          handleExcelImportAction.trigger({ file: selectedFile });
-        } else {
-          showErrorNotification(
-            t('common.errors.notificationTitle'),
-            t('common.file.pleaseSelectFileFirst'),
-          );
-        }
-      },
-    });
-  };
+    searchFilter: (product, query) =>
+      product.name.toLowerCase().includes(query) ||
+      product.productCode.toLowerCase().includes(query) ||
+      (product.category?.toLowerCase().includes(query) ?? false),
+  });
 
   if (!canView) {
     return <PermissionDeniedPage />;
@@ -392,18 +169,17 @@ export function ProductConfigPage() {
         withGoBack
         isLoading={isLoading}
         error={error}
-        clearError={() => setError(undefined)}
+        clearError={clearError}
         header={<AppPageTitle title={t('common.pages.productManagement')} />}
       >
         {/* Sticky Search Bar */}
         <Box
+          py="xs"
+          bg="var(--mantine-color-body)"
           style={{
             position: 'sticky',
             top: 0,
             zIndex: 100,
-            backgroundColor: 'var(--mantine-color-body)',
-            paddingTop: '0.5rem',
-            paddingBottom: '0.5rem',
           }}
         >
           <SearchBar
@@ -416,12 +192,12 @@ export function ProductConfigPage() {
         {/* Blank State for no results */}
         <BlankState
           hidden={paginatedProducts.length > 0 || isLoading}
-          title={searchQuery ? t('common.noDataFound') : t('common.noDataFound')}
+          title={t('common.noDataFound')}
           description={searchQuery ? t('common.tryDifferentSearch') : t('common.noDataFound')}
         />
 
         {/* Product List */}
-        <Box mt="md">
+        <Box mb="xl">
           {paginatedProducts.length > 0 && (
             <Stack gap="sm" px="sm">
               {paginatedProducts.map((product) => (
@@ -430,15 +206,6 @@ export function ProductConfigPage() {
             </Stack>
           )}
         </Box>
-
-        {/* Pagination */}
-        <Pagination
-          totalPages={paginationState.totalPages}
-          pageSize={paginationState.pageSize}
-          currentPage={paginationState.currentPage}
-          onPageSizeChange={paginationHandlers.setPageSize}
-          onPageChange={paginationHandlers.setCurrentPage}
-        />
       </AppMobileLayout>
     );
   }
@@ -447,9 +214,7 @@ export function ProductConfigPage() {
     <AppDesktopLayout
       isLoading={isLoading && !createOpened && !editOpened}
       error={error}
-      clearError={() => {
-        setError(undefined);
-      }}
+      clearError={clearError}
     >
       {/* Page Title with Actions */}
       <Group justify="space-between" align="center" mb="xl">
@@ -459,7 +224,7 @@ export function ProductConfigPage() {
             variant="light"
             leftSection={<IconUpload size={16} />}
             disabled={!canCreate}
-            onClick={openBulkImportModal}
+            onClick={() => openBulkImportModal()}
           >
             {t('product.bulkImport')}
           </Button>
@@ -482,8 +247,9 @@ export function ProductConfigPage() {
 
       <Paper withBorder shadow="md" p="md" radius="md">
         <DataTable
+          withIndex
+          indexStart={(paginationState.currentPage - 1) * paginationState.pageSize + 1}
           data={paginatedProducts as Product[]}
-          isLoading={false}
           emptyMessage={t('common.noDataFound')}
           onRowClick={openEditModal}
           columns={[
@@ -515,10 +281,11 @@ export function ProductConfigPage() {
               header: t('common.status'),
               width: '200px',
               render: (product: Product) => {
+                const isActive = product.isActive ?? true;
                 return (
                   <ActiveBadge
-                    isActive={!product.isDeleted}
-                    label={product.isDeleted ? t('product.inactive') : t('product.active')}
+                    isActive={isActive}
+                    label={isActive ? t('product.active') : t('product.inactive')}
                   />
                 );
               },
@@ -541,7 +308,7 @@ export function ProductConfigPage() {
         isLoading={isLoading}
         opened={createOpened}
         onClose={closeCreate}
-        onSubmit={handleCreateProductAction.trigger}
+        onSubmit={handleCreate}
       />
 
       <ProductFormModal
@@ -551,11 +318,9 @@ export function ProductConfigPage() {
         form={form}
         isLoading={isLoading}
         onClose={closeEdit}
-        onSubmit={handleUpdateProductAction.trigger}
-        onActivate={() => selectedProduct && handleActivateProductAction.trigger(selectedProduct)}
-        onDeactivate={() =>
-          selectedProduct && handleDeactivateProductAction.trigger(selectedProduct)
-        }
+        onSubmit={handleUpdate}
+        onActivate={() => selectedProduct && handleActivate(selectedProduct)}
+        onDeactivate={() => selectedProduct && handleDeactivate(selectedProduct)}
       />
     </AppDesktopLayout>
   );

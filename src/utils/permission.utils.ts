@@ -48,6 +48,22 @@ export function canDeleteCustomer(permissions: Permission) {
   return Boolean(permissions.customer.canDelete);
 }
 
+export function canViewVendor(permissions: Permission) {
+  return Boolean(permissions.vendor?.canView);
+}
+
+export function canCreateVendor(permissions: Permission) {
+  return Boolean(permissions.vendor?.canCreate);
+}
+
+export function canEditVendor(permissions: Permission) {
+  return Boolean(permissions.vendor?.canEdit);
+}
+
+export function canDeleteVendor(permissions: Permission) {
+  return Boolean(permissions.vendor?.canDelete);
+}
+
 export function canViewPurchaseOrder(permissions: Permission) {
   return Boolean(permissions.purchaseOrder.canView);
 }
@@ -74,6 +90,10 @@ export function canTakePhotoPurchaseOrder(permissions: Permission) {
 
 export function canDeletePhotoPurchaseOrder(permissions: Permission) {
   return Boolean(permissions.purchaseOrder.actions?.canDeletePhoto);
+}
+
+export function canDeletePurchaseOrder(permissions: Permission) {
+  return Boolean(permissions.purchaseOrder.canDelete);
 }
 
 export function canCopyPurchaseOrder(permissions: Permission) {
@@ -146,4 +166,8 @@ export function canUpdateDeliveryOrderInDay(permissions: Permission) {
 
 export function canDeletePhotoDeliveryRequest(permissions: Permission) {
   return Boolean(permissions.deliveryRequest.actions?.canDeletePhoto);
+}
+
+export function canDeleteDeliveryRequest(permissions: Permission) {
+  return Boolean(permissions.deliveryRequest.canDelete);
 }

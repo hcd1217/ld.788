@@ -10,6 +10,7 @@ import type { DeliveryRequest } from '@/services/sales';
 import { formatDate } from '@/utils/time';
 
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
+import { DeliveryTypeBadge } from './DeliveryTypeBadge';
 
 type DeliveryDataTableProps = {
   readonly deliveryRequests: readonly DeliveryRequest[];
@@ -33,8 +34,13 @@ function DeliveryDataTableComponent({ deliveryRequests }: DeliveryDataTableProps
       <Table striped highlightOnHover>
         <Table.Thead>
           <Table.Tr>
+            <Table.Th>#</Table.Th>
             <Table.Th>{t('delivery.id')}</Table.Th>
-            <Table.Th>{t('common.customer')}</Table.Th>
+            <Table.Th>
+              {t('common.customer')}
+              {' / '}
+              {t('common.vendor')}
+            </Table.Th>
             <Table.Th>{t('delivery.scheduledDate')}</Table.Th>
             <Table.Th>{t('delivery.completedDate')}</Table.Th>
             <Table.Th>{t('delivery.assignedTo')}</Table.Th>
@@ -42,7 +48,7 @@ function DeliveryDataTableComponent({ deliveryRequests }: DeliveryDataTableProps
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {deliveryRequests.map((delivery) => {
+          {deliveryRequests.map((delivery, index) => {
             return (
               <Table.Tr
                 key={delivery.id}
@@ -55,11 +61,14 @@ function DeliveryDataTableComponent({ deliveryRequests }: DeliveryDataTableProps
                 onClick={handleRowClick(delivery.id)}
               >
                 <Table.Td>
+                  <Text fw={500}>{index + 1}</Text>
+                </Table.Td>
+                <Table.Td>
                   <Text fw={500}>{delivery.deliveryRequestNumber}</Text>
                 </Table.Td>
                 <Table.Td>
                   <Group gap="sm" justify="start">
-                    <Text fw={400}>{delivery.customerName}</Text>
+                    <Text fw={400}>{delivery.customerName || delivery.vendorName}</Text>
                   </Group>
                 </Table.Td>
                 <Table.Td>{formatDate(delivery.scheduledDate)}</Table.Td>
@@ -70,6 +79,7 @@ function DeliveryDataTableComponent({ deliveryRequests }: DeliveryDataTableProps
                 <Table.Td>
                   <Group gap="xs">
                     {delivery.isUrgentDelivery && <UrgentBadge size="xs" />}
+                    <DeliveryTypeBadge type={delivery.type} size="xs" />
                     <DeliveryStatusBadge status={delivery.status} />
                   </Group>
                 </Table.Td>

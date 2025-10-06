@@ -12,6 +12,7 @@ import { formatDate } from '@/utils/time';
 
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
+import { POUrgentBadge } from './POUrgentBadge';
 
 type POGridCardProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -30,6 +31,7 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
       style={{
         cursor: 'pointer',
       }}
+      bg={purchaseOrder.isUrgentPO ? 'var(--mantine-color-red-1)' : undefined}
       onClick={() => navigate(getPODetailRoute(purchaseOrder.id))}
     >
       <Stack
@@ -46,7 +48,7 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
             <Group justify="space-between" w="100%">
               <div>
                 <Text size="sm" c="dimmed">
-                  {t('po.customer')}
+                  {t('common.customer')}
                 </Text>
                 <Text size="sm" fw={500}>
                   {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
@@ -61,18 +63,26 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
                 </Text>
               </div>
             </Group>
-            {purchaseOrder.salesId && (
-              <Group justify="space-between" w="100%">
+            <Group justify="space-between" w="100%">
+              <div>
+                <Text size="sm" c="dimmed">
+                  {t('po.salesPerson')}
+                </Text>
+                <Text size="sm" fw={500}>
+                  {purchaseOrder.salesPerson ?? '-'}
+                </Text>
+              </div>
+              {purchaseOrder.customerPONumber && (
                 <div>
                   <Text size="sm" c="dimmed">
-                    {t('po.salesPerson')}
+                    {t('po.customerPONumber')}
                   </Text>
                   <Text size="sm" fw={500}>
-                    {purchaseOrder.salesPerson}
+                    {purchaseOrder.customerPONumber ?? '-'}
                   </Text>
                 </div>
-              </Group>
-            )}
+              )}
+            </Group>
             <Group justify="space-between" w="100%">
               <div>
                 <Text size="sm" c="dimmed">
@@ -103,6 +113,7 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
           >
             <POStatusBadge status={purchaseOrder.status} />
             <PODeliveryBadge isInternalDelivery={purchaseOrder.isInternalDelivery} />
+            <POUrgentBadge isUrgentPO={purchaseOrder.isUrgentPO} />
           </Stack>
         </Group>
       </Stack>

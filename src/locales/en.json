@@ -48,7 +48,8 @@
       "fields": {
         "customer": "customer name",
         "employee": "first and last name",
-        "product": "product code"
+        "product": "product code",
+        "vendor": "vendor name"
       },
       "importFailed": "Failed to import {{entity}} data",
       "importSuccess": "Import {{entity}} completed successfully",
@@ -69,6 +70,7 @@
     "customerName": "Customer Name",
     "dangerZone": "Danger Zone",
     "darkMode": "Dark Mode",
+    "date": "Date",
     "deactivate": "Deactivate",
     "deactivated": " {{entity}}Deactivated",
     "delete": "Delete",
@@ -76,22 +78,20 @@
     "description": "Description",
     "doNotHavePermissionForAction": "You don't have permission to perform this action",
     "download": "Download",
-    "downloading": "Downloading",
     "dragAndDropFile": "Drag and drop your file here",
     "edit": "Edit",
     "entity": {
       "customer": "Customer",
       "deliveryRequest": "Delivery Request",
       "employee": "Employee",
-      "product": "Product"
+      "product": "Product",
+      "vendor": "Vendor"
     },
     "errors": {
       "notificationTitle": "Error",
       "setPasswordFailed": "Failed to set password"
     },
     "failed": "Failed",
-    "failedToParseExcel": "Failed to parse Excel file",
-    "failedToReadFile": "Failed to read file",
     "file": {
       "pleaseSelectExcelFile": "Please select a CSV or Excel file",
       "pleaseSelectFileFirst": "Please select a file first"
@@ -101,7 +101,6 @@
       "selectCustomer": "Select Customer",
       "selectStatus": "Select Status"
     },
-    "firstName": "First name",
     "form": {
       "email": "Email",
       "emailPlaceholder": "Enter email",
@@ -111,6 +110,7 @@
       "picPlaceholder": "Enter Contact Person",
       "update": "Update"
     },
+    "from": "from",
     "goToHome": "Go to Home",
     "googleMapsUrl": "Google Maps URL",
     "googleMapsUrlForDelivery": "Google Maps URL (Delivery Address)",
@@ -120,7 +120,6 @@
     "import": "Import",
     "importResults": "Import Results",
     "invalidFormData": "Invalid form data",
-    "lastName": "Last name",
     "loadingFailed": "Failed to load data",
     "loadingMore": "Loading more...",
     "logout": "Logout",
@@ -162,7 +161,10 @@
       "profileDescription": "Manage your profile",
       "salesPoManagement": "[Sales] Purchase Orders",
       "timeKeeper": "Timekeeper",
-      "timeKeeperDescription": "Manage timekeeping and attendance"
+      "timeKeeperDescription": "Manage timekeeping and attendance",
+      "vendorConfig": "Vendor Config",
+      "vendorConfigDescription": "Configure vendor settings",
+      "vendorManagement": "Vendor Management"
     },
     "phone": "Phone",
     "photos": {
@@ -199,19 +201,20 @@
     },
     "remove": "Remove",
     "save": "Save",
-    "selectFile": "Select File",
     "status": "Status",
     "statusesSelected": "{{count}} statuses selected",
     "success": "Success",
     "tableDisplayOrder": "#",
     "tableView": "Table",
+    "to": "to",
     "total": "Total",
     "tryAgain": "Try again",
     "tryDifferentSearch": "Try adjusting your search criteria",
-    "unknownError": "Unknown error",
+    "unit": "Unit",
     "updateFailed": "Failed to update {{entity}}",
     "updatedAt": "Updated At",
     "urgent": "Urgent",
+    "vendor": "Vendor",
     "viewOnMap": "View on Google Maps"
   },
   "customer": {
@@ -220,18 +223,13 @@
     "bulkImport": "Bulk Import",
     "company": "Company",
     "companyPlaceholder": "Company Name",
-    "created": "Customer Created",
-    "createdMessage": "Customer '{{name}}' has been successfully created",
     "deliveryAddress": "Delivery Address",
     "deliveryAddressPlaceholder": "Delivery Address (if different from main address)",
     "namePlaceholder": "Customer Name",
-    "noValidDataFound": "No valid customer data found in the file",
     "phonePlaceholder": "+84901234567",
-    "searchPlaceholder": "Search customers by name, company, email, or phone...",
+    "searchPlaceholder": "Search customers by name",
     "taxCode": "Tax Code",
-    "taxCodePlaceholder": "Tax Code (Optional)",
-    "updated": "Customer Updated",
-    "updatedMessage": "Customer '{{name}}' has been successfully updated"
+    "taxCodePlaceholder": "Tax Code (Optional)"
   },
   "delivery": {
     "actions": {
@@ -248,12 +246,16 @@
     "assignedTo": "Assigned To",
     "completedDate": "Completed Date",
     "completionNotes": "Completion Notes",
+    "createDeliveryDescription": "Create a delivery request to send items to customer",
+    "createReceiveRequest": "Create Request",
+    "deleteDelivery": "Delete Delivery",
+    "deleteDeliveryDescription": "Are you sure you want to delete this delivery request? This action cannot be undone.",
     "deliveryId": "Delivery ID",
     "deliveryInfo": "Delivery Information",
     "descriptions": {
       "completeDelivery": "Mark this delivery as completed",
       "completionNotes": "Notes about the completed delivery",
-      "createFirstDeliveryRequest": "Create your first delivery request from a purchase order"
+      "createFirstDeliveryRequest": "Create your first delivery request"
     },
     "detail": "Delivery Details",
     "filters": {
@@ -264,16 +266,29 @@
     "form": {
       "enterNotes": "Enter delivery notes",
       "selectAssignee": "Select Assignee",
+      "selectCustomer": "Select Customer",
       "selectDate": "Select Scheduled Date",
+      "selectDriver": "Select Driver",
+      "selectPO": "Select Purchase Order (optional)",
+      "selectPOs": "Select Purchase Orders",
+      "selectPOsDescription": "Select one or more purchase orders to create delivery requests",
       "urgentDeliveryDescription": "Mark this delivery as urgent"
     },
     "id": "Request ID",
     "messages": {
       "completeFailed": "Failed to complete delivery",
       "completed": "Delivery completed successfully",
+      "deleteFailed": "Failed to delete delivery",
+      "deleted": "Delivery deleted successfully",
       "photosUploaded": "Photos uploaded successfully",
       "statusUpdateFailed": "Failed to update delivery status",
       "statusUpdated": "Delivery status updated to {{status}}"
+    },
+    "modal": {
+      "tabs": {
+        "delivery": "Delivery Request",
+        "receive": "Receive Request"
+      }
     },
     "noDeliveryRequestsFound": "No delivery requests found",
     "noDeliveryRequestsFoundSearch": "No delivery requests found matching your search",
@@ -285,6 +300,7 @@
     "pleaseSelectAssigneeAndScheduledDate": "Please select assignee and scheduled date",
     "poNumber": "PO Number",
     "purchaseOrder": "Purchase Order",
+    "purchaseOrders": "Purchase Orders",
     "quickActions": {
       "allDates": "All Dates",
       "thisMonth": "This Month",
@@ -292,8 +308,12 @@
       "title": "Quick Actions",
       "today": "Today"
     },
+    "receiveRequestDescription": "This will create a delivery request for receiving items from a vendor to the warehouse.",
+    "receiveRequestInfo": "Receive Request Information",
+    "receiveType": "RECEIVE",
     "receivedBy": "ReceivedBy",
     "receivedByDescription": "Name of person who received the delivery",
+    "requestType": "Request Type",
     "scheduledDate": "Scheduled Date",
     "status": "Status",
     "statuses": {
@@ -304,7 +324,18 @@
     "title": "Delivery Management",
     "transitNotes": "Transit Notes",
     "transitNotesDescription": "Optional notes about starting transit",
-    "urgentDelivery": "Urgent"
+    "types": {
+      "delivery": "Delivery",
+      "receive": "Receive"
+    },
+    "updateDeliveryRequest": "Update Delivery Request",
+    "updateReceiveRequest": "Update Receive Request",
+    "urgentDelivery": "Urgent",
+    "useCustomVendor": "Use custom vendor name",
+    "vendorName": "Vendor Name",
+    "vendorNamePlaceholder": "Enter vendor name",
+    "vendorPickupAddress": "Vendor Pickup Address",
+    "vendorPickupAddressPlaceholder": "Enter vendor address where driver will pick up items"
   },
   "employee": {
     "activateEmployee": "Activate Employee",
@@ -446,6 +477,9 @@
     "title": "Desktop Feature"
   },
   "po": {
+    "actions": {
+      "loadPOs": "Load Purchase Orders"
+    },
     "addAndContinue": "Add Item and Save",
     "addFirstItem": "Add First Item",
     "addItem": "Add Item",
@@ -454,8 +488,12 @@
     "address": "Address",
     "addressPlaceholder": "Enter complete address",
     "allCustomers": "All Customers",
+    "attachments": "Attachments",
+    "attachmentsDescription": "Upload photos or documents (images, PDF, Word). Max 10MB per file.",
+    "attachmentsOptional": "Optional",
     "autoFilledFromCustomerAddress": "Auto-filled from customer address",
     "availableActions": "Available Actions",
+    "bulkDeliveryModalTitle": "Create Delivery Requests ({{count}} POs)",
     "cancel": "Cancel",
     "cancelFailed": "Failed to cancel order",
     "cancelOrder": "Cancel Order",
@@ -484,18 +522,25 @@
     "continueWithoutAdding": "Save Without Adding",
     "country": "Country",
     "countryPlaceholder": "Enter country name",
+    "createBulkDelivery": "Create Bulk Delivery",
     "createDeliveryRequest": "Create Delivery Request",
+    "createDeliveryRequests": "Create {{count}} Delivery Requests",
     "createFirstPO": "Create Your First PO",
     "createFirstPODescription": "Get started by creating your first purchase order",
     "createPO": "Create Purchase Order",
     "created": "Purchase order created successfully",
     "createdBy": "Created by",
     "current": "Current",
-    "customer": "Customer",
     "customerInformation": "Customer Information",
     "customerNotFound": "Customer not found",
+    "customerPONumber": "Customer PO Number",
     "customerRequired": "Customer is required",
     "dateRange": "Date Range",
+    "deleteFailed": "Failed to delete purchase order",
+    "deleteOrder": "Delete Order",
+    "deleteOrderDescription": "Are you sure you want to delete this order? This action cannot be undone.",
+    "deleteReason": "Delete Reason",
+    "deleted": "Purchase order deleted successfully",
     "deliverFailed": "Failed to mark as delivered",
     "deliverOrder": "Deliver Order",
     "deliverOrderDescription": "Mark this order as delivered. You can add delivery notes if needed.",
@@ -515,6 +560,8 @@
     "endDate": "End Date",
     "enterCancellationReason": "Enter reason for cancellation",
     "enterCarrier": "Enter carrier name (e.g., FedEx, UPS)",
+    "enterCustomerPONumber": "Enter customer PO number",
+    "enterDeleteReason": "Enter reason for deletion",
     "enterDeliveryNotes": "Enter any delivery notes or comments",
     "enterDescription": "Enter product description",
     "enterRefundReason": "Enter reason for refund",
@@ -525,9 +572,12 @@
     "exportPDF": "Export PDF",
     "exportPDFComingSoon": "PDF export feature coming soon",
     "externalDelivery": "External",
+    "fileTooLarge": "File size exceeds the maximum limit of 10MB",
     "internalDelivery": "Internal",
+    "invalidFileType": "Invalid file type",
     "invalidQuantity": "Invalid quantity",
     "isInternalDelivery": "Internal Delivery",
+    "isUrgentPO": "Urgent PO",
     "items": "Items",
     "itemsCount": "items",
     "itemsRequired": "At least one item is required",
@@ -540,6 +590,7 @@
     "markReadyOrderDescription": "Mark this order as ready for pickup. You can specify the pickup location and send a notification.",
     "markShipped": "Mark as Shipped",
     "markedReady": "Order marked as ready for pickup",
+    "moreFilters": "More Filters",
     "noItemsMessage": "No items added yet. Click the button below to add your first item.",
     "noMorePOs": "No more purchase orders to load",
     "noPOsFound": "No purchase orders found",
@@ -561,6 +612,7 @@
     "orderTimeline": "Order Timeline",
     "pending": "Pending",
     "pendingItemDetails": "Pending item details",
+    "photos": "Purchase Order Photos",
     "pickupLocation": "Pickup Location",
     "poCard": "Purchase order card for {{poNumber}}",
     "poDetails": "Purchase Order Details",
@@ -582,6 +634,7 @@
     "productCode": "Product Code",
     "quantity": "Qty",
     "reason": "Reason",
+    "receiveAddress": "Receiving Address",
     "refund": "Refund",
     "refundFailed": "Failed to process refund",
     "refundOrder": "Refund Order",
@@ -593,15 +646,19 @@
     "searchCustomer": "Search customers",
     "searchPlaceholder": "Search by PO number",
     "searchProduct": "Search product",
+    "selectAll": "Select all",
     "selectCategory": "Select category",
     "selectCustomer": "Select a customer",
     "selectDateRange": "Select Date Range",
     "selectDeliveryDate": "Select delivery date",
     "selectEndDate": "Select End Date",
+    "selectFiles": "Select Files",
     "selectOrderDate": "Select order date",
+    "selectPO": "Select PO {{poNumber}}",
     "selectSalesPerson": "Select Person in charge",
     "selectStartDate": "Select Start Date",
     "selectStatus": "Select Status",
+    "selectedFiles": "Selected Files",
     "ship": "Ship",
     "shipFailed": "Failed to mark as shipped",
     "shipOrder": "Ship Order",
@@ -644,20 +701,15 @@
     "categoryPlaceholder": "Enter product category",
     "color": "Color",
     "colorPlaceholder": "Enter product color",
-    "created": "Product Created",
-    "createdMessage": "Product '{{name}}' has been successfully created",
     "descriptionPlaceholder": "Enter product description",
     "editProduct": "Edit Product",
     "inactive": "Stopped",
     "namePlaceholder": "Enter product name",
-    "noValidDataFound": "No valid product data found in the file",
     "productCode": "Product Code",
     "productCodePlaceholder": "Enter product code",
-    "searchPlaceholder": "Search products by name, code, category...",
+    "searchPlaceholder": "Search products by name, code...",
     "unit": "Unit",
-    "unitPlaceholder": "pcs, kg, etc.",
-    "updated": "Product Updated",
-    "updatedMessage": "Product '{{name}}' has been successfully updated"
+    "unitPlaceholder": "pcs, kg, etc."
   },
   "profile": {
     "changePassword": "Change Password",
@@ -787,5 +839,15 @@
     "phoneRequired": "Phone number is required",
     "required": "{{field}} is required",
     "tooShort": "{{field}} must be at least {{length}} characters"
+  },
+  "vendor": {
+    "address": "Address",
+    "addressPlaceholder": "Vendor Address",
+    "bulkImport": "Bulk Import",
+    "namePlaceholder": "Vendor Name",
+    "phonePlaceholder": "+84901234567",
+    "searchPlaceholder": "Search vendors by name",
+    "taxCode": "Tax Code",
+    "taxCodePlaceholder": "Tax Code (Optional)"
   }
 }

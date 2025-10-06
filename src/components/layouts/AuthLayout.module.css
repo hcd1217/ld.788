@@ -18,7 +18,7 @@
   padding-left: var(--mantine-spacing-lg);
   padding-right: 0;
   border-style: solid;
-  border-width: 0px 0px .5px 0px;
+  border-width: 0px 0px 0.5px 0px;
   color: var(--menu-color);
   border-color: var(--menu-border-color);
   position: relative;
@@ -79,7 +79,7 @@
   padding-left: var(--mantine-spacing-lg);
   padding-right: 0;
   border-style: solid;
-  border-width: 0px 0px .5px 0px;
+  border-width: 0px 0px 0.5px 0px;
   color: var(--menu-color);
   border-color: var(--menu-border-color);
   position: relative;

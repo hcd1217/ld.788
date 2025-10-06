@@ -55,6 +55,12 @@ export const ClientConfigSchema = z.object({
           noEmail: optionalBooleanSchema,
         })
         .partial(),
+      vendor: z
+        .object({
+          noTaxCode: optionalBooleanSchema,
+          noEmail: optionalBooleanSchema,
+        })
+        .partial(),
     })
     .partial()
     .optional(),

@@ -10,6 +10,7 @@ import type { DeliveryRequest } from '@/services/sales';
 import { formatDate } from '@/utils/time';
 
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
+import { DeliveryTypeBadge } from './DeliveryTypeBadge';
 
 type DeliveryCardProps = {
   readonly deliveryRequest: DeliveryRequest;
@@ -51,13 +52,28 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
           <Text fw="bold" size="sm">
             {deliveryRequest.deliveryRequestNumber}
           </Text>
-          {deliveryRequest.customerName && (
+          <Group gap="xs">
+            <Text size="sm" c="dimmed">
+              {t('delivery.requestType')}:
+            </Text>
+            <DeliveryTypeBadge type={deliveryRequest.type} />
+          </Group>
+          {deliveryRequest.isDelivery ? (
             <Group gap="sm">
               <Text size="sm" c="dimmed">
                 {t('common.customer')}:
               </Text>
               <Text size="sm" fw={500}>
                 {deliveryRequest.customerName}
+              </Text>
+            </Group>
+          ) : (
+            <Group gap="sm">
+              <Text size="sm" c="dimmed">
+                {t('common.vendor')}:
+              </Text>
+              <Text size="sm" fw={500}>
+                {deliveryRequest.vendorName}
               </Text>
             </Group>
           )}

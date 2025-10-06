@@ -2,12 +2,30 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useNavigate } from 'react-router';
 
-import { Button, Center, Flex, Group, Loader, SimpleGrid, Stack, Text } from '@mantine/core';
+import {
+  ActionIcon,
+  Affix,
+  Button,
+  Center,
+  Flex,
+  Group,
+  Loader,
+  SimpleGrid,
+  Stack,
+  Text,
+} from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
-import { IconChevronLeft, IconChevronRight, IconSortAscending } from '@tabler/icons-react';
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconPackage,
+  IconPlus,
+  IconSortAscending,
+} from '@tabler/icons-react';
 
 import {
   DeliveryCard,
+  DeliveryCreateModal,
   DeliveryDataTable,
   DeliveryErrorBoundary,
   DeliveryFilterBarDesktop,
@@ -29,6 +47,7 @@ import { ROUTERS } from '@/config/routeConfig';
 import { DELIVERY_STATUS } from '@/constants/deliveryRequest';
 import { useDeliveryRequestFilters } from '@/hooks/useDeliveryRequestFilters';
 import { useDeviceType } from '@/hooks/useDeviceType';
+import { useSWRAction } from '@/hooks/useSWRAction';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useViewMode } from '@/hooks/useViewMode';
 import { useMe, usePermissions } from '@/stores/useAppStore';
@@ -42,6 +61,7 @@ import {
 import type { Timeout } from '@/types';
 import { xOr } from '@/utils/boolean';
 import {
+  canCreateDeliveryRequest,
   canUpdateDeliveryOrderInDay,
   canViewAllDeliveryRequest,
   canViewDeliveryRequest,
@@ -58,9 +78,10 @@ export function DeliveryListPage() {
   const isLoading = useDeliveryRequestLoading();
   const error = useDeliveryRequestError();
 
-  const { currentEmployeeId, canView, canViewAll, canUpdateOrderInDay } = useMemo(() => {
+  const { currentEmployeeId, canCreate, canView, canViewAll, canUpdateOrderInDay } = useMemo(() => {
     const employeeId = currentUser?.employee?.id ?? '-';
     return {
+      canCreate: canCreateDeliveryRequest(permissions),
       currentEmployeeId: employeeId,
       canView: canViewDeliveryRequest(permissions),
       canViewAll: canViewAllDeliveryRequest(permissions),
@@ -74,6 +95,7 @@ export function DeliveryListPage() {
     loadNextPage,
     loadPreviousPage,
     clearError,
+    createDeliveryRequest,
   } = useDeliveryRequestActions();
   const { hasMoreDeliveryRequests, hasPreviousPage, isLoadingMore, currentPage } =
     useDeliveryRequestPaginationState();
@@ -85,6 +107,7 @@ export function DeliveryListPage() {
   const [quickActionsDrawerOpened, setQuickActionsDrawerOpened] = useState(false);
   const [statusDrawerOpened, setStatusDrawerOpened] = useState(false);
   const [selectedQuickAction, setSelectedQuickAction] = useState<string | undefined>();
+  const [createModalOpened, setCreateModalOpened] = useState(false);
 
   // Debounce the search query for API calls (1 second delay)
   const [debouncedSearch] = useDebouncedValue(filters.searchQuery, 1000);
@@ -100,23 +123,22 @@ export function DeliveryListPage() {
   const lastLoadTimeRef = useRef<number>(0);
 
   // Create stable filter params with useMemo to prevent unnecessary re-renders
-  const filterParams = useMemo(
-    () => ({
+  const filterParams = useMemo(() => {
+    // Filter out 'ALL' status and convert to API format
+    const validStatuses = filters.statuses.filter((s) => s !== DELIVERY_STATUS.ALL);
+
+    return {
       customerId: filters.customerId,
-      // Filter out 'all' status before passing to API
-      status:
-        filters.statuses.length === 1 && filters.statuses[0] !== DELIVERY_STATUS.ALL
-          ? filters.statuses[0]
-          : undefined,
+      statuses: validStatuses.length > 1 ? validStatuses : undefined,
+      status: validStatuses.length === 1 ? validStatuses[0] : undefined,
       assignedTo: canViewAll ? filters.assignedTo : currentEmployeeId,
       deliveryRequestNumber: debouncedSearch || undefined,
       scheduledDateFrom: filters.scheduledDateRange.start?.toISOString(),
       scheduledDateTo: filters.scheduledDateRange.end?.toISOString(),
       sortBy: 'scheduledDate' as const,
       sortOrder: 'asc' as const,
-    }),
-    [canViewAll, filters, debouncedSearch, currentEmployeeId],
-  );
+    };
+  }, [canViewAll, filters, debouncedSearch, currentEmployeeId]);
 
   // Effect to load delivery requests when filter params change with forced delay for ALL filters
   useEffect(() => {
@@ -227,6 +249,36 @@ export function DeliveryListPage() {
     // The apply is handled within the drawer component
   };
 
+  // Create delivery request action
+  const createReceiveRequestAction = useSWRAction(
+    'create-receive-request',
+    async (data: {
+      type: 'RECEIVE' | 'DELIVERY';
+      assignedTo: string;
+      scheduledDate: string;
+      notes?: string;
+      isUrgentDelivery?: boolean;
+      vendorName?: string;
+      receiveAddress?: {
+        oneLineAddress: string;
+        googleMapsUrl?: string;
+      };
+      purchaseOrderId?: string;
+    }) => {
+      await createDeliveryRequest(data);
+      setCreateModalOpened(false);
+      await loadDeliveryRequestsWithFilter(filterParams, true);
+    },
+    {
+      onSuccess: () => {
+        // The action already handles closing the modal and refreshing
+      },
+      onError: (error: Error) => {
+        console.error('Failed to create receive request:', error);
+      },
+    },
+  );
+
   // Check view permission
   if (!canView) {
     return <PermissionDeniedPage />;
@@ -300,8 +352,6 @@ export function DeliveryListPage() {
             </Flex>
           )}
 
-          {/* Note: Delivery requests are created from PO pages, not directly */}
-
           {/* Mobile Filter Drawers */}
           <DeliveryQuickActionsDrawer
             opened={quickActionsDrawerOpened}
@@ -318,6 +368,27 @@ export function DeliveryListPage() {
             onApply={handleStatusApply}
             onClear={() => filterHandlers.setStatuses([])}
           />
+
+          {/* Create Receive Request Modal */}
+          <DeliveryCreateModal
+            opened={createModalOpened}
+            onClose={() => setCreateModalOpened(false)}
+            onConfirm={createReceiveRequestAction.trigger}
+            isLoading={createReceiveRequestAction.isMutating}
+          />
+          {/* Floating Action Button for Add Request */}
+          {!createModalOpened && !isLoading && canCreate && (
+            <Affix position={{ bottom: 80, right: 10 }}>
+              <ActionIcon
+                size="xl"
+                radius="xl"
+                color="blue"
+                onClick={() => setCreateModalOpened(true)}
+              >
+                <IconPlus size={24} />
+              </ActionIcon>
+            </Affix>
+          )}
         </DeliveryErrorBoundary>
       </AppMobileLayout>
     );
@@ -341,8 +412,14 @@ export function DeliveryListPage() {
             >
               {t('delivery.actions.arrangeDeliveryOrder')}
             </Button>
+            <Button
+              leftSection={<IconPackage size={16} />}
+              onClick={() => setCreateModalOpened(true)}
+              disabled={!canCreate}
+            >
+              {t('delivery.createReceiveRequest')}
+            </Button>
             <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
-            {/* Note: Delivery requests are created from PO pages, not directly */}
           </Group>
         </Group>
 
@@ -415,6 +492,14 @@ export function DeliveryListPage() {
         )}
 
         {/* Note: Desktop now uses inline controls in DeliveryFilterBarDesktop, no drawers needed */}
+
+        {/* Create Receive Request Modal */}
+        <DeliveryCreateModal
+          opened={createModalOpened}
+          onClose={() => setCreateModalOpened(false)}
+          onConfirm={createReceiveRequestAction.trigger}
+          isLoading={createReceiveRequestAction.isMutating}
+        />
       </DeliveryErrorBoundary>
     </AppDesktopLayout>
   );

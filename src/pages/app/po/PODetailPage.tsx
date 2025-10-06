@@ -29,6 +29,7 @@ import {
   canCancelPurchaseOrder,
   canConfirmPurchaseOrder,
   canCreatePurchaseOrder,
+  canDeletePurchaseOrder,
   canDeliverPurchaseOrder,
   canEditPurchaseOrder,
   canMarkReadyPurchaseOrder,
@@ -58,6 +59,7 @@ export function PODetailPage() {
     deliverPurchaseOrder,
     cancelPurchaseOrder,
     refundPurchaseOrder,
+    deletePurchaseOrder,
     clearError,
   } = usePOActions();
 
@@ -88,6 +90,7 @@ export function PODetailPage() {
         | 'deliver'
         | 'cancel'
         | 'refund'
+        | 'delete'
         | 'uploadPhotos',
     ) =>
       () =>
@@ -115,7 +118,9 @@ export function PODetailPage() {
               googleMapsUrl: purchaseOrder.googleMapsUrl,
             },
             notes: purchaseOrder.notes,
+            isUrgentPO: purchaseOrder.isUrgentPO,
             isInternalDelivery: purchaseOrder.isInternalDelivery,
+            customerPONumber: purchaseOrder.customerPONumber,
           },
         },
       });
@@ -161,6 +166,12 @@ export function PODetailPage() {
   const handleRefund = () => {
     if (purchaseOrder) {
       handlers.handleRefund(purchaseOrder);
+    }
+  };
+
+  const handleDelete = () => {
+    if (purchaseOrder) {
+      handlers.handleDelete(purchaseOrder);
     }
   };
 
@@ -349,6 +360,31 @@ export function PODetailPage() {
     },
   );
 
+  const deletePOAction = useSWRAction(
+    'delete-po',
+    async () => {
+      if (!canDeletePurchaseOrder(permissions)) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      if (!selectedPO) {
+        throw new Error(t('common.invalidFormData'));
+      }
+      await deletePurchaseOrder(selectedPO.id);
+    },
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('po.deleted'),
+        errorTitle: t('common.errors.notificationTitle'),
+        errorMessage: t('po.deleteFailed'),
+      },
+      onSuccess: () => {
+        closeModal('delete');
+        navigate(ROUTERS.PO_MANAGEMENT);
+      },
+    },
+  );
+
   const { createDeliveryRequest } = useDeliveryRequestActions();
 
   // Upload photos action
@@ -391,6 +427,7 @@ export function PODetailPage() {
         purchaseOrderId: purchaseOrder.id,
         assignedTo: data.assignedTo,
         scheduledDate: data.scheduledDate,
+        type: 'DELIVERY',
         notes: data.notes,
         isUrgentDelivery: data.isUrgentDelivery,
       });
@@ -482,6 +519,16 @@ export function PODetailPage() {
         onClose={handleCloseModal('refund')}
         onConfirm={refundPOAction.trigger}
       />
+      <POStatusModal
+        opened={modals.deleteModalOpened}
+        purchaseOrder={selectedPO}
+        mode="delete"
+        isLoading={deletePOAction.isMutating}
+        onClose={handleCloseModal('delete')}
+        onConfirm={async () => {
+          await deletePOAction.trigger();
+        }}
+      />
       <DeliveryRequestModal
         opened={deliveryModalOpened}
         purchaseOrder={purchaseOrder}
@@ -551,6 +598,7 @@ export function PODetailPage() {
             onDeliver={handleDeliver}
             onCancel={handleCancel}
             onRefund={handleRefund}
+            onDelete={handleDelete}
             onCreateDelivery={handleCreateDelivery}
           />
           {!modals.uploadPhotosModalOpened && (
@@ -641,6 +689,7 @@ export function PODetailPage() {
             onDeliver={handleDeliver}
             onCancel={handleCancel}
             onRefund={handleRefund}
+            onDelete={handleDelete}
             onCreateDelivery={handleCreateDelivery}
           />
         </POErrorBoundary>

@@ -14,6 +14,8 @@ type DataTableColumn<T> = {
 };
 
 type DataTableProps<T> = {
+  readonly withIndex?: boolean;
+  readonly indexStart?: number;
   readonly data: T[];
   readonly columns: Array<DataTableColumn<T>>;
   readonly isLoading?: boolean;
@@ -25,6 +27,8 @@ type DataTableProps<T> = {
 };
 
 export function DataTable<T extends Record<string, unknown> & { id: string }>({
+  withIndex = false,
+  indexStart = 1,
   data,
   columns,
   isLoading = false,
@@ -56,6 +60,7 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
           <Table striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
+                {withIndex && <Table.Th>#</Table.Th>}
                 {columns.map((column) => (
                   <Table.Th
                     key={column.key}
@@ -68,7 +73,7 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {data.map((item) => {
+              {data.map((item, index) => {
                 const rowStyles = getRowStyles?.(item) || {};
                 const hasClickHandler = Boolean(onRowClick);
                 const combinedStyles = {
@@ -78,6 +83,7 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
 
                 return (
                   <Table.Tr key={item.id} onClick={() => onRowClick?.(item)} style={combinedStyles}>
+                    {withIndex && <Table.Td>{index + indexStart}</Table.Td>}
                     {columns.map((column) => (
                       <Table.Td
                         key={column.key}

@@ -1,10 +1,5 @@
 import { lazy } from 'react';
 
-export const ServiceLayout = lazy(async () => {
-  const module = await import('@/components/layouts/ServiceLayout');
-  return { default: module.ServiceLayout };
-});
-
 export const MobileOnlyLayout = lazy(async () => {
   const module = await import('@/components/layouts/MobileOnlyLayout');
   return { default: module.MobileOnlyLayout };

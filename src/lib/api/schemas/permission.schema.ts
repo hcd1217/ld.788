@@ -58,6 +58,8 @@ const DeliveryRequestPermissionSchema = BasePermissionSchema.extend({
   }),
 });
 
+export const VendorPermissionSchema = BasePermissionSchema;
+
 // Complete UserPermission schema
 export const PermissionSchema = z.object({
   customer: CustomerPermissionSchema,
@@ -65,4 +67,8 @@ export const PermissionSchema = z.object({
   employee: EmployeePermissionSchema,
   purchaseOrder: PurchaseOrderPermissionSchema,
   deliveryRequest: DeliveryRequestPermissionSchema,
+  vendor: VendorPermissionSchema,
 });
+
+// Types
+export type Permission = z.infer<typeof PermissionSchema>;

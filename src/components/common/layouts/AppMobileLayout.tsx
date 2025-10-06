@@ -2,7 +2,15 @@ import React from 'react';
 
 import { useNavigate } from 'react-router';
 
-import { ActionIcon, Affix, AppShell, Container, Group, LoadingOverlay } from '@mantine/core';
+import {
+  ActionIcon,
+  Affix,
+  AppShell,
+  Container,
+  Group,
+  LoadingOverlay,
+  Stack,
+} from '@mantine/core';
 import { IconHome } from '@tabler/icons-react';
 
 import { ROUTERS } from '@/config/routeConfig';
@@ -82,7 +90,6 @@ export function AppMobileLayout({
           overlayProps={{ blur: 2 }}
           transitionProps={{ duration: 300 }}
         />
-        <ErrorAlert error={error} clearError={clearError} />
         <Container
           fluid
           w="100%"
@@ -91,7 +98,10 @@ export function AppMobileLayout({
           mt={noHeader ? undefined : 60}
           mb={noFooter ? undefined : 60}
         >
-          {children}
+          <Stack>
+            <ErrorAlert error={error} clearError={clearError} />
+            {children}
+          </Stack>
         </Container>
       </AppShell.Main>
       {noFooter ? (

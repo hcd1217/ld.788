@@ -29,10 +29,19 @@ function useNavigationItems(isMobile = false) {
         t,
         userRoles,
         navigationOverrides,
+        user?.isRoot ?? false,
       );
     }
 
-    return getNavigationItems(user?.clientConfig?.navigation, t, userRoles, navigationOverrides);
+    const navigationItems = getNavigationItems(
+      user?.clientConfig?.navigation,
+      t,
+      userRoles,
+      navigationOverrides,
+      user?.isRoot ?? false,
+    );
+    console.log('navigationItems', user?.isRoot ?? false, JSON.stringify(navigationItems, null, 2));
+    return navigationItems;
   }, [user, t, isMobile]);
 
   return {

@@ -38,6 +38,7 @@ type PODetailTabsProps = {
   readonly onDeliver: () => void;
   readonly onCancel: () => void;
   readonly onRefund: () => void;
+  readonly onDelete?: () => void;
   readonly onCreateDelivery?: () => void;
 };
 
@@ -51,6 +52,7 @@ export function PODetailTabs({
   onDeliver,
   onCancel,
   onRefund,
+  onDelete,
   onCreateDelivery,
 }: PODetailTabsProps) {
   const { t } = useTranslation();
@@ -143,6 +145,7 @@ export function PODetailTabs({
             onDeliver={onDeliver}
             onCancel={onCancel}
             onRefund={onRefund}
+            onDelete={onDelete}
             onCreateDelivery={onCreateDelivery}
           />
           <POErrorBoundary componentName="POBasicInfoCard">
@@ -167,6 +170,7 @@ export function PODetailTabs({
       <Tabs.Panel value="photos" pt="xl">
         <POPhotoGallery
           photos={purchaseOrder.photos}
+          deliveryPhotos={purchaseOrder.deliveryRequest?.photos}
           columns={2}
           withScrollArea
           scrollAreaHeight="65vh"

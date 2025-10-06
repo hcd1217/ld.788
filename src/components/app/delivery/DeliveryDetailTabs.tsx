@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 
 import { Anchor, Button, Card, Grid, Group, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconEdit, IconMapPin } from '@tabler/icons-react';
+import { IconEdit, IconMapPin, IconTrash } from '@tabler/icons-react';
 
 import { UrgentBadge, ViewOnMap } from '@/components/common';
 import { getPODetailRoute } from '@/config/routeConfig';
@@ -12,29 +12,37 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales';
 import { usePermissions } from '@/stores/useAppStore';
 import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
-import { canDeletePhotoDeliveryRequest, canEditDeliveryRequest } from '@/utils/permission.utils';
+import {
+  canDeleteDeliveryRequest,
+  canDeletePhotoDeliveryRequest,
+  canEditDeliveryRequest,
+} from '@/utils/permission.utils';
 import { formatDate } from '@/utils/time';
 
 import { DeliveryPhotoGallery } from './DeliveryPhotoGallery';
 import { DeliveryStatusBadge } from './DeliveryStatusBadge';
+import { DeliveryTypeBadge } from './DeliveryTypeBadge';
 
 type DeliveryDetailTabsProps = {
   readonly deliveryRequest: DeliveryRequest;
   readonly isLoading?: boolean;
   readonly onUpdate?: () => void;
+  readonly onDelete?: () => void;
 };
 
 export function DeliveryDetailTabs({
   deliveryRequest,
   isLoading: _isLoading,
   onUpdate,
+  onDelete,
 }: DeliveryDetailTabsProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const permissions = usePermissions();
   const { deletePhoto } = useDeliveryRequestActions();
   const canEdit = useMemo(() => canEditDeliveryRequest(permissions), [permissions]);
-  const canDelete = useMemo(() => canDeletePhotoDeliveryRequest(permissions), [permissions]);
+  const canDeletePhoto = useMemo(() => canDeletePhotoDeliveryRequest(permissions), [permissions]);
+  const canDeleteDelivery = useMemo(() => canDeleteDeliveryRequest(permissions), [permissions]);
 
   const handleDeletePhoto = async (photoId: string) => {
     try {
@@ -62,16 +70,28 @@ export function DeliveryDetailTabs({
             {t('delivery.deliveryId')}: {deliveryRequest.deliveryRequestNumber}
           </Text>
           {deliveryRequest.isUrgentDelivery && <UrgentBadge />}
-          <DeliveryStatusBadge status={deliveryRequest.status} />
+          <DeliveryTypeBadge type={deliveryRequest.type} />
         </Group>
-        <Button
-          disabled={!canEdit}
-          leftSection={<IconEdit size={16} />}
-          variant="outline"
-          onClick={onUpdate}
-        >
-          {t('common.edit')}
-        </Button>
+        <Group gap="sm">
+          <Button
+            disabled={!canEdit}
+            leftSection={<IconEdit size={16} />}
+            variant="outline"
+            onClick={onUpdate}
+          >
+            {t('common.edit')}
+          </Button>
+          {canDeleteDelivery && onDelete && (
+            <Button
+              leftSection={<IconTrash size={16} />}
+              variant="outline"
+              color="red"
+              onClick={onDelete}
+            >
+              {t('common.delete')}
+            </Button>
+          )}
+        </Group>
       </Group>
 
       {/* Main Content */}
@@ -96,32 +116,47 @@ export function DeliveryDetailTabs({
               <Grid>
                 <Grid.Col span={6}>
                   <Stack gap="xs">
-                    <div>
-                      <Text size="sm" c="dimmed">
-                        {t('delivery.poNumber')}
-                      </Text>
-                      <Text size="sm" fw={500}>
-                        <Anchor
-                          size="sm"
-                          c="blue"
-                          fw="bold"
-                          onClick={() => {
-                            const purchaseOrderId = deliveryRequest.purchaseOrderId || '-';
-                            navigate(getPODetailRoute(purchaseOrderId));
-                          }}
-                        >
-                          {deliveryRequest.purchaseOrderNumber}
-                        </Anchor>
-                      </Text>
-                    </div>
-                    <div>
-                      <Text size="sm" c="dimmed">
-                        {t('common.customer')}
-                      </Text>
-                      <Text size="sm" fw={500}>
-                        {deliveryRequest.customerName}
-                      </Text>
-                    </div>
+                    {deliveryRequest.isDelivery ? (
+                      <>
+                        <div>
+                          <Text size="sm" c="dimmed">
+                            {t('delivery.poNumber')}
+                          </Text>
+                          <Text size="sm" fw={500}>
+                            <Anchor
+                              size="sm"
+                              c="blue"
+                              fw="bold"
+                              onClick={() => {
+                                const purchaseOrderId = deliveryRequest.purchaseOrderId || '-';
+                                navigate(getPODetailRoute(purchaseOrderId));
+                              }}
+                            >
+                              {deliveryRequest.purchaseOrderNumber}
+                            </Anchor>
+                          </Text>
+                        </div>
+                        <div>
+                          <Text size="sm" c="dimmed">
+                            {t('common.customer')}
+                          </Text>
+                          <Text size="sm" fw={500}>
+                            {deliveryRequest.customerName}
+                          </Text>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>
+                          <Text size="sm" c="dimmed">
+                            {t('common.vendor')}
+                          </Text>
+                          <Text size="sm" fw={500}>
+                            {deliveryRequest.vendorName}
+                          </Text>
+                        </div>
+                      </>
+                    )}
                     <div>
                       <Text size="sm" c="dimmed">
                         {t('delivery.assignedTo')}
@@ -156,43 +191,69 @@ export function DeliveryDetailTabs({
                       <Text size="sm" c="dimmed">
                         {t('delivery.status')}
                       </Text>
-                      <DeliveryStatusBadge status={deliveryRequest.status} />
+                      <Group gap="xs">
+                        <DeliveryStatusBadge status={deliveryRequest.status} />
+                      </Group>
                     </div>
                   </Stack>
                 </Grid.Col>
               </Grid>
 
-              {deliveryRequest.notes && (
-                <div>
-                  <Text size="sm" c="dimmed" mt="md" mb="xs">
-                    {t('common.notes')}
-                  </Text>
-                  <Text size="sm">{deliveryRequest.notes}</Text>
-                </div>
-              )}
+              <div>
+                <Text size="sm" c="dimmed" mt="md" mb="xs">
+                  {t('common.notes')}
+                </Text>
+                <Text size="sm">{deliveryRequest.notes ?? '-'}</Text>
+              </div>
             </Card>
 
             {/* Delivery Address */}
-            <Card
-              withBorder
-              style={{
-                backgroundColor: deliveryRequest.isUrgentDelivery
-                  ? 'var(--mantine-color-red-0)'
-                  : undefined,
-                borderColor: deliveryRequest.isUrgentDelivery
-                  ? 'var(--mantine-color-red-3)'
-                  : undefined,
-              }}
-            >
-              <Group justify="space-between" mb="md">
-                <Group gap="xs">
-                  <IconMapPin size={20} />
-                  <Text fw={500}>{t('po.shippingAddress')}</Text>
+            {deliveryRequest.isDelivery && (
+              <Card
+                withBorder
+                style={{
+                  backgroundColor: deliveryRequest.isUrgentDelivery
+                    ? 'var(--mantine-color-red-0)'
+                    : undefined,
+                  borderColor: deliveryRequest.isUrgentDelivery
+                    ? 'var(--mantine-color-red-3)'
+                    : undefined,
+                }}
+              >
+                <Group justify="space-between" mb="md">
+                  <Group gap="xs">
+                    <IconMapPin size={20} />
+                    <Text fw={500}>{t('po.shippingAddress')}</Text>
+                  </Group>
+                  <ViewOnMap googleMapsUrl={deliveryRequest.deliveryAddress?.googleMapsUrl} />
                 </Group>
-                <ViewOnMap googleMapsUrl={deliveryRequest.deliveryAddress?.googleMapsUrl} />
-              </Group>
-              <Text size="sm">{deliveryRequest.deliveryAddress?.oneLineAddress || '-'}</Text>
-            </Card>
+                <Text size="sm">{deliveryRequest.deliveryAddress?.oneLineAddress || '-'}</Text>
+              </Card>
+            )}
+
+            {/* Receiving Address */}
+            {deliveryRequest.isReceive && (
+              <Card
+                withBorder
+                style={{
+                  backgroundColor: deliveryRequest.isUrgentDelivery
+                    ? 'var(--mantine-color-red-0)'
+                    : undefined,
+                  borderColor: deliveryRequest.isUrgentDelivery
+                    ? 'var(--mantine-color-red-3)'
+                    : undefined,
+                }}
+              >
+                <Group justify="space-between" mb="md">
+                  <Group gap="xs">
+                    <IconMapPin size={20} />
+                    <Text fw={500}>{t('po.receiveAddress')}</Text>
+                  </Group>
+                  <ViewOnMap googleMapsUrl={deliveryRequest.receiveAddress?.googleMapsUrl} />
+                </Group>
+                <Text size="sm">{deliveryRequest.receiveAddress?.oneLineAddress || '-'}</Text>
+              </Card>
+            )}
           </Stack>
         </Grid.Col>
 
@@ -216,7 +277,7 @@ export function DeliveryDetailTabs({
               photos={deliveryRequest.photos}
               columns={6}
               imageHeight={120}
-              canDelete={canDelete}
+              canDelete={canDeletePhoto}
               onDeletePhoto={handleDeletePhoto}
             />
           </Card>

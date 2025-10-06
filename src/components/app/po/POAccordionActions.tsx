@@ -9,6 +9,7 @@ import { usePermissions } from '@/stores/useAppStore';
 import {
   canCancelPurchaseOrder,
   canConfirmPurchaseOrder,
+  canDeletePurchaseOrder,
   canDeliverPurchaseOrder,
   canMarkReadyPurchaseOrder,
   canProcessPurchaseOrder,
@@ -26,6 +27,7 @@ type POAccordionActionsProps = {
   readonly onDeliver: () => void;
   readonly onCancel: () => void;
   readonly onRefund: () => void;
+  readonly onDelete?: () => void;
   readonly onCreateDelivery: () => void;
 };
 
@@ -39,24 +41,34 @@ export function POAccordionActions({
   onDeliver,
   onCancel,
   onRefund,
+  onDelete,
   onCreateDelivery,
 }: POAccordionActionsProps) {
   const { t } = useTranslation();
 
   const permissions = usePermissions();
-  const { canConfirm, canCancel, canProcess, canMarkReady, canShip, canDeliver, canRefund } =
-    useMemo(
-      () => ({
-        canConfirm: canConfirmPurchaseOrder(permissions),
-        canCancel: canCancelPurchaseOrder(permissions),
-        canProcess: canProcessPurchaseOrder(permissions),
-        canMarkReady: canMarkReadyPurchaseOrder(permissions),
-        canShip: canShipPurchaseOrder(permissions),
-        canDeliver: canDeliverPurchaseOrder(permissions),
-        canRefund: canRefundPurchaseOrder(permissions),
-      }),
-      [permissions],
-    );
+  const {
+    canConfirm,
+    canCancel,
+    canProcess,
+    canMarkReady,
+    canShip,
+    canDeliver,
+    canRefund,
+    canDelete,
+  } = useMemo(
+    () => ({
+      canConfirm: canConfirmPurchaseOrder(permissions),
+      canCancel: canCancelPurchaseOrder(permissions),
+      canProcess: canProcessPurchaseOrder(permissions),
+      canMarkReady: canMarkReadyPurchaseOrder(permissions),
+      canShip: canShipPurchaseOrder(permissions),
+      canDeliver: canDeliverPurchaseOrder(permissions),
+      canRefund: canRefundPurchaseOrder(permissions),
+      canDelete: canDeletePurchaseOrder(permissions),
+    }),
+    [permissions],
+  );
 
   // Use the centralized hook for action logic
   const actions = usePOActions({
@@ -69,6 +81,7 @@ export function POAccordionActions({
       canShip,
       canDeliver,
       canRefund,
+      canDelete,
     },
     callbacks: {
       onConfirm,
@@ -78,6 +91,7 @@ export function POAccordionActions({
       onShip,
       onDeliver,
       onRefund,
+      onDelete: onDelete ?? (() => {}),
       onCreateDelivery,
     },
     options: {

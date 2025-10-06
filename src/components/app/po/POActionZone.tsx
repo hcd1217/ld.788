@@ -9,6 +9,7 @@ import { usePermissions } from '@/stores/useAppStore';
 import {
   canCancelPurchaseOrder,
   canConfirmPurchaseOrder,
+  canDeletePurchaseOrder,
   canDeliverPurchaseOrder,
   canMarkReadyPurchaseOrder,
   canProcessPurchaseOrder,
@@ -26,6 +27,7 @@ type POActionZoneProps = {
   readonly onDeliver: () => void;
   readonly onCancel: () => void;
   readonly onRefund: () => void;
+  readonly onDelete?: () => void;
   readonly onCreateDelivery?: () => void;
 };
 
@@ -39,24 +41,34 @@ export function POActionZone({
   onDeliver,
   onCancel,
   onRefund,
+  onDelete,
   onCreateDelivery,
 }: POActionZoneProps) {
   const { t } = useTranslation();
 
   const permissions = usePermissions();
-  const { canConfirm, canProcess, canShip, canMarkReady, canDeliver, canRefund, canCancel } =
-    useMemo(
-      () => ({
-        canConfirm: canConfirmPurchaseOrder(permissions),
-        canProcess: canProcessPurchaseOrder(permissions),
-        canShip: canShipPurchaseOrder(permissions),
-        canMarkReady: canMarkReadyPurchaseOrder(permissions),
-        canDeliver: canDeliverPurchaseOrder(permissions),
-        canRefund: canRefundPurchaseOrder(permissions),
-        canCancel: canCancelPurchaseOrder(permissions),
-      }),
-      [permissions],
-    );
+  const {
+    canConfirm,
+    canProcess,
+    canShip,
+    canMarkReady,
+    canDeliver,
+    canRefund,
+    canCancel,
+    canDelete,
+  } = useMemo(
+    () => ({
+      canConfirm: canConfirmPurchaseOrder(permissions),
+      canProcess: canProcessPurchaseOrder(permissions),
+      canShip: canShipPurchaseOrder(permissions),
+      canMarkReady: canMarkReadyPurchaseOrder(permissions),
+      canDeliver: canDeliverPurchaseOrder(permissions),
+      canRefund: canRefundPurchaseOrder(permissions),
+      canCancel: canCancelPurchaseOrder(permissions),
+      canDelete: canDeletePurchaseOrder(permissions),
+    }),
+    [permissions],
+  );
 
   // Use the centralized hook for action logic
   const actions = usePOActions({
@@ -70,6 +82,7 @@ export function POActionZone({
       canShip,
       canDeliver,
       canRefund,
+      canDelete,
     },
     callbacks: {
       onConfirm,
@@ -79,6 +92,7 @@ export function POActionZone({
       onShip,
       onDeliver,
       onRefund,
+      onDelete: onDelete ?? (() => {}),
       onCreateDelivery,
     },
     options: {

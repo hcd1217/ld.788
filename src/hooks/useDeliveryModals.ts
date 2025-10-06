@@ -5,6 +5,7 @@ type DeliveryModalState = {
   complete: boolean;
   uploadPhotos: boolean;
   update: boolean;
+  delete: boolean;
 };
 
 export function useDeliveryModals() {
@@ -13,6 +14,7 @@ export function useDeliveryModals() {
     complete: false,
     uploadPhotos: false,
     update: false,
+    delete: false,
   });
 
   const openModal = (modalType: keyof DeliveryModalState) => {

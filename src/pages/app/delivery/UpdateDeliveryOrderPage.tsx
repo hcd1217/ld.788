@@ -21,6 +21,7 @@ import {
   AppPageTitle,
   DateInput,
   PermissionDeniedPage,
+  ViewOnMap,
 } from '@/components/common';
 import { ROUTERS } from '@/config/routeConfig';
 import { useSWRAction } from '@/hooks/useSWRAction';
@@ -128,7 +129,6 @@ export function UpdateDeliveryOrderPage() {
       }
       await updateDeliveryOrderInDay(
         selectedAssignee,
-        selectedDate,
         deliveryRequests.map((dr) => dr.id),
       );
     },
@@ -259,10 +259,31 @@ export function UpdateDeliveryOrderPage() {
                         </Text>
                       )}
 
-                      {deliveryRequest.deliveryAddress?.oneLineAddress && (
-                        <Text size="sm" c="dimmed" lineClamp={1}>
-                          {deliveryRequest.deliveryAddress.oneLineAddress}
+                      {deliveryRequest.vendorName && (
+                        <Text size="sm" c="dimmed">
+                          {t('common.vendor')}: {deliveryRequest.vendorName}
                         </Text>
+                      )}
+
+                      {deliveryRequest.deliveryAddress?.oneLineAddress && (
+                        <Group>
+                          <Text size="sm" c="dimmed" lineClamp={1}>
+                            {deliveryRequest.deliveryAddress.oneLineAddress}
+                          </Text>
+                          <ViewOnMap
+                            googleMapsUrl={deliveryRequest.deliveryAddress?.googleMapsUrl}
+                          />
+                        </Group>
+                      )}
+                      {deliveryRequest.receiveAddress?.oneLineAddress && (
+                        <Group>
+                          <Text size="sm" c="dimmed" lineClamp={1}>
+                            {deliveryRequest.receiveAddress.oneLineAddress}
+                          </Text>
+                          <ViewOnMap
+                            googleMapsUrl={deliveryRequest.receiveAddress?.googleMapsUrl}
+                          />
+                        </Group>
                       )}
                     </Stack>
                   </Group>

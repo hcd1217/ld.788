@@ -86,7 +86,7 @@ export const AddressSchema = z.object({
 // const dummyUrl =
 //   'https://t3.ftcdn.net/jpg/02/17/65/88/360_F_217658823_vVaB79Y6lBL2JRk9eFPBKR6PdwcL8Ett.jpg';
 
-export const PhotoDataSchema = z.looseObject({
+export const S3DataSchema = z.looseObject({
   id: idSchema,
   // publicUrl: isDevelopment ? stringSchema.transform(() => dummyUrl) : stringSchema,
   publicUrl: stringSchema,
@@ -96,7 +96,7 @@ export const PhotoDataSchema = z.looseObject({
   uploadedBy: idSchema, // User ID
 });
 
-export const UploadPhotoSchema = PhotoDataSchema.omit({
+export const UploadPhotoSchema = S3DataSchema.omit({
   id: true,
   timestamp: true,
   uploadedBy: true,

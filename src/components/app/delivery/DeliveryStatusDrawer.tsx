@@ -22,6 +22,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales';
 import { usePermissions } from '@/stores/useAppStore';
 import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
+import type { UploadPhoto } from '@/types';
 import { canTakePhotoDeliveryRequest } from '@/utils/permission.utils';
 import { formatDate } from '@/utils/time';
 
@@ -36,8 +37,8 @@ type DeliveryStatusDrawerProps = {
   readonly onClose: () => void;
   readonly onConfirm?: (data?: { transitNotes?: string }) => Promise<void>;
   readonly onComplete?: (data: {
-    photos: { publicUrl: string; key: string }[];
-    completionNotes: string;
+    photos: UploadPhoto[];
+    deliveryNotes: string;
     receivedBy: string;
   }) => Promise<void>;
 };
@@ -82,7 +83,6 @@ export function DeliveryStatusDrawer({
   const { isDesktop } = useDeviceType();
   const [notes, setNotes] = useState('');
   const [receivedBy, setReceivedBy] = useState('');
-  const [deliveryTime, setDeliveryTime] = useState('');
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [uploadedPhotos, setUploadedPhotos] = useState<{ publicUrl: string; key: string }[]>(
     deliveryRequest?.photos?.map((photo) => ({ publicUrl: photo.publicUrl, key: photo.key })) || [],
@@ -136,27 +136,18 @@ export function DeliveryStatusDrawer({
   };
 
   const handleConfirm = async () => {
-    let data: any = undefined;
-
     if (mode === 'start_transit') {
-      data = {
-        transitNotes: notes.trim(),
-        startedAt: new Date().toISOString(),
-        photos: uploadedPhotos,
-      };
       if (onConfirm) {
-        await onConfirm(data);
+        await onConfirm({
+          transitNotes: notes.trim(),
+        });
       }
-    } else if (mode === 'complete') {
-      data = {
-        completionNotes: notes.trim(),
+    } else if (mode === 'complete' && onComplete) {
+      onComplete({
+        deliveryNotes: notes.trim(),
         receivedBy: receivedBy.trim(),
-        deliveredAt: deliveryTime || new Date().toISOString(),
         photos: uploadedPhotos,
-      };
-      if (onComplete) {
-        onComplete(data);
-      }
+      });
     }
 
     handleClose();
@@ -165,7 +156,6 @@ export function DeliveryStatusDrawer({
   const handleClose = () => {
     setNotes('');
     setReceivedBy('');
-    setDeliveryTime('');
     setUploadedPhotos([]);
     setShowPhotoUpload(false);
     onClose();

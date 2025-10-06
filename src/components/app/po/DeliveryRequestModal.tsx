@@ -89,11 +89,16 @@ export function DeliveryRequestModal({
             </Text>
             <Text size="sm" fw={500}>
               {purchaseOrder.poNumber}
+              {purchaseOrder.customerPONumber && (
+                <Text size="sm" ml="xs">
+                  ({purchaseOrder.customerPONumber})
+                </Text>
+              )}
             </Text>
           </Group>
           <Group justify="space-between">
             <Text size="sm" c="dimmed">
-              {t('po.customer')}:
+              {t('common.customer')}:
             </Text>
             <Text size="sm" fw={500}>
               {getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}

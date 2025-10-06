@@ -8,6 +8,7 @@ import {
   IconPackageExport,
   type IconProps,
   IconReceipt,
+  IconTrash,
   IconTruck,
   IconX,
 } from '@tabler/icons-react';
@@ -29,6 +30,7 @@ export type POActionConfig = {
     | 'ship'
     | 'deliver'
     | 'refund'
+    | 'delete'
     | 'createDelivery';
   readonly color: ButtonProps['color'];
   readonly variant?: ButtonProps['variant'];
@@ -62,6 +64,7 @@ export type UsePOActionsProps = {
     readonly canShip: boolean;
     readonly canDeliver: boolean;
     readonly canRefund: boolean;
+    readonly canDelete: boolean;
   };
   readonly callbacks: {
     readonly onConfirm: () => void;
@@ -71,6 +74,7 @@ export type UsePOActionsProps = {
     readonly onShip: () => void;
     readonly onDeliver: () => void;
     readonly onRefund: () => void;
+    readonly onDelete: () => void;
     readonly onCreateDelivery?: () => void;
   };
   readonly options?: POActionsOptions;
@@ -95,6 +99,7 @@ export function usePOActions({
     const canDeliver = permissions.canDeliver;
     const canRefund = permissions.canRefund;
     const canConfirm = permissions.canConfirm;
+    const canDelete = permissions.canDelete;
 
     const actions: POActionConfig[] = [];
 
@@ -120,6 +125,18 @@ export function usePOActions({
       translationKey: 'po.refund',
       onClick: callbacks.onRefund,
       isDisabled: !canRefund,
+    });
+
+    // Helper to create delete button config
+    const createDeleteAction = (): POActionConfig => ({
+      key: 'delete',
+      action: 'delete',
+      color: 'red',
+      variant: 'outline',
+      icon: IconTrash,
+      translationKey: 'po.deleteOrder',
+      onClick: callbacks.onDelete,
+      isDisabled: !canDelete,
     });
 
     switch (purchaseOrder.status) {
@@ -220,7 +237,7 @@ export function usePOActions({
 
       case 'CANCELLED':
       case 'REFUNDED': {
-        // No actions available for terminal states
+        actions.push(createDeleteAction());
         break;
       }
     }

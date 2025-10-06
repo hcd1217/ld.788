@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { Container, LoadingOverlay } from '@mantine/core';
+import { Affix, Container, LoadingOverlay, Text } from '@mantine/core';
+
+import { isDevelopment } from '@/utils/env';
 
 import { ErrorAlert } from '../feedback';
 
@@ -25,6 +27,21 @@ export function AppDesktopLayout({
         transitionProps={{ duration: 300 }}
       />
       {children}
+      {isDevelopment && (
+        <Affix position={{ top: 10, left: window.innerWidth / 2 }}>
+          <Text
+            c="orange"
+            fz={20}
+            fw={600}
+            w="100%"
+            ta="left"
+            style={{ fontStyle: 'italic' }}
+            pl="sm"
+          >
+            Backend: {import.meta.env.VITE_API_URL}
+          </Text>
+        </Affix>
+      )}
     </Container>
   );
 }

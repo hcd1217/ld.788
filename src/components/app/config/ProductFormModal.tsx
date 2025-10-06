@@ -80,10 +80,10 @@ export function ProductFormModal({
               <Alert
                 icon={<IconInfoCircle size={16} />}
                 variant="light"
-                color={product.isDeleted ? 'var(--app-inactive-color)' : 'var(--app-active-color)'}
+                color={!product.isActive ? 'var(--app-inactive-color)' : 'var(--app-active-color)'}
               >
                 {t('common.status')}:{' '}
-                {product.isDeleted ? t('product.inactive') : t('product.active')}
+                {!product.isActive ? t('product.inactive') : t('product.active')}
               </Alert>
             )}
             <ScrollArea style={{ height: '50vh' }}>
@@ -154,7 +154,7 @@ export function ProductFormModal({
               <Group>
                 {mode === 'edit' && product && (
                   <>
-                    {product.isDeleted ? (
+                    {!product.isActive ? (
                       <Button
                         color="var(--app-active-color)"
                         leftSection={<IconCheck size={16} />}

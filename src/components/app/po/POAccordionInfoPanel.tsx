@@ -26,6 +26,7 @@ import { DeliveryStatusBadge } from '../delivery/DeliveryStatusBadge';
 
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
+import { POUrgentBadge } from './POUrgentBadge';
 
 type POAccordionInfoPanelProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -64,14 +65,7 @@ export function POAccordionInfoPanel({
       <Grid>
         <Grid.Col span={6}>
           <InfoField
-            label={
-              <Group gap="xs">
-                <Text size="xs" fw={500} c="dimmed">
-                  {t('po.poNumber')}
-                </Text>
-                <PODeliveryBadge isInternalDelivery={purchaseOrder.isInternalDelivery} />
-              </Group>
-            }
+            label={t('po.poNumber')}
             value={purchaseOrder.poNumber}
             valueProps={{ fw: 600 }}
           />
@@ -80,7 +74,12 @@ export function POAccordionInfoPanel({
           <Text size="xs" fw={500} c="dimmed">
             {t('po.poStatus')}
           </Text>
-          <POStatusBadge status={purchaseOrder.status} size="sm" />
+          <Group gap="xs">
+            <POStatusBadge status={purchaseOrder.status} size="sm" />
+            <PODeliveryBadge isInternalDelivery={purchaseOrder.isInternalDelivery} />
+            <POUrgentBadge isUrgentPO={purchaseOrder.isUrgentPO} />
+          </Group>
+
           {isEditable && (
             <Button
               key="edit"
@@ -98,14 +97,22 @@ export function POAccordionInfoPanel({
         </Grid.Col>
         <Grid.Col span={6}>
           <InfoField
-            label={t('po.customer')}
+            label={t('common.customer')}
             icon={IconIdentifiers.BUILDING}
             value={getCustomerNameByCustomerId(customerMapByCustomerId, purchaseOrder.customerId)}
           />
         </Grid.Col>
-        <Grid.Col span={6}>
-          <InfoField label={t('po.salesPerson')} value={purchaseOrder.salesPerson} />
-        </Grid.Col>
+        {purchaseOrder.customerPONumber && (
+          <Grid.Col span={6}>
+            <InfoField label={t('po.customerPONumber')} value={purchaseOrder.customerPONumber} />
+          </Grid.Col>
+        )}
+
+        {purchaseOrder.salesPerson && (
+          <Grid.Col span={6}>
+            <InfoField label={t('po.salesPerson')} value={purchaseOrder.salesPerson} />
+          </Grid.Col>
+        )}
         <Grid.Col span={6}>
           <InfoField
             label={t('po.orderDate')}

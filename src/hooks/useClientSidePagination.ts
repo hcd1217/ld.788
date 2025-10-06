@@ -8,6 +8,7 @@ import { useDeviceType } from './useDeviceType';
 export interface PaginationOptions<T, TFilters = { searchQuery?: string }> {
   readonly data: readonly T[];
   readonly defaultPageSize?: number;
+  readonly noPagination?: boolean;
   readonly filterFn?: (item: T, filters: TFilters) => boolean;
   readonly filters?: TFilters;
 }
@@ -31,6 +32,7 @@ export interface PaginationHandlers {
 export function useClientSidePagination<T, TFilters = { searchQuery?: string }>({
   data,
   defaultPageSize,
+  noPagination,
   filterFn,
   filters,
 }: PaginationOptions<T, TFilters>): [readonly T[], PaginationState, PaginationHandlers] {
@@ -66,17 +68,23 @@ export function useClientSidePagination<T, TFilters = { searchQuery?: string }>(
 
   // Calculate pagination values
   const totalPages = React.useMemo(() => {
+    if (noPagination) {
+      return 1;
+    }
     const size = Number.parseInt(pageSize, 10);
     return Math.ceil(filteredData.length / size) || 1;
-  }, [filteredData.length, pageSize]);
+  }, [filteredData.length, pageSize, noPagination]);
 
   // Get paginated data
   const paginatedData = React.useMemo(() => {
+    if (noPagination) {
+      return filteredData;
+    }
     const size = Number.parseInt(pageSize, 10);
     const startIndex = (currentPage - 1) * size;
     const endIndex = startIndex + size;
     return filteredData.slice(startIndex, endIndex);
-  }, [filteredData, currentPage, pageSize]);
+  }, [filteredData, currentPage, pageSize, noPagination]);
 
   // Reset to first page when filters change
   React.useEffect(() => {
@@ -91,45 +99,63 @@ export function useClientSidePagination<T, TFilters = { searchQuery?: string }>(
   }, [currentPage, totalPages]);
 
   // Handlers
-  const handlePageSizeChange = React.useCallback((size: number) => {
-    if (size > 0) {
-      setPageSizeState(size.toString());
-      setCurrentPage(1); // Reset to first page when page size changes
-    }
-  }, []);
+  const handlePageSizeChange = React.useCallback(
+    (size: number) => {
+      if (noPagination) {
+        return;
+      }
+      if (size > 0) {
+        setPageSizeState(size.toString());
+        setCurrentPage(1); // Reset to first page when page size changes
+      }
+    },
+    [noPagination],
+  );
 
   const handleSetCurrentPage = React.useCallback(
     (page: number) => {
+      if (noPagination) {
+        return;
+      }
       const validPage = Math.max(1, Math.min(page, totalPages));
       setCurrentPage(validPage);
     },
-    [totalPages],
+    [totalPages, noPagination],
   );
 
   const nextPage = React.useCallback(() => {
+    if (noPagination) {
+      return;
+    }
     if (currentPage < totalPages) {
       setCurrentPage((prev) => prev + 1);
     }
-  }, [currentPage, totalPages]);
+  }, [currentPage, totalPages, noPagination]);
 
   const previousPage = React.useCallback(() => {
+    if (noPagination) {
+      return;
+    }
     if (currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
     }
-  }, [currentPage]);
+  }, [currentPage, noPagination]);
 
   const firstPage = React.useCallback(() => {
     setCurrentPage(1);
   }, []);
 
   const lastPage = React.useCallback(() => {
+    if (noPagination) {
+      return;
+    }
     setCurrentPage(totalPages);
-  }, [totalPages]);
+  }, [totalPages, noPagination]);
 
   const paginationState: PaginationState = {
-    currentPage,
-    pageSize: Number.parseInt(pageSize, 10),
-    totalPages,
+    currentPage: noPagination ? 1 : currentPage,
+    pageSize: noPagination ? filteredData.length : Number.parseInt(pageSize, 10),
+    totalPages: noPagination ? 1 : totalPages,
     totalItems: filteredData.length,
   };
 

@@ -1,14 +1,30 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { Button, Drawer, Group, Modal, Select, Stack, Switch, Text, Textarea } from '@mantine/core';
-import { IconCalendar, IconEdit, IconUrgent } from '@tabler/icons-react';
+import {
+  Button,
+  Checkbox,
+  Drawer,
+  Group,
+  Modal,
+  Select,
+  Stack,
+  Switch,
+  Text,
+  Textarea,
+  TextInput,
+} from '@mantine/core';
+import { IconBuilding, IconCalendar, IconEdit, IconMapPin, IconUrgent } from '@tabler/icons-react';
 
 import { DateInput, UrgentBadge } from '@/components/common';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { DeliveryRequest } from '@/services/sales';
-import { useClientConfig, useEmployees } from '@/stores/useAppStore';
-import { useCustomerMapByCustomerId } from '@/stores/useAppStore';
+import {
+  useClientConfig,
+  useCustomerMapByCustomerId,
+  useEmployees,
+  useVendorOptions,
+} from '@/stores/useAppStore';
 import { getCustomerNameByCustomerId } from '@/utils/overview';
 
 type DeliveryUpdateModalProps = {
@@ -20,6 +36,15 @@ type DeliveryUpdateModalProps = {
     scheduledDate: string;
     notes: string;
     isUrgentDelivery?: boolean;
+    vendorName?: string;
+    receiveAddress?: {
+      oneLineAddress: string;
+      googleMapsUrl?: string;
+    };
+    deliveryAddress?: {
+      oneLineAddress: string;
+      googleMapsUrl?: string;
+    };
   }) => Promise<void>;
 };
 
@@ -34,12 +59,18 @@ export function DeliveryUpdateModal({
   const employees = useEmployees();
   const clientConfig = useClientConfig();
   const customerMapByCustomerId = useCustomerMapByCustomerId();
+  const vendorOptions = useVendorOptions();
 
   // Form state - initialize with existing values
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined);
   const [notes, setNotes] = useState('');
   const [isUrgentDelivery, setIsUrgentDelivery] = useState(false);
+  const [selectedVendorId, setSelectedVendorId] = useState<string | null>(null);
+  const [customVendorName, setCustomVendorName] = useState('');
+  const [useCustomVendor, setUseCustomVendor] = useState(false);
+  const [oneLineAddress, setOneLineAddress] = useState('');
+  const [googleMapsUrl, setGoogleMapsUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Employee options for select - filtered by assigneeIds from clientConfig
@@ -58,6 +89,26 @@ export function DeliveryUpdateModal({
     }));
   }, [employees, clientConfig.features?.deliveryRequest]);
 
+  // Auto-fill address and google maps URL when vendor is selected (only in select mode)
+  useEffect(() => {
+    if (!useCustomVendor && selectedVendorId && deliveryRequest?.isReceive) {
+      const selectedVendor = vendorOptions.find((v) => v.id === selectedVendorId);
+      if (selectedVendor) {
+        setOneLineAddress(selectedVendor.address ?? '');
+        setGoogleMapsUrl(selectedVendor.googleMapsUrl ?? '');
+      }
+    }
+  }, [selectedVendorId, vendorOptions, useCustomVendor, deliveryRequest?.isReceive]);
+
+  // Clear vendor selection when switching to custom mode
+  useEffect(() => {
+    if (useCustomVendor) {
+      setSelectedVendorId(null);
+    } else {
+      setCustomVendorName('');
+    }
+  }, [useCustomVendor]);
+
   // Initialize form with existing values when modal opens or deliveryRequest changes
   useEffect(() => {
     if (opened && deliveryRequest) {
@@ -67,14 +118,45 @@ export function DeliveryUpdateModal({
       );
       setNotes(deliveryRequest.notes || '');
       setIsUrgentDelivery(deliveryRequest.isUrgentDelivery || false);
+
+      // Set vendor if RECEIVE type - check if it exists in vendor options
+      if (deliveryRequest.isReceive && deliveryRequest.vendorName) {
+        const matchingVendor = vendorOptions.find((v) => v.label === deliveryRequest.vendorName);
+        if (matchingVendor) {
+          setUseCustomVendor(false);
+          setSelectedVendorId(matchingVendor.id);
+          setCustomVendorName('');
+        } else {
+          setUseCustomVendor(true);
+          setCustomVendorName(deliveryRequest.vendorName);
+          setSelectedVendorId(null);
+        }
+      } else {
+        setUseCustomVendor(false);
+        setSelectedVendorId(null);
+        setCustomVendorName('');
+      }
+
+      // Set address based on type
+      const address = deliveryRequest.isReceive
+        ? deliveryRequest.receiveAddress
+        : deliveryRequest.deliveryAddress;
+
+      setOneLineAddress(address?.oneLineAddress || '');
+      setGoogleMapsUrl(address?.googleMapsUrl || '');
     } else if (!opened) {
       // Reset form when modal closes
       setSelectedEmployeeId(null);
       setScheduledDate(undefined);
       setNotes('');
       setIsUrgentDelivery(false);
+      setSelectedVendorId(null);
+      setCustomVendorName('');
+      setUseCustomVendor(false);
+      setOneLineAddress('');
+      setGoogleMapsUrl('');
     }
-  }, [opened, deliveryRequest]);
+  }, [opened, deliveryRequest, vendorOptions]);
 
   // Handle form submission
   const handleSubmit = async () => {
@@ -82,14 +164,45 @@ export function DeliveryUpdateModal({
       return;
     }
 
+    // For RECEIVE type, address is required
+    if (deliveryRequest?.isReceive && !oneLineAddress.trim()) {
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await onConfirm({
+      const data: Parameters<typeof onConfirm>[0] = {
         assignedTo: selectedEmployeeId,
         scheduledDate: scheduledDate.toISOString(),
         notes,
         isUrgentDelivery,
-      });
+      };
+
+      // Add vendor name for RECEIVE type - get from appropriate mode
+      if (deliveryRequest?.isReceive) {
+        let vendorName: string | undefined;
+        if (useCustomVendor) {
+          vendorName = customVendorName.trim() || undefined;
+        } else if (selectedVendorId) {
+          const selectedVendor = vendorOptions.find((v) => v.id === selectedVendorId);
+          vendorName = selectedVendor?.label;
+        }
+        data.vendorName = vendorName;
+
+        if (oneLineAddress.trim()) {
+          data.receiveAddress = {
+            oneLineAddress: oneLineAddress.trim(),
+            googleMapsUrl: googleMapsUrl.trim() || undefined,
+          };
+        }
+      } else if (deliveryRequest?.isDelivery && oneLineAddress.trim()) {
+        data.deliveryAddress = {
+          oneLineAddress: oneLineAddress.trim(),
+          googleMapsUrl: googleMapsUrl.trim() || undefined,
+        };
+      }
+
+      await onConfirm(data);
       onClose();
     } finally {
       setIsSubmitting(false);
@@ -108,22 +221,30 @@ export function DeliveryUpdateModal({
               {deliveryRequest.deliveryRequestNumber}
             </Text>
           </Group>
-          <Group justify="space-between">
-            <Text size="sm" c="dimmed">
-              {t('po.customer')}:
-            </Text>
-            <Text size="sm" fw={500}>
-              {getCustomerNameByCustomerId(customerMapByCustomerId, deliveryRequest.customerId)}
-            </Text>
-          </Group>
-          <Group justify="space-between">
-            <Text size="sm" c="dimmed">
-              {t('po.poNumber')}:
-            </Text>
-            <Text size="sm" fw={500}>
-              {deliveryRequest.purchaseOrderNumber}
-            </Text>
-          </Group>
+
+          {/* Show customer only if available (DELIVERY type usually has customer) */}
+          {deliveryRequest.customerId && (
+            <Group justify="space-between">
+              <Text size="sm" c="dimmed">
+                {t('common.customer')}:
+              </Text>
+              <Text size="sm" fw={500}>
+                {getCustomerNameByCustomerId(customerMapByCustomerId, deliveryRequest.customerId)}
+              </Text>
+            </Group>
+          )}
+
+          {/* Show PO number only if available (DELIVERY type usually has PO) */}
+          {deliveryRequest.purchaseOrderNumber && (
+            <Group justify="space-between">
+              <Text size="sm" c="dimmed">
+                {t('po.poNumber')}:
+              </Text>
+              <Text size="sm" fw={500}>
+                {deliveryRequest.purchaseOrderNumber}
+              </Text>
+            </Group>
+          )}
         </Stack>
       )}
 
@@ -146,6 +267,64 @@ export function DeliveryUpdateModal({
         required
         minDate={new Date()}
         leftSection={<IconCalendar size={16} />}
+      />
+
+      {/* Show vendor input for RECEIVE type - toggle between Select and Custom */}
+      {deliveryRequest?.isReceive && (
+        <Stack gap="xs">
+          <Checkbox
+            label={t('delivery.useCustomVendor')}
+            checked={useCustomVendor}
+            onChange={(e) => setUseCustomVendor(e.currentTarget.checked)}
+            disabled={isSubmitting}
+          />
+
+          {useCustomVendor ? (
+            <TextInput
+              label={t('delivery.vendorName')}
+              placeholder={t('delivery.vendorNamePlaceholder')}
+              value={customVendorName}
+              onChange={(e) => setCustomVendorName(e.currentTarget.value)}
+              leftSection={<IconBuilding size={16} />}
+            />
+          ) : (
+            <Select
+              label={t('delivery.vendorName')}
+              placeholder={t('delivery.vendorNamePlaceholder')}
+              data={vendorOptions}
+              value={selectedVendorId}
+              onChange={setSelectedVendorId}
+              searchable
+              leftSection={<IconBuilding size={16} />}
+            />
+          )}
+        </Stack>
+      )}
+
+      {/* Address fields - show appropriate label based on type */}
+      <TextInput
+        label={
+          deliveryRequest?.isReceive
+            ? t('delivery.vendorPickupAddress')
+            : t('customer.deliveryAddress')
+        }
+        placeholder={
+          deliveryRequest?.isReceive
+            ? t('delivery.vendorPickupAddressPlaceholder')
+            : t('customer.deliveryAddressPlaceholder')
+        }
+        value={oneLineAddress}
+        onChange={(e) => setOneLineAddress(e.currentTarget.value)}
+        leftSection={<IconMapPin size={16} />}
+        required={deliveryRequest?.isReceive}
+      />
+
+      <TextInput
+        label={t('common.googleMapsUrl')}
+        placeholder={t('common.googleMapsUrlPlaceholder')}
+        value={googleMapsUrl}
+        onChange={(e) => setGoogleMapsUrl(e.currentTarget.value)}
+        leftSection={<IconMapPin size={16} />}
       />
 
       <Textarea
@@ -178,7 +357,11 @@ export function DeliveryUpdateModal({
         <Button
           onClick={handleSubmit}
           loading={isSubmitting}
-          disabled={!selectedEmployeeId || !scheduledDate}
+          disabled={
+            !selectedEmployeeId ||
+            !scheduledDate ||
+            (deliveryRequest?.isReceive && !oneLineAddress.trim())
+          }
           leftSection={<IconEdit size={16} />}
         >
           {t('common.form.update')}
@@ -187,12 +370,17 @@ export function DeliveryUpdateModal({
     </Stack>
   );
 
+  // Determine modal title based on type
+  const modalTitle = deliveryRequest?.isReceive
+    ? t('delivery.updateReceiveRequest')
+    : t('delivery.updateDeliveryRequest');
+
   if (isMobile) {
     return (
       <Drawer
         opened={opened}
         onClose={onClose}
-        title={t('common.form.update')}
+        title={modalTitle}
         position="bottom"
         size="auto"
         padding="md"
@@ -206,7 +394,7 @@ export function DeliveryUpdateModal({
     <Modal
       opened={opened}
       onClose={onClose}
-      title={t('common.form.update')}
+      title={modalTitle}
       centered
       size="md"
       trapFocus

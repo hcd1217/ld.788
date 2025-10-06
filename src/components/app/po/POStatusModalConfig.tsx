@@ -5,6 +5,7 @@ import {
   IconCurrencyDollar,
   IconPackage,
   IconPackageExport,
+  IconTrash,
   IconTruck,
   IconX,
 } from '@tabler/icons-react';
@@ -16,7 +17,8 @@ export type POModalMode =
   | 'markReady'
   | 'ship'
   | 'deliver'
-  | 'refund';
+  | 'refund'
+  | 'delete';
 
 export type ModalConfig = {
   title: string;
@@ -98,6 +100,17 @@ export const getModalConfig = (mode: POModalMode, t: any): ModalConfig => {
       requiresReason: true,
       reasonLabel: t('po.refundReason'),
       reasonPlaceholder: t('po.enterRefundReason'),
+    },
+    delete: {
+      title: t('po.deleteOrder'),
+      description: t('po.deleteOrderDescription'),
+      buttonText: t('common.delete'),
+      buttonColor: 'red',
+      icon: <IconTrash size={16} />,
+      alertColor: 'red',
+      requiresReason: true,
+      reasonLabel: t('po.deleteReason'),
+      reasonPlaceholder: t('po.enterDeleteReason'),
     },
   };
 

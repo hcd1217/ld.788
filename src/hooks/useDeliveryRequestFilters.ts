@@ -89,11 +89,21 @@ export function useDeliveryRequestFilters() {
 
   const toggleStatus = useCallback((status: DeliveryStatusType) => {
     setFilters((prev) => {
-      const isSelected = prev.statuses.includes(status);
-      const newStatuses = isSelected
-        ? prev.statuses.filter((s) => s !== status)
-        : [...prev.statuses, status];
-      return { ...prev, statuses: newStatuses };
+      // Special handling for "ALL" status
+      if (status === DELIVERY_STATUS.ALL) {
+        return { ...prev, statuses: [] };
+      }
+
+      const currentStatuses = prev.statuses.filter((s) => s !== DELIVERY_STATUS.ALL);
+      const isSelected = currentStatuses.includes(status);
+
+      if (isSelected) {
+        // Remove status
+        return { ...prev, statuses: currentStatuses.filter((s) => s !== status) };
+      } else {
+        // Add status
+        return { ...prev, statuses: [...currentStatuses, status] };
+      }
     });
   }, []);
 

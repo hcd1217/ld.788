@@ -5,6 +5,7 @@ import type {
   DepartmentOverview as BEDepartmentOverview,
   EmployeeOverview as BEEmployeeOverview,
   ProductOverview as BEProductOverview,
+  VendorOverview as BEVendorOverview,
   OverviewParams,
 } from '@/lib/api/schemas/overview.schemas';
 import { renderFullName } from '@/utils/string';
@@ -31,6 +32,14 @@ export type ProductOverview = {
   unit: string;
 };
 
+export type VendorOverview = {
+  id: string;
+  name: string;
+  isActive: boolean;
+  address: string | undefined;
+  googleMapsUrl: string | undefined;
+};
+
 export type CustomerOverview = {
   id: string;
   name: string;
@@ -48,6 +57,7 @@ export type OverviewData = {
   departments: DepartmentOverview[];
   products: ProductOverview[];
   customers: CustomerOverview[];
+  vendors: VendorOverview[];
 };
 
 // Service object
@@ -82,6 +92,14 @@ export const overviewService = {
   },
 
   /**
+   * Fetch overview data and return separated product data
+   */
+  async getProductOverview(params?: OverviewParams): Promise<Map<string, ProductOverview>> {
+    const data = await this.getOverviewData(params);
+    return new Map(data.products.map((product) => [product.id, product]));
+  },
+
+  /**
    * Transform backend data to frontend format
    */
   transformOverviewData(beData: BECombinedOverview): OverviewData {
@@ -90,6 +108,7 @@ export const overviewService = {
       departments: beData.departments.map(this.transformDepartment),
       products: beData.products.map(this.transformProduct),
       customers: beData.customers.map(this.transformCustomer),
+      vendors: beData.vendors.map(this.transformVendor),
     };
   },
 
@@ -148,6 +167,19 @@ export const overviewService = {
       name: beProduct.name,
       code: beProduct.code,
       unit: beProduct.unit,
+    };
+  },
+
+  /**
+   * Transform backend vendor to frontend format
+   */
+  transformVendor(beVendor: BEVendorOverview): VendorOverview {
+    return {
+      id: beVendor.id,
+      name: beVendor.name,
+      address: beVendor.address ?? undefined,
+      googleMapsUrl: beVendor.googleMapsUrl ?? undefined,
+      isActive: beVendor.isActive,
     };
   },
 };

@@ -15,15 +15,17 @@ import {
   Text,
 } from '@mantine/core';
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
-import { IconChevronLeft, IconChevronRight, IconPlus } from '@tabler/icons-react';
+import { IconChevronLeft, IconChevronRight, IconPlus, IconTruck } from '@tabler/icons-react';
 
+import { BulkDeliveryModal } from '@/components/app/delivery';
 import {
+  POAdvancedFiltersDrawer,
   POCard,
   PODataTable,
-  PODateDrawer,
   POErrorBoundary,
   POFilterBarDesktop,
   POFilterBarMobile,
+  POFilterPills,
   POGridCard,
   POListSkeleton,
   POStatusDrawer,
@@ -40,9 +42,11 @@ import { ROUTERS } from '@/config/routeConfig';
 import { PO_STATUS } from '@/constants/purchaseOrder';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { usePOFilters } from '@/hooks/usePOFilters';
+import { useSWRAction } from '@/hooks/useSWRAction';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useViewMode } from '@/hooks/useViewMode';
 import { useMe, usePermissions } from '@/stores/useAppStore';
+import { useDeliveryRequestActions } from '@/stores/useDeliveryRequestStore';
 import {
   usePOActions,
   usePOError,
@@ -94,16 +98,62 @@ export function POListPage() {
   // Drawer states using Mantine's useDisclosure directly
   const [statusDrawerOpened, { open: openStatusDrawer, close: closeStatusDrawer }] =
     useDisclosure(false);
-  const [dateDrawerOpened, { open: openDateDrawer, close: closeDateDrawer }] = useDisclosure(false);
+  const [
+    advancedFiltersDrawerOpened,
+    { open: openAdvancedFiltersDrawer, close: closeAdvancedFiltersDrawer },
+  ] = useDisclosure(false);
 
   // Scroll detection state
   const [isNearBottom, setIsNearBottom] = useState(false);
   const lastLoadTimeRef = useRef<number>(0);
 
+  // Selection mode for bulk delivery creation (desktop table view only)
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedPOIds, setSelectedPOIds] = useState<string[]>([]);
+  const [deliveryModalOpened, { open: openDeliveryModal, close: closeDeliveryModal }] =
+    useDisclosure(false);
+
+  // Delivery request actions
+  const { createDeliveryRequest } = useDeliveryRequestActions();
+
+  // Create bulk delivery requests action
+  const createBulkDeliveryAction = useSWRAction(
+    'create-bulk-delivery-from-po-list',
+    async (data: {
+      assignedTo: string;
+      scheduledDate: string;
+      notes: string;
+      isUrgentDelivery: boolean;
+    }) => {
+      // Create delivery request for each selected PO
+      for (const poId of selectedPOIds) {
+        await createDeliveryRequest({
+          type: 'DELIVERY',
+          assignedTo: data.assignedTo,
+          scheduledDate: data.scheduledDate,
+          notes: data.notes,
+          isUrgentDelivery: data.isUrgentDelivery,
+          purchaseOrderId: poId,
+        });
+      }
+      closeDeliveryModal();
+      await loadPOsWithFilter(filterParams, true);
+    },
+    {
+      onSuccess: () => {
+        setSelectedPOIds([]);
+        setSelectionMode(false);
+      },
+      onError: (error: Error) => {
+        console.error('Failed to create delivery requests:', error);
+      },
+    },
+  );
+
   // Create stable filter params with useMemo to prevent unnecessary re-renders
   const filterParams = useMemo(
     () => ({
-      salesId: canViewAll ? undefined : currentUser?.employee?.id,
+      salesId: filters.salesId || (canViewAll ? undefined : currentUser?.employee?.id),
       customerId: filters.customerId,
       // Filter out 'all' status before passing to API
       statuses:
@@ -119,6 +169,7 @@ export function POListPage() {
       sortOrder: 'asc' as const, // Ascending order
     }),
     [
+      filters.salesId,
       filters.customerId,
       filters.statuses,
       debouncedSearch,
@@ -257,13 +308,14 @@ export function POListPage() {
           {/* Mobile Filter Bar */}
           <POFilterBarMobile
             searchQuery={filters.searchQuery}
+            salesId={filters.salesId}
             selectedStatuses={filters.statuses}
             hasOrderDateFilter={hasOrderDateFilter}
             hasDeliveryDateFilter={hasDeliveryDateFilter}
             hasActiveFilters={hasActiveFilters}
             onSearchChange={filterHandlers.setSearchQuery}
             onStatusClick={openStatusDrawer}
-            onDateClick={openDateDrawer}
+            onAdvancedFiltersClick={openAdvancedFiltersDrawer}
             onClearFilters={filterHandlers.resetFilters}
           />
 
@@ -280,14 +332,16 @@ export function POListPage() {
             }}
           />
 
-          {/* Date Range Selection Drawer */}
-          <PODateDrawer
-            opened={dateDrawerOpened}
+          {/* Advanced Filters Drawer */}
+          <POAdvancedFiltersDrawer
+            opened={advancedFiltersDrawerOpened}
+            salesId={filters.salesId}
             orderDateStart={filters.orderDateRange.start}
             orderDateEnd={filters.orderDateRange.end}
             deliveryDateStart={filters.deliveryDateRange.start}
             deliveryDateEnd={filters.deliveryDateRange.end}
-            onClose={closeDateDrawer}
+            onClose={closeAdvancedFiltersDrawer}
+            onSalesIdChange={filterHandlers.setSalesId}
             onOrderDateRangeSelect={filterHandlers.setOrderDateRange}
             onDeliveryDateRangeSelect={filterHandlers.setDeliveryDateRange}
           />
@@ -358,6 +412,25 @@ export function POListPage() {
           <AppPageTitle title={t('po.title')} />
           <Group gap="sm">
             <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
+            {isTableView && !selectionMode && (
+              <Button
+                variant="light"
+                leftSection={<IconTruck size={16} />}
+                onClick={() => setSelectionMode(true)}
+                disabled={!canCreate}
+              >
+                {t('po.createBulkDelivery')}
+              </Button>
+            )}
+            {isTableView && selectionMode && (
+              <Button
+                leftSection={<IconTruck size={16} />}
+                onClick={openDeliveryModal}
+                disabled={selectedPOIds.length === 0}
+              >
+                {t('po.createDeliveryRequests', { count: selectedPOIds.length })}
+              </Button>
+            )}
             <Button
               leftSection={<IconPlus size={16} />}
               onClick={handleNavigateToAdd}
@@ -372,6 +445,7 @@ export function POListPage() {
         <POFilterBarDesktop
           searchQuery={filters.searchQuery}
           customerId={filters.customerId}
+          salesId={filters.salesId}
           selectedStatuses={filters.statuses}
           orderDateStart={filters.orderDateRange.start}
           orderDateEnd={filters.orderDateRange.end}
@@ -380,10 +454,27 @@ export function POListPage() {
           hasActiveFilters={hasActiveFilters}
           onSearchChange={filterHandlers.setSearchQuery}
           onCustomerChange={filterHandlers.setCustomerId}
+          onSalesIdChange={filterHandlers.setSalesId}
           onStatusesChange={filterHandlers.setStatuses}
           onOrderDateChange={filterHandlers.setOrderDateRange}
           onDeliveryDateChange={filterHandlers.setDeliveryDateRange}
           onClearFilters={filterHandlers.resetFilters}
+        />
+
+        {/* Active Filter Pills */}
+        <POFilterPills
+          customerId={filters.customerId}
+          salesId={filters.salesId}
+          selectedStatuses={filters.statuses}
+          orderDateStart={filters.orderDateRange.start}
+          orderDateEnd={filters.orderDateRange.end}
+          deliveryDateStart={filters.deliveryDateRange.start}
+          deliveryDateEnd={filters.deliveryDateRange.end}
+          onRemoveCustomer={() => filterHandlers.setCustomerId(undefined)}
+          onRemoveSalesId={() => filterHandlers.setSalesId(undefined)}
+          onRemoveStatus={filterHandlers.toggleStatus}
+          onRemoveOrderDate={() => filterHandlers.setOrderDateRange(undefined, undefined)}
+          onRemoveDeliveryDate={() => filterHandlers.setDeliveryDateRange(undefined, undefined)}
         />
 
         {/* Content Area */}
@@ -410,6 +501,9 @@ export function POListPage() {
                 noAction={isLoading || isFilterLoading}
                 isLoading={isLoading || isFilterLoading}
                 purchaseOrders={purchaseOrders}
+                selectionMode={selectionMode}
+                selectedPOIds={selectedPOIds}
+                onSelectionChange={setSelectedPOIds}
               />
             ) : (
               <SimpleGrid
@@ -443,6 +537,19 @@ export function POListPage() {
             )}
           </>
         )}
+
+        {/* Bulk Delivery Creation Modal */}
+        <BulkDeliveryModal
+          opened={deliveryModalOpened}
+          onClose={() => {
+            closeDeliveryModal();
+            setSelectionMode(false);
+            setSelectedPOIds([]);
+          }}
+          selectedCount={selectedPOIds.length}
+          onSubmit={createBulkDeliveryAction.trigger}
+          isLoading={createBulkDeliveryAction.isMutating}
+        />
       </POErrorBoundary>
     </AppDesktopLayout>
   );
