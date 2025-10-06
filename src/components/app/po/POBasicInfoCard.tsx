@@ -12,6 +12,7 @@ import {
   getShippingInfo,
 } from '@/utils/purchaseOrder';
 
+import { POAttachmentsSection } from './POAttachmentsSection';
 import { PODatesSection } from './PODatesSection';
 import { PODeliverySection } from './PODeliverySection';
 import { POInfoSection } from './POInfoSection';
@@ -43,6 +44,8 @@ export function POBasicInfoCard({ purchaseOrder, onNavigateToItemsList }: POBasi
         <Divider />
         <PODatesSection purchaseOrder={purchaseOrder} />
         <Divider />
+        <POAttachmentsSection attachments={purchaseOrder.attachments} />
+        {purchaseOrder.attachments && purchaseOrder.attachments.length > 0 && <Divider />}
         <Grid>
           <Grid.Col span={{ base: 12, md: 6 }}>
             <div>

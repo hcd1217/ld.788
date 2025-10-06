@@ -98,6 +98,7 @@ export const PurchaseOrderSchema = z.object({
   isPersonalCustomer: optionalBooleanSchema,
   personalCustomerName: optionalStringSchema,
   customerPONumber: optionalStringSchema,
+  attachments: z.array(UploadPhotoSchema).optional(),
   completedDate: optionalTimestampSchema,
   notes: optionalStringSchema,
   items: z.array(POItemSchema),

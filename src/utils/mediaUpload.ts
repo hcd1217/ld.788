@@ -58,8 +58,7 @@ export const uploadToS3 = async (
 ): Promise<MediaUploadResult> => {
   if (isDevelopment) {
     return {
-      publicUrl:
-        'https://ctkper.s3.amazonaws.com/nktu/undefined/2025-10-02/d505ed07-ee27-415b-aeff-56ccb52a6806/delivery-request-photo/delivery/1759383029926-delivery-photo-1759383029879.jpg',
+      publicUrl: 'https://ctkper.s3.amazonaws.com/nktu/ACME/2025-10-06/ef43dfb9-6c97-41a3-86cc-964c45189743/purchase-order-attachment/purchase-order/1759738146693-avatar_blue.png',
       key: '1759383029926-delivery-photo-1759383029879.jpg',
     };
   }

@@ -23,6 +23,7 @@ import { formatDate, formatDateTime } from '@/utils/time';
 
 import { DeliveryStatusBadge } from '../delivery/DeliveryStatusBadge';
 
+import { POAttachmentsSection } from './POAttachmentsSection';
 import { POCustomer } from './POCustomer';
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
@@ -140,6 +141,8 @@ export function POAccordionInfoPanel({
         labelProps={{ size: 'xs', fw: 600, c: 'dimmed' }}
         value={purchaseOrder.notes ?? ''}
       />
+
+      <POAttachmentsSection attachments={purchaseOrder.attachments} />
 
       {notes.deliveryNotes && (
         <div>
