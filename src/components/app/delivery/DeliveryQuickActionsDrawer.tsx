@@ -1,6 +1,8 @@
+import { useState } from 'react';
+
 import { Button, Stack } from '@mantine/core';
 
-import { Drawer } from '@/components/common';
+import { DatePickerInput, Drawer } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   endOfDay,
@@ -28,15 +30,39 @@ export function DeliveryQuickActionsDrawer({
   onActionSelect,
 }: DeliveryQuickActionsDrawerProps) {
   const { t } = useTranslation();
+  const [customDateRange, setCustomDateRange] = useState<
+    [string | Date | undefined, string | Date | undefined]
+  >([undefined, undefined]);
+  const [showCustomPicker, setShowCustomPicker] = useState(false);
 
   const handleActionSelect = (action: string, dateRange?: { start: Date; end: Date }) => {
     onActionSelect(action, dateRange);
+    setShowCustomPicker(false);
     onClose();
   };
 
   const handleClear = () => {
     onActionSelect(undefined);
+    setCustomDateRange([undefined, undefined]);
+    setShowCustomPicker(false);
     onClose();
+  };
+
+  const handleCustomRangeClick = () => {
+    setShowCustomPicker(!showCustomPicker);
+  };
+
+  const handleCustomDateChange = (dates: [string | undefined, string | undefined]) => {
+    setCustomDateRange(dates);
+
+    // Only apply when both dates are selected
+    const [start, end] = dates;
+    if (start && end) {
+      handleActionSelect(t('delivery.quickActions.customRange'), {
+        start: new Date(start),
+        end: new Date(end),
+      });
+    }
   };
 
   const today = new Date();
@@ -71,7 +97,7 @@ export function DeliveryQuickActionsDrawer({
   return (
     <Drawer
       opened={opened}
-      size="40vh"
+      expanded
       position="bottom"
       title={t('delivery.quickActions.title')}
       onClose={onClose}
@@ -101,6 +127,31 @@ export function DeliveryQuickActionsDrawer({
             {action.label}
           </Button>
         ))}
+
+        {/* Custom Date Range option */}
+        <Button
+          size="sm"
+          variant={
+            selectedAction === t('delivery.quickActions.customRange') && !showCustomPicker
+              ? 'filled'
+              : 'light'
+          }
+          onClick={handleCustomRangeClick}
+          fullWidth
+          styles={{ label: { textAlign: 'left' } }}
+        >
+          {t('delivery.quickActions.customRange')}
+        </Button>
+
+        {/* Custom Date Range Picker - shown when button clicked */}
+        {showCustomPicker && (
+          <DatePickerInput
+            placeholder={t('delivery.filters.selectScheduledDate')}
+            value={customDateRange}
+            onChange={handleCustomDateChange}
+            size="sm"
+          />
+        )}
       </Stack>
     </Drawer>
   );

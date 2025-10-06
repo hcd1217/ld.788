@@ -291,13 +291,7 @@ export function usePOActions({
 
     // Filter out actions that shouldn't be shown
     return actions.filter((action) => action.showCondition !== false);
-  }, [
-    purchaseOrder,
-    permissions,
-    callbacks,
-    toggleInternalDeliveryAction.trigger,
-    toggleInternalDeliveryAction.isMutating,
-  ]);
+  }, [purchaseOrder, permissions, callbacks, toggleInternalDeliveryAction]);
 
   return availableActions;
 }

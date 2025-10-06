@@ -305,6 +305,7 @@
     "purchaseOrders": "Các Đơn Đặt Hàng",
     "quickActions": {
       "allDates": "Tất Cả",
+      "customRange": "Tùy Chọn Ngày",
       "thisMonth": "Tháng Này",
       "thisWeek": "Tuần Này",
       "title": "Chọn Nhanh",

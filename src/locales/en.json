@@ -305,6 +305,7 @@
     "purchaseOrders": "Purchase Orders",
     "quickActions": {
       "allDates": "All Dates",
+      "customRange": "Custom Range",
       "thisMonth": "This Month",
       "thisWeek": "This Week",
       "title": "Quick Actions",
