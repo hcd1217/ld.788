@@ -354,4 +354,8 @@ export const purchaseOrderService = {
   async deletePurchaseOrder(id: string): Promise<void> {
     await salesApi.deletePurchaseOrder(id);
   },
+
+  async toggleInternalDelivery(id: string): Promise<void> {
+    await salesApi.toggleInternalDelivery(id);
+  },
 };

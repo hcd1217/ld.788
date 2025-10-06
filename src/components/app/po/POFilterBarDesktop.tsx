@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Button, Group, MultiSelect, Select } from '@mantine/core';
-import { IconClearAll } from '@tabler/icons-react';
+import { IconCheck, IconClearAll } from '@tabler/icons-react';
 
 import { SearchBar } from '@/components/common';
 import { PO_STATUS, type POStatusType } from '@/constants/purchaseOrder';
@@ -53,6 +53,25 @@ export function POFilterBarDesktop({
 
   const customerOptions = useCustomerOptions();
 
+  // Local state for pending status changes
+  const [pendingStatuses, setPendingStatuses] = useState<POStatusType[]>(selectedStatuses);
+
+  // Sync local state when external filters change (e.g., clear filters)
+  useEffect(() => {
+    setPendingStatuses(selectedStatuses);
+  }, [selectedStatuses]);
+
+  // Check if there are pending changes
+  const hasPendingChanges = useMemo(() => {
+    if (pendingStatuses.length !== selectedStatuses.length) return true;
+    return !pendingStatuses.every((status) => selectedStatuses.includes(status));
+  }, [pendingStatuses, selectedStatuses]);
+
+  // Apply pending status changes
+  const handleApplyStatuses = () => {
+    onStatusesChange(pendingStatuses);
+  };
+
   // Status options for MultiSelect
   const statusOptions = useMemo(() => {
     return [
@@ -67,10 +86,10 @@ export function POFilterBarDesktop({
     ];
   }, [t]);
 
-  // Custom placeholder for MultiSelect to show count
+  // Custom placeholder for MultiSelect to show count - use pendingStatuses for display
   const { filteredStatuses, statusPlaceholder } = useMemo(() => {
     // Filter out 'all' status if present
-    const filteredStatuses = selectedStatuses.filter((s) => s !== PO_STATUS.ALL);
+    const filteredStatuses = pendingStatuses.filter((s) => s !== PO_STATUS.ALL);
     const count = filteredStatuses.length;
     if (count === 0) {
       return {
@@ -88,7 +107,7 @@ export function POFilterBarDesktop({
       filteredStatuses,
       statusPlaceholder: t('common.statusesSelected', { count }),
     };
-  }, [selectedStatuses, statusOptions, t]);
+  }, [pendingStatuses, statusOptions, t]);
 
   if (!canFilterPurchaseOrder(permissions)) {
     return null;
@@ -124,7 +143,7 @@ export function POFilterBarDesktop({
         data={statusOptions}
         value={filteredStatuses}
         style={{ flex: 1, minWidth: 180 }}
-        onChange={(values) => onStatusesChange(values as POStatusType[])}
+        onChange={(values) => setPendingStatuses(values as POStatusType[])}
         label={t('po.poStatus')}
         maxDropdownHeight={280}
         styles={{
@@ -137,6 +156,16 @@ export function POFilterBarDesktop({
           },
         }}
       />
+
+      {/* Apply Status Button */}
+      <Button
+        disabled={!hasPendingChanges}
+        variant="filled"
+        leftSection={<IconCheck size={16} />}
+        onClick={handleApplyStatuses}
+      >
+        {t('common.apply')}
+      </Button>
 
       {/* Advanced Filters Popover */}
       <POAdvancedFiltersPopover

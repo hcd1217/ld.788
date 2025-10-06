@@ -11,6 +11,7 @@ import {
   canConfirmPurchaseOrder,
   canDeletePurchaseOrder,
   canDeliverPurchaseOrder,
+  canEditPurchaseOrder,
   canMarkReadyPurchaseOrder,
   canProcessPurchaseOrder,
   canRefundPurchaseOrder,
@@ -56,6 +57,7 @@ export function POActionZone({
     canRefund,
     canCancel,
     canDelete,
+    canEdit,
   } = useMemo(
     () => ({
       canConfirm: canConfirmPurchaseOrder(permissions),
@@ -66,6 +68,7 @@ export function POActionZone({
       canRefund: canRefundPurchaseOrder(permissions),
       canCancel: canCancelPurchaseOrder(permissions),
       canDelete: canDeletePurchaseOrder(permissions),
+      canEdit: canEditPurchaseOrder(permissions),
     }),
     [permissions],
   );
@@ -73,7 +76,6 @@ export function POActionZone({
   // Use the centralized hook for action logic
   const actions = usePOActions({
     purchaseOrder,
-    // POActionZone uses canEdit for all permissions
     permissions: {
       canConfirm,
       canCancel,
@@ -83,6 +85,7 @@ export function POActionZone({
       canDeliver,
       canRefund,
       canDelete,
+      canEdit,
     },
     callbacks: {
       onConfirm,
@@ -101,6 +104,7 @@ export function POActionZone({
     },
   });
 
+  // Show card if there are actions available
   if (actions.length === 0) {
     return null;
   }
@@ -117,7 +121,7 @@ export function POActionZone({
                 key={action.key}
                 color={action.color}
                 variant={action.variant}
-                loading={isLoading}
+                loading={action.isLoading ?? isLoading}
                 disabled={action.isDisabled}
                 leftSection={<Icon size={16} />}
                 onClick={action.onClick}

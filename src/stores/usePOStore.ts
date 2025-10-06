@@ -96,6 +96,7 @@ type POState = {
   uploadPhotos: (id: string, photos: { publicUrl: string; key: string }[]) => Promise<void>;
   deletePhoto: (id: string, photoId: string) => Promise<void>;
   deletePurchaseOrder: (id: string) => Promise<void>;
+  toggleInternalDelivery: (id: string) => Promise<void>;
   clearError: () => void;
 
   // Selectors
@@ -538,6 +539,33 @@ export const usePOStore = create<POState>()(
         }
       },
 
+      async toggleInternalDelivery(id: string) {
+        const state = get();
+
+        // Check if action is already pending
+        if (state.pendingActions.has(id)) {
+          return;
+        }
+
+        // Mark as pending
+        state._markPending(id);
+
+        try {
+          // Call service
+          await purchaseOrderService.toggleInternalDelivery(id);
+
+          // Force reload to get latest data from server
+          get()._forceReload(id);
+        } catch (error) {
+          const errorMessage = getErrorMessage(error, 'Failed to toggle internal delivery');
+          set({ error: errorMessage });
+          throw error;
+        } finally {
+          // Clear pending
+          state._removePending(id);
+        }
+      },
+
       clearError() {
         set({ error: undefined });
       },
@@ -721,6 +749,7 @@ export const usePOActions = () => {
   const uploadPhotos = usePOStore((state) => state.uploadPhotos);
   const deletePhoto = usePOStore((state) => state.deletePhoto);
   const deletePurchaseOrder = usePOStore((state) => state.deletePurchaseOrder);
+  const toggleInternalDelivery = usePOStore((state) => state.toggleInternalDelivery);
   const clearError = usePOStore((state) => state.clearError);
 
   return {
@@ -744,6 +773,7 @@ export const usePOActions = () => {
     uploadPhotos,
     deletePhoto,
     deletePurchaseOrder,
+    toggleInternalDelivery,
   };
 };
 

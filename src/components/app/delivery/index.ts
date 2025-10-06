@@ -9,6 +9,7 @@ export { DeliveryStatusBadge } from './DeliveryStatusBadge';
 export { DeliveryTypeBadge } from './DeliveryTypeBadge';
 export { DeliveryStatusDrawer } from './DeliveryStatusDrawer';
 export { DeliveryStatusFilterDrawer } from './DeliveryStatusFilterDrawer';
+export { DeliveryEmployeeFilterDrawer } from './DeliveryEmployeeFilterDrawer';
 export { DeliveryQuickActionsDrawer } from './DeliveryQuickActionsDrawer';
 export { DeliveryDetailTabs } from './DeliveryDetailTabs';
 export { DeliveryDetailAccordion } from './DeliveryDetailAccordion';

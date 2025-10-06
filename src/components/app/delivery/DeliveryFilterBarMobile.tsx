@@ -1,39 +1,44 @@
 import { useCallback, useMemo } from 'react';
 
 import { Button, Group, Stack } from '@mantine/core';
-import { IconCalendar, IconChevronDown, IconClearAll } from '@tabler/icons-react';
+import { IconCalendar, IconChevronDown, IconClearAll, IconUser } from '@tabler/icons-react';
 
 import { SearchBar } from '@/components/common';
 import type { DeliveryStatusType } from '@/constants/deliveryRequest';
 import { useTranslation } from '@/hooks/useTranslation';
-import { usePermissions } from '@/stores/useAppStore';
+import { useEmployees, usePermissions } from '@/stores/useAppStore';
 import { canFilterDeliveryRequest } from '@/utils/permission.utils';
 
 interface DeliveryFilterBarMobileProps {
   readonly searchQuery: string;
   readonly selectedStatuses: DeliveryStatusType[];
+  readonly assignedTo?: string;
   readonly hasDateFilter: boolean;
   readonly quickAction?: string;
   readonly hasActiveFilters: boolean;
   readonly onSearchChange: (query: string) => void;
   readonly onQuickActionsClick: () => void;
   readonly onStatusClick: () => void;
+  readonly onEmployeeClick: () => void;
   readonly onClearFilters: () => void;
 }
 
 export function DeliveryFilterBarMobile({
   searchQuery,
   selectedStatuses,
+  assignedTo,
   hasDateFilter,
   quickAction,
   hasActiveFilters,
   onSearchChange,
   onQuickActionsClick,
   onStatusClick,
+  onEmployeeClick,
   onClearFilters,
 }: DeliveryFilterBarMobileProps) {
   const { t } = useTranslation();
   const permissions = usePermissions();
+  const employees = useEmployees();
 
   const canFilter = useMemo(() => canFilterDeliveryRequest(permissions), [permissions]);
 
@@ -56,6 +61,14 @@ export function DeliveryFilterBarMobile({
       ? `${t('delivery.quickActions.title')} (1)`
       : t('delivery.quickActions.title');
   }, [quickAction, hasDateFilter, t]);
+
+  const getEmployeeLabel = useCallback((): string => {
+    if (!assignedTo) {
+      return t('delivery.filters.allEmployees');
+    }
+    const employee = employees.find((emp) => emp.id === assignedTo);
+    return employee?.fullName ?? t('delivery.filters.allEmployees');
+  }, [assignedTo, employees, t]);
 
   if (!canFilter) {
     return null;
@@ -80,6 +93,16 @@ export function DeliveryFilterBarMobile({
           style={{ flex: 1 }}
         >
           {getQuickActionLabel()}
+        </Button>
+
+        <Button
+          size="xs"
+          variant={assignedTo ? 'filled' : 'light'}
+          rightSection={<IconUser size={16} />}
+          onClick={onEmployeeClick}
+          style={{ flex: 1 }}
+        >
+          {getEmployeeLabel()}
         </Button>
 
         <Button

@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Button, Group, MultiSelect, Select } from '@mantine/core';
-import { IconClearAll } from '@tabler/icons-react';
+import { IconCheck, IconClearAll } from '@tabler/icons-react';
 
 import { DatePickerInput } from '@/components/common';
 import { SearchBar } from '@/components/common';
@@ -56,6 +56,25 @@ export function DeliveryFilterBarDesktop({
 
   const canFilter = useMemo(() => canFilterDeliveryRequest(permissions), [permissions]);
 
+  // Local state for pending status changes
+  const [pendingStatuses, setPendingStatuses] = useState<DeliveryStatusType[]>(selectedStatuses);
+
+  // Sync local state when external filters change (e.g., clear filters)
+  useEffect(() => {
+    setPendingStatuses(selectedStatuses);
+  }, [selectedStatuses]);
+
+  // Check if there are pending changes
+  const hasPendingChanges = useMemo(() => {
+    if (pendingStatuses.length !== selectedStatuses.length) return true;
+    return !pendingStatuses.every((status) => selectedStatuses.includes(status));
+  }, [pendingStatuses, selectedStatuses]);
+
+  // Apply pending status changes
+  const handleApplyStatuses = () => {
+    onStatusesChange(pendingStatuses);
+  };
+
   // Employee options for Select - filtered by assigneeIds from clientConfig
   const employeeOptions = useMemo(() => {
     const assigneeIds = clientConfig.features?.deliveryRequest?.assigneeIds ?? [];
@@ -85,19 +104,25 @@ export function DeliveryFilterBarDesktop({
     [t],
   );
 
-  // Custom placeholder for MultiSelect to show count
+  // Custom placeholder for MultiSelect to show count - use pendingStatuses for display
   const { filteredStatuses, statusPlaceholder } = useMemo(() => {
     // Filter out 'all' status if present
-    const filteredStatuses = selectedStatuses.filter((s) => s !== DELIVERY_STATUS.ALL);
+    const filteredStatuses = pendingStatuses.filter((s) => s !== DELIVERY_STATUS.ALL);
     const count = filteredStatuses.length;
     if (count === 0) {
       return { filteredStatuses, statusPlaceholder: t('common.filters.selectStatus') };
+    }
+    if (count === 1) {
+      return {
+        filteredStatuses,
+        statusPlaceholder: statusOptions.find((s) => s.value === filteredStatuses[0])?.label,
+      };
     }
     return {
       filteredStatuses,
       statusPlaceholder: t('common.statusesSelected', { count }),
     };
-  }, [selectedStatuses, t]);
+  }, [pendingStatuses, statusOptions, t]);
 
   if (!canFilter) {
     return null;
@@ -146,7 +171,7 @@ export function DeliveryFilterBarDesktop({
         data={statusOptions}
         value={filteredStatuses}
         style={{ flex: 1, minWidth: 180 }}
-        onChange={(values) => onStatusesChange(values as DeliveryStatusType[])}
+        onChange={(values) => setPendingStatuses(values as DeliveryStatusType[])}
         label={t('delivery.status') as string}
         maxDropdownHeight={280}
         styles={{
@@ -160,6 +185,16 @@ export function DeliveryFilterBarDesktop({
         }}
         hidePickedOptions={false}
       />
+
+      {/* Apply Status Button */}
+      <Button
+        disabled={!hasPendingChanges}
+        variant="filled"
+        leftSection={<IconCheck size={16} />}
+        onClick={handleApplyStatuses}
+      >
+        {t('common.apply')}
+      </Button>
 
       {/* Scheduled Date Range */}
       <DatePickerInput

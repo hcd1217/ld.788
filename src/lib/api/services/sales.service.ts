@@ -236,6 +236,10 @@ export class SalesApi extends BaseApiClient {
     );
   }
 
+  async toggleInternalDelivery(id: string): Promise<void> {
+    await this.patch<void, void>(`/api/sales/purchase-orders/${id}/toggle-internal-delivery`);
+  }
+
   async confirmPurchaseOrder(id: string, data?: UpdatePOStatusRequest): Promise<void> {
     return this.patch<void, UpdatePOStatusRequest | undefined>(
       `/api/sales/purchase-orders/${id}/confirm`,

@@ -11,6 +11,7 @@ import {
   canConfirmPurchaseOrder,
   canDeletePurchaseOrder,
   canDeliverPurchaseOrder,
+  canEditPurchaseOrder,
   canMarkReadyPurchaseOrder,
   canProcessPurchaseOrder,
   canRefundPurchaseOrder,
@@ -56,6 +57,7 @@ export function POAccordionActions({
     canDeliver,
     canRefund,
     canDelete,
+    canEdit,
   } = useMemo(
     () => ({
       canConfirm: canConfirmPurchaseOrder(permissions),
@@ -66,6 +68,7 @@ export function POAccordionActions({
       canDeliver: canDeliverPurchaseOrder(permissions),
       canRefund: canRefundPurchaseOrder(permissions),
       canDelete: canDeletePurchaseOrder(permissions),
+      canEdit: canEditPurchaseOrder(permissions),
     }),
     [permissions],
   );
@@ -82,6 +85,7 @@ export function POAccordionActions({
       canDeliver,
       canRefund,
       canDelete,
+      canEdit,
     },
     callbacks: {
       onConfirm,
@@ -100,6 +104,7 @@ export function POAccordionActions({
     },
   });
 
+  // Show group if there are actions available
   if (actions.length === 0) return null;
 
   return (
@@ -112,7 +117,7 @@ export function POAccordionActions({
             color={action.color}
             variant={action.variant}
             size="xs"
-            loading={isLoading}
+            loading={action.isLoading ?? isLoading}
             disabled={action.isDisabled}
             leftSection={<Icon size={14} />}
             onClick={action.onClick}

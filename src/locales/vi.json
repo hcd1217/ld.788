@@ -259,8 +259,10 @@
     },
     "detail": "Chi Tiết Giao Nhận",
     "filters": {
+      "allEmployees": "Tất Cả Nhân Viên",
       "searchPlaceholder": "Tìm kiếm theo mã giao nhận",
       "selectAssignee": "Chọn Người Phụ Trách",
+      "selectEmployee": "Chọn Nhân Viên",
       "selectScheduledDate": "Chọn ngày dự kiến"
     },
     "form": {
@@ -690,6 +692,10 @@
     "tableAriaLabel": "Bảng đơn hàng",
     "thisComponent": "thành phần này",
     "title": "Đơn Hàng",
+    "toggleExternalDelivery": "Giao Ngoài",
+    "toggleInternalDelivery": "Giao Nội Bộ",
+    "toggleInternalDeliveryFailed": "Không thể chuyển đổi giao nội bộ",
+    "toggleInternalDeliverySuccess": "Đã chuyển đổi giao nội bộ thành công",
     "trackingNumber": "Mã Theo Dõi",
     "unsavedItem": "Mục chưa lưu",
     "unsavedItemMessage": "Bạn có một mục chưa lưu trong biểu mẫu. Bạn có muốn thêm nó trước khi lưu không?",

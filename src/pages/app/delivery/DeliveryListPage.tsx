@@ -27,6 +27,7 @@ import {
   DeliveryCard,
   DeliveryCreateModal,
   DeliveryDataTable,
+  DeliveryEmployeeFilterDrawer,
   DeliveryErrorBoundary,
   DeliveryFilterBarDesktop,
   DeliveryFilterBarMobile,
@@ -106,6 +107,7 @@ export function DeliveryListPage() {
   // Mobile drawer states
   const [quickActionsDrawerOpened, setQuickActionsDrawerOpened] = useState(false);
   const [statusDrawerOpened, setStatusDrawerOpened] = useState(false);
+  const [employeeDrawerOpened, setEmployeeDrawerOpened] = useState(false);
   const [selectedQuickAction, setSelectedQuickAction] = useState<string | undefined>();
   const [createModalOpened, setCreateModalOpened] = useState(false);
 
@@ -298,12 +300,14 @@ export function DeliveryListPage() {
           <DeliveryFilterBarMobile
             searchQuery={filters.searchQuery}
             selectedStatuses={filters.statuses}
+            assignedTo={canViewAll ? filters.assignedTo : currentEmployeeId}
             hasDateFilter={!!filters.scheduledDateRange.start || !!filters.scheduledDateRange.end}
             quickAction={selectedQuickAction}
             hasActiveFilters={hasActiveFilters}
             onSearchChange={filterHandlers.setSearchQuery}
             onQuickActionsClick={() => setQuickActionsDrawerOpened(true)}
             onStatusClick={() => setStatusDrawerOpened(true)}
+            onEmployeeClick={() => setEmployeeDrawerOpened(true)}
             onClearFilters={() => {
               filterHandlers.resetFilters();
               setSelectedQuickAction(undefined);
@@ -368,6 +372,17 @@ export function DeliveryListPage() {
             onApply={handleStatusApply}
             onClear={() => filterHandlers.setStatuses([])}
           />
+
+          {canViewAll && (
+            <DeliveryEmployeeFilterDrawer
+              opened={employeeDrawerOpened}
+              selectedEmployeeId={canViewAll ? filters.assignedTo : currentEmployeeId}
+              onClose={() => setEmployeeDrawerOpened(false)}
+              onEmployeeChange={(employeeId) => {
+                filterHandlers.setAssignedTo(canViewAll ? employeeId : currentEmployeeId);
+              }}
+            />
+          )}
 
           {/* Create Receive Request Modal */}
           <DeliveryCreateModal

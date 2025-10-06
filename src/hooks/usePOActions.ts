@@ -8,12 +8,16 @@ import {
   IconPackageExport,
   type IconProps,
   IconReceipt,
+  IconRefresh,
   IconTrash,
   IconTruck,
   IconX,
 } from '@tabler/icons-react';
 
+import { useSWRAction } from '@/hooks/useSWRAction';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
+import { usePOActions as usePOStoreActions } from '@/stores/usePOStore';
 
 import type { ButtonProps } from '@mantine/core';
 
@@ -31,13 +35,15 @@ export type POActionConfig = {
     | 'deliver'
     | 'refund'
     | 'delete'
-    | 'createDelivery';
+    | 'createDelivery'
+    | 'toggleInternalDelivery';
   readonly color: ButtonProps['color'];
   readonly variant?: ButtonProps['variant'];
   readonly icon: React.ComponentType<IconProps>;
   readonly translationKey: string;
   readonly onClick: () => void;
   readonly isDisabled?: boolean;
+  readonly isLoading?: boolean;
   readonly showCondition?: boolean;
 };
 
@@ -65,6 +71,7 @@ export type UsePOActionsProps = {
     readonly canDeliver: boolean;
     readonly canRefund: boolean;
     readonly canDelete: boolean;
+    readonly canEdit: boolean;
   };
   readonly callbacks: {
     readonly onConfirm: () => void;
@@ -89,7 +96,27 @@ export function usePOActions({
   permissions,
   callbacks,
 }: UsePOActionsProps): POActionConfig[] {
-  // Extract permissions with defaults based on variant
+  const { t } = useTranslation();
+  const { toggleInternalDelivery } = usePOStoreActions();
+
+  // Toggle internal delivery action
+  const toggleInternalDeliveryAction = useSWRAction(
+    'toggle-internal-delivery',
+    async () => {
+      if (!permissions.canEdit) {
+        throw new Error(t('common.doNotHavePermissionForAction'));
+      }
+      await toggleInternalDelivery(purchaseOrder.id);
+    },
+    {
+      notifications: {
+        successTitle: t('common.success'),
+        successMessage: t('po.toggleInternalDeliverySuccess'),
+        errorTitle: t('common.errors.notificationTitle'),
+        errorMessage: t('po.toggleInternalDeliveryFailed'),
+      },
+    },
+  );
 
   const availableActions = useMemo(() => {
     const canCancel = permissions.canCancel;
@@ -100,8 +127,23 @@ export function usePOActions({
     const canRefund = permissions.canRefund;
     const canConfirm = permissions.canConfirm;
     const canDelete = permissions.canDelete;
+    const canEdit = permissions.canEdit;
 
     const actions: POActionConfig[] = [];
+
+    const createToggleInternalDeliveryAction = (): POActionConfig => ({
+      key: 'toggle-internal-delivery',
+      action: 'toggleInternalDelivery',
+      color: 'orange',
+      variant: 'light',
+      icon: IconRefresh,
+      translationKey: purchaseOrder.isInternalDelivery
+        ? 'po.toggleExternalDelivery'
+        : 'po.toggleInternalDelivery',
+      isDisabled: !canEdit,
+      onClick: () => void toggleInternalDeliveryAction.trigger(),
+      isLoading: toggleInternalDeliveryAction.isMutating,
+    });
 
     // Helper to create cancel button config
     const createCancelAction = (): POActionConfig => ({
@@ -142,6 +184,7 @@ export function usePOActions({
     switch (purchaseOrder.status) {
       case 'NEW': {
         actions.push(
+          createToggleInternalDeliveryAction(),
           {
             key: 'confirm',
             action: 'confirm',
@@ -158,6 +201,7 @@ export function usePOActions({
 
       case 'CONFIRMED': {
         actions.push(
+          createToggleInternalDeliveryAction(),
           {
             key: 'process',
             action: 'process',
@@ -173,7 +217,7 @@ export function usePOActions({
       }
 
       case 'PROCESSING': {
-        actions.push({
+        actions.push(createToggleInternalDeliveryAction(), {
           key: 'markReady',
           action: 'markReady',
           color: 'teal',
@@ -187,6 +231,9 @@ export function usePOActions({
       }
 
       case 'READY_FOR_PICKUP': {
+        if (!purchaseOrder.deliveryRequest) {
+          actions.push(createToggleInternalDeliveryAction());
+        }
         if (purchaseOrder.isInternalDelivery && !purchaseOrder.deliveryRequest) {
           actions.push({
             key: 'create-delivery',
@@ -244,7 +291,13 @@ export function usePOActions({
 
     // Filter out actions that shouldn't be shown
     return actions.filter((action) => action.showCondition !== false);
-  }, [purchaseOrder, permissions, callbacks]);
+  }, [
+    purchaseOrder,
+    permissions,
+    callbacks,
+    toggleInternalDeliveryAction.trigger,
+    toggleInternalDeliveryAction.isMutating,
+  ]);
 
   return availableActions;
 }

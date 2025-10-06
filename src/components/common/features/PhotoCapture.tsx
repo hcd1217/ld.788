@@ -37,10 +37,10 @@ export type PhotoCaptureProps = {
 
 const DEFAULT_CONFIG: Required<PhotoConfig> = {
   quality: 0.8,
-  maxWidth: 1024,
-  maxHeight: 768,
-  targetSize: 200 * 1024, // 200KB
-  minQuality: 0.3,
+  maxWidth: 2048, // ← 2x increase (4x pixels)
+  maxHeight: 1536, // ← 2x increase (4x pixels)
+  targetSize: 500 * 1024, // ← 500KB for documents
+  minQuality: 0.7, // ← Prevent excessive degradation
   includeTimestamp: true,
   includeLocation: true,
 };

@@ -259,8 +259,10 @@
     },
     "detail": "Delivery Details",
     "filters": {
+      "allEmployees": "All Employees",
       "searchPlaceholder": "Search by delivery number",
       "selectAssignee": "Select Assignee",
+      "selectEmployee": "Select Employee",
       "selectScheduledDate": "Select scheduled data"
     },
     "form": {
@@ -690,6 +692,10 @@
     "tableAriaLabel": "Purchase orders table",
     "thisComponent": "this component",
     "title": "Purchase Orders",
+    "toggleExternalDelivery": "Toggle External Delivery",
+    "toggleInternalDelivery": "Toggle Internal Delivery",
+    "toggleInternalDeliveryFailed": "Failed to toggle internal delivery",
+    "toggleInternalDeliverySuccess": "Internal delivery toggled successfully",
     "trackingNumber": "Tracking Number",
     "unsavedItem": "Unsaved Item",
     "unsavedItemMessage": "You have an unsaved item in the form. Would you like to add it before saving?",
