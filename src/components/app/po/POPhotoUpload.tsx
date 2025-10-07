@@ -22,7 +22,6 @@ export function POPhotoUpload({ opened, onClose, onUpload }: POPhotoUploadProps)
         // Step 1: Upload to S3
         const { publicUrl, key } = await uploadBase64ToS3(capturedPhoto, {
           fileName: `po-photo-${Date.now()}.jpg`,
-          fileType: 'image/jpeg',
           purpose: 'PURCHASE_ORDER_PHOTO', // Same purpose type for all photos
           prefix: 'purchase-order',
         });

@@ -22,7 +22,6 @@ export function DeliveryPhotoUpload({ opened, onClose, onUpload }: DeliveryPhoto
         // Step 1: Upload to S3
         const { publicUrl, key } = await uploadBase64ToS3(capturedPhoto, {
           fileName: `delivery-photo-${Date.now()}.jpg`,
-          fileType: 'image/jpeg',
           purpose: 'DELIVERY_REQUEST_PHOTO',
           prefix: 'delivery',
         });

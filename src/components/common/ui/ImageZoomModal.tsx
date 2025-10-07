@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { ActionIcon, Group, Image, Modal, Stack } from '@mantine/core';
-import { IconArrowDown, IconArrowLeft, IconArrowRight, IconArrowUp, IconMinus, IconPlus } from '@tabler/icons-react';
+import { IconArrowDown, IconArrowLeft, IconArrowRight, IconArrowUp, IconMinus, IconPlus, IconRotateClockwise } from '@tabler/icons-react';
 import { useDeviceType } from '@/hooks/useDeviceType';
 
 type ImageZoomModalProps = {
@@ -14,6 +14,7 @@ type ImageZoomModalProps = {
 export function ImageZoomModal({ opened, onClose, imageUrl, imageAlt }: ImageZoomModalProps) {
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [rotation, setRotation] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLDivElement>(null);
@@ -24,6 +25,7 @@ export function ImageZoomModal({ opened, onClose, imageUrl, imageAlt }: ImageZoo
     if (!opened) {
       setScale(1);
       setPosition({ x: 0, y: 0 });
+      setRotation(0);
       setIsDragging(false);
     }
   }, [opened]);
@@ -121,6 +123,10 @@ export function ImageZoomModal({ opened, onClose, imageUrl, imageAlt }: ImageZoo
     setPosition((prev) => ({ ...prev, x: prev.x - PAN_STEP }));
   };
 
+  const handleRotate = () => {
+    setRotation((prev) => (prev + 90) % 360);
+  };
+
   return (
     <Modal
       opened={opened}
@@ -146,39 +152,49 @@ export function ImageZoomModal({ opened, onClose, imageUrl, imageAlt }: ImageZoo
         },
       }}
     >
+      {/* Zoom and rotate controls */}
+      <Group
+        gap="xs"
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          right: 20,
+          zIndex: 1000,
+        }}
+      >
+        <ActionIcon
+          size="lg"
+          variant="filled"
+          color="dark"
+          onClick={handleZoomOut}
+          disabled={scale <= 1}
+          aria-label="Zoom out"
+        >
+          <IconMinus size={20} />
+        </ActionIcon>
+        <ActionIcon
+          size="lg"
+          variant="filled"
+          color="dark"
+          onClick={handleZoomIn}
+          disabled={scale >= 5}
+          aria-label="Zoom in"
+        >
+          <IconPlus size={20} />
+        </ActionIcon>
+        <ActionIcon
+          size="lg"
+          variant="filled"
+          color="dark"
+          onClick={handleRotate}
+          aria-label="Rotate image"
+        >
+          <IconRotateClockwise size={20} />
+        </ActionIcon>
+      </Group>
+
       {isMobile && (
         <>
-          {/* Zoom controls */}
-          <Group
-            gap="xs"
-            style={{
-              position: 'absolute',
-              bottom: 20,
-              right: 20,
-              zIndex: 1000,
-            }}
-          >
-            <ActionIcon
-              size="lg"
-              variant="filled"
-              color="dark"
-              onClick={handleZoomOut}
-              disabled={scale <= 1}
-              aria-label="Zoom out"
-            >
-              <IconMinus size={20} />
-            </ActionIcon>
-            <ActionIcon
-              size="lg"
-              variant="filled"
-              color="dark"
-              onClick={handleZoomIn}
-              disabled={scale >= 5}
-              aria-label="Zoom in"
-            >
-              <IconPlus size={20} />
-            </ActionIcon>
-          </Group>
 
           {/* Pan controls - only show when zoomed */}
           {scale > 1 && (
@@ -245,7 +261,7 @@ export function ImageZoomModal({ opened, onClose, imageUrl, imageAlt }: ImageZoo
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         style={{
-          transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+          transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px) rotate(${rotation}deg)`,
           transition: isDragging ? 'none' : 'transform 0.1s ease-out',
           cursor: isMobile ? 'pointer' : scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'pointer',
         }}

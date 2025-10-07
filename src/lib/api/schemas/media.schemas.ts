@@ -3,7 +3,7 @@ import { z } from 'zod/v4';
 // Request schemas
 export const UploadUrlRequestSchema = z.object({
   fileName: z.string(),
-  fileType: z.string(),
+  fileSize: z.number(),
   purpose: z.enum(['DELIVERY_REQUEST_PHOTO', 'PURCHASE_ORDER_PHOTO', 'PURCHASE_ORDER_ATTACHMENT']),
   prefix: z.string().optional(),
 });

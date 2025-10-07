@@ -2,11 +2,10 @@ import { mediaApi } from '@/lib/api';
 import type { UploadUrlRequest } from '@/lib/api/schemas/media.schemas';
 import { logError, logInfo } from '@/utils/logger';
 
-import { isDevelopment } from './env';
+// import { isDevelopment } from './env';
 
 export type MediaUploadOptions = {
   fileName: string;
-  fileType: string;
   purpose: UploadUrlRequest['purpose'];
   prefix?: string;
 };
@@ -56,20 +55,19 @@ export const uploadToS3 = async (
   file: File,
   options: MediaUploadOptions,
 ): Promise<MediaUploadResult> => {
-  if (isDevelopment) {
-    return {
-      publicUrl:
-        'https://ctkper.s3.amazonaws.com/nktu/ACME/2025-10-06/ef43dfb9-6c97-41a3-86cc-964c45189743/purchase-order-attachment/purchase-order/1759738146693-avatar_blue.png',
-      key: '1759383029926-delivery-photo-1759383029879.jpg',
-    };
-  }
+  // if (isDevelopment) {
+  //   return {
+  //     publicUrl:
+  //       'https://ctkper.s3.amazonaws.com/nktu/ACME/2025-10-06/ef43dfb9-6c97-41a3-86cc-964c45189743/purchase-order-attachment/purchase-order/1759738146693-avatar_blue.png',
+  //     key: '1759383029926-delivery-photo-1759383029879.jpg',
+  //   };
+  // }
   try {
     logInfo('Starting S3 upload', {
       module: 'MediaUpload',
       action: 'uploadToS3',
       metadata: {
         fileName: options.fileName,
-        fileType: options.fileType,
         fileSize: file.size,
         purpose: options.purpose,
       },
@@ -78,8 +76,8 @@ export const uploadToS3 = async (
     // Step 1: Get presigned upload URL
     const uploadUrlRequest: UploadUrlRequest = {
       fileName: options.fileName,
-      fileType: options.fileType,
       purpose: options.purpose,
+      fileSize: file.size,
       ...(options.prefix && { prefix: options.prefix }),
     };
 

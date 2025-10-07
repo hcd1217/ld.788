@@ -83,13 +83,10 @@ export const AddressSchema = z.object({
   googleMapsUrl: optionalStringSchema,
 });
 
-// const dummyUrl =
-//   'https://t3.ftcdn.net/jpg/02/17/65/88/360_F_217658823_vVaB79Y6lBL2JRk9eFPBKR6PdwcL8Ett.jpg';
-
 export const S3DataSchema = z.looseObject({
   id: idSchema,
-  // publicUrl: isDevelopment ? stringSchema.transform(() => dummyUrl) : stringSchema,
-  publicUrl: stringSchema,
+  // TODO: remove this transform once we have a proper S3 URL
+  publicUrl: stringSchema.transform((val) => val.replace('undefined', 'NKTU')),
   key: stringSchema,
   caption: optionalStringSchema,
   timestamp: stringSchema,

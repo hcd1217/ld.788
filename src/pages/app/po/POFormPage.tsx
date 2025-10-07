@@ -179,7 +179,6 @@ export function POFormPage({ mode }: POFormPageProps) {
               values.attachments.map((file) =>
                 uploadToS3(file, {
                   fileName: file.name,
-                  fileType: file.type,
                   purpose: 'PURCHASE_ORDER_ATTACHMENT',
                   prefix: 'purchase-order',
                 }),
