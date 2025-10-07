@@ -20,8 +20,9 @@ export function POPhotoUpload({ opened, onClose, onUpload }: POPhotoUploadProps)
     async (capturedPhoto: string) => {
       try {
         // Step 1: Upload to S3
+        const random = Math.random().toString(36).substring(3, 10);
         const { publicUrl, key } = await uploadBase64ToS3(capturedPhoto, {
-          fileName: `po-photo-${Date.now()}.jpg`,
+          fileName: `po-photo-${random}-${Date.now()}.jpg`,
           purpose: 'PURCHASE_ORDER_PHOTO', // Same purpose type for all photos
           prefix: 'purchase-order',
         });

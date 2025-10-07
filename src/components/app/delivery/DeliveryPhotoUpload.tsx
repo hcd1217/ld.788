@@ -20,8 +20,9 @@ export function DeliveryPhotoUpload({ opened, onClose, onUpload }: DeliveryPhoto
     async (capturedPhoto: string) => {
       try {
         // Step 1: Upload to S3
+        const random = Math.random().toString(36).substring(3, 10);
         const { publicUrl, key } = await uploadBase64ToS3(capturedPhoto, {
-          fileName: `delivery-photo-${Date.now()}.jpg`,
+          fileName: `delivery-photo-${random}-${Date.now()}.jpg`,
           purpose: 'DELIVERY_REQUEST_PHOTO',
           prefix: 'delivery',
         });
