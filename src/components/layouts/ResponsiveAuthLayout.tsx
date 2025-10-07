@@ -1,10 +1,9 @@
-import { useMediaQuery } from '@mantine/hooks';
-
 import { AuthLayout } from './AuthLayout';
 import { AuthLayoutMobile } from './AuthLayoutMobile';
+import { useDeviceType } from '@/hooks/useDeviceType';
 
 export function ResponsiveAuthLayout() {
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const { isMobile } = useDeviceType();
 
   return isMobile ? <AuthLayoutMobile /> : <AuthLayout />;
 }
