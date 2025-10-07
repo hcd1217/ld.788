@@ -18,6 +18,7 @@ export type POFormValues = {
   shippingAddress?: Address;
   notes?: string;
   attachments?: File[];
+  poTags?: string[];
 };
 
 type UsePOFormOptions = {
@@ -36,6 +37,7 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
       isUrgentPO: false,
       customerPONumber: '',
       orderDate: new Date(new Date().setHours(0, 0, 0, 1)),
+      poTags: [],
     }),
     [],
   );
@@ -63,6 +65,7 @@ export function usePOForm({ isEditMode }: UsePOFormOptions) {
       personalCustomerName: values.personalCustomerName,
       isUrgentPO: values.isUrgentPO ?? false,
       customerPONumber: values.customerPONumber,
+      poTags: values.poTags,
     };
 
     if (!isEditMode) {

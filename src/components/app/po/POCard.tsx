@@ -12,6 +12,7 @@ import { formatDate } from '@/utils/time';
 import { POCustomer } from './POCustomer';
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
+import { POTags } from './POTags';
 import { POUrgentBadge } from './POUrgentBadge';
 
 type POCardProps = {
@@ -92,6 +93,8 @@ export function POCard({ purchaseOrder, style, className }: POCardProps) {
               {formatDate(purchaseOrder.orderDate)}
             </Text>
           </Group>
+
+          <POTags tags={purchaseOrder.poTags} />
         </Box>
         <Group gap="xs">
           <POUrgentBadge isUrgentPO={purchaseOrder.isUrgentPO} />

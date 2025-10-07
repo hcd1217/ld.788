@@ -6,6 +6,7 @@ import {
   dictionarySchema,
   idSchema,
   optionalBooleanSchema,
+  stringSchema,
 } from './common.schemas';
 import {
   DEFAULT_MOBILE_NAVIGATION_CONFIG,
@@ -41,6 +42,7 @@ export const ClientConfigSchema = z.object({
       purchaseOrder: z
         .object({
           assigneeIds: z.array(idSchema),
+          tags: z.array(stringSchema),
         })
         .partial(),
       employee: z

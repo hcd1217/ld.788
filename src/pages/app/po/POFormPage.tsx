@@ -81,6 +81,7 @@ export function POFormPage({ mode }: POFormPageProps) {
         isInternalDelivery: copyData.isInternalDelivery,
         isPersonalCustomer: copyData.isPersonalCustomer,
         personalCustomerName: copyData.personalCustomerName,
+        poTags: copyData.poTags || [],
         // Don't copy dates, customerPONumber - use fresh dates for new PO
         customerPONumber: initialValues.customerPONumber || '',
         orderDate: initialValues.orderDate,
@@ -133,6 +134,7 @@ export function POFormPage({ mode }: POFormPageProps) {
         personalCustomerName: po.personalCustomerName || '',
         isUrgentPO: po.isUrgentPO ?? false,
         customerPONumber: po.customerPONumber || '',
+        poTags: po.poTags || [],
       });
     } catch (error) {
       logError('Failed to load PO:', error, {
@@ -201,6 +203,7 @@ export function POFormPage({ mode }: POFormPageProps) {
         personalCustomerName: values.personalCustomerName,
         isUrgentPO: values.isUrgentPO,
         customerPONumber: values.customerPONumber,
+        poTags: values.poTags,
         photos: uploadedAttachments.map(({ publicUrl, key }) => ({
           publicUrl,
           key,
@@ -214,12 +217,13 @@ export function POFormPage({ mode }: POFormPageProps) {
         const newPO = {
           ...poData,
           status: 'NEW' as const,
-          orderDate: poData.orderDate || new Date(),
+          orderDate: new Date(),
           isInternalDelivery: poData.isInternalDelivery,
           isPersonalCustomer: poData.isPersonalCustomer,
           personalCustomerName: poData.personalCustomerName,
           isUrgentPO: poData.isUrgentPO,
           customerPONumber: poData.customerPONumber,
+          poTags: poData.poTags,
         };
         await createPurchaseOrder(newPO);
       }

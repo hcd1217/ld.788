@@ -241,6 +241,7 @@ export const purchaseOrderService = {
         isPersonalCustomer: data.isPersonalCustomer,
         personalCustomerName: data.personalCustomerName,
         isUrgentPO: data.isUrgentPO,
+        poTags: data.poTags,
         notes: data.notes,
         shippingAddress: {
           oneLineAddress: data.address,
@@ -287,6 +288,7 @@ export const purchaseOrderService = {
         personalCustomerName: data.personalCustomerName,
         customerPONumber: data.customerPONumber,
         isUrgentPO: data.isUrgentPO,
+        poTags: data.poTags,
         notes: data.notes,
         shippingAddress: {
           oneLineAddress: data.address,

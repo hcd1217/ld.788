@@ -320,6 +320,7 @@ export const usePOStore = create<POState>()(
             isInternalDelivery: poData.isInternalDelivery,
             isUrgentPO: poData.isUrgentPO,
             customerPONumber: poData.customerPONumber,
+            poTags: poData.poTags,
             address: poData.address,
             googleMapsUrl: poData.googleMapsUrl,
             notes: poData.notes,

@@ -9,6 +9,14 @@ import { isDevelopment } from '@/utils/env';
 import { logError } from '@/utils/logger';
 import { showSuccessNotification } from '@/utils/notifications';
 
+let LATEST_VERSION: {
+  version: string;
+  build: string;
+  timestamp: number;
+  env: string;
+  updateAt: number;
+} | null = null;
+
 // Browser detection utilities
 const isChromium = () => {
   const ua = navigator.userAgent.toLowerCase();
@@ -307,6 +315,10 @@ export function usePWA() {
 
 // Fetch version from version.json with retry logic
 async function fetchVersionWithRetry(retries = 3): Promise<string | null> {
+  const updateAt = LATEST_VERSION?.updateAt ?? 0;
+  if (updateAt > Date.now() - 60e3) {
+    return LATEST_VERSION?.build ?? null;
+  }
   for (let i = 0; i < retries; i++) {
     try {
       // Fetch with cache-busting query parameter and no-cache headers
@@ -322,6 +334,10 @@ async function fetchVersionWithRetry(retries = 3): Promise<string | null> {
       }
 
       const versionData = await response.json();
+      LATEST_VERSION = {
+        ...versionData,
+        updateAt: Date.now(),
+      };
       return versionData.build;
     } catch (error) {
       console.error(`Failed to fetch version (attempt ${i + 1}/${retries}):`, error);

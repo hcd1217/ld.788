@@ -11,6 +11,7 @@ import { formatDate } from '@/utils/time';
 
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
+import { POTags } from './POTags';
 import { POUrgentBadge } from './POUrgentBadge';
 
 type PODataTableProps = {
@@ -111,7 +112,7 @@ function PODataTableComponent({
             <Table.Th>{t('po.orderDate')}</Table.Th>
             <Table.Th>{t('po.deliveryDate')}</Table.Th>
             <Table.Th>{t('po.items')}</Table.Th>
-            <Table.Th>{t('po.poStatus')}</Table.Th>
+            <Table.Th w="150px">{t('po.poStatus')}</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -167,11 +168,12 @@ function PODataTableComponent({
                   </Text>
                 </Table.Td>
                 <Table.Td>
-                  <Group gap="xs" m={0}>
+                  <Group gap="xs" m={0} mb="xs" justify="space-between">
                     <POStatusBadge status={po.status} />
                     <PODeliveryBadge isInternalDelivery={po.isInternalDelivery} />
                     <POUrgentBadge isUrgentPO={po.isUrgentPO} />
                   </Group>
+                  <POTags tags={po.poTags} size="xs" />
                 </Table.Td>
               </Table.Tr>
             );

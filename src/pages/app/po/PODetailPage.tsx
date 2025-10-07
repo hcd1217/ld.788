@@ -121,6 +121,7 @@ export function PODetailPage() {
             isUrgentPO: purchaseOrder.isUrgentPO,
             isInternalDelivery: purchaseOrder.isInternalDelivery,
             customerPONumber: purchaseOrder.customerPONumber,
+            poTags: purchaseOrder.poTags,
             isPersonalCustomer: purchaseOrder.isPersonalCustomer,
             personalCustomerName: purchaseOrder.personalCustomerName,
           },

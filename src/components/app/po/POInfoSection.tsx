@@ -7,6 +7,7 @@ import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { POCustomer } from './POCustomer';
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
+import { POTags } from './POTags';
 import { POUrgentBadge } from './POUrgentBadge';
 
 type POInfoSectionProps = {
@@ -35,6 +36,10 @@ export function POInfoSection({ purchaseOrder, onNavigateToItemsList }: POInfoSe
               <PODeliveryBadge isInternalDelivery={purchaseOrder.isInternalDelivery} size="md" />
               <POUrgentBadge isUrgentPO={purchaseOrder.isUrgentPO} size="md" />
             </Group>
+          </div>
+
+          <div>
+            <POTags tags={purchaseOrder.poTags} size="sm" />
           </div>
 
           <div>
@@ -80,7 +85,7 @@ export function POInfoSection({ purchaseOrder, onNavigateToItemsList }: POInfoSe
             <Text size="sm" fw={500} c="dimmed">
               {t('po.customerPONumber')}
             </Text>
-            <Text fw={500}>{purchaseOrder.customerPONumber}</Text>
+            <Text fw={500}>{purchaseOrder.customerPONumber || '-'}</Text>
           </div>
         </Stack>
       </Grid.Col>

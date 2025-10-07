@@ -12,6 +12,7 @@ import { POCustomer } from './POCustomer';
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
 import { POUrgentBadge } from './POUrgentBadge';
+import { POTags } from './POTags';
 
 type POGridCardProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -112,6 +113,7 @@ export function POGridCard({ purchaseOrder }: POGridCardProps) {
             <POStatusBadge status={purchaseOrder.status} />
             <PODeliveryBadge isInternalDelivery={purchaseOrder.isInternalDelivery} />
             <POUrgentBadge isUrgentPO={purchaseOrder.isUrgentPO} />
+            <POTags tags={purchaseOrder.poTags} size="xs" />
           </Stack>
         </Group>
       </Stack>

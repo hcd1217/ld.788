@@ -30,6 +30,7 @@ const POUpsertMetadataSchema = z.object({
   isPersonalCustomer: optionalBooleanSchema,
   personalCustomerName: optionalStringSchema,
   attachments: z.array(UploadPhotoSchema),
+  poTags: z.array(stringSchema).optional(),
 });
 
 // PO Item schemas
@@ -97,6 +98,7 @@ export const PurchaseOrderSchema = z.object({
   isUrgentPO: optionalBooleanSchema,
   isPersonalCustomer: optionalBooleanSchema,
   personalCustomerName: optionalStringSchema,
+  poTags: z.array(stringSchema).optional(),
   customerPONumber: optionalStringSchema,
   attachments: z.array(UploadPhotoSchema).optional(),
   completedDate: optionalTimestampSchema,

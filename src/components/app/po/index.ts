@@ -4,6 +4,7 @@ export { POGridCard } from './POGridCard';
 export { POStatusBadge } from './POStatusBadge';
 export { PODeliveryBadge } from './PODeliveryBadge';
 export { POUrgentBadge } from './POUrgentBadge';
+export { POTags } from './POTags';
 export { PONumber } from './PONumber';
 export { POListSkeleton } from './POListSkeleton';
 export { POForm } from './POForm';

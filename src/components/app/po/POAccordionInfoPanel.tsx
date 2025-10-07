@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useNavigate } from 'react-router';
 
-import { Anchor, Button, Grid, Group, Stack, Text } from '@mantine/core';
+import { Anchor, Box, Button, Grid, Group, Stack, Text } from '@mantine/core';
 import { IconEdit, IconTruckDelivery, IconUser } from '@tabler/icons-react';
 
 import { InfoField } from '@/components/common';
@@ -28,6 +28,7 @@ import { POCustomer } from './POCustomer';
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
 import { POUrgentBadge } from './POUrgentBadge';
+import { POTags } from './POTags';
 
 type POAccordionInfoPanelProps = {
   readonly purchaseOrder: PurchaseOrder;
@@ -62,7 +63,8 @@ export function POAccordionInfoPanel({
 
   return (
     <Stack gap="md">
-      <Grid>
+      <POTags tags={purchaseOrder.poTags} size="sm" />
+      <Grid style={{ position: 'relative' }}>
         <Grid.Col span={6}>
           <InfoField
             label={t('po.poNumber')}
@@ -76,24 +78,9 @@ export function POAccordionInfoPanel({
           </Text>
           <Group gap="xs">
             <POStatusBadge status={purchaseOrder.status} size="sm" />
-            <PODeliveryBadge isInternalDelivery={purchaseOrder.isInternalDelivery} />
+            <PODeliveryBadge isInternalDelivery={!purchaseOrder.isInternalDelivery} />
             <POUrgentBadge isUrgentPO={purchaseOrder.isUrgentPO} />
           </Group>
-
-          {isEditable && (
-            <Button
-              key="edit"
-              variant="light"
-              size="xs"
-              ml="xs"
-              loading={isLoading}
-              disabled={!canEdit}
-              leftSection={<IconEdit size={14} />}
-              onClick={onEdit}
-            >
-              {t('common.edit')}
-            </Button>
-          )}
         </Grid.Col>
         <Grid.Col span={6}>
           <InfoField
@@ -134,6 +121,24 @@ export function POAccordionInfoPanel({
             value={formatDateTime(purchaseOrder.completedDate)}
           />
         </Grid.Col>
+
+        <Box style={{ position: 'absolute', right: 0, bottom: 0 }}>
+          {isEditable && (
+            <Button
+              key="edit"
+              variant="light"
+              size="xs"
+              ml="xs"
+              w="fit-content"
+              loading={isLoading}
+              disabled={!canEdit}
+              leftSection={<IconEdit size={14} />}
+              onClick={onEdit}
+            >
+              {t('common.edit')}
+            </Button>
+          )}
+        </Box>
       </Grid>
 
       <InfoField

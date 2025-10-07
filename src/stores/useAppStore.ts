@@ -394,6 +394,20 @@ export const usePermissions = () =>
 export const useClientConfig = () =>
   useAppStore((state) => state.user?.clientConfig ?? EMPTY_CLIENT_CONFIG);
 
+// Stable empty array for PO tags to avoid infinite re-renders
+const EMPTY_PO_TAGS_ARRAY: readonly string[] = [];
+
+// PO Tags selector - use stable empty array reference
+export const usePOTags = () => {
+  const tags = useAppStore((state) => state.user?.clientConfig?.features?.purchaseOrder?.tags);
+
+  // Use useMemo to create stable reference (as per CLAUDE.md line 52)
+  return React.useMemo(() => {
+    if (!tags || tags.length === 0) return EMPTY_PO_TAGS_ARRAY;
+    return tags;
+  }, [tags]);
+};
+
 // Current logged in user
 export const useMe = () => useAppStore((state) => state.user);
 
