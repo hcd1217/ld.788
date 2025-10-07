@@ -27,8 +27,8 @@ import { POAttachmentsSection } from './POAttachmentsSection';
 import { POCustomer } from './POCustomer';
 import { PODeliveryBadge } from './PODeliveryBadge';
 import { POStatusBadge } from './POStatusBadge';
-import { POUrgentBadge } from './POUrgentBadge';
 import { POTags } from './POTags';
+import { POUrgentBadge } from './POUrgentBadge';
 
 type POAccordionInfoPanelProps = {
   readonly purchaseOrder: PurchaseOrder;

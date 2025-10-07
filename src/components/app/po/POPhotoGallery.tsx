@@ -1,19 +1,9 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-import {
-  ActionIcon,
-  Box,
-  Divider,
-  Grid,
-  Image,
-  Modal,
-  ScrollArea,
-  Stack,
-  Text,
-} from '@mantine/core';
+import { ActionIcon, Box, Divider, Grid, Image, ScrollArea, Stack, Text } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 
+import { ImageZoomModal } from '@/components/common/ui/ImageZoomModal';
 import { useTranslation } from '@/hooks/useTranslation';
 import { confirmAction } from '@/utils/modals';
 
@@ -157,45 +147,12 @@ export function POPhotoGallery({
       {wrappedContent}
 
       {/* Photo Modal for enlarged view */}
-      <Modal
+      <ImageZoomModal
         opened={selectedPhoto !== null}
         onClose={() => setSelectedPhoto(null)}
-        size="xl"
-        centered
-        withCloseButton={false}
-        padding={0}
-        styles={{
-          body: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'rgba(77, 77, 77, 0.95)',
-            padding: '2px',
-          },
-          content: {
-            backgroundColor: 'transparent',
-            maxHeight: '95vh',
-            maxWidth: '95vw',
-          },
-        }}
-      >
-        {selectedPhoto && (
-          <Image
-            src={selectedPhoto.url}
-            alt={`${selectedPhoto.type === 'po' ? 'PO' : 'Delivery'} photo`}
-            fit="contain"
-            onClick={() => setSelectedPhoto(null)}
-            style={{
-              cursor: 'pointer',
-              maxHeight: '90vh',
-              maxWidth: '90vw',
-              width: 'auto',
-              height: 'auto',
-            }}
-            fallbackSrc="/photos/no-photo.svg"
-          />
-        )}
-      </Modal>
+        imageUrl={selectedPhoto?.url ?? ''}
+        imageAlt={`${selectedPhoto?.type === 'po' ? 'PO' : 'Delivery'} photo`}
+      />
     </>
   );
 }
