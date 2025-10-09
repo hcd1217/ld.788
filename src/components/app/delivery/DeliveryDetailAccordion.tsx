@@ -61,7 +61,8 @@ export function DeliveryDetailAccordion({
   const { canStartTransitBased, canCompleteBased, canTakePhotoBased } = useMemo(() => {
     const canStartTransitBased = deliveryRequest.status === 'PENDING';
     const canCompleteBased = deliveryRequest.status === 'IN_TRANSIT';
-    const canTakePhotoBased = deliveryRequest.status !== 'PENDING';
+    const canTakePhotoBased =
+      deliveryRequest.status !== 'PENDING' && deliveryRequest.status !== 'DRAFT';
     return {
       canStartTransitBased,
       canCompleteBased,

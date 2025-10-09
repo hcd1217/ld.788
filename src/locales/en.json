@@ -32,6 +32,10 @@
     "password": "Password",
     "signIn": "Sign in"
   },
+  "chat": {
+    "noMessages": "No messages yet. Start the conversation!",
+    "typeMessage": "Type a message..."
+  },
   "common": {
     "actions": "Actions",
     "activate": "Activate",
@@ -119,6 +123,7 @@
     "gridView": "Grid",
     "import": "Import",
     "importResults": "Import Results",
+    "information": "Information",
     "invalidFormData": "Invalid form data",
     "loadingFailed": "Failed to load data",
     "loadingMore": "Loading more...",
@@ -321,6 +326,7 @@
     "status": "Status",
     "statuses": {
       "completed": "Completed",
+      "draft": "Draft",
       "inTransit": "In Transit",
       "pending": "Pending"
     },

@@ -4,6 +4,7 @@ export const DELIVERY_STATUS = {
   ALL: 'ALL',
   PENDING: 'PENDING',
   IN_TRANSIT: 'IN_TRANSIT',
+  DRAFT: 'DRAFT',
   COMPLETED: 'COMPLETED',
 } as const;
 
@@ -20,6 +21,7 @@ export type DeliveryActionType = (typeof DELIVERY_ACTIONS)[keyof typeof DELIVERY
 // Status colors for UI (including ALL for filter UI)
 export const DELIVERY_STATUS_COLORS: Record<DeliveryStatusType, string> = {
   [DELIVERY_STATUS.ALL]: 'gray',
+  [DELIVERY_STATUS.DRAFT]: 'gray',
   [DELIVERY_STATUS.PENDING]: 'blue',
   [DELIVERY_STATUS.IN_TRANSIT]: 'orange',
   [DELIVERY_STATUS.COMPLETED]: 'green',
@@ -27,6 +29,7 @@ export const DELIVERY_STATUS_COLORS: Record<DeliveryStatusType, string> = {
 
 // Status labels for display
 export const DELIVERY_STATUS_LABELS: Record<DeliveryStatus, string> = {
+  [DELIVERY_STATUS.DRAFT]: 'delivery.statuses.draft',
   [DELIVERY_STATUS.PENDING]: 'delivery.statuses.pending',
   [DELIVERY_STATUS.IN_TRANSIT]: 'delivery.statuses.inTransit',
   [DELIVERY_STATUS.COMPLETED]: 'delivery.statuses.completed',

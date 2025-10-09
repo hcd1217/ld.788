@@ -217,6 +217,19 @@ export function usePOActions({
       }
 
       case 'PROCESSING': {
+        if (purchaseOrder.isInternalDelivery && !purchaseOrder.deliveryRequest) {
+          actions.push({
+            key: 'create-delivery',
+            action: 'createDelivery',
+            color: 'blue',
+            variant: 'filled',
+            icon: IconClipboardList,
+            translationKey: 'po.createDeliveryRequest',
+            onClick: callbacks.onCreateDelivery ?? (() => {}),
+            isDisabled: !canShip,
+            showCondition: true,
+          });
+        }
         actions.push(createToggleInternalDeliveryAction(), {
           key: 'markReady',
           action: 'markReady',

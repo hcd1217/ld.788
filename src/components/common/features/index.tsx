@@ -1,3 +1,4 @@
+export { ChatPanel } from './ChatPanel';
 export { ColorSchemeToggle } from './ColorSchemeToggle';
 export { LanguageSwitcher } from './LanguageSwitcher';
 export { OrientationNotice } from './OrientationNotice';

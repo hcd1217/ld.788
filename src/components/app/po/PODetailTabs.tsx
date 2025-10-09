@@ -14,7 +14,7 @@ import {
   IconTruck,
 } from '@tabler/icons-react';
 
-import { ComingSoonCard, Tabs } from '@/components/common';
+import { ChatPanel, ComingSoonCard, Tabs } from '@/components/common';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { PurchaseOrder } from '@/services/sales/purchaseOrder';
 import { usePermissions } from '@/stores/useAppStore';
@@ -124,9 +124,9 @@ export function PODetailTabs({
           <Tabs.Tab value="timeline" leftSection={<IconTruck size={16} />}>
             {t('po.orderTimeline')}
           </Tabs.Tab>
-          <Tabs.Tab value="documents" leftSection={<IconFileInvoice size={16} />}>
+          {/* <Tabs.Tab value="documents" leftSection={<IconFileInvoice size={16} />}>
             {t('po.documents')}
-          </Tabs.Tab>
+          </Tabs.Tab> */}
           <Tabs.Tab value="communication" leftSection={<IconMessage size={16} />}>
             {t('po.communicationLog')}
           </Tabs.Tab>
@@ -209,10 +209,7 @@ export function PODetailTabs({
       </Tabs.Panel>
 
       <Tabs.Panel value="communication" pt="xl">
-        <ComingSoonCard
-          icon={<IconMessage size={48} color="var(--mantine-color-gray-5)" />}
-          title={t('po.communicationLogComingSoon')}
-        />
+        <ChatPanel targetId={purchaseOrder.id} type="PO" />
       </Tabs.Panel>
     </Tabs>
   );

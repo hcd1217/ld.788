@@ -1,15 +1,16 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router';
 
-import { Button, Group, LoadingOverlay, Modal, Stack, Text } from '@mantine/core';
+import { Button, Group, LoadingOverlay, Modal, ScrollArea, Stack, Text } from '@mantine/core';
+import { IconInfoCircle, IconMessage } from '@tabler/icons-react';
 
 import { DeliveryDetailAccordion } from '@/components/app/delivery/DeliveryDetailAccordion';
 import { DeliveryDetailTabs } from '@/components/app/delivery/DeliveryDetailTabs';
 import { DeliveryPhotoUpload } from '@/components/app/delivery/DeliveryPhotoUpload';
 import { DeliveryStatusDrawer } from '@/components/app/delivery/DeliveryStatusDrawer';
 import { DeliveryUpdateModal } from '@/components/app/delivery/DeliveryUpdateModal';
-import { AppDesktopLayout, AppMobileLayout } from '@/components/common';
+import { AppDesktopLayout, AppMobileLayout, ChatPanel, Tabs } from '@/components/common';
 import { AppPageTitle } from '@/components/common';
 import { PermissionDeniedPage } from '@/components/common/layouts/PermissionDeniedPage';
 import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
@@ -72,6 +73,9 @@ export function DeliveryDetailPage() {
 
   // Modal management
   const { modals, openModal, closeModal } = useDeliveryModals();
+
+  // Mobile tabs state
+  const [mobileTabValue, setMobileTabValue] = useState<'info' | 'communication'>('info');
 
   // Load delivery request on mount
   useEffect(() => {
@@ -254,15 +258,38 @@ export function DeliveryDetailPage() {
         ) : (
           <>
             <Stack gap="md">
-              <DeliveryDetailAccordion
-                deliveryRequest={deliveryRequest}
-                isLoading={isLoading}
-                onComplete={handleOpenModal('complete')}
-                onTakePhoto={handleOpenModal('uploadPhotos')}
-                onUpdate={handleOpenModal('update')}
-                onStartTransit={handleOpenModal('startTransit')}
-                onDelete={handleOpenModal('delete')}
-              />
+              <Tabs
+                defaultValue="info"
+                value={mobileTabValue}
+                onChange={(value) => setMobileTabValue(value as 'info' | 'communication')}
+              >
+                <ScrollArea offsetScrollbars scrollbarSize={4}>
+                  <Tabs.List>
+                    <Tabs.Tab value="info" leftSection={<IconInfoCircle size={16} />}>
+                      {t('delivery.deliveryInfo')}
+                    </Tabs.Tab>
+                    <Tabs.Tab value="communication" leftSection={<IconMessage size={16} />}>
+                      {t('po.communicationLog')}
+                    </Tabs.Tab>
+                  </Tabs.List>
+                </ScrollArea>
+
+                <Tabs.Panel value="info" pt="md">
+                  <DeliveryDetailAccordion
+                    deliveryRequest={deliveryRequest}
+                    isLoading={isLoading}
+                    onComplete={handleOpenModal('complete')}
+                    onTakePhoto={handleOpenModal('uploadPhotos')}
+                    onUpdate={handleOpenModal('update')}
+                    onStartTransit={handleOpenModal('startTransit')}
+                    onDelete={handleOpenModal('delete')}
+                  />
+                </Tabs.Panel>
+
+                <Tabs.Panel value="communication" pt="md">
+                  <ChatPanel targetId={deliveryRequest.id} type="DR" />
+                </Tabs.Panel>
+              </Tabs>
             </Stack>
 
             {/* Modal components */}

@@ -25,6 +25,7 @@ export {
   type BulkImportModalContentProps,
 } from './ui';
 export {
+  ChatPanel,
   ColorSchemeToggle,
   LanguageSwitcher,
   OrientationNotice,

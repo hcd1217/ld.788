@@ -36,6 +36,7 @@ export function DeliveryStatusFilterDrawer({
   }, [opened, selectedStatuses]);
 
   const statusOptions = [
+    { value: DELIVERY_STATUS.DRAFT, label: t('delivery.statuses.draft') },
     { value: DELIVERY_STATUS.PENDING, label: t('delivery.statuses.pending') },
     { value: DELIVERY_STATUS.IN_TRANSIT, label: t('delivery.statuses.inTransit') },
     { value: DELIVERY_STATUS.COMPLETED, label: t('delivery.statuses.completed') },

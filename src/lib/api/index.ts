@@ -1,4 +1,5 @@
 import { AuthApi } from './services/auth.service';
+import { ChatApi } from './services/chat.service';
 import { ClientApi } from './services/client.service';
 import { DeliveryRequestApi } from './services/deliveryRequest.service';
 import { HrApi } from './services/hr.service';
@@ -43,6 +44,10 @@ export const mediaApi = new MediaApi({
   baseURL: API_BASE_URL,
 });
 
+export const chatApi = new ChatApi({
+  baseURL: API_BASE_URL,
+});
+
 // Export types and schemas
 export * from './schemas';
 
@@ -55,5 +60,6 @@ export { SalesApi } from './services/sales.service';
 export { OverviewApi } from './services/overview.service';
 export { DeliveryRequestApi } from './services/deliveryRequest.service';
 export { MediaApi } from './services/media.service';
+export { ChatApi } from './services/chat.service';
 
 export { ApiError } from './base';

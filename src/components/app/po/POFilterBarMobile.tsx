@@ -10,6 +10,7 @@ import { canFilterPurchaseOrder } from '@/utils/permission.utils';
 
 interface POFilterBarMobileProps {
   readonly searchQuery: string;
+  readonly customerId?: string;
   readonly salesId?: string;
   readonly selectedStatuses: string[];
   readonly hasOrderDateFilter: boolean;
@@ -23,6 +24,7 @@ interface POFilterBarMobileProps {
 
 export function POFilterBarMobile({
   searchQuery,
+  customerId,
   salesId,
   selectedStatuses,
   hasOrderDateFilter,
@@ -51,6 +53,7 @@ export function POFilterBarMobile({
 
   const getAdvancedFiltersLabel = useCallback(() => {
     let count = 0;
+    if (customerId) count++;
     if (salesId) count++;
     if (hasOrderDateFilter) count++;
     if (hasDeliveryDateFilter) count++;
@@ -59,7 +62,7 @@ export function POFilterBarMobile({
       return t('po.moreFilters');
     }
     return `${t('po.moreFilters')} (${count})`;
-  }, [salesId, hasOrderDateFilter, hasDeliveryDateFilter, t]);
+  }, [customerId, salesId, hasOrderDateFilter, hasDeliveryDateFilter, t]);
 
   if (!canFilterPurchaseOrder(permissions)) {
     return null;
@@ -88,7 +91,11 @@ export function POFilterBarMobile({
 
         <Button
           size="xs"
-          variant={salesId || hasOrderDateFilter || hasDeliveryDateFilter ? 'filled' : 'light'}
+          variant={
+            customerId || salesId || hasOrderDateFilter || hasDeliveryDateFilter
+              ? 'filled'
+              : 'light'
+          }
           rightSection={<IconChevronDown size={16} />}
           onClick={onAdvancedFiltersClick}
           style={{ flex: 1 }}

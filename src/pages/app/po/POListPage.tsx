@@ -308,6 +308,7 @@ export function POListPage() {
           {/* Mobile Filter Bar */}
           <POFilterBarMobile
             searchQuery={filters.searchQuery}
+            customerId={filters.customerId}
             salesId={filters.salesId}
             selectedStatuses={filters.statuses}
             hasOrderDateFilter={hasOrderDateFilter}
@@ -335,12 +336,14 @@ export function POListPage() {
           {/* Advanced Filters Drawer */}
           <POAdvancedFiltersDrawer
             opened={advancedFiltersDrawerOpened}
+            customerId={filters.customerId}
             salesId={filters.salesId}
             orderDateStart={filters.orderDateRange.start}
             orderDateEnd={filters.orderDateRange.end}
             deliveryDateStart={filters.deliveryDateRange.start}
             deliveryDateEnd={filters.deliveryDateRange.end}
             onClose={closeAdvancedFiltersDrawer}
+            onCustomerChange={filterHandlers.setCustomerId}
             onSalesIdChange={filterHandlers.setSalesId}
             onOrderDateRangeSelect={filterHandlers.setOrderDateRange}
             onDeliveryDateRangeSelect={filterHandlers.setDeliveryDateRange}

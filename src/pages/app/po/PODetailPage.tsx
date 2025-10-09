@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router';
 
-import { Affix, Button, Group, LoadingOverlay, Stack } from '@mantine/core';
-import { IconCamera, IconCopy, IconEdit } from '@tabler/icons-react';
+import { Affix, Button, Group, LoadingOverlay, ScrollArea, Stack } from '@mantine/core';
+import { IconCamera, IconCopy, IconEdit, IconInfoCircle, IconMessage } from '@tabler/icons-react';
 
 import {
   DeliveryRequestModal,
@@ -14,7 +14,8 @@ import {
   POPhotoUpload,
   POStatusModal,
 } from '@/components/app/po';
-import { AppPageTitle, PermissionDeniedPage } from '@/components/common';
+import { ChatPanel } from '@/components/common';
+import { AppPageTitle, PermissionDeniedPage, Tabs } from '@/components/common';
 import { AppDesktopLayout, AppMobileLayout } from '@/components/common';
 import { ResourceNotFound } from '@/components/common/layouts/ResourceNotFound';
 import { getPOEditRoute, ROUTERS } from '@/config/routeConfig';
@@ -78,6 +79,9 @@ export function PODetailPage() {
 
   // Delivery modal state
   const [deliveryModalOpened, setDeliveryModalOpened] = useState(false);
+
+  // Mobile tabs state
+  const [mobileTabValue, setMobileTabValue] = useState<'info' | 'communication'>('info');
 
   // Memoized modal close handler
   const handleCloseModal = useCallback(
@@ -590,54 +594,76 @@ export function PODetailPage() {
         header={<AppPageTitle title={title} />}
       >
         <Stack gap="md" style={{ position: 'relative' }} h="100%">
-          <PODetailAccordion
-            purchaseOrder={purchaseOrder}
-            isLoading={isLoading}
-            onEdit={handleEdit}
-            onConfirm={handleConfirm}
-            onProcess={handleProcess}
-            onMarkReady={handleMarkReady}
-            onShip={handleShip}
-            onDeliver={handleDeliver}
-            onCancel={handleCancel}
-            onRefund={handleRefund}
-            onDelete={handleDelete}
-            onCreateDelivery={handleCreateDelivery}
-          />
-          {!modals.uploadPhotosModalOpened && (
-            <Affix w="100%" position={{ bottom: 0 }} m="0" bg="white">
-              <Group justify="end" m="sm">
-                {canTakePhoto && (
-                  <Button
-                    leftSection={<IconCamera size={16} />}
-                    variant="outline"
-                    size="xs"
-                    onClick={handleTakePhoto}
-                    disabled={isLoading}
-                  >
-                    {t('common.photos.takePhoto')}
-                  </Button>
-                )}
-                {canCopy && (
-                  <Button
-                    key="copy"
-                    variant="filled"
-                    color="orange"
-                    size="xs"
-                    m={1}
-                    loading={isLoading}
-                    disabled={!canCopy}
-                    leftSection={<IconCopy size={14} />}
-                    onClick={handleCopy}
-                  >
-                    {t('common.copy')}
-                  </Button>
-                )}
-              </Group>
-            </Affix>
-          )}
+          <Tabs
+            defaultValue="info"
+            value={mobileTabValue}
+            onChange={(value) => setMobileTabValue(value as 'info' | 'communication')}
+          >
+            <ScrollArea offsetScrollbars scrollbarSize={4}>
+              <Tabs.List>
+                <Tabs.Tab value="info" leftSection={<IconInfoCircle size={16} />}>
+                  {t('common.information')}
+                </Tabs.Tab>
+                <Tabs.Tab value="communication" leftSection={<IconMessage size={16} />}>
+                  {t('po.communicationLog')}
+                </Tabs.Tab>
+              </Tabs.List>
+            </ScrollArea>
+
+            <Tabs.Panel value="info" pt="md">
+              <PODetailAccordion
+                purchaseOrder={purchaseOrder}
+                isLoading={isLoading}
+                onEdit={handleEdit}
+                onConfirm={handleConfirm}
+                onProcess={handleProcess}
+                onMarkReady={handleMarkReady}
+                onShip={handleShip}
+                onDeliver={handleDeliver}
+                onCancel={handleCancel}
+                onRefund={handleRefund}
+                onDelete={handleDelete}
+                onCreateDelivery={handleCreateDelivery}
+              />
+            </Tabs.Panel>
+
+            <Tabs.Panel value="communication" pt="md">
+              <ChatPanel targetId={purchaseOrder.id} type="PO" />
+            </Tabs.Panel>
+          </Tabs>
         </Stack>
-        {modalComponents}
+        {!modals.uploadPhotosModalOpened && mobileTabValue === 'info' && (
+          <Affix w="100%" position={{ bottom: 0 }} m="0" bg="white">
+            <Group justify="end" m="sm">
+              {canTakePhoto && (
+                <Button
+                  leftSection={<IconCamera size={16} />}
+                  variant="outline"
+                  size="xs"
+                  onClick={handleTakePhoto}
+                  disabled={isLoading}
+                >
+                  {t('common.photos.takePhoto')}
+                </Button>
+              )}
+              {canCopy && (
+                <Button
+                  key="copy"
+                  variant="filled"
+                  color="orange"
+                  size="xs"
+                  m={1}
+                  loading={isLoading}
+                  disabled={!canCopy}
+                  leftSection={<IconCopy size={14} />}
+                  onClick={handleCopy}
+                >
+                  {t('common.copy')}
+                </Button>
+              )}
+            </Group>
+          </Affix>
+        )}
       </AppMobileLayout>
     );
   }

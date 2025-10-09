@@ -32,6 +32,10 @@
     "password": "Mật khẩu",
     "signIn": "Đăng nhập"
   },
+  "chat": {
+    "noMessages": "Chưa có tin nhắn. Bắt đầu cuộc trò chuyện!",
+    "typeMessage": "Nhập tin nhắn..."
+  },
   "common": {
     "actions": "",
     "activate": "Kích Hoạt",
@@ -119,6 +123,7 @@
     "gridView": "Xem Dạng Lưới",
     "import": "Nhập",
     "importResults": "Kết Quả Nhập",
+    "information": "Thông Tin",
     "invalidFormData": "Dữ liệu không hợp lệ",
     "loadingFailed": "Không thể tải dữ liệu",
     "loadingMore": "Đang tải thêm...",
@@ -321,6 +326,7 @@
     "status": "Trạng Thái",
     "statuses": {
       "completed": "Đã Giao",
+      "draft": "Nháp",
       "inTransit": "Đang Giao",
       "pending": "Đang Chờ"
     },
@@ -510,7 +516,7 @@
     "category": "Danh Mục",
     "city": "Thành Phố",
     "cityPlaceholder": "Nhập tên thành phố",
-    "communicationLog": "Nhật Ký Liên Lạc",
+    "communicationLog": "Liên Lạc",
     "communicationLogComingSoon": "Lịch sử liên lạc sẽ được hiển thị ở đây",
     "completed": "Hoàn Thành",
     "completedDate": "Ngày Hoàn Thành",

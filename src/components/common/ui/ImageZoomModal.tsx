@@ -1,7 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { ActionIcon, Group, Image, Modal, Stack } from '@mantine/core';
-import { IconArrowDown, IconArrowLeft, IconArrowRight, IconArrowUp, IconMinus, IconPlus, IconRotateClockwise } from '@tabler/icons-react';
+import {
+  IconArrowDown,
+  IconArrowLeft,
+  IconArrowRight,
+  IconArrowUp,
+  IconMinus,
+  IconPlus,
+  IconRotateClockwise,
+} from '@tabler/icons-react';
+
 import { useDeviceType } from '@/hooks/useDeviceType';
 
 type ImageZoomModalProps = {
@@ -195,7 +204,6 @@ export function ImageZoomModal({ opened, onClose, imageUrl, imageAlt }: ImageZoo
 
       {isMobile && (
         <>
-
           {/* Pan controls - only show when zoomed */}
           {scale > 1 && (
             <Stack
