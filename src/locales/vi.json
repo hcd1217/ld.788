@@ -37,6 +37,7 @@
     "typeMessage": "Nhập tin nhắn..."
   },
   "common": {
+    "noPermission": "-",
     "actions": "",
     "activate": "Kích Hoạt",
     "activated": "Đã Kích Hoạt {{entity}}",
@@ -461,6 +462,41 @@
     "backToPreviousPage": "Quay lại trang trước",
     "notFound": "Không tìm thấy thông tin được yêu cầu.",
     "notFoundDescription": "Thông tin bạn đang tìm kiếm không tồn tại."
+  },
+  "home": {
+    "delivery": {
+      "columns": {
+        "customer": "Khách Hàng",
+        "drNumber": "Mã Yêu Cầu",
+        "scheduled": "Giờ Hẹn",
+        "status": "Trạng Thái"
+      },
+      "sectionTitle": "Lịch Trình Hôm Nay"
+    },
+    "sales": {
+      "columns": {
+        "customer": "Khách Hàng",
+        "orderDate": "Ngày Đặt Hàng",
+        "poNumber": "Mã Đơn Hàng",
+        "status": "Trạng Thái"
+      },
+      "sectionTitle": "Đơn Hàng Đang Xử Lý"
+    },
+    "title": "Trang Chủ",
+    "warehouse": {
+      "actions": {
+        "continue": "Tiếp Tục Xử Lý",
+        "readyForShip": "Sẵn Sàng Giao Hàng",
+        "startProcessing": "Bắt Đầu Xử Lý"
+      },
+      "columns": {
+        "action": "Hành Động Tiếp Theo",
+        "customer": "Khách Hàng",
+        "poNumber": "Mã Đơn Hàng",
+        "status": "Trạng Thái"
+      },
+      "sectionTitle": "Hàng Đợi Xử Lý"
+    }
   },
   "mobileOnly": {
     "description": "Tính năng này được tối ưu cho thiết bị di động. Vui lòng truy cập từ điện thoại thông minh hoặc máy tính bảng để có trải nghiệm tốt nhất.",

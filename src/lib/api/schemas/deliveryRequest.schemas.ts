@@ -72,7 +72,6 @@ export const UpdateDeliveryRequestSchema = z.object({
   type: DeliveryRequestTypeSchema,
   vendorName: optionalStringSchema,
   receiveAddress: AddressSchema.optional(),
-  deliveryAddress: AddressSchema.optional(),
   isUrgentDelivery: optionalBooleanSchema,
 });
 

@@ -200,7 +200,6 @@ export function DeliveryDetailPage() {
         isUrgentDelivery: data?.isUrgentDelivery,
         vendorName: data?.vendorName,
         receiveAddress: data?.receiveAddress,
-        deliveryAddress: data?.deliveryAddress,
       });
       closeModal('update');
     },

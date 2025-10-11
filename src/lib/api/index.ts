@@ -4,6 +4,7 @@ import { ClientApi } from './services/client.service';
 import { DeliveryRequestApi } from './services/deliveryRequest.service';
 import { HrApi } from './services/hr.service';
 import { MediaApi } from './services/media.service';
+import { NktuOverviewApi } from './services/nktuOverview.service';
 import { OverviewApi } from './services/overview.service';
 import { SalesApi } from './services/sales.service';
 import { UserApi } from './services/user.service';
@@ -48,6 +49,10 @@ export const chatApi = new ChatApi({
   baseURL: API_BASE_URL,
 });
 
+export const nktuOverviewApi = new NktuOverviewApi({
+  baseURL: API_BASE_URL,
+});
+
 // Export types and schemas
 export * from './schemas';
 
@@ -61,5 +66,6 @@ export { OverviewApi } from './services/overview.service';
 export { DeliveryRequestApi } from './services/deliveryRequest.service';
 export { MediaApi } from './services/media.service';
 export { ChatApi } from './services/chat.service';
+export { NktuOverviewApi } from './services/nktuOverview.service';
 
 export { ApiError } from './base';

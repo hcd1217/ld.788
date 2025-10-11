@@ -1,15 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import {
-  ActionIcon,
-  Box,
-  Group,
-  Paper,
-  ScrollArea,
-  Stack,
-  Text,
-  Textarea,
-} from '@mantine/core';
+import { ActionIcon, Box, Group, Paper, ScrollArea, Stack, Text, Textarea } from '@mantine/core';
 import { IconSend } from '@tabler/icons-react';
 
 import { useTranslation } from '@/hooks/useTranslation';
@@ -34,23 +25,26 @@ export function ChatPanel({ targetId, type }: ChatPanelProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
 
   // Load chat history
-  const loadChatHistory = useCallback(async (showLoading = true) => {
-    try {
-      if (showLoading) {
-        setIsLoading(true);
+  const loadChatHistory = useCallback(
+    async (showLoading = true) => {
+      try {
+        if (showLoading) {
+          setIsLoading(true);
+        }
+        const messages = await chatService.getChatHistory({ type, targetId });
+        setMessages(messages);
+      } catch (error) {
+        if (isDevelopment) {
+          console.error('Failed to load chat history:', error);
+        }
+      } finally {
+        if (showLoading) {
+          setIsLoading(false);
+        }
       }
-      const messages = await chatService.getChatHistory({ type, targetId });
-      setMessages(messages);
-    } catch (error) {
-      if (isDevelopment) {
-        console.error('Failed to load chat history:', error);
-      }
-    } finally {
-      if (showLoading) {
-        setIsLoading(false);
-      }
-    }
-  }, [type, targetId]);
+    },
+    [type, targetId],
+  );
 
   // Load chat on mount and setup auto-refresh
   useEffect(() => {
@@ -164,7 +158,12 @@ export function ChatPanel({ targetId, type }: ChatPanelProps) {
                       justify={isOwnMessage ? 'flex-end' : 'flex-start'}
                     >
                       <Stack gap={4} style={{ maxWidth: '65%' }}>
-                        <Text size="xs" fw={600} c={isOwnMessage ? 'blue' : 'dark'} ta={isOwnMessage ? 'right' : 'left'}>
+                        <Text
+                          size="xs"
+                          fw={600}
+                          c={isOwnMessage ? 'blue' : 'dark'}
+                          ta={isOwnMessage ? 'right' : 'left'}
+                        >
                           {senderName}
                         </Text>
                         <Paper

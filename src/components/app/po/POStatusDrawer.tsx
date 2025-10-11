@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Button, Checkbox, Group, ScrollArea, Stack } from '@mantine/core';
+import { Button, Checkbox, Group, Stack } from '@mantine/core';
 
 import { Drawer } from '@/components/common';
 import { PO_STATUS, type POStatusType } from '@/constants/purchaseOrder';
@@ -40,6 +40,7 @@ export function POStatusDrawer({
       { value: PO_STATUS.NEW, label: t('po.status.NEW') },
       { value: PO_STATUS.CONFIRMED, label: t('po.status.CONFIRMED') },
       { value: PO_STATUS.PROCESSING, label: t('po.status.PROCESSING') },
+      { value: PO_STATUS.READY_FOR_PICKUP, label: t('po.status.READY_FOR_PICKUP') },
       { value: PO_STATUS.SHIPPED, label: t('po.status.SHIPPED') },
       { value: PO_STATUS.DELIVERED, label: t('po.status.DELIVERED') },
       { value: PO_STATUS.CANCELLED, label: t('po.status.CANCELLED') },
@@ -100,7 +101,7 @@ export function POStatusDrawer({
   return (
     <Drawer
       opened={opened}
-      size="40vh"
+      expanded
       position="bottom"
       title={
         selectedCount > 0 ? `${t('po.selectStatus')} (${selectedCount})` : t('po.selectStatus')
@@ -108,32 +109,28 @@ export function POStatusDrawer({
       onClose={onClose}
     >
       <Stack gap="md" h="100%">
-        <ScrollArea h="calc(100% - 60px)" offsetScrollbars>
-          <Stack gap="md">
-            {/* All option */}
-            <Checkbox
-              label={t('common.filters.allStatus')}
-              checked={isAllSelected}
-              onChange={() => handleAllToggle()}
-            />
+        <Stack gap="md">
+          {/* All option */}
+          <Checkbox
+            label={t('common.filters.allStatus')}
+            checked={isAllSelected}
+            onChange={() => handleAllToggle()}
+          />
 
-            {/* Individual status options */}
-            <Stack gap="xs" pl="md">
-              {statusOptions.map((option) => (
-                <Checkbox
-                  key={option.value}
-                  label={option.label}
-                  checked={localStatuses.includes(option.value)}
-                  disabled={isAllSelected}
-                  onChange={() => handleStatusToggle(option.value)}
-                />
-              ))}
-            </Stack>
+          {/* Individual status options */}
+          <Stack gap="xs" pl="md">
+            {statusOptions.map((option) => (
+              <Checkbox
+                key={option.value}
+                label={option.label}
+                checked={localStatuses.includes(option.value)}
+                disabled={isAllSelected}
+                onChange={() => handleStatusToggle(option.value)}
+              />
+            ))}
           </Stack>
-        </ScrollArea>
-
-        {/* Action buttons - fixed at bottom */}
-        <Group grow>
+        </Stack>
+        <Group grow mt="xl">
           <Button variant="light" onClick={handleClear}>
             {t('common.clear')}
           </Button>

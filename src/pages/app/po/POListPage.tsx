@@ -7,6 +7,7 @@ import {
   Affix,
   Button,
   Center,
+  Container,
   Flex,
   Group,
   Loader,
@@ -411,7 +412,8 @@ export function POListPage() {
       clearError={clearError}
     >
       <POErrorBoundary componentName="POListPage">
-        <Group justify="space-between" mb="lg">
+        <Container fluid px="xl">
+          <Group justify="space-between" mb="lg">
           <AppPageTitle title={t('po.title')} />
           <Group gap="sm">
             <SwitchView viewMode={viewMode} setViewMode={setViewMode} />
@@ -553,6 +555,7 @@ export function POListPage() {
           onSubmit={createBulkDeliveryAction.trigger}
           isLoading={createBulkDeliveryAction.isMutating}
         />
+        </Container>
       </POErrorBoundary>
     </AppDesktopLayout>
   );

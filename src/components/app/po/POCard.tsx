@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import { useNavigate } from 'react-router';
 
-import { Box, Card, Group, type MantineStyleProp, Text } from '@mantine/core';
+import { Badge, Box, Card, Group, type MantineStyleProp, Text } from '@mantine/core';
 
 import { getPODetailRoute } from '@/config/routeConfig';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -94,12 +94,74 @@ export function POCard({ purchaseOrder, style, className }: POCardProps) {
             </Text>
           </Group>
 
+          {purchaseOrder.deliveryDate && (
+            <Group gap="lg">
+              <Text size="xs" c="dimmed">
+                {t('po.deliveryDate')}:
+              </Text>
+              <Text size="xs" fw={500}>
+                {formatDate(purchaseOrder.deliveryDate)}
+              </Text>
+            </Group>
+          )}
+
+          {purchaseOrder.completedDate && (
+            <Group gap="lg">
+              <Text size="xs" c="dimmed">
+                {t('po.completedDate')}:
+              </Text>
+              <Text size="xs" fw={500}>
+                {formatDate(purchaseOrder.completedDate)}
+              </Text>
+            </Group>
+          )}
+
+          <Group gap="xs">
+            <Badge size="sm" variant="light" color="gray">
+              {purchaseOrder.items.length} {t('po.itemsCount')}
+            </Badge>
+          </Group>
+
+          {purchaseOrder.deliveryRequest && (
+            <>
+              <Group gap="lg">
+                <Text size="xs" c="dimmed">
+                  {t('delivery.scheduledDate')}:
+                </Text>
+                <Text size="xs" fw={500}>
+                  {formatDate(purchaseOrder.deliveryRequest.scheduledDate)}
+                </Text>
+              </Group>
+
+              {purchaseOrder.deliveryRequest.deliveryPerson && (
+                <Group gap="lg">
+                  <Text size="xs" c="dimmed">
+                    {t('delivery.assignedTo')}:
+                  </Text>
+                  <Text size="xs" fw={500}>
+                    {purchaseOrder.deliveryRequest.deliveryPerson}
+                  </Text>
+                </Group>
+              )}
+            </>
+          )}
+
           <POTags tags={purchaseOrder.poTags} />
         </Box>
-        <Group gap="xs">
+        <Group gap="xs" wrap="wrap" justify="flex-end">
           <POUrgentBadge isUrgentPO={purchaseOrder.isUrgentPO} />
           <POStatusBadge status={purchaseOrder.status} />
           <PODeliveryBadge isInternalDelivery={purchaseOrder.isInternalDelivery} />
+          {purchaseOrder.salesPerson && (
+            <Badge size="sm" variant="light" color="blue">
+              {purchaseOrder.salesPerson}
+            </Badge>
+          )}
+          {purchaseOrder.deliveryRequest?.deliveryPerson && (
+            <Badge size="sm" variant="light" color="green">
+              {purchaseOrder.deliveryRequest.deliveryPerson}
+            </Badge>
+          )}
         </Group>
       </Group>
     </Card>

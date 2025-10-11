@@ -37,6 +37,7 @@
     "typeMessage": "Type a message..."
   },
   "common": {
+    "noPermission": "You don't have permission to view this page / section",
     "actions": "Actions",
     "activate": "Activate",
     "activated": "{{entity}} Activated",
@@ -461,6 +462,41 @@
     "backToPreviousPage": "Back to previous page",
     "notFound": "The requested resource was not found.",
     "notFoundDescription": "The page you are looking for does not exist."
+  },
+  "home": {
+    "delivery": {
+      "columns": {
+        "customer": "Customer",
+        "drNumber": "DR Number",
+        "scheduled": "Scheduled Time",
+        "status": "Status"
+      },
+      "sectionTitle": "Delivery - Today's Schedule"
+    },
+    "sales": {
+      "columns": {
+        "customer": "Customer",
+        "orderDate": "Order Date",
+        "poNumber": "PO Number",
+        "status": "Status"
+      },
+      "sectionTitle": "Sales - Active Orders"
+    },
+    "title": "Dashboard",
+    "warehouse": {
+      "actions": {
+        "continue": "Continue Processing",
+        "readyForShip": "Ready for Shipment",
+        "startProcessing": "Start Processing"
+      },
+      "columns": {
+        "action": "Next Action",
+        "customer": "Customer",
+        "poNumber": "PO Number",
+        "status": "Status"
+      },
+      "sectionTitle": "Warehouse - Processing Queue"
+    }
   },
   "mobileOnly": {
     "description": "This feature is optimized for mobile devices. Please access it from your smartphone or tablet for the best experience.",

@@ -58,6 +58,16 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
             </Text>
             <DeliveryTypeBadge type={deliveryRequest.type} />
           </Group>
+          {deliveryRequest.purchaseOrderNumber && (
+            <Group gap="sm">
+              <Text size="sm" c="dimmed">
+                {t('po.poNumber')}:
+              </Text>
+              <Text size="sm" fw={500}>
+                {deliveryRequest.purchaseOrderNumber}
+              </Text>
+            </Group>
+          )}
           {deliveryRequest.isDelivery ? (
             <Group gap="sm">
               <Text size="sm" c="dimmed">
@@ -109,7 +119,7 @@ export function DeliveryCard({ deliveryRequest, style, className }: DeliveryCard
         </Box>
 
         <div style={{ position: 'absolute', top: 0, right: 0 }}>
-          <Group gap="xs">
+          <Group gap="xs" wrap="wrap" justify="flex-end">
             {deliveryRequest.isUrgentDelivery && <UrgentBadge size="xs" />}
             <DeliveryStatusBadge status={deliveryRequest.status} />
           </Group>

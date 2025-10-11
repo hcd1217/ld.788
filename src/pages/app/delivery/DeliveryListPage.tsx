@@ -7,6 +7,7 @@ import {
   Affix,
   Button,
   Center,
+  Container,
   Flex,
   Group,
   Loader,
@@ -416,7 +417,8 @@ export function DeliveryListPage() {
       clearError={clearError}
     >
       <DeliveryErrorBoundary componentName="DeliveryListPage">
-        <Group justify="space-between" mb="lg">
+        <Container fluid px="xl">
+          <Group justify="space-between" mb="lg">
           <AppPageTitle title={t('delivery.title')} />
           <Group gap="sm">
             <Button
@@ -515,6 +517,7 @@ export function DeliveryListPage() {
           onConfirm={createReceiveRequestAction.trigger}
           isLoading={createReceiveRequestAction.isMutating}
         />
+        </Container>
       </DeliveryErrorBoundary>
     </AppDesktopLayout>
   );

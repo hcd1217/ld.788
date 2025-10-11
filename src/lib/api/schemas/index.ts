@@ -21,3 +21,6 @@ export * from './sales.schemas';
 
 // Overview schemas
 export * from './overview.schemas';
+
+// NKTU custom schemas
+export * from './nktuOverview.schemas';
